@@ -55,3 +55,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# PyCharm project files
+.idea/
+
+# MPF
+_cache
+*.p
