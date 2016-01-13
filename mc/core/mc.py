@@ -1,3 +1,7 @@
+"""Contains the MpfMc base class, which is the main App instance for the
+mpf-mc.
+
+"""
 import queue
 import time
 
@@ -6,11 +10,10 @@ from kivy.clock import Clock
 from kivy.logger import Logger
 from mc.core.bcp_processor import BcpProcessor
 from mc.core.keyboard import Keyboard
-from mc.core.kivy_config_processor import McConfig
+from mc.core.config_processor import McConfig
 from mc.core.mode_controller import ModeController
 from mc.core.screen_player import ScreenPlayer
 from mc.core.widget_player import WidgetPlayer
-from mc.uix.display import MpfDisplay
 from mc.uix.screen import Screen
 from mpf.system.config import CaseInsensitiveDict
 from mpf.system.events import EventManager
@@ -60,8 +63,6 @@ class MpfMc(App):
         if 'keyboard' in self.machine_config:
             self.keyboard = Keyboard(self)
 
-        self.setup_displays()
-
         self.events.post("init_phase_1")
         self.events._process_event_queue()
         self.events.post("init_phase_2")
@@ -88,31 +89,6 @@ class MpfMc(App):
     def get_config(self):
         return self.machine_config
 
-    def setup_displays(self):
-        # parse the displays: section of the config and create the displays
-
-        if 'displays' not in self.machine_config:
-            return
-
-        # config validate the displays: section
-        for display in self.machine_config['displays']:
-            self.machine_config['displays'][display] = (
-                self.config_processor.process_config2(
-                        'displays', self.machine_config['displays'][display],
-                        'displays'))
-
-        for k, v in self.machine_config['displays'].items():
-            self.create_display(width=v['width'],
-                                height=v['height'],
-                                name=k,
-                                bpp=v['bits_per_pixel'])
-
-        self.default_display = self.displays['window']
-
-    def create_display(self, width, height, name, bpp=24, **kwargs):
-        self.displays[name] = MpfDisplay(mc=self, width=width, height=height,
-                                         bpp=bpp)
-
     def display_created(self, *args, **kwargs):
         self.show_boot_screen()
 
@@ -126,7 +102,7 @@ class MpfMc(App):
 
     def show_boot_screen(self):
         if 'screens' in self.machine_config and 'boot' in self.machine_config[
-                'screens']:
+            'screens']:
             Screen(name='boot',
                    screen_manager=self.default_display.screen_manager,
                    config=self.machine_config['screens']['boot'])
@@ -135,7 +111,7 @@ class MpfMc(App):
 
     def on_stop(self):
         print("loop rate {}Hz".format(
-            round(self.ticks / (time.time() - self.start_time), 2)))
+                round(self.ticks / (time.time() - self.start_time), 2)))
         print("stopping...")
         self.bcp_processor.socket_thread.stop()
 

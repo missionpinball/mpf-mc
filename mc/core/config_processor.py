@@ -7,6 +7,8 @@ from kivy.graphics import (Rectangle, Triangle, Quad, Point, Mesh, Line,
 from kivy.logger import Logger
 from kivy.uix.video import Video
 from kivy.utils import get_color_from_hex
+
+from mc.uix.display import MpfDisplay
 from mc.widgets.image import Image
 from mc.widgets.text import Text
 from mpf.system.config import CaseInsensitiveDict, Config as MpfConfig
@@ -31,32 +33,53 @@ class McConfig(MpfConfig):
         self.system_config = self.mc.machine_config['mpf-mc']
         self.log = Logger
 
-        self.sections = dict(screens=self.process_screens,
-                             widgets=self.process_widgets)
+        self.machine_sections = dict(screens=self.process_screens,
+                                     widgets=self.process_widgets,
+                                     displays=self.process_displays)
+
+        self.mode_sections = dict(screens=self.process_screens,
+                                  widgets=self.process_widgets)
 
         # process mode-based and machine-wide configs
         self.register_load_methods()
-        self.process_config_file(config=self.mc.machine_config)
+        self.process_config_file(section_dict=self.machine_sections,
+                                 config=self.mc.machine_config)
 
     def register_load_methods(self):
-        for section in self.sections:
+        for section in self.mode_sections:
             self.mc.mode_controller.register_load_method(
                     load_method=self.process_mode_config,
                     config_section_name=section, section=section)
 
-    def process_config_file(self, config):
-        for section in self.sections:
-            try:
+    def process_config_file(self, section_dict, config):
+        for section in section_dict:
+            if section in section_dict and section in config:
                 self.process_localized_config_section(config=config[section],
                                                       section=section)
-            except KeyError:
-                pass
 
     def process_mode_config(self, config, mode_path, section):
         self.process_localized_config_section(config, section)
 
     def process_localized_config_section(self, config, section):
-        config = self.sections[section](config)
+        try:
+            config = self.machine_sections[section](config)
+        except KeyError:
+            config = self.mode_sections[section](config)
+
+    def process_displays(self, config):
+        # config is localized to 'displays' section
+        for display, settings in config.items():
+            self.mc.displays[display] = self.create_display(settings)
+
+    def create_display(self, config):
+        # config is localized display settings
+        config = self.process_config2('displays', config)
+
+        display = MpfDisplay(self.mc, **config)
+        if config['default']:
+            self.mc.default_display = display
+
+        return display
 
     def process_screens(self, config):
         # config is localized to 'screens' section
