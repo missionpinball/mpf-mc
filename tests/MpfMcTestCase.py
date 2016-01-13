@@ -63,9 +63,10 @@ class MpfMcTestCase(unittest.TestCase):
         print('flip', self.mc.default_display.size)
 
     def tearDown(self):
+        from kivy.base import stopTouchApp
         from kivy.core.window import Window
         Window.unbind(on_flip=self.on_window_flip)
-        self.mc.stop()
+        stopTouchApp()
 
     def run(self, name):
         self._test_name = name
