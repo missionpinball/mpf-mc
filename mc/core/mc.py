@@ -50,10 +50,14 @@ class MpfMc(App):
         self.ticks = 0
         self.start_time = 0
         self.crash_queue = None
+        self.init_done = False
 
-        self.bcp_processor = BcpProcessor(self)
+        # self.bcp_processor = BcpProcessor(self)
 
-        self.icon = self.machine_config['window']['icon']
+        try:
+            self.icon = self.machine_config['window']['icon']
+        except KeyError:
+            self.icon = 'mc/icons/256x256.png'
 
         try:
             self.title = self.machine_config['window']['title']
@@ -91,6 +95,7 @@ class MpfMc(App):
 
     def display_created(self, *args, **kwargs):
         self.show_boot_screen()
+        self.init_done = True
 
     def build(self):
         self.start_time = time.time()
@@ -113,7 +118,7 @@ class MpfMc(App):
         print("loop rate {}Hz".format(
                 round(self.ticks / (time.time() - self.start_time), 2)))
         print("stopping...")
-        self.bcp_processor.socket_thread.stop()
+        # self.bcp_processor.socket_thread.stop()
 
     def reset(self, **kwargs):
         self.player = None

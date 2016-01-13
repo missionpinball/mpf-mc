@@ -1,8 +1,8 @@
 
-from .MpfMcTestCase import KmcTestCase
+from .MpfMcTestCase import MpfMcTestCase
 
 
-class TestKmc(KmcTestCase):
+class TestKmc(MpfMcTestCase):
 
     def test_mc_start(self):
         from kivy.core.window import Window
