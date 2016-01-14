@@ -19,8 +19,8 @@ the core MPF engine, or it can be a separate machine.
 
 More details about MPF are here : https://missionpinball.com/mpf/
 
-[![Coverage Status](https://coveralls.io/repos/missionpinball/mpf-mc/badge.svg?branch=dev&service=github)](https://coveralls.io/github/missionpinball/mpf?branch=dev)
-[![Build Status](https://travis-ci.org/missionpinball/mpf-mc.svg?branch=dev)](https://travis-ci.org/missionpinball/mpf)
+[![Coverage Status](https://coveralls.io/repos/missionpinball/mpf-mc/badge.svg?branch=dev&service=github)](https://coveralls.io/github/missionpinball/mpf-mc?branch=dev)
+[![Build Status](https://travis-ci.org/missionpinball/mpf-mc.svg?branch=dev)](https://travis-ci.org/missionpinball/mpf-mc)
 
 Installation, Documentation, and Examples
 -----------------------------------------
