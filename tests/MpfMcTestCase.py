@@ -19,8 +19,6 @@ class TestMpfMc(MpfMc):
 
 
 class MpfMcTestCase(unittest.TestCase):
-    mc = None
-
     def get_options(self):
 
         return dict(machine_path=self.get_machine_path(),

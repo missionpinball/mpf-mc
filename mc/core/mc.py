@@ -41,7 +41,7 @@ class MpfMc(App):
 
         self.events = EventManager(self, setup_event_player=False)
         self.mode_controller = ModeController(self)
-        McConfig.load_config_spec('../mpf/mpf/config_validator.yaml')
+        McConfig.load_config_spec()
         self.config_processor = McConfig(self)
         self.screen_player = ScreenPlayer(self)
         self.widget_player = WidgetPlayer(self)
