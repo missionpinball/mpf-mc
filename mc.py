@@ -1,12 +1,11 @@
 """Starts the MPF media controller."""
 
 import argparse
-from datetime import datetime
-import errno
 import logging
 import os
 import socket
 import sys
+from datetime import datetime
 
 sys.path.insert(0, '../mpf')  # temp until we get a proper install for mpf
 
@@ -15,6 +14,7 @@ from mpf.system.config import Config as MpfConfig
 from kivy.config import Config
 from kivy.logger import Logger
 import version
+from mc.core.mc import MpfMc
 
 parser = argparse.ArgumentParser(description='Starts the MPF Media Controller')
 
@@ -24,38 +24,43 @@ parser.add_argument("-l",
                     action="store", dest="logfile",
                     metavar='file_name',
                     default=os.path.join("logs", datetime.now().strftime(
-                    "%Y-%m-%d-%H-%M-%S-mc-" + socket.gethostname() + ".log")),
+                            "%Y-%m-%d-%H-%M-%S-mc-" + socket.gethostname() +
+                            ".log")),
                     help="The name (and path) of the log file")
 
 parser.add_argument("-c",
                     action="store", dest="configfile",
                     default="config", metavar='config_file(s)',
                     help="The name of a config file to load. Default is "
-                    "config.yaml. Multiple files can be used via a comma-"
-                    "separated list (no spaces between)")
+                         "config.yaml. Multiple files can be used via a comma-"
+                         "separated list (no spaces between)")
 
 parser.add_argument("-v",
                     action="store_const", dest="loglevel", const=logging.DEBUG,
                     default=logging.INFO, help="Enables verbose logging to the"
-                    " log file")
+                                               " log file")
 
 parser.add_argument("-V",
                     action="store_true", dest="consoleloglevel",
                     default=logging.INFO,
                     help="Enables verbose logging to the console. Do NOT on "
-                    "Windows platforms")
+                         "Windows platforms")
 
 parser.add_argument("-C",
                     action="store", dest="mcconfigfile",
                     default=os.path.join("mc", "mcconfig.yaml"),
                     metavar='config_file',
                     help="The MPF framework default config file. Default is "
-                    "mc/mcconfig.yaml")
+                         "mc/mcconfig.yaml")
 
 parser.add_argument("--version",
                     action="version", version=version.version_str,
                     help="Displays the MPF, config file, and BCP version info "
                          "and exits")
+
+parser.add_argument("-b",
+                    action="store_false", dest="bcp", default=True,
+                    help="Do not set up the BCP server threads")
 
 # The following are just included for full compatibility with mpf.py which is
 # needed when launching from a batch file or shell script.
@@ -67,12 +72,9 @@ parser.add_argument("-X",
                     action="store_const", dest="force_platform",
                     const='smart_virtual', help=argparse.SUPPRESS)
 
-parser.add_argument("-b",
-                    action="store_false", dest="bcp", default=True,
-                    help=argparse.SUPPRESS)
-
 args = parser.parse_args()
 args.configfile = Util.string_to_list(args.configfile)
+
 
 # Configure logging. Creates a logfile and logs to the console.
 # Formatting options are documented here:
@@ -85,7 +87,8 @@ args.configfile = Util.string_to_list(args.configfile)
 #         raise
 #
 # logging.basicConfig(level=args.loglevel,
-#                     format='%(asctime)s : %(levelname)s : %(name)s : %(message)s',
+#                     format='%(asctime)s : %(levelname)s : %(name)s : %(
+# message)s',
 #                     filename=args.logfile,
 #                     filemode='w')
 #
@@ -103,7 +106,6 @@ args.configfile = Util.string_to_list(args.configfile)
 # logging.getLogger('').addHandler(console)
 
 def preprocess_config(config):
-
     kivy_config = config['kivy_config']
 
     try:
@@ -127,18 +129,21 @@ def preprocess_config(config):
             except KeyError:
                 continue
 
+
 mpf_config = MpfConfig.load_config_file(args.mcconfigfile)
 machine_path = MpfConfig.set_machine_path(args.machine_path,
-                mpf_config['mpf-mc']['paths']['machine_files'])
+                                          mpf_config['mpf-mc']['paths'][
+                                              'machine_files'])
 
 mpf_config = MpfConfig.load_machine_config(args.configfile, machine_path,
-                mpf_config['mpf-mc']['paths']['config'], mpf_config)
+                                           mpf_config['mpf-mc']['paths'][
+                                               'config'], mpf_config)
 
 preprocess_config(mpf_config)
 
-def main():
 
-    from mc.core.mc import MpfMc
+def main():
+    # from mc.core.mc import MpfMc
 
     try:
         MpfMc(options=vars(args), config=mpf_config,
@@ -148,6 +153,7 @@ def main():
         Logger.exception(e)
 
     sys.exit()
+
 
 if __name__ == '__main__':
     main()

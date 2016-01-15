@@ -52,7 +52,7 @@ class MpfMc(App):
         self.crash_queue = None
         self.init_done = False
 
-        # self.bcp_processor = BcpProcessor(self)
+        self.bcp_processor = BcpProcessor(self)
 
         try:
             self.icon = self.machine_config['window']['icon']
@@ -112,7 +112,10 @@ class MpfMc(App):
         print("loop rate {}Hz".format(
                 round(self.ticks / (time.time() - self.start_time), 2)))
         print("stopping...")
-        # self.bcp_processor.socket_thread.stop()
+        try:
+            self.bcp_processor.socket_thread.stop()
+        except AttributeError:  # if we're running without BCP processor
+            pass
 
     def reset(self, **kwargs):
         self.player = None

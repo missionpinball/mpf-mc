@@ -16,7 +16,12 @@ class BcpProcessor(object):
         self.receive_queue = queue.Queue()
         self.sending_queue = queue.Queue()
 
-        self.start_socket_thread()
+        if self.mc.options['bcp']:
+            self._start_socket_thread()
+            self.enabled = True
+        else:
+            print('Will NOT setup BCP server')
+            self.enabled = False
 
         self.bcp_commands = {'ball_start': self._bcp_ball_start,
                              'ball_end': self._bcp_ball_end,
@@ -40,9 +45,9 @@ class BcpProcessor(object):
                              'trigger': self._bcp_trigger,
                             }
 
-        Clock.schedule_interval(self.get_from_queue, 0)
+        Clock.schedule_interval(self._get_from_queue, 0)
 
-    def start_socket_thread(self):
+    def _start_socket_thread(self):
         self.socket_thread = BCPServer(self, self.receive_queue,
                                        self.sending_queue)
         self.socket_thread.daemon = True
@@ -50,6 +55,9 @@ class BcpProcessor(object):
 
     def send(self, bcp_command, callback=None, **kwargs):
         """Sends a BCP command to the connected pinball controller.
+
+        Note that if the BCP server is not running, this method will just throw
+        the BCP away. (It will still call the callback in that case.
 
         Args:
             bcp_command: String of the BCP command name.
@@ -59,20 +67,33 @@ class BcpProcessor(object):
                 command string.
 
         """
-        self.sending_queue.put(bcp.encode_command_string(bcp_command,
-                                                         **kwargs))
+        if self.enabled:
+            self.sending_queue.put(bcp.encode_command_string(bcp_command,
+                                                             **kwargs))
         if callback:
             callback()
 
-    def get_from_queue(self, dt):
+    def receive_bcp_message(self, msg):
+        """Receives an incoming BCP message to be processed.
+
+        Note this message is intended for testing. Usually BCP messages are
+        handled by the BCP Server thread, but for test purposes it's possible
+        to run mpf-mc without the BCP Server, so in that case you can use this
+        method to send BCP messages into the mpf-mc.
+
+        Args:
+            msg: A string of the BCP message (in the standard BCP format:
+                command?param1=value1&param2=value2...
+
+        """
+        cmd, kwargs = bcp.decode_command_string(msg)
+        self.receive_queue.put((cmd, kwargs))
+
+    def _get_from_queue(self, dt):
         """Gets and processes all queued up incoming BCP commands."""
         while not self.receive_queue.empty():
             cmd, kwargs = self.receive_queue.get(False)
             self._process_command(cmd, **kwargs)
-
-            # self.screen1.canvas.clear()
-            # with self.screen1.canvas:
-            #     Label(text='{} {}'.format(cmd, kwargs), pos=(400, 100))
 
     def _process_command(self, bcp_command, **kwargs):
         Logger.debug("Processing command: %s %s", bcp_command, kwargs)

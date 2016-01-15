@@ -34,10 +34,10 @@ class BCPServer(threading.Thread):
         self.done = False
 
         self.setup_server_socket()
-
         self.sending_thread = threading.Thread(target=self.sending_loop)
         self.sending_thread.daemon = True
         self.sending_thread.start()
+
 
     def setup_server_socket(self, interface='localhost', port=5050):
         """Sets up the socket listener.
