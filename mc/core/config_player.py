@@ -8,6 +8,12 @@ class EventPlayer(object):
     def __init__(self, mc):
         self.mc = mc
 
+        try:
+            self.process_config(
+                    self.mc.machine_config[self.config_file_section])
+        except KeyError:
+            pass
+
         self.mc.mode_controller.register_start_method(self.process_config,
                                                       self.config_file_section)
 
@@ -20,6 +26,7 @@ class EventPlayer(object):
                     self.play,
                     mode=mode,
                     settings=settings))
+            print('adding handler', event, self.play)
 
         return self.unload_player_events, key_list
 

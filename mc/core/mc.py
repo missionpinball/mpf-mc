@@ -64,8 +64,7 @@ class MpfMc(App):
         except KeyError:
             self.title = "Mission Pinball Framework"
 
-        if 'keyboard' in self.machine_config:
-            self.keyboard = Keyboard(self)
+
 
         self.events.post("init_phase_1")
         self.events._process_event_queue()
@@ -99,6 +98,19 @@ class MpfMc(App):
     def displays_initialized(self, *args):
         print('displays initialized')
         self.init_done = True
+
+        from mc.uix.window import Window
+
+        try:
+            display = self.displays[self.machine_config['window'][
+                'source_display']]
+        except KeyError:
+            display = self.default_display
+
+
+        Window.set_source_display(display)
+        if 'keyboard' in self.machine_config:
+            self.keyboard = Keyboard(self)
 
     def build(self):
         self.start_time = time.time()

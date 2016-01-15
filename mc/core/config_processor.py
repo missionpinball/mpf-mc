@@ -69,13 +69,13 @@ class McConfig(MpfConfig):
     def process_displays(self, config):
         # config is localized to 'displays' section
         for display, settings in config.items():
-            self.mc.displays[display] = self.create_display(settings)
+            self.mc.displays[display] = self.create_display(display, settings)
 
-    def create_display(self, config):
+    def create_display(self, name, config):
         # config is localized display settings
         config = self.process_config2('displays', config)
 
-        display = MpfDisplay(self.mc, **config)
+        display = MpfDisplay(self.mc, name, **config)
         if config['default']:
             self.mc.default_display = display
 

@@ -3,19 +3,14 @@ mpf-mc.
 
 """
 from kivy.clock import Clock
-from kivy.core.window import Window
+# from kivy.core.window import Window
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.scatter import ScatterPlane
 
 from mc.uix.screen import Screen
 from mc.uix.screen_manager import ScreenManager
 
-
-# TODO how does this display know it's in a window?
-
-
 class MpfDisplay(ScatterPlane, RelativeLayout):
-
     displays_to_initialize = 0
 
     @classmethod
@@ -26,9 +21,9 @@ class MpfDisplay(ScatterPlane, RelativeLayout):
         else:
             return False
 
-
-    def __init__(self, mc, **kwargs):
+    def __init__(self, mc, name, **kwargs):
         self.mc = mc
+        self.name = name
         MpfDisplay.displays_to_initialize += 1
 
         self.screen_manager = None
@@ -42,9 +37,9 @@ class MpfDisplay(ScatterPlane, RelativeLayout):
 
         Clock.schedule_once(self._display_created, 0)
 
-        Window.bind(system_size=self.on_window_resize)
+        # Window.bind(system_size=self.on_window_resize)
 
-        Clock.schedule_once(self.fit_to_window, -1)
+        # Clock.schedule_once(self.fit_to_window, -1)
 
     def _display_created(self, *args):
         # There's a race condition since mpf-mc will continue while the display
@@ -77,14 +72,17 @@ class MpfDisplay(ScatterPlane, RelativeLayout):
             Clock.schedule_once(self.mc.displays_initialized)
 
     def show_boot_screen(self, *args):
-        if 'screens' in self.mc.machine_config and 'boot' in \
-                self.mc.machine_config[
-            'screens']:
-            Screen(name='boot',
-                   screen_manager=self.screen_manager,
-                   config=self.mc.machine_config['screens']['boot'])
-
-            self.screen_manager.current = 'boot'
+        self.mc.events.post('display_{}_initialized'.format(self.name))
+        print('display_{}_initialized'.format(self.name))
+        # if 'screens' in self.mc.machine_config and 'boot' in \
+        #         self.mc.machine_config[
+        #             'screens']:
+        #     Screen(mc=self.mc,
+        #            name='boot',
+        #            screen_manager=self.screen_manager,
+        #            config=self.mc.machine_config['screens']['boot'])
+        #
+        #     self.screen_manager.current = 'boot'
 
     def _sort_children(self):
         pass
@@ -93,14 +91,19 @@ class MpfDisplay(ScatterPlane, RelativeLayout):
         self.fit_to_window()
 
     def fit_to_window(self, *args):
+
+        print('fit_to_window')
+
+        from kivy.core.window import Window
+
         self.scale = min(Window.width / self.native_size[0],
                          Window.height / self.native_size[1])
         self.pos = (0, 0)
         self.size = self.native_size
 
     def add_screen(self, name, config, priority=0):
-        Screen(mc = self.mc, name=name, screen_manager=self.screen_manager, \
-                                             config=config)
+        Screen(mc=self.mc, name=name, screen_manager=self.screen_manager,
+               config=config)
 
         if priority >= self.screen_manager.current_screen.priority:
             self.screen_manager.current = name

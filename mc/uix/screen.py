@@ -47,18 +47,6 @@ class Screen(KivyScreen):
                                                widget['y'], widget['h_pos'],
                                                widget['v_pos'])
 
-    # def on_size(self, screen, size):
-    #     for widget in self.walk():
-    #
-    #         try:
-    #             widget.pos = self.set_position(self, widget,
-    #                                            widget.config['x'],
-    #                                            widget.config['y'],
-    #                                            widget.config['h_pos'],
-    #                                            widget.config['v_pos'])
-    #         except AttributeError:
-    #             pass
-
     def set_position(self, screen, widget, x=None, y=None, h_pos=None,
                      v_pos=None):
         """Calculates the x,y position for the upper-left corner of this

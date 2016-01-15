@@ -5,6 +5,7 @@ sys.path.insert(0, '../mpf')  # temp until we get a proper install for mpf
 import unittest
 from kivy.clock import Clock
 from kivy.config import Config
+
 print(1111)
 from mpf.system.config import Config as MpfConfig
 from mpf.system.utility_functions import Util
@@ -24,7 +25,8 @@ class MpfMcTestCase(unittest.TestCase):
 
         return dict(machine_path=self.get_machine_path(),
                     mcconfigfile='mc/mcconfig.yaml',
-                    configfile=Util.string_to_list(self.get_config_file()))
+                    configfile=Util.string_to_list(self.get_config_file()),
+                    bcp=False)
 
     def get_machine_path(self):
         raise NotImplementedError
@@ -61,6 +63,10 @@ class MpfMcTestCase(unittest.TestCase):
     def on_window_flip(self, window):
         print('flip', self.mc.default_display.size)
 
+    def setUp(self):
+        # Most of the setup is done in run(). Explanation is there.
+        Config._named_configs.pop('app', None)
+
     def tearDown(self):
         from kivy.base import stopTouchApp
         from kivy.core.window import Window
@@ -68,9 +74,18 @@ class MpfMcTestCase(unittest.TestCase):
         stopTouchApp()
 
     def run(self, name):
+        # This setup is done in run() because we need to give control to the
+        # kivy event loop which we can only do by returning from the run()
+        # that's called. So we override run() and setup mpf-mc and then call
+        # our own run_test() on a callback. Then we can wait until the
+        # environment is setup (which can take a few frames), then we call
+        # super().run() to get the actual TestCase.run() method to run and
+        # we return the results.
 
-        Config._named_configs.pop('app', None)
-
+        # We have to do this in run() and not setUp() because run actually
+        # calls setUp(), so since we were overriding it ours doesn't call it
+        # so we just do our setup here since if we manually called setUp() then
+        # it would be called again when we call super().run().
         self._test_name = name
         mpf_config = MpfConfig.load_config_file(self.get_options()[
                                                     'mcconfigfile'])

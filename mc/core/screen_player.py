@@ -8,6 +8,20 @@ class ScreenPlayer(EventPlayer):
         if mode and not mode.active:
             return
 
-        self.mc.default_display.add_screen(settings['screen'],
-                                           mode.config['screens'][
-                                               settings['screen']])
+        print('PLAY', settings)
+
+        # TODO change to central screen repo
+
+        try:
+            display = self.mc.displays[settings['display']]
+        except KeyError:
+            display = self.mc.default_display
+
+        if mode:
+            display.add_screen(settings['screen'],
+                                               mode.config['screens'][
+                                                   settings['screen']])
+        else:
+            display.add_screen(settings['screen'],
+                                               self.mc.machine_config[
+                                                   'screens'][settings['screen']])
