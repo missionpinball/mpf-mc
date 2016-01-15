@@ -1,5 +1,5 @@
 #config_version=3
 displays:
   window:
-    width: 400
-    height: 300
+    width: 401
+    height: 301

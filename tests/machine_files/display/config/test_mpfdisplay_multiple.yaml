@@ -1,0 +1,27 @@
+#config_version=3
+displays:
+  window:
+    width: 401
+    height: 301
+  display2:
+    width: 402
+    height: 302
+    default: true
+
+screens:
+  screen1:
+    type: text
+    text: hello
+  screen2:
+    type: text
+    text: hello
+    display: display2
+  screen3:
+    type: text
+    text: hello
+  screen4:
+    type: text
+    text: hello
+  screen5:
+    type: text
+    text: hello

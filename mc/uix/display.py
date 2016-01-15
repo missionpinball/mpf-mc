@@ -6,6 +6,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.scatter import ScatterPlane
+
 from mc.uix.screen import Screen
 from mc.uix.screen_manager import ScreenManager
 
@@ -14,8 +15,22 @@ from mc.uix.screen_manager import ScreenManager
 
 
 class MpfDisplay(ScatterPlane, RelativeLayout):
+
+    displays_to_initialize = 0
+
+    @classmethod
+    def display_initialized(cls):
+        MpfDisplay.displays_to_initialize -= 1
+        if not MpfDisplay.displays_to_initialize:
+            return True
+        else:
+            return False
+
+
     def __init__(self, mc, **kwargs):
         self.mc = mc
+        MpfDisplay.displays_to_initialize += 1
+
         self.screen_manager = None
         self.native_size = ((kwargs['width'], kwargs['height']))
 
@@ -56,9 +71,20 @@ class MpfDisplay(ScatterPlane, RelativeLayout):
 
         self.add_widget(self.screen_manager)
 
-        # TODO send the name back too
+        Clock.schedule_once(self.show_boot_screen)
 
-        Clock.schedule_once(self.mc.display_created)
+        if MpfDisplay.display_initialized():
+            Clock.schedule_once(self.mc.displays_initialized)
+
+    def show_boot_screen(self, *args):
+        if 'screens' in self.mc.machine_config and 'boot' in \
+                self.mc.machine_config[
+            'screens']:
+            Screen(name='boot',
+                   screen_manager=self.screen_manager,
+                   config=self.mc.machine_config['screens']['boot'])
+
+            self.screen_manager.current = 'boot'
 
     def _sort_children(self):
         pass
@@ -73,7 +99,8 @@ class MpfDisplay(ScatterPlane, RelativeLayout):
         self.size = self.native_size
 
     def add_screen(self, name, config, priority=0):
-        Screen(name=name, screen_manager=self.screen_manager, config=config)
+        Screen(mc = self.mc, name=name, screen_manager=self.screen_manager, \
+                                             config=config)
 
         if priority >= self.screen_manager.current_screen.priority:
             self.screen_manager.current = name

@@ -1,0 +1,35 @@
+#config_version=3
+
+modes:
+ - mode1
+
+displays:
+  display1:
+    width: 401
+    height: 301
+  display2:
+    width: 402
+    height: 302
+    default: true
+
+
+screens:
+  screen1:
+  - type: text
+    text: text1
+  - type: text
+    text: text2
+  - type: text
+    text: text3
+  screen2:
+    type: text
+    text: text2
+  screen3:
+    type: text
+    text: text3
+  screen4:
+    type: text
+    text: text4
+  screen5:
+    type: text
+    text: text5

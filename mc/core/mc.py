@@ -95,6 +95,9 @@ class MpfMc(App):
 
     def display_created(self, *args, **kwargs):
         self.show_boot_screen()
+
+    def displays_initialized(self, *args):
+        print('displays initialized')
         self.init_done = True
 
     def build(self):
@@ -104,15 +107,6 @@ class MpfMc(App):
         Clock.schedule_interval(self.tick, 0)
 
         return self.default_display
-
-    def show_boot_screen(self):
-        if 'screens' in self.machine_config and 'boot' in self.machine_config[
-            'screens']:
-            Screen(name='boot',
-                   screen_manager=self.default_display.screen_manager,
-                   config=self.machine_config['screens']['boot'])
-
-            self.default_display.screen_manager.current = 'boot'
 
     def on_stop(self):
         print("loop rate {}Hz".format(

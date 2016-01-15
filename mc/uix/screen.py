@@ -1,17 +1,35 @@
 from kivy.uix.screenmanager import Screen as KivyScreen
 
+from mc.core.mode import Mode
+
 
 class Screen(KivyScreen):
-    def __init__(self, name, config, screen_manager, mode=None, priority=0,
-                 **kwargs):
+    def __init__(self, mc, name, config, screen_manager, mode=None,
+                 priority=None, **kwargs):
         super().__init__(**kwargs)
+
+        self.mc = mc
 
         self.size = screen_manager.size
         self.orig_w, self.orig_h = self.size
 
         self.name = name
-        self.mode = mode
-        self.priority = priority
+
+        if mode:
+            if isinstance(mode, Mode):
+                self.mode = mode
+            else:
+                self.mode = self.mc.modes[mode]
+        else:
+            self.mode = None
+
+        if priority is None:
+            try:
+                self.priority = mode.priority
+            except AttributeError:
+                self.priority = 0
+        else:
+            self.priority = int(priority)
 
         self._create_widgets_from_config(config)
 

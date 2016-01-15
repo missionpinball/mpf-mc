@@ -5,6 +5,7 @@ sys.path.insert(0, '../mpf')  # temp until we get a proper install for mpf
 import unittest
 from kivy.clock import Clock
 from kivy.config import Config
+print(1111)
 from mpf.system.config import Config as MpfConfig
 from mpf.system.utility_functions import Util
 
@@ -26,10 +27,10 @@ class MpfMcTestCase(unittest.TestCase):
                     configfile=Util.string_to_list(self.get_config_file()))
 
     def get_machine_path(self):
-        return 'tests/machine_files/mpf-mc'
+        raise NotImplementedError
 
     def get_config_file(self):
-        return 'test_mc.yaml'
+        raise NotImplementedError
 
     def preprocess_config(self, config):
         # TODO this method is copied from the mc.py launcher. Prob a better way
@@ -67,6 +68,9 @@ class MpfMcTestCase(unittest.TestCase):
         stopTouchApp()
 
     def run(self, name):
+
+        Config._named_configs.pop('app', None)
+
         self._test_name = name
         mpf_config = MpfConfig.load_config_file(self.get_options()[
                                                     'mcconfigfile'])
@@ -85,8 +89,12 @@ class MpfMcTestCase(unittest.TestCase):
         Window.create_window()
         Window.canvas.clear()
 
-        Clock.schedule_once(self.run_test, 1)
+        Clock.schedule_once(self.run_test, 0)
         return self.mc.run()
 
     def run_test(self, time):
+        if not self.mc.init_done:
+            Clock.schedule_once(self.run_test, 0)
+            return
+
         return super().run(self._test_name)
