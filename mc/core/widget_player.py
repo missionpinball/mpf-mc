@@ -1,7 +1,7 @@
-from mc.core.config_player import EventPlayer
+from mc.core.config_player import ConfigPlayer
 
 
-class WidgetPlayer(EventPlayer):
+class WidgetPlayer(ConfigPlayer):
     config_file_section = 'widget_player'
 
     def play(self, settings, mode=None):

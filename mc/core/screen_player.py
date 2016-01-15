@@ -1,7 +1,7 @@
-from mc.core.config_player import EventPlayer
+from mc.core.config_player import ConfigPlayer
 
 
-class ScreenPlayer(EventPlayer):
+class ScreenPlayer(ConfigPlayer):
     config_file_section = 'screen_player'
 
     def play(self, settings, mode=None):

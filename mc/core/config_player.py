@@ -2,7 +2,7 @@
 WidgetPlayer, ScreenPlayer, etc."""
 
 
-class EventPlayer(object):
+class ConfigPlayer(object):
     config_file_section = None
 
     def __init__(self, mc):
