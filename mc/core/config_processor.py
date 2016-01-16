@@ -76,13 +76,8 @@ class McConfig(MpfConfig):
 
     def create_display(self, name, config):
         # config is localized display settings
-        config = self.process_config2('displays', config)
-
-        display = Display(self.mc, name, **config)
-        if config['default']:
-            self.mc.default_display = display
-
-        return display
+        return Display(self.mc, name,
+                       **self.process_config2('displays', config))
 
     def process_slides(self, config):
         # config is localized to 'slides' section

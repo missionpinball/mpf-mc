@@ -20,7 +20,6 @@ class TestSlides(MpfMcTestCase):
         slide = Slide(mc=self.mc,
                         name='slide1',
                         config=self.mc.machine_config['slides']['slide1'],
-                        slide_frame=self.mc.default_display.slide_frame,
                         mode='attract',
                         priority=0)
 
@@ -30,7 +29,6 @@ class TestSlides(MpfMcTestCase):
         slide = Slide(mc=self.mc,
                         name='slide1',
                         config=self.mc.machine_config['slides']['slide1'],
-                        slide_frame=self.mc.default_display.slide_frame,
                         mode=self.mc.modes['attract'],
                         priority=0)
 
@@ -40,7 +38,6 @@ class TestSlides(MpfMcTestCase):
         slide = Slide(mc=self.mc,
                         name='slide1',
                         config=self.mc.machine_config['slides']['slide1'],
-                        slide_frame=self.mc.default_display.slide_frame,
                         mode=self.mc.modes['attract'],
                         priority=123)
 
@@ -50,7 +47,6 @@ class TestSlides(MpfMcTestCase):
         slide = Slide(mc=self.mc,
                         name='slide1',
                         config=self.mc.machine_config['slides']['slide1'],
-                        slide_frame=self.mc.default_display.slide_frame,
                         mode=self.mc.modes['attract'])
 
         self.assertEqual(slide.priority, self.mc.modes['attract'].priority)
@@ -58,8 +54,7 @@ class TestSlides(MpfMcTestCase):
     def test_no_priority_no_mode(self):
         slide = Slide(mc=self.mc,
                         name='slide1',
-                        config=self.mc.machine_config['slides']['slide1'],
-                        slide_frame=self.mc.default_display.slide_frame)
+                        config=self.mc.machine_config['slides']['slide1'])
 
         self.assertIs(slide.priority, 0)
 
@@ -67,7 +62,6 @@ class TestSlides(MpfMcTestCase):
         slide = Slide(mc=self.mc,
                         name='slide1',
                         config=self.mc.machine_config['slides']['slide1'],
-                        slide_frame=self.mc.default_display.slide_frame,
                         mode='attract',
                         priority=0)
 

@@ -6,7 +6,6 @@ from kivy.clock import Clock
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.scatter import ScatterPlane
 
-from mc.uix.slide import Slide
 from mc.uix.slide_frame import SlideFrame
 
 
@@ -23,29 +22,21 @@ class Display(ScatterPlane, RelativeLayout):
 
     @staticmethod
     def create_default_display(mc):
-        display = Display(mc, 'default', width=1, height=1)
-        mc.displays['default'] = display
-        mc.default_display = display
+        Display(mc, 'default', width=1, height=1)
 
     def __init__(self, mc, name, **kwargs):
         self.mc = mc
         self.name = name
+        self.config = kwargs
         Display.displays_to_initialize += 1
 
         self.slide_frame = None
-        self.native_size = ((kwargs['width'], kwargs['height']))
+        self.native_size = ((self.config['width'], self.config['height']))
 
         self.size_hint = (None, None)
         super().__init__()
 
-        if not self.mc.default_display:
-            self.mc.default_display = self
-
         Clock.schedule_once(self._display_created, 0)
-
-        # Window.bind(system_size=self.on_window_resize)
-
-        # Clock.schedule_once(self.fit_to_window, -1)
 
     def _display_created(self, *args):
         # There's a race condition since mpf-mc will continue while the display
@@ -58,7 +49,7 @@ class Display(ScatterPlane, RelativeLayout):
             Clock.schedule_once(self._display_created, 0)
             return
 
-        self.slide_frame = SlideFrame(self.mc)
+        self.slide_frame = SlideFrame(self.mc, self.name)
         self._slide_frame_created()
 
     def _slide_frame_created(self, *args):
@@ -71,13 +62,25 @@ class Display(ScatterPlane, RelativeLayout):
             return
 
         self.add_widget(self.slide_frame)
+        self.mc.displays[self.name] = self
+        self._set_default_target()
 
-        Clock.schedule_once(self.show_boot_slide)
+        Clock.schedule_once(self._init_done)
 
         if Display.display_initialized():
             Clock.schedule_once(self.mc.displays_initialized)
 
-    def show_boot_slide(self, *args):
+    def _set_default_target(self):
+        if 'default' not in self.mc.targets:
+            self.mc.targets['default'] = self.slide_frame
+        else:
+            try:
+                if self.config['default']:
+                    self.mc.targets['default'] = self.slide_frame
+            except KeyError:
+                pass
+
+    def _init_done(self, *args):
         self.mc.events.post('display_{}_initialized'.format(self.name))
 
     def _sort_children(self):
@@ -93,10 +96,3 @@ class Display(ScatterPlane, RelativeLayout):
                          Window.height / self.native_size[1])
         self.pos = (0, 0)
         self.size = self.native_size
-
-    def add_slide(self, name, config, priority=0):
-        Slide(mc=self.mc, name=name, slide_frame=self.slide_frame,
-              config=config)
-
-        if priority >= self.slide_frame.current_slide.priority:
-            self.slide_frame.current = name

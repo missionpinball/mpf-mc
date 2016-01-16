@@ -14,7 +14,6 @@ from mc.core.config_processor import McConfig
 from mc.core.mode_controller import ModeController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
-from mc.uix.slide import Slide
 from mpf.system.config import CaseInsensitiveDict
 from mpf.system.events import EventManager
 from mpf.system.player import Player
@@ -34,10 +33,14 @@ class MpfMc(App):
         self.num_players = 0
 
         self.displays = CaseInsensitiveDict()
-        self.default_display = None
 
         self.machine_vars = CaseInsensitiveDict()
         self.machine_var_monitor = False
+        self.targets = dict()
+        """Dict which contains all the active slide frames in the machine that
+        a slide can target. Will always contain an entry called 'default'
+        which will be used if a slide doesn't specify targeting.
+        """
 
         self.events = EventManager(self, setup_event_player=False)
         self.mode_controller = ModeController(self)
@@ -54,19 +57,6 @@ class MpfMc(App):
 
         self.bcp_processor = BcpProcessor(self)
 
-        self.events.post("init_phase_1")
-        self.events._process_event_queue()
-        self.events.post("init_phase_2")
-        self.events._process_event_queue()
-        self.events.post("init_phase_3")
-        self.events._process_event_queue()
-        self.events.post("init_phase_4")
-        self.events._process_event_queue()
-        self.events.post("init_phase_5")
-        self.events._process_event_queue()
-        McConfig.unload_config_spec()
-        self.reset()
-
     def validate_machine_config_section(self, section):
         if section not in McConfig.config_spec:
             return
@@ -81,11 +71,24 @@ class MpfMc(App):
         return self.machine_config
 
     def displays_initialized(self, *args):
-        self.init_done = True
 
         from mc.uix.window import Window
-
         Window.initialize(self)
+
+        self.events.post("init_phase_1")
+        self.events._process_event_queue()
+        self.events.post("init_phase_2")
+        self.events._process_event_queue()
+        self.events.post("init_phase_3")
+        self.events._process_event_queue()
+        self.events.post("init_phase_4")
+        self.events._process_event_queue()
+        self.events.post("init_phase_5")
+        self.events._process_event_queue()
+        McConfig.unload_config_spec()
+        self.reset()
+
+        self.init_done = True
 
     def build(self):
         self.start_time = time.time()
@@ -93,7 +96,7 @@ class MpfMc(App):
 
         Clock.schedule_interval(self.tick, 0)
 
-        return self.default_display
+        # return self.default_display
 
     def on_stop(self):
         print("loop rate {}Hz".format(

@@ -30,6 +30,7 @@ class Mode(object):
         self.start_callback = None
         self.stop_callback = None
         self.event_handlers = set()
+        self.target = None
 
         if 'mode' in self.config:
             self.configure_mode_settings(config['mode'])
@@ -90,6 +91,11 @@ class Mode(object):
         if 'start_events' in config:
             for event in config['start_events']:
                 self.mc.events.add_handler(event, self.start)
+
+        try:
+            self.target = self.mc.targets[config['target']]
+        except KeyError:
+            self.target = self.mc.targets['default']
 
         self.config['mode'] = config
 

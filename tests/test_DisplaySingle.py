@@ -16,11 +16,12 @@ class TestDisplaySingle(MpfMcTestCase):
         self.assertIn('window', self.mc.displays)
         self.assertTrue(isinstance(self.mc.displays['window'], Display))
         self.assertEqual(self.mc.displays['window'].size, [401, 301])
-        self.assertEqual(self.mc.default_display, self.mc.displays['window'])
+        self.assertEqual(self.mc.targets['default'], self.mc.targets[
+            'window'])
 
         # walk the display's widget tree and make sure everything is right
         widget_hierarchy = ['display', 'slide_frame']
-        for widget, name in zip(self.mc.default_display.walk(),
+        for widget, name in zip(self.mc.displays['window'].walk(),
                                 widget_hierarchy):
             getattr(self, 'check_{}'.format(name))(widget=widget)
 

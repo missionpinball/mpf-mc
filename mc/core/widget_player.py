@@ -13,7 +13,7 @@ class WidgetPlayer(ConfigPlayer):
                 ._create_widgets_from_config(
                     mode.config['widgets'][settings['widget']])
 
-        else:  # add this current slide
-            self.mc.default_display.slide_frame.current_slide. \
+        else:  # add this current slide on the default target
+            self.mc.targets['default'].current_slide. \
                 _create_widgets_from_config(
                     mode.config['widgets'][settings['widget']])

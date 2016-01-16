@@ -28,11 +28,14 @@ class Window(object):
         except KeyError:
             mc.title = "Mission Pinball Framework"
 
+        # if there's window: section in the machine config, and if it
+        # contains a 'source_display' section, then we'll try to use that.
+        # Otherwise we'll use display that has the default target
         try:
             display = mc.displays[mc.machine_config['window'][
                 'source_display']]
         except KeyError:
-            display = mc.default_display
+            display = mc.targets['default'].parent
 
         Window.set_source_display(display)
 

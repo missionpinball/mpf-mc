@@ -89,7 +89,7 @@ class MpfMcTestCase(unittest.TestCase):
 
     def _bcp_send(self, bcp_command, callback=None, **kwargs):
         # used for commands sent from the MC to the PC
-        print((bcp_command, callback, kwargs))
+        # print((bcp_command, callback, kwargs))
         self.sent_bcp_commands.append((bcp_command, callback, kwargs))
         self.orig_bcp_send(bcp_command=bcp_command, callback=callback,
                            **kwargs)

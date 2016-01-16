@@ -4,13 +4,14 @@ from mc.core.mode import Mode
 
 
 class Slide(Screen):
-    def __init__(self, mc, name, config, slide_frame, mode=None,
+    def __init__(self, mc, name, config, target='default', mode=None,
                  priority=None, **kwargs):
         super().__init__(**kwargs)
 
         self.mc = mc
+        target = mc.targets[target]
 
-        self.size = slide_frame.size
+        self.size = target.size
         self.orig_w, self.orig_h = self.size
 
         self.name = name
@@ -33,7 +34,7 @@ class Slide(Screen):
 
         self._create_widgets_from_config(config)
 
-        slide_frame.add_widget(self)
+        target.add_widget(self)
 
     def _create_widgets_from_config(self, config):
         for widget in config:

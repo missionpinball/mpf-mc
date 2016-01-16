@@ -20,4 +20,5 @@ class TestDisplayMultiple(MpfMcTestCase):
         self.assertTrue(isinstance(self.mc.displays['display2'], Display))
         self.assertEqual(self.mc.displays['display2'].size, [402, 302])
 
-        self.assertEqual(self.mc.default_display, self.mc.displays['display2'])
+        self.assertEqual(self.mc.targets['display2'].parent, self.mc.displays[
+            'display2'])

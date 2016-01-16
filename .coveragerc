@@ -8,3 +8,6 @@ exclude_lines =
 
 [run]
 source = mc
+omit =
+    dmd_test.py
+    fbo.py
