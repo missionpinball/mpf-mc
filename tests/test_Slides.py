@@ -9,6 +9,13 @@ class TestSlides(MpfMcTestCase):
     def get_config_file(self):
         return 'test_slides.yaml'
 
+    def test_slide(self):
+        slide = Slide(mc=self.mc, name='slide1', config={}, priority=100)
+
+        self.assertEqual(slide.mc, self.mc)
+        self.assertEqual(slide.name, 'slide1')
+        self.assertEqual(slide.priority, 100)
+
     def test_mc_slide_processor(self):
         self.assertIn('slide1', self.mc.machine_config['slides'])
         self.assertIn('slide2', self.mc.machine_config['slides'])
@@ -50,6 +57,19 @@ class TestSlides(MpfMcTestCase):
                         mode=self.mc.modes['attract'])
 
         self.assertEqual(slide.priority, self.mc.modes['attract'].priority)
+
+    def test_priority_merged_with_mode(self):
+        self.mc.modes['mode1'].start()
+
+        slide = Slide(mc=self.mc,
+                        name='slide1',
+                        config=self.mc.machine_config['slides']['slide1'],
+                        mode=self.mc.modes['mode1'],
+                        priority=123)
+
+        self.assertEqual(self.mc.modes['mode1'].priority, 500)
+
+        self.assertEqual(slide.priority, 623)
 
     def test_no_priority_no_mode(self):
         slide = Slide(mc=self.mc,

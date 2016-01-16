@@ -21,44 +21,44 @@ class TestModes(MpfMcTestCase):
                   version='1.0',
                   controller_version=version.__version__,
                   controller_name='Mission Pinball Framework')
-        self.advance_time(.1)
+        self.advance_time()
 
         response = ('hello', None, {'version': '1.0'})
         self.assertIn(response, self.sent_bcp_commands)
 
         self.send('reset')
-        self.advance_time(.1)
+        self.advance_time()
         response = ('reset_complete', None, {})
         self.assertIn(response, self.sent_bcp_commands)
 
         self.send('mode_start',
                   name='tilt',
                   priority='10000')
-        self.advance_time(.1)
+        self.advance_time()
         self.send('mode_start',
                   name='attract',
                   priority='10')
-        self.advance_time(.1)
+        self.advance_time()
 
         self.send('mode_start',
                   name='game',
                   priority='20')
-        self.advance_time(.1)
+        self.advance_time()
 
         self.send('player_added',
                   player_num='1')
-        self.advance_time(.1)
+        self.advance_time()
 
         self.send('player_score',
                   value='0',
                   player_num='1',
                   prev_value='0',
                   change='False')
-        self.advance_time(.1)
+        self.advance_time()
 
         self.send('player_turn_start',
                   player_num='1')
-        self.advance_time(.1)
+        self.advance_time()
 
         self.send('player_variable',
                   name='ball',
@@ -66,11 +66,11 @@ class TestModes(MpfMcTestCase):
                   player_num='1',
                   prev_value='0',
                   change='True')
-        self.advance_time(.1)
+        self.advance_time()
 
         self.send('mode_stop',
                   name='attract')
-        self.advance_time(.1)
+        self.advance_time()
 
     def test_machine_variable(self):
         self.send('machine_variable',
@@ -85,7 +85,7 @@ class TestModes(MpfMcTestCase):
                   value='0',
                   name='foo')
         self.assertEqual(self.mc.machine_vars['foo'], '0')
-        self.advance_time(.1)
+        self.advance_time()
         self.callback.assert_called_with(value='0', prev_value=None,
                                          change=True)
 
@@ -96,6 +96,6 @@ class TestModes(MpfMcTestCase):
                   prev_value='0',
                   change='10')
         self.assertEqual(self.mc.machine_vars['foo'], '10')
-        self.advance_time(.1)
+        self.advance_time()
         self.callback.assert_called_with(value='10', prev_value='0',
                                          change='10')

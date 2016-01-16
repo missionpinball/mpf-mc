@@ -1,4 +1,6 @@
 import unittest
+
+from kivy.base import EventLoop
 from kivy.clock import Clock
 from kivy.config import Config
 
@@ -63,11 +65,14 @@ class MpfMcTestCase(unittest.TestCase):
     def on_window_flip(self, window):
         pass
 
-    def advance_time(self, secs=1):
+    def advance_time(self, secs=.1):
         start = time()
-        while time() < start + secs:
-            sleep(.01)
-            Clock.tick()
+        self.mc.events._process_event_queue()
+        # while time() < start + secs:
+        #     sleep(.01)
+        #     self.mc.events._process_event_queue()
+            # Clock.tick()
+            # EventLoop.idle()
 
     def setUp(self):
         # Most of the setup is done in run(). Explanation is there.

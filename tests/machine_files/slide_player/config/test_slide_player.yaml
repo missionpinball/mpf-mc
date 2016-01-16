@@ -1,0 +1,48 @@
+#config_version=3
+modes:
+ - mode1
+
+displays:
+  display1:
+    height: 400
+    width: 300
+  display2:
+    height: 400
+    width: 300
+
+slides:
+  machine_slide_1:
+    type: text
+    text: slide1
+  machine_slide_2:
+    type: text
+    text: slide2
+  machine_slide_3:
+    type: text
+    text: slide3
+  machine_slide_4:
+    type: text
+    text: slide4
+  machine_slide_5:
+    type: text
+    text: slide5
+    priority: 100
+
+slide_player:
+  show_slide_1:
+    slide: machine_slide_1
+  show_slide_2:
+    slide: machine_slide_2
+    target: display1
+  show_slide_3:
+    slide: machine_slide_3
+    target: display2
+  show_slide_4:
+    slide: machine_slide_4
+  show_slide_5:
+    slide: machine_slide_5
+  replace_slide_5_with_4:
+    slide: machine_slide_4
+  replace_slide_5_with_4_with_priority:
+    slide: machine_slide_4
+    priority: 200

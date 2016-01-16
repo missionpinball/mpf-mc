@@ -19,11 +19,11 @@ class TestKeyboard(MpfMcTestCase):
         self.mc.keyboard._on_keyboard_down(None, (None, key_string.lower()),
                                            None,
                                            mods)
-        # self.advance_time(.1)
+        # self.advance_time()
 
     def release(self, key_string):
         self.mc.keyboard._on_keyboard_up(None, (None, key_string.lower()))
-        # self.advance_time(.1)
+        # self.advance_time()
 
     def test_switch(self):
         self.press('a')
@@ -95,7 +95,7 @@ class TestKeyboard(MpfMcTestCase):
         self.mc.events.add_handler('event_f', self.callback)
 
         self.press('f')
-        self.advance_time(.1)
+        self.advance_time()
         self.callback.assert_called_once_with()
 
     def test_mc_event_with_params(self):
@@ -104,7 +104,7 @@ class TestKeyboard(MpfMcTestCase):
         self.mc.events.add_handler('event_g', self.callback)
 
         self.press('g')
-        self.advance_time(.1)
+        self.advance_time()
         self.callback.assert_called_once_with(foo='bar', mission='pinball')
 
     def test_mod_key_with_dash(self):

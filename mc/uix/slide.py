@@ -6,23 +6,9 @@ from mc.core.mode import Mode
 class Slide(Screen):
     def __init__(self, mc, name, config, target='default', mode=None,
                  priority=None, **kwargs):
-        super().__init__(**kwargs)
-
         self.mc = mc
-        target = mc.targets[target]
-
-        self.size = target.size
-        self.orig_w, self.orig_h = self.size
-
         self.name = name
-
-        if mode:
-            if isinstance(mode, Mode):
-                self.mode = mode
-            else:
-                self.mode = self.mc.modes[mode]
-        else:
-            self.mode = None
+        self.priority = None
 
         if priority is None:
             try:
@@ -32,9 +18,29 @@ class Slide(Screen):
         else:
             self.priority = int(priority)
 
+        if mode:
+            if isinstance(mode, Mode):
+                self.mode = mode
+            else:
+                self.mode = self.mc.modes[mode]
+        else:
+            self.mode = None
+
+        if self.mode:
+            self.priority += self.mode.priority
+
+        target = mc.targets[target]
+
+        super().__init__(**kwargs)
+        self.size = target.size
+        self.orig_w, self.orig_h = self.size
+
         self._create_widgets_from_config(config)
 
         target.add_widget(self)
+
+    def __repr__(self):
+        return '<Slide name={}, priority={}>'.format(self.name, self.priority)
 
     def _create_widgets_from_config(self, config):
         for widget in config:
