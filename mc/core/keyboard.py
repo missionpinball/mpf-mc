@@ -35,6 +35,9 @@ class Keyboard(Widget):
             key = k[-1]
             mods = k[:-1]
 
+            if mods:
+                mods = sorted(mods)
+
             # What happens when it's pressed?
             if switch_name:  # We're processing a key entry for a switch
                 if invert:
@@ -50,6 +53,11 @@ class Keyboard(Widget):
                 self.add_key_map(key, mods, event_dict=event_dict)
 
     def get_key_string(self, key, mods):
+        try:
+            mods = sorted(mods)
+        except AttributeError:
+            pass
+
         return '{}-{}'.format(key, '-'.join(mods))
 
     def add_key_map(self, key, mods, switch_name=None, toggle_key=False,
@@ -123,9 +131,9 @@ class Keyboard(Widget):
                 event_params = event_dict['params'] or {}
 
                 if 'event' in event_dict:
-                    self.mc.send(bcp_command='trigger',
-                                 name=str(event_dict['event']),
-                                 **event_params)
+                    self.mc.bcp_processor.send(bcp_command='trigger',
+                                               name=str(event_dict['event']),
+                                               **event_params)
 
                 elif 'mc_event' in event_dict:
                     self.mc.events.post(event_dict['mc_event'],

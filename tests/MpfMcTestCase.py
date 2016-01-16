@@ -9,13 +9,18 @@ Config.set('kivy', 'log_enable', '0')
 Config.set('kivy', 'log_level', 'warning')
 
 from mc.core.mc import MpfMc
-
+from time import time, sleep
 
 class TestMpfMc(MpfMc):
     pass
 
 
 class MpfMcTestCase(unittest.TestCase):
+
+    def __init__(self, *args):
+        self.sent_bcp_commands = list()
+        super().__init__(*args)
+
     def get_options(self):
 
         return dict(machine_path=self.get_machine_path(),
@@ -58,6 +63,12 @@ class MpfMcTestCase(unittest.TestCase):
     def on_window_flip(self, window):
         pass
 
+    def advance_time(self, secs=1):
+        start = time()
+        while time() < start + secs:
+            sleep(.01)
+            Clock.tick()
+
     def setUp(self):
         # Most of the setup is done in run(). Explanation is there.
         Config._named_configs.pop('app', None)
@@ -67,6 +78,15 @@ class MpfMcTestCase(unittest.TestCase):
         from kivy.core.window import Window
         Window.unbind(on_flip=self.on_window_flip)
         stopTouchApp()
+
+    def patch_bcp(self):
+        self.orig_bcp_send = self.mc.bcp_processor.send
+        self.mc.bcp_processor.send = self.bcp_send
+
+    def bcp_send(self, bcp_command, callback=None, **kwargs):
+        self.sent_bcp_commands.append((bcp_command, callback, kwargs))
+        self.orig_bcp_send(bcp_command=bcp_command, callback=callback,
+                           **kwargs)
 
     def run(self, name):
         # This setup is done in run() because we need to give control to the
@@ -93,6 +113,8 @@ class MpfMcTestCase(unittest.TestCase):
         self.mc = TestMpfMc(options=self.get_options(),
                             config=mpf_config,
                             machine_path=self.get_machine_path())
+
+        self.patch_bcp()
 
         from kivy.core.window import Window
         Window.bind(on_flip=self.on_window_flip)

@@ -8,7 +8,7 @@ class TestDisplaySingle(MpfMcTestCase):
         return 'tests/machine_files/display'
 
     def get_config_file(self):
-        return 'test_mpfdisplay_single.yaml'
+        return 'test_display_single.yaml'
 
     def test_mc_display(self):
         # Make sure a single display is loaded properly:
