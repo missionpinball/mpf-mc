@@ -9,7 +9,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
 from mc.core.bcp_processor import BcpProcessor
-from mc.core.keyboard import Keyboard
+
 from mc.core.config_processor import McConfig
 from mc.core.mode_controller import ModeController
 from mc.core.screen_player import ScreenPlayer
@@ -54,18 +54,6 @@ class MpfMc(App):
 
         self.bcp_processor = BcpProcessor(self)
 
-        try:
-            self.icon = self.machine_config['window']['icon']
-        except KeyError:
-            self.icon = 'mc/icons/256x256.png'
-
-        try:
-            self.title = self.machine_config['window']['title']
-        except KeyError:
-            self.title = "Mission Pinball Framework"
-
-
-
         self.events.post("init_phase_1")
         self.events._process_event_queue()
         self.events.post("init_phase_2")
@@ -101,16 +89,7 @@ class MpfMc(App):
 
         from mc.uix.window import Window
 
-        try:
-            display = self.displays[self.machine_config['window'][
-                'source_display']]
-        except KeyError:
-            display = self.default_display
-
-
-        Window.set_source_display(display)
-        if 'keyboard' in self.machine_config:
-            self.keyboard = Keyboard(self)
+        Window.initialize(self)
 
     def build(self):
         self.start_time = time.time()
