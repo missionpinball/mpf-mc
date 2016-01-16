@@ -45,6 +45,9 @@ class McConfig(MpfConfig):
         self.process_config_file(section_dict=self.machine_sections,
                                  config=self.mc.machine_config)
 
+        if not self.mc.displays:
+            Display.create_default_display(self.mc)
+
     def register_load_methods(self):
         for section in self.mode_sections:
             self.mc.mode_controller.register_load_method(

@@ -3,7 +3,6 @@ mpf-mc.
 
 """
 from kivy.clock import Clock
-# from kivy.core.window import Window
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.scatter import ScatterPlane
 
@@ -21,6 +20,12 @@ class Display(ScatterPlane, RelativeLayout):
             return True
         else:
             return False
+
+    @staticmethod
+    def create_default_display(mc):
+        display = Display(mc, 'default', width=1, height=1)
+        mc.displays['default'] = display
+        mc.default_display = display
 
     def __init__(self, mc, name, **kwargs):
         self.mc = mc

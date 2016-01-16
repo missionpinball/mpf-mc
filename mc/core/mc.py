@@ -80,9 +80,6 @@ class MpfMc(App):
     def get_config(self):
         return self.machine_config
 
-    def display_created(self, *args, **kwargs):
-        self.show_boot_slide()
-
     def displays_initialized(self, *args):
         self.init_done = True
 
