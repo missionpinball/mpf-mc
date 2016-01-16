@@ -1,5 +1,5 @@
 """Base class used for things that "play" from the config files, such as
-WidgetPlayer, ScreenPlayer, etc."""
+WidgetPlayer, SlidePlayer, etc."""
 
 
 class ConfigPlayer(object):
@@ -26,7 +26,6 @@ class ConfigPlayer(object):
                     self.play,
                     mode=mode,
                     settings=settings))
-            print('adding handler', event, self.play)
 
         return self.unload_player_events, key_list
 

@@ -1,8 +1,8 @@
-from mc.uix.display import MpfDisplay
+from mc.uix.display import Display
 from .MpfMcTestCase import MpfMcTestCase
 
 
-class TestMpfDisplayMultiple(MpfMcTestCase):
+class TestDisplayMultiple(MpfMcTestCase):
     def get_machine_path(self):
         return 'tests/machine_files/display'
 
@@ -13,11 +13,11 @@ class TestMpfDisplayMultiple(MpfMcTestCase):
         # Make sure a multiple displays are loaded properly:
 
         self.assertIn('window', self.mc.displays)
-        self.assertTrue(isinstance(self.mc.displays['window'], MpfDisplay))
+        self.assertTrue(isinstance(self.mc.displays['window'], Display))
         self.assertEqual(self.mc.displays['window'].size, [401, 301])
 
         self.assertIn('display2', self.mc.displays)
-        self.assertTrue(isinstance(self.mc.displays['display2'], MpfDisplay))
+        self.assertTrue(isinstance(self.mc.displays['display2'], Display))
         self.assertEqual(self.mc.displays['display2'].size, [402, 302])
 
         self.assertEqual(self.mc.default_display, self.mc.displays['display2'])

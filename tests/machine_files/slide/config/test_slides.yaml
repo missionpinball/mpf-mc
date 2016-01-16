@@ -13,23 +13,23 @@ displays:
     default: true
 
 
-screens:
-  screen1:
+slides:
+  slide1:
   - type: text
     text: text1
   - type: text
     text: text2
   - type: text
     text: text3
-  screen2:
+  slide2:
     type: text
     text: text2
-  screen3:
+  slide3:
     type: text
     text: text3
-  screen4:
+  slide4:
     type: text
     text: text4
-  screen5:
+  slide5:
     type: text
     text: text5

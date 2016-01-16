@@ -1,9 +1,9 @@
-from mc.uix.display import MpfDisplay
-from mc.uix.screen_manager import ScreenManager
+from mc.uix.display import Display
+from mc.uix.slide_frame import SlideFrame
 from .MpfMcTestCase import MpfMcTestCase
 
 
-class TestMpfDisplaySingle(MpfMcTestCase):
+class TestDisplaySingle(MpfMcTestCase):
     def get_machine_path(self):
         return 'tests/machine_files/display'
 
@@ -14,19 +14,19 @@ class TestMpfDisplaySingle(MpfMcTestCase):
         # Make sure a single display is loaded properly:
 
         self.assertIn('window', self.mc.displays)
-        self.assertTrue(isinstance(self.mc.displays['window'], MpfDisplay))
+        self.assertTrue(isinstance(self.mc.displays['window'], Display))
         self.assertEqual(self.mc.displays['window'].size, [401, 301])
         self.assertEqual(self.mc.default_display, self.mc.displays['window'])
 
         # walk the display's widget tree and make sure everything is right
-        widget_hierarchy = ['display', 'screen_manager']
+        widget_hierarchy = ['display', 'slide_frame']
         for widget, name in zip(self.mc.default_display.walk(),
                                 widget_hierarchy):
             getattr(self, 'check_{}'.format(name))(widget=widget)
 
     def check_display(self, widget):
-        self.assertTrue(isinstance(widget, MpfDisplay))
+        self.assertTrue(isinstance(widget, Display))
 
-    def check_screen_manager(self, widget):
-        self.assertTrue(isinstance(widget, ScreenManager))
+    def check_slide_frame(self, widget):
+        self.assertTrue(isinstance(widget, SlideFrame))
         self.assertEqual(widget.size, [401, 301])

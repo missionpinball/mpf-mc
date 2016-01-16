@@ -8,20 +8,20 @@ displays:
     height: 302
     default: true
 
-screens:
-  screen1:
+slides:
+  slide1:
     type: text
     text: hello
-  screen2:
+  slide2:
     type: text
     text: hello
     display: display2
-  screen3:
+  slide3:
     type: text
     text: hello
-  screen4:
+  slide4:
     type: text
     text: hello
-  screen5:
+  slide5:
     type: text
     text: hello

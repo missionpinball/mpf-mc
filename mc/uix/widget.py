@@ -19,13 +19,13 @@ class MpfWidget(object):
     config = CaseInsensitiveDict()
     """Dict which holds the settings for this widget."""
 
-    screen = None
-    """Screen that this widget will be used with."""
+    slide = None
+    """Slide that this widget will be used with."""
 
-    def __init__(self, mode, priority, screen, config, **kwargs):
+    def __init__(self, mode, priority, slide, config, **kwargs):
         super().__init__()
 
-        self.screen = screen
+        self.slide = slide
 
         if '_parsed_' in config:
             self.config = config
@@ -51,7 +51,7 @@ class MpfWidget(object):
 
     def on_size(self, *args):
 
-        self.pos = self.screen.set_position(self.screen, self,
+        self.pos = self.slide.set_position(self.slide, self,
                                             self.config['x'],
                                             self.config['y'],
                                             self.config['h_pos'],
@@ -59,7 +59,7 @@ class MpfWidget(object):
 
     @staticmethod
     def parse_config(config):
-        """Processes a dict config of screen settings and converts it into
+        """Processes a dict config of slide settings and converts it into
         the format the widget class actually needs. Also checks & validates it.
 
         Args:

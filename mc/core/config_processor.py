@@ -8,7 +8,7 @@ from kivy.logger import Logger
 from kivy.uix.video import Video
 from kivy.utils import get_color_from_hex
 
-from mc.uix.display import MpfDisplay
+from mc.uix.display import Display
 from mc.widgets.image import Image
 from mc.widgets.text import Text
 from mpf.system.config import CaseInsensitiveDict, Config as MpfConfig
@@ -33,11 +33,11 @@ class McConfig(MpfConfig):
         self.system_config = self.mc.machine_config['mpf-mc']
         self.log = Logger
 
-        self.machine_sections = dict(screens=self.process_screens,
+        self.machine_sections = dict(slides=self.process_slides,
                                      widgets=self.process_widgets,
                                      displays=self.process_displays)
 
-        self.mode_sections = dict(screens=self.process_screens,
+        self.mode_sections = dict(slides=self.process_slides,
                                   widgets=self.process_widgets)
 
         # process mode-based and machine-wide configs
@@ -75,21 +75,21 @@ class McConfig(MpfConfig):
         # config is localized display settings
         config = self.process_config2('displays', config)
 
-        display = MpfDisplay(self.mc, name, **config)
+        display = Display(self.mc, name, **config)
         if config['default']:
             self.mc.default_display = display
 
         return display
 
-    def process_screens(self, config):
-        # config is localized to 'screens' section
-        for screen_name in config:
-            config[screen_name] = self.process_screen(config[screen_name])
+    def process_slides(self, config):
+        # config is localized to 'slides' section
+        for slide_name in config:
+            config[slide_name] = self.process_slide(config[slide_name])
 
         return config
 
-    def process_screen(self, config):
-        # config is localized to an single screen name entry
+    def process_slide(self, config):
+        # config is localized to an single slide name entry
         if isinstance(config, dict):
             config = [config]
 

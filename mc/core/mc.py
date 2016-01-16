@@ -12,9 +12,9 @@ from mc.core.bcp_processor import BcpProcessor
 
 from mc.core.config_processor import McConfig
 from mc.core.mode_controller import ModeController
-from mc.core.screen_player import ScreenPlayer
+from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
-from mc.uix.screen import Screen
+from mc.uix.slide import Slide
 from mpf.system.config import CaseInsensitiveDict
 from mpf.system.events import EventManager
 from mpf.system.player import Player
@@ -43,7 +43,7 @@ class MpfMc(App):
         self.mode_controller = ModeController(self)
         McConfig.load_config_spec()
         self.config_processor = McConfig(self)
-        self.screen_player = ScreenPlayer(self)
+        self.slide_player = SlidePlayer(self)
         self.widget_player = WidgetPlayer(self)
         self.keyboard = None
         self.crash_queue = queue.Queue()
@@ -81,10 +81,9 @@ class MpfMc(App):
         return self.machine_config
 
     def display_created(self, *args, **kwargs):
-        self.show_boot_screen()
+        self.show_boot_slide()
 
     def displays_initialized(self, *args):
-        print('displays initialized')
         self.init_done = True
 
         from mc.uix.window import Window

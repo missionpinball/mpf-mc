@@ -1,16 +1,16 @@
-from kivy.uix.screenmanager import Screen as KivyScreen
+from kivy.uix.screenmanager import Screen
 
 from mc.core.mode import Mode
 
 
-class Screen(KivyScreen):
-    def __init__(self, mc, name, config, screen_manager, mode=None,
+class Slide(Screen):
+    def __init__(self, mc, name, config, slide_frame, mode=None,
                  priority=None, **kwargs):
         super().__init__(**kwargs)
 
         self.mc = mc
 
-        self.size = screen_manager.size
+        self.size = slide_frame.size
         self.orig_w, self.orig_h = self.size
 
         self.name = name
@@ -33,12 +33,12 @@ class Screen(KivyScreen):
 
         self._create_widgets_from_config(config)
 
-        screen_manager.add_widget(self)
+        slide_frame.add_widget(self)
 
     def _create_widgets_from_config(self, config):
         for widget in config:
             widget_obj = widget['widget_cls'](mc=self, config=widget,
-                                              screen=self)
+                                              slide=self)
 
             self.add_widget(widget_obj)
             widget_obj.texture_update()
@@ -47,7 +47,7 @@ class Screen(KivyScreen):
                                                widget['y'], widget['h_pos'],
                                                widget['v_pos'])
 
-    def set_position(self, screen, widget, x=None, y=None, h_pos=None,
+    def set_position(self, slide, widget, x=None, y=None, h_pos=None,
                      v_pos=None):
         """Calculates the x,y position for the upper-left corner of this
         element
@@ -83,7 +83,7 @@ class Screen(KivyScreen):
 
         """
         try:
-            screen_w, screen_h = screen.size
+            slide_w, slide_h = slide.size
             widget_w, widget_h = widget.size
         except AttributeError:
             return
@@ -105,31 +105,31 @@ class Screen(KivyScreen):
         if v_pos == 'bottom':
             final_y = 0
         elif v_pos == 'top':
-            final_y = screen_h - widget_h
+            final_y = slide_h - widget_h
         elif v_pos == 'center' or v_pos == 'middle':
-            final_y = (screen_h - widget_h) / 2
+            final_y = (slide_h - widget_h) / 2
         else:
             raise ValueError('Received invalid v_pos value:', v_pos)
 
         if h_pos == 'left':
             final_x = 0
         elif h_pos == 'right':
-            final_x = screen_w - widget_w
+            final_x = slide_w - widget_w
         elif h_pos == 'center' or h_pos == 'middle':
-            final_x = (screen_w - widget_w) / 2
+            final_x = (slide_w - widget_w) / 2
         else:
             raise ValueError("Received invalid 'h_pos' value:", h_pos)
 
         # Finally shift x, y based on values passed.
         if x is not None:
             if -1.0 < x < 1.0:
-                final_x += x * screen_w
+                final_x += x * slide_w
             else:
                 final_x += x
 
         if y is not None:
             if -1.0 < y < 1.0:
-                final_y += y * screen_h
+                final_y += y * slide_h
             else:
                 final_y += y
 

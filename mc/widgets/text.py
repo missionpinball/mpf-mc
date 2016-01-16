@@ -7,7 +7,7 @@ from mc.uix.widget import MpfWidget
 class Text(MpfWidget, Label):
     var_finder = re.compile("(?<=%)[a-zA-Z_0-9|]+(?=%)")
 
-    def __init__(self, mc, config, screen, text_variables=None, mode=None,
+    def __init__(self, mc, config, slide, text_variables=None, mode=None,
                  priority=0):
         self.mc = mc
         self.original_text = config.get('text', '')
@@ -27,7 +27,7 @@ class Text(MpfWidget, Label):
         if not config['font_size']:
             config['font_size'] = 15
 
-        super().__init__(mode=mode, priority=priority, screen=screen,
+        super().__init__(mode=mode, priority=priority, slide=slide,
                          config=config)
 
         self.texture_update()

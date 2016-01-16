@@ -8,12 +8,12 @@ class WidgetPlayer(ConfigPlayer):
         if mode and not mode.active:
             return
 
-        if 'screen' in settings:  # add to a named screen
-            self.mc.default_display.screens[settings['screen']] \
+        if 'slide' in settings:  # add to a named slide
+            self.mc.default_display.slides[settings['slide']] \
                 ._create_widgets_from_config(
                     mode.config['widgets'][settings['widget']])
 
-        else:  # add this current screen
-            self.mc.default_display.screen_manager.current_screen. \
+        else:  # add this current slide
+            self.mc.default_display.slide_frame.current_slide. \
                 _create_widgets_from_config(
                     mode.config['widgets'][settings['widget']])

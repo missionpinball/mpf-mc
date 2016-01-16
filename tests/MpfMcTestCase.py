@@ -1,12 +1,7 @@
-import sys
-
-sys.path.insert(0, '../mpf')  # temp until we get a proper install for mpf
-
 import unittest
 from kivy.clock import Clock
 from kivy.config import Config
 
-print(1111)
 from mpf.system.config import Config as MpfConfig
 from mpf.system.utility_functions import Util
 
@@ -61,7 +56,7 @@ class MpfMcTestCase(unittest.TestCase):
                     continue
 
     def on_window_flip(self, window):
-        print('flip', self.mc.default_display.size)
+        pass
 
     def setUp(self):
         # Most of the setup is done in run(). Explanation is there.

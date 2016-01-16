@@ -105,17 +105,17 @@ asset_defaults:
     images:
         default:
             load: preload
-        screen:
-            target: screen
+        slide:
+            target: slide
         dmd:
             target: dmd
     animations:
         default:
             load: preload
             target: dmd
-        screen:
+        slide:
             load: preload
-            target: screen
+            target: slide
     sounds:
         default:
             track: sfx
