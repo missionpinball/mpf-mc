@@ -80,10 +80,16 @@ class MpfMcTestCase(unittest.TestCase):
         stopTouchApp()
 
     def patch_bcp(self):
+        # used internally
         self.orig_bcp_send = self.mc.bcp_processor.send
-        self.mc.bcp_processor.send = self.bcp_send
+        self.mc.bcp_processor.send = self._bcp_send
 
-    def bcp_send(self, bcp_command, callback=None, **kwargs):
+        # this is used to send BCP commands to mpf_mc
+        self.send = self.mc.bcp_processor._process_command
+
+    def _bcp_send(self, bcp_command, callback=None, **kwargs):
+        # used for commands sent from the MC to the PC
+        print((bcp_command, callback, kwargs))
         self.sent_bcp_commands.append((bcp_command, callback, kwargs))
         self.orig_bcp_send(bcp_command=bcp_command, callback=callback,
                            **kwargs)

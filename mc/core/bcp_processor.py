@@ -176,9 +176,10 @@ class BcpProcessor(object):
         """Processes an incoming BCP 'player_variable' command."""
         self.mc.update_player_var(name, value, int(player_num))
 
-    def _bcp_machine_variable(self, name, value, **kwargs):
+    def _bcp_machine_variable(self, name, value, change=True, prev_value=None,
+                              **kwargs):
         """Processes an incoming BCP 'machine_variable' command."""
-        self.mc.set_machine_var(name, value)
+        self.mc.set_machine_var(name, value, change, prev_value)
 
     def _bcp_player_score(self, value, prev_value, change, player_num,
                          **kwargs):

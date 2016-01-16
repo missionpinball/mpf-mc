@@ -200,21 +200,12 @@ class MpfMc(App):
     #
     #             self.events.remove_handler(self.asset_loading_counter)
 
-    def set_machine_var(self, name, value):
-        try:
-            prev_value = self.machine_vars[name]
-        except KeyError:
-            prev_value = None
+    def set_machine_var(self, name, value, change, prev_value):
+
+        if type(change) is not bool and change.lower() in ('false', '0'):
+            change = False
 
         self.machine_vars[name] = value
-
-        try:
-            change = value - prev_value
-        except TypeError:
-            if prev_value != value:
-                change = True
-            else:
-                change = False
 
         if change:
             Logger.debug("Setting machine_var '%s' to: %s, (prior: %s, "
