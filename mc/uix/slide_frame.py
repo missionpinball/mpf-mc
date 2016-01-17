@@ -88,3 +88,21 @@ class SlideFrame(ScreenManager):
     def show_current_slide(self):
         if self.screens[0] != self.current_screen:
             self.current = self.screens[0].name
+
+    def remove_slide(self, slide):
+        # note there has to be at least one slide, so you can't remove the last
+        # one
+        if type(slide) is str:
+            for s in [x for x in self.screens if x.name == slide]:
+                slide = s
+
+        if not isinstance(slide, Slide):
+            return
+
+        if self.current_screen == self.screens[0]:
+            try:
+                self.current = self.screens[1].name
+            except (IndexError, AttributeError):
+                pass
+
+        self.remove_widget(slide)

@@ -170,6 +170,4 @@ class Mode(object):
         target_list = set(self.mc.targets.values())
         for target in target_list:
             for screen in [x for x in target.screens if x.mode == self]:
-                if target.current_screen == target.screens[0]:
-                    target.current = target.screens[1].name
-                target.remove_widget(screen)
+                target.remove_slide(screen)

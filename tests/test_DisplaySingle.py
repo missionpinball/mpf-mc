@@ -95,6 +95,17 @@ class TestDisplaySingle(MpfMcTestCase):
         self.mc.displays['window'].current_slide_name = 'slide2'
         self.assertEqual(self.mc.targets['window'].current_slide, slide2)
 
+        # now remove the current slide and make sure slide1 comes back
+        self.mc.targets['window'].remove_slide(slide2)
+        self.assertEqual(self.mc.targets['window'].current_slide, slide1)
+
+        # add another slide so we have 2
+        slide3 = Slide(mc=self.mc, name='slide3', config={})
+
+        # also test removing by name
+        self.mc.targets['window'].remove_slide('slide1')
+        self.assertEqual(self.mc.targets['window'].current_slide, slide3)
+
     def test_priorities(self):
         slide1 = Slide(mc=self.mc, name='slide1', config={}, priority=100)
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
