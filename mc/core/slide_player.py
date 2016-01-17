@@ -29,15 +29,14 @@ class SlidePlayer(ConfigPlayer):
             else:
                 target = self.mc.targets['default']
 
+        name = settings['slide']
+        config = self.mc.slide_configs[name]
+
         if mode:
-            target.add_slide(name=settings['slide'],
-                             config=mode.config['slides'][settings['slide']],
+            target.add_slide(name=name, config=config,
                              show=settings['show'], force=settings['force'],
-                             priority=priority + mode.config['slides'][settings['slide']]['priority'])
+                             priority=priority)
         else:
-            target.add_slide(name=settings['slide'],
-                             config=self.mc.machine_config['slides'][settings[
-                                 'slide']],
+            target.add_slide(name=name, config=config,
                              show=settings['show'], force=settings['force'],
-                             priority=priority + self.mc.machine_config['slides'][settings[
-                                 'slide']][0]['priority'])
+                             priority=priority)

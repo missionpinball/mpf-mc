@@ -32,21 +32,7 @@ class TestSlidePlayer(MpfMcTestCase):
         self.assertEqual(self.mc.displays['display2'].current_slide_name,
                          'machine_slide_3')
 
-    def test_priority_from_slide(self):
-        self.mc.events.post('show_slide_5')
-        self.advance_time()
-        self.assertEqual(self.mc.displays['display1'].current_slide_name,
-                         'machine_slide_5')
-        self.assertEqual(self.mc.displays['display1'].current_slide.priority,
-                         100)
-
-        # make sure a lower priority slide doesn't show
-        self.mc.events.post('show_slide_1')
-        self.advance_time()
-        self.assertEqual(self.mc.targets['display1'].current_slide_name,
-                         'machine_slide_5')
-
-    def test_priority_from_player(self):
+    def test_priority_from_slide_player(self):
         self.mc.events.post('show_slide_4_p200')
         self.advance_time()
         self.assertEqual(self.mc.displays['display1'].current_slide_name,
@@ -55,12 +41,12 @@ class TestSlidePlayer(MpfMcTestCase):
                          200)
 
     def test_force_slide(self):
-        self.mc.events.post('show_slide_5')
+        self.mc.events.post('show_slide_4_p200')
         self.advance_time()
         self.assertEqual(self.mc.displays['display1'].current_slide_name,
-                         'machine_slide_5')
+                         'machine_slide_4')
         self.assertEqual(self.mc.displays['display1'].current_slide.priority,
-                         100)
+                         200)
 
         self.mc.events.post('show_slide_1_force')
         self.advance_time()

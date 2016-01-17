@@ -64,10 +64,13 @@ class McConfig(MpfConfig):
         self.process_localized_config_section(config, section)
 
     def process_localized_config_section(self, config, section):
-        try:
-            config = self.machine_sections[section](config)
-        except KeyError:
-            config = self.mode_sections[section](config)
+
+        config = self.machine_sections[section](config)
+
+        # try:
+        #     config = self.machine_sections[section](config)
+        # except KeyError:
+        #     config = self.mode_sections[section](config)
 
     def process_displays(self, config):
         # config is localized to 'displays' section
@@ -84,7 +87,10 @@ class McConfig(MpfConfig):
         for slide_name in config:
             config[slide_name] = self.process_slide(config[slide_name])
 
-        return config
+        self.mc.slide_configs.update(config)
+        config = None
+
+        # return config
 
     def process_slide(self, config):
         # config is localized to an single slide name entry
@@ -96,8 +102,6 @@ class McConfig(MpfConfig):
 
         for widget in config:
             widget = self.process_widget(widget)
-
-        # TODO add the display to this processed config
 
         return config
 

@@ -32,6 +32,8 @@ class MpfMc(App):
         self.player = None
         self.num_players = 0
 
+        self.slide_configs = dict()
+
         self.displays = CaseInsensitiveDict()
 
         self.machine_vars = CaseInsensitiveDict()
