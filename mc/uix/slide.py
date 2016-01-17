@@ -4,11 +4,20 @@ from mc.core.mode import Mode
 
 
 class Slide(Screen):
+
+    next_id = 0
+
+    @classmethod
+    def get_id(cls):
+        Slide.next_id += 1
+        return Slide.next_id
+
     def __init__(self, mc, name, config, target='default', mode=None,
                  priority=None, show=True, force=False, **kwargs):
         self.mc = mc
         self.name = name
         self.priority = None
+        self.creation_order = Slide.get_id()
 
         if priority is None:
             try:

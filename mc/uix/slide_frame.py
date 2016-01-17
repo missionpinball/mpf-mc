@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     SlideTransition, SwapTransition,
                                     FadeTransition, WipeTransition,
@@ -68,8 +70,22 @@ class SlideFrame(ScreenManager):
     def add_widget(self, slide, show=True, force=False):
         super().add_widget(screen=slide)
 
+        self._sort_slides()
+
         if force:
             self.current = slide.name
-        elif show and ((self.current_slide and slide.priority >=
-            self.current_slide.priority) or not self.current_slide):
-            self.current = slide.name
+        elif show:
+            self.current = self.screens[0].name
+
+    def _sort_slides(self):
+        # sort reverse order by priority, then by creation order (so if two
+        # slides have the same priority, the newest one is higher priority.
+        self.screens = sorted(self.screens, key=attrgetter('creation_order'),
+                              reverse=True)
+        self.screens = sorted(self.screens, key=attrgetter('priority'),
+                              reverse=True)
+
+
+    def show_current_slide(self):
+        if self.screens[0] != self.current_screen:
+            self.current = self.screens[0].name

@@ -42,7 +42,6 @@ class ModeController(object):
         # Loads the modes from the Modes: section of the machine configuration
         # file.
 
-
         for mode in set(self.mc.machine_config['modes']):
             self.mc.modes[mode] = self._load_mode(mode)
 
