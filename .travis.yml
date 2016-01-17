@@ -15,7 +15,8 @@ install:
  - sudo apt-get -y install xvfb pulseaudio
  - pip install --upgrade cython pillow coveralls ruamel.yaml pyserial
  - pip install kivy
- - pip install mpf
+# - pip install mpf
+ - pip install https://github.com/missionpinball/mpf/zipball/dev
 
 before_script:
  - export DISPLAY=:99.0
