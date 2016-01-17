@@ -60,9 +60,9 @@ class SlideFrame(ScreenManager):
         frame."""
         return self.screens
 
-    def add_slide(self, name, config, priority=0, show=True, force=False):
+    def add_slide(self, name, config, priority=0, mode=None, show=True, force=False):
         Slide(mc=self.mc, name=name, target=self.name, config=config,
-              show=show, force=force, priority=priority)
+              mode=mode, show=show, force=force, priority=priority)
 
         if not self.current_screen or priority >= self.current_screen.priority:
             self.current = name

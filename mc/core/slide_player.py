@@ -11,15 +11,10 @@ class SlidePlayer(ConfigPlayer):
         except AttributeError:
             pass
 
-        if mode:
-            priority = mode.priority
-        else:
-            priority = 0
-
         try:
-            priority += settings['priority']
+            priority = settings['priority']
         except KeyError:
-            pass
+            priority = 0
 
         try:
             target = self.mc.targets[settings['target']]
@@ -32,11 +27,6 @@ class SlidePlayer(ConfigPlayer):
         name = settings['slide']
         config = self.mc.slide_configs[name]
 
-        if mode:
-            target.add_slide(name=name, config=config,
-                             show=settings['show'], force=settings['force'],
-                             priority=priority)
-        else:
-            target.add_slide(name=name, config=config,
-                             show=settings['show'], force=settings['force'],
-                             priority=priority)
+        target.add_slide(name=name, config=config,
+                         show=settings['show'], force=settings['force'],
+                         priority=priority, mode=mode)

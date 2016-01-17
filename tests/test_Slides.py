@@ -94,3 +94,29 @@ class TestSlides(MpfMcTestCase):
         self.assertEqual(widget_tree[2].text, 'SLIDE TEST - SLIDE 1 - TEXT 2')
         self.assertEqual(widget_tree[3].text, 'SLIDE TEST - SLIDE 1 - TEXT 1')
 
+    def test_slides_from_modes(self):
+        self.assertIn('mode1_slide1', self.mc.slide_configs)
+
+        # set a current slide
+        self.mc.targets['display1'].add_slide(name='slide1', config={})
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'slide1')
+
+        # start a mode and add a slide from that mode
+        self.mc.modes['mode1'].start()
+        self.mc.targets['display1'].add_slide(name='slide2', config={},
+                                              mode=self.mc.modes['mode1'])
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'slide2')
+        self.assertEqual(self.mc.targets['display1'].current_slide.priority,
+                         500)
+
+        # stop the mode and its slide should be removed
+        num_slides = len(self.mc.targets['display1'].slides)
+        self.mc.modes['mode1'].stop()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'slide1')
+        self.assertEqual(self.mc.targets['display1'].current_slide.priority,
+                         0)
+        self.assertEqual(len(self.mc.targets['display1'].slides),
+                         num_slides - 1)

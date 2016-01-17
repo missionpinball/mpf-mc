@@ -70,3 +70,68 @@ class TestSlidePlayer(MpfMcTestCase):
                          'machine_slide_1')
         self.assertEqual(self.mc.displays['display1'].current_slide.priority,
                          0)
+
+    def test_mode_slide_player(self):
+        # set a baseline slide
+        self.mc.events.post('show_slide_1')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        # post the slide_player event from the mode. Should not show the slide
+        # since the mode is not running
+        self.mc.events.post('show_mode1_slide')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        # start the mode and then post that event again. The slide should
+        # switch
+        self.mc.modes['mode1'].start()
+        self.mc.events.post('show_mode1_slide')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'mode1_slide')
+
+        # stop the mode and make sure the slide is removed
+        num_slides = len(self.mc.targets['display1'].slides)
+        self.mc.modes['mode1'].stop()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+        self.assertEqual(len(self.mc.targets['display1'].slides),
+                         num_slides - 1)
+
+        # post the slide_player event from the mode. Should not show the slide
+        # since the mode is not running
+        self.mc.events.post('show_mode1_slide')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        # show a priority 200 slide from the machine config
+        self.mc.events.post('show_slide_4_p200')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_4')
+        self.assertEqual(self.mc.targets['display1'].current_slide.priority,
+                         200)
+
+        # start the mode again (priority 500)
+        self.mc.modes['mode1'].start()
+
+        # show a slide, but priority -450 which should equal priority 50 and
+        # mean the slide will not be shown
+        self.mc.events.post('show_mode1_slide_2')
+        self.advance_time()
+        print(self.mc.targets['display1'].current_slide.priority)
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_4')
+        self.assertEqual(self.mc.targets['display1'].current_slide.priority,
+                         200)
+
+        # now kill the current slide and the mode slide should show
+        self.mc.targets['display1'].remove_slide('machine_slide_4')
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'mode1_slide_2')
+        self.assertEqual(self.mc.targets['display1'].current_slide.priority,
+                         50)
