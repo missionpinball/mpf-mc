@@ -1,0 +1,63 @@
+#config_version=3
+
+displays:
+  default:
+    width: 400
+    height: 300
+  display2:
+    width: 400
+    height: 300
+
+widgets:
+  widget1:
+    type: text
+    text: widget1
+  widget2:
+  - type: text
+    text: widget2
+  widget3:
+  - type: text
+    text: widget3.1
+  - type: text
+    text: widget3.2
+  - type: text
+    text: widget3.3
+  widget4:
+  - type: text
+    text: widget4.1
+    y: -150
+    z: 1
+  - type: text
+    text: widget4.2
+    z: 1000
+    y: -100
+  - type: text
+    text: widget4.3
+    y: -50
+  - type: text
+    text: widget4.4
+    z: 1
+  - type: text
+    text: widget4.5
+    z: 1000
+    y: 50
+  - type: text
+    text: widget4.6
+  - type: text
+    text: widget4.7
+    y: 100
+  widget5:
+    type: text
+    text: widget5
+    z: 200
+    y: 150
+
+widget_player:
+  add_widget1_to_current:
+    widget: widget1
+  add_widget2_to_slide1:
+    widget: widget1
+    slide: slide1
+  add_widget1_to_display2:
+    widget: widget1
+    target: display2

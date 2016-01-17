@@ -7,11 +7,11 @@ from kivy.graphics import (Rectangle, Triangle, Quad, Point, Mesh, Line,
 from kivy.logger import Logger
 from kivy.uix.video import Video
 from kivy.utils import get_color_from_hex
+from mpf.system.config import CaseInsensitiveDict, Config as MpfConfig
 
 from mc.uix.display import Display
 from mc.widgets.image import Image
 from mc.widgets.text import Text
-from mpf.system.config import CaseInsensitiveDict, Config as MpfConfig
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=Image,
@@ -90,15 +90,10 @@ class McConfig(MpfConfig):
         self.mc.slide_configs.update(config)
         config = None
 
-        # return config
-
     def process_slide(self, config):
         # config is localized to an single slide name entry
         if isinstance(config, dict):
             config = [config]
-
-        else:
-            config.reverse()
 
         for widget in config:
             widget = self.process_widget(widget)
@@ -114,10 +109,15 @@ class McConfig(MpfConfig):
             else:
                 widget_settings.reverse()
 
-            for widget in widget_settings:
-                widget = self.process_widget(widget)
+            widget_list = list()
 
-        return config
+            for widget in widget_settings:
+                widget_list.append(self.process_widget(widget))
+
+            config[widget_name] = widget_list
+
+        self.mc.widget_configs.update(config)
+        config = None
 
     def process_widget(self, config, mode=None):
         # config is localized widget settings

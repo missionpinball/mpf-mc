@@ -4,8 +4,9 @@ from mc.core.mode import Mode
 
 
 class Slide(Screen):
-
     next_id = 0
+    active_slides = dict()
+
 
     @classmethod
     def get_id(cls):
@@ -44,24 +45,18 @@ class Slide(Screen):
         self.size = target.size
         self.orig_w, self.orig_h = self.size
 
-        self._create_widgets_from_config(config)
+        # print(config)
 
+        try:
+            self.add_widgets_from_config(config)
+        except KeyError:
+            pass
+
+        Slide.active_slides[name] = self
         target.add_widget(slide=self, show=show, force=force)
 
     def __repr__(self):
         return '<Slide name={}, priority={}>'.format(self.name, self.priority)
-
-    def _create_widgets_from_config(self, config):
-        for widget in config:
-            widget_obj = widget['widget_cls'](mc=self, config=widget,
-                                              slide=self)
-
-            self.add_widget(widget_obj)
-            widget_obj.texture_update()
-            widget_obj.size = widget_obj.texture_size
-            widget_obj.pos = self.set_position(self, widget_obj, widget['x'],
-                                               widget['y'], widget['h_pos'],
-                                               widget['v_pos'])
 
     def set_position(self, slide, widget, x=None, y=None, h_pos=None,
                      v_pos=None):
@@ -151,10 +146,62 @@ class Slide(Screen):
 
         return final_x, final_y
 
-    def add_widget(self, widget, index=0):
+    def add_widgets_from_library(self, name, mode=None):
+        if name not in self.mc.widget_configs:
+            return
+
+        return self.add_widgets_from_config(self.mc.widget_configs[name])
+
+    def add_widgets_from_config(self, config, mode=None):
+        if type(config) is not list:
+            config = [config]
+
+        widgets_added = list()
+
+        for widget in config:
+            widget_obj = widget['widget_cls'](mc=self, config=widget,
+                                              slide=self, mode=mode)
+            self.add_widget(widget_obj)
+            widget_obj.texture_update()
+            widget_obj.size = widget_obj.texture_size
+            widget_obj.pos = self.set_position(self, widget_obj, widget['x'],
+                                               widget['y'], widget['h_pos'],
+                                               widget['v_pos'])
+            widgets_added.append(widget_obj)
+
+        return widgets_added
+
+    def add_widget(self, widget):
+        """Adds a widget to this slide.
+
+        Args:
+            widget: An MPF-enhanced widget (which will include details like z
+                order and what mode created it.
+
+        This method respects the z-order of the widget it's adding and inserts
+        it into the proper position in the widget tree. Higher numbered z order
+        values will be inserted after (so they draw on top) of existing ones.
+
+        If the new widget has the same priority of existing widgets, the new
+        one is inserted after the widgets of that priority, meaning the newest
+        widget will be displayed on top of existing ones with the same
+        priority.
+
+        """
+        my_priority = widget.config['z']
+        index = 0
+
+        for i, w in enumerate(self.children):
+            if w.config['z'] <= my_priority:
+                index = i + 1
+                # need to increment index until we hit the next priority
+                if my_priority < w.config['z']:
+                    break
+
+        # BTW I have no idea why this simpler code doesn't work:
+        # for i, w in enumerate(self.children):
+        #     if w.config['z'] > my_priority:
+        #         index = i
+        #         break
+
         super().add_widget(widget, index)
-
-        # sort widgets
-
-    def _sort_widgets(self):
-        pass

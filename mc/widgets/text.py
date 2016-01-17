@@ -5,6 +5,8 @@ from mc.uix.widget import MpfWidget
 
 
 class Text(MpfWidget, Label):
+
+    widget_type_name = 'Text'
     var_finder = re.compile("(?<=%)[a-zA-Z_0-9|]+(?=%)")
 
     def __init__(self, mc, config, slide, text_variables=None, mode=None,
@@ -32,6 +34,9 @@ class Text(MpfWidget, Label):
 
         self.texture_update()
         self.size = self.texture_size
+
+    def __repr__(self):
+        return '<Text Widget text={}>'.format(self.text)
 
     def _get_text_vars(self):
         return Text.var_finder.findall(self.original_text)

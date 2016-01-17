@@ -13,24 +13,19 @@ class MpfWidget(object):
     mode = ObjectProperty(None, allownone=True)
     """:class:`Mode` object, which is the mode that created this widget."""
 
-    priority = NumericProperty(0)
-    """Priority of this widget."""
-
     config = CaseInsensitiveDict()
     """Dict which holds the settings for this widget."""
 
     slide = None
     """Slide that this widget will be used with."""
 
-    def __init__(self, mode, priority, slide, config, **kwargs):
+    def __init__(self, mode, slide, config, **kwargs):
         super().__init__()
 
+        self.mode = mode
         self.slide = slide
+        self.config = config
 
-        if '_parsed_' in config:
-            self.config = config
-        else:
-            self.config = MpfWidget.parse_config(config)
 
         for k, v in self.config.items():
             if hasattr(self, k):
@@ -49,31 +44,13 @@ class MpfWidget(object):
                                      **{prop: settings['end']})
                     anim.start(self)
 
-    def on_size(self, *args):
+    def __repr__(self):
+        return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
+    def on_size(self, *args):
         self.pos = self.slide.set_position(self.slide, self,
                                             self.config['x'],
                                             self.config['y'],
                                             self.config['h_pos'],
                                             self.config['v_pos'])
 
-    @staticmethod
-    def parse_config(config):
-        """Processes a dict config of slide settings and converts it into
-        the format the widget class actually needs. Also checks & validates it.
-
-        Args:
-            config: The incoming dict to process.
-
-        Returns:
-            dict: Parsed dict, includes the _parsed_ key which indicates it's
-                ready to go.
-
-        """
-
-        # run through the config file validator
-
-        # run each widget through the widget config parser?
-        # should there only be one instance of each widget?
-
-        return config

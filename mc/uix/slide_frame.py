@@ -99,6 +99,8 @@ class SlideFrame(ScreenManager):
         if not isinstance(slide, Slide):
             return
 
+        Slide.active_slides.pop(slide.name, None)
+
         if self.current_screen == self.screens[0]:
             try:
                 self.current = self.screens[1].name
