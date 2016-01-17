@@ -135,6 +135,9 @@ class MpfMcTestCase(unittest.TestCase):
         self.mc.run()
 
     def run_test(self, time):
+        # set the title bar, just for fun. :)
+        self.mc.title = str(self._test_name)
+
         if not self.mc.init_done:
             Clock.schedule_once(self.run_test, 0)
             return

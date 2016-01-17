@@ -13,24 +13,24 @@ displays:
 slides:
   machine_slide_1:
     type: text
-    text: slide1
-    priority: 0
+    text: TEST SLIDE PLAYER - SLIDE 1
+    color: ff0000
   machine_slide_2:
     type: text
-    text: slide2
-    priority: 0
+    text: TEST SLIDE PLAYER - SLIDE 2
+    color: ffaa00
   machine_slide_3:
     type: text
-    text: slide3
-    priority: 0
+    text: TEST SLIDE PLAYER - SLIDE 3
+    color: 00ff00
   machine_slide_4:
     type: text
-    text: slide4
-    priority: 0
+    text: TEST SLIDE PLAYER - SLIDE 4
+    color: 0000ff
   machine_slide_5:
     type: text
-    text: slide5
-    priority: 100
+    text: TEST SLIDE PLAYER - SLIDE 5
+    color: ff00ff
 
 slide_player:
   show_slide_1:

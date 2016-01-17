@@ -11,17 +11,17 @@ displays:
 slides:
   slide1:
     type: text
-    text: hello
+    text: MULTIPLE DISPLAY TEST - SLIDE 1
   slide2:
     type: text
-    text: hello
+    text: MULTIPLE DISPLAY TEST - SLIDE 2
     display: display2
   slide3:
     type: text
-    text: hello
+    text: MULTIPLE DISPLAY TEST - SLIDE 3
   slide4:
     type: text
-    text: hello
+    text: MULTIPLE DISPLAY TEST - SLIDE 4
   slide5:
     type: text
-    text: hello
+    text: MULTIPLE DISPLAY TEST - SLIDE 5

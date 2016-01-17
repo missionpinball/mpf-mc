@@ -90,7 +90,7 @@ class TestSlides(MpfMcTestCase):
             widget_tree.append(s)
 
         # last widget is drawn last (on top), so the order should be flipped
-        self.assertEqual(widget_tree[1].text, 'text3')
-        self.assertEqual(widget_tree[2].text, 'text2')
-        self.assertEqual(widget_tree[3].text, 'text1')
+        self.assertEqual(widget_tree[1].text, 'SLIDE TEST - SLIDE 1 - TEXT 3')
+        self.assertEqual(widget_tree[2].text, 'SLIDE TEST - SLIDE 1 - TEXT 2')
+        self.assertEqual(widget_tree[3].text, 'SLIDE TEST - SLIDE 1 - TEXT 1')
 

@@ -16,20 +16,29 @@ displays:
 slides:
   slide1:
   - type: text
-    text: text1
+    text: SLIDE TEST - SLIDE 1 - TEXT 1
+    y: -50
+    color: ff0000
   - type: text
-    text: text2
+    text: SLIDE TEST - SLIDE 1 - TEXT 2
+    color: 00ff00
   - type: text
-    text: text3
+    text: SLIDE TEST - SLIDE 1 - TEXT 3
+    y: 50
+    color: 0000ff
   slide2:
     type: text
-    text: text2
+    text: SLIDE TEST - SLIDE 2
+    color: 00ffff
   slide3:
     type: text
-    text: text3
+    text: SLIDE TEST - SLIDE 3
+    color: 00ff00
   slide4:
     type: text
-    text: text4
+    text: SLIDE TEST - SLIDE 4
+    color: ffff00
   slide5:
     type: text
-    text: text5
+    text: SLIDE TEST - SLIDE 5
+    color: ffaa00
