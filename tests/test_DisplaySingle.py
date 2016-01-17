@@ -38,13 +38,18 @@ class TestDisplaySingle(MpfMcTestCase):
     def test_current_slide_properties(self):
         slide1 = Slide(mc=self.mc, name='slide1', config={})
 
-        # test display slide frame properties
+        # test display properties
+        self.assertEqual(self.mc.displays['window'].current_slide, slide1)
+        self.assertEqual(self.mc.displays['window'].current_slide_name,
+                         'slide1')
+
+        # test display slide_frame properties
         self.assertEqual(self.mc.displays['window'].slide_frame.current_slide,
                          slide1)
         self.assertEqual(self.mc.displays['window'].slide_frame.current_slide_name,
                          'slide1')
 
-        # test slide frame properties
+        # test slide_frame properties
         self.assertEqual(
                 self.mc.targets['window'].current_slide,
                 slide1)
@@ -52,28 +57,43 @@ class TestDisplaySingle(MpfMcTestCase):
                 self.mc.targets['window'].current_slide_name,
                 'slide1')
 
-        # test target frame properties
+        # test target properties
         self.assertEqual(
                 self.mc.targets['window'].current_slide,
                 slide1)
         self.assertEqual(
                 self.mc.targets['window'].current_slide_name,
                 'slide1')
-
 
         # make sure adding a slide at the same priority replaces the current
-        # one
+        # one.
         slide2 = Slide(mc=self.mc, name='slide2', config={})
         self.assertEqual(self.mc.targets['window'].current_slide, slide2)
         self.assertEqual(self.mc.targets['window'].current_slide_name,
                          'slide2')
+        self.assertEqual(self.mc.displays['window'].current_slide_name,
+                         'slide2')
+        self.assertEqual(self.mc.displays['window'].current_slide, slide2)
 
         # test property setters for slide frames
-        self.mc.targets['window'].current_slide = 'slide2'
+        self.mc.targets['window'].current_slide = 'slide1'
+        self.assertEqual(self.mc.targets['window'].current_slide, slide1)
+
+        self.mc.targets['window'].current_slide_name = 'slide2'
         self.assertEqual(self.mc.targets['window'].current_slide, slide2)
 
-        self.mc.targets['window'].current_slide_name = 'slide1'
+        self.mc.targets['window'].current_slide = slide1
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
+
+        # test property setters for displays
+        self.mc.displays['window'].current_slide = slide2
+        self.assertEqual(self.mc.targets['window'].current_slide, slide2)
+
+        self.mc.displays['window'].current_slide = 'slide1'
+        self.assertEqual(self.mc.targets['window'].current_slide, slide1)
+
+        self.mc.displays['window'].current_slide_name = 'slide2'
+        self.assertEqual(self.mc.targets['window'].current_slide, slide2)
 
     def test_priorities(self):
         slide1 = Slide(mc=self.mc, name='slide1', config={}, priority=100)

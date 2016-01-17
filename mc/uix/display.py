@@ -12,14 +12,6 @@ from mc.uix.slide_frame import SlideFrame
 class Display(ScatterPlane, RelativeLayout):
     displays_to_initialize = 0
 
-    @classmethod
-    def display_initialized(cls):
-        Display.displays_to_initialize -= 1
-        if not Display.displays_to_initialize:
-            return True
-        else:
-            return False
-
     @staticmethod
     def create_default_display(mc):
         Display(mc, 'default', width=1, height=1)
@@ -37,6 +29,27 @@ class Display(ScatterPlane, RelativeLayout):
         super().__init__()
 
         Clock.schedule_once(self._display_created, 0)
+
+    def __repr__(self):
+        return '<Display name={}, size={}x{}>'.format(self.name,
+                                                    self.native_size[0],
+                                                    self.native_size[1])
+
+    @property
+    def current_slide(self):
+        return self.slide_frame.current_slide
+
+    @current_slide.setter
+    def current_slide(self, value):
+        self.slide_frame.current_slide = value
+
+    @property
+    def current_slide_name(self):
+        return self.slide_frame.current_slide_name
+
+    @current_slide_name.setter
+    def current_slide_name(self, value):
+        self.slide_frame.current_slide_name = value
 
     def _display_created(self, *args):
         # There's a race condition since mpf-mc will continue while the display
@@ -67,21 +80,42 @@ class Display(ScatterPlane, RelativeLayout):
 
         Clock.schedule_once(self._init_done)
 
-        if Display.display_initialized():
-            Clock.schedule_once(self.mc.displays_initialized)
-
     def _set_default_target(self):
-        if 'default' not in self.mc.targets:
-            self.mc.targets['default'] = self.slide_frame
-        else:
-            try:
-                if self.config['default']:
-                    self.mc.targets['default'] = self.slide_frame
-            except KeyError:
-                pass
+        try:
+            if self.config['default']:
+                self.mc.targets['default'] = self.slide_frame
+        except KeyError:
+            pass
 
     def _init_done(self, *args):
         self.mc.events.post('display_{}_initialized'.format(self.name))
+
+        Display.displays_to_initialize -= 1
+
+        if not Display.displays_to_initialize:
+            Clock.schedule_once(self._displays_initialized)
+    def _displays_initialized(self, *args):
+
+        if len(self.mc.displays) == 1:
+            self.mc.targets['default'] = [x for x in self.mc.displays.values()][0].slide_frame
+
+        # elif not self.mc.displays:
+        #     Display.create_default_display(self.mc)
+        #     return
+
+        elif not 'default' in self.mc.targets:
+            print('WARNING: You have more than one display, but no default set')
+            for target in ('window', 'dmd'):
+                if target in self.mc.targets:
+                    self.mc.targets['default'] = self.mc.targets[target]
+                    break
+
+            if not 'default' in self.mc.targets:
+                self.mc.targets['default'] = self.mc.displays[(sorted(self.mc.displays.keys()))[0]].slide_frame
+
+        print('Setting default display to', self.mc.targets['default'].name)
+
+        self.mc.displays_initialized()
 
     def _sort_children(self):
         pass

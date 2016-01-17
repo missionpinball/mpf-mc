@@ -18,9 +18,13 @@ class ConfigPlayer(object):
                                                       self.config_file_section)
 
     def process_config(self, config, mode=None, priority=0):
+        # config is localized
         key_list = list()
 
         for event, settings in config.items():
+            settings = self.mc.config_processor.process_config2(
+                    self.config_file_section, settings)
+
             key_list.append(self.mc.events.add_handler(
                     event,
                     self.play,

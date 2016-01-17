@@ -68,11 +68,10 @@ class MpfMcTestCase(unittest.TestCase):
     def advance_time(self, secs=.1):
         start = time()
         self.mc.events._process_event_queue()
-        # while time() < start + secs:
-        #     sleep(.01)
-        #     self.mc.events._process_event_queue()
-            # Clock.tick()
-            # EventLoop.idle()
+        while time() < start + secs:
+            sleep(.01)
+            self.mc.events._process_event_queue()
+            EventLoop.idle()
 
     def setUp(self):
         # Most of the setup is done in run(). Explanation is there.
@@ -133,7 +132,7 @@ class MpfMcTestCase(unittest.TestCase):
         Window.canvas.clear()
 
         Clock.schedule_once(self.run_test, 0)
-        return self.mc.run()
+        self.mc.run()
 
     def run_test(self, time):
         if not self.mc.init_done:

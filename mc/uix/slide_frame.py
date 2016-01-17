@@ -1,15 +1,31 @@
-from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.screenmanager import (ScreenManager, NoTransition,
+                                    SlideTransition, SwapTransition,
+                                    FadeTransition, WipeTransition,
+                                    FallOutTransition, RiseInTransition)
 
 from mc.uix.slide import Slide
+
+transition_map = dict(none=NoTransition,
+                      slide=SlideTransition,
+                      swap=SwapTransition,
+                      fade=FadeTransition,
+                      wipe=WipeTransition,
+                      fall_out=FallOutTransition,
+                      rise_in=RiseInTransition)
 
 
 class SlideFrame(ScreenManager):
     def __init__(self, mc, name):
-        super().__init__()
         self.mc = mc
         self.name = name
+        super().__init__()
 
         mc.targets[name] = self
+
+        self.transition = transition_map['none']()
+
+    def __repr__(self):
+        return '<SlideFrame name={}, parent={}>'.format(self.name, self.parent)
 
     @property
     def current_slide(self):
@@ -42,17 +58,18 @@ class SlideFrame(ScreenManager):
         frame."""
         return self.screens
 
-    def add_slide(self, name, config, priority=0):
-        Slide(mc=self.mc, name=name, target=self.name, config=config)
+    def add_slide(self, name, config, priority=0, show=True, force=False):
+        Slide(mc=self.mc, name=name, target=self.name, config=config,
+              show=show, force=force, priority=priority)
 
-        if not self.current or priority >= self.current_screen.priority:
+        if not self.current_screen or priority >= self.current_screen.priority:
             self.current = name
 
     def add_widget(self, slide, show=True, force=False):
         super().add_widget(screen=slide)
 
         if force:
-            self.current_slide = slide
+            self.current = slide.name
         elif show and ((self.current_slide and slide.priority >=
             self.current_slide.priority) or not self.current_slide):
-            self.current_slide = slide
+            self.current = slide.name

@@ -9,5 +9,5 @@ exclude_lines =
 [run]
 source = mc
 omit =
-    dmd_test.py
-    fbo.py
+    mc/dmd_test.py
+    mc/fbo.py

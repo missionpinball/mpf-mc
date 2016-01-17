@@ -4,11 +4,10 @@ import version
 from .MpfMcTestCase import MpfMcTestCase
 
 
-class TestModes(MpfMcTestCase):
+class TestBcpProcessor(MpfMcTestCase):
 
     def __init__(self, *args):
         super().__init__(*args)
-
 
     def get_machine_path(self):
         return 'tests/machine_files/bcp'

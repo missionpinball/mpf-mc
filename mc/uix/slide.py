@@ -5,7 +5,7 @@ from mc.core.mode import Mode
 
 class Slide(Screen):
     def __init__(self, mc, name, config, target='default', mode=None,
-                 priority=None, **kwargs):
+                 priority=None, show=True, force=False, **kwargs):
         self.mc = mc
         self.name = name
         self.priority = None
@@ -37,7 +37,7 @@ class Slide(Screen):
 
         self._create_widgets_from_config(config)
 
-        target.add_widget(self)
+        target.add_widget(slide=self, show=show, force=force)
 
     def __repr__(self):
         return '<Slide name={}, priority={}>'.format(self.name, self.priority)

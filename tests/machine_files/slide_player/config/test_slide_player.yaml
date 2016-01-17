@@ -14,15 +14,19 @@ slides:
   machine_slide_1:
     type: text
     text: slide1
+    priority: 0
   machine_slide_2:
     type: text
     text: slide2
+    priority: 0
   machine_slide_3:
     type: text
     text: slide3
+    priority: 0
   machine_slide_4:
     type: text
     text: slide4
+    priority: 0
   machine_slide_5:
     type: text
     text: slide5
@@ -41,8 +45,12 @@ slide_player:
     slide: machine_slide_4
   show_slide_5:
     slide: machine_slide_5
-  replace_slide_5_with_4:
-    slide: machine_slide_4
-  replace_slide_5_with_4_with_priority:
+  show_slide_4_p200:
     slide: machine_slide_4
     priority: 200
+  show_slide_1_force:
+    slide: machine_slide_1
+    force: true
+  add_slide_5_dont_show:
+    slide: slide1
+    show: false
