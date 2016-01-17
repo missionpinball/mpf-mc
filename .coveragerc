@@ -11,3 +11,4 @@ source = mc
 omit =
     mc/dmd_test.py
     mc/fbo.py
+    mc/bcp_server.py

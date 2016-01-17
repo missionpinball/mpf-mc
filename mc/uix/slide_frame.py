@@ -75,7 +75,7 @@ class SlideFrame(ScreenManager):
         if force:
             self.current = slide.name
         elif show:
-            self.current = self.screens[0].name
+            self.show_current_slide()
 
     def _sort_slides(self):
         # sort reverse order by priority, then by creation order (so if two
@@ -84,7 +84,6 @@ class SlideFrame(ScreenManager):
                               reverse=True)
         self.screens = sorted(self.screens, key=attrgetter('priority'),
                               reverse=True)
-
 
     def show_current_slide(self):
         if self.screens[0] != self.current_screen:
