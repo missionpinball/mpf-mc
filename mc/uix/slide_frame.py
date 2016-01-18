@@ -33,11 +33,16 @@ class SlideFrameParent(FloatLayout):
 
         super().add_widget(self.slide_frame)
 
+    def __repr__(self):
+        return '<SlideFrameParent name={}>'.format(self.name)
+
     def add_widget(self, widget):
         widget.config['z'] = abs(widget.config['z'])
 
-        super().add_widget(widget, Slide.get_insert_index(
-                z=abs(widget.config['z']), target_widget=self))
+        super().add_widget(widget=widget,
+                           index=Slide.get_insert_index(
+                                   z=abs(widget.config['z']),
+                                   target_widget=self))
 
 
 class SlideFrame(MpfWidget, ScreenManager):

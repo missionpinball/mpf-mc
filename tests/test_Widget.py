@@ -265,8 +265,6 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.children])
 
         # verify widget6 is the highest priority in the parent frame
-        print(self.mc.targets['default'].parent)
-        print(self.mc.targets['default'].parent.children)
         self.assertEqual('widget6', self.mc.targets[
             'default'].parent.children[-1].text)
         self.assertTrue(isinstance(self.mc.targets[

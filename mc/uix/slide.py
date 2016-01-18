@@ -198,9 +198,6 @@ class Slide(Screen):
 
         # this might be able to be a count of a list comprehension or something
 
-        print(target_widget)
-        print(target_widget.children)
-
         for i, w in enumerate(target_widget.children):
 
             try:
