@@ -4,6 +4,8 @@ from kivy.properties import ObjectProperty
 from kivy.animation import Animation
 from mpf.system.config import CaseInsensitiveDict
 
+from mc.uix.slide import Slide
+
 
 class MpfWidget(object):
     """Mixin class that's used to extend all the Kivy widget base classes with
@@ -54,7 +56,9 @@ class MpfWidget(object):
 
     def on_size(self, *args):
         try:
-            self.pos = self.slide.set_position(self.slide, self,
+            self.pos = Slide.set_position(self.parent.width,
+                                                self.parent.height,
+                                                self.width, self.height,
                                                 self.config['x'],
                                                 self.config['y'],
                                                 self.config['h_pos'],

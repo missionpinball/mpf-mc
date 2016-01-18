@@ -1,6 +1,5 @@
 from operator import attrgetter
 
-from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     SlideTransition, SwapTransition,
@@ -23,14 +22,16 @@ class SlideFrameParent(FloatLayout):
     def __init__(self, mc, name, slide_frame):
         self.mc = mc
         self.name = slide_frame.name
-        self.size = slide_frame.native_size
-        self.ready = False
-        super().__init__()
 
-        super().add_widget(slide_frame)
+        self.ready = False
+        self.size_hint = (None, None)
+        super().__init__()
+        self.size = slide_frame.native_size
+        self.add_widget(slide_frame)
 
     def __repr__(self):
-        return '<SlideFrameParent name={}>'.format(self.name)
+        return '<SlideFrameParent name={}, parent={}>'.format(self.name,
+                                                              self.parent)
 
     def add_widget(self, widget):
         widget.config['z'] = abs(widget.config['z'])
@@ -40,15 +41,28 @@ class SlideFrameParent(FloatLayout):
                                    z=abs(widget.config['z']),
                                    target_widget=self))
 
+    def on_size(self, *args):
+        for widget in self.children:
+            widget.pos = Slide.set_position(self.width, self.height,
+                                            widget.width, widget.height)
+
 
 class SlideFrame(MpfWidget, ScreenManager):
-    def __init__(self, mc, name=None, config=None, slide=None, mode=None,
-                 init_callback=None):
+    def __init__(self, mc, name=None, config=None, slide=None, mode=None):
 
         self.name = name  # needs to be set before super()
+
+        # If this is a the main SlideFrame of a display, it will get its size
+        # from its parent. If this is a widget, it will get its size from
+        # the config.
+        try:
+            self.native_size = (config['width'], config['height'])
+        except (KeyError, TypeError):
+            self.native_size = self.slide.native_size
+
         super().__init__(mc=mc, mode=mode, slide=slide, config=config)
         self.slide_frame_parent = None
-        self.init_callback = init_callback
+        # self.init_callback = init_callback
 
         # minimal config needed if this is a widget
         if not config:
@@ -57,60 +71,17 @@ class SlideFrame(MpfWidget, ScreenManager):
         if 'z' not in self.config:
             self.config['z'] = 0
 
-        # If this is a the main SlideFrame of a display, it will get its size
-        # from its parent. If this is a widget, it will get its size from
-        # the config.
-        try:
-            self.native_size = (config['width'], config['height'])
-        except (KeyError, TypeError):
-            self.native_size = self.parent.native_size
-
         self.transition = transition_map['none']()
 
         self.slide_frame_parent = SlideFrameParent(mc, name, self)
         self.slide_frame_parent.config = self.config
 
-        Clock.schedule_once(self._check_for_init_complete, 0)
-
-    def __repr__(self):
-        return '<SlideFrame name={}, parent={}>'.format(self.name, self.parent)
-
-    def _check_for_init_complete(self, *args):
-        if (self.size[0] != self.native_size[0] or
-                    self.size[1] != self.native_size[1] or
-                    self.slide_frame_parent.size[0] != self.native_size[0] or
-                    self.slide_frame_parent.size[1] != self.native_size[1]):
-
-            self.slide_frame_parent.size = self.native_size
-
-            Clock.schedule_once(self._check_for_init_complete, 0)
-
-        else:
-            self._init_complete()
-
-    def _init_complete(self):
-        if callable(self.init_callback):
-            self.init_callback()
-        del self.init_callback
-        self.ready = True
-        self.slide_frame_parent.ready = True
-
-        # Don't make it a valid target until it's ready
         self.mc.targets[self.name] = self
 
-    def on_size(self, *args):
-        # We can get rid of these trys if we can figure out the exact order of
-        # everything in __init__(), but meh...
-        try:
-            self.slide_frame_parent.size = self.size
-        except AttributeError:
-            pass
-
-    def on_pos(self, *args):
-        try:
-            self.slide_frame_parent.pos = self.pos
-        except AttributeError:
-            pass
+    def __repr__(self):
+        return '<SlideFrame name={}, current slide={}, total slides={' \
+               '}>'.format(
+                self.name, self.current_slide_name, len(self.screens))
 
     @property
     def current_slide(self):

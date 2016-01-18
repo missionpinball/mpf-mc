@@ -15,17 +15,12 @@ class TestSlideFrame(MpfMcTestCase):
                                              config=self.mc.slide_configs[
                                                  'slide1'])
 
-        # it takes a few frames for new slide frames to initialize, so we have
-        # to wait for that to be done and to get added to the list
-        while len(self.mc.targets['default'].current_slide.children) == 1:
-            self.advance_time(.01)
-
         # make sure our slide frame is a valid target
         self.assertIn('frame1', self.mc.targets)
 
-        # the slide frame's parent should be a widget in slide1
+        # the slide frame's parent should be the first widget in slide1
         self.assertEqual(
-                self.mc.targets['default'].current_slide.children[1].name,
+                self.mc.targets['default'].current_slide.children[0].name,
                 'frame1')
 
         # grab some references which are easy to follow
@@ -47,8 +42,14 @@ class TestSlideFrame(MpfMcTestCase):
         # make sure the slide frame is the right size and in the right pos
         self.assertEqual(frame1_frame.size, [200, 100])
         self.assertEqual(frame1_frame.pos, [200, 200])
-        self.assertEqual(frame1_frame_parent.size, [400, 300])
+
+        # it's parent should be the same size and pos
+        self.assertEqual(frame1_frame_parent.size, [200, 100])
         self.assertEqual(frame1_frame_parent.pos, [200, 200])
+
+        # it's parent's parent is the display
+        self.assertEqual(frame1_frame_parent.parent.size, [400, 300])
+        self.assertEqual(frame1_frame_parent.parent.pos, [0, 0])
 
         # add a widget to the frame
         self.mc.events.post('show_frame_text')

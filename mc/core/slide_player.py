@@ -15,13 +15,13 @@ class SlidePlayer(ConfigPlayer):
 
             name = s['slide']
 
-            try:
+            if s['target']:
                 target = self.mc.targets[s['target']]
-            except KeyError:
-                if mode:
-                    target = mode.target
-                else:
-                    target = self.mc.targets['default']
+
+            elif mode:
+                target = mode.target
+            else:
+                target = self.mc.targets['default']
 
             # if the slide already exists and is not active, show it
             if not target.show_slide(name, s['force']):

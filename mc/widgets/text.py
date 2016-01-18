@@ -123,7 +123,7 @@ class Text(MpfWidget, Label):
 
                 # group the numbers and replace them in the string
                 for item in number_list:
-                    grouped_item = self.group_digits(item)
+                    grouped_item = Text.group_digits(item)
                     text = text.replace(str(item), grouped_item)
 
                     # Are we set up for multi-language?
@@ -174,6 +174,7 @@ class Text(MpfWidget, Label):
         self.machine.events.remove_handler(self._player_var_change)
         self.machine.events.remove_handler(self._machine_var_change)
 
+    @staticmethod
     def group_digits(self, text, separator=',', group_size=3):
         """Enables digit grouping (i.e. adds comma separators between
         thousands digits).
