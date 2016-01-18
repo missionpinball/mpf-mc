@@ -1,6 +1,5 @@
 *.pyc
 *.pyo
-*.c
 *.so
 *.swp
 build
