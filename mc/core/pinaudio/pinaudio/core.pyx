@@ -23,6 +23,7 @@ __all__ = (
     'AudioException')
 
 DEF SDL_INIT_AUDIO = 0x10
+
 DEF MIX_CHANNELS_MAX = 8
 DEF AUDIO_S16SYS = 0x8010
 DEF AUDIO_S8 = 0x8008
@@ -373,7 +374,7 @@ cdef class AudioOutput:
         self.raw_chunk_silence = NULL
 
     def __init__(self, rate=44100, channels=2, buffersize=1024, encoding=16,
-                 formats=MIX_INIT_FLAC|MIX_INIT_MP3|MIX_INIT_OGG):
+                 formats=MIX_INIT_FLAC|MIX_INIT_OGG):
         self.samples = {}
         self.next_sample_number = 1
         self.rate = rate
@@ -449,6 +450,8 @@ cdef class AudioOutput:
         self.audio_init = 1
         return 0
 
+    # TODO: Implement a close function/destructor for the audio output to shut everything down and clean up
+
     @property
     def supports_wav(self):
         return self.audio_init == 1
@@ -460,10 +463,6 @@ cdef class AudioOutput:
     @property
     def supports_flac(self):
         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC
-
-    @property
-    def supports_mp3(self):
-        return self.audio_init == 1 and (self.supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3
 
     def load_sample(self, str file_name, float default_volume=1.0, int simultaneous_limit=-1):
         """
@@ -567,6 +566,11 @@ cdef class AudioOutput:
             return False
 
         if channel < 0 or channel >= len(self.mixer_channels):
+            return False
+
+        # Make sure channel has been enabled
+        channel_playing = (Mix_Playing(channel) == 1)
+        if not channel_playing:
             return False
 
         cdef MixerChannel *mix_channel = \

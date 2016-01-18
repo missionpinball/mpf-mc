@@ -106,6 +106,8 @@ cdef extern from "SDL_mixer.h" nogil:
     void Mix_Pause(int channel)
     void Mix_Resume(int channel)
     void Mix_CloseAudio()
+    int Mix_Playing(int channel)
+    int Mix_Paused(int channel)
     int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
     int Mix_HaltChannel(int channel)
     char *Mix_GetError()

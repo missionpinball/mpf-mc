@@ -506,9 +506,9 @@ typedef struct __pyx_t_8pinaudio_4core_FadeEnvelope __pyx_t_8pinaudio_4core_Fade
 struct __pyx_t_8pinaudio_4core_AudioEventData;
 typedef struct __pyx_t_8pinaudio_4core_AudioEventData __pyx_t_8pinaudio_4core_AudioEventData;
 struct __pyx_t_8pinaudio_4core_Sample16Bytes;
-union __pyx_t_8pinaudio_4core_Sample16Bits;
+union __pyx_t_8pinaudio_4core_Sample16Bit;
 
-/* "pinaudio\core.pyx":926
+/* "pinaudio\core.pyx":932
  *     return -1
  * 
  * cdef enum AudioSamplePlayerStatus:             # <<<<<<<<<<<<<<
@@ -522,7 +522,7 @@ enum __pyx_t_8pinaudio_4core_AudioSamplePlayerStatus {
   __pyx_e_8pinaudio_4core_player_finished
 };
 
-/* "pinaudio\core.pyx":944
+/* "pinaudio\core.pyx":950
  *     int sample_number
  * 
  * cdef enum DuckingEnvelopeSegment:             # <<<<<<<<<<<<<<
@@ -538,7 +538,7 @@ enum __pyx_t_8pinaudio_4core_DuckingEnvelopeSegment {
   __pyx_e_8pinaudio_4core_finished_segment
 };
 
-/* "pinaudio\core.pyx":982
+/* "pinaudio\core.pyx":988
  *     int fade_out_time
  * 
  * cdef enum AudioEvent:             # <<<<<<<<<<<<<<
@@ -551,7 +551,7 @@ enum __pyx_t_8pinaudio_4core_AudioEvent {
   __pyx_e_8pinaudio_4core_event_sound_stop
 };
 
-/* "pinaudio\core.pyx":819
+/* "pinaudio\core.pyx":825
  * 
  * 
  * ctypedef struct MixerChannel:             # <<<<<<<<<<<<<<
@@ -568,7 +568,7 @@ struct __pyx_t_8pinaudio_4core_MixerChannel {
   __pyx_t_8pinaudio_4core_AudioEventData *events;
 };
 
-/* "pinaudio\core.pyx":830
+/* "pinaudio\core.pyx":836
  *     AudioEventData *events
  * 
  * cdef MixerChannel *alloc_mixer_channel(int channel, int simultaneous_sounds=1) nogil:             # <<<<<<<<<<<<<<
@@ -580,7 +580,7 @@ struct __pyx_opt_args_8pinaudio_4core_alloc_mixer_channel {
   int simultaneous_sounds;
 };
 
-/* "pinaudio\core.pyx":932
+/* "pinaudio\core.pyx":938
  *     player_finished
  * 
  * ctypedef struct AudioSamplePlayer:             # <<<<<<<<<<<<<<
@@ -597,7 +597,7 @@ struct __pyx_t_8pinaudio_4core_AudioSamplePlayer {
   int sample_number;
 };
 
-/* "pinaudio\core.pyx":952
+/* "pinaudio\core.pyx":958
  *     finished_segment
  * 
  * ctypedef struct DuckingEnvelope:             # <<<<<<<<<<<<<<
@@ -619,7 +619,7 @@ struct __pyx_t_8pinaudio_4core_DuckingEnvelope {
   __pyx_t_8pinaudio_4core_DuckingEnvelope *next;
 };
 
-/* "pinaudio\core.pyx":976
+/* "pinaudio\core.pyx":982
  * 
  * 
  * ctypedef struct FadeEnvelope:             # <<<<<<<<<<<<<<
@@ -633,7 +633,7 @@ struct __pyx_t_8pinaudio_4core_FadeEnvelope {
   int fade_out_time;
 };
 
-/* "pinaudio\core.pyx":987
+/* "pinaudio\core.pyx":993
  *     event_sound_stop
  * 
  * ctypedef struct AudioEventData:             # <<<<<<<<<<<<<<
@@ -647,7 +647,7 @@ struct __pyx_t_8pinaudio_4core_AudioEventData {
   int sample_number;
 };
 
-/* "pinaudio\core.pyx":993
+/* "pinaudio\core.pyx":999
  *     int sample_number
  * 
  * cdef struct Sample16Bytes:             # <<<<<<<<<<<<<<
@@ -659,19 +659,19 @@ struct __pyx_t_8pinaudio_4core_Sample16Bytes {
   __pyx_t_8pinaudio_4core_int8_t byte2;
 };
 
-/* "pinaudio\core.pyx":997
+/* "pinaudio\core.pyx":1003
  *     int8_t byte2
  * 
- * cdef union Sample16Bits:             # <<<<<<<<<<<<<<
+ * cdef union Sample16Bit:             # <<<<<<<<<<<<<<
  *     int16_t value
  *     Sample16Bytes bytes
  */
-union __pyx_t_8pinaudio_4core_Sample16Bits {
+union __pyx_t_8pinaudio_4core_Sample16Bit {
   __pyx_t_8pinaudio_4core_int16_t value;
   struct __pyx_t_8pinaudio_4core_Sample16Bytes bytes;
 };
 
-/* "pinaudio\core.pyx":346
+/* "pinaudio\core.pyx":350
  * 
  * 
  * cdef class AudioOutput:             # <<<<<<<<<<<<<<
@@ -999,17 +999,16 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
 static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_4supports_wav(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_6supports_ogg(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_8supports_flac(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_10supports_mp3(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, PyObject *__pyx_v_file_name, float __pyx_v_default_volume, int __pyx_v_simultaneous_limit); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_sample_number); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_sample_number, int __pyx_v_channel, float __pyx_v_volume); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope_to_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel, int __pyx_v_delay_time, int __pyx_v_attack_time, float __pyx_v_attenuation, int __pyx_v_release_point, int __pyx_v_release_time); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_simultaneous_sounds); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_22enable_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24enable_all_mixer_channels(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volume(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel, float __pyx_v_volume); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_volume(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, float __pyx_v_volume); /* proto */
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_10load_sample(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, PyObject *__pyx_v_file_name, float __pyx_v_default_volume, int __pyx_v_simultaneous_limit); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12unload_sample(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_sample_number); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14play_sample_on_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_sample_number, int __pyx_v_channel, float __pyx_v_volume); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16apply_ducking_envelope_to_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel, int __pyx_v_delay_time, int __pyx_v_attack_time, float __pyx_v_attenuation, int __pyx_v_release_point, int __pyx_v_release_time); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18add_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_simultaneous_sounds); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20enable_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_22enable_all_mixer_channels(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24set_mixer_channel_volume(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel, float __pyx_v_volume); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_all_mixer_channel_volume(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, float __pyx_v_volume); /* proto */
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28process_event_callbacks(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_4rate___get__(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_8channels___get__(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_10buffersize___get__(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self); /* proto */
@@ -1058,7 +1057,6 @@ static char __pyx_k_attack_time[] = "attack_time";
 static char __pyx_k_attenuation[] = "attenuation";
 static char __pyx_k_get_version[] = "get_version";
 static char __pyx_k_release_time[] = "release_time";
-static char __pyx_k_supports_mp3[] = "supports_mp3";
 static char __pyx_k_supports_ogg[] = "supports_ogg";
 static char __pyx_k_supports_wav[] = "supports_wav";
 static char __pyx_k_pinaudio_core[] = "pinaudio.core";
@@ -1155,7 +1153,6 @@ static PyObject *__pyx_n_s_set_mixer_channel_volume;
 static PyObject *__pyx_n_s_simultaneous_limit;
 static PyObject *__pyx_n_s_simultaneous_sounds;
 static PyObject *__pyx_n_s_supports_flac;
-static PyObject *__pyx_n_s_supports_mp3;
 static PyObject *__pyx_n_s_supports_ogg;
 static PyObject *__pyx_n_s_supports_wav;
 static PyObject *__pyx_n_s_test;
@@ -1181,7 +1178,7 @@ static PyObject *__pyx_codeobj__7;
 static PyObject *__pyx_codeobj__9;
 static PyObject *__pyx_codeobj__11;
 
-/* "pinaudio\core.pyx":53
+/* "pinaudio\core.pyx":54
  * 
  * 
  * cdef void mix_track_callback_s8(int channel, void *stream, int length, void *userdata) nogil:             # <<<<<<<<<<<<<<
@@ -1223,7 +1220,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
   __Pyx_RefNannySetupContext("mix_track_callback_s8", 1);
   /*try:*/ {
 
-    /* "pinaudio\core.pyx":63
+    /* "pinaudio\core.pyx":64
  *     :return: None
  *     """
  *     if userdata == NULL:             # <<<<<<<<<<<<<<
@@ -1233,7 +1230,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
     __pyx_t_1 = ((__pyx_v_userdata == NULL) != 0);
     if (__pyx_t_1) {
 
-      /* "pinaudio\core.pyx":64
+      /* "pinaudio\core.pyx":65
  *     """
  *     if userdata == NULL:
  *         return             # <<<<<<<<<<<<<<
@@ -1243,7 +1240,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
       goto __pyx_L3_return;
     }
 
-    /* "pinaudio\core.pyx":69
+    /* "pinaudio\core.pyx":70
  *     # This is so SDL_Mixer thinks the channel is active and will call the channel callback
  *     # function which is used to read and mix the source audio.
  *     cdef MixerChannel *mix_channel = <MixerChannel*>userdata             # <<<<<<<<<<<<<<
@@ -1252,7 +1249,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
     __pyx_v_mix_channel = ((__pyx_t_8pinaudio_4core_MixerChannel *)__pyx_v_userdata);
 
-    /* "pinaudio\core.pyx":72
+    /* "pinaudio\core.pyx":73
  * 
  *     # Attempt to lock the track/channel mutex while performing operations on the track/channel
  *     if SDL_LockMutex(mix_channel.mutex) != 0:             # <<<<<<<<<<<<<<
@@ -1262,7 +1259,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
     __pyx_t_1 = ((SDL_LockMutex(__pyx_v_mix_channel->mutex) != 0) != 0);
     if (__pyx_t_1) {
 
-      /* "pinaudio\core.pyx":73
+      /* "pinaudio\core.pyx":74
  *     # Attempt to lock the track/channel mutex while performing operations on the track/channel
  *     if SDL_LockMutex(mix_channel.mutex) != 0:
  *         return             # <<<<<<<<<<<<<<
@@ -1272,7 +1269,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
       goto __pyx_L3_return;
     }
 
-    /* "pinaudio\core.pyx":76
+    /* "pinaudio\core.pyx":77
  * 
  *     # Get the current clock from SDL (it is used for the audio timing master)
  *     cdef uint32_t sdl_ticks = SDL_GetTicks()             # <<<<<<<<<<<<<<
@@ -1281,7 +1278,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
     __pyx_v_sdl_ticks = SDL_GetTicks();
 
-    /* "pinaudio\core.pyx":80
+    /* "pinaudio\core.pyx":81
  *     # Setup source and destination buffer pointers/values
  *     cdef int8_t *dst8
  *     dst8 = <int8_t*>stream             # <<<<<<<<<<<<<<
@@ -1290,7 +1287,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
     __pyx_v_dst8 = ((__pyx_t_8pinaudio_4core_int8_t *)__pyx_v_stream);
 
-    /* "pinaudio\core.pyx":87
+    /* "pinaudio\core.pyx":88
  * 
  *     # Loop over all channel audio playback objects
  *     for i in range(mix_channel.max_simultaneous_sounds):             # <<<<<<<<<<<<<<
@@ -1301,7 +1298,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
     for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
       __pyx_v_i = __pyx_t_3;
 
-      /* "pinaudio\core.pyx":89
+      /* "pinaudio\core.pyx":90
  *     for i in range(mix_channel.max_simultaneous_sounds):
  *         # Check if player has a sound pending playback (ready to start)
  *         if mix_channel.sample_players[i].status is player_pending:             # <<<<<<<<<<<<<<
@@ -1311,7 +1308,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
       __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).status == __pyx_e_8pinaudio_4core_player_pending) != 0);
       if (__pyx_t_1) {
 
-        /* "pinaudio\core.pyx":92
+        /* "pinaudio\core.pyx":93
  *             # Sound ready to start playback, send notification and set status to playing
  *             # TODO: set notification that a sound has started playing
  *             mix_channel.sample_players[i].status = player_playing             # <<<<<<<<<<<<<<
@@ -1320,7 +1317,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
         (__pyx_v_mix_channel->sample_players[__pyx_v_i]).status = __pyx_e_8pinaudio_4core_player_playing;
 
-        /* "pinaudio\core.pyx":94
+        /* "pinaudio\core.pyx":95
  *             mix_channel.sample_players[i].status = player_playing
  * 
  *             with gil:             # <<<<<<<<<<<<<<
@@ -1333,20 +1330,20 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
             #endif
             /*try:*/ {
 
-              /* "pinaudio\core.pyx":95
+              /* "pinaudio\core.pyx":96
  * 
  *             with gil:
  *                 print("Callback: Changing status from pending to playing (sample {} on channel {} with player {})".format(mix_channel.sample_players[i].sample_number, channel, i))             # <<<<<<<<<<<<<<
  * 
  *         # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
  */
-              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Callback_Changing_status_from_pe, __pyx_n_s_format); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Callback_Changing_status_from_pe, __pyx_n_s_format); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
               __Pyx_GOTREF(__pyx_t_5);
-              __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+              __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
               __Pyx_GOTREF(__pyx_t_6);
-              __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+              __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
               __Pyx_GOTREF(__pyx_t_7);
-              __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+              __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
               __Pyx_GOTREF(__pyx_t_8);
               __pyx_t_9 = NULL;
               __pyx_t_10 = 0;
@@ -1360,7 +1357,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
                   __pyx_t_10 = 1;
                 }
               }
-              __pyx_t_11 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+              __pyx_t_11 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
               __Pyx_GOTREF(__pyx_t_11);
               if (__pyx_t_9) {
                 PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __Pyx_GIVEREF(__pyx_t_9); __pyx_t_9 = NULL;
@@ -1374,22 +1371,22 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
               __pyx_t_6 = 0;
               __pyx_t_7 = 0;
               __pyx_t_8 = 0;
-              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-              __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+              __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
               __Pyx_GOTREF(__pyx_t_5);
               PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
               __Pyx_GIVEREF(__pyx_t_4);
               __pyx_t_4 = 0;
-              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
+              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L14_error;}
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             }
 
-            /* "pinaudio\core.pyx":94
+            /* "pinaudio\core.pyx":95
  *             mix_channel.sample_players[i].status = player_playing
  * 
  *             with gil:             # <<<<<<<<<<<<<<
@@ -1416,7 +1413,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
       }
       __pyx_L10:;
 
-      /* "pinaudio\core.pyx":98
+      /* "pinaudio\core.pyx":99
  * 
  *         # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
  *         if mix_channel.sample_players[i].status is player_playing and mix_channel.sample_players[i].volume > 0:             # <<<<<<<<<<<<<<
@@ -1434,7 +1431,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
       __pyx_L17_bool_binop_done:;
       if (__pyx_t_1) {
 
-        /* "pinaudio\core.pyx":101
+        /* "pinaudio\core.pyx":102
  * 
  *             # Get source sample buffer
  *             src8 = <int8_t*>mix_channel.sample_players[i].chunk.abuf             # <<<<<<<<<<<<<<
@@ -1443,7 +1440,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
         __pyx_v_src8 = ((__pyx_t_8pinaudio_4core_int8_t *)(__pyx_v_mix_channel->sample_players[__pyx_v_i]).chunk->abuf);
 
-        /* "pinaudio\core.pyx":103
+        /* "pinaudio\core.pyx":104
  *             src8 = <int8_t*>mix_channel.sample_players[i].chunk.abuf
  * 
  *             with gil:             # <<<<<<<<<<<<<<
@@ -1456,20 +1453,20 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
             #endif
             /*try:*/ {
 
-              /* "pinaudio\core.pyx":104
+              /* "pinaudio\core.pyx":105
  * 
  *             with gil:
  *                 print("Callback: Playing (sample {} on channel {} with player {})".format(mix_channel.sample_players[i].sample_number, channel, i))             # <<<<<<<<<<<<<<
  * 
  *             # Loop over destination buffer one byte at a time, mixing in the source sample
  */
-              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Callback_Playing_sample_on_chann, __pyx_n_s_format); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Callback_Playing_sample_on_chann, __pyx_n_s_format); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 105; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
               __Pyx_GOTREF(__pyx_t_5);
-              __pyx_t_11 = __Pyx_PyInt_From_int((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+              __pyx_t_11 = __Pyx_PyInt_From_int((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 105; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
               __Pyx_GOTREF(__pyx_t_11);
-              __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+              __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 105; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
               __Pyx_GOTREF(__pyx_t_8);
-              __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+              __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 105; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
               __Pyx_GOTREF(__pyx_t_7);
               __pyx_t_6 = NULL;
               __pyx_t_10 = 0;
@@ -1483,7 +1480,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
                   __pyx_t_10 = 1;
                 }
               }
-              __pyx_t_9 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+              __pyx_t_9 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 105; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
               __Pyx_GOTREF(__pyx_t_9);
               if (__pyx_t_6) {
                 PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_6); __Pyx_GIVEREF(__pyx_t_6); __pyx_t_6 = NULL;
@@ -1497,22 +1494,22 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
               __pyx_t_11 = 0;
               __pyx_t_8 = 0;
               __pyx_t_7 = 0;
-              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_9, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 105; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-              __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+              __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 105; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
               __Pyx_GOTREF(__pyx_t_5);
               PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
               __Pyx_GIVEREF(__pyx_t_4);
               __pyx_t_4 = 0;
-              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 104; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
+              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 105; __pyx_clineno = __LINE__; goto __pyx_L22_error;}
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             }
 
-            /* "pinaudio\core.pyx":103
+            /* "pinaudio\core.pyx":104
  *             src8 = <int8_t*>mix_channel.sample_players[i].chunk.abuf
  * 
  *             with gil:             # <<<<<<<<<<<<<<
@@ -1536,7 +1533,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
             }
         }
 
-        /* "pinaudio\core.pyx":107
+        /* "pinaudio\core.pyx":108
  * 
  *             # Loop over destination buffer one byte at a time, mixing in the source sample
  *             for index in range(length):             # <<<<<<<<<<<<<<
@@ -1547,7 +1544,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
         for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
           __pyx_v_index = __pyx_t_14;
 
-          /* "pinaudio\core.pyx":110
+          /* "pinaudio\core.pyx":111
  * 
  *                 # Get source sample byte and apply sample volume
  *                 src_sample = src8[mix_channel.sample_players[i].sample_pos]             # <<<<<<<<<<<<<<
@@ -1556,7 +1553,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
           __pyx_v_src_sample = (__pyx_v_src8[(__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_pos]);
 
-          /* "pinaudio\core.pyx":111
+          /* "pinaudio\core.pyx":112
  *                 # Get source sample byte and apply sample volume
  *                 src_sample = src8[mix_channel.sample_players[i].sample_pos]
  *                 src_sample = (src_sample * mix_channel.sample_players[i].volume) / MIX_MAX_VOLUME             # <<<<<<<<<<<<<<
@@ -1565,7 +1562,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
           __pyx_v_src_sample = __Pyx_div_long((__pyx_v_src_sample * (__pyx_v_mix_channel->sample_players[__pyx_v_i]).volume), 128);
 
-          /* "pinaudio\core.pyx":114
+          /* "pinaudio\core.pyx":115
  * 
  *                 # Calculate the new destination sample (mix in source sample)
  *                 dst_sample = dst8[index] + src_sample             # <<<<<<<<<<<<<<
@@ -1574,7 +1571,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
           __pyx_v_dst_sample = ((__pyx_v_dst8[__pyx_v_index]) + __pyx_v_src_sample);
 
-          /* "pinaudio\core.pyx":117
+          /* "pinaudio\core.pyx":118
  * 
  *                 # Apply clipping to destination sample
  *                 if dst_sample > MAX_AUDIO_VALUE_S8:             # <<<<<<<<<<<<<<
@@ -1584,7 +1581,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
           __pyx_t_1 = ((__pyx_v_dst_sample > 127) != 0);
           if (__pyx_t_1) {
 
-            /* "pinaudio\core.pyx":118
+            /* "pinaudio\core.pyx":119
  *                 # Apply clipping to destination sample
  *                 if dst_sample > MAX_AUDIO_VALUE_S8:
  *                     dst8[index] = MAX_AUDIO_VALUE_S8             # <<<<<<<<<<<<<<
@@ -1595,7 +1592,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
             goto __pyx_L26;
           }
 
-          /* "pinaudio\core.pyx":119
+          /* "pinaudio\core.pyx":120
  *                 if dst_sample > MAX_AUDIO_VALUE_S8:
  *                     dst8[index] = MAX_AUDIO_VALUE_S8
  *                 elif dst_sample < MIN_AUDIO_VALUE_S8:             # <<<<<<<<<<<<<<
@@ -1605,7 +1602,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
           __pyx_t_1 = ((__pyx_v_dst_sample < -128) != 0);
           if (__pyx_t_1) {
 
-            /* "pinaudio\core.pyx":120
+            /* "pinaudio\core.pyx":121
  *                     dst8[index] = MAX_AUDIO_VALUE_S8
  *                 elif dst_sample < MIN_AUDIO_VALUE_S8:
  *                     dst8[index] = MIN_AUDIO_VALUE_S8             # <<<<<<<<<<<<<<
@@ -1617,7 +1614,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
           }
           /*else*/ {
 
-            /* "pinaudio\core.pyx":122
+            /* "pinaudio\core.pyx":123
  *                     dst8[index] = MIN_AUDIO_VALUE_S8
  *                 else:
  *                     dst8[index] = dst_sample             # <<<<<<<<<<<<<<
@@ -1628,7 +1625,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
           }
           __pyx_L26:;
 
-          /* "pinaudio\core.pyx":125
+          /* "pinaudio\core.pyx":126
  * 
  *                 # Advance the source sample pointer to the next sample (byte)
  *                 mix_channel.sample_players[i].sample_pos += 1             # <<<<<<<<<<<<<<
@@ -1638,7 +1635,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
           __pyx_t_15 = __pyx_v_i;
           (__pyx_v_mix_channel->sample_players[__pyx_t_15]).sample_pos = ((__pyx_v_mix_channel->sample_players[__pyx_t_15]).sample_pos + 1);
 
-          /* "pinaudio\core.pyx":128
+          /* "pinaudio\core.pyx":129
  * 
  *                 # Check if we are at the end of the source sample buffer (loop if applicable)
  *                 if mix_channel.sample_players[i].sample_pos > mix_channel.sample_players[i].chunk.alen:             # <<<<<<<<<<<<<<
@@ -1648,7 +1645,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
           __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_pos > (__pyx_v_mix_channel->sample_players[__pyx_v_i]).chunk->alen) != 0);
           if (__pyx_t_1) {
 
-            /* "pinaudio\core.pyx":129
+            /* "pinaudio\core.pyx":130
  *                 # Check if we are at the end of the source sample buffer (loop if applicable)
  *                 if mix_channel.sample_players[i].sample_pos > mix_channel.sample_players[i].chunk.alen:
  *                     if mix_channel.sample_players[i].loops_remaining > 0:             # <<<<<<<<<<<<<<
@@ -1658,7 +1655,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
             __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).loops_remaining > 0) != 0);
             if (__pyx_t_1) {
 
-              /* "pinaudio\core.pyx":131
+              /* "pinaudio\core.pyx":132
  *                     if mix_channel.sample_players[i].loops_remaining > 0:
  *                         # At the end and still loops remaining, loop back to the beginning
  *                         mix_channel.sample_players[i].loops_remaining -= 1             # <<<<<<<<<<<<<<
@@ -1668,7 +1665,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
               __pyx_t_15 = __pyx_v_i;
               (__pyx_v_mix_channel->sample_players[__pyx_t_15]).loops_remaining = ((__pyx_v_mix_channel->sample_players[__pyx_t_15]).loops_remaining - 1);
 
-              /* "pinaudio\core.pyx":132
+              /* "pinaudio\core.pyx":133
  *                         # At the end and still loops remaining, loop back to the beginning
  *                         mix_channel.sample_players[i].loops_remaining -= 1
  *                         mix_channel.sample_players[i].sample_pos = 0             # <<<<<<<<<<<<<<
@@ -1680,7 +1677,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
             }
             __pyx_L28:;
 
-            /* "pinaudio\core.pyx":133
+            /* "pinaudio\core.pyx":134
  *                         mix_channel.sample_players[i].loops_remaining -= 1
  *                         mix_channel.sample_players[i].sample_pos = 0
  *                     if mix_channel.sample_players[i].loops_remaining == 0:             # <<<<<<<<<<<<<<
@@ -1690,7 +1687,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
             __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).loops_remaining == 0) != 0);
             if (__pyx_t_1) {
 
-              /* "pinaudio\core.pyx":135
+              /* "pinaudio\core.pyx":136
  *                     if mix_channel.sample_players[i].loops_remaining == 0:
  *                         # At the end and not looping, the sample has finished playing
  *                         mix_channel.sample_players[i].status = player_finished             # <<<<<<<<<<<<<<
@@ -1699,7 +1696,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
               (__pyx_v_mix_channel->sample_players[__pyx_v_i]).status = __pyx_e_8pinaudio_4core_player_finished;
 
-              /* "pinaudio\core.pyx":136
+              /* "pinaudio\core.pyx":137
  *                         # At the end and not looping, the sample has finished playing
  *                         mix_channel.sample_players[i].status = player_finished
  *                         with gil:             # <<<<<<<<<<<<<<
@@ -1712,20 +1709,20 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
                   #endif
                   /*try:*/ {
 
-                    /* "pinaudio\core.pyx":137
+                    /* "pinaudio\core.pyx":138
  *                         mix_channel.sample_players[i].status = player_finished
  *                         with gil:
  *                             print("Callback: Changing status from playing to finished (sample {} on channel {} with player {})".format(mix_channel.sample_players[i].sample_number, channel, i))             # <<<<<<<<<<<<<<
  *                         break
  *                     else:
  */
-                    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Callback_Changing_status_from_pl, __pyx_n_s_format); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
+                    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Callback_Changing_status_from_pl, __pyx_n_s_format); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
                     __Pyx_GOTREF(__pyx_t_5);
-                    __pyx_t_9 = __Pyx_PyInt_From_int((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
+                    __pyx_t_9 = __Pyx_PyInt_From_int((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
                     __Pyx_GOTREF(__pyx_t_9);
-                    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
+                    __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
                     __Pyx_GOTREF(__pyx_t_7);
-                    __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
+                    __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
                     __Pyx_GOTREF(__pyx_t_8);
                     __pyx_t_11 = NULL;
                     __pyx_t_10 = 0;
@@ -1739,7 +1736,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
                         __pyx_t_10 = 1;
                       }
                     }
-                    __pyx_t_6 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
+                    __pyx_t_6 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
                     __Pyx_GOTREF(__pyx_t_6);
                     if (__pyx_t_11) {
                       PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_11); __Pyx_GIVEREF(__pyx_t_11); __pyx_t_11 = NULL;
@@ -1753,22 +1750,22 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
                     __pyx_t_9 = 0;
                     __pyx_t_7 = 0;
                     __pyx_t_8 = 0;
-                    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
+                    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
                     __Pyx_GOTREF(__pyx_t_4);
                     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
                     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-                    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
+                    __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
                     __Pyx_GOTREF(__pyx_t_5);
                     PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
                     __Pyx_GIVEREF(__pyx_t_4);
                     __pyx_t_4 = 0;
-                    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 137; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
+                    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 138; __pyx_clineno = __LINE__; goto __pyx_L33_error;}
                     __Pyx_GOTREF(__pyx_t_4);
                     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
                     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
                   }
 
-                  /* "pinaudio\core.pyx":136
+                  /* "pinaudio\core.pyx":137
  *                         # At the end and not looping, the sample has finished playing
  *                         mix_channel.sample_players[i].status = player_finished
  *                         with gil:             # <<<<<<<<<<<<<<
@@ -1792,7 +1789,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
                   }
               }
 
-              /* "pinaudio\core.pyx":138
+              /* "pinaudio\core.pyx":139
  *                         with gil:
  *                             print("Callback: Changing status from playing to finished (sample {} on channel {} with player {})".format(mix_channel.sample_players[i].sample_number, channel, i))
  *                         break             # <<<<<<<<<<<<<<
@@ -1803,7 +1800,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
             }
             /*else*/ {
 
-              /* "pinaudio\core.pyx":141
+              /* "pinaudio\core.pyx":142
  *                     else:
  *                         # Looping infinitely, loop back to the beginning
  *                         mix_channel.sample_players[i].sample_pos = 0             # <<<<<<<<<<<<<<
@@ -1821,7 +1818,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
       }
       __pyx_L16:;
 
-      /* "pinaudio\core.pyx":144
+      /* "pinaudio\core.pyx":145
  * 
  *         # Check if the sound has finished
  *         if mix_channel.sample_players[i].status is player_finished:             # <<<<<<<<<<<<<<
@@ -1831,7 +1828,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
       __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).status == __pyx_e_8pinaudio_4core_player_finished) != 0);
       if (__pyx_t_1) {
 
-        /* "pinaudio\core.pyx":147
+        /* "pinaudio\core.pyx":148
  *             # Sound has finished, send notification and set player to idle status
  *             # TODO: send sound finished playing notification
  *             mix_channel.sample_players[i].status = player_idle             # <<<<<<<<<<<<<<
@@ -1840,7 +1837,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
  */
         (__pyx_v_mix_channel->sample_players[__pyx_v_i]).status = __pyx_e_8pinaudio_4core_player_idle;
 
-        /* "pinaudio\core.pyx":149
+        /* "pinaudio\core.pyx":150
  *             mix_channel.sample_players[i].status = player_idle
  * 
  *             with gil:             # <<<<<<<<<<<<<<
@@ -1853,20 +1850,20 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
             #endif
             /*try:*/ {
 
-              /* "pinaudio\core.pyx":150
+              /* "pinaudio\core.pyx":151
  * 
  *             with gil:
  *                 print("Callback: Changing status from finished to idle (sample {} on channel {} with player {})".format(mix_channel.sample_players[i].sample_number, channel, i))             # <<<<<<<<<<<<<<
  * 
  *     # Apply channel volume
  */
-              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Callback_Changing_status_from_fi, __pyx_n_s_format); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
+              __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Callback_Changing_status_from_fi, __pyx_n_s_format); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
               __Pyx_GOTREF(__pyx_t_5);
-              __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
+              __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
               __Pyx_GOTREF(__pyx_t_6);
-              __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
+              __pyx_t_8 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
               __Pyx_GOTREF(__pyx_t_8);
-              __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
+              __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_i); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
               __Pyx_GOTREF(__pyx_t_7);
               __pyx_t_9 = NULL;
               __pyx_t_10 = 0;
@@ -1880,7 +1877,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
                   __pyx_t_10 = 1;
                 }
               }
-              __pyx_t_11 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
+              __pyx_t_11 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
               __Pyx_GOTREF(__pyx_t_11);
               if (__pyx_t_9) {
                 PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __Pyx_GIVEREF(__pyx_t_9); __pyx_t_9 = NULL;
@@ -1894,22 +1891,22 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
               __pyx_t_6 = 0;
               __pyx_t_8 = 0;
               __pyx_t_7 = 0;
-              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
+              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-              __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
+              __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
               __Pyx_GOTREF(__pyx_t_5);
               PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
               __Pyx_GIVEREF(__pyx_t_4);
               __pyx_t_4 = 0;
-              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 150; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
+              __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 151; __pyx_clineno = __LINE__; goto __pyx_L39_error;}
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
             }
 
-            /* "pinaudio\core.pyx":149
+            /* "pinaudio\core.pyx":150
  *             mix_channel.sample_players[i].status = player_idle
  * 
  *             with gil:             # <<<<<<<<<<<<<<
@@ -1937,7 +1934,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
       __pyx_L35:;
     }
 
-    /* "pinaudio\core.pyx":157
+    /* "pinaudio\core.pyx":158
  * 
  *     # Release the lock on the channel mutex
  *     SDL_UnlockMutex(mix_channel.mutex)             # <<<<<<<<<<<<<<
@@ -1947,7 +1944,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
     SDL_UnlockMutex(__pyx_v_mix_channel->mutex);
   }
 
-  /* "pinaudio\core.pyx":54
+  /* "pinaudio\core.pyx":55
  * 
  * cdef void mix_track_callback_s8(int channel, void *stream, int length, void *userdata) nogil:
  *     """             # <<<<<<<<<<<<<<
@@ -1976,7 +1973,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
     __pyx_L5:;
   }
 
-  /* "pinaudio\core.pyx":53
+  /* "pinaudio\core.pyx":54
  * 
  * 
  * cdef void mix_track_callback_s8(int channel, void *stream, int length, void *userdata) nogil:             # <<<<<<<<<<<<<<
@@ -2001,7 +1998,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s8(int __pyx_v_channel, v
   #endif
 }
 
-/* "pinaudio\core.pyx":159
+/* "pinaudio\core.pyx":160
  *     SDL_UnlockMutex(mix_channel.mutex)
  * 
  * cdef void mix_track_callback_s16sys(int channel, void *stream, int length, void *userdata) nogil:             # <<<<<<<<<<<<<<
@@ -2013,13 +2010,13 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
   __pyx_t_8pinaudio_4core_MixerChannel *__pyx_v_mix_channel;
   CYTHON_UNUSED __pyx_t_8pinaudio_4core_uint32_t __pyx_v_sdl_ticks;
   __pyx_t_8pinaudio_4core_int8_t *__pyx_v_src;
-  union __pyx_t_8pinaudio_4core_Sample16Bits __pyx_v_src_sample;
-  union __pyx_t_8pinaudio_4core_Sample16Bits __pyx_v_channel_sample;
+  union __pyx_t_8pinaudio_4core_Sample16Bit __pyx_v_src_sample;
+  union __pyx_t_8pinaudio_4core_Sample16Bit __pyx_v_channel_sample;
   __pyx_t_8pinaudio_4core_int8_t *__pyx_v_dst8;
   int __pyx_v_temp_sample;
-  union __pyx_t_8pinaudio_4core_Sample16Bits __pyx_v_dst_sample;
+  union __pyx_t_8pinaudio_4core_Sample16Bit __pyx_v_dst_sample;
   int __pyx_v_index;
-  int __pyx_v_i;
+  int __pyx_v_player;
   int __pyx_v_event_index;
   int __pyx_t_1;
   int __pyx_t_2;
@@ -2028,7 +2025,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
   int __pyx_t_5;
   __pyx_t_8pinaudio_4core_int8_t __pyx_t_6;
 
-  /* "pinaudio\core.pyx":169
+  /* "pinaudio\core.pyx":170
  *     :return: None
  *     """
  *     if userdata == NULL:             # <<<<<<<<<<<<<<
@@ -2038,7 +2035,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
   __pyx_t_1 = ((__pyx_v_userdata == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":170
+    /* "pinaudio\core.pyx":171
  *     """
  *     if userdata == NULL:
  *         return             # <<<<<<<<<<<<<<
@@ -2048,7 +2045,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":175
+  /* "pinaudio\core.pyx":176
  *     # This is so SDL_Mixer thinks the channel is active and will call the channel callback
  *     # function which is used to read and mix the source audio.
  *     cdef MixerChannel *mix_channel = <MixerChannel*>userdata             # <<<<<<<<<<<<<<
@@ -2057,7 +2054,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
   __pyx_v_mix_channel = ((__pyx_t_8pinaudio_4core_MixerChannel *)__pyx_v_userdata);
 
-  /* "pinaudio\core.pyx":178
+  /* "pinaudio\core.pyx":179
  * 
  *     # Attempt to lock the track/channel mutex while performing operations on the track/channel
  *     if SDL_LockMutex(mix_channel.mutex) != 0:             # <<<<<<<<<<<<<<
@@ -2067,7 +2064,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
   __pyx_t_1 = ((SDL_LockMutex(__pyx_v_mix_channel->mutex) != 0) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":179
+    /* "pinaudio\core.pyx":180
  *     # Attempt to lock the track/channel mutex while performing operations on the track/channel
  *     if SDL_LockMutex(mix_channel.mutex) != 0:
  *         return             # <<<<<<<<<<<<<<
@@ -2077,7 +2074,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":182
+  /* "pinaudio\core.pyx":183
  * 
  *     # Get the current clock from SDL (it is used for the audio timing master)
  *     cdef uint32_t sdl_ticks = SDL_GetTicks()             # <<<<<<<<<<<<<<
@@ -2086,7 +2083,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
   __pyx_v_sdl_ticks = SDL_GetTicks();
 
-  /* "pinaudio\core.pyx":191
+  /* "pinaudio\core.pyx":192
  * 
  *     cdef int16_t *dst16
  *     dst8 = <int8_t*>stream             # <<<<<<<<<<<<<<
@@ -2095,30 +2092,30 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
   __pyx_v_dst8 = ((__pyx_t_8pinaudio_4core_int8_t *)__pyx_v_stream);
 
-  /* "pinaudio\core.pyx":199
+  /* "pinaudio\core.pyx":200
  * 
  *     # Loop over all channel audio playback objects
- *     for i in range(mix_channel.max_simultaneous_sounds):             # <<<<<<<<<<<<<<
+ *     for player in range(mix_channel.max_simultaneous_sounds):             # <<<<<<<<<<<<<<
  * 
  *         # If the player is idle, there is nothing to do so move on to the next player
  */
   __pyx_t_2 = __pyx_v_mix_channel->max_simultaneous_sounds;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
-    __pyx_v_i = __pyx_t_3;
+    __pyx_v_player = __pyx_t_3;
 
-    /* "pinaudio\core.pyx":202
+    /* "pinaudio\core.pyx":203
  * 
  *         # If the player is idle, there is nothing to do so move on to the next player
- *         if mix_channel.sample_players[i].status is player_idle:             # <<<<<<<<<<<<<<
+ *         if mix_channel.sample_players[player].status is player_idle:             # <<<<<<<<<<<<<<
  *             continue
  * 
  */
-    __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).status == __pyx_e_8pinaudio_4core_player_idle) != 0);
+    __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_player]).status == __pyx_e_8pinaudio_4core_player_idle) != 0);
     if (__pyx_t_1) {
 
-      /* "pinaudio\core.pyx":203
+      /* "pinaudio\core.pyx":204
  *         # If the player is idle, there is nothing to do so move on to the next player
- *         if mix_channel.sample_players[i].status is player_idle:
+ *         if mix_channel.sample_players[player].status is player_idle:
  *             continue             # <<<<<<<<<<<<<<
  * 
  *         # Check if player has a sound pending playback (ready to start)
@@ -2126,18 +2123,18 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
       goto __pyx_L5_continue;
     }
 
-    /* "pinaudio\core.pyx":206
+    /* "pinaudio\core.pyx":207
  * 
  *         # Check if player has a sound pending playback (ready to start)
- *         if mix_channel.sample_players[i].status is player_pending:             # <<<<<<<<<<<<<<
+ *         if mix_channel.sample_players[player].status is player_pending:             # <<<<<<<<<<<<<<
  *             # Sound ready to start playback, send notification and set status to playing
  *             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)
  */
-    __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).status == __pyx_e_8pinaudio_4core_player_pending) != 0);
+    __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_player]).status == __pyx_e_8pinaudio_4core_player_pending) != 0);
     if (__pyx_t_1) {
 
-      /* "pinaudio\core.pyx":208
- *         if mix_channel.sample_players[i].status is player_pending:
+      /* "pinaudio\core.pyx":209
+ *         if mix_channel.sample_players[player].status is player_pending:
  *             # Sound ready to start playback, send notification and set status to playing
  *             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)             # <<<<<<<<<<<<<<
  *             if event_index != -1:
@@ -2145,7 +2142,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
       __pyx_v_event_index = __pyx_f_8pinaudio_4core_get_first_available_audio_event_on_mixer_channel(__pyx_v_mix_channel);
 
-      /* "pinaudio\core.pyx":209
+      /* "pinaudio\core.pyx":210
  *             # Sound ready to start playback, send notification and set status to playing
  *             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)
  *             if event_index != -1:             # <<<<<<<<<<<<<<
@@ -2155,86 +2152,94 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
       __pyx_t_1 = ((__pyx_v_event_index != -1) != 0);
       if (__pyx_t_1) {
 
-        /* "pinaudio\core.pyx":210
+        /* "pinaudio\core.pyx":211
  *             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)
  *             if event_index != -1:
  *                 mix_channel.events[event_index].event = event_sound_start             # <<<<<<<<<<<<<<
  *                 mix_channel.events[event_index].channel = channel
- *                 mix_channel.events[event_index].player = i
+ *                 mix_channel.events[event_index].player = player
  */
         (__pyx_v_mix_channel->events[__pyx_v_event_index]).event = __pyx_e_8pinaudio_4core_event_sound_start;
 
-        /* "pinaudio\core.pyx":211
+        /* "pinaudio\core.pyx":212
  *             if event_index != -1:
  *                 mix_channel.events[event_index].event = event_sound_start
  *                 mix_channel.events[event_index].channel = channel             # <<<<<<<<<<<<<<
- *                 mix_channel.events[event_index].player = i
- *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[i].sample_number
+ *                 mix_channel.events[event_index].player = player
+ *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[player].sample_number
  */
         (__pyx_v_mix_channel->events[__pyx_v_event_index]).channel = __pyx_v_channel;
 
-        /* "pinaudio\core.pyx":212
+        /* "pinaudio\core.pyx":213
  *                 mix_channel.events[event_index].event = event_sound_start
  *                 mix_channel.events[event_index].channel = channel
- *                 mix_channel.events[event_index].player = i             # <<<<<<<<<<<<<<
- *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[i].sample_number
+ *                 mix_channel.events[event_index].player = player             # <<<<<<<<<<<<<<
+ *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[player].sample_number
  * 
  */
-        (__pyx_v_mix_channel->events[__pyx_v_event_index]).player = __pyx_v_i;
+        (__pyx_v_mix_channel->events[__pyx_v_event_index]).player = __pyx_v_player;
 
-        /* "pinaudio\core.pyx":213
+        /* "pinaudio\core.pyx":214
  *                 mix_channel.events[event_index].channel = channel
- *                 mix_channel.events[event_index].player = i
- *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[i].sample_number             # <<<<<<<<<<<<<<
+ *                 mix_channel.events[event_index].player = player
+ *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[player].sample_number             # <<<<<<<<<<<<<<
  * 
  *             # TODO: Log error if events are full
  */
-        __pyx_t_4 = (__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number;
+        __pyx_t_4 = (__pyx_v_mix_channel->sample_players[__pyx_v_player]).sample_number;
         (__pyx_v_mix_channel->events[__pyx_v_event_index]).sample_number = __pyx_t_4;
         goto __pyx_L9;
       }
       __pyx_L9:;
 
-      /* "pinaudio\core.pyx":217
+      /* "pinaudio\core.pyx":218
  *             # TODO: Log error if events are full
  * 
- *             mix_channel.sample_players[i].status = player_playing             # <<<<<<<<<<<<<<
+ *             mix_channel.sample_players[player].status = player_playing             # <<<<<<<<<<<<<<
  * 
  *         # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
  */
-      (__pyx_v_mix_channel->sample_players[__pyx_v_i]).status = __pyx_e_8pinaudio_4core_player_playing;
+      (__pyx_v_mix_channel->sample_players[__pyx_v_player]).status = __pyx_e_8pinaudio_4core_player_playing;
       goto __pyx_L8;
     }
     __pyx_L8:;
 
-    /* "pinaudio\core.pyx":220
+    /* "pinaudio\core.pyx":221
  * 
  *         # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
- *         if mix_channel.sample_players[i].status is player_playing and mix_channel.sample_players[i].volume > 0:             # <<<<<<<<<<<<<<
+ *         if mix_channel.sample_players[player].status is player_playing \             # <<<<<<<<<<<<<<
+ *                 and mix_channel.sample_players[player].volume > 0:
  * 
- *             # Get source sample buffer (read one byte at a time, bytes will be combined into a
  */
-    __pyx_t_5 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).status == __pyx_e_8pinaudio_4core_player_playing) != 0);
+    __pyx_t_5 = (((__pyx_v_mix_channel->sample_players[__pyx_v_player]).status == __pyx_e_8pinaudio_4core_player_playing) != 0);
     if (__pyx_t_5) {
     } else {
       __pyx_t_1 = __pyx_t_5;
       goto __pyx_L11_bool_binop_done;
     }
-    __pyx_t_5 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).volume > 0) != 0);
+
+    /* "pinaudio\core.pyx":222
+ *         # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
+ *         if mix_channel.sample_players[player].status is player_playing \
+ *                 and mix_channel.sample_players[player].volume > 0:             # <<<<<<<<<<<<<<
+ * 
+ *             # Get source sample buffer (read one byte at a time, bytes will be combined into a
+ */
+    __pyx_t_5 = (((__pyx_v_mix_channel->sample_players[__pyx_v_player]).volume > 0) != 0);
     __pyx_t_1 = __pyx_t_5;
     __pyx_L11_bool_binop_done:;
     if (__pyx_t_1) {
 
-      /* "pinaudio\core.pyx":224
+      /* "pinaudio\core.pyx":226
  *             # Get source sample buffer (read one byte at a time, bytes will be combined into a
  *             # 16-bit sample value before being mixed)
- *             src = <int8_t*>mix_channel.sample_players[i].chunk.abuf             # <<<<<<<<<<<<<<
+ *             src = <int8_t*>mix_channel.sample_players[player].chunk.abuf             # <<<<<<<<<<<<<<
  * 
  *             # Loop over destination buffer, mixing in the source sample
  */
-      __pyx_v_src = ((__pyx_t_8pinaudio_4core_int8_t *)(__pyx_v_mix_channel->sample_players[__pyx_v_i]).chunk->abuf);
+      __pyx_v_src = ((__pyx_t_8pinaudio_4core_int8_t *)(__pyx_v_mix_channel->sample_players[__pyx_v_player]).chunk->abuf);
 
-      /* "pinaudio\core.pyx":227
+      /* "pinaudio\core.pyx":229
  * 
  *             # Loop over destination buffer, mixing in the source sample
  *             index = 0             # <<<<<<<<<<<<<<
@@ -2243,7 +2248,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
       __pyx_v_index = 0;
 
-      /* "pinaudio\core.pyx":228
+      /* "pinaudio\core.pyx":230
  *             # Loop over destination buffer, mixing in the source sample
  *             index = 0
  *             while index < length:             # <<<<<<<<<<<<<<
@@ -2254,34 +2259,34 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
         __pyx_t_1 = ((__pyx_v_index < __pyx_v_length) != 0);
         if (!__pyx_t_1) break;
 
-        /* "pinaudio\core.pyx":231
- * 
- *                 # Get source sample (2 bytes), combine into a 16-bit value and apply sample volume
- *                 src_sample.bytes.byte1 = src[mix_channel.sample_players[i].sample_pos]             # <<<<<<<<<<<<<<
- *                 src_sample.bytes.byte2 = src[mix_channel.sample_players[i].sample_pos + 1]
- *                 src_sample.value = (src_sample.value * mix_channel.sample_players[i].volume) / MIX_MAX_VOLUME
- */
-        __pyx_v_src_sample.bytes.byte1 = (__pyx_v_src[(__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_pos]);
-
-        /* "pinaudio\core.pyx":232
- *                 # Get source sample (2 bytes), combine into a 16-bit value and apply sample volume
- *                 src_sample.bytes.byte1 = src[mix_channel.sample_players[i].sample_pos]
- *                 src_sample.bytes.byte2 = src[mix_channel.sample_players[i].sample_pos + 1]             # <<<<<<<<<<<<<<
- *                 src_sample.value = (src_sample.value * mix_channel.sample_players[i].volume) / MIX_MAX_VOLUME
- * 
- */
-        __pyx_v_src_sample.bytes.byte2 = (__pyx_v_src[((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_pos + 1)]);
-
         /* "pinaudio\core.pyx":233
- *                 src_sample.bytes.byte1 = src[mix_channel.sample_players[i].sample_pos]
- *                 src_sample.bytes.byte2 = src[mix_channel.sample_players[i].sample_pos + 1]
- *                 src_sample.value = (src_sample.value * mix_channel.sample_players[i].volume) / MIX_MAX_VOLUME             # <<<<<<<<<<<<<<
+ * 
+ *                 # Get source sample (2 bytes), combine into a 16-bit value and apply sample volume
+ *                 src_sample.bytes.byte1 = src[mix_channel.sample_players[player].sample_pos]             # <<<<<<<<<<<<<<
+ *                 src_sample.bytes.byte2 = src[mix_channel.sample_players[player].sample_pos + 1]
+ *                 src_sample.value = (src_sample.value * mix_channel.sample_players[player].volume) / MIX_MAX_VOLUME
+ */
+        __pyx_v_src_sample.bytes.byte1 = (__pyx_v_src[(__pyx_v_mix_channel->sample_players[__pyx_v_player]).sample_pos]);
+
+        /* "pinaudio\core.pyx":234
+ *                 # Get source sample (2 bytes), combine into a 16-bit value and apply sample volume
+ *                 src_sample.bytes.byte1 = src[mix_channel.sample_players[player].sample_pos]
+ *                 src_sample.bytes.byte2 = src[mix_channel.sample_players[player].sample_pos + 1]             # <<<<<<<<<<<<<<
+ *                 src_sample.value = (src_sample.value * mix_channel.sample_players[player].volume) / MIX_MAX_VOLUME
+ * 
+ */
+        __pyx_v_src_sample.bytes.byte2 = (__pyx_v_src[((__pyx_v_mix_channel->sample_players[__pyx_v_player]).sample_pos + 1)]);
+
+        /* "pinaudio\core.pyx":235
+ *                 src_sample.bytes.byte1 = src[mix_channel.sample_players[player].sample_pos]
+ *                 src_sample.bytes.byte2 = src[mix_channel.sample_players[player].sample_pos + 1]
+ *                 src_sample.value = (src_sample.value * mix_channel.sample_players[player].volume) / MIX_MAX_VOLUME             # <<<<<<<<<<<<<<
  * 
  *                 # Get sample (2 bytes) already in the destination buffer and combine into 16-bit value
  */
-        __pyx_v_src_sample.value = __Pyx_div_long((__pyx_v_src_sample.value * (__pyx_v_mix_channel->sample_players[__pyx_v_i]).volume), 128);
+        __pyx_v_src_sample.value = __Pyx_div_long((__pyx_v_src_sample.value * (__pyx_v_mix_channel->sample_players[__pyx_v_player]).volume), 128);
 
-        /* "pinaudio\core.pyx":236
+        /* "pinaudio\core.pyx":238
  * 
  *                 # Get sample (2 bytes) already in the destination buffer and combine into 16-bit value
  *                 channel_sample.bytes.byte1 = dst8[index]             # <<<<<<<<<<<<<<
@@ -2290,7 +2295,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
         __pyx_v_channel_sample.bytes.byte1 = (__pyx_v_dst8[__pyx_v_index]);
 
-        /* "pinaudio\core.pyx":237
+        /* "pinaudio\core.pyx":239
  *                 # Get sample (2 bytes) already in the destination buffer and combine into 16-bit value
  *                 channel_sample.bytes.byte1 = dst8[index]
  *                 channel_sample.bytes.byte2 = dst8[index + 1]             # <<<<<<<<<<<<<<
@@ -2299,18 +2304,18 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
         __pyx_v_channel_sample.bytes.byte2 = (__pyx_v_dst8[(__pyx_v_index + 1)]);
 
-        /* "pinaudio\core.pyx":241
+        /* "pinaudio\core.pyx":243
  *                 # Calculate the new destination sample (mix the existing destination sample with
- *                 # the new source sample)
+ *                 # the new source sample).  The temp sample is a 32-bit value to avoid overflow.
  *                 temp_sample = channel_sample.value + src_sample.value             # <<<<<<<<<<<<<<
  * 
- *                 # Apply clipping to destination sample
+ *                 # Clip the temp sample back to a 16-bit value (will cause distortion if samples
  */
         __pyx_v_temp_sample = (__pyx_v_channel_sample.value + __pyx_v_src_sample.value);
 
-        /* "pinaudio\core.pyx":244
- * 
- *                 # Apply clipping to destination sample
+        /* "pinaudio\core.pyx":247
+ *                 # Clip the temp sample back to a 16-bit value (will cause distortion if samples
+ *                 # on channel are too loud)
  *                 if temp_sample > MAX_AUDIO_VALUE_S16:             # <<<<<<<<<<<<<<
  *                     temp_sample = MAX_AUDIO_VALUE_S16
  *                 elif temp_sample < MIN_AUDIO_VALUE_S16:
@@ -2318,8 +2323,8 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
         __pyx_t_1 = ((__pyx_v_temp_sample > 32767) != 0);
         if (__pyx_t_1) {
 
-          /* "pinaudio\core.pyx":245
- *                 # Apply clipping to destination sample
+          /* "pinaudio\core.pyx":248
+ *                 # on channel are too loud)
  *                 if temp_sample > MAX_AUDIO_VALUE_S16:
  *                     temp_sample = MAX_AUDIO_VALUE_S16             # <<<<<<<<<<<<<<
  *                 elif temp_sample < MIN_AUDIO_VALUE_S16:
@@ -2329,7 +2334,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
           goto __pyx_L15;
         }
 
-        /* "pinaudio\core.pyx":246
+        /* "pinaudio\core.pyx":249
  *                 if temp_sample > MAX_AUDIO_VALUE_S16:
  *                     temp_sample = MAX_AUDIO_VALUE_S16
  *                 elif temp_sample < MIN_AUDIO_VALUE_S16:             # <<<<<<<<<<<<<<
@@ -2339,29 +2344,29 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
         __pyx_t_1 = ((__pyx_v_temp_sample < -32768) != 0);
         if (__pyx_t_1) {
 
-          /* "pinaudio\core.pyx":247
+          /* "pinaudio\core.pyx":250
  *                     temp_sample = MAX_AUDIO_VALUE_S16
  *                 elif temp_sample < MIN_AUDIO_VALUE_S16:
  *                     temp_sample = MIN_AUDIO_VALUE_S16             # <<<<<<<<<<<<<<
  * 
- *                 # Write the new destination sample back to the destination buffer
+ *                 # Write the new destination sample back to the destination buffer (from a 32-bit
  */
           __pyx_v_temp_sample = -32768;
           goto __pyx_L15;
         }
         __pyx_L15:;
 
-        /* "pinaudio\core.pyx":250
- * 
- *                 # Write the new destination sample back to the destination buffer
+        /* "pinaudio\core.pyx":254
+ *                 # Write the new destination sample back to the destination buffer (from a 32-bit
+ *                 # back to a 16-bit value that we know is in range)
  *                 dst_sample.value = temp_sample             # <<<<<<<<<<<<<<
  *                 dst8[index] = dst_sample.bytes.byte1
  *                 dst8[index + 1] = dst_sample.bytes.byte2
  */
         __pyx_v_dst_sample.value = __pyx_v_temp_sample;
 
-        /* "pinaudio\core.pyx":251
- *                 # Write the new destination sample back to the destination buffer
+        /* "pinaudio\core.pyx":255
+ *                 # back to a 16-bit value that we know is in range)
  *                 dst_sample.value = temp_sample
  *                 dst8[index] = dst_sample.bytes.byte1             # <<<<<<<<<<<<<<
  *                 dst8[index + 1] = dst_sample.bytes.byte2
@@ -2370,7 +2375,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
         __pyx_t_6 = __pyx_v_dst_sample.bytes.byte1;
         (__pyx_v_dst8[__pyx_v_index]) = __pyx_t_6;
 
-        /* "pinaudio\core.pyx":252
+        /* "pinaudio\core.pyx":256
  *                 dst_sample.value = temp_sample
  *                 dst8[index] = dst_sample.bytes.byte1
  *                 dst8[index + 1] = dst_sample.bytes.byte2             # <<<<<<<<<<<<<<
@@ -2380,17 +2385,17 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
         __pyx_t_6 = __pyx_v_dst_sample.bytes.byte2;
         (__pyx_v_dst8[(__pyx_v_index + 1)]) = __pyx_t_6;
 
-        /* "pinaudio\core.pyx":255
+        /* "pinaudio\core.pyx":259
  * 
  *                 # Advance the source sample pointer to the next sample (2 bytes)
- *                 mix_channel.sample_players[i].sample_pos += 2             # <<<<<<<<<<<<<<
+ *                 mix_channel.sample_players[player].sample_pos += 2             # <<<<<<<<<<<<<<
  * 
  *                 # Advance the destination buffer pointer to the next sample (2 bytes)
  */
-        __pyx_t_4 = __pyx_v_i;
+        __pyx_t_4 = __pyx_v_player;
         (__pyx_v_mix_channel->sample_players[__pyx_t_4]).sample_pos = ((__pyx_v_mix_channel->sample_players[__pyx_t_4]).sample_pos + 2);
 
-        /* "pinaudio\core.pyx":258
+        /* "pinaudio\core.pyx":262
  * 
  *                 # Advance the destination buffer pointer to the next sample (2 bytes)
  *                 index += 2             # <<<<<<<<<<<<<<
@@ -2399,70 +2404,69 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
         __pyx_v_index = (__pyx_v_index + 2);
 
-        /* "pinaudio\core.pyx":261
+        /* "pinaudio\core.pyx":265
  * 
  *                 # Check if we are at the end of the source sample buffer (loop if applicable)
- *                 if mix_channel.sample_players[i].sample_pos > mix_channel.sample_players[i].chunk.alen:             # <<<<<<<<<<<<<<
- *                     if mix_channel.sample_players[i].loops_remaining > 0:
+ *                 if mix_channel.sample_players[player].sample_pos > mix_channel.sample_players[player].chunk.alen:             # <<<<<<<<<<<<<<
+ *                     if mix_channel.sample_players[player].loops_remaining > 0:
  *                         # At the end and still loops remaining, loop back to the beginning
  */
-        __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_pos > (__pyx_v_mix_channel->sample_players[__pyx_v_i]).chunk->alen) != 0);
+        __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_player]).sample_pos > (__pyx_v_mix_channel->sample_players[__pyx_v_player]).chunk->alen) != 0);
         if (__pyx_t_1) {
 
-          /* "pinaudio\core.pyx":262
- *                 # Check if we are at the end of the source sample buffer (loop if applicable)
- *                 if mix_channel.sample_players[i].sample_pos > mix_channel.sample_players[i].chunk.alen:
- *                     if mix_channel.sample_players[i].loops_remaining > 0:             # <<<<<<<<<<<<<<
- *                         # At the end and still loops remaining, loop back to the beginning
- *                         mix_channel.sample_players[i].loops_remaining -= 1
- */
-          __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).loops_remaining > 0) != 0);
-          if (__pyx_t_1) {
-
-            /* "pinaudio\core.pyx":264
- *                     if mix_channel.sample_players[i].loops_remaining > 0:
- *                         # At the end and still loops remaining, loop back to the beginning
- *                         mix_channel.sample_players[i].loops_remaining -= 1             # <<<<<<<<<<<<<<
- *                         mix_channel.sample_players[i].sample_pos = 0
- *                     if mix_channel.sample_players[i].loops_remaining == 0:
- */
-            __pyx_t_4 = __pyx_v_i;
-            (__pyx_v_mix_channel->sample_players[__pyx_t_4]).loops_remaining = ((__pyx_v_mix_channel->sample_players[__pyx_t_4]).loops_remaining - 1);
-
-            /* "pinaudio\core.pyx":265
- *                         # At the end and still loops remaining, loop back to the beginning
- *                         mix_channel.sample_players[i].loops_remaining -= 1
- *                         mix_channel.sample_players[i].sample_pos = 0             # <<<<<<<<<<<<<<
- *                     if mix_channel.sample_players[i].loops_remaining == 0:
- *                         # At the end and not looping, the sample has finished playing
- */
-            (__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_pos = 0;
-            goto __pyx_L17;
-          }
-          __pyx_L17:;
-
           /* "pinaudio\core.pyx":266
- *                         mix_channel.sample_players[i].loops_remaining -= 1
- *                         mix_channel.sample_players[i].sample_pos = 0
- *                     if mix_channel.sample_players[i].loops_remaining == 0:             # <<<<<<<<<<<<<<
- *                         # At the end and not looping, the sample has finished playing
- *                         mix_channel.sample_players[i].status = player_finished
+ *                 # Check if we are at the end of the source sample buffer (loop if applicable)
+ *                 if mix_channel.sample_players[player].sample_pos > mix_channel.sample_players[player].chunk.alen:
+ *                     if mix_channel.sample_players[player].loops_remaining > 0:             # <<<<<<<<<<<<<<
+ *                         # At the end and still loops remaining, loop back to the beginning
+ *                         mix_channel.sample_players[player].loops_remaining -= 1
  */
-          __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).loops_remaining == 0) != 0);
+          __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_player]).loops_remaining > 0) != 0);
           if (__pyx_t_1) {
 
             /* "pinaudio\core.pyx":268
- *                     if mix_channel.sample_players[i].loops_remaining == 0:
+ *                     if mix_channel.sample_players[player].loops_remaining > 0:
+ *                         # At the end and still loops remaining, loop back to the beginning
+ *                         mix_channel.sample_players[player].loops_remaining -= 1             # <<<<<<<<<<<<<<
+ *                         mix_channel.sample_players[player].sample_pos = 0
+ *                     elif mix_channel.sample_players[player].loops_remaining == 0:
+ */
+            __pyx_t_4 = __pyx_v_player;
+            (__pyx_v_mix_channel->sample_players[__pyx_t_4]).loops_remaining = ((__pyx_v_mix_channel->sample_players[__pyx_t_4]).loops_remaining - 1);
+
+            /* "pinaudio\core.pyx":269
+ *                         # At the end and still loops remaining, loop back to the beginning
+ *                         mix_channel.sample_players[player].loops_remaining -= 1
+ *                         mix_channel.sample_players[player].sample_pos = 0             # <<<<<<<<<<<<<<
+ *                     elif mix_channel.sample_players[player].loops_remaining == 0:
  *                         # At the end and not looping, the sample has finished playing
- *                         mix_channel.sample_players[i].status = player_finished             # <<<<<<<<<<<<<<
+ */
+            (__pyx_v_mix_channel->sample_players[__pyx_v_player]).sample_pos = 0;
+            goto __pyx_L17;
+          }
+
+          /* "pinaudio\core.pyx":270
+ *                         mix_channel.sample_players[player].loops_remaining -= 1
+ *                         mix_channel.sample_players[player].sample_pos = 0
+ *                     elif mix_channel.sample_players[player].loops_remaining == 0:             # <<<<<<<<<<<<<<
+ *                         # At the end and not looping, the sample has finished playing
+ *                         mix_channel.sample_players[player].status = player_finished
+ */
+          __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_player]).loops_remaining == 0) != 0);
+          if (__pyx_t_1) {
+
+            /* "pinaudio\core.pyx":272
+ *                     elif mix_channel.sample_players[player].loops_remaining == 0:
+ *                         # At the end and not looping, the sample has finished playing
+ *                         mix_channel.sample_players[player].status = player_finished             # <<<<<<<<<<<<<<
  *                         break
  *                     else:
  */
-            (__pyx_v_mix_channel->sample_players[__pyx_v_i]).status = __pyx_e_8pinaudio_4core_player_finished;
+            (__pyx_v_mix_channel->sample_players[__pyx_v_player]).status = __pyx_e_8pinaudio_4core_player_finished;
 
-            /* "pinaudio\core.pyx":269
+            /* "pinaudio\core.pyx":273
  *                         # At the end and not looping, the sample has finished playing
- *                         mix_channel.sample_players[i].status = player_finished
+ *                         mix_channel.sample_players[player].status = player_finished
  *                         break             # <<<<<<<<<<<<<<
  *                     else:
  *                         # Looping infinitely, loop back to the beginning
@@ -2471,15 +2475,16 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
           }
           /*else*/ {
 
-            /* "pinaudio\core.pyx":272
+            /* "pinaudio\core.pyx":276
  *                     else:
  *                         # Looping infinitely, loop back to the beginning
- *                         mix_channel.sample_players[i].sample_pos = 0             # <<<<<<<<<<<<<<
+ *                         mix_channel.sample_players[player].sample_pos = 0             # <<<<<<<<<<<<<<
  * 
  *         # Check if the sound has finished
  */
-            (__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_pos = 0;
+            (__pyx_v_mix_channel->sample_players[__pyx_v_player]).sample_pos = 0;
           }
+          __pyx_L17:;
           goto __pyx_L16;
         }
         __pyx_L16:;
@@ -2489,18 +2494,18 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
     }
     __pyx_L10:;
 
-    /* "pinaudio\core.pyx":275
+    /* "pinaudio\core.pyx":279
  * 
  *         # Check if the sound has finished
- *         if mix_channel.sample_players[i].status is player_finished:             # <<<<<<<<<<<<<<
+ *         if mix_channel.sample_players[player].status is player_finished:             # <<<<<<<<<<<<<<
  *             # Sound has finished, send notification and set player to idle status
  *             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)
  */
-    __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).status == __pyx_e_8pinaudio_4core_player_finished) != 0);
+    __pyx_t_1 = (((__pyx_v_mix_channel->sample_players[__pyx_v_player]).status == __pyx_e_8pinaudio_4core_player_finished) != 0);
     if (__pyx_t_1) {
 
-      /* "pinaudio\core.pyx":277
- *         if mix_channel.sample_players[i].status is player_finished:
+      /* "pinaudio\core.pyx":281
+ *         if mix_channel.sample_players[player].status is player_finished:
  *             # Sound has finished, send notification and set player to idle status
  *             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)             # <<<<<<<<<<<<<<
  *             if event_index != -1:
@@ -2508,7 +2513,7 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
       __pyx_v_event_index = __pyx_f_8pinaudio_4core_get_first_available_audio_event_on_mixer_channel(__pyx_v_mix_channel);
 
-      /* "pinaudio\core.pyx":278
+      /* "pinaudio\core.pyx":282
  *             # Sound has finished, send notification and set player to idle status
  *             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)
  *             if event_index != -1:             # <<<<<<<<<<<<<<
@@ -2518,61 +2523,61 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
       __pyx_t_1 = ((__pyx_v_event_index != -1) != 0);
       if (__pyx_t_1) {
 
-        /* "pinaudio\core.pyx":279
+        /* "pinaudio\core.pyx":283
  *             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)
  *             if event_index != -1:
  *                 mix_channel.events[event_index].event = event_sound_stop             # <<<<<<<<<<<<<<
  *                 mix_channel.events[event_index].channel = channel
- *                 mix_channel.events[event_index].player = i
+ *                 mix_channel.events[event_index].player = player
  */
         (__pyx_v_mix_channel->events[__pyx_v_event_index]).event = __pyx_e_8pinaudio_4core_event_sound_stop;
 
-        /* "pinaudio\core.pyx":280
+        /* "pinaudio\core.pyx":284
  *             if event_index != -1:
  *                 mix_channel.events[event_index].event = event_sound_stop
  *                 mix_channel.events[event_index].channel = channel             # <<<<<<<<<<<<<<
- *                 mix_channel.events[event_index].player = i
- *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[i].sample_number
+ *                 mix_channel.events[event_index].player = player
+ *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[player].sample_number
  */
         (__pyx_v_mix_channel->events[__pyx_v_event_index]).channel = __pyx_v_channel;
 
-        /* "pinaudio\core.pyx":281
+        /* "pinaudio\core.pyx":285
  *                 mix_channel.events[event_index].event = event_sound_stop
  *                 mix_channel.events[event_index].channel = channel
- *                 mix_channel.events[event_index].player = i             # <<<<<<<<<<<<<<
- *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[i].sample_number
+ *                 mix_channel.events[event_index].player = player             # <<<<<<<<<<<<<<
+ *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[player].sample_number
  * 
  */
-        (__pyx_v_mix_channel->events[__pyx_v_event_index]).player = __pyx_v_i;
+        (__pyx_v_mix_channel->events[__pyx_v_event_index]).player = __pyx_v_player;
 
-        /* "pinaudio\core.pyx":282
+        /* "pinaudio\core.pyx":286
  *                 mix_channel.events[event_index].channel = channel
- *                 mix_channel.events[event_index].player = i
- *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[i].sample_number             # <<<<<<<<<<<<<<
+ *                 mix_channel.events[event_index].player = player
+ *                 mix_channel.events[event_index].sample_number = mix_channel.sample_players[player].sample_number             # <<<<<<<<<<<<<<
  * 
  *             # TODO: Log error if events are full
  */
-        __pyx_t_4 = (__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_number;
+        __pyx_t_4 = (__pyx_v_mix_channel->sample_players[__pyx_v_player]).sample_number;
         (__pyx_v_mix_channel->events[__pyx_v_event_index]).sample_number = __pyx_t_4;
-        goto __pyx_L20;
+        goto __pyx_L19;
       }
-      __pyx_L20:;
+      __pyx_L19:;
 
-      /* "pinaudio\core.pyx":286
- *             # TODO: Log error if events are full
+      /* "pinaudio\core.pyx":291
  * 
- *             mix_channel.sample_players[i].status = player_idle             # <<<<<<<<<<<<<<
+ *             # The sample play is now idle (ready to play another sample)
+ *             mix_channel.sample_players[player].status = player_idle             # <<<<<<<<<<<<<<
  * 
- *     # Apply channel volume (this might be handled already by SDL_Mixer)
+ *     # Apply channel volume
  */
-      (__pyx_v_mix_channel->sample_players[__pyx_v_i]).status = __pyx_e_8pinaudio_4core_player_idle;
-      goto __pyx_L19;
+      (__pyx_v_mix_channel->sample_players[__pyx_v_player]).status = __pyx_e_8pinaudio_4core_player_idle;
+      goto __pyx_L18;
     }
-    __pyx_L19:;
+    __pyx_L18:;
     __pyx_L5_continue:;
   }
 
-  /* "pinaudio\core.pyx":292
+  /* "pinaudio\core.pyx":297
  * 
  *     # Apply channel envelopes (if applicable)
  *     apply_ducking_envelopes_to_mixer_channel_s16(stream, length, mix_channel)             # <<<<<<<<<<<<<<
@@ -2581,16 +2586,16 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
  */
   __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16(__pyx_v_stream, __pyx_v_length, __pyx_v_mix_channel);
 
-  /* "pinaudio\core.pyx":295
+  /* "pinaudio\core.pyx":300
  * 
  *     # Release the lock on the channel mutex
  *     SDL_UnlockMutex(mix_channel.mutex)             # <<<<<<<<<<<<<<
  * 
- * 
+ * cdef void apply_ducking_envelopes_to_mixer_channel_s16(void *stream, int length, MixerChannel* mix_channel) nogil:
  */
   SDL_UnlockMutex(__pyx_v_mix_channel->mutex);
 
-  /* "pinaudio\core.pyx":159
+  /* "pinaudio\core.pyx":160
  *     SDL_UnlockMutex(mix_channel.mutex)
  * 
  * cdef void mix_track_callback_s16sys(int channel, void *stream, int length, void *userdata) nogil:             # <<<<<<<<<<<<<<
@@ -2602,12 +2607,12 @@ static void __pyx_f_8pinaudio_4core_mix_track_callback_s16sys(int __pyx_v_channe
   __pyx_L0:;
 }
 
-/* "pinaudio\core.pyx":298
- * 
+/* "pinaudio\core.pyx":302
+ *     SDL_UnlockMutex(mix_channel.mutex)
  * 
  * cdef void apply_ducking_envelopes_to_mixer_channel_s16(void *stream, int length, MixerChannel* mix_channel) nogil:             # <<<<<<<<<<<<<<
  *     """
- *     Applies any in-process ducking envelopes to the specified mixer channel
+ *     Applies any in-process ducking envelopes to the specified mixer channel output buffer
  */
 
 static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16(CYTHON_UNUSED void *__pyx_v_stream, int __pyx_v_length, __pyx_t_8pinaudio_4core_MixerChannel *__pyx_v_mix_channel) {
@@ -2619,7 +2624,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
   int __pyx_t_3;
   int __pyx_t_4;
 
-  /* "pinaudio\core.pyx":306
+  /* "pinaudio\core.pyx":310
  *     :return: void
  *     """
  *     if mix_channel == NULL:             # <<<<<<<<<<<<<<
@@ -2629,7 +2634,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
   __pyx_t_1 = ((__pyx_v_mix_channel == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":307
+    /* "pinaudio\core.pyx":311
  *     """
  *     if mix_channel == NULL:
  *         return             # <<<<<<<<<<<<<<
@@ -2639,7 +2644,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":310
+  /* "pinaudio\core.pyx":314
  * 
  *     # Attempt to lock the track/channel mutex while performing operations on the track/channel
  *     if SDL_LockMutex(mix_channel.mutex) != 0:             # <<<<<<<<<<<<<<
@@ -2649,7 +2654,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
   __pyx_t_1 = ((SDL_LockMutex(__pyx_v_mix_channel->mutex) != 0) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":311
+    /* "pinaudio\core.pyx":315
  *     # Attempt to lock the track/channel mutex while performing operations on the track/channel
  *     if SDL_LockMutex(mix_channel.mutex) != 0:
  *         return             # <<<<<<<<<<<<<<
@@ -2659,7 +2664,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":314
+  /* "pinaudio\core.pyx":318
  * 
  *     cdef DuckingEnvelope *envelope
  *     envelope = mix_channel.ducking_envelopes             # <<<<<<<<<<<<<<
@@ -2669,7 +2674,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
   __pyx_t_2 = __pyx_v_mix_channel->ducking_envelopes;
   __pyx_v_envelope = __pyx_t_2;
 
-  /* "pinaudio\core.pyx":317
+  /* "pinaudio\core.pyx":321
  * 
  *     # Are there any envelopes to process?
  *     if envelope == NULL:             # <<<<<<<<<<<<<<
@@ -2679,7 +2684,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
   __pyx_t_1 = ((__pyx_v_envelope == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":319
+    /* "pinaudio\core.pyx":323
  *     if envelope == NULL:
  *         # Release the lock on the channel mutex
  *         SDL_UnlockMutex(mix_channel.mutex)             # <<<<<<<<<<<<<<
@@ -2688,7 +2693,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
  */
     SDL_UnlockMutex(__pyx_v_mix_channel->mutex);
 
-    /* "pinaudio\core.pyx":320
+    /* "pinaudio\core.pyx":324
  *         # Release the lock on the channel mutex
  *         SDL_UnlockMutex(mix_channel.mutex)
  *         return             # <<<<<<<<<<<<<<
@@ -2698,7 +2703,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":322
+  /* "pinaudio\core.pyx":326
  *         return
  * 
  *     cdef float sample_attenuation = 1.0             # <<<<<<<<<<<<<<
@@ -2707,7 +2712,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
  */
   __pyx_v_sample_attenuation = 1.0;
 
-  /* "pinaudio\core.pyx":325
+  /* "pinaudio\core.pyx":329
  * 
  *     # There is at least one ducking envelope to process, loop over output buffer samples
  *     for sample_index in range(length):             # <<<<<<<<<<<<<<
@@ -2718,7 +2723,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
   for (__pyx_t_4 = 0; __pyx_t_4 < __pyx_t_3; __pyx_t_4+=1) {
     __pyx_v_sample_index = __pyx_t_4;
 
-    /* "pinaudio\core.pyx":327
+    /* "pinaudio\core.pyx":331
  *     for sample_index in range(length):
  * 
  *         sample_attenuation = 1.0             # <<<<<<<<<<<<<<
@@ -2727,7 +2732,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
  */
     __pyx_v_sample_attenuation = 1.0;
 
-    /* "pinaudio\core.pyx":330
+    /* "pinaudio\core.pyx":334
  * 
  *         # Loop over any envelopes to process for the channel
  *         while envelope != NULL:             # <<<<<<<<<<<<<<
@@ -2738,7 +2743,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
       __pyx_t_1 = ((__pyx_v_envelope != NULL) != 0);
       if (!__pyx_t_1) break;
 
-      /* "pinaudio\core.pyx":334
+      /* "pinaudio\core.pyx":338
  * 
  *             # Get the next envelope (if there is one, they are stored in a linked list)
  *             envelope = envelope.next             # <<<<<<<<<<<<<<
@@ -2749,7 +2754,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
       __pyx_v_envelope = __pyx_t_2;
     }
 
-    /* "pinaudio\core.pyx":337
+    /* "pinaudio\core.pyx":341
  * 
  *         # Apply envelope attenuation
  *         if sample_attenuation < 1.0:             # <<<<<<<<<<<<<<
@@ -2763,7 +2768,7 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
     __pyx_L10:;
   }
 
-  /* "pinaudio\core.pyx":343
+  /* "pinaudio\core.pyx":347
  * 
  *     # Release the lock on the channel mutex
  *     SDL_UnlockMutex(mix_channel.mutex)             # <<<<<<<<<<<<<<
@@ -2772,19 +2777,19 @@ static void __pyx_f_8pinaudio_4core_apply_ducking_envelopes_to_mixer_channel_s16
  */
   SDL_UnlockMutex(__pyx_v_mix_channel->mutex);
 
-  /* "pinaudio\core.pyx":298
- * 
+  /* "pinaudio\core.pyx":302
+ *     SDL_UnlockMutex(mix_channel.mutex)
  * 
  * cdef void apply_ducking_envelopes_to_mixer_channel_s16(void *stream, int length, MixerChannel* mix_channel) nogil:             # <<<<<<<<<<<<<<
  *     """
- *     Applies any in-process ducking envelopes to the specified mixer channel
+ *     Applies any in-process ducking envelopes to the specified mixer channel output buffer
  */
 
   /* function exit code */
   __pyx_L0:;
 }
 
-/* "pinaudio\core.pyx":368
+/* "pinaudio\core.pyx":372
  *     cdef Mix_Chunk *raw_chunk_silence
  * 
  *     def __cinit__(self, *args, **kw):             # <<<<<<<<<<<<<<
@@ -2820,7 +2825,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput___cinit__(struct __pyx_obj_8pi
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "pinaudio\core.pyx":369
+  /* "pinaudio\core.pyx":373
  * 
  *     def __cinit__(self, *args, **kw):
  *         self.audio_init = 0             # <<<<<<<<<<<<<<
@@ -2829,7 +2834,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput___cinit__(struct __pyx_obj_8pi
  */
   __pyx_v_self->audio_init = 0;
 
-  /* "pinaudio\core.pyx":370
+  /* "pinaudio\core.pyx":374
  *     def __cinit__(self, *args, **kw):
  *         self.audio_init = 0
  *         self.raw_chunk_silence = NULL             # <<<<<<<<<<<<<<
@@ -2838,7 +2843,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput___cinit__(struct __pyx_obj_8pi
  */
   __pyx_v_self->raw_chunk_silence = NULL;
 
-  /* "pinaudio\core.pyx":368
+  /* "pinaudio\core.pyx":372
  *     cdef Mix_Chunk *raw_chunk_silence
  * 
  *     def __cinit__(self, *args, **kw):             # <<<<<<<<<<<<<<
@@ -2852,11 +2857,11 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput___cinit__(struct __pyx_obj_8pi
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":372
+/* "pinaudio\core.pyx":376
  *         self.raw_chunk_silence = NULL
  * 
  *     def __init__(self, rate=44100, channels=2, buffersize=1024, encoding=16,             # <<<<<<<<<<<<<<
- *                  formats=MIX_INIT_FLAC|MIX_INIT_MP3|MIX_INIT_OGG):
+ *                  formats=MIX_INIT_FLAC|MIX_INIT_OGG):
  *         self.samples = {}
  */
 
@@ -2923,7 +2928,7 @@ static int __pyx_pw_8pinaudio_4core_11AudioOutput_3__init__(PyObject *__pyx_v_se
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -2944,7 +2949,7 @@ static int __pyx_pw_8pinaudio_4core_11AudioOutput_3__init__(PyObject *__pyx_v_se
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 372; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 0, 5, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pinaudio.core.AudioOutput.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -2972,14 +2977,14 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "pinaudio\core.pyx":374
+  /* "pinaudio\core.pyx":378
  *     def __init__(self, rate=44100, channels=2, buffersize=1024, encoding=16,
- *                  formats=MIX_INIT_FLAC|MIX_INIT_MP3|MIX_INIT_OGG):
+ *                  formats=MIX_INIT_FLAC|MIX_INIT_OGG):
  *         self.samples = {}             # <<<<<<<<<<<<<<
  *         self.next_sample_number = 1
  *         self.rate = rate
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->samples);
@@ -2987,8 +2992,8 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
   __pyx_v_self->samples = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pinaudio\core.pyx":375
- *                  formats=MIX_INIT_FLAC|MIX_INIT_MP3|MIX_INIT_OGG):
+  /* "pinaudio\core.pyx":379
+ *                  formats=MIX_INIT_FLAC|MIX_INIT_OGG):
  *         self.samples = {}
  *         self.next_sample_number = 1             # <<<<<<<<<<<<<<
  *         self.rate = rate
@@ -2996,47 +3001,47 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
  */
   __pyx_v_self->next_sample_number = 1;
 
-  /* "pinaudio\core.pyx":376
+  /* "pinaudio\core.pyx":380
  *         self.samples = {}
  *         self.next_sample_number = 1
  *         self.rate = rate             # <<<<<<<<<<<<<<
  *         self.channels = channels
  *         self.buffersize = buffersize
  */
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_rate); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 376; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_rate); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 380; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->rate = __pyx_t_2;
 
-  /* "pinaudio\core.pyx":377
+  /* "pinaudio\core.pyx":381
  *         self.next_sample_number = 1
  *         self.rate = rate
  *         self.channels = channels             # <<<<<<<<<<<<<<
  *         self.buffersize = buffersize
  *         self.encoding = encoding
  */
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_channels); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_channels); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 381; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->channels = __pyx_t_2;
 
-  /* "pinaudio\core.pyx":378
+  /* "pinaudio\core.pyx":382
  *         self.rate = rate
  *         self.channels = channels
  *         self.buffersize = buffersize             # <<<<<<<<<<<<<<
  *         self.encoding = encoding
  *         self.audio_format = 0
  */
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_buffersize); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 378; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_buffersize); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->buffersize = __pyx_t_2;
 
-  /* "pinaudio\core.pyx":379
+  /* "pinaudio\core.pyx":383
  *         self.channels = channels
  *         self.buffersize = buffersize
  *         self.encoding = encoding             # <<<<<<<<<<<<<<
  *         self.audio_format = 0
  *         self.supported_formats = formats
  */
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_encoding); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 379; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_encoding); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 383; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->encoding = __pyx_t_2;
 
-  /* "pinaudio\core.pyx":380
+  /* "pinaudio\core.pyx":384
  *         self.buffersize = buffersize
  *         self.encoding = encoding
  *         self.audio_format = 0             # <<<<<<<<<<<<<<
@@ -3045,24 +3050,24 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
  */
   __pyx_v_self->audio_format = 0;
 
-  /* "pinaudio\core.pyx":381
+  /* "pinaudio\core.pyx":385
  *         self.encoding = encoding
  *         self.audio_format = 0
  *         self.supported_formats = formats             # <<<<<<<<<<<<<<
  *         self.mixer_channels = []
  * 
  */
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_formats); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 381; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_formats); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->supported_formats = __pyx_t_2;
 
-  /* "pinaudio\core.pyx":382
+  /* "pinaudio\core.pyx":386
  *         self.audio_format = 0
  *         self.supported_formats = formats
  *         self.mixer_channels = []             # <<<<<<<<<<<<<<
  * 
  *         assert(encoding in (8, 16))
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 382; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->mixer_channels);
@@ -3070,7 +3075,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
   __pyx_v_self->mixer_channels = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "pinaudio\core.pyx":384
+  /* "pinaudio\core.pyx":388
  *         self.mixer_channels = []
  * 
  *         assert(encoding in (8, 16))             # <<<<<<<<<<<<<<
@@ -3081,28 +3086,28 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
   if (unlikely(!Py_OptimizeFlag)) {
     __Pyx_INCREF(__pyx_v_encoding);
     __pyx_t_1 = __pyx_v_encoding;
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_int_8, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_int_8, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (!__pyx_t_5) {
     } else {
       __pyx_t_3 = __pyx_t_5;
       goto __pyx_L3_bool_binop_done;
     }
-    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_int_16, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyObject_RichCompare(__pyx_t_1, __pyx_int_16, Py_EQ); __Pyx_XGOTREF(__pyx_t_4); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_5 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_t_3 = __pyx_t_5;
     __pyx_L3_bool_binop_done:;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (unlikely(!(__pyx_t_3 != 0))) {
       PyErr_SetNone(PyExc_AssertionError);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pinaudio\core.pyx":385
+  /* "pinaudio\core.pyx":389
  * 
  *         assert(encoding in (8, 16))
  *         assert(channels >= 1)             # <<<<<<<<<<<<<<
@@ -3111,17 +3116,17 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyObject_RichCompare(__pyx_v_channels, __pyx_int_1, Py_GE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyObject_RichCompare(__pyx_v_channels, __pyx_int_1, Py_GE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (unlikely(!__pyx_t_3)) {
       PyErr_SetNone(PyExc_AssertionError);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 385; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pinaudio\core.pyx":386
+  /* "pinaudio\core.pyx":390
  *         assert(encoding in (8, 16))
  *         assert(channels >= 1)
  *         assert(buffersize >= 0)             # <<<<<<<<<<<<<<
@@ -3130,17 +3135,17 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
  */
   #ifndef CYTHON_WITHOUT_ASSERTIONS
   if (unlikely(!Py_OptimizeFlag)) {
-    __pyx_t_1 = PyObject_RichCompare(__pyx_v_buffersize, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyObject_RichCompare(__pyx_v_buffersize, __pyx_int_0, Py_GE); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 390; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 390; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (unlikely(!__pyx_t_3)) {
       PyErr_SetNone(PyExc_AssertionError);
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 386; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 390; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
   }
   #endif
 
-  /* "pinaudio\core.pyx":388
+  /* "pinaudio\core.pyx":392
  *         assert(buffersize >= 0)
  * 
  *         if self._init_audio() < 0:             # <<<<<<<<<<<<<<
@@ -3150,24 +3155,24 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
   __pyx_t_3 = ((((struct __pyx_vtabstruct_8pinaudio_4core_AudioOutput *)__pyx_v_self->__pyx_vtab)->_init_audio(__pyx_v_self) < 0) != 0);
   if (__pyx_t_3) {
 
-    /* "pinaudio\core.pyx":389
+    /* "pinaudio\core.pyx":393
  * 
  *         if self._init_audio() < 0:
  *             raise AudioException('AudioOutput: unable to initialize audio')             # <<<<<<<<<<<<<<
  * 
  *         # Initialize the supported SDL_Mixer library formats with the requested formats
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pinaudio\core.pyx":392
+  /* "pinaudio\core.pyx":396
  * 
  *         # Initialize the supported SDL_Mixer library formats with the requested formats
  *         self.supported_formats = Mix_Init(self.supported_formats)             # <<<<<<<<<<<<<<
@@ -3176,7 +3181,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
  */
   __pyx_v_self->supported_formats = Mix_Init(__pyx_v_self->supported_formats);
 
-  /* "pinaudio\core.pyx":397
+  /* "pinaudio\core.pyx":401
  *         # must play something to call its effects callback functions which are used in this library
  *         # to perform the actual sound generation/mixing)
  *         cdef uint8_t *silence = NULL             # <<<<<<<<<<<<<<
@@ -3185,7 +3190,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
  */
   __pyx_v_silence = NULL;
 
-  /* "pinaudio\core.pyx":398
+  /* "pinaudio\core.pyx":402
  *         # to perform the actual sound generation/mixing)
  *         cdef uint8_t *silence = NULL
  *         cdef uint32_t length = self.rate * self.buffersize * self.channels             # <<<<<<<<<<<<<<
@@ -3194,7 +3199,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
  */
   __pyx_v_length = ((__pyx_v_self->rate * __pyx_v_self->buffersize) * __pyx_v_self->channels);
 
-  /* "pinaudio\core.pyx":399
+  /* "pinaudio\core.pyx":403
  *         cdef uint8_t *silence = NULL
  *         cdef uint32_t length = self.rate * self.buffersize * self.channels
  *         silence = <uint8_t *>calloc(1, length)             # <<<<<<<<<<<<<<
@@ -3203,7 +3208,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
  */
   __pyx_v_silence = ((__pyx_t_8pinaudio_4core_uint8_t *)calloc(1, __pyx_v_length));
 
-  /* "pinaudio\core.pyx":401
+  /* "pinaudio\core.pyx":405
  *         silence = <uint8_t *>calloc(1, length)
  * 
  *         self.raw_chunk_silence = Mix_QuickLoad_RAW(silence, length)             # <<<<<<<<<<<<<<
@@ -3212,7 +3217,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
  */
   __pyx_v_self->raw_chunk_silence = Mix_QuickLoad_RAW(__pyx_v_silence, __pyx_v_length);
 
-  /* "pinaudio\core.pyx":402
+  /* "pinaudio\core.pyx":406
  * 
  *         self.raw_chunk_silence = Mix_QuickLoad_RAW(silence, length)
  *         if self.raw_chunk_silence == NULL:             # <<<<<<<<<<<<<<
@@ -3222,28 +3227,28 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
   __pyx_t_3 = ((__pyx_v_self->raw_chunk_silence == NULL) != 0);
   if (__pyx_t_3) {
 
-    /* "pinaudio\core.pyx":403
+    /* "pinaudio\core.pyx":407
  *         self.raw_chunk_silence = Mix_QuickLoad_RAW(silence, length)
  *         if self.raw_chunk_silence == NULL:
  *             raise AudioException('AudioOutput: unable to initialize and load silence')             # <<<<<<<<<<<<<<
  * 
  *     cdef int _init_audio(self):
  */
-    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 407; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 407; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 407; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
 
-  /* "pinaudio\core.pyx":372
+  /* "pinaudio\core.pyx":376
  *         self.raw_chunk_silence = NULL
  * 
  *     def __init__(self, rate=44100, channels=2, buffersize=1024, encoding=16,             # <<<<<<<<<<<<<<
- *                  formats=MIX_INIT_FLAC|MIX_INIT_MP3|MIX_INIT_OGG):
+ *                  formats=MIX_INIT_FLAC|MIX_INIT_OGG):
  *         self.samples = {}
  */
 
@@ -3260,7 +3265,7 @@ static int __pyx_pf_8pinaudio_4core_11AudioOutput_2__init__(struct __pyx_obj_8pi
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":405
+/* "pinaudio\core.pyx":409
  *             raise AudioException('AudioOutput: unable to initialize and load silence')
  * 
  *     cdef int _init_audio(self):             # <<<<<<<<<<<<<<
@@ -3283,7 +3288,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("_init_audio", 0);
 
-  /* "pinaudio\core.pyx":413
+  /* "pinaudio\core.pyx":417
  * 
  *         # Make sure we haven't already performed initialization
  *         if self.audio_init == 1:             # <<<<<<<<<<<<<<
@@ -3293,7 +3298,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
   __pyx_t_1 = ((__pyx_v_self->audio_init == 1) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":414
+    /* "pinaudio\core.pyx":418
  *         # Make sure we haven't already performed initialization
  *         if self.audio_init == 1:
  *             return 0             # <<<<<<<<<<<<<<
@@ -3304,7 +3309,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":417
+  /* "pinaudio\core.pyx":421
  * 
  *         # Initialize threading in the extension library and acquire the Python global interpreter lock
  *         PyEval_InitThreads()             # <<<<<<<<<<<<<<
@@ -3313,7 +3318,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
  */
   PyEval_InitThreads();
 
-  /* "pinaudio\core.pyx":420
+  /* "pinaudio\core.pyx":424
  * 
  *         # Initialize the SDL audio system
  *         if SDL_Init(SDL_INIT_AUDIO) < 0:             # <<<<<<<<<<<<<<
@@ -3323,29 +3328,29 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
   __pyx_t_1 = ((SDL_Init(16) < 0) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":421
+    /* "pinaudio\core.pyx":425
  *         # Initialize the SDL audio system
  *         if SDL_Init(SDL_INIT_AUDIO) < 0:
  *             print('SDL_Init: %s' % SDL_GetError())             # <<<<<<<<<<<<<<
  *             return -1
  * 
  */
-    __pyx_t_2 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyUnicode_Format(__pyx_kp_u_SDL_Init_s, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyUnicode_Format(__pyx_kp_u_SDL_Init_s, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
     __Pyx_GIVEREF(__pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 421; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 425; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "pinaudio\core.pyx":422
+    /* "pinaudio\core.pyx":426
  *         if SDL_Init(SDL_INIT_AUDIO) < 0:
  *             print('SDL_Init: %s' % SDL_GetError())
  *             return -1             # <<<<<<<<<<<<<<
@@ -3356,7 +3361,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":424
+  /* "pinaudio\core.pyx":428
  *             return -1
  * 
  *         cdef unsigned int encoding = AUDIO_S8 if self.encoding == 8 else AUDIO_S16SYS             # <<<<<<<<<<<<<<
@@ -3370,7 +3375,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
   }
   __pyx_v_encoding = __pyx_t_4;
 
-  /* "pinaudio\core.pyx":425
+  /* "pinaudio\core.pyx":429
  * 
  *         cdef unsigned int encoding = AUDIO_S8 if self.encoding == 8 else AUDIO_S16SYS
  *         self.audio_format = encoding             # <<<<<<<<<<<<<<
@@ -3379,7 +3384,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
  */
   __pyx_v_self->audio_format = __pyx_v_encoding;
 
-  /* "pinaudio\core.pyx":429
+  /* "pinaudio\core.pyx":433
  *         # Initialize the SDL_Mixer library to establish the output audio format and encoding
  *         # (sample rate, bit depth, buffer size)
  *         if Mix_OpenAudio(self.rate, encoding, self.channels, self.buffersize):             # <<<<<<<<<<<<<<
@@ -3389,29 +3394,29 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
   __pyx_t_1 = (Mix_OpenAudio(__pyx_v_self->rate, __pyx_v_encoding, __pyx_v_self->channels, __pyx_v_self->buffersize) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":430
+    /* "pinaudio\core.pyx":434
  *         # (sample rate, bit depth, buffer size)
  *         if Mix_OpenAudio(self.rate, encoding, self.channels, self.buffersize):
  *             print('Mix_OpenAudio: %s' % SDL_GetError())             # <<<<<<<<<<<<<<
  *             return -1
  * 
  */
-    __pyx_t_3 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 430; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = PyUnicode_Format(__pyx_kp_u_Mix_OpenAudio_s, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 430; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyUnicode_Format(__pyx_kp_u_Mix_OpenAudio_s, __pyx_t_3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 430; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_2);
     __pyx_t_2 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 430; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 434; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "pinaudio\core.pyx":431
+    /* "pinaudio\core.pyx":435
  *         if Mix_OpenAudio(self.rate, encoding, self.channels, self.buffersize):
  *             print('Mix_OpenAudio: %s' % SDL_GetError())
  *             return -1             # <<<<<<<<<<<<<<
@@ -3422,7 +3427,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":434
+  /* "pinaudio\core.pyx":438
  * 
  *         # Lock SDL from calling the audio callback functions
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -3431,20 +3436,20 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
  */
   SDL_LockAudio();
 
-  /* "pinaudio\core.pyx":438
+  /* "pinaudio\core.pyx":442
  *         # Determine the actual audio format in use by the opened audio device.  This may or may not match
  *         # the parameters used to initialize the output device.
  *         print('AudioOutput asked for ', self.rate, self.channels, self.buffersize)             # <<<<<<<<<<<<<<
  *         Mix_QuerySpec(&self.rate, NULL, &self.channels)
  *         print('AudioOutput received ', self.rate, self.channels, self.buffersize)
  */
-  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_self->rate); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_self->rate); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->channels); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->channels); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_self->buffersize); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_self->buffersize); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyTuple_New(4); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyTuple_New(4); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_INCREF(__pyx_kp_u_AudioOutput_asked_for);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_kp_u_AudioOutput_asked_for);
@@ -3458,12 +3463,12 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
   __pyx_t_2 = 0;
   __pyx_t_3 = 0;
   __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 438; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 442; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "pinaudio\core.pyx":439
+  /* "pinaudio\core.pyx":443
  *         # the parameters used to initialize the output device.
  *         print('AudioOutput asked for ', self.rate, self.channels, self.buffersize)
  *         Mix_QuerySpec(&self.rate, NULL, &self.channels)             # <<<<<<<<<<<<<<
@@ -3472,20 +3477,20 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
  */
   Mix_QuerySpec((&__pyx_v_self->rate), NULL, (&__pyx_v_self->channels));
 
-  /* "pinaudio\core.pyx":440
+  /* "pinaudio\core.pyx":444
  *         print('AudioOutput asked for ', self.rate, self.channels, self.buffersize)
  *         Mix_QuerySpec(&self.rate, NULL, &self.channels)
  *         print('AudioOutput received ', self.rate, self.channels, self.buffersize)             # <<<<<<<<<<<<<<
  * 
  *         # Unlock the SDL audio callback functions
  */
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_self->rate); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 440; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_self->rate); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 444; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_self->channels); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 440; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_self->channels); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 444; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->buffersize); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 440; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->buffersize); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 444; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 440; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 444; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_kp_u_AudioOutput_received);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_kp_u_AudioOutput_received);
@@ -3499,12 +3504,12 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
   __pyx_t_5 = 0;
   __pyx_t_6 = 0;
   __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 440; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 444; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "pinaudio\core.pyx":443
+  /* "pinaudio\core.pyx":447
  * 
  *         # Unlock the SDL audio callback functions
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -3513,7 +3518,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
  */
   SDL_UnlockAudio();
 
-  /* "pinaudio\core.pyx":446
+  /* "pinaudio\core.pyx":450
  * 
  *         # Audio has now been initialized
  *         self.audio_init = 1             # <<<<<<<<<<<<<<
@@ -3522,17 +3527,17 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
  */
   __pyx_v_self->audio_init = 1;
 
-  /* "pinaudio\core.pyx":447
+  /* "pinaudio\core.pyx":451
  *         # Audio has now been initialized
  *         self.audio_init = 1
  *         return 0             # <<<<<<<<<<<<<<
  * 
- *     @property
+ *     # TODO: Implement a close function/destructor for the audio output to shut everything down and clean up
  */
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":405
+  /* "pinaudio\core.pyx":409
  *             raise AudioException('AudioOutput: unable to initialize and load silence')
  * 
  *     cdef int _init_audio(self):             # <<<<<<<<<<<<<<
@@ -3553,7 +3558,7 @@ static int __pyx_f_8pinaudio_4core_11AudioOutput__init_audio(struct __pyx_obj_8p
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":450
+/* "pinaudio\core.pyx":456
  * 
  *     @property
  *     def supports_wav(self):             # <<<<<<<<<<<<<<
@@ -3584,7 +3589,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_4supports_wav(struct __p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("supports_wav", 0);
 
-  /* "pinaudio\core.pyx":451
+  /* "pinaudio\core.pyx":457
  *     @property
  *     def supports_wav(self):
  *         return self.audio_init == 1             # <<<<<<<<<<<<<<
@@ -3592,13 +3597,13 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_4supports_wav(struct __p
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong((__pyx_v_self->audio_init == 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 451; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyBool_FromLong((__pyx_v_self->audio_init == 1)); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":450
+  /* "pinaudio\core.pyx":456
  * 
  *     @property
  *     def supports_wav(self):             # <<<<<<<<<<<<<<
@@ -3617,7 +3622,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_4supports_wav(struct __p
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":454
+/* "pinaudio\core.pyx":460
  * 
  *     @property
  *     def supports_ogg(self):             # <<<<<<<<<<<<<<
@@ -3650,7 +3655,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_6supports_ogg(struct __p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("supports_ogg", 0);
 
-  /* "pinaudio\core.pyx":455
+  /* "pinaudio\core.pyx":461
  *     @property
  *     def supports_ogg(self):
  *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_OGG) == MIX_INIT_OGG             # <<<<<<<<<<<<<<
@@ -3661,14 +3666,14 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_6supports_ogg(struct __p
   __pyx_t_2 = (__pyx_v_self->audio_init == 1);
   if (__pyx_t_2) {
   } else {
-    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_1 = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L3_bool_binop_done;
   }
   __pyx_t_2 = ((__pyx_v_self->supported_formats & MIX_INIT_OGG) == MIX_INIT_OGG);
-  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_1 = __pyx_t_3;
   __pyx_t_3 = 0;
@@ -3677,7 +3682,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_6supports_ogg(struct __p
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":454
+  /* "pinaudio\core.pyx":460
  * 
  *     @property
  *     def supports_ogg(self):             # <<<<<<<<<<<<<<
@@ -3697,7 +3702,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_6supports_ogg(struct __p
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":458
+/* "pinaudio\core.pyx":464
  * 
  *     @property
  *     def supports_flac(self):             # <<<<<<<<<<<<<<
@@ -3730,25 +3735,25 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_8supports_flac(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("supports_flac", 0);
 
-  /* "pinaudio\core.pyx":459
+  /* "pinaudio\core.pyx":465
  *     @property
  *     def supports_flac(self):
  *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC             # <<<<<<<<<<<<<<
  * 
- *     @property
+ *     def load_sample(self, str file_name, float default_volume=1.0, int simultaneous_limit=-1):
  */
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_2 = (__pyx_v_self->audio_init == 1);
   if (__pyx_t_2) {
   } else {
-    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_1 = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L3_bool_binop_done;
   }
   __pyx_t_2 = ((__pyx_v_self->supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC);
-  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_1 = __pyx_t_3;
   __pyx_t_3 = 0;
@@ -3757,7 +3762,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_8supports_flac(struct __
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":458
+  /* "pinaudio\core.pyx":464
  * 
  *     @property
  *     def supports_flac(self):             # <<<<<<<<<<<<<<
@@ -3777,88 +3782,8 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_8supports_flac(struct __
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":462
- * 
- *     @property
- *     def supports_mp3(self):             # <<<<<<<<<<<<<<
- *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3
- * 
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_11supports_mp3(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_10supports_mp3[] = "AudioOutput.supports_mp3(self)";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_11supports_mp3(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("supports_mp3 (wrapper)", 0);
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_10supports_mp3(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self));
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_10supports_mp3(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self) {
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  PyObject *__pyx_t_1 = NULL;
-  int __pyx_t_2;
-  PyObject *__pyx_t_3 = NULL;
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("supports_mp3", 0);
-
-  /* "pinaudio\core.pyx":463
- *     @property
- *     def supports_mp3(self):
- *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3             # <<<<<<<<<<<<<<
- * 
- *     def load_sample(self, str file_name, float default_volume=1.0, int simultaneous_limit=-1):
- */
-  __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = (__pyx_v_self->audio_init == 1);
-  if (__pyx_t_2) {
-  } else {
-    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 463; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __pyx_t_3;
-    __pyx_t_3 = 0;
-    goto __pyx_L3_bool_binop_done;
-  }
-  __pyx_t_2 = ((__pyx_v_self->supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3);
-  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 463; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_1 = __pyx_t_3;
-  __pyx_t_3 = 0;
-  __pyx_L3_bool_binop_done:;
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
-  goto __pyx_L0;
-
-  /* "pinaudio\core.pyx":462
- * 
- *     @property
- *     def supports_mp3(self):             # <<<<<<<<<<<<<<
- *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3
- * 
- */
-
-  /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_AddTraceback("pinaudio.core.AudioOutput.supports_mp3", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "pinaudio\core.pyx":465
- *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3
+/* "pinaudio\core.pyx":467
+ *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC
  * 
  *     def load_sample(self, str file_name, float default_volume=1.0, int simultaneous_limit=-1):             # <<<<<<<<<<<<<<
  *         """
@@ -3866,9 +3791,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_10supports_mp3(struct __
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_13load_sample(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_12load_sample[] = "AudioOutput.load_sample(self, unicode file_name, float default_volume=1.0, int simultaneous_limit=-1)\n\n        Loads a sample into memory from the specified file name. A pointer to the\n        sample will be stored in a dictionary with the sample name as the key.\n        :param file_name: The full file OS path to the sample file to load.\n        :param default_volume: The default volume for this sample (0.0 to 1.0)\n        :param simultaneous_limit: The maximum number of instances of this sound\n        that may be played at one time (-1 means there is no limit)\n        :return: The unique sample number for the newly loaded sample.  This number\n        will be used to reference this particular sample from now on.  If\n        the sample could not be loaded, 0 is returned.\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_13load_sample(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_11load_sample(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_10load_sample[] = "AudioOutput.load_sample(self, unicode file_name, float default_volume=1.0, int simultaneous_limit=-1)\n\n        Loads a sample into memory from the specified file name. A pointer to the\n        sample will be stored in a dictionary with the sample name as the key.\n        :param file_name: The full file OS path to the sample file to load.\n        :param default_volume: The default volume for this sample (0.0 to 1.0)\n        :param simultaneous_limit: The maximum number of instances of this sound\n        that may be played at one time (-1 means there is no limit)\n        :return: The unique sample number for the newly loaded sample.  This number\n        will be used to reference this particular sample from now on.  If\n        the sample could not be loaded, 0 is returned.\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_11load_sample(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_file_name = 0;
   float __pyx_v_default_volume;
   int __pyx_v_simultaneous_limit;
@@ -3908,7 +3833,7 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_13load_sample(PyObject *
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "load_sample") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "load_sample") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3921,26 +3846,26 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_13load_sample(PyObject *
     }
     __pyx_v_file_name = ((PyObject*)values[0]);
     if (values[1]) {
-      __pyx_v_default_volume = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_default_volume == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_default_volume = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_default_volume == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_default_volume = ((float)1.0);
     }
     if (values[2]) {
-      __pyx_v_simultaneous_limit = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_simultaneous_limit == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_simultaneous_limit = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_simultaneous_limit == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_simultaneous_limit = ((int)-1);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("load_sample", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("load_sample", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pinaudio.core.AudioOutput.load_sample", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_name), (&PyUnicode_Type), 1, "file_name", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 465; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_file_name, __pyx_v_default_volume, __pyx_v_simultaneous_limit);
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_name), (&PyUnicode_Type), 1, "file_name", 1))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 467; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_10load_sample(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_file_name, __pyx_v_default_volume, __pyx_v_simultaneous_limit);
 
   /* function exit code */
   goto __pyx_L0;
@@ -3951,7 +3876,7 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_13load_sample(PyObject *
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, PyObject *__pyx_v_file_name, float __pyx_v_default_volume, int __pyx_v_simultaneous_limit) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_10load_sample(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, PyObject *__pyx_v_file_name, float __pyx_v_default_volume, int __pyx_v_simultaneous_limit) {
   PyObject *__pyx_v_loaded_sample_num = NULL;
   PyObject *__pyx_v_py_byte_file_name = NULL;
   char *__pyx_v_c_file_name;
@@ -3981,7 +3906,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("load_sample", 0);
 
-  /* "pinaudio\core.pyx":480
+  /* "pinaudio\core.pyx":482
  *         # Check if sample file_name has already been loaded.  If so returns its
  *         # existing sample number
  *         for loaded_sample_num in self.samples:             # <<<<<<<<<<<<<<
@@ -3991,9 +3916,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
   __pyx_t_2 = 0;
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->samples, 1, ((PyObject *)NULL), (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_dict_iterator(__pyx_v_self->samples, 1, ((PyObject *)NULL), (&__pyx_t_3), (&__pyx_t_4)); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_1);
   __pyx_t_1 = __pyx_t_5;
@@ -4001,12 +3926,12 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
   while (1) {
     __pyx_t_6 = __Pyx_dict_iter_next(__pyx_t_1, __pyx_t_3, &__pyx_t_2, &__pyx_t_5, NULL, NULL, __pyx_t_4);
     if (unlikely(__pyx_t_6 == 0)) break;
-    if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 480; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    if (unlikely(__pyx_t_6 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 482; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_XDECREF_SET(__pyx_v_loaded_sample_num, __pyx_t_5);
     __pyx_t_5 = 0;
 
-    /* "pinaudio\core.pyx":481
+    /* "pinaudio\core.pyx":483
  *         # existing sample number
  *         for loaded_sample_num in self.samples:
  *             if file_name == self.samples[loaded_sample_num]['file_name']:             # <<<<<<<<<<<<<<
@@ -4015,18 +3940,18 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
  */
     if (unlikely(__pyx_v_self->samples == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_v_loaded_sample_num); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_v_loaded_sample_num); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_7 = PyObject_GetItem(__pyx_t_5, __pyx_n_u_file_name); if (unlikely(__pyx_t_7 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_7 = PyObject_GetItem(__pyx_t_5, __pyx_n_u_file_name); if (unlikely(__pyx_t_7 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_8 = (__Pyx_PyUnicode_Equals(__pyx_v_file_name, __pyx_t_7, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 481; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_8 = (__Pyx_PyUnicode_Equals(__pyx_v_file_name, __pyx_t_7, Py_EQ)); if (unlikely(__pyx_t_8 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 483; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     if (__pyx_t_8) {
 
-      /* "pinaudio\core.pyx":482
+      /* "pinaudio\core.pyx":484
  *         for loaded_sample_num in self.samples:
  *             if file_name == self.samples[loaded_sample_num]['file_name']:
  *                 return loaded_sample_num             # <<<<<<<<<<<<<<
@@ -4042,7 +3967,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pinaudio\core.pyx":489
+  /* "pinaudio\core.pyx":491
  *         # 2) convert the python byte string to a C char* (can just do an assign)
  *         # 3) the C char* string is now ready for use in calls to the C library
  *         py_byte_file_name = file_name.encode('UTF-8')             # <<<<<<<<<<<<<<
@@ -4051,24 +3976,24 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
  */
   if (unlikely(__pyx_v_file_name == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "encode");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_file_name); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 489; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_file_name); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 491; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_py_byte_file_name = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "pinaudio\core.pyx":490
+  /* "pinaudio\core.pyx":492
  *         # 3) the C char* string is now ready for use in calls to the C library
  *         py_byte_file_name = file_name.encode('UTF-8')
  *         cdef char* c_file_name = py_byte_file_name             # <<<<<<<<<<<<<<
  *         py_byte_mode = "rb".encode('UTF-8')
  *         cdef char* c_mode = py_byte_mode
  */
-  __pyx_t_9 = __Pyx_PyObject_AsString(__pyx_v_py_byte_file_name); if (unlikely((!__pyx_t_9) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 490; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_9 = __Pyx_PyObject_AsString(__pyx_v_py_byte_file_name); if (unlikely((!__pyx_t_9) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_c_file_name = __pyx_t_9;
 
-  /* "pinaudio\core.pyx":491
+  /* "pinaudio\core.pyx":493
  *         py_byte_file_name = file_name.encode('UTF-8')
  *         cdef char* c_file_name = py_byte_file_name
  *         py_byte_mode = "rb".encode('UTF-8')             # <<<<<<<<<<<<<<
@@ -4078,17 +4003,17 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
   __Pyx_INCREF(__pyx_n_b_rb);
   __pyx_v_py_byte_mode = __pyx_n_b_rb;
 
-  /* "pinaudio\core.pyx":492
+  /* "pinaudio\core.pyx":494
  *         cdef char* c_file_name = py_byte_file_name
  *         py_byte_mode = "rb".encode('UTF-8')
  *         cdef char* c_mode = py_byte_mode             # <<<<<<<<<<<<<<
  * 
  *         # Load the sample file into memory
  */
-  __pyx_t_9 = __Pyx_PyObject_AsString(__pyx_v_py_byte_mode); if (unlikely((!__pyx_t_9) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 492; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_9 = __Pyx_PyObject_AsString(__pyx_v_py_byte_mode); if (unlikely((!__pyx_t_9) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 494; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_c_mode = __pyx_t_9;
 
-  /* "pinaudio\core.pyx":495
+  /* "pinaudio\core.pyx":497
  * 
  *         # Load the sample file into memory
  *         cdef Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromFile(c_file_name, c_mode), 1)             # <<<<<<<<<<<<<<
@@ -4097,7 +4022,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
  */
   __pyx_v_chunk = Mix_LoadWAV_RW(SDL_RWFromFile(__pyx_v_c_file_name, __pyx_v_c_mode), 1);
 
-  /* "pinaudio\core.pyx":496
+  /* "pinaudio\core.pyx":498
  *         # Load the sample file into memory
  *         cdef Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromFile(c_file_name, c_mode), 1)
  *         if chunk is NULL:             # <<<<<<<<<<<<<<
@@ -4107,16 +4032,16 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
   __pyx_t_8 = ((__pyx_v_chunk == NULL) != 0);
   if (__pyx_t_8) {
 
-    /* "pinaudio\core.pyx":497
+    /* "pinaudio\core.pyx":499
  *         cdef Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromFile(c_file_name, c_mode), 1)
  *         if chunk is NULL:
  *             print("An error occurred while loading sound file '{}': {}".format(file_name, SDL_GetError()))             # <<<<<<<<<<<<<<
  *             return 0
  * 
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_An_error_occurred_while_loading, __pyx_n_s_format); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_An_error_occurred_while_loading, __pyx_n_s_format); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_5 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_10 = NULL;
     __pyx_t_3 = 0;
@@ -4130,7 +4055,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
         __pyx_t_3 = 1;
       }
     }
-    __pyx_t_11 = PyTuple_New(2+__pyx_t_3); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_11 = PyTuple_New(2+__pyx_t_3); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_11);
     if (__pyx_t_10) {
       PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_10); __Pyx_GIVEREF(__pyx_t_10); __pyx_t_10 = NULL;
@@ -4141,21 +4066,21 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
     PyTuple_SET_ITEM(__pyx_t_11, 1+__pyx_t_3, __pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_5);
     __pyx_t_5 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_11, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_1);
     __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 497; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 499; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "pinaudio\core.pyx":498
+    /* "pinaudio\core.pyx":500
  *         if chunk is NULL:
  *             print("An error occurred while loading sound file '{}': {}".format(file_name, SDL_GetError()))
  *             return 0             # <<<<<<<<<<<<<<
@@ -4168,7 +4093,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":501
+  /* "pinaudio\core.pyx":503
  * 
  *         # Ensure volume is in the range from 0.0 to 1.0
  *         default_volume = max(min(default_volume, 1.0), 0.0)             # <<<<<<<<<<<<<<
@@ -4191,7 +4116,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
   }
   __pyx_v_default_volume = __pyx_t_15;
 
-  /* "pinaudio\core.pyx":504
+  /* "pinaudio\core.pyx":506
  * 
  *         # Compute the new volume setting (between 0 and MIX_MAX_VOLUME)
  *         chunk.volume = int(default_volume * MIX_MAX_VOLUME)             # <<<<<<<<<<<<<<
@@ -4200,7 +4125,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
  */
   __pyx_v_chunk->volume = ((__pyx_t_8pinaudio_4core_uint8_t)(__pyx_v_default_volume * 128.0));
 
-  /* "pinaudio\core.pyx":508
+  /* "pinaudio\core.pyx":510
  *         # Store the chunk pointer in a python capsule (wraps a c pointer in a python object)
  *         # so it can be stored in a python dictionary
  *         sample_number = self.next_sample_number             # <<<<<<<<<<<<<<
@@ -4210,7 +4135,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
   __pyx_t_4 = __pyx_v_self->next_sample_number;
   __pyx_v_sample_number = __pyx_t_4;
 
-  /* "pinaudio\core.pyx":509
+  /* "pinaudio\core.pyx":511
  *         # so it can be stored in a python dictionary
  *         sample_number = self.next_sample_number
  *         self.next_sample_number += 1             # <<<<<<<<<<<<<<
@@ -4219,26 +4144,26 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
  */
   __pyx_v_self->next_sample_number = (__pyx_v_self->next_sample_number + 1);
 
-  /* "pinaudio\core.pyx":510
+  /* "pinaudio\core.pyx":512
  *         sample_number = self.next_sample_number
  *         self.next_sample_number += 1
  *         self.samples[sample_number] = {}             # <<<<<<<<<<<<<<
  *         self.samples[sample_number]['file_name'] = file_name
  *         self.samples[sample_number]['chunk'] = pycapsule.PyCapsule_New(chunk, NULL, NULL)
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 510; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 512; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 510; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 512; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 510; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 512; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
-  if (unlikely(PyDict_SetItem(__pyx_v_self->samples, __pyx_t_7, __pyx_t_1) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 510; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(PyDict_SetItem(__pyx_v_self->samples, __pyx_t_7, __pyx_t_1) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 512; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pinaudio\core.pyx":511
+  /* "pinaudio\core.pyx":513
  *         self.next_sample_number += 1
  *         self.samples[sample_number] = {}
  *         self.samples[sample_number]['file_name'] = file_name             # <<<<<<<<<<<<<<
@@ -4247,61 +4172,61 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
  */
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_1); if (unlikely(__pyx_t_7 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_1); if (unlikely(__pyx_t_7 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(PyObject_SetItem(__pyx_t_7, __pyx_n_u_file_name, __pyx_v_file_name) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 511; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(PyObject_SetItem(__pyx_t_7, __pyx_n_u_file_name, __pyx_v_file_name) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "pinaudio\core.pyx":512
+  /* "pinaudio\core.pyx":514
  *         self.samples[sample_number] = {}
  *         self.samples[sample_number]['file_name'] = file_name
  *         self.samples[sample_number]['chunk'] = pycapsule.PyCapsule_New(chunk, NULL, NULL)             # <<<<<<<<<<<<<<
  *         self.samples[sample_number]['limit'] = simultaneous_limit
  *         self.samples[sample_number]['instances'] = 0
  */
-  __pyx_t_7 = PyCapsule_New(__pyx_v_chunk, NULL, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 512; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = PyCapsule_New(__pyx_v_chunk, NULL, NULL); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 512; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 512; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_1); if (unlikely(__pyx_t_11 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 512; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_1); if (unlikely(__pyx_t_11 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (unlikely(PyObject_SetItem(__pyx_t_11, __pyx_n_u_chunk, __pyx_t_7) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 512; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(PyObject_SetItem(__pyx_t_11, __pyx_n_u_chunk, __pyx_t_7) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "pinaudio\core.pyx":513
+  /* "pinaudio\core.pyx":515
  *         self.samples[sample_number]['file_name'] = file_name
  *         self.samples[sample_number]['chunk'] = pycapsule.PyCapsule_New(chunk, NULL, NULL)
  *         self.samples[sample_number]['limit'] = simultaneous_limit             # <<<<<<<<<<<<<<
  *         self.samples[sample_number]['instances'] = 0
  * 
  */
-  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_simultaneous_limit); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_simultaneous_limit); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 515; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 515; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 515; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_11);
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_11); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_11); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 515; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-  if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_n_u_limit, __pyx_t_7) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 513; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_n_u_limit, __pyx_t_7) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 515; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-  /* "pinaudio\core.pyx":514
+  /* "pinaudio\core.pyx":516
  *         self.samples[sample_number]['chunk'] = pycapsule.PyCapsule_New(chunk, NULL, NULL)
  *         self.samples[sample_number]['limit'] = simultaneous_limit
  *         self.samples[sample_number]['instances'] = 0             # <<<<<<<<<<<<<<
@@ -4310,17 +4235,17 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
  */
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_7); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_7); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_n_u_instances, __pyx_int_0) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 514; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(PyObject_SetItem(__pyx_t_1, __pyx_n_u_instances, __pyx_int_0) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pinaudio\core.pyx":516
+  /* "pinaudio\core.pyx":518
  *         self.samples[sample_number]['instances'] = 0
  * 
  *         return sample_number             # <<<<<<<<<<<<<<
@@ -4328,14 +4253,14 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
  *     def unload_sample(self, int sample_number):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 516; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":465
- *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3
+  /* "pinaudio\core.pyx":467
+ *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC
  * 
  *     def load_sample(self, str file_name, float default_volume=1.0, int simultaneous_limit=-1):             # <<<<<<<<<<<<<<
  *         """
@@ -4360,7 +4285,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":518
+/* "pinaudio\core.pyx":520
  *         return sample_number
  * 
  *     def unload_sample(self, int sample_number):             # <<<<<<<<<<<<<<
@@ -4369,9 +4294,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12load_sample(struct __p
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_15unload_sample(PyObject *__pyx_v_self, PyObject *__pyx_arg_sample_number); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_14unload_sample[] = "AudioOutput.unload_sample(self, int sample_number)\n\n        Unloads a sample from memory and removes it from the dictionary of loaded sounds.\n        :param sample_number: The sound/sample number (used as dictionary key)\n        :return: True if the sample was successfully unloaded from memory and removed\n        from the dictionary, False otherwise\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_15unload_sample(PyObject *__pyx_v_self, PyObject *__pyx_arg_sample_number) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_13unload_sample(PyObject *__pyx_v_self, PyObject *__pyx_arg_sample_number); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_12unload_sample[] = "AudioOutput.unload_sample(self, int sample_number)\n\n        Unloads a sample from memory and removes it from the dictionary of loaded sounds.\n        :param sample_number: The sound/sample number (used as dictionary key)\n        :return: True if the sample was successfully unloaded from memory and removed\n        from the dictionary, False otherwise\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_13unload_sample(PyObject *__pyx_v_self, PyObject *__pyx_arg_sample_number) {
   int __pyx_v_sample_number;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -4380,7 +4305,7 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_15unload_sample(PyObject
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("unload_sample (wrapper)", 0);
   assert(__pyx_arg_sample_number); {
-    __pyx_v_sample_number = __Pyx_PyInt_As_int(__pyx_arg_sample_number); if (unlikely((__pyx_v_sample_number == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 518; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_sample_number = __Pyx_PyInt_As_int(__pyx_arg_sample_number); if (unlikely((__pyx_v_sample_number == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 520; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -4388,14 +4313,14 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_15unload_sample(PyObject
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), ((int)__pyx_v_sample_number));
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_12unload_sample(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), ((int)__pyx_v_sample_number));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_sample_number) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_12unload_sample(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_sample_number) {
   struct Mix_Chunk *__pyx_v_chunk;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -4409,7 +4334,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("unload_sample", 0);
 
-  /* "pinaudio\core.pyx":525
+  /* "pinaudio\core.pyx":527
  *         from the dictionary, False otherwise
  *         """
  *         cdef Mix_Chunk *chunk = NULL             # <<<<<<<<<<<<<<
@@ -4418,25 +4343,25 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
  */
   __pyx_v_chunk = NULL;
 
-  /* "pinaudio\core.pyx":528
+  /* "pinaudio\core.pyx":530
  * 
  *         # Find the sample by name key in the dictionary
  *         if sample_number not in self.samples:             # <<<<<<<<<<<<<<
  *             return False
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 528; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 528; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = (__Pyx_PyDict_Contains(__pyx_t_1, __pyx_v_self->samples, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 528; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = (__Pyx_PyDict_Contains(__pyx_t_1, __pyx_v_self->samples, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 530; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = (__pyx_t_2 != 0);
   if (__pyx_t_3) {
 
-    /* "pinaudio\core.pyx":529
+    /* "pinaudio\core.pyx":531
  *         # Find the sample by name key in the dictionary
  *         if sample_number not in self.samples:
  *             return False             # <<<<<<<<<<<<<<
@@ -4449,7 +4374,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":534
+  /* "pinaudio\core.pyx":536
  * 
  *         # Sample was found, get the Mix_Chunk pointer from the capsule object and free it
  *         chunk = <Mix_Chunk*>pycapsule.PyCapsule_GetPointer(self.samples[sample_number]['chunk'], NULL)             # <<<<<<<<<<<<<<
@@ -4458,21 +4383,21 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
  */
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_GetItem(__pyx_t_4, __pyx_n_u_chunk); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_1 = PyObject_GetItem(__pyx_t_4, __pyx_n_u_chunk); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_5 = PyCapsule_GetPointer(__pyx_t_1, NULL); if (unlikely(__pyx_t_5 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 534; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyCapsule_GetPointer(__pyx_t_1, NULL); if (unlikely(__pyx_t_5 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 536; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_chunk = ((struct Mix_Chunk *)__pyx_t_5);
 
-  /* "pinaudio\core.pyx":535
+  /* "pinaudio\core.pyx":537
  *         # Sample was found, get the Mix_Chunk pointer from the capsule object and free it
  *         chunk = <Mix_Chunk*>pycapsule.PyCapsule_GetPointer(self.samples[sample_number]['chunk'], NULL)
  *         if chunk is not NULL:             # <<<<<<<<<<<<<<
@@ -4482,7 +4407,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
   __pyx_t_3 = ((__pyx_v_chunk != NULL) != 0);
   if (__pyx_t_3) {
 
-    /* "pinaudio\core.pyx":536
+    /* "pinaudio\core.pyx":538
  *         chunk = <Mix_Chunk*>pycapsule.PyCapsule_GetPointer(self.samples[sample_number]['chunk'], NULL)
  *         if chunk is not NULL:
  *             Mix_FreeChunk(chunk)             # <<<<<<<<<<<<<<
@@ -4494,7 +4419,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
   }
   __pyx_L4:;
 
-  /* "pinaudio\core.pyx":539
+  /* "pinaudio\core.pyx":541
  * 
  *         # Finally remove the dictionary item
  *         del self.samples[sample_number]             # <<<<<<<<<<<<<<
@@ -4503,14 +4428,14 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
  */
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 541; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 541; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_DelItem(__pyx_v_self->samples, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 539; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_DelItem(__pyx_v_self->samples, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 541; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pinaudio\core.pyx":540
+  /* "pinaudio\core.pyx":542
  *         # Finally remove the dictionary item
  *         del self.samples[sample_number]
  *         return True             # <<<<<<<<<<<<<<
@@ -4522,7 +4447,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":518
+  /* "pinaudio\core.pyx":520
  *         return sample_number
  * 
  *     def unload_sample(self, int sample_number):             # <<<<<<<<<<<<<<
@@ -4542,7 +4467,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":542
+/* "pinaudio\core.pyx":544
  *         return True
  * 
  *     def play_sample_on_mixer_channel(self, int sample_number, int channel, float volume):             # <<<<<<<<<<<<<<
@@ -4551,9 +4476,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14unload_sample(struct _
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_17play_sample_on_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_channel[] = "AudioOutput.play_sample_on_mixer_channel(self, int sample_number, int channel, float volume)\n\n        Plays the given sample on the specified mixer channel at the specified volume.\n        :param sample_number:\n        :param channel:\n        :param volume: The volume to play\n        :return:\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_17play_sample_on_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_15play_sample_on_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_14play_sample_on_mixer_channel[] = "AudioOutput.play_sample_on_mixer_channel(self, int sample_number, int channel, float volume)\n\n        Plays the given sample on the specified mixer channel at the specified volume.\n        :param sample_number:\n        :param channel:\n        :param volume: The volume to play\n        :return:\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_15play_sample_on_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   int __pyx_v_sample_number;
   int __pyx_v_channel;
   float __pyx_v_volume;
@@ -4584,16 +4509,16 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_17play_sample_on_mixer_c
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_channel)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("play_sample_on_mixer_channel", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 542; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("play_sample_on_mixer_channel", 1, 3, 3, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 544; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_volume)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("play_sample_on_mixer_channel", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 542; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("play_sample_on_mixer_channel", 1, 3, 3, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 544; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "play_sample_on_mixer_channel") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 542; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "play_sample_on_mixer_channel") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 544; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 3) {
       goto __pyx_L5_argtuple_error;
@@ -4602,27 +4527,28 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_17play_sample_on_mixer_c
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
       values[2] = PyTuple_GET_ITEM(__pyx_args, 2);
     }
-    __pyx_v_sample_number = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_sample_number == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 542; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_channel = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_channel == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 542; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_volume = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_volume == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 542; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_sample_number = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_sample_number == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 544; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_channel = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_channel == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 544; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_volume = __pyx_PyFloat_AsFloat(values[2]); if (unlikely((__pyx_v_volume == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 544; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("play_sample_on_mixer_channel", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 542; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("play_sample_on_mixer_channel", 1, 3, 3, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 544; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pinaudio.core.AudioOutput.play_sample_on_mixer_channel", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_channel(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_sample_number, __pyx_v_channel, __pyx_v_volume);
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_14play_sample_on_mixer_channel(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_sample_number, __pyx_v_channel, __pyx_v_volume);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_sample_number, int __pyx_v_channel, float __pyx_v_volume) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_14play_sample_on_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_sample_number, int __pyx_v_channel, float __pyx_v_volume) {
   struct Mix_Chunk *__pyx_v_sample;
+  PyObject *__pyx_v_channel_playing = NULL;
   __pyx_t_8pinaudio_4core_MixerChannel *__pyx_v_mix_channel;
   int __pyx_v_player;
   int __pyx_v_sample_volume;
@@ -4649,25 +4575,25 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("play_sample_on_mixer_channel", 0);
 
-  /* "pinaudio\core.pyx":552
+  /* "pinaudio\core.pyx":554
  * 
  *         # Find the sample by name key in the dictionary
  *         if sample_number not in self.samples:             # <<<<<<<<<<<<<<
  *             return False
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 554; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 554; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = (__Pyx_PyDict_Contains(__pyx_t_1, __pyx_v_self->samples, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 552; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = (__Pyx_PyDict_Contains(__pyx_t_1, __pyx_v_self->samples, Py_NE)); if (unlikely(__pyx_t_2 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 554; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_3 = (__pyx_t_2 != 0);
   if (__pyx_t_3) {
 
-    /* "pinaudio\core.pyx":553
+    /* "pinaudio\core.pyx":555
  *         # Find the sample by name key in the dictionary
  *         if sample_number not in self.samples:
  *             return False             # <<<<<<<<<<<<<<
@@ -4680,7 +4606,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":558
+  /* "pinaudio\core.pyx":560
  *         # do not allow this request to play another instance.
  *         # TODO: Add more options for what happens when instance limit is reached (replace oldest?)
  *         if self.samples[sample_number]['instances'] == self.samples[sample_number]['limit']:             # <<<<<<<<<<<<<<
@@ -4689,36 +4615,36 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_1); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyObject_GetItem(__pyx_t_4, __pyx_n_u_instances); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_1 = PyObject_GetItem(__pyx_t_4, __pyx_n_u_instances); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_4); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_4); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_4 = PyObject_GetItem(__pyx_t_5, __pyx_n_u_limit); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_4 = PyObject_GetItem(__pyx_t_5, __pyx_n_u_limit); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyObject_RichCompare(__pyx_t_1, __pyx_t_4, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 558; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 560; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   if (__pyx_t_3) {
 
-    /* "pinaudio\core.pyx":559
+    /* "pinaudio\core.pyx":561
  *         # TODO: Add more options for what happens when instance limit is reached (replace oldest?)
  *         if self.samples[sample_number]['instances'] == self.samples[sample_number]['limit']:
  *             return False             # <<<<<<<<<<<<<<
@@ -4731,7 +4657,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":562
+  /* "pinaudio\core.pyx":564
  * 
  *         # Sample was found, get the Mix_Chunk pointer from the capsule object and free it
  *         sample = <Mix_Chunk*>pycapsule.PyCapsule_GetPointer(self.samples[sample_number]['chunk'], NULL)             # <<<<<<<<<<<<<<
@@ -4740,21 +4666,21 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 562; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 564; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 562; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 564; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_5); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 562; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_5); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 564; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyObject_GetItem(__pyx_t_4, __pyx_n_u_chunk); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 562; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_5 = PyObject_GetItem(__pyx_t_4, __pyx_n_u_chunk); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 564; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-  __pyx_t_6 = PyCapsule_GetPointer(__pyx_t_5, NULL); if (unlikely(__pyx_t_6 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 562; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyCapsule_GetPointer(__pyx_t_5, NULL); if (unlikely(__pyx_t_6 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 564; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_sample = ((struct Mix_Chunk *)__pyx_t_6);
 
-  /* "pinaudio\core.pyx":563
+  /* "pinaudio\core.pyx":565
  *         # Sample was found, get the Mix_Chunk pointer from the capsule object and free it
  *         sample = <Mix_Chunk*>pycapsule.PyCapsule_GetPointer(self.samples[sample_number]['chunk'], NULL)
  *         if sample is NULL:             # <<<<<<<<<<<<<<
@@ -4764,7 +4690,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
   __pyx_t_3 = ((__pyx_v_sample == NULL) != 0);
   if (__pyx_t_3) {
 
-    /* "pinaudio\core.pyx":564
+    /* "pinaudio\core.pyx":566
  *         sample = <Mix_Chunk*>pycapsule.PyCapsule_GetPointer(self.samples[sample_number]['chunk'], NULL)
  *         if sample is NULL:
  *             return False             # <<<<<<<<<<<<<<
@@ -4777,7 +4703,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":566
+  /* "pinaudio\core.pyx":568
  *             return False
  * 
  *         if channel < 0 or channel >= len(self.mixer_channels):             # <<<<<<<<<<<<<<
@@ -4794,18 +4720,54 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
   __Pyx_INCREF(__pyx_t_5);
   if (unlikely(__pyx_t_5 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 566; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 568; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_7 = PyList_GET_SIZE(__pyx_t_5); if (unlikely(__pyx_t_7 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 566; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_7 = PyList_GET_SIZE(__pyx_t_5); if (unlikely(__pyx_t_7 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 568; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_t_2 = ((__pyx_v_channel >= __pyx_t_7) != 0);
   __pyx_t_3 = __pyx_t_2;
   __pyx_L7_bool_binop_done:;
   if (__pyx_t_3) {
 
-    /* "pinaudio\core.pyx":567
+    /* "pinaudio\core.pyx":569
  * 
  *         if channel < 0 or channel >= len(self.mixer_channels):
+ *             return False             # <<<<<<<<<<<<<<
+ * 
+ *         # Make sure channel has been enabled
+ */
+    __Pyx_XDECREF(__pyx_r);
+    __Pyx_INCREF(Py_False);
+    __pyx_r = Py_False;
+    goto __pyx_L0;
+  }
+
+  /* "pinaudio\core.pyx":572
+ * 
+ *         # Make sure channel has been enabled
+ *         channel_playing = (Mix_Playing(channel) == 1)             # <<<<<<<<<<<<<<
+ *         if not channel_playing:
+ *             return False
+ */
+  __pyx_t_5 = __Pyx_PyBool_FromLong((Mix_Playing(__pyx_v_channel) == 1)); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 572; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_5);
+  __pyx_v_channel_playing = __pyx_t_5;
+  __pyx_t_5 = 0;
+
+  /* "pinaudio\core.pyx":573
+ *         # Make sure channel has been enabled
+ *         channel_playing = (Mix_Playing(channel) == 1)
+ *         if not channel_playing:             # <<<<<<<<<<<<<<
+ *             return False
+ * 
+ */
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_channel_playing); if (unlikely(__pyx_t_3 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 573; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = ((!__pyx_t_3) != 0);
+  if (__pyx_t_2) {
+
+    /* "pinaudio\core.pyx":574
+ *         channel_playing = (Mix_Playing(channel) == 1)
+ *         if not channel_playing:
  *             return False             # <<<<<<<<<<<<<<
  * 
  *         cdef MixerChannel *mix_channel = \
@@ -4816,7 +4778,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":570
+  /* "pinaudio\core.pyx":577
  * 
  *         cdef MixerChannel *mix_channel = \
  *             <MixerChannel*>pycapsule.PyCapsule_GetPointer(self.mixer_channels[channel], NULL)             # <<<<<<<<<<<<<<
@@ -4825,25 +4787,25 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   if (unlikely(__pyx_v_self->mixer_channels == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 577; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_self->mixer_channels, __pyx_v_channel, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_5 = __Pyx_GetItemInt_List(__pyx_v_self->mixer_channels, __pyx_v_channel, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 577; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyCapsule_GetPointer(__pyx_t_5, NULL); if (unlikely(__pyx_t_6 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 570; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_6 = PyCapsule_GetPointer(__pyx_t_5, NULL); if (unlikely(__pyx_t_6 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 577; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __pyx_v_mix_channel = ((__pyx_t_8pinaudio_4core_MixerChannel *)__pyx_t_6);
 
-  /* "pinaudio\core.pyx":572
+  /* "pinaudio\core.pyx":579
  *             <MixerChannel*>pycapsule.PyCapsule_GetPointer(self.mixer_channels[channel], NULL)
  * 
  *         if mix_channel is NULL:             # <<<<<<<<<<<<<<
  *             return False
  * 
  */
-  __pyx_t_3 = ((__pyx_v_mix_channel == NULL) != 0);
-  if (__pyx_t_3) {
+  __pyx_t_2 = ((__pyx_v_mix_channel == NULL) != 0);
+  if (__pyx_t_2) {
 
-    /* "pinaudio\core.pyx":573
+    /* "pinaudio\core.pyx":580
  * 
  *         if mix_channel is NULL:
  *             return False             # <<<<<<<<<<<<<<
@@ -4856,17 +4818,17 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":575
+  /* "pinaudio\core.pyx":582
  *             return False
  * 
  *         if SDL_LockMutex(mix_channel.mutex) != 0:             # <<<<<<<<<<<<<<
  *             return False
  * 
  */
-  __pyx_t_3 = ((SDL_LockMutex(__pyx_v_mix_channel->mutex) != 0) != 0);
-  if (__pyx_t_3) {
+  __pyx_t_2 = ((SDL_LockMutex(__pyx_v_mix_channel->mutex) != 0) != 0);
+  if (__pyx_t_2) {
 
-    /* "pinaudio\core.pyx":576
+    /* "pinaudio\core.pyx":583
  * 
  *         if SDL_LockMutex(mix_channel.mutex) != 0:
  *             return False             # <<<<<<<<<<<<<<
@@ -4879,7 +4841,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":578
+  /* "pinaudio\core.pyx":585
  *             return False
  * 
  *         cdef int player = get_open_sample_player_on_mixer_channel(mix_channel)             # <<<<<<<<<<<<<<
@@ -4888,17 +4850,17 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   __pyx_v_player = __pyx_f_8pinaudio_4core_get_open_sample_player_on_mixer_channel(__pyx_v_mix_channel);
 
-  /* "pinaudio\core.pyx":579
+  /* "pinaudio\core.pyx":586
  * 
  *         cdef int player = get_open_sample_player_on_mixer_channel(mix_channel)
  *         if player == -1:             # <<<<<<<<<<<<<<
  *             return False
  * 
  */
-  __pyx_t_3 = ((__pyx_v_player == -1) != 0);
-  if (__pyx_t_3) {
+  __pyx_t_2 = ((__pyx_v_player == -1) != 0);
+  if (__pyx_t_2) {
 
-    /* "pinaudio\core.pyx":580
+    /* "pinaudio\core.pyx":587
  *         cdef int player = get_open_sample_player_on_mixer_channel(mix_channel)
  *         if player == -1:
  *             return False             # <<<<<<<<<<<<<<
@@ -4911,7 +4873,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":583
+  /* "pinaudio\core.pyx":590
  * 
  *         # Ensure volume is in the range from 0.0 to 1.0
  *         volume = max(min(volume, 1.0), 0.0)             # <<<<<<<<<<<<<<
@@ -4934,7 +4896,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
   }
   __pyx_v_volume = __pyx_t_11;
 
-  /* "pinaudio\core.pyx":586
+  /* "pinaudio\core.pyx":593
  * 
  *         # Compute the new volume setting (between 0 and MIX_MAX_VOLUME)
  *         cdef int sample_volume = int(volume * MIX_MAX_VOLUME)             # <<<<<<<<<<<<<<
@@ -4943,7 +4905,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   __pyx_v_sample_volume = ((int)(__pyx_v_volume * 128.0));
 
-  /* "pinaudio\core.pyx":588
+  /* "pinaudio\core.pyx":595
  *         cdef int sample_volume = int(volume * MIX_MAX_VOLUME)
  * 
  *         mix_channel.sample_players[player].chunk = sample             # <<<<<<<<<<<<<<
@@ -4952,7 +4914,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   (__pyx_v_mix_channel->sample_players[__pyx_v_player]).chunk = __pyx_v_sample;
 
-  /* "pinaudio\core.pyx":589
+  /* "pinaudio\core.pyx":596
  * 
  *         mix_channel.sample_players[player].chunk = sample
  *         mix_channel.sample_players[player].status = player_pending             # <<<<<<<<<<<<<<
@@ -4961,7 +4923,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   (__pyx_v_mix_channel->sample_players[__pyx_v_player]).status = __pyx_e_8pinaudio_4core_player_pending;
 
-  /* "pinaudio\core.pyx":590
+  /* "pinaudio\core.pyx":597
  *         mix_channel.sample_players[player].chunk = sample
  *         mix_channel.sample_players[player].status = player_pending
  *         mix_channel.sample_players[player].loops_remaining = 0             # <<<<<<<<<<<<<<
@@ -4970,7 +4932,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   (__pyx_v_mix_channel->sample_players[__pyx_v_player]).loops_remaining = 0;
 
-  /* "pinaudio\core.pyx":591
+  /* "pinaudio\core.pyx":598
  *         mix_channel.sample_players[player].status = player_pending
  *         mix_channel.sample_players[player].loops_remaining = 0
  *         mix_channel.sample_players[player].start_time = SDL_GetTicks()             # <<<<<<<<<<<<<<
@@ -4979,7 +4941,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   (__pyx_v_mix_channel->sample_players[__pyx_v_player]).start_time = SDL_GetTicks();
 
-  /* "pinaudio\core.pyx":592
+  /* "pinaudio\core.pyx":599
  *         mix_channel.sample_players[player].loops_remaining = 0
  *         mix_channel.sample_players[player].start_time = SDL_GetTicks()
  *         mix_channel.sample_players[player].volume = sample_volume             # <<<<<<<<<<<<<<
@@ -4988,7 +4950,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   (__pyx_v_mix_channel->sample_players[__pyx_v_player]).volume = __pyx_v_sample_volume;
 
-  /* "pinaudio\core.pyx":593
+  /* "pinaudio\core.pyx":600
  *         mix_channel.sample_players[player].start_time = SDL_GetTicks()
  *         mix_channel.sample_players[player].volume = sample_volume
  *         mix_channel.sample_players[player].sample_pos = 0             # <<<<<<<<<<<<<<
@@ -4997,7 +4959,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   (__pyx_v_mix_channel->sample_players[__pyx_v_player]).sample_pos = 0;
 
-  /* "pinaudio\core.pyx":594
+  /* "pinaudio\core.pyx":601
  *         mix_channel.sample_players[player].volume = sample_volume
  *         mix_channel.sample_players[player].sample_pos = 0
  *         mix_channel.sample_players[player].sample_number = sample_number             # <<<<<<<<<<<<<<
@@ -5006,7 +4968,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   (__pyx_v_mix_channel->sample_players[__pyx_v_player]).sample_number = __pyx_v_sample_number;
 
-  /* "pinaudio\core.pyx":596
+  /* "pinaudio\core.pyx":603
  *         mix_channel.sample_players[player].sample_number = sample_number
  * 
  *         self.samples[sample_number]['instances'] += 1             # <<<<<<<<<<<<<<
@@ -5015,26 +4977,26 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   if (unlikely(__pyx_v_self->samples == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 596; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 603; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 596; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 603; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_5); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 596; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->samples, __pyx_t_5); if (unlikely(__pyx_t_4 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 603; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_INCREF(__pyx_n_u_instances);
   __pyx_t_12 = __pyx_n_u_instances;
-  __pyx_t_5 = PyObject_GetItem(__pyx_t_4, __pyx_t_12); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 596; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_5 = PyObject_GetItem(__pyx_t_4, __pyx_t_12); if (unlikely(__pyx_t_5 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 603; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_t_5, __pyx_int_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 596; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_t_5, __pyx_int_1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 603; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(PyObject_SetItem(__pyx_t_4, __pyx_t_12, __pyx_t_1) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 596; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (unlikely(PyObject_SetItem(__pyx_t_4, __pyx_t_12, __pyx_t_1) < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 603; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pinaudio\core.pyx":598
+  /* "pinaudio\core.pyx":605
  *         self.samples[sample_number]['instances'] += 1
  * 
  *         SDL_UnlockMutex(mix_channel.mutex)             # <<<<<<<<<<<<<<
@@ -5043,20 +5005,20 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
   SDL_UnlockMutex(__pyx_v_mix_channel->mutex);
 
-  /* "pinaudio\core.pyx":600
+  /* "pinaudio\core.pyx":607
  *         SDL_UnlockMutex(mix_channel.mutex)
  * 
  *         print("Playing sample #{} on channel {} player {}".format(sample_number, channel, player))             # <<<<<<<<<<<<<<
  * 
  *         return True
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Playing_sample_on_channel_player, __pyx_n_s_format); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 600; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Playing_sample_on_channel_player, __pyx_n_s_format); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 600; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_sample_number); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_13 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 600; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_13 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_13)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_13);
-  __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_player); if (unlikely(!__pyx_t_14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 600; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_14 = __Pyx_PyInt_From_int(__pyx_v_player); if (unlikely(!__pyx_t_14)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_14);
   __pyx_t_15 = NULL;
   __pyx_t_7 = 0;
@@ -5070,7 +5032,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
       __pyx_t_7 = 1;
     }
   }
-  __pyx_t_16 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_16)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 600; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_16 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_16)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_16);
   if (__pyx_t_15) {
     PyTuple_SET_ITEM(__pyx_t_16, 0, __pyx_t_15); __Pyx_GIVEREF(__pyx_t_15); __pyx_t_15 = NULL;
@@ -5084,21 +5046,21 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
   __pyx_t_5 = 0;
   __pyx_t_13 = 0;
   __pyx_t_14 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_16, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 600; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_16, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 600; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
   __Pyx_GIVEREF(__pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_1, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 600; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_print, __pyx_t_1, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 607; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "pinaudio\core.pyx":602
+  /* "pinaudio\core.pyx":609
  *         print("Playing sample #{} on channel {} player {}".format(sample_number, channel, player))
  * 
  *         return True             # <<<<<<<<<<<<<<
@@ -5110,7 +5072,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":542
+  /* "pinaudio\core.pyx":544
  *         return True
  * 
  *     def play_sample_on_mixer_channel(self, int sample_number, int channel, float volume):             # <<<<<<<<<<<<<<
@@ -5131,12 +5093,13 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
   __Pyx_AddTraceback("pinaudio.core.AudioOutput.play_sample_on_mixer_channel", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_channel_playing);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":604
+/* "pinaudio\core.pyx":611
  *         return True
  * 
  *     def apply_ducking_envelope_to_mixer_channel(self, int channel, int delay_time, int attack_time,             # <<<<<<<<<<<<<<
@@ -5145,9 +5108,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_c
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_19apply_ducking_envelope_to_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope_to_mixer_channel[] = "AudioOutput.apply_ducking_envelope_to_mixer_channel(self, int channel, int delay_time, int attack_time, float attenuation, int release_point, int release_time)\n\n        Applies and executes a ducking envelope to the specified mixer channel.\n        :param channel: The mixer channel to apply the envelope to.\n        :param delay_time: The number of milliseconds to delay before the attack segment of the envelope starts.\n        :param attack_time: The number of milliseconds for the attack (go from no attenuation to the\n        full attenuation value).\n        :param attenuation: The attenuation level to apply to the channel (0.0 = full attenuation to\n        1.0 = no attenuation)\n        :param release_point: The number of milliseconds from the start of the sound to begin the release\n        segment of the envelope (NOTE: the user will be providing a time from the END of the sound, but\n        this parameter requires the elapsed time from the beginning of the sound/envelope).\n        :param release_time: The number of milliseconds for the release (go from full attenuation to no\n        attenuation).  Once this time has elapsed, the envelope processing has finished.\n        :return: None\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_19apply_ducking_envelope_to_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_17apply_ducking_envelope_to_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_16apply_ducking_envelope_to_mixer_channel[] = "AudioOutput.apply_ducking_envelope_to_mixer_channel(self, int channel, int delay_time, int attack_time, float attenuation, int release_point, int release_time)\n\n        Applies and executes a ducking envelope to the specified mixer channel.\n        :param channel: The mixer channel to apply the envelope to.\n        :param delay_time: The number of milliseconds to delay before the attack segment of the envelope starts.\n        :param attack_time: The number of milliseconds for the attack (go from no attenuation to the\n        full attenuation value).\n        :param attenuation: The attenuation level to apply to the channel (0.0 = full attenuation to\n        1.0 = no attenuation)\n        :param release_point: The number of milliseconds from the start of the sound to begin the release\n        segment of the envelope (NOTE: the user will be providing a time from the END of the sound, but\n        this parameter requires the elapsed time from the beginning of the sound/envelope).\n        :param release_time: The number of milliseconds for the release (go from full attenuation to no\n        attenuation).  Once this time has elapsed, the envelope processing has finished.\n        :return: None\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_17apply_ducking_envelope_to_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   int __pyx_v_channel;
   int __pyx_v_delay_time;
   int __pyx_v_attack_time;
@@ -5184,31 +5147,31 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_19apply_ducking_envelope
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_delay_time)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_attack_time)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 2); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_attenuation)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 3); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  4:
         if (likely((values[4] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_release_point)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 4); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
         case  5:
         if (likely((values[5] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_release_time)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 5); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, 5); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "apply_ducking_envelope_to_mixer_channel") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "apply_ducking_envelope_to_mixer_channel") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 6) {
       goto __pyx_L5_argtuple_error;
@@ -5220,29 +5183,29 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_19apply_ducking_envelope
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
       values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
     }
-    __pyx_v_channel = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_channel == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_delay_time = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_delay_time == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_attack_time = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_attack_time == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_attenuation = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_attenuation == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_release_point = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_release_point == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_release_time = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_release_time == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 605; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_channel = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_channel == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_delay_time = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_delay_time == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_attack_time = __Pyx_PyInt_As_int(values[2]); if (unlikely((__pyx_v_attack_time == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_attenuation = __pyx_PyFloat_AsFloat(values[3]); if (unlikely((__pyx_v_attenuation == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 612; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_release_point = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_release_point == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 612; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_release_time = __Pyx_PyInt_As_int(values[5]); if (unlikely((__pyx_v_release_time == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 612; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 604; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("apply_ducking_envelope_to_mixer_channel", 1, 6, 6, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 611; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pinaudio.core.AudioOutput.apply_ducking_envelope_to_mixer_channel", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope_to_mixer_channel(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_channel, __pyx_v_delay_time, __pyx_v_attack_time, __pyx_v_attenuation, __pyx_v_release_point, __pyx_v_release_time);
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_16apply_ducking_envelope_to_mixer_channel(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_channel, __pyx_v_delay_time, __pyx_v_attack_time, __pyx_v_attenuation, __pyx_v_release_point, __pyx_v_release_time);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope_to_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel, int __pyx_v_delay_time, int __pyx_v_attack_time, float __pyx_v_attenuation, int __pyx_v_release_point, int __pyx_v_release_time) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_16apply_ducking_envelope_to_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel, int __pyx_v_delay_time, int __pyx_v_attack_time, float __pyx_v_attenuation, int __pyx_v_release_point, int __pyx_v_release_time) {
   __pyx_t_8pinaudio_4core_MixerChannel *__pyx_v_mix_channel;
   __pyx_t_8pinaudio_4core_DuckingEnvelope *__pyx_v_envelope;
   PyObject *__pyx_r = NULL;
@@ -5258,7 +5221,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("apply_ducking_envelope_to_mixer_channel", 0);
 
-  /* "pinaudio\core.pyx":623
+  /* "pinaudio\core.pyx":630
  * 
  *         # Retrieve the specified mixer channel
  *         if channel < 0 or channel >= len(self.mixer_channels):             # <<<<<<<<<<<<<<
@@ -5275,16 +5238,16 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
   __Pyx_INCREF(__pyx_t_3);
   if (unlikely(__pyx_t_3 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 623; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_4 = PyList_GET_SIZE(__pyx_t_3); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 623; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyList_GET_SIZE(__pyx_t_3); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 630; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_2 = ((__pyx_v_channel >= __pyx_t_4) != 0);
   __pyx_t_1 = __pyx_t_2;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":624
+    /* "pinaudio\core.pyx":631
  *         # Retrieve the specified mixer channel
  *         if channel < 0 or channel >= len(self.mixer_channels):
  *             return False             # <<<<<<<<<<<<<<
@@ -5297,7 +5260,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":627
+  /* "pinaudio\core.pyx":634
  * 
  *         cdef MixerChannel *mix_channel = \
  *             <MixerChannel*>pycapsule.PyCapsule_GetPointer(self.mixer_channels[channel], NULL)             # <<<<<<<<<<<<<<
@@ -5306,15 +5269,15 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   if (unlikely(__pyx_v_self->mixer_channels == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 627; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 634; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_self->mixer_channels, __pyx_v_channel, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 627; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+  __pyx_t_3 = __Pyx_GetItemInt_List(__pyx_v_self->mixer_channels, __pyx_v_channel, int, 1, __Pyx_PyInt_From_int, 1, 1, 1); if (unlikely(__pyx_t_3 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 634; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = PyCapsule_GetPointer(__pyx_t_3, NULL); if (unlikely(__pyx_t_5 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 627; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = PyCapsule_GetPointer(__pyx_t_3, NULL); if (unlikely(__pyx_t_5 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 634; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_v_mix_channel = ((__pyx_t_8pinaudio_4core_MixerChannel *)__pyx_t_5);
 
-  /* "pinaudio\core.pyx":629
+  /* "pinaudio\core.pyx":636
  *             <MixerChannel*>pycapsule.PyCapsule_GetPointer(self.mixer_channels[channel], NULL)
  * 
  *         if mix_channel is NULL:             # <<<<<<<<<<<<<<
@@ -5324,7 +5287,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
   __pyx_t_1 = ((__pyx_v_mix_channel == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":630
+    /* "pinaudio\core.pyx":637
  * 
  *         if mix_channel is NULL:
  *             return False             # <<<<<<<<<<<<<<
@@ -5337,7 +5300,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":633
+  /* "pinaudio\core.pyx":640
  * 
  *         # Allocate a new ducking envelope struct
  *         cdef DuckingEnvelope *envelope = <DuckingEnvelope*>calloc(1, sizeof(DuckingEnvelope))             # <<<<<<<<<<<<<<
@@ -5346,7 +5309,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope = ((__pyx_t_8pinaudio_4core_DuckingEnvelope *)calloc(1, (sizeof(__pyx_t_8pinaudio_4core_DuckingEnvelope))));
 
-  /* "pinaudio\core.pyx":634
+  /* "pinaudio\core.pyx":641
  *         # Allocate a new ducking envelope struct
  *         cdef DuckingEnvelope *envelope = <DuckingEnvelope*>calloc(1, sizeof(DuckingEnvelope))
  *         if envelope == NULL:             # <<<<<<<<<<<<<<
@@ -5356,7 +5319,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
   __pyx_t_1 = ((__pyx_v_envelope == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":635
+    /* "pinaudio\core.pyx":642
  *         cdef DuckingEnvelope *envelope = <DuckingEnvelope*>calloc(1, sizeof(DuckingEnvelope))
  *         if envelope == NULL:
  *             return False             # <<<<<<<<<<<<<<
@@ -5369,7 +5332,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":638
+  /* "pinaudio\core.pyx":645
  * 
  *         # Set the user-defined attributes
  *         envelope.delay_time = delay_time             # <<<<<<<<<<<<<<
@@ -5378,7 +5341,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->delay_time = __pyx_v_delay_time;
 
-  /* "pinaudio\core.pyx":639
+  /* "pinaudio\core.pyx":646
  *         # Set the user-defined attributes
  *         envelope.delay_time = delay_time
  *         envelope.attack_time = attack_time             # <<<<<<<<<<<<<<
@@ -5387,7 +5350,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->attack_time = __pyx_v_attack_time;
 
-  /* "pinaudio\core.pyx":640
+  /* "pinaudio\core.pyx":647
  *         envelope.delay_time = delay_time
  *         envelope.attack_time = attack_time
  *         envelope.attenuation = attenuation             # <<<<<<<<<<<<<<
@@ -5396,7 +5359,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->attenuation = __pyx_v_attenuation;
 
-  /* "pinaudio\core.pyx":641
+  /* "pinaudio\core.pyx":648
  *         envelope.attack_time = attack_time
  *         envelope.attenuation = attenuation
  *         envelope.release_point = release_point             # <<<<<<<<<<<<<<
@@ -5405,7 +5368,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->release_point = __pyx_v_release_point;
 
-  /* "pinaudio\core.pyx":642
+  /* "pinaudio\core.pyx":649
  *         envelope.attenuation = attenuation
  *         envelope.release_point = release_point
  *         envelope.release_time = release_time             # <<<<<<<<<<<<<<
@@ -5414,7 +5377,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->release_time = __pyx_v_release_time;
 
-  /* "pinaudio\core.pyx":645
+  /* "pinaudio\core.pyx":652
  * 
  *         # Calculate/set the internal state attributes
  *         envelope.start_time = 0             # <<<<<<<<<<<<<<
@@ -5423,7 +5386,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->start_time = 0;
 
-  /* "pinaudio\core.pyx":646
+  /* "pinaudio\core.pyx":653
  *         # Calculate/set the internal state attributes
  *         envelope.start_time = 0
  *         envelope.attack_start_samples = self.rate * delay_time // 1000             # <<<<<<<<<<<<<<
@@ -5432,7 +5395,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->attack_start_samples = __Pyx_div_long((__pyx_v_self->rate * __pyx_v_delay_time), 1000);
 
-  /* "pinaudio\core.pyx":647
+  /* "pinaudio\core.pyx":654
  *         envelope.start_time = 0
  *         envelope.attack_start_samples = self.rate * delay_time // 1000
  *         envelope.release_start_samples = self.rate * release_point // 1000             # <<<<<<<<<<<<<<
@@ -5441,7 +5404,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->release_start_samples = __Pyx_div_long((__pyx_v_self->rate * __pyx_v_release_point), 1000);
 
-  /* "pinaudio\core.pyx":648
+  /* "pinaudio\core.pyx":655
  *         envelope.attack_start_samples = self.rate * delay_time // 1000
  *         envelope.release_start_samples = self.rate * release_point // 1000
  *         envelope.envelope_finished_samples = self.rate * (release_point + release_time) // 1000             # <<<<<<<<<<<<<<
@@ -5450,7 +5413,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->envelope_finished_samples = __Pyx_div_long((__pyx_v_self->rate * (__pyx_v_release_point + __pyx_v_release_time)), 1000);
 
-  /* "pinaudio\core.pyx":649
+  /* "pinaudio\core.pyx":656
  *         envelope.release_start_samples = self.rate * release_point // 1000
  *         envelope.envelope_finished_samples = self.rate * (release_point + release_time) // 1000
  *         envelope.elapsed_samples = 0             # <<<<<<<<<<<<<<
@@ -5459,7 +5422,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->elapsed_samples = 0;
 
-  /* "pinaudio\core.pyx":650
+  /* "pinaudio\core.pyx":657
  *         envelope.envelope_finished_samples = self.rate * (release_point + release_time) // 1000
  *         envelope.elapsed_samples = 0
  *         envelope.segment = pending_segment             # <<<<<<<<<<<<<<
@@ -5468,7 +5431,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   __pyx_v_envelope->segment = __pyx_e_8pinaudio_4core_pending_segment;
 
-  /* "pinaudio\core.pyx":653
+  /* "pinaudio\core.pyx":660
  * 
  *         # Ensure the SDL audio callback functions are not called during this code (lock)
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -5477,7 +5440,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   SDL_LockAudio();
 
-  /* "pinaudio\core.pyx":656
+  /* "pinaudio\core.pyx":663
  * 
  *         # Insert the envelope into the beginning of the mixer channel's ducking envelope linked list
  *         if mix_channel.ducking_envelopes == NULL:             # <<<<<<<<<<<<<<
@@ -5487,7 +5450,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
   __pyx_t_1 = ((__pyx_v_mix_channel->ducking_envelopes == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":657
+    /* "pinaudio\core.pyx":664
  *         # Insert the envelope into the beginning of the mixer channel's ducking envelope linked list
  *         if mix_channel.ducking_envelopes == NULL:
  *             mix_channel.ducking_envelopes = envelope             # <<<<<<<<<<<<<<
@@ -5496,7 +5459,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
     __pyx_v_mix_channel->ducking_envelopes = __pyx_v_envelope;
 
-    /* "pinaudio\core.pyx":658
+    /* "pinaudio\core.pyx":665
  *         if mix_channel.ducking_envelopes == NULL:
  *             mix_channel.ducking_envelopes = envelope
  *             envelope.next = NULL             # <<<<<<<<<<<<<<
@@ -5508,7 +5471,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
   }
   /*else*/ {
 
-    /* "pinaudio\core.pyx":660
+    /* "pinaudio\core.pyx":667
  *             envelope.next = NULL
  *         else:
  *             envelope.next = mix_channel.ducking_envelopes             # <<<<<<<<<<<<<<
@@ -5518,7 +5481,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
     __pyx_t_6 = __pyx_v_mix_channel->ducking_envelopes;
     __pyx_v_envelope->next = __pyx_t_6;
 
-    /* "pinaudio\core.pyx":661
+    /* "pinaudio\core.pyx":668
  *         else:
  *             envelope.next = mix_channel.ducking_envelopes
  *             mix_channel.ducking_envelopes = envelope             # <<<<<<<<<<<<<<
@@ -5529,7 +5492,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
   }
   __pyx_L8:;
 
-  /* "pinaudio\core.pyx":663
+  /* "pinaudio\core.pyx":670
  *             mix_channel.ducking_envelopes = envelope
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -5538,7 +5501,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
   SDL_UnlockAudio();
 
-  /* "pinaudio\core.pyx":665
+  /* "pinaudio\core.pyx":672
  *         SDL_UnlockAudio()
  * 
  *         return True             # <<<<<<<<<<<<<<
@@ -5550,7 +5513,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":604
+  /* "pinaudio\core.pyx":611
  *         return True
  * 
  *     def apply_ducking_envelope_to_mixer_channel(self, int channel, int delay_time, int attack_time,             # <<<<<<<<<<<<<<
@@ -5569,7 +5532,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":667
+/* "pinaudio\core.pyx":674
  *         return True
  * 
  *     def add_mixer_channel(self, int simultaneous_sounds=1):             # <<<<<<<<<<<<<<
@@ -5578,9 +5541,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_21add_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_20add_mixer_channel[] = "AudioOutput.add_mixer_channel(self, int simultaneous_sounds=1)\n\n        Adds a channel to the mixer.\n        :param name: The channel name\n        :param simultaneous_sounds: The maximum number of sounds that can be played simultaneously on the channel\n        :return: The newly added channel number\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_21add_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_19add_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_18add_mixer_channel[] = "AudioOutput.add_mixer_channel(self, int simultaneous_sounds=1)\n\n        Adds a channel to the mixer.\n        :param simultaneous_sounds: The maximum number of sounds that can be played simultaneously on the channel\n        :return: The newly added channel number\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_19add_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   int __pyx_v_simultaneous_sounds;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -5608,7 +5571,7 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_21add_mixer_channel(PyOb
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_mixer_channel") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_mixer_channel") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 674; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -5618,27 +5581,27 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_21add_mixer_channel(PyOb
       }
     }
     if (values[0]) {
-      __pyx_v_simultaneous_sounds = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_simultaneous_sounds == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_v_simultaneous_sounds = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_simultaneous_sounds == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 674; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     } else {
       __pyx_v_simultaneous_sounds = ((int)1);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_mixer_channel", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 667; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("add_mixer_channel", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 674; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pinaudio.core.AudioOutput.add_mixer_channel", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_simultaneous_sounds);
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_18add_mixer_channel(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_simultaneous_sounds);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_simultaneous_sounds) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_18add_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_simultaneous_sounds) {
   int __pyx_v_channel;
   __pyx_t_8pinaudio_4core_MixerChannel *__pyx_v_mixer_channel;
   Mix_EffectFunc_t __pyx_v_channel_callback_fn;
@@ -5655,7 +5618,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("add_mixer_channel", 0);
 
-  /* "pinaudio\core.pyx":674
+  /* "pinaudio\core.pyx":680
  *         :return: The newly added channel number
  *         """
  *         cdef int channel = len(self.mixer_channels)             # <<<<<<<<<<<<<<
@@ -5666,13 +5629,13 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 674; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 680; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 674; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 680; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_channel = __pyx_t_2;
 
-  /* "pinaudio\core.pyx":677
+  /* "pinaudio\core.pyx":683
  * 
  *         # Create a new MixerChannel struct (C object) that will keep track of channel state/attributes
  *         mixer_channel = alloc_mixer_channel(channel, simultaneous_sounds)             # <<<<<<<<<<<<<<
@@ -5684,7 +5647,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
   __pyx_t_3 = __pyx_f_8pinaudio_4core_alloc_mixer_channel(__pyx_v_channel, &__pyx_t_4); 
   __pyx_v_mixer_channel = __pyx_t_3;
 
-  /* "pinaudio\core.pyx":682
+  /* "pinaudio\core.pyx":688
  *         # a list, it is converted to a Python object using a capsule (wraps a C pointer in a
  *         # Python object).
  *         self.mixer_channels.append(pycapsule.PyCapsule_New(<void *>mixer_channel, NULL, NULL))             # <<<<<<<<<<<<<<
@@ -5693,14 +5656,14 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
  */
   if (unlikely(__pyx_v_self->mixer_channels == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "append");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 682; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 688; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_1 = PyCapsule_New(((void *)__pyx_v_mixer_channel), NULL, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 682; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyCapsule_New(((void *)__pyx_v_mixer_channel), NULL, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 688; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_self->mixer_channels, __pyx_t_1); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 682; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyList_Append(__pyx_v_self->mixer_channels, __pyx_t_1); if (unlikely(__pyx_t_5 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 688; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "pinaudio\core.pyx":687
+  /* "pinaudio\core.pyx":693
  *         cdef Mix_EffectFunc_t channel_callback_fn
  * 
  *         if self.audio_format == AUDIO_S8:             # <<<<<<<<<<<<<<
@@ -5710,7 +5673,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
   __pyx_t_6 = ((__pyx_v_self->audio_format == 32776) != 0);
   if (__pyx_t_6) {
 
-    /* "pinaudio\core.pyx":688
+    /* "pinaudio\core.pyx":694
  * 
  *         if self.audio_format == AUDIO_S8:
  *             channel_callback_fn = mix_track_callback_s8             # <<<<<<<<<<<<<<
@@ -5722,7 +5685,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
   }
   /*else*/ {
 
-    /* "pinaudio\core.pyx":690
+    /* "pinaudio\core.pyx":696
  *             channel_callback_fn = mix_track_callback_s8
  *         else:
  *             channel_callback_fn = mix_track_callback_s16sys             # <<<<<<<<<<<<<<
@@ -5733,7 +5696,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
   }
   __pyx_L3:;
 
-  /* "pinaudio\core.pyx":692
+  /* "pinaudio\core.pyx":698
  *             channel_callback_fn = mix_track_callback_s16sys
  * 
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5747,7 +5710,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
       #endif
       /*try:*/ {
 
-        /* "pinaudio\core.pyx":694
+        /* "pinaudio\core.pyx":700
  *         with nogil:
  *             # Ensure the SDL audio callback functions are not called during this code (lock)
  *             SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -5756,7 +5719,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
  */
         SDL_LockAudio();
 
-        /* "pinaudio\core.pyx":698
+        /* "pinaudio\core.pyx":704
  *             # Set the number of channels to mix (will cause existing channels to be stopped and restarted if playing)
  *             # This is an SDL_Mixer library function call.
  *             Mix_AllocateChannels(channel + 1)             # <<<<<<<<<<<<<<
@@ -5765,7 +5728,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
  */
         Mix_AllocateChannels((__pyx_v_channel + 1));
 
-        /* "pinaudio\core.pyx":704
+        /* "pinaudio\core.pyx":710
  *             # callback function.
  *             # This is an SDL_Mixer library function call.
  *             Mix_RegisterEffect(channel, channel_callback_fn, NULL, <void *>mixer_channel)             # <<<<<<<<<<<<<<
@@ -5774,7 +5737,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
  */
         Mix_RegisterEffect(__pyx_v_channel, __pyx_v_channel_callback_fn, NULL, ((void *)__pyx_v_mixer_channel));
 
-        /* "pinaudio\core.pyx":707
+        /* "pinaudio\core.pyx":713
  * 
  *             # Allow the audio callback functions to be called (unlock)
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -5784,7 +5747,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
         SDL_UnlockAudio();
       }
 
-      /* "pinaudio\core.pyx":692
+      /* "pinaudio\core.pyx":698
  *             channel_callback_fn = mix_track_callback_s16sys
  * 
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5802,7 +5765,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
       }
   }
 
-  /* "pinaudio\core.pyx":709
+  /* "pinaudio\core.pyx":715
  *             SDL_UnlockAudio()
  * 
  *         return channel             # <<<<<<<<<<<<<<
@@ -5810,13 +5773,13 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 709; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 715; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":667
+  /* "pinaudio\core.pyx":674
  *         return True
  * 
  *     def add_mixer_channel(self, int simultaneous_sounds=1):             # <<<<<<<<<<<<<<
@@ -5835,7 +5798,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":712
+/* "pinaudio\core.pyx":718
  * 
  * 
  *     def enable_mixer_channel(self, int channel):             # <<<<<<<<<<<<<<
@@ -5844,9 +5807,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20add_mixer_channel(stru
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_23enable_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_arg_channel); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_22enable_mixer_channel[] = "AudioOutput.enable_mixer_channel(self, int channel)\n\n        Enables audio playback on the specified mixer channel (begins processing)\n        :param channel:\n        :return:\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_23enable_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_arg_channel) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_21enable_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_arg_channel); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_20enable_mixer_channel[] = "AudioOutput.enable_mixer_channel(self, int channel)\n\n        Enables audio playback on the specified mixer channel (begins processing)\n        :param channel:\n        :return:\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_21enable_mixer_channel(PyObject *__pyx_v_self, PyObject *__pyx_arg_channel) {
   int __pyx_v_channel;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -5855,7 +5818,7 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_23enable_mixer_channel(P
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("enable_mixer_channel (wrapper)", 0);
   assert(__pyx_arg_channel); {
-    __pyx_v_channel = __Pyx_PyInt_As_int(__pyx_arg_channel); if (unlikely((__pyx_v_channel == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 712; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_channel = __Pyx_PyInt_As_int(__pyx_arg_channel); if (unlikely((__pyx_v_channel == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 718; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5863,19 +5826,19 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_23enable_mixer_channel(P
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_22enable_mixer_channel(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), ((int)__pyx_v_channel));
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_20enable_mixer_channel(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), ((int)__pyx_v_channel));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_22enable_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_20enable_mixer_channel(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("enable_mixer_channel", 0);
 
-  /* "pinaudio\core.pyx":718
+  /* "pinaudio\core.pyx":724
  *         :return:
  *         """
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5889,7 +5852,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_22enable_mixer_channel(s
       #endif
       /*try:*/ {
 
-        /* "pinaudio\core.pyx":719
+        /* "pinaudio\core.pyx":725
  *         """
  *         with nogil:
  *             Mix_PlayChannel(channel, self.raw_chunk_silence, -1)             # <<<<<<<<<<<<<<
@@ -5899,7 +5862,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_22enable_mixer_channel(s
         Mix_PlayChannel(__pyx_v_channel, __pyx_v_self->raw_chunk_silence, -1);
       }
 
-      /* "pinaudio\core.pyx":718
+      /* "pinaudio\core.pyx":724
  *         :return:
  *         """
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5917,7 +5880,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_22enable_mixer_channel(s
       }
   }
 
-  /* "pinaudio\core.pyx":712
+  /* "pinaudio\core.pyx":718
  * 
  * 
  *     def enable_mixer_channel(self, int channel):             # <<<<<<<<<<<<<<
@@ -5932,7 +5895,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_22enable_mixer_channel(s
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":721
+/* "pinaudio\core.pyx":727
  *             Mix_PlayChannel(channel, self.raw_chunk_silence, -1)
  * 
  *     def enable_all_mixer_channels(self):             # <<<<<<<<<<<<<<
@@ -5941,20 +5904,20 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_22enable_mixer_channel(s
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_25enable_all_mixer_channels(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_24enable_all_mixer_channels[] = "AudioOutput.enable_all_mixer_channels(self)\n\n        Enables audio playback on all mixer channels (begins processing)\n        :return:\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_25enable_all_mixer_channels(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_23enable_all_mixer_channels(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_22enable_all_mixer_channels[] = "AudioOutput.enable_all_mixer_channels(self)\n\n        Enables audio playback on all mixer channels (begins processing)\n        :return:\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_23enable_all_mixer_channels(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("enable_all_mixer_channels (wrapper)", 0);
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_24enable_all_mixer_channels(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self));
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_22enable_all_mixer_channels(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24enable_all_mixer_channels(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_22enable_all_mixer_channels(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self) {
   Py_ssize_t __pyx_v_channel;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -5970,7 +5933,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24enable_all_mixer_chann
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("enable_all_mixer_channels", 0);
 
-  /* "pinaudio\core.pyx":726
+  /* "pinaudio\core.pyx":732
  *         :return:
  *         """
  *         for channel in range(len(self.mixer_channels)):             # <<<<<<<<<<<<<<
@@ -5981,23 +5944,23 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24enable_all_mixer_chann
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 726; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 732; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 726; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 732; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_channel = __pyx_t_3;
 
-    /* "pinaudio\core.pyx":727
+    /* "pinaudio\core.pyx":733
  *         """
  *         for channel in range(len(self.mixer_channels)):
  *             self.enable_mixer_channel(channel)             # <<<<<<<<<<<<<<
  * 
  *     def set_mixer_channel_volume(self, int channel, float volume):
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_enable_mixer_channel); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 727; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_enable_mixer_channel); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = PyInt_FromSsize_t(__pyx_v_channel); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 727; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = PyInt_FromSsize_t(__pyx_v_channel); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6010,17 +5973,17 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24enable_all_mixer_chann
       }
     }
     if (!__pyx_t_6) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 727; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 727; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_7);
       PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __Pyx_GIVEREF(__pyx_t_6); __pyx_t_6 = NULL;
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_5);
       __pyx_t_5 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 727; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 733; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
@@ -6028,7 +5991,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24enable_all_mixer_chann
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "pinaudio\core.pyx":721
+  /* "pinaudio\core.pyx":727
  *             Mix_PlayChannel(channel, self.raw_chunk_silence, -1)
  * 
  *     def enable_all_mixer_channels(self):             # <<<<<<<<<<<<<<
@@ -6053,7 +6016,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24enable_all_mixer_chann
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":729
+/* "pinaudio\core.pyx":735
  *             self.enable_mixer_channel(channel)
  * 
  *     def set_mixer_channel_volume(self, int channel, float volume):             # <<<<<<<<<<<<<<
@@ -6062,9 +6025,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24enable_all_mixer_chann
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_27set_mixer_channel_volume(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volume[] = "AudioOutput.set_mixer_channel_volume(self, int channel, float volume)\n\n        Sets the volume of the specified mixer channel.\n        :param channel: The mixer channel number\n        :param volume: The new volume setting (between 0.0 and 1.0)\n        :return:\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_27set_mixer_channel_volume(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_25set_mixer_channel_volume(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_24set_mixer_channel_volume[] = "AudioOutput.set_mixer_channel_volume(self, int channel, float volume)\n\n        Sets the volume of the specified mixer channel.\n        :param channel: The mixer channel number\n        :param volume: The new volume setting (between 0.0 and 1.0)\n        :return:\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_25set_mixer_channel_volume(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   int __pyx_v_channel;
   float __pyx_v_volume;
   int __pyx_lineno = 0;
@@ -6093,11 +6056,11 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_27set_mixer_channel_volu
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_volume)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("set_mixer_channel_volume", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+          __Pyx_RaiseArgtupleInvalid("set_mixer_channel_volume", 1, 2, 2, 1); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 735; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "set_mixer_channel_volume") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "set_mixer_channel_volume") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 735; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -6105,25 +6068,25 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_27set_mixer_channel_volu
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_channel = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_channel == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    __pyx_v_volume = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_volume == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_channel = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_channel == (int)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 735; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_volume = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_volume == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 735; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("set_mixer_channel_volume", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 729; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("set_mixer_channel_volume", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 735; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("pinaudio.core.AudioOutput.set_mixer_channel_volume", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volume(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_channel, __pyx_v_volume);
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_24set_mixer_channel_volume(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), __pyx_v_channel, __pyx_v_volume);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volume(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel, float __pyx_v_volume) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_24set_mixer_channel_volume(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, int __pyx_v_channel, float __pyx_v_volume) {
   int __pyx_v_new_volume;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -6140,7 +6103,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("set_mixer_channel_volume", 0);
 
-  /* "pinaudio\core.pyx":736
+  /* "pinaudio\core.pyx":742
  *         :return:
  *         """
  *         if channel < 0 or channel >= len(self.mixer_channels):             # <<<<<<<<<<<<<<
@@ -6157,16 +6120,16 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
   __Pyx_INCREF(__pyx_t_3);
   if (unlikely(__pyx_t_3 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 736; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 742; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_4 = PyList_GET_SIZE(__pyx_t_3); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 736; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = PyList_GET_SIZE(__pyx_t_3); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 742; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_2 = ((__pyx_v_channel >= __pyx_t_4) != 0);
   __pyx_t_1 = __pyx_t_2;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":737
+    /* "pinaudio\core.pyx":743
  *         """
  *         if channel < 0 or channel >= len(self.mixer_channels):
  *             return False             # <<<<<<<<<<<<<<
@@ -6179,7 +6142,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":740
+  /* "pinaudio\core.pyx":746
  * 
  *         # Ensure volume is in the range from 0.0 to 1.0
  *         volume = max(min(volume, 1.0), 0.0)             # <<<<<<<<<<<<<<
@@ -6202,7 +6165,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
   }
   __pyx_v_volume = __pyx_t_8;
 
-  /* "pinaudio\core.pyx":743
+  /* "pinaudio\core.pyx":749
  * 
  *         # Compute the new volume setting (between 0 and MIX_MAX_VOLUME)
  *         cdef int new_volume = int(volume * MIX_MAX_VOLUME)             # <<<<<<<<<<<<<<
@@ -6211,7 +6174,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
  */
   __pyx_v_new_volume = ((int)(__pyx_v_volume * 128.0));
 
-  /* "pinaudio\core.pyx":744
+  /* "pinaudio\core.pyx":750
  *         # Compute the new volume setting (between 0 and MIX_MAX_VOLUME)
  *         cdef int new_volume = int(volume * MIX_MAX_VOLUME)
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -6225,7 +6188,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
       #endif
       /*try:*/ {
 
-        /* "pinaudio\core.pyx":745
+        /* "pinaudio\core.pyx":751
  *         cdef int new_volume = int(volume * MIX_MAX_VOLUME)
  *         with nogil:
  *             Mix_Volume(channel, new_volume)             # <<<<<<<<<<<<<<
@@ -6235,7 +6198,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
         Mix_Volume(__pyx_v_channel, __pyx_v_new_volume);
       }
 
-      /* "pinaudio\core.pyx":744
+      /* "pinaudio\core.pyx":750
  *         # Compute the new volume setting (between 0 and MIX_MAX_VOLUME)
  *         cdef int new_volume = int(volume * MIX_MAX_VOLUME)
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -6253,7 +6216,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
       }
   }
 
-  /* "pinaudio\core.pyx":747
+  /* "pinaudio\core.pyx":753
  *             Mix_Volume(channel, new_volume)
  * 
  *         return True             # <<<<<<<<<<<<<<
@@ -6265,7 +6228,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
   __pyx_r = Py_True;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":729
+  /* "pinaudio\core.pyx":735
  *             self.enable_mixer_channel(channel)
  * 
  *     def set_mixer_channel_volume(self, int channel, float volume):             # <<<<<<<<<<<<<<
@@ -6284,7 +6247,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":749
+/* "pinaudio\core.pyx":755
  *         return True
  * 
  *     def set_all_mixer_channel_volume(self, float volume):             # <<<<<<<<<<<<<<
@@ -6293,9 +6256,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volu
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_29set_all_mixer_channel_volume(PyObject *__pyx_v_self, PyObject *__pyx_arg_volume); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_volume[] = "AudioOutput.set_all_mixer_channel_volume(self, float volume)\n\n        Sets the volume of all mixer channels.\n        :param volume: The new volume setting (between 0.0 and 1.0)\n        :return:\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_29set_all_mixer_channel_volume(PyObject *__pyx_v_self, PyObject *__pyx_arg_volume) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_27set_all_mixer_channel_volume(PyObject *__pyx_v_self, PyObject *__pyx_arg_volume); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_26set_all_mixer_channel_volume[] = "AudioOutput.set_all_mixer_channel_volume(self, float volume)\n\n        Sets the volume of all mixer channels.\n        :param volume: The new volume setting (between 0.0 and 1.0)\n        :return:\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_27set_all_mixer_channel_volume(PyObject *__pyx_v_self, PyObject *__pyx_arg_volume) {
   float __pyx_v_volume;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
@@ -6304,7 +6267,7 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_29set_all_mixer_channel_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("set_all_mixer_channel_volume (wrapper)", 0);
   assert(__pyx_arg_volume); {
-    __pyx_v_volume = __pyx_PyFloat_AsFloat(__pyx_arg_volume); if (unlikely((__pyx_v_volume == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 749; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_v_volume = __pyx_PyFloat_AsFloat(__pyx_arg_volume); if (unlikely((__pyx_v_volume == (float)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 755; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6312,14 +6275,14 @@ static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_29set_all_mixer_channel_
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_volume(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), ((float)__pyx_v_volume));
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_26set_all_mixer_channel_volume(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self), ((float)__pyx_v_volume));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_volume(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, float __pyx_v_volume) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_26set_all_mixer_channel_volume(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self, float __pyx_v_volume) {
   int __pyx_v_channel;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -6337,7 +6300,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("set_all_mixer_channel_volume", 0);
 
-  /* "pinaudio\core.pyx":755
+  /* "pinaudio\core.pyx":761
  *         :return:
  *         """
  *         cdef int channel = 0             # <<<<<<<<<<<<<<
@@ -6346,7 +6309,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_
  */
   __pyx_v_channel = 0;
 
-  /* "pinaudio\core.pyx":756
+  /* "pinaudio\core.pyx":762
  *         """
  *         cdef int channel = 0
  *         for channel in range(len(self.mixer_channels)):             # <<<<<<<<<<<<<<
@@ -6357,25 +6320,25 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 756; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 762; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 756; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 762; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_channel = __pyx_t_3;
 
-    /* "pinaudio\core.pyx":757
+    /* "pinaudio\core.pyx":763
  *         cdef int channel = 0
  *         for channel in range(len(self.mixer_channels)):
  *             self.set_mixer_channel_volume(channel, volume)             # <<<<<<<<<<<<<<
  * 
  *     # TODO: Add process callbacks function designed to be called from MPF tick function
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_mixer_channel_volume); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 757; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_mixer_channel_volume); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 757; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_channel); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_volume); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 757; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyFloat_FromDouble(__pyx_v_volume); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_7 = NULL;
     __pyx_t_8 = 0;
@@ -6389,7 +6352,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_
         __pyx_t_8 = 1;
       }
     }
-    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 757; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_9 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_9);
     if (__pyx_t_7) {
       PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __Pyx_GIVEREF(__pyx_t_7); __pyx_t_7 = NULL;
@@ -6400,14 +6363,14 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_
     __Pyx_GIVEREF(__pyx_t_6);
     __pyx_t_5 = 0;
     __pyx_t_6 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 757; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_9, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 763; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "pinaudio\core.pyx":749
+  /* "pinaudio\core.pyx":755
  *         return True
  * 
  *     def set_all_mixer_channel_volume(self, float volume):             # <<<<<<<<<<<<<<
@@ -6433,29 +6396,29 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":761
+/* "pinaudio\core.pyx":767
  *     # TODO: Add process callbacks function designed to be called from MPF tick function
  * 
- *     def tick(self):             # <<<<<<<<<<<<<<
+ *     def process_event_callbacks(self):             # <<<<<<<<<<<<<<
  *         """
  *         Designed to be called on every MPF tick, this function processes any state changes
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_31tick(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_8pinaudio_4core_11AudioOutput_30tick[] = "AudioOutput.tick(self)\n\n        Designed to be called on every MPF tick, this function processes any state changes\n        or events generated in the SDL callbacks (separate thread).\n        ";
-static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_31tick(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_29process_event_callbacks(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_8pinaudio_4core_11AudioOutput_28process_event_callbacks[] = "AudioOutput.process_event_callbacks(self)\n\n        Designed to be called on every MPF tick, this function processes any state changes\n        or events generated in the SDL callbacks (separate thread).\n        ";
+static PyObject *__pyx_pw_8pinaudio_4core_11AudioOutput_29process_event_callbacks(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("tick (wrapper)", 0);
-  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_30tick(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self));
+  __Pyx_RefNannySetupContext("process_event_callbacks (wrapper)", 0);
+  __pyx_r = __pyx_pf_8pinaudio_4core_11AudioOutput_28process_event_callbacks(((struct __pyx_obj_8pinaudio_4core_AudioOutput *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self) {
+static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_28process_event_callbacks(struct __pyx_obj_8pinaudio_4core_AudioOutput *__pyx_v_self) {
   __pyx_t_8pinaudio_4core_MixerChannel *__pyx_v_mix_channel;
   Py_ssize_t __pyx_v_channel;
   long __pyx_v_i;
@@ -6470,9 +6433,9 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
-  __Pyx_RefNannySetupContext("tick", 0);
+  __Pyx_RefNannySetupContext("process_event_callbacks", 0);
 
-  /* "pinaudio\core.pyx":769
+  /* "pinaudio\core.pyx":775
  * 
  *         # Loop over mixer channels, looking for any unprocessed events
  *         for channel in range(len(self.mixer_channels)):             # <<<<<<<<<<<<<<
@@ -6483,14 +6446,14 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 769; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 775; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 769; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 775; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_channel = __pyx_t_3;
 
-    /* "pinaudio\core.pyx":770
+    /* "pinaudio\core.pyx":776
  *         # Loop over mixer channels, looking for any unprocessed events
  *         for channel in range(len(self.mixer_channels)):
  *             mix_channel = <MixerChannel*>pycapsule.PyCapsule_GetPointer(self.mixer_channels[channel], NULL)             # <<<<<<<<<<<<<<
@@ -6499,15 +6462,15 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
  */
     if (unlikely(__pyx_v_self->mixer_channels == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 770; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+      {__pyx_filename = __pyx_f[0]; __pyx_lineno = 776; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     }
-    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_self->mixer_channels, __pyx_v_channel, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 770; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
+    __pyx_t_1 = __Pyx_GetItemInt_List(__pyx_v_self->mixer_channels, __pyx_v_channel, Py_ssize_t, 1, PyInt_FromSsize_t, 1, 1, 1); if (unlikely(__pyx_t_1 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 776; __pyx_clineno = __LINE__; goto __pyx_L1_error;};
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = PyCapsule_GetPointer(__pyx_t_1, NULL); if (unlikely(__pyx_t_4 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 770; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = PyCapsule_GetPointer(__pyx_t_1, NULL); if (unlikely(__pyx_t_4 == NULL && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 776; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_mix_channel = ((__pyx_t_8pinaudio_4core_MixerChannel *)__pyx_t_4);
 
-    /* "pinaudio\core.pyx":771
+    /* "pinaudio\core.pyx":777
  *         for channel in range(len(self.mixer_channels)):
  *             mix_channel = <MixerChannel*>pycapsule.PyCapsule_GetPointer(self.mixer_channels[channel], NULL)
  *             if mix_channel == NULL:             # <<<<<<<<<<<<<<
@@ -6517,7 +6480,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
     __pyx_t_5 = ((__pyx_v_mix_channel == NULL) != 0);
     if (__pyx_t_5) {
 
-      /* "pinaudio\core.pyx":772
+      /* "pinaudio\core.pyx":778
  *             mix_channel = <MixerChannel*>pycapsule.PyCapsule_GetPointer(self.mixer_channels[channel], NULL)
  *             if mix_channel == NULL:
  *                 continue             # <<<<<<<<<<<<<<
@@ -6527,7 +6490,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
       goto __pyx_L3_continue;
     }
 
-    /* "pinaudio\core.pyx":775
+    /* "pinaudio\core.pyx":781
  * 
  *             # Lock the mixer channel so it can't be accessed in another thread
  *             SDL_LockMutex(mix_channel.mutex)             # <<<<<<<<<<<<<<
@@ -6536,7 +6499,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
  */
     SDL_LockMutex(__pyx_v_mix_channel->mutex);
 
-    /* "pinaudio\core.pyx":777
+    /* "pinaudio\core.pyx":783
  *             SDL_LockMutex(mix_channel.mutex)
  * 
  *             for i in range(MAX_AUDIO_EVENTS):             # <<<<<<<<<<<<<<
@@ -6546,7 +6509,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
     for (__pyx_t_6 = 0; __pyx_t_6 < 50; __pyx_t_6+=1) {
       __pyx_v_i = __pyx_t_6;
 
-      /* "pinaudio\core.pyx":778
+      /* "pinaudio\core.pyx":784
  * 
  *             for i in range(MAX_AUDIO_EVENTS):
  *                 if mix_channel.events[i].event != event_none:             # <<<<<<<<<<<<<<
@@ -6560,7 +6523,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
       __pyx_L8:;
     }
 
-    /* "pinaudio\core.pyx":783
+    /* "pinaudio\core.pyx":789
  * 
  *             # Unlock the mixer channel
  *             SDL_UnlockMutex(mix_channel.mutex)             # <<<<<<<<<<<<<<
@@ -6571,10 +6534,10 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
     __pyx_L3_continue:;
   }
 
-  /* "pinaudio\core.pyx":761
+  /* "pinaudio\core.pyx":767
  *     # TODO: Add process callbacks function designed to be called from MPF tick function
  * 
- *     def tick(self):             # <<<<<<<<<<<<<<
+ *     def process_event_callbacks(self):             # <<<<<<<<<<<<<<
  *         """
  *         Designed to be called on every MPF tick, this function processes any state changes
  */
@@ -6584,7 +6547,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
   goto __pyx_L0;
   __pyx_L1_error:;
   __Pyx_XDECREF(__pyx_t_1);
-  __Pyx_AddTraceback("pinaudio.core.AudioOutput.tick", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pinaudio.core.AudioOutput.process_event_callbacks", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
@@ -6592,7 +6555,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_30tick(struct __pyx_obj_
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":359
+/* "pinaudio\core.pyx":363
  *     cdef int next_sample_number
  *     cdef int audio_init
  *     cdef readonly int rate             # <<<<<<<<<<<<<<
@@ -6622,7 +6585,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_4rate___get__(struct __p
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->rate); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 359; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->rate); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 363; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6639,7 +6602,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_4rate___get__(struct __p
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":360
+/* "pinaudio\core.pyx":364
  *     cdef int audio_init
  *     cdef readonly int rate
  *     cdef readonly int channels             # <<<<<<<<<<<<<<
@@ -6669,7 +6632,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_8channels___get__(struct
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->channels); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 360; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->channels); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6686,7 +6649,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_8channels___get__(struct
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":361
+/* "pinaudio\core.pyx":365
  *     cdef readonly int rate
  *     cdef readonly int channels
  *     cdef readonly int buffersize             # <<<<<<<<<<<<<<
@@ -6716,7 +6679,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_10buffersize___get__(str
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->buffersize); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 361; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->buffersize); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 365; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6733,7 +6696,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_10buffersize___get__(str
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":362
+/* "pinaudio\core.pyx":366
  *     cdef readonly int channels
  *     cdef readonly int buffersize
  *     cdef readonly int encoding             # <<<<<<<<<<<<<<
@@ -6763,7 +6726,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_8encoding___get__(struct
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->encoding); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 362; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->encoding); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 366; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6780,7 +6743,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_11AudioOutput_8encoding___get__(struct
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":786
+/* "pinaudio\core.pyx":792
  * 
  * 
  * def get_audio_output(**kwargs):             # <<<<<<<<<<<<<<
@@ -6821,7 +6784,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_get_audio_output(CYTHON_UNUSED PyObjec
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_audio_output", 0);
 
-  /* "pinaudio\core.pyx":792
+  /* "pinaudio\core.pyx":798
  *     :return: AudioOutput
  *     """
  *     return AudioOutput(**kwargs)             # <<<<<<<<<<<<<<
@@ -6831,14 +6794,14 @@ static PyObject *__pyx_pf_8pinaudio_4core_get_audio_output(CYTHON_UNUSED PyObjec
   __Pyx_XDECREF(__pyx_r);
   __pyx_t_1 = __pyx_v_kwargs;
   __Pyx_INCREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_8pinaudio_4core_AudioOutput)), __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 792; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(((PyObject *)((PyObject*)__pyx_ptype_8pinaudio_4core_AudioOutput)), __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 798; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":786
+  /* "pinaudio\core.pyx":792
  * 
  * 
  * def get_audio_output(**kwargs):             # <<<<<<<<<<<<<<
@@ -6858,7 +6821,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_get_audio_output(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":794
+/* "pinaudio\core.pyx":800
  *     return AudioOutput(**kwargs)
  * 
  * def get_version():             # <<<<<<<<<<<<<<
@@ -6890,7 +6853,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_2get_version(CYTHON_UNUSED PyObject *_
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_version", 0);
 
-  /* "pinaudio\core.pyx":799
+  /* "pinaudio\core.pyx":805
  *     :return: PinAudio version string
  *     """
  *     return __version__             # <<<<<<<<<<<<<<
@@ -6898,13 +6861,13 @@ static PyObject *__pyx_pf_8pinaudio_4core_2get_version(CYTHON_UNUSED PyObject *_
  * def get_sdl_version():
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_version); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 799; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_version); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 805; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":794
+  /* "pinaudio\core.pyx":800
  *     return AudioOutput(**kwargs)
  * 
  * def get_version():             # <<<<<<<<<<<<<<
@@ -6923,7 +6886,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_2get_version(CYTHON_UNUSED PyObject *_
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":801
+/* "pinaudio\core.pyx":807
  *     return __version__
  * 
  * def get_sdl_version():             # <<<<<<<<<<<<<<
@@ -6963,7 +6926,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_4get_sdl_version(CYTHON_UNUSED PyObjec
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_sdl_version", 0);
 
-  /* "pinaudio\core.pyx":807
+  /* "pinaudio\core.pyx":813
  *     """
  *     cdef SDL_version version
  *     SDL_GetVersion(&version)             # <<<<<<<<<<<<<<
@@ -6972,7 +6935,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_4get_sdl_version(CYTHON_UNUSED PyObjec
  */
   SDL_GetVersion((&__pyx_v_version));
 
-  /* "pinaudio\core.pyx":808
+  /* "pinaudio\core.pyx":814
  *     cdef SDL_version version
  *     SDL_GetVersion(&version)
  *     return 'SDL {}.{}.{}'.format(version.major, version.minor, version.patch)             # <<<<<<<<<<<<<<
@@ -6980,13 +6943,13 @@ static PyObject *__pyx_pf_8pinaudio_4core_4get_sdl_version(CYTHON_UNUSED PyObjec
  * def get_sdl_mixer_version():
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SDL, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 808; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SDL, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 814; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version.major); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 808; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version.major); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 814; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version.minor); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 808; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version.minor); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 814; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version.patch); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 808; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version.patch); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 814; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   __pyx_t_7 = 0;
@@ -7000,7 +6963,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_4get_sdl_version(CYTHON_UNUSED PyObjec
       __pyx_t_7 = 1;
     }
   }
-  __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 808; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 814; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   if (__pyx_t_6) {
     PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __Pyx_GIVEREF(__pyx_t_6); __pyx_t_6 = NULL;
@@ -7014,7 +6977,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_4get_sdl_version(CYTHON_UNUSED PyObjec
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 808; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 814; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -7022,7 +6985,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_4get_sdl_version(CYTHON_UNUSED PyObjec
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":801
+  /* "pinaudio\core.pyx":807
  *     return __version__
  * 
  * def get_sdl_version():             # <<<<<<<<<<<<<<
@@ -7047,7 +7010,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_4get_sdl_version(CYTHON_UNUSED PyObjec
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":810
+/* "pinaudio\core.pyx":816
  *     return 'SDL {}.{}.{}'.format(version.major, version.minor, version.patch)
  * 
  * def get_sdl_mixer_version():             # <<<<<<<<<<<<<<
@@ -7087,7 +7050,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_6get_sdl_mixer_version(CYTHON_UNUSED P
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("get_sdl_mixer_version", 0);
 
-  /* "pinaudio\core.pyx":815
+  /* "pinaudio\core.pyx":821
  *     :return: SDL_Mixer library version string
  *     """
  *     cdef SDL_version *version =  Mix_Linked_Version()             # <<<<<<<<<<<<<<
@@ -7096,7 +7059,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_6get_sdl_mixer_version(CYTHON_UNUSED P
  */
   __pyx_v_version = Mix_Linked_Version();
 
-  /* "pinaudio\core.pyx":816
+  /* "pinaudio\core.pyx":822
  *     """
  *     cdef SDL_version *version =  Mix_Linked_Version()
  *     return 'SDL_Mixer {}.{}.{}'.format(version.major, version.minor, version.patch)             # <<<<<<<<<<<<<<
@@ -7104,13 +7067,13 @@ static PyObject *__pyx_pf_8pinaudio_4core_6get_sdl_mixer_version(CYTHON_UNUSED P
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SDL_Mixer, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SDL_Mixer, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 822; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version->major); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version->major); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 822; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version->minor); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version->minor); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 822; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version->patch); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_5 = __Pyx_PyInt_From_unsigned_char(__pyx_v_version->patch); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 822; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   __pyx_t_7 = 0;
@@ -7124,7 +7087,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_6get_sdl_mixer_version(CYTHON_UNUSED P
       __pyx_t_7 = 1;
     }
   }
-  __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 822; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_8);
   if (__pyx_t_6) {
     PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __Pyx_GIVEREF(__pyx_t_6); __pyx_t_6 = NULL;
@@ -7138,7 +7101,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_6get_sdl_mixer_version(CYTHON_UNUSED P
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 822; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -7146,7 +7109,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_6get_sdl_mixer_version(CYTHON_UNUSED P
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":810
+  /* "pinaudio\core.pyx":816
  *     return 'SDL {}.{}.{}'.format(version.major, version.minor, version.patch)
  * 
  * def get_sdl_mixer_version():             # <<<<<<<<<<<<<<
@@ -7171,7 +7134,7 @@ static PyObject *__pyx_pf_8pinaudio_4core_6get_sdl_mixer_version(CYTHON_UNUSED P
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":830
+/* "pinaudio\core.pyx":836
  *     AudioEventData *events
  * 
  * cdef MixerChannel *alloc_mixer_channel(int channel, int simultaneous_sounds=1) nogil:             # <<<<<<<<<<<<<<
@@ -7192,7 +7155,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
     }
   }
 
-  /* "pinaudio\core.pyx":840
+  /* "pinaudio\core.pyx":846
  * 
  *     # Allocate memory and assign it to the new mixer channel structure
  *     cdef MixerChannel *mix_channel = <MixerChannel *>calloc(1, sizeof(MixerChannel))             # <<<<<<<<<<<<<<
@@ -7201,7 +7164,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
   __pyx_v_mix_channel = ((__pyx_t_8pinaudio_4core_MixerChannel *)calloc(1, (sizeof(__pyx_t_8pinaudio_4core_MixerChannel))));
 
-  /* "pinaudio\core.pyx":843
+  /* "pinaudio\core.pyx":849
  * 
  *     # Set the mixer channel attributes
  *     mix_channel.channel = channel             # <<<<<<<<<<<<<<
@@ -7210,7 +7173,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
   __pyx_v_mix_channel->channel = __pyx_v_channel;
 
-  /* "pinaudio\core.pyx":844
+  /* "pinaudio\core.pyx":850
  *     # Set the mixer channel attributes
  *     mix_channel.channel = channel
  *     mix_channel.max_simultaneous_sounds = simultaneous_sounds             # <<<<<<<<<<<<<<
@@ -7219,7 +7182,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
   __pyx_v_mix_channel->max_simultaneous_sounds = __pyx_v_simultaneous_sounds;
 
-  /* "pinaudio\core.pyx":847
+  /* "pinaudio\core.pyx":853
  * 
  *     # Create a mutex used for locking/thread protection in SDL
  *     mix_channel.mutex = SDL_CreateMutex()             # <<<<<<<<<<<<<<
@@ -7228,7 +7191,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
   __pyx_v_mix_channel->mutex = SDL_CreateMutex();
 
-  /* "pinaudio\core.pyx":851
+  /* "pinaudio\core.pyx":857
  *     # Allocate memory for the audio sample player objects needed for the desired number of
  *     # simultaneous sounds that can be played on the channel.
  *     mix_channel.sample_players = <AudioSamplePlayer *>calloc(mix_channel.max_simultaneous_sounds, sizeof(AudioSamplePlayer))             # <<<<<<<<<<<<<<
@@ -7237,7 +7200,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
   __pyx_v_mix_channel->sample_players = ((__pyx_t_8pinaudio_4core_AudioSamplePlayer *)calloc(__pyx_v_mix_channel->max_simultaneous_sounds, (sizeof(__pyx_t_8pinaudio_4core_AudioSamplePlayer))));
 
-  /* "pinaudio\core.pyx":854
+  /* "pinaudio\core.pyx":860
  * 
  *     # Initialize mixer channel settings
  *     for i in range(mix_channel.max_simultaneous_sounds):             # <<<<<<<<<<<<<<
@@ -7248,7 +7211,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "pinaudio\core.pyx":855
+    /* "pinaudio\core.pyx":861
  *     # Initialize mixer channel settings
  *     for i in range(mix_channel.max_simultaneous_sounds):
  *         mix_channel.sample_players[i].chunk = NULL             # <<<<<<<<<<<<<<
@@ -7257,7 +7220,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
     (__pyx_v_mix_channel->sample_players[__pyx_v_i]).chunk = NULL;
 
-    /* "pinaudio\core.pyx":856
+    /* "pinaudio\core.pyx":862
  *     for i in range(mix_channel.max_simultaneous_sounds):
  *         mix_channel.sample_players[i].chunk = NULL
  *         mix_channel.sample_players[i].status = player_idle             # <<<<<<<<<<<<<<
@@ -7266,7 +7229,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
     (__pyx_v_mix_channel->sample_players[__pyx_v_i]).status = __pyx_e_8pinaudio_4core_player_idle;
 
-    /* "pinaudio\core.pyx":857
+    /* "pinaudio\core.pyx":863
  *         mix_channel.sample_players[i].chunk = NULL
  *         mix_channel.sample_players[i].status = player_idle
  *         mix_channel.sample_players[i].loops_remaining = 0             # <<<<<<<<<<<<<<
@@ -7275,7 +7238,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
     (__pyx_v_mix_channel->sample_players[__pyx_v_i]).loops_remaining = 0;
 
-    /* "pinaudio\core.pyx":858
+    /* "pinaudio\core.pyx":864
  *         mix_channel.sample_players[i].status = player_idle
  *         mix_channel.sample_players[i].loops_remaining = 0
  *         mix_channel.sample_players[i].start_time = 0             # <<<<<<<<<<<<<<
@@ -7284,7 +7247,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
     (__pyx_v_mix_channel->sample_players[__pyx_v_i]).start_time = 0;
 
-    /* "pinaudio\core.pyx":859
+    /* "pinaudio\core.pyx":865
  *         mix_channel.sample_players[i].loops_remaining = 0
  *         mix_channel.sample_players[i].start_time = 0
  *         mix_channel.sample_players[i].volume = 0             # <<<<<<<<<<<<<<
@@ -7293,7 +7256,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
     (__pyx_v_mix_channel->sample_players[__pyx_v_i]).volume = 0;
 
-    /* "pinaudio\core.pyx":860
+    /* "pinaudio\core.pyx":866
  *         mix_channel.sample_players[i].start_time = 0
  *         mix_channel.sample_players[i].volume = 0
  *         mix_channel.sample_players[i].sample_pos = 0             # <<<<<<<<<<<<<<
@@ -7303,7 +7266,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
     (__pyx_v_mix_channel->sample_players[__pyx_v_i]).sample_pos = 0;
   }
 
-  /* "pinaudio\core.pyx":863
+  /* "pinaudio\core.pyx":869
  * 
  *     # Initialize ducking envelopes
  *     mix_channel.ducking_envelopes = NULL             # <<<<<<<<<<<<<<
@@ -7312,7 +7275,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
   __pyx_v_mix_channel->ducking_envelopes = NULL;
 
-  /* "pinaudio\core.pyx":866
+  /* "pinaudio\core.pyx":872
  * 
  *     # Initialize audio events
  *     mix_channel.events = <AudioEventData*>calloc(MAX_AUDIO_EVENTS, sizeof(AudioEventData))             # <<<<<<<<<<<<<<
@@ -7321,7 +7284,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
   __pyx_v_mix_channel->events = ((__pyx_t_8pinaudio_4core_AudioEventData *)calloc(50, (sizeof(__pyx_t_8pinaudio_4core_AudioEventData))));
 
-  /* "pinaudio\core.pyx":867
+  /* "pinaudio\core.pyx":873
  *     # Initialize audio events
  *     mix_channel.events = <AudioEventData*>calloc(MAX_AUDIO_EVENTS, sizeof(AudioEventData))
  *     for i in range(MAX_AUDIO_EVENTS):             # <<<<<<<<<<<<<<
@@ -7331,7 +7294,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
   for (__pyx_t_2 = 0; __pyx_t_2 < 50; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "pinaudio\core.pyx":868
+    /* "pinaudio\core.pyx":874
  *     mix_channel.events = <AudioEventData*>calloc(MAX_AUDIO_EVENTS, sizeof(AudioEventData))
  *     for i in range(MAX_AUDIO_EVENTS):
  *         mix_channel.events[i].event = event_none             # <<<<<<<<<<<<<<
@@ -7340,7 +7303,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
     (__pyx_v_mix_channel->events[__pyx_v_i]).event = __pyx_e_8pinaudio_4core_event_none;
 
-    /* "pinaudio\core.pyx":869
+    /* "pinaudio\core.pyx":875
  *     for i in range(MAX_AUDIO_EVENTS):
  *         mix_channel.events[i].event = event_none
  *         mix_channel.events[i].channel = 0             # <<<<<<<<<<<<<<
@@ -7349,7 +7312,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
     (__pyx_v_mix_channel->events[__pyx_v_i]).channel = 0;
 
-    /* "pinaudio\core.pyx":870
+    /* "pinaudio\core.pyx":876
  *         mix_channel.events[i].event = event_none
  *         mix_channel.events[i].channel = 0
  *         mix_channel.events[i].player = 0             # <<<<<<<<<<<<<<
@@ -7358,7 +7321,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
  */
     (__pyx_v_mix_channel->events[__pyx_v_i]).player = 0;
 
-    /* "pinaudio\core.pyx":871
+    /* "pinaudio\core.pyx":877
  *         mix_channel.events[i].channel = 0
  *         mix_channel.events[i].player = 0
  *         mix_channel.events[i].sample_number = 0             # <<<<<<<<<<<<<<
@@ -7368,7 +7331,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
     (__pyx_v_mix_channel->events[__pyx_v_i]).sample_number = 0;
   }
 
-  /* "pinaudio\core.pyx":874
+  /* "pinaudio\core.pyx":880
  * 
  *     # Return the new mixer channel object pointer
  *     return mix_channel             # <<<<<<<<<<<<<<
@@ -7378,7 +7341,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
   __pyx_r = __pyx_v_mix_channel;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":830
+  /* "pinaudio\core.pyx":836
  *     AudioEventData *events
  * 
  * cdef MixerChannel *alloc_mixer_channel(int channel, int simultaneous_sounds=1) nogil:             # <<<<<<<<<<<<<<
@@ -7391,7 +7354,7 @@ static __pyx_t_8pinaudio_4core_MixerChannel *__pyx_f_8pinaudio_4core_alloc_mixer
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":876
+/* "pinaudio\core.pyx":882
  *     return mix_channel
  * 
  * cdef void free_mixer_channel(MixerChannel* mix_channel) nogil:             # <<<<<<<<<<<<<<
@@ -7405,7 +7368,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
   int __pyx_t_1;
   __pyx_t_8pinaudio_4core_DuckingEnvelope *__pyx_t_2;
 
-  /* "pinaudio\core.pyx":880
+  /* "pinaudio\core.pyx":886
  *     """
  * 
  *     if mix_channel == NULL:             # <<<<<<<<<<<<<<
@@ -7415,7 +7378,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
   __pyx_t_1 = ((__pyx_v_mix_channel == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "pinaudio\core.pyx":881
+    /* "pinaudio\core.pyx":887
  * 
  *     if mix_channel == NULL:
  *         return             # <<<<<<<<<<<<<<
@@ -7425,7 +7388,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
     goto __pyx_L0;
   }
 
-  /* "pinaudio\core.pyx":883
+  /* "pinaudio\core.pyx":889
  *         return
  * 
  *     SDL_DestroyMutex(mix_channel.mutex)             # <<<<<<<<<<<<<<
@@ -7434,7 +7397,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
  */
   SDL_DestroyMutex(__pyx_v_mix_channel->mutex);
 
-  /* "pinaudio\core.pyx":886
+  /* "pinaudio\core.pyx":892
  * 
  *     # Free all audio sample players for the channel
  *     free(mix_channel.sample_players)             # <<<<<<<<<<<<<<
@@ -7443,7 +7406,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
  */
   free(__pyx_v_mix_channel->sample_players);
 
-  /* "pinaudio\core.pyx":889
+  /* "pinaudio\core.pyx":895
  * 
  *     # Free all ducking envelopes
  *     cdef DuckingEnvelope *envelope = mix_channel.ducking_envelopes             # <<<<<<<<<<<<<<
@@ -7453,7 +7416,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
   __pyx_t_2 = __pyx_v_mix_channel->ducking_envelopes;
   __pyx_v_envelope = __pyx_t_2;
 
-  /* "pinaudio\core.pyx":890
+  /* "pinaudio\core.pyx":896
  *     # Free all ducking envelopes
  *     cdef DuckingEnvelope *envelope = mix_channel.ducking_envelopes
  *     cdef DuckingEnvelope *next_envelope = NULL             # <<<<<<<<<<<<<<
@@ -7462,7 +7425,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
  */
   __pyx_v_next_envelope = NULL;
 
-  /* "pinaudio\core.pyx":891
+  /* "pinaudio\core.pyx":897
  *     cdef DuckingEnvelope *envelope = mix_channel.ducking_envelopes
  *     cdef DuckingEnvelope *next_envelope = NULL
  *     while envelope != NULL:             # <<<<<<<<<<<<<<
@@ -7473,7 +7436,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
     __pyx_t_1 = ((__pyx_v_envelope != NULL) != 0);
     if (!__pyx_t_1) break;
 
-    /* "pinaudio\core.pyx":892
+    /* "pinaudio\core.pyx":898
  *     cdef DuckingEnvelope *next_envelope = NULL
  *     while envelope != NULL:
  *         next_envelope = envelope.next             # <<<<<<<<<<<<<<
@@ -7483,7 +7446,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
     __pyx_t_2 = __pyx_v_envelope->next;
     __pyx_v_next_envelope = __pyx_t_2;
 
-    /* "pinaudio\core.pyx":893
+    /* "pinaudio\core.pyx":899
  *     while envelope != NULL:
  *         next_envelope = envelope.next
  *         free(envelope)             # <<<<<<<<<<<<<<
@@ -7492,7 +7455,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
  */
     free(__pyx_v_envelope);
 
-    /* "pinaudio\core.pyx":894
+    /* "pinaudio\core.pyx":900
  *         next_envelope = envelope.next
  *         free(envelope)
  *         envelope = next_envelope             # <<<<<<<<<<<<<<
@@ -7502,7 +7465,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
     __pyx_v_envelope = __pyx_v_next_envelope;
   }
 
-  /* "pinaudio\core.pyx":897
+  /* "pinaudio\core.pyx":903
  * 
  *     # Free audio event data
  *     free(mix_channel.events)             # <<<<<<<<<<<<<<
@@ -7511,7 +7474,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
  */
   free(__pyx_v_mix_channel->events);
 
-  /* "pinaudio\core.pyx":900
+  /* "pinaudio\core.pyx":906
  * 
  *     # Free mixer channel itself
  *     free(mix_channel)             # <<<<<<<<<<<<<<
@@ -7520,7 +7483,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
  */
   free(__pyx_v_mix_channel);
 
-  /* "pinaudio\core.pyx":876
+  /* "pinaudio\core.pyx":882
  *     return mix_channel
  * 
  * cdef void free_mixer_channel(MixerChannel* mix_channel) nogil:             # <<<<<<<<<<<<<<
@@ -7532,7 +7495,7 @@ static void __pyx_f_8pinaudio_4core_free_mixer_channel(__pyx_t_8pinaudio_4core_M
   __pyx_L0:;
 }
 
-/* "pinaudio\core.pyx":902
+/* "pinaudio\core.pyx":908
  *     free(mix_channel)
  * 
  * cdef int get_open_sample_player_on_mixer_channel(MixerChannel* mix_channel) nogil:             # <<<<<<<<<<<<<<
@@ -7547,7 +7510,7 @@ static int __pyx_f_8pinaudio_4core_get_open_sample_player_on_mixer_channel(__pyx
   int __pyx_t_2;
   int __pyx_t_3;
 
-  /* "pinaudio\core.pyx":907
+  /* "pinaudio\core.pyx":913
  *     :param mix_channel: The mixer channel to check for open sample players.
  *     """
  *     for i in range(mix_channel.max_simultaneous_sounds):             # <<<<<<<<<<<<<<
@@ -7558,7 +7521,7 @@ static int __pyx_f_8pinaudio_4core_get_open_sample_player_on_mixer_channel(__pyx
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "pinaudio\core.pyx":908
+    /* "pinaudio\core.pyx":914
  *     """
  *     for i in range(mix_channel.max_simultaneous_sounds):
  *         if mix_channel.sample_players[i].status == player_idle:             # <<<<<<<<<<<<<<
@@ -7568,7 +7531,7 @@ static int __pyx_f_8pinaudio_4core_get_open_sample_player_on_mixer_channel(__pyx
     __pyx_t_3 = (((__pyx_v_mix_channel->sample_players[__pyx_v_i]).status == __pyx_e_8pinaudio_4core_player_idle) != 0);
     if (__pyx_t_3) {
 
-      /* "pinaudio\core.pyx":909
+      /* "pinaudio\core.pyx":915
  *     for i in range(mix_channel.max_simultaneous_sounds):
  *         if mix_channel.sample_players[i].status == player_idle:
  *             return i             # <<<<<<<<<<<<<<
@@ -7580,7 +7543,7 @@ static int __pyx_f_8pinaudio_4core_get_open_sample_player_on_mixer_channel(__pyx
     }
   }
 
-  /* "pinaudio\core.pyx":911
+  /* "pinaudio\core.pyx":917
  *             return i
  * 
  *     return -1             # <<<<<<<<<<<<<<
@@ -7590,7 +7553,7 @@ static int __pyx_f_8pinaudio_4core_get_open_sample_player_on_mixer_channel(__pyx
   __pyx_r = -1;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":902
+  /* "pinaudio\core.pyx":908
  *     free(mix_channel)
  * 
  * cdef int get_open_sample_player_on_mixer_channel(MixerChannel* mix_channel) nogil:             # <<<<<<<<<<<<<<
@@ -7603,7 +7566,7 @@ static int __pyx_f_8pinaudio_4core_get_open_sample_player_on_mixer_channel(__pyx
   return __pyx_r;
 }
 
-/* "pinaudio\core.pyx":913
+/* "pinaudio\core.pyx":919
  *     return -1
  * 
  * cdef int get_first_available_audio_event_on_mixer_channel(MixerChannel* mix_channel) nogil:             # <<<<<<<<<<<<<<
@@ -7617,7 +7580,7 @@ static int __pyx_f_8pinaudio_4core_get_first_available_audio_event_on_mixer_chan
   long __pyx_t_1;
   int __pyx_t_2;
 
-  /* "pinaudio\core.pyx":920
+  /* "pinaudio\core.pyx":926
  *     :return: The index of the first available audio event.  -1 if all are in use.
  *     """
  *     for i in range(MAX_AUDIO_EVENTS):             # <<<<<<<<<<<<<<
@@ -7627,7 +7590,7 @@ static int __pyx_f_8pinaudio_4core_get_first_available_audio_event_on_mixer_chan
   for (__pyx_t_1 = 0; __pyx_t_1 < 50; __pyx_t_1+=1) {
     __pyx_v_i = __pyx_t_1;
 
-    /* "pinaudio\core.pyx":921
+    /* "pinaudio\core.pyx":927
  *     """
  *     for i in range(MAX_AUDIO_EVENTS):
  *         if mix_channel.events[i].event == event_none:             # <<<<<<<<<<<<<<
@@ -7637,7 +7600,7 @@ static int __pyx_f_8pinaudio_4core_get_first_available_audio_event_on_mixer_chan
     __pyx_t_2 = (((__pyx_v_mix_channel->events[__pyx_v_i]).event == __pyx_e_8pinaudio_4core_event_none) != 0);
     if (__pyx_t_2) {
 
-      /* "pinaudio\core.pyx":922
+      /* "pinaudio\core.pyx":928
  *     for i in range(MAX_AUDIO_EVENTS):
  *         if mix_channel.events[i].event == event_none:
  *             return i             # <<<<<<<<<<<<<<
@@ -7649,7 +7612,7 @@ static int __pyx_f_8pinaudio_4core_get_first_available_audio_event_on_mixer_chan
     }
   }
 
-  /* "pinaudio\core.pyx":924
+  /* "pinaudio\core.pyx":930
  *             return i
  * 
  *     return -1             # <<<<<<<<<<<<<<
@@ -7659,7 +7622,7 @@ static int __pyx_f_8pinaudio_4core_get_first_available_audio_event_on_mixer_chan
   __pyx_r = -1;
   goto __pyx_L0;
 
-  /* "pinaudio\core.pyx":913
+  /* "pinaudio\core.pyx":919
  *     return -1
  * 
  * cdef int get_first_available_audio_event_on_mixer_channel(MixerChannel* mix_channel) nogil:             # <<<<<<<<<<<<<<
@@ -7749,17 +7712,16 @@ static PyMethodDef __pyx_methods_8pinaudio_4core_AudioOutput[] = {
   {"supports_wav", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_5supports_wav, METH_NOARGS, __pyx_doc_8pinaudio_4core_11AudioOutput_4supports_wav},
   {"supports_ogg", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_7supports_ogg, METH_NOARGS, __pyx_doc_8pinaudio_4core_11AudioOutput_6supports_ogg},
   {"supports_flac", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_9supports_flac, METH_NOARGS, __pyx_doc_8pinaudio_4core_11AudioOutput_8supports_flac},
-  {"supports_mp3", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_11supports_mp3, METH_NOARGS, __pyx_doc_8pinaudio_4core_11AudioOutput_10supports_mp3},
-  {"load_sample", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_13load_sample, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_12load_sample},
-  {"unload_sample", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_15unload_sample, METH_O, __pyx_doc_8pinaudio_4core_11AudioOutput_14unload_sample},
-  {"play_sample_on_mixer_channel", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_17play_sample_on_mixer_channel, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_16play_sample_on_mixer_channel},
-  {"apply_ducking_envelope_to_mixer_channel", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_19apply_ducking_envelope_to_mixer_channel, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_18apply_ducking_envelope_to_mixer_channel},
-  {"add_mixer_channel", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_21add_mixer_channel, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_20add_mixer_channel},
-  {"enable_mixer_channel", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_23enable_mixer_channel, METH_O, __pyx_doc_8pinaudio_4core_11AudioOutput_22enable_mixer_channel},
-  {"enable_all_mixer_channels", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_25enable_all_mixer_channels, METH_NOARGS, __pyx_doc_8pinaudio_4core_11AudioOutput_24enable_all_mixer_channels},
-  {"set_mixer_channel_volume", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_27set_mixer_channel_volume, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_26set_mixer_channel_volume},
-  {"set_all_mixer_channel_volume", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_29set_all_mixer_channel_volume, METH_O, __pyx_doc_8pinaudio_4core_11AudioOutput_28set_all_mixer_channel_volume},
-  {"tick", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_31tick, METH_NOARGS, __pyx_doc_8pinaudio_4core_11AudioOutput_30tick},
+  {"load_sample", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_11load_sample, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_10load_sample},
+  {"unload_sample", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_13unload_sample, METH_O, __pyx_doc_8pinaudio_4core_11AudioOutput_12unload_sample},
+  {"play_sample_on_mixer_channel", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_15play_sample_on_mixer_channel, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_14play_sample_on_mixer_channel},
+  {"apply_ducking_envelope_to_mixer_channel", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_17apply_ducking_envelope_to_mixer_channel, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_16apply_ducking_envelope_to_mixer_channel},
+  {"add_mixer_channel", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_19add_mixer_channel, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_18add_mixer_channel},
+  {"enable_mixer_channel", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_21enable_mixer_channel, METH_O, __pyx_doc_8pinaudio_4core_11AudioOutput_20enable_mixer_channel},
+  {"enable_all_mixer_channels", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_23enable_all_mixer_channels, METH_NOARGS, __pyx_doc_8pinaudio_4core_11AudioOutput_22enable_all_mixer_channels},
+  {"set_mixer_channel_volume", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_25set_mixer_channel_volume, METH_VARARGS|METH_KEYWORDS, __pyx_doc_8pinaudio_4core_11AudioOutput_24set_mixer_channel_volume},
+  {"set_all_mixer_channel_volume", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_27set_all_mixer_channel_volume, METH_O, __pyx_doc_8pinaudio_4core_11AudioOutput_26set_all_mixer_channel_volume},
+  {"process_event_callbacks", (PyCFunction)__pyx_pw_8pinaudio_4core_11AudioOutput_29process_event_callbacks, METH_NOARGS, __pyx_doc_8pinaudio_4core_11AudioOutput_28process_event_callbacks},
   {0, 0, 0, 0}
 };
 
@@ -7796,7 +7758,7 @@ static PyTypeObject __pyx_type_8pinaudio_4core_AudioOutput = {
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
-  "AudioOutput(rate=44100, channels=2, buffersize=1024, encoding=16, formats=MIX_INIT_FLAC | MIX_INIT_MP3 | MIX_INIT_OGG)\n:class:`AudioOutput` class is the base for initializing the internal\n    audio.\n    \n    .. warning::\n    \n        You can instantiate only one AudioOutput in a process. It must be\n        instantiated before any others components of the library.\n    ", /*tp_doc*/
+  "AudioOutput(rate=44100, channels=2, buffersize=1024, encoding=16, formats=MIX_INIT_FLAC | MIX_INIT_OGG)\n:class:`AudioOutput` class is the base for initializing the internal\n    audio.\n    \n    .. warning::\n    \n        You can instantiate only one AudioOutput in a process. It must be\n        instantiated before any others components of the library.\n    ", /*tp_doc*/
   __pyx_tp_traverse_8pinaudio_4core_AudioOutput, /*tp_traverse*/
   __pyx_tp_clear_8pinaudio_4core_AudioOutput, /*tp_clear*/
   0, /*tp_richcompare*/
@@ -7918,7 +7880,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_simultaneous_limit, __pyx_k_simultaneous_limit, sizeof(__pyx_k_simultaneous_limit), 0, 0, 1, 1},
   {&__pyx_n_s_simultaneous_sounds, __pyx_k_simultaneous_sounds, sizeof(__pyx_k_simultaneous_sounds), 0, 0, 1, 1},
   {&__pyx_n_s_supports_flac, __pyx_k_supports_flac, sizeof(__pyx_k_supports_flac), 0, 0, 1, 1},
-  {&__pyx_n_s_supports_mp3, __pyx_k_supports_mp3, sizeof(__pyx_k_supports_mp3), 0, 0, 1, 1},
   {&__pyx_n_s_supports_ogg, __pyx_k_supports_ogg, sizeof(__pyx_k_supports_ogg), 0, 0, 1, 1},
   {&__pyx_n_s_supports_wav, __pyx_k_supports_wav, sizeof(__pyx_k_supports_wav), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
@@ -7928,10 +7889,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_Exception = __Pyx_GetBuiltinName(__pyx_n_s_Exception); if (!__pyx_builtin_Exception) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 47; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_property = __Pyx_GetBuiltinName(__pyx_n_s_property); if (!__pyx_builtin_property) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 95; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_Exception = __Pyx_GetBuiltinName(__pyx_n_s_Exception); if (!__pyx_builtin_Exception) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_property = __Pyx_GetBuiltinName(__pyx_n_s_property); if (!__pyx_builtin_property) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 88; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_print = __Pyx_GetBuiltinName(__pyx_n_s_print); if (!__pyx_builtin_print) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 96; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -7941,25 +7902,25 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "pinaudio\core.pyx":389
+  /* "pinaudio\core.pyx":393
  * 
  *         if self._init_audio() < 0:
  *             raise AudioException('AudioOutput: unable to initialize audio')             # <<<<<<<<<<<<<<
  * 
  *         # Initialize the supported SDL_Mixer library formats with the requested formats
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_AudioOutput_unable_to_initialize); if (unlikely(!__pyx_tuple__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 389; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_AudioOutput_unable_to_initialize); if (unlikely(!__pyx_tuple__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 393; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "pinaudio\core.pyx":403
+  /* "pinaudio\core.pyx":407
  *         self.raw_chunk_silence = Mix_QuickLoad_RAW(silence, length)
  *         if self.raw_chunk_silence == NULL:
  *             raise AudioException('AudioOutput: unable to initialize and load silence')             # <<<<<<<<<<<<<<
  * 
  *     cdef int _init_audio(self):
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_AudioOutput_unable_to_initialize_2); if (unlikely(!__pyx_tuple__3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 403; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_AudioOutput_unable_to_initialize_2); if (unlikely(!__pyx_tuple__3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 407; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
@@ -7974,50 +7935,50 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "pinaudio\core.pyx":786
+  /* "pinaudio\core.pyx":792
  * 
  * 
  * def get_audio_output(**kwargs):             # <<<<<<<<<<<<<<
  *     """
  *     Function to initialize the PinAudio audio output
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_n_s_kwargs); if (unlikely(!__pyx_tuple__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 786; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_n_s_kwargs); if (unlikely(!__pyx_tuple__5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 792; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
-  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mc, __pyx_n_s_get_audio_output, 786, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 786; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, CO_VARKEYWORDS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mc, __pyx_n_s_get_audio_output, 792, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 792; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "pinaudio\core.pyx":794
+  /* "pinaudio\core.pyx":800
  *     return AudioOutput(**kwargs)
  * 
  * def get_version():             # <<<<<<<<<<<<<<
  *     """
  *     Retrieves the current version of the PinAudio library
  */
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mc, __pyx_n_s_get_version, 794, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 794; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mc, __pyx_n_s_get_version, 800, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 800; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "pinaudio\core.pyx":801
+  /* "pinaudio\core.pyx":807
  *     return __version__
  * 
  * def get_sdl_version():             # <<<<<<<<<<<<<<
  *     """
  *     Returns the version of the SDL library
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_n_s_version_2); if (unlikely(!__pyx_tuple__8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 801; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_n_s_version_2); if (unlikely(!__pyx_tuple__8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 807; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mc, __pyx_n_s_get_sdl_version, 801, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 801; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mc, __pyx_n_s_get_sdl_version, 807, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 807; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "pinaudio\core.pyx":810
+  /* "pinaudio\core.pyx":816
  *     return 'SDL {}.{}.{}'.format(version.major, version.minor, version.patch)
  * 
  * def get_sdl_mixer_version():             # <<<<<<<<<<<<<<
  *     """
  *     Returns the version of the dynamically linked SDL_Mixer library
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_n_s_version_2); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 810; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_n_s_version_2); if (unlikely(!__pyx_tuple__10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
-  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mc, __pyx_n_s_get_sdl_mixer_version, 810, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 810; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(0, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mc, __pyx_n_s_get_sdl_mixer_version, 816, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -8124,10 +8085,10 @@ PyMODINIT_FUNC PyInit_core(void)
   /*--- Type init code ---*/
   __pyx_vtabptr_8pinaudio_4core_AudioOutput = &__pyx_vtable_8pinaudio_4core_AudioOutput;
   __pyx_vtable_8pinaudio_4core_AudioOutput._init_audio = (int (*)(struct __pyx_obj_8pinaudio_4core_AudioOutput *))__pyx_f_8pinaudio_4core_11AudioOutput__init_audio;
-  if (PyType_Ready(&__pyx_type_8pinaudio_4core_AudioOutput) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 346; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_8pinaudio_4core_AudioOutput) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_8pinaudio_4core_AudioOutput.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_8pinaudio_4core_AudioOutput.tp_dict, __pyx_vtabptr_8pinaudio_4core_AudioOutput) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 346; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  if (PyObject_SetAttrString(__pyx_m, "AudioOutput", (PyObject *)&__pyx_type_8pinaudio_4core_AudioOutput) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 346; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (__Pyx_SetVtable(__pyx_type_8pinaudio_4core_AudioOutput.tp_dict, __pyx_vtabptr_8pinaudio_4core_AudioOutput) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "AudioOutput", (PyObject *)&__pyx_type_8pinaudio_4core_AudioOutput) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 350; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_8pinaudio_4core_AudioOutput = &__pyx_type_8pinaudio_4core_AudioOutput;
   /*--- Type import code ---*/
   /*--- Variable import code ---*/
@@ -8143,226 +8104,197 @@ PyMODINIT_FUNC PyInit_core(void)
  */
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_all, __pyx_tuple__4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 17; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "pinaudio\core.pyx":43
+  /* "pinaudio\core.pyx":44
  * 
  * cimport cpython.pycapsule as pycapsule
  * from .version import __version__             # <<<<<<<<<<<<<<
  * 
  * include "common.pxi"
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_version);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_version);
   __Pyx_GIVEREF(__pyx_n_s_version);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_version_2, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_version_2, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_version); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_version); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_version, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 43; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_version, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 44; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "pinaudio\core.pyx":47
+  /* "pinaudio\core.pyx":48
  * include "common.pxi"
  * 
  * class AudioException(Exception):             # <<<<<<<<<<<<<<
  *     """Exception returned by the PinAudio module
  *     """
  */
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 47; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_builtin_Exception);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_builtin_Exception);
   __Pyx_GIVEREF(__pyx_builtin_Exception);
-  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 47; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_AudioException, __pyx_n_s_AudioException, (PyObject *) NULL, __pyx_n_s_pinaudio_core, __pyx_kp_s_Exception_returned_by_the_PinAud); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 47; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_AudioException, __pyx_n_s_AudioException, (PyObject *) NULL, __pyx_n_s_pinaudio_core, __pyx_kp_s_Exception_returned_by_the_PinAud); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_AudioException, __pyx_t_2, __pyx_t_3, NULL, 0, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 47; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_AudioException, __pyx_t_2, __pyx_t_3, NULL, 0, 0); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_AudioException, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 47; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_AudioException, __pyx_t_4) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 48; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "pinaudio\core.pyx":373
+  /* "pinaudio\core.pyx":377
  * 
  *     def __init__(self, rate=44100, channels=2, buffersize=1024, encoding=16,
- *                  formats=MIX_INIT_FLAC|MIX_INIT_MP3|MIX_INIT_OGG):             # <<<<<<<<<<<<<<
+ *                  formats=MIX_INIT_FLAC|MIX_INIT_OGG):             # <<<<<<<<<<<<<<
  *         self.samples = {}
  *         self.next_sample_number = 1
  */
-  __pyx_t_2 = __Pyx_PyInt_From_int(((MIX_INIT_FLAC | MIX_INIT_MP3) | MIX_INIT_OGG)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 373; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyInt_From_int((MIX_INIT_FLAC | MIX_INIT_OGG)); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 377; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_k_ = __pyx_t_2;
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "pinaudio\core.pyx":450
+  /* "pinaudio\core.pyx":456
  * 
  *     @property
  *     def supports_wav(self):             # <<<<<<<<<<<<<<
  *         return self.audio_init == 1
  * 
  */
-  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput, __pyx_n_s_supports_wav); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput, __pyx_n_s_supports_wav); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 456; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "pinaudio\core.pyx":449
- *         return 0
+  /* "pinaudio\core.pyx":455
+ *     # TODO: Implement a close function/destructor for the audio output to shut everything down and clean up
  * 
  *     @property             # <<<<<<<<<<<<<<
  *     def supports_wav(self):
  *         return self.audio_init == 1
  */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_property, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 449; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_property, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 455; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput->tp_dict, __pyx_n_s_supports_wav, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 450; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput->tp_dict, __pyx_n_s_supports_wav, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 456; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_8pinaudio_4core_AudioOutput);
 
-  /* "pinaudio\core.pyx":454
+  /* "pinaudio\core.pyx":460
  * 
  *     @property
  *     def supports_ogg(self):             # <<<<<<<<<<<<<<
  *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_OGG) == MIX_INIT_OGG
  * 
  */
-  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput, __pyx_n_s_supports_ogg); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput, __pyx_n_s_supports_ogg); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 460; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "pinaudio\core.pyx":453
+  /* "pinaudio\core.pyx":459
  *         return self.audio_init == 1
  * 
  *     @property             # <<<<<<<<<<<<<<
  *     def supports_ogg(self):
  *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_OGG) == MIX_INIT_OGG
  */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 453; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_property, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 453; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_property, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 459; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput->tp_dict, __pyx_n_s_supports_ogg, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 454; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput->tp_dict, __pyx_n_s_supports_ogg, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 460; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_8pinaudio_4core_AudioOutput);
 
-  /* "pinaudio\core.pyx":458
+  /* "pinaudio\core.pyx":464
  * 
  *     @property
  *     def supports_flac(self):             # <<<<<<<<<<<<<<
  *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC
  * 
  */
-  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput, __pyx_n_s_supports_flac); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 458; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput, __pyx_n_s_supports_flac); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 464; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "pinaudio\core.pyx":457
+  /* "pinaudio\core.pyx":463
  *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_OGG) == MIX_INIT_OGG
  * 
  *     @property             # <<<<<<<<<<<<<<
  *     def supports_flac(self):
  *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC
  */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 463; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_property, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 457; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_property, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 463; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput->tp_dict, __pyx_n_s_supports_flac, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 458; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput->tp_dict, __pyx_n_s_supports_flac, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 464; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_8pinaudio_4core_AudioOutput);
 
-  /* "pinaudio\core.pyx":462
- * 
- *     @property
- *     def supports_mp3(self):             # <<<<<<<<<<<<<<
- *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3
- * 
- */
-  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput, __pyx_n_s_supports_mp3); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 462; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_2);
-
-  /* "pinaudio\core.pyx":461
- *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC
- * 
- *     @property             # <<<<<<<<<<<<<<
- *     def supports_mp3(self):
- *         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3
- */
-  __pyx_t_1 = PyTuple_New(1); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_1);
-  PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_2);
-  __Pyx_GIVEREF(__pyx_t_2);
-  __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_property, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 461; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_8pinaudio_4core_AudioOutput->tp_dict, __pyx_n_s_supports_mp3, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 462; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  PyType_Modified(__pyx_ptype_8pinaudio_4core_AudioOutput);
-
-  /* "pinaudio\core.pyx":786
+  /* "pinaudio\core.pyx":792
  * 
  * 
  * def get_audio_output(**kwargs):             # <<<<<<<<<<<<<<
  *     """
  *     Function to initialize the PinAudio audio output
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8pinaudio_4core_1get_audio_output, NULL, __pyx_n_s_pinaudio_core); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 786; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8pinaudio_4core_1get_audio_output, NULL, __pyx_n_s_pinaudio_core); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 792; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_audio_output, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 786; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_audio_output, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 792; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "pinaudio\core.pyx":794
+  /* "pinaudio\core.pyx":800
  *     return AudioOutput(**kwargs)
  * 
  * def get_version():             # <<<<<<<<<<<<<<
  *     """
  *     Retrieves the current version of the PinAudio library
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8pinaudio_4core_3get_version, NULL, __pyx_n_s_pinaudio_core); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 794; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8pinaudio_4core_3get_version, NULL, __pyx_n_s_pinaudio_core); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 800; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_version, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 794; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_version, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 800; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "pinaudio\core.pyx":801
+  /* "pinaudio\core.pyx":807
  *     return __version__
  * 
  * def get_sdl_version():             # <<<<<<<<<<<<<<
  *     """
  *     Returns the version of the SDL library
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8pinaudio_4core_5get_sdl_version, NULL, __pyx_n_s_pinaudio_core); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 801; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8pinaudio_4core_5get_sdl_version, NULL, __pyx_n_s_pinaudio_core); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 807; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_sdl_version, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 801; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_sdl_version, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 807; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "pinaudio\core.pyx":810
+  /* "pinaudio\core.pyx":816
  *     return 'SDL {}.{}.{}'.format(version.major, version.minor, version.patch)
  * 
  * def get_sdl_mixer_version():             # <<<<<<<<<<<<<<
  *     """
  *     Returns the version of the dynamically linked SDL_Mixer library
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8pinaudio_4core_7get_sdl_mixer_version, NULL, __pyx_n_s_pinaudio_core); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 810; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_8pinaudio_4core_7get_sdl_mixer_version, NULL, __pyx_n_s_pinaudio_core); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_sdl_mixer_version, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 810; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_sdl_mixer_version, __pyx_t_2) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 816; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "pinaudio\core.pyx":1
