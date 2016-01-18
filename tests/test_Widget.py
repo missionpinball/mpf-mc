@@ -1,4 +1,4 @@
-from mc.uix.slide import Slide
+from mc.widgets.text import Text
 from .MpfMcTestCase import MpfMcTestCase
 
 
@@ -170,7 +170,7 @@ class TestWidget(MpfMcTestCase):
         self.advance_time()
 
         # post the event to add the widget. This will also test that the
-        # widget_player in a mode can add a widget fro the base
+        # widget_player in a mode can add a widget from the base
         self.mc.events.post('mode1_add_widgets')
         self.advance_time()
 
@@ -189,6 +189,101 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.children])
         self.assertNotIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.children])
+
+    def test_widgets_in_slide_frame_parent(self):
+        # create a slide and add some base widgets
+        self.mc.targets['default'].add_slide(name='slide1', config={})
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('add_widget1_to_current')
+        self.advance_time()
+
+        # verify widget 1 is there but not widget 6
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+        self.assertNotIn('widget6', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+
+
+        self.mc.events.post('add_widget6')
+        self.advance_time()
+
+        # verify widget1 is in the slide but not widget 6
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+        self.assertNotIn('widget6', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+
+        # verify widget6 is the highest priority in the parent frame
+        # (highest priority is the last element in the list)
+        self.assertEqual('widget6', self.mc.targets[
+            'default'].parent.children[-1].text)
+
+        # now switch the slide
+        self.mc.targets['default'].add_slide(name='slide2', config={})
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide2')
+
+        # make sure neither widget is in this slide
+        self.assertNotIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+        self.assertNotIn('widget6', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+
+        # make sure widget6 is still in the SlideFrameParent
+        self.assertEqual('widget6', self.mc.targets[
+            'default'].parent.children[-1].text)
+
+    def test_removing_mode_widget_from_parent_frame_on_mode_stop(self):
+        # create a slide and add some base widgets
+        self.mc.targets['default'].add_slide(name='slide1', config={})
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('add_widget1_to_current')
+        self.advance_time()
+
+        # verify widget 1 is there but not widget 6
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+        self.assertNotIn('widget6', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+
+        # start a mode
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+
+        # post the event to add the widget.
+        self.mc.events.post('mode1_add_widget6')
+        self.advance_time()
+
+        # make sure the new widget is not there, but the old one is
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+        self.assertNotIn('widget6', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+
+        # verify widget6 is the highest priority in the parent frame
+        print(self.mc.targets['default'].parent)
+        print(self.mc.targets['default'].parent.children)
+        self.assertEqual('widget6', self.mc.targets[
+            'default'].parent.children[-1].text)
+        self.assertTrue(isinstance(self.mc.targets[
+            'default'].parent.children[-1], Text))
+
+        # stop the mode
+        self.mc.modes['mode1'].stop()
+        self.advance_time()
+
+        # make sure the the first one is still there
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+
+        # verify widget6 is gone
+        self.assertFalse(isinstance(self.mc.targets[
+            'default'].parent.children[-1], Text))
+
 
 
     def test_widget_player_errors(self):

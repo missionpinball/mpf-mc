@@ -7,6 +7,7 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     FallOutTransition, RiseInTransition)
 
 from mc.uix.slide import Slide
+from mc.uix.widget import MpfWidget
 
 transition_map = dict(none=NoTransition,
                       slide=SlideTransition,
@@ -16,9 +17,11 @@ transition_map = dict(none=NoTransition,
                       fall_out=FallOutTransition,
                       rise_in=RiseInTransition)
 
+
 def create_slide_frame(mc, name):
     parent = SlideFrameParent(mc, name)
     return parent.slide_frame
+
 
 class SlideFrameParent(FloatLayout):
     def __init__(self, mc, name):
@@ -28,14 +31,21 @@ class SlideFrameParent(FloatLayout):
 
         self.slide_frame = SlideFrame(mc, name)
 
-        self.add_widget(self.slide_frame)
+        super().add_widget(self.slide_frame)
+
+    def add_widget(self, widget):
+        widget.config['z'] = abs(widget.config['z'])
+
+        super().add_widget(widget, Slide.get_insert_index(
+                z=abs(widget.config['z']), target_widget=self))
 
 
-class SlideFrame(ScreenManager):
-    def __init__(self, mc, name):
-        self.mc = mc
+class SlideFrame(MpfWidget, ScreenManager):
+    def __init__(self, mc, name, mode=None):
+        self.config = dict()  # this exists for the SlideFrameParent z-order
+        self.config['z'] = 0
         self.name = name
-        super().__init__()
+        super().__init__(mc=mc, mode=mode)
 
         mc.targets[name] = self
 
@@ -75,7 +85,8 @@ class SlideFrame(ScreenManager):
         frame."""
         return self.screens
 
-    def add_slide(self, name, config, priority=0, mode=None, show=True, force=False):
+    def add_slide(self, name, config, priority=0, mode=None, show=True,
+                  force=False):
         Slide(mc=self.mc, name=name, target=self.name, config=config,
               mode=mode, show=show, force=force, priority=priority)
 

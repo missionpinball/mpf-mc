@@ -6,3 +6,5 @@ mode:
 widget_player:
   mode1_add_widgets:
     widget: widget2
+  mode1_add_widget6:
+    widget: widget6

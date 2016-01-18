@@ -56,6 +56,10 @@ widgets:
     text: widget5
     z: 200
     y: 150
+  widget6:
+    type: text
+    text: widget6
+    z: -100
 
 widget_player:
   add_widget1_to_current:
@@ -66,3 +70,5 @@ widget_player:
   add_widget1_to_display2:
     widget: widget1
     target: display2
+  add_widget6:
+    widget: widget6

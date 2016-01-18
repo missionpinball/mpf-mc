@@ -19,13 +19,16 @@ class MpfWidget(object):
     slide = None
     """Slide that this widget will be used with."""
 
-    def __init__(self, mc, mode, slide, config, **kwargs):
+    def __init__(self, mc, mode, slide=None, config=None, **kwargs):
         super().__init__()
 
         self.mode = mode
         self.slide = slide
         self.config = config
         self.mc = mc
+
+        if not config:
+            return
 
         for k, v in self.config.items():
             if hasattr(self, k):
@@ -48,9 +51,11 @@ class MpfWidget(object):
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
     def on_size(self, *args):
-        self.pos = self.slide.set_position(self.slide, self,
-                                            self.config['x'],
-                                            self.config['y'],
-                                            self.config['h_pos'],
-                                            self.config['v_pos'])
-
+        try:
+            self.pos = self.slide.set_position(self.slide, self,
+                                                self.config['x'],
+                                                self.config['y'],
+                                                self.config['h_pos'],
+                                                self.config['v_pos'])
+        except AttributeError:
+            pass

@@ -183,30 +183,43 @@ class Slide(Screen):
         priority.
 
         """
-        my_priority = widget.config['z']
+        z = widget.config['z']
 
-        if my_priority < 0:
+        if z < 0:
             self.add_widget_to_parent_frame(widget)
             return
 
+        super().add_widget(widget, Slide.get_insert_index(z=z,
+                                                          target_widget=self))
+
+    @staticmethod
+    def get_insert_index(z, target_widget):
         index = 0
 
         # this might be able to be a count of a list comprehension or something
 
-        for i, w in enumerate(self.children):
-            if w.config['z'] <= my_priority:
+        print(target_widget)
+        print(target_widget.children)
+
+        for i, w in enumerate(target_widget.children):
+
+            try:
+                if w.config['z'] <= z:
+                    index = i + 1
+                    # need to increment index until we hit the next priority
+                    if z < w.config['z']:
+                        break
+
+                        # BTW I have no idea why this simpler code doesn't work:
+                        # for i, w in enumerate(self.children):
+                        #     if w.config['z'] > my_priority:
+                        #         index = i
+                        #         break
+            except TypeError:
+                # have to save to index in case this is the last loop
                 index = i + 1
-                # need to increment index until we hit the next priority
-                if my_priority < w.config['z']:
-                    break
 
-        # BTW I have no idea why this simpler code doesn't work:
-        # for i, w in enumerate(self.children):
-        #     if w.config['z'] > my_priority:
-        #         index = i
-        #         break
-
-        super().add_widget(widget, index)
+        return index
 
     def remove_widgets_by_mode(self, mode):
         for widget in [x for x in self.children if x.mode == mode]:
@@ -223,10 +236,10 @@ class Slide(Screen):
         Widgets added to the parent slide_frame stay active and visible even
         if the slide in the frame changes.
 
-        Note that slide_frame z-order is negative, with more negative values
-        showing on top of less negative values. (Think of it like they're
-        moving farther away from the slide.) e.g. -100 widget shows on top of
-        -50 widget.
+        Note that negative z-order values tell the widget it should be applied
+        to the parent frame instead of the slide, but the absolute value of the
+        values is used to control their z-order. e.g. -100 widget shows on top
+        of a -50 widget.
 
         """
-        self.parent.add_widget(widget)
+        self.parent.parent.add_widget(widget)
