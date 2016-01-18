@@ -1,4 +1,4 @@
-from .MpfMcTestCase import MpfMcTestCase
+from tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestModes(MpfMcTestCase):

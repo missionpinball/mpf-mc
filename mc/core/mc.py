@@ -77,7 +77,7 @@ class MpfMc(App):
         return self.machine_config
 
     def displays_initialized(self, *args):
-        print('Displays Initialized')
+        # print('Displays Initialized')
         from mc.uix.window import Window
         Window.initialize(self)
 
@@ -102,13 +102,13 @@ class MpfMc(App):
         Clock.schedule_interval(self.tick, 0)
 
     def on_stop(self):
-        try:
-            print("loop rate {}Hz".format(
-                    round(self.ticks / (time.time() - self.start_time), 2)))
-        except ZeroDivisionError:
-            pass
-
-        print("stopping...")
+        # try:
+        #     print("loop rate {}Hz".format(
+        #             round(self.ticks / (time.time() - self.start_time), 2)))
+        # except ZeroDivisionError:
+        #     pass
+        #
+        # print("stopping...")
 
         try:
             self.bcp_processor.socket_thread.stop()

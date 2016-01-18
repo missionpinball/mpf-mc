@@ -17,16 +17,21 @@ transition_map = dict(none=NoTransition,
                       fall_out=FallOutTransition,
                       rise_in=RiseInTransition)
 
+
 class SlideFrameParent(FloatLayout):
     def __init__(self, mc, name, slide_frame):
         self.mc = mc
-        self.name = name
-        super().__init__()
+        self.name = slide_frame.name
 
-        super().add_widget(slide_frame)
+        self.ready = False
+        self.size_hint = (None, None)
+        super().__init__()
+        self.size = slide_frame.native_size
+        self.add_widget(slide_frame)
 
     def __repr__(self):
-        return '<SlideFrameParent name={}>'.format(self.name)
+        return '<SlideFrameParent name={}, parent={}>'.format(self.name,
+                                                              self.parent)
 
     def add_widget(self, widget):
         widget.config['z'] = abs(widget.config['z'])
@@ -36,23 +41,47 @@ class SlideFrameParent(FloatLayout):
                                    z=abs(widget.config['z']),
                                    target_widget=self))
 
+    def on_size(self, *args):
+        for widget in self.children:
+            widget.pos = Slide.set_position(self.width, self.height,
+                                            widget.width, widget.height)
+
 
 class SlideFrame(MpfWidget, ScreenManager):
+    def __init__(self, mc, name=None, config=None, slide=None, mode=None):
 
-    def __init__(self, mc, name, mode=None):
-        self.config = dict()  # this exists for the SlideFrameParent z-order
-        self.config['z'] = 0
-        self.name = name
-        super().__init__(mc=mc, mode=mode)
+        self.name = name  # needs to be set before super()
 
-        mc.targets[name] = self
+        # If this is a the main SlideFrame of a display, it will get its size
+        # from its parent. If this is a widget, it will get its size from
+        # the config.
+        try:
+            self.native_size = (config['width'], config['height'])
+        except (KeyError, TypeError):
+            self.native_size = self.slide.native_size
+
+        super().__init__(mc=mc, mode=mode, slide=slide, config=config)
+        self.slide_frame_parent = None
+        # self.init_callback = init_callback
+
+        # minimal config needed if this is a widget
+        if not config:
+            self.config = dict()
+
+        if 'z' not in self.config:
+            self.config['z'] = 0
 
         self.transition = transition_map['none']()
 
         self.slide_frame_parent = SlideFrameParent(mc, name, self)
+        self.slide_frame_parent.config = self.config
+
+        self.mc.targets[self.name] = self
 
     def __repr__(self):
-        return '<SlideFrame name={}, parent={}>'.format(self.name, self.parent)
+        return '<SlideFrame name={}, current slide={}, total slides={' \
+               '}>'.format(
+                self.name, self.current_slide_name, len(self.screens))
 
     @property
     def current_slide(self):
@@ -85,6 +114,10 @@ class SlideFrame(MpfWidget, ScreenManager):
         frame."""
         return self.screens
 
+    def get_slide_by_name(self, slide_name):
+        for slide in [x for x in self.screens if x.name == slide_name]:
+            return slide
+
     def add_slide(self, name, config, priority=0, mode=None, show=True,
                   force=False):
         Slide(mc=self.mc, name=name, target=self.name, config=config,
@@ -114,6 +147,16 @@ class SlideFrame(MpfWidget, ScreenManager):
     def show_current_slide(self):
         if self.screens[0] != self.current_screen:
             self.current = self.screens[0].name
+
+    def show_slide(self, slide_name, force=False):
+        slide = self.get_slide_by_name(slide_name)
+
+        if slide and (slide.priority <= self.current_slide.priority or force):
+            self.current_slide = slide_name
+            return True
+
+        else:
+            return False
 
     def remove_slide(self, slide):
         # note there has to be at least one slide, so you can't remove the last

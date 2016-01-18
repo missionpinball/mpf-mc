@@ -22,14 +22,21 @@ class ConfigPlayer(object):
         key_list = list()
 
         for event, settings in config.items():
-            settings = self.mc.config_processor.process_config2(
-                    self.config_file_section, settings)
+
+            if isinstance(settings, dict):
+                settings = [settings]
+
+            final_settings = list()
+            for these_settings in settings:
+
+                final_settings.append(self.mc.config_processor.process_config2(
+                        self.config_file_section, these_settings))
 
             key_list.append(self.mc.events.add_handler(
                     event,
                     self.play,
                     mode=mode,
-                    settings=settings))
+                    settings=final_settings))
 
         return self.unload_player_events, key_list
 

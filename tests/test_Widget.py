@@ -1,5 +1,5 @@
 from mc.widgets.text import Text
-from .MpfMcTestCase import MpfMcTestCase
+from tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestWidget(MpfMcTestCase):

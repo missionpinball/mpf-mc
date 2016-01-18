@@ -20,7 +20,7 @@ class BcpProcessor(object):
             self._start_socket_thread()
             self.enabled = True
         else:
-            print('Will NOT setup BCP server')
+            # print('Will NOT setup BCP server')
             self.enabled = False
 
         self.bcp_commands = {'ball_start': self._bcp_ball_start,

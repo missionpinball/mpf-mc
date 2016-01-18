@@ -3,7 +3,6 @@ import unittest
 from kivy.base import EventLoop
 from kivy.clock import Clock
 from kivy.config import Config
-
 from mpf.system.config import Config as MpfConfig
 from mpf.system.utility_functions import Util
 
@@ -13,12 +12,12 @@ Config.set('kivy', 'log_level', 'warning')
 from mc.core.mc import MpfMc
 from time import time, sleep
 
+
 class TestMpfMc(MpfMc):
     pass
 
 
 class MpfMcTestCase(unittest.TestCase):
-
     def __init__(self, *args):
         self.sent_bcp_commands = list()
         super().__init__(*args)
@@ -99,6 +98,7 @@ class MpfMcTestCase(unittest.TestCase):
                            **kwargs)
 
     def run(self, name):
+        print("Running", name)
         # This setup is done in run() because we need to give control to the
         # kivy event loop which we can only do by returning from the run()
         # that's called. So we override run() and setup mpf-mc and then call

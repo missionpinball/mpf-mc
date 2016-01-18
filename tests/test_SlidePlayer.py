@@ -1,4 +1,4 @@
-from .MpfMcTestCase import MpfMcTestCase
+from tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestSlidePlayer(MpfMcTestCase):
@@ -123,7 +123,6 @@ class TestSlidePlayer(MpfMcTestCase):
         # mean the slide will not be shown
         self.mc.events.post('show_mode1_slide_2')
         self.advance_time()
-        print(self.mc.targets['display1'].current_slide.priority)
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_4')
         self.assertEqual(self.mc.targets['display1'].current_slide.priority,

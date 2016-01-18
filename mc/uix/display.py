@@ -8,8 +8,6 @@ from kivy.uix.scatter import ScatterPlane
 
 from mc.uix.slide_frame import SlideFrame
 
-# import mc.uix.slide_frame
-
 
 class Display(ScatterPlane, RelativeLayout):
     displays_to_initialize = 0
@@ -34,8 +32,8 @@ class Display(ScatterPlane, RelativeLayout):
 
     def __repr__(self):
         return '<Display name={}, size={}x{}>'.format(self.name,
-                                                    self.native_size[0],
-                                                    self.native_size[1])
+                                                      self.native_size[0],
+                                                      self.native_size[1])
 
     @property
     def current_slide(self):
@@ -64,23 +62,19 @@ class Display(ScatterPlane, RelativeLayout):
             Clock.schedule_once(self._display_created, 0)
             return
 
-        self.slide_frame = SlideFrame(self.mc, self.name)
-        self._slide_frame_created()
+        config = dict(width=self.native_size[0], height=self.native_size[1])
 
-    def _slide_frame_created(self, *args):
-        # Again we keep waiting here until the new slide manager has been
-        # created at the proper size.
-        if (self.slide_frame.size[0] != self.native_size[0] or
-                    self.slide_frame.size[1] != self.native_size[1]):
-            self.slide_frame.size = self.native_size
-            Clock.schedule_once(self._slide_frame_created, 0)
-            return
+        self.slide_frame = SlideFrame(mc=self.mc, name=self.name,
+                                      config=config)
 
+        self.slide_frame_created()
+
+    def slide_frame_created(self, *args):
         self.add_widget(self.slide_frame.slide_frame_parent)
         self.mc.displays[self.name] = self
         self._set_default_target()
 
-        Clock.schedule_once(self._init_done)
+        Clock.schedule_once(self._init_done, 0)
 
     def _set_default_target(self):
         try:
@@ -96,26 +90,30 @@ class Display(ScatterPlane, RelativeLayout):
 
         if not Display.displays_to_initialize:
             Clock.schedule_once(self._displays_initialized)
+
     def _displays_initialized(self, *args):
 
         if len(self.mc.displays) == 1:
-            self.mc.targets['default'] = [x for x in self.mc.displays.values()][0].slide_frame
+            self.mc.targets['default'] = \
+                [x for x in self.mc.displays.values()][0].slide_frame
 
         # elif not self.mc.displays:
         #     Display.create_default_display(self.mc)
         #     return
 
         elif not 'default' in self.mc.targets:
-            print('WARNING: You have more than one display, but no default set')
+            # print('WARNING: You have more than one display, but no default
+            #  set')
             for target in ('window', 'dmd'):
                 if target in self.mc.targets:
                     self.mc.targets['default'] = self.mc.targets[target]
                     break
 
             if not 'default' in self.mc.targets:
-                self.mc.targets['default'] = self.mc.displays[(sorted(self.mc.displays.keys()))[0]].slide_frame
+                self.mc.targets['default'] = self.mc.displays[
+                    (sorted(self.mc.displays.keys()))[0]].slide_frame
 
-        print('Setting default display to', self.mc.targets['default'].name)
+        # print('Setting default display to', self.mc.targets['default'].name)
 
         self.mc.displays_initialized()
 

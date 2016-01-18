@@ -7,3 +7,5 @@ slides:
   mode1_slide1:
     type: text
     text: MODE 1 SLIDE 1
+    h_pos: 100
+    color: ffaa00

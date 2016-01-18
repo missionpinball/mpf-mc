@@ -12,6 +12,7 @@ from mpf.system.config import CaseInsensitiveDict, Config as MpfConfig
 from mc.uix.display import Display
 from mc.widgets.image import Image
 from mc.widgets.text import Text
+from mc.uix.slide_frame import SlideFrame
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=Image,
@@ -24,7 +25,8 @@ type_map = CaseInsensitiveDict(text=Text,
                                point=Point,
                                quad=Quad,
                                rectangle=Rectangle,
-                               triangle=Triangle)
+                               triangle=Triangle,
+                               slide_frame=SlideFrame)
 
 
 class McConfig(MpfConfig):

@@ -11,22 +11,27 @@ class SlidePlayer(ConfigPlayer):
         except AttributeError:
             pass
 
-        try:
-            priority = settings['priority']
-        except KeyError:
-            priority = 0
+        for s in settings:  # settings is a list of one or more slide configs
 
-        try:
-            target = self.mc.targets[settings['target']]
-        except KeyError:
-            if mode:
+            name = s['slide']
+
+            if s['target']:
+                target = self.mc.targets[s['target']]
+
+            elif mode:
                 target = mode.target
             else:
                 target = self.mc.targets['default']
 
-        name = settings['slide']
-        config = self.mc.slide_configs[name]
+            # if the slide already exists and is not active, show it
+            if not target.show_slide(name, s['force']):
+                try:
+                    priority = s['priority']
+                except KeyError:
+                    priority = 0
 
-        target.add_slide(name=name, config=config,
-                         show=settings['show'], force=settings['force'],
-                         priority=priority, mode=mode)
+                config = self.mc.slide_configs[name]
+
+                target.add_slide(name=name, config=config,
+                                 show=s['show'], force=s['force'],
+                                 priority=priority, mode=mode)

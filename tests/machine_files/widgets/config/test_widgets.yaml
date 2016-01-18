@@ -15,6 +15,7 @@ widgets:
   widget1:
     type: text
     text: widget1
+    color: ffff00
   widget2:
   - type: text
     text: widget2
@@ -23,34 +24,44 @@ widgets:
   widget3:
   - type: text
     text: widget3.1
+    color: ff0000
   - type: text
     text: widget3.2
+    color: 00ff66
   - type: text
     text: widget3.3
+    color: ff00ff
   widget4:
   - type: text
     text: widget4.1
     y: -150
     z: 1
+    color: ff0000
   - type: text
     text: widget4.2
     z: 1000
     y: -100
+    color: ffff00
   - type: text
     text: widget4.3
     y: -50
+    color: 00ff00
   - type: text
     text: widget4.4
     z: 1
+    color: 00ffff
   - type: text
     text: widget4.5
     z: 1000
     y: 50
+    color: 0000ff
   - type: text
     text: widget4.6
+    color: ff00ff
   - type: text
     text: widget4.7
     y: 100
+    color: 888888
   widget5:
     type: text
     text: widget5
@@ -60,6 +71,7 @@ widgets:
     type: text
     text: widget6
     z: -100
+    color: 774303
 
 widget_player:
   add_widget1_to_current:
