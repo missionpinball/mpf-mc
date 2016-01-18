@@ -19,13 +19,13 @@ class MpfWidget(object):
     slide = None
     """Slide that this widget will be used with."""
 
-    def __init__(self, mode, slide, config, **kwargs):
+    def __init__(self, mc, mode, slide, config, **kwargs):
         super().__init__()
 
         self.mode = mode
         self.slide = slide
         self.config = config
-
+        self.mc = mc
 
         for k, v in self.config.items():
             if hasattr(self, k):

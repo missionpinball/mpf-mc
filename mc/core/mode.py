@@ -163,6 +163,7 @@ class Mode(object):
         self.stop_methods = list()
 
         self.remove_slides()
+        self.remove_widgets()
 
     def remove_slides(self):
         """Removes all the slides from this mode from the active targets."""
@@ -171,3 +172,7 @@ class Mode(object):
         for target in target_list:
             for screen in [x for x in target.screens if x.mode == self]:
                 target.remove_slide(screen)
+
+    def remove_widgets(self):
+        for slide in self.mc.active_slides.values():
+            slide.remove_widgets_by_mode(self)

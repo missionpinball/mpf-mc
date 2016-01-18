@@ -19,7 +19,7 @@ class WidgetPlayer(ConfigPlayer):
 
         if settings['slide']:
             try:
-                slide = Slide.active_slides[settings['slide']]
+                slide = self.mc.active_slides[settings['slide']]
             except KeyError:
                 pass
 

@@ -34,6 +34,7 @@ class MpfMc(App):
 
         self.slide_configs = dict()
         self.widget_configs = dict()
+        self.active_slides = dict()
 
         self.displays = CaseInsensitiveDict()
 

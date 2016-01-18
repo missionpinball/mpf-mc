@@ -5,8 +5,6 @@ from mc.core.mode import Mode
 
 class Slide(Screen):
     next_id = 0
-    active_slides = dict()
-
 
     @classmethod
     def get_id(cls):
@@ -45,14 +43,12 @@ class Slide(Screen):
         self.size = target.size
         self.orig_w, self.orig_h = self.size
 
-        # print(config)
-
         try:
             self.add_widgets_from_config(config)
         except KeyError:
             pass
 
-        Slide.active_slides[name] = self
+        self.mc.active_slides[name] = self
         target.add_widget(slide=self, show=show, force=force)
 
     def __repr__(self):
@@ -150,12 +146,11 @@ class Slide(Screen):
         if name not in self.mc.widget_configs:
             return
 
-        return self.add_widgets_from_config(self.mc.widget_configs[name])
+        return self.add_widgets_from_config(self.mc.widget_configs[name], mode)
 
     def add_widgets_from_config(self, config, mode=None):
         if type(config) is not list:
             config = [config]
-
         widgets_added = list()
 
         for widget in config:
@@ -191,6 +186,8 @@ class Slide(Screen):
         my_priority = widget.config['z']
         index = 0
 
+        # this might be able to be a count of a list comprehension or something
+
         for i, w in enumerate(self.children):
             if w.config['z'] <= my_priority:
                 index = i + 1
@@ -205,3 +202,7 @@ class Slide(Screen):
         #         break
 
         super().add_widget(widget, index)
+
+    def remove_widgets_by_mode(self, mode):
+        for widget in [x for x in self.children if x.mode == mode]:
+            self.remove_widget(widget)

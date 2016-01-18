@@ -1,21 +1,20 @@
 import re
 
 from kivy.uix.label import Label
+
 from mc.uix.widget import MpfWidget
 
 
 class Text(MpfWidget, Label):
-
     widget_type_name = 'Text'
     var_finder = re.compile("(?<=%)[a-zA-Z_0-9|]+(?=%)")
 
     def __init__(self, mc, config, slide, text_variables=None, mode=None,
                  priority=0):
-        self.mc = mc
         self.original_text = config.get('text', '')
         # self.fonts = mc.fonts
 
-        self.config = config
+        # self.config = config
 
         self.text_variables = dict()
 
@@ -29,8 +28,7 @@ class Text(MpfWidget, Label):
         if not config['font_size']:
             config['font_size'] = 15
 
-        super().__init__(mode=mode, priority=priority, slide=slide,
-                         config=config)
+        super().__init__(mc=mc, mode=mode, slide=slide, config=config)
 
         self.texture_update()
         self.size = self.texture_size
@@ -89,7 +87,7 @@ class Text(MpfWidget, Label):
                                                 var_string.split('|')[1]]))
                 elif var_string.startswith('player'):
                     player_num, var_name = var_string.lstrip('player').split(
-                        '|')
+                            '|')
                     try:
                         value = self.machine.player_list[int(player_num) - 1][
                             var_name]
@@ -151,7 +149,7 @@ class Text(MpfWidget, Label):
                     if source.lstrip('player'):
                         self.add_player_var_handler(name=variable_name,
                                                     player=source.lstrip(
-                                                        'player'))
+                                                            'player'))
                     else:
                         self.add_player_var_handler(name=var_string,
                                                     player=self.machine.player[
@@ -188,7 +186,8 @@ class Text(MpfWidget, Label):
         Returns: A string with the separator added.
 
         MPF uses this method instead of the Python locale settings because the
-        locale settings are a mess. They're set system-wide and it's really hard
+        locale settings are a mess. They're set system-wide and it's really
+        hard
         to make them work cross-platform and there are all sorts of external
         dependencies, so this is just way easier.
 

@@ -1,5 +1,8 @@
 #config_version=3
 
+modes:
+- mode1
+
 displays:
   default:
     width: 400
@@ -15,6 +18,8 @@ widgets:
   widget2:
   - type: text
     text: widget2
+    y: -50
+    color: ff0000
   widget3:
   - type: text
     text: widget3.1

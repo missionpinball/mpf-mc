@@ -106,9 +106,9 @@ class TestWidget(MpfMcTestCase):
 
         # widget1 should be in slide1, not slide2, not current slide
         self.assertIn('widget1',
-                      [x.text for x in Slide.active_slides['slide1'].children])
+                      [x.text for x in self.mc.active_slides['slide1'].children])
         self.assertNotIn('widget1',
-                      [x.text for x in Slide.active_slides['slide2'].children])
+                      [x.text for x in self.mc.active_slides['slide2'].children])
         self.assertNotIn('widget1', [x.text for x in self.mc.targets[
             'default'].current_slide.children])
 
@@ -136,11 +136,11 @@ class TestWidget(MpfMcTestCase):
         # widget1 should be in slide2, the current on display2. It should
         # not be in slide1
         self.assertIn('widget1',
-                      [x.text for x in Slide.active_slides['slide2'].children])
+                      [x.text for x in self.mc.active_slides['slide2'].children])
         self.assertIn('widget1', [x.text for x in self.mc.targets[
             'display2'].current_slide.children])
         self.assertNotIn('widget1',
-                      [x.text for x in Slide.active_slides['slide1'].children])
+                      [x.text for x in self.mc.active_slides['slide1'].children])
 
 
         # show slide1 and make sure the widget is not there
@@ -150,9 +150,46 @@ class TestWidget(MpfMcTestCase):
         self.assertNotIn('widget1', [x.text for x in self.mc.targets[
             'display2'].current_slide.children])
 
+    def test_removing_mode_widget_on_mode_stop(self):
+        # create a slide and add some base widgets
+        self.mc.targets['default'].add_slide(name='slide1', config={})
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
 
-# We don't have to test mode-based widget player settings since they just use
-# the same ConfigPlayer base class which is tested in the slide tests.
+        self.mc.events.post('add_widget1_to_current')
+        self.advance_time()
+
+        # verify widget 1 is there but not widget 2
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+
+        # start a mode
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+
+        # post the event to add the widget. This will also test that the
+        # widget_player in a mode can add a widget fro the base
+        self.mc.events.post('mode1_add_widgets')
+        self.advance_time()
+
+        # make sure the new widget is there, and the old one is still there
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+
+        # stop the mode
+        self.mc.modes['mode1'].stop()
+        self.advance_time()
+
+        # make sure the mode widget is gone, but the first one is still there
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children])
+
 
     def test_widget_player_errors(self):
         pass
