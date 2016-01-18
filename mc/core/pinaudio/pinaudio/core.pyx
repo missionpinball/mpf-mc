@@ -1,9 +1,9 @@
 #cython: embedsignature=True, language_level=3
 
 """
-Pinaudio python extension. Provides cross-platform audio playback functions
-designed for pinball machines, but would likely work well in many other
-gaming genres.
+Pinaudio Python extension library. Provides cross-platform audio playback
+functions designed for pinball machines, but would likely work well in many
+other gaming genres.
 
 Loosely based on the Kivy Audiostream open source Python extension library:
 https://github.com/kivy/audiostream
@@ -52,8 +52,8 @@ class AudioException(Exception):
 
 cdef void mix_track_callback_s8(int channel, void *stream, int length, void *userdata) nogil:
     """
-    Callback function used to mix playing sounds to a track/channel.  Ducking envelopes are
-    also processed and applied in this function.
+    SDL Callback function used to mix playing 8-bit sounds to a track/channel.
+    Ducking envelopes are also processed and applied in this function.
     :param channel: The SDL_Mixer channel number used for the track
     :param stream: A pointer to the track/channel audio buffer
     :param length: The track/channel audio buffer length
@@ -158,8 +158,8 @@ cdef void mix_track_callback_s8(int channel, void *stream, int length, void *use
 
 cdef void mix_track_callback_s16sys(int channel, void *stream, int length, void *userdata) nogil:
     """
-    Callback function used to mix playing sounds to a track/channel.  Ducking envelopes are
-    also processed and applied in this function.
+    SDL Callback function used to mix playing 16-bit sounds to a track/channel.
+    Ducking envelopes are also processed and applied in this function.
     :param channel: The SDL_Mixer channel number used for the track
     :param stream: A pointer to the track/channel audio buffer
     :param length: The track/channel audio buffer length
@@ -179,114 +179,118 @@ cdef void mix_track_callback_s16sys(int channel, void *stream, int length, void 
         return
 
     # Get the current clock from SDL (it is used for the audio timing master)
-    #cdef uint32_t sdl_ticks = SDL_GetTicks()
+    cdef uint32_t sdl_ticks = SDL_GetTicks()
 
     # Setup source and destination buffer pointers/values
     cdef int8_t *src
 
-    cdef Sample16Bits src_sample
-    cdef Sample16Bits channel_sample
+    cdef Sample16Bit src_sample
+    cdef Sample16Bit channel_sample
 
     cdef int16_t *dst16
     dst8 = <int8_t*>stream
 
     cdef int temp_sample
-    cdef Sample16Bits dst_sample
+    cdef Sample16Bit dst_sample
 
     cdef int index
 
     # Loop over all channel audio playback objects
-    for i in range(mix_channel.max_simultaneous_sounds):
+    for player in range(mix_channel.max_simultaneous_sounds):
 
         # If the player is idle, there is nothing to do so move on to the next player
-        if mix_channel.sample_players[i].status is player_idle:
+        if mix_channel.sample_players[player].status is player_idle:
             continue
 
         # Check if player has a sound pending playback (ready to start)
-        if mix_channel.sample_players[i].status is player_pending:
+        if mix_channel.sample_players[player].status is player_pending:
             # Sound ready to start playback, send notification and set status to playing
             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)
             if event_index != -1:
                 mix_channel.events[event_index].event = event_sound_start
                 mix_channel.events[event_index].channel = channel
-                mix_channel.events[event_index].player = i
-                mix_channel.events[event_index].sample_number = mix_channel.sample_players[i].sample_number
+                mix_channel.events[event_index].player = player
+                mix_channel.events[event_index].sample_number = mix_channel.sample_players[player].sample_number
 
             # TODO: Log error if events are full
 
-            mix_channel.sample_players[i].status = player_playing
+            mix_channel.sample_players[player].status = player_playing
 
         # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
-        if mix_channel.sample_players[i].status is player_playing and mix_channel.sample_players[i].volume > 0:
+        if mix_channel.sample_players[player].status is player_playing \
+                and mix_channel.sample_players[player].volume > 0:
 
             # Get source sample buffer (read one byte at a time, bytes will be combined into a
             # 16-bit sample value before being mixed)
-            src = <int8_t*>mix_channel.sample_players[i].chunk.abuf
+            src = <int8_t*>mix_channel.sample_players[player].chunk.abuf
 
             # Loop over destination buffer, mixing in the source sample
             index = 0
             while index < length:
 
                 # Get source sample (2 bytes), combine into a 16-bit value and apply sample volume
-                src_sample.bytes.byte1 = src[mix_channel.sample_players[i].sample_pos]
-                src_sample.bytes.byte2 = src[mix_channel.sample_players[i].sample_pos + 1]
-                src_sample.value = (src_sample.value * mix_channel.sample_players[i].volume) / MIX_MAX_VOLUME
+                src_sample.bytes.byte1 = src[mix_channel.sample_players[player].sample_pos]
+                src_sample.bytes.byte2 = src[mix_channel.sample_players[player].sample_pos + 1]
+                src_sample.value = (src_sample.value * mix_channel.sample_players[player].volume) / MIX_MAX_VOLUME
 
                 # Get sample (2 bytes) already in the destination buffer and combine into 16-bit value
                 channel_sample.bytes.byte1 = dst8[index]
                 channel_sample.bytes.byte2 = dst8[index + 1]
 
                 # Calculate the new destination sample (mix the existing destination sample with
-                # the new source sample)
+                # the new source sample).  The temp sample is a 32-bit value to avoid overflow.
                 temp_sample = channel_sample.value + src_sample.value
 
-                # Apply clipping to destination sample
+                # Clip the temp sample back to a 16-bit value (will cause distortion if samples
+                # on channel are too loud)
                 if temp_sample > MAX_AUDIO_VALUE_S16:
                     temp_sample = MAX_AUDIO_VALUE_S16
                 elif temp_sample < MIN_AUDIO_VALUE_S16:
                     temp_sample = MIN_AUDIO_VALUE_S16
 
-                # Write the new destination sample back to the destination buffer
+                # Write the new destination sample back to the destination buffer (from a 32-bit
+                # back to a 16-bit value that we know is in range)
                 dst_sample.value = temp_sample
                 dst8[index] = dst_sample.bytes.byte1
                 dst8[index + 1] = dst_sample.bytes.byte2
 
                 # Advance the source sample pointer to the next sample (2 bytes)
-                mix_channel.sample_players[i].sample_pos += 2
+                mix_channel.sample_players[player].sample_pos += 2
 
-                # Advance the destination buffer pointer by 2 bytes
+                # Advance the destination buffer pointer to the next sample (2 bytes)
                 index += 2
 
                 # Check if we are at the end of the source sample buffer (loop if applicable)
-                if mix_channel.sample_players[i].sample_pos > mix_channel.sample_players[i].chunk.alen:
-                    if mix_channel.sample_players[i].loops_remaining > 0:
+                if mix_channel.sample_players[player].sample_pos > mix_channel.sample_players[player].chunk.alen:
+                    if mix_channel.sample_players[player].loops_remaining > 0:
                         # At the end and still loops remaining, loop back to the beginning
-                        mix_channel.sample_players[i].loops_remaining -= 1
-                        mix_channel.sample_players[i].sample_pos = 0
-                    if mix_channel.sample_players[i].loops_remaining == 0:
+                        mix_channel.sample_players[player].loops_remaining -= 1
+                        mix_channel.sample_players[player].sample_pos = 0
+                    elif mix_channel.sample_players[player].loops_remaining == 0:
                         # At the end and not looping, the sample has finished playing
-                        mix_channel.sample_players[i].status = player_finished
+                        mix_channel.sample_players[player].status = player_finished
                         break
                     else:
                         # Looping infinitely, loop back to the beginning
-                        mix_channel.sample_players[i].sample_pos = 0
+                        mix_channel.sample_players[player].sample_pos = 0
 
         # Check if the sound has finished
-        if mix_channel.sample_players[i].status is player_finished:
+        if mix_channel.sample_players[player].status is player_finished:
             # Sound has finished, send notification and set player to idle status
             event_index = get_first_available_audio_event_on_mixer_channel(mix_channel)
             if event_index != -1:
                 mix_channel.events[event_index].event = event_sound_stop
                 mix_channel.events[event_index].channel = channel
-                mix_channel.events[event_index].player = i
-                mix_channel.events[event_index].sample_number = mix_channel.sample_players[i].sample_number
+                mix_channel.events[event_index].player = player
+                mix_channel.events[event_index].sample_number = mix_channel.sample_players[player].sample_number
 
             # TODO: Log error if events are full
 
-            mix_channel.sample_players[i].status = player_idle
+            # The sample play is now idle (ready to play another sample)
+            mix_channel.sample_players[player].status = player_idle
 
-    # Apply channel volume (this might be handled already by SDL_Mixer)
-    # TODO: implement me
+    # Apply channel volume
+    # TODO: implement me (this might be handled already by SDL_Mixer)
 
     # Apply channel envelopes (if applicable)
     apply_ducking_envelopes_to_mixer_channel_s16(stream, length, mix_channel)
@@ -294,10 +298,9 @@ cdef void mix_track_callback_s16sys(int channel, void *stream, int length, void 
     # Release the lock on the channel mutex
     SDL_UnlockMutex(mix_channel.mutex)
 
-
 cdef void apply_ducking_envelopes_to_mixer_channel_s16(void *stream, int length, MixerChannel* mix_channel) nogil:
     """
-    Applies any in-process ducking envelopes to the specified mixer channel
+    Applies any in-process ducking envelopes to the specified mixer channel output buffer
     :param stream:
     :param length:
     :param mix_channel:
@@ -446,6 +449,22 @@ cdef class AudioOutput:
         self.audio_init = 1
         return 0
 
+    @property
+    def supports_wav(self):
+        return self.audio_init == 1
+
+    @property
+    def supports_ogg(self):
+        return self.audio_init == 1 and (self.supported_formats & MIX_INIT_OGG) == MIX_INIT_OGG
+
+    @property
+    def supports_flac(self):
+        return self.audio_init == 1 and (self.supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC
+
+    @property
+    def supports_mp3(self):
+        return self.audio_init == 1 and (self.supported_formats & MIX_INIT_MP3) == MIX_INIT_MP3
+
     def load_sample(self, str file_name, float default_volume=1.0, int simultaneous_limit=-1):
         """
         Loads a sample into memory from the specified file name. A pointer to the
@@ -476,8 +495,8 @@ cdef class AudioOutput:
         cdef char* c_mode = py_byte_mode
 
         # Load the sample file into memory
-        cdef Mix_Chunk *sample = Mix_LoadWAV_RW(SDL_RWFromFile(c_file_name, c_mode), 1)
-        if sample is NULL:
+        cdef Mix_Chunk *chunk = Mix_LoadWAV_RW(SDL_RWFromFile(c_file_name, c_mode), 1)
+        if chunk is NULL:
             print("An error occurred while loading sound file '{}': {}".format(file_name, SDL_GetError()))
             return 0
 
@@ -485,7 +504,7 @@ cdef class AudioOutput:
         default_volume = max(min(default_volume, 1.0), 0.0)
 
         # Compute the new volume setting (between 0 and MIX_MAX_VOLUME)
-        sample.volume = int(default_volume * MIX_MAX_VOLUME)
+        chunk.volume = int(default_volume * MIX_MAX_VOLUME)
 
         # Store the chunk pointer in a python capsule (wraps a c pointer in a python object)
         # so it can be stored in a python dictionary
@@ -493,7 +512,7 @@ cdef class AudioOutput:
         self.next_sample_number += 1
         self.samples[sample_number] = {}
         self.samples[sample_number]['file_name'] = file_name
-        self.samples[sample_number]['chunk'] = pycapsule.PyCapsule_New(sample, NULL, NULL)
+        self.samples[sample_number]['chunk'] = pycapsule.PyCapsule_New(chunk, NULL, NULL)
         self.samples[sample_number]['limit'] = simultaneous_limit
         self.samples[sample_number]['instances'] = 0
 
@@ -506,7 +525,7 @@ cdef class AudioOutput:
         :return: True if the sample was successfully unloaded from memory and removed
         from the dictionary, False otherwise
         """
-        cdef Mix_Chunk *sample = NULL
+        cdef Mix_Chunk *chunk = NULL
 
         # Find the sample by name key in the dictionary
         if sample_number not in self.samples:
@@ -515,9 +534,9 @@ cdef class AudioOutput:
         # TODO: make sure sample is not currently playing (stop it first)
 
         # Sample was found, get the Mix_Chunk pointer from the capsule object and free it
-        sample = <Mix_Chunk*>pycapsule.PyCapsule_GetPointer(self.samples[sample_number]['chunk'], NULL)
-        if sample is not NULL:
-            Mix_FreeChunk(sample)
+        chunk = <Mix_Chunk*>pycapsule.PyCapsule_GetPointer(self.samples[sample_number]['chunk'], NULL)
+        if chunk is not NULL:
+            Mix_FreeChunk(chunk)
 
         # Finally remove the dictionary item
         del self.samples[sample_number]
@@ -651,7 +670,6 @@ cdef class AudioOutput:
     def add_mixer_channel(self, int simultaneous_sounds=1):
         """
         Adds a channel to the mixer.
-        :param name: The channel name
         :param simultaneous_sounds: The maximum number of sounds that can be played simultaneously on the channel
         :return: The newly added channel number
         """
@@ -742,7 +760,7 @@ cdef class AudioOutput:
 
     # TODO: Add process callbacks function designed to be called from MPF tick function
 
-    def tick(self):
+    def process_event_callbacks(self):
         """
         Designed to be called on every MPF tick, this function processes any state changes
         or events generated in the SDL callbacks (separate thread).
@@ -978,7 +996,7 @@ cdef struct Sample16Bytes:
     int8_t byte1
     int8_t byte2
 
-cdef union Sample16Bits:
+cdef union Sample16Bit:
     int16_t value
     Sample16Bytes bytes
 
