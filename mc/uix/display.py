@@ -14,6 +14,10 @@ from mc.uix.slide_frame import SlideFrame
 class Display(ScatterPlane, RelativeLayout):
     displays_to_initialize = 0
 
+    @staticmethod
+    def create_default_display(mc):
+        Display(mc, 'default', width=1, height=1)
+
     def __init__(self, mc, name, **kwargs):
         self.mc = mc
         self.name = name
