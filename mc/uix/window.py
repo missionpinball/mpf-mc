@@ -1,6 +1,8 @@
 from kivy.core.window import Window as KivyWindow
 from kivy.clock import Clock
 from mc.core.keyboard import Keyboard
+from mc.uix.display import Display
+
 
 class Window(object):
 
@@ -36,6 +38,11 @@ class Window(object):
                 'source_display']]
         except KeyError:
             display = mc.targets['default'].parent
+
+        # We need the window to map to a Display instance, so no matter what
+        # we're passed, we keep on moving up until we find the actual display.
+        while not isinstance(display, Display):
+            display = display.parent
 
         Window.set_source_display(display)
 

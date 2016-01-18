@@ -1,5 +1,6 @@
 from operator import attrgetter
 
+from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     SlideTransition, SwapTransition,
                                     FadeTransition, WipeTransition,
@@ -14,6 +15,20 @@ transition_map = dict(none=NoTransition,
                       wipe=WipeTransition,
                       fall_out=FallOutTransition,
                       rise_in=RiseInTransition)
+
+def create_slide_frame(mc, name):
+    parent = SlideFrameParent(mc, name)
+    return parent.slide_frame
+
+class SlideFrameParent(FloatLayout):
+    def __init__(self, mc, name):
+        self.mc = mc
+        self.name = name
+        super().__init__()
+
+        self.slide_frame = SlideFrame(mc, name)
+
+        self.add_widget(self.slide_frame)
 
 
 class SlideFrame(ScreenManager):

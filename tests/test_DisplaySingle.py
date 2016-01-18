@@ -2,7 +2,7 @@ from copy import copy
 
 from mc.uix.display import Display
 from mc.uix.slide import Slide
-from mc.uix.slide_frame import SlideFrame
+from mc.uix.slide_frame import SlideFrame, SlideFrameParent
 from .MpfMcTestCase import MpfMcTestCase
 
 
@@ -23,7 +23,7 @@ class TestDisplaySingle(MpfMcTestCase):
             'window'])
 
         # walk the display's widget tree and make sure everything is right
-        widget_hierarchy = ['display', 'slide_frame']
+        widget_hierarchy = ['display', 'slide_frame_parent', 'slide_frame']
         for widget, name in zip(self.mc.displays['window'].walk(),
                                 widget_hierarchy):
             getattr(self, 'check_{}'.format(name))(widget=widget)
@@ -34,6 +34,9 @@ class TestDisplaySingle(MpfMcTestCase):
     def check_slide_frame(self, widget):
         self.assertTrue(isinstance(widget, SlideFrame))
         self.assertEqual(widget.size, [401, 301])
+
+    def check_slide_frame_parent(self, widget):
+        self.assertTrue(isinstance(widget, SlideFrameParent))
 
     def test_current_slide_properties(self):
         slide1 = Slide(mc=self.mc, name='slide1', config={})
@@ -46,8 +49,9 @@ class TestDisplaySingle(MpfMcTestCase):
         # test display slide_frame properties
         self.assertEqual(self.mc.displays['window'].slide_frame.current_slide,
                          slide1)
-        self.assertEqual(self.mc.displays['window'].slide_frame.current_slide_name,
-                         'slide1')
+        self.assertEqual(
+            self.mc.displays['window'].slide_frame.current_slide_name,
+            'slide1')
 
         # test slide_frame properties
         self.assertEqual(
@@ -136,7 +140,7 @@ class TestDisplaySingle(MpfMcTestCase):
                         self.mc.targets['window'].current_slide.priority)
 
         self.mc.targets['window'].add_widget(slide=slide5,
-                                                          force=True)
+                                             force=True)
 
         # slide should show
         self.assertEqual(self.mc.targets['window'].current_slide, slide5)
@@ -149,7 +153,7 @@ class TestDisplaySingle(MpfMcTestCase):
                            self.mc.targets['window'].current_slide.priority)
 
         self.mc.targets['window'].add_widget(slide=slide6,
-                                                          show=False)
+                                             show=False)
 
         # slide should not show
         self.assertEqual(self.mc.targets['window'].current_slide, slide5)

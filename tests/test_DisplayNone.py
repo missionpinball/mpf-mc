@@ -15,6 +15,6 @@ class TestDisplaySingle(MpfMcTestCase):
 
         self.assertIn('default', self.mc.displays)
         self.assertEqual(self.mc.displays['default'].size, [1, 1])
-        self.assertEqual(self.mc.targets['default'].parent, self.mc.displays[
-            'default'])
+        self.assertEqual(self.mc.targets['default'].parent.parent,
+                         self.mc.displays['default'])
 
