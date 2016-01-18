@@ -1,6 +1,6 @@
 from mc.uix.display import Display
 from mc.uix.slide_frame import SlideFrame
-from .MpfMcTestCase import MpfMcTestCase
+from tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestDisplaySingle(MpfMcTestCase):

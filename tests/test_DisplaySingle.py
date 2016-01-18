@@ -3,7 +3,7 @@ from copy import copy
 from mc.uix.display import Display
 from mc.uix.slide import Slide
 from mc.uix.slide_frame import SlideFrame, SlideFrameParent
-from .MpfMcTestCase import MpfMcTestCase
+from tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestDisplaySingle(MpfMcTestCase):

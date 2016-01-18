@@ -3,7 +3,7 @@
 # Rename TestTemplate to TestWhatever in line 9
 # Rename machine path and config file in lines 11 and 14
 
-from .MpfMcTestCase import MpfMcTestCase
+from tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestTemplate(MpfMcTestCase):
