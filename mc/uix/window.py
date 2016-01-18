@@ -8,7 +8,6 @@ class Window(object):
 
     @staticmethod
     def set_source_display(display):
-        print("Setting source display to:", display)
         KivyWindow.clear()
 
         for widget in KivyWindow.children:
@@ -21,8 +20,6 @@ class Window(object):
 
     @staticmethod
     def initialize(mc):
-        print()
-        print("Initializing Display")
         try:
             mc.icon = mc.machine_config['window']['icon']
         except KeyError:
@@ -39,19 +36,15 @@ class Window(object):
         try:
             display = mc.displays[mc.machine_config['window'][
                 'source_display']]
-            print("Found window:source_display setting",
-                  mc.machine_config['window']['source_display'])
         except KeyError:
             display = mc.targets['default'].parent
-            print("Selecting source display", display)
+            # print("Selecting source display", display)
 
         # We need the window to map to a Display instance, so no matter what
         # we're passed, we keep on moving up until we find the actual display.
         while not isinstance(display, Display):
-            print("Display is not Display, trying parent...")
             display = display.parent
 
-        print("Found source display", display)
         Window.set_source_display(display)
 
         if 'keyboard' in mc.machine_config:

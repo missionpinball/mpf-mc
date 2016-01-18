@@ -1,5 +1,6 @@
 from operator import attrgetter
 
+from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     SlideTransition, SwapTransition,
@@ -17,10 +18,13 @@ transition_map = dict(none=NoTransition,
                       fall_out=FallOutTransition,
                       rise_in=RiseInTransition)
 
+
 class SlideFrameParent(FloatLayout):
     def __init__(self, mc, name, slide_frame):
         self.mc = mc
-        self.name = name
+        self.name = slide_frame.name
+        self.size = slide_frame.native_size
+        self.ready = False
         super().__init__()
 
         super().add_widget(slide_frame)
@@ -38,21 +42,75 @@ class SlideFrameParent(FloatLayout):
 
 
 class SlideFrame(MpfWidget, ScreenManager):
+    def __init__(self, mc, name=None, config=None, slide=None, mode=None,
+                 init_callback=None):
 
-    def __init__(self, mc, name, mode=None):
-        self.config = dict()  # this exists for the SlideFrameParent z-order
-        self.config['z'] = 0
-        self.name = name
-        super().__init__(mc=mc, mode=mode)
+        self.name = name  # needs to be set before super()
+        super().__init__(mc=mc, mode=mode, slide=slide, config=config)
+        self.slide_frame_parent = None
+        self.init_callback = init_callback
 
-        mc.targets[name] = self
+        # minimal config needed if this is a widget
+        if not config:
+            self.config = dict()
+
+        if 'z' not in self.config:
+            self.config['z'] = 0
+
+        # If this is a the main SlideFrame of a display, it will get its size
+        # from its parent. If this is a widget, it will get its size from
+        # the config.
+        try:
+            self.native_size = (config['width'], config['height'])
+        except (KeyError, TypeError):
+            self.native_size = self.parent.native_size
 
         self.transition = transition_map['none']()
 
         self.slide_frame_parent = SlideFrameParent(mc, name, self)
+        self.slide_frame_parent.config = self.config
+
+        Clock.schedule_once(self._check_for_init_complete, 0)
 
     def __repr__(self):
         return '<SlideFrame name={}, parent={}>'.format(self.name, self.parent)
+
+    def _check_for_init_complete(self, *args):
+        if (self.size[0] != self.native_size[0] or
+                    self.size[1] != self.native_size[1] or
+                    self.slide_frame_parent.size[0] != self.native_size[0] or
+                    self.slide_frame_parent.size[1] != self.native_size[1]):
+
+            self.slide_frame_parent.size = self.native_size
+
+            Clock.schedule_once(self._check_for_init_complete, 0)
+
+        else:
+            self._init_complete()
+
+    def _init_complete(self):
+        if callable(self.init_callback):
+            self.init_callback()
+        del self.init_callback
+        self.ready = True
+        self.slide_frame_parent.ready = True
+
+        # Don't make it a valid target until it's ready
+        self.mc.targets[self.name] = self
+
+    def on_size(self, *args):
+        # We can get rid of these trys if we can figure out the exact order of
+        # everything in __init__(), but meh...
+        try:
+            self.slide_frame_parent.size = self.size
+        except AttributeError:
+            pass
+
+    def on_pos(self, *args):
+        try:
+            self.slide_frame_parent.pos = self.pos
+        except AttributeError:
+            pass
 
     @property
     def current_slide(self):
@@ -85,6 +143,10 @@ class SlideFrame(MpfWidget, ScreenManager):
         frame."""
         return self.screens
 
+    def get_slide_by_name(self, slide_name):
+        for slide in [x for x in self.screens if x.name == slide_name]:
+            return slide
+
     def add_slide(self, name, config, priority=0, mode=None, show=True,
                   force=False):
         Slide(mc=self.mc, name=name, target=self.name, config=config,
@@ -114,6 +176,16 @@ class SlideFrame(MpfWidget, ScreenManager):
     def show_current_slide(self):
         if self.screens[0] != self.current_screen:
             self.current = self.screens[0].name
+
+    def show_slide(self, slide_name, force=False):
+        slide = self.get_slide_by_name(slide_name)
+
+        if slide and (slide.priority <= self.current_slide.priority or force):
+            self.current_slide = slide_name
+            return True
+
+        else:
+            return False
 
     def remove_slide(self, slide):
         # note there has to be at least one slide, so you can't remove the last

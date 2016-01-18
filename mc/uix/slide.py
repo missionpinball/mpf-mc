@@ -1,3 +1,4 @@
+from kivy.clock import Clock
 from kivy.uix.screenmanager import Screen
 
 from mc.core.mode import Mode
@@ -17,6 +18,7 @@ class Slide(Screen):
         self.name = name
         self.priority = None
         self.creation_order = Slide.get_id()
+        self.pending_widgets = set()
 
         if priority is None:
             try:
@@ -154,14 +156,25 @@ class Slide(Screen):
         widgets_added = list()
 
         for widget in config:
-            widget_obj = widget['widget_cls'](mc=self, config=widget,
+            widget_obj = widget['widget_cls'](mc=self.mc, config=widget,
                                               slide=self, mode=mode)
-            self.add_widget(widget_obj)
-            widget_obj.texture_update()
-            widget_obj.size = widget_obj.texture_size
+
+            top_widget = widget_obj
+
+            while top_widget.parent:
+                top_widget = top_widget.parent
+
+            self.add_widget(top_widget)
+            try:  # text only? Need to change this. TODO
+                widget_obj.texture_update()
+                widget_obj.size = widget_obj.texture_size
+            except AttributeError:
+                widget_obj.size = (widget['width'], widget['height'])
+
             widget_obj.pos = self.set_position(self, widget_obj, widget['x'],
                                                widget['y'], widget['h_pos'],
                                                widget['v_pos'])
+
             widgets_added.append(widget_obj)
 
         return widgets_added
@@ -183,6 +196,13 @@ class Slide(Screen):
         priority.
 
         """
+
+        if not widget.ready:
+            Clock.schedule_once(self.check_pending_widgets)
+            # TODO verify this will only be added once
+            self.pending_widgets.add(widget)
+            return
+
         z = widget.config['z']
 
         if z < 0:
@@ -191,6 +211,19 @@ class Slide(Screen):
 
         super().add_widget(widget, Slide.get_insert_index(z=z,
                                                           target_widget=self))
+
+    def check_pending_widgets(self, *args):
+
+        # TODO add support for if this slide gets removed. weakref or
+        # removal method?
+
+        for widget in self.pending_widgets.copy():
+            if widget.ready:
+                self.pending_widgets.remove(widget)
+                self.add_widget(widget)
+
+        if self.pending_widgets:
+            Clock.schedule_once(self.check_pending_widgets)
 
     @staticmethod
     def get_insert_index(z, target_widget):

@@ -20,12 +20,14 @@ class MpfWidget(object):
     """Slide that this widget will be used with."""
 
     def __init__(self, mc, mode, slide=None, config=None, **kwargs):
+        self.size_hint = (None, None)
         super().__init__()
 
         self.mode = mode
         self.slide = slide
         self.config = config
         self.mc = mc
+        self.ready = False
 
         if not config:
             return
@@ -34,18 +36,18 @@ class MpfWidget(object):
             if hasattr(self, k):
                 setattr(self, k, v)
 
-        if 'animation' in config:
-            if 'entrance' in config['animation']:
-                for prop, settings in config['animation']['entrance'].items():
-
-                    if 'start' in settings:
-                        if hasattr(self, prop):
-                            setattr(self, prop, settings['start'])
-
-                    anim = Animation(t=settings['function'],
-                                     duration=settings['time'],
-                                     **{prop: settings['end']})
-                    anim.start(self)
+        # if 'animation' in config:
+        #     if 'entrance' in config['animation']:
+        #         for prop, settings in config['animation']['entrance'].items():
+        #
+        #             if 'start' in settings:
+        #                 if hasattr(self, prop):
+        #                     setattr(self, prop, settings['start'])
+        #
+        #             anim = Animation(t=settings['function'],
+        #                              duration=settings['time'],
+        #                              **{prop: settings['end']})
+        #             anim.start(self)
 
     def __repr__(self):
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)

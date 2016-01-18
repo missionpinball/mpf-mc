@@ -8,27 +8,29 @@ class WidgetPlayer(ConfigPlayer):
         if mode and not mode.active:
             return
 
-        # figure out the target slide. If there is a slide, it will win
-        slide = None
+        for s in settings:
 
-        if settings['target']:
-            try:
-                slide = self.mc.targets[settings['target']].current_slide
-            except KeyError:
-                pass
+            # figure out the target slide. If there is a slide, it will win
+            slide = None
 
-        if settings['slide']:
-            try:
-                slide = self.mc.active_slides[settings['slide']]
-            except KeyError:
-                pass
+            if s['target']:
+                try:
+                    slide = self.mc.targets[s['target']].current_slide
+                except KeyError:
+                    pass
 
-        if not slide:
-            slide = self.mc.targets['default'].current_slide
+            if s['slide']:
+                try:
+                    slide = self.mc.active_slides[s['slide']]
+                except KeyError:
+                    pass
 
-        if not slide:
-            return
+            if not slide:
+                slide = self.mc.targets['default'].current_slide
 
-        for widget in settings['widget']:
-            slide.add_widgets_from_library(name=widget, mode=mode)
+            if not slide:
+                return
+
+            for widget in s['widget']:
+                slide.add_widgets_from_library(name=widget, mode=mode)
 

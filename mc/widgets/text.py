@@ -21,9 +21,9 @@ class Text(MpfWidget, Label):
         self._process_text(self.text, local_replacements=text_variables,
                            local_type='event')
 
-        self.size_hint = (None, None)
-
-        config['size_hint'] = (None, None)
+        # self.size_hint = (None, None)
+        #
+        # config['size_hint'] = (None, None)
 
         if not config['font_size']:
             config['font_size'] = 15
@@ -32,6 +32,7 @@ class Text(MpfWidget, Label):
 
         self.texture_update()
         self.size = self.texture_size
+        self.ready = True
 
     def __repr__(self):
         return '<Text Widget text={}>'.format(self.text)
