@@ -6,15 +6,13 @@ from kivy.clock import Clock
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.scatter import ScatterPlane
 
-import mc.uix.slide_frame
+from mc.uix.slide_frame import SlideFrame
+
+# import mc.uix.slide_frame
 
 
 class Display(ScatterPlane, RelativeLayout):
     displays_to_initialize = 0
-
-    @staticmethod
-    def create_default_display(mc):
-        Display(mc, 'default', width=1, height=1)
 
     def __init__(self, mc, name, **kwargs):
         self.mc = mc
@@ -62,8 +60,7 @@ class Display(ScatterPlane, RelativeLayout):
             Clock.schedule_once(self._display_created, 0)
             return
 
-        self.slide_frame = mc.uix.slide_frame.create_slide_frame(self.mc,
-                                                             self.name)
+        self.slide_frame = SlideFrame(self.mc, self.name)
         self._slide_frame_created()
 
     def _slide_frame_created(self, *args):
@@ -75,7 +72,7 @@ class Display(ScatterPlane, RelativeLayout):
             Clock.schedule_once(self._slide_frame_created, 0)
             return
 
-        self.add_widget(self.slide_frame.parent)
+        self.add_widget(self.slide_frame.slide_frame_parent)
         self.mc.displays[self.name] = self
         self._set_default_target()
 

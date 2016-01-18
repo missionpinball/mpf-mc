@@ -181,7 +181,6 @@ class Mode(object):
         # remove widgets from slide frame parents
         target_list = set(self.mc.targets.values())
         for target in target_list:
-            for widget in [x for x in target.parent.children if x.mode ==
-                    self]:
-
+            for widget in [x for x in target.parent.children if
+                           x.mode == self]:
                 target.parent.remove_widget(widget)

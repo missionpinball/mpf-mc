@@ -17,21 +17,13 @@ transition_map = dict(none=NoTransition,
                       fall_out=FallOutTransition,
                       rise_in=RiseInTransition)
 
-
-def create_slide_frame(mc, name):
-    parent = SlideFrameParent(mc, name)
-    return parent.slide_frame
-
-
 class SlideFrameParent(FloatLayout):
-    def __init__(self, mc, name):
+    def __init__(self, mc, name, slide_frame):
         self.mc = mc
         self.name = name
         super().__init__()
 
-        self.slide_frame = SlideFrame(mc, name)
-
-        super().add_widget(self.slide_frame)
+        super().add_widget(slide_frame)
 
     def __repr__(self):
         return '<SlideFrameParent name={}>'.format(self.name)
@@ -46,6 +38,7 @@ class SlideFrameParent(FloatLayout):
 
 
 class SlideFrame(MpfWidget, ScreenManager):
+
     def __init__(self, mc, name, mode=None):
         self.config = dict()  # this exists for the SlideFrameParent z-order
         self.config['z'] = 0
@@ -55,6 +48,8 @@ class SlideFrame(MpfWidget, ScreenManager):
         mc.targets[name] = self
 
         self.transition = transition_map['none']()
+
+        self.slide_frame_parent = SlideFrameParent(mc, name, self)
 
     def __repr__(self):
         return '<SlideFrame name={}, parent={}>'.format(self.name, self.parent)
