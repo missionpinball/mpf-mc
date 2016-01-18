@@ -12,6 +12,7 @@ from mc.core.bcp_processor import BcpProcessor
 
 from mc.core.config_processor import McConfig
 from mc.core.mode_controller import ModeController
+from mc.core.sound import SoundController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
 from mpf.system.config import CaseInsensitiveDict
@@ -48,6 +49,7 @@ class MpfMc(App):
 
         self.events = EventManager(self, setup_event_player=False)
         self.mode_controller = ModeController(self)
+        self.sound_controller = SoundController(self)
         McConfig.load_config_spec()
         self.config_processor = McConfig(self)
         self.slide_player = SlidePlayer(self)
