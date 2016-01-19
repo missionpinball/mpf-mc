@@ -1,5 +1,5 @@
 """Contains the MpfMc base class, which is the main App instance for the
-mpc_mc.
+mpf_mc.
 
 """
 import queue

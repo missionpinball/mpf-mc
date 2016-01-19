@@ -51,7 +51,7 @@ class TestKeyboard(MpfMcTestCase):
 
     def test_toggle_switch(self):
         # BCP spec sends state -1 to tell MPF to flip the switch state. -1 is
-        # used so mpc_mc doesn't have to maintain of state which means it can't
+        # used so mpf_mc doesn't have to maintain of state which means it can't
         # get out of sync. :)
         self.press('b')
         bcp_command = ('switch', None, {'name': 'switch_b', 'state': -1})

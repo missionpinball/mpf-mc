@@ -101,7 +101,7 @@ class MpfMcTestCase(unittest.TestCase):
         print("Running", name)
         # This setup is done in run() because we need to give control to the
         # kivy event loop which we can only do by returning from the run()
-        # that's called. So we override run() and setup mpc_mc and then call
+        # that's called. So we override run() and setup mpf_mc and then call
         # our own run_test() on a callback. Then we can wait until the
         # environment is setup (which can take a few frames), then we call
         # super().run() to get the actual TestCase.run() method to run and
@@ -117,7 +117,7 @@ class MpfMcTestCase(unittest.TestCase):
         mpf_config = MpfConfig.load_machine_config(
                 Util.string_to_list(self.get_config_file()),
                 self.get_machine_path(),
-                mpf_config['mpc_mc']['paths']['config'], mpf_config)
+                mpf_config['mpf_mc']['paths']['config'], mpf_config)
         self.preprocess_config(mpf_config)
 
         self.mc = TestMpfMc(options=self.get_options(),
