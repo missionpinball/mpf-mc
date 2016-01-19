@@ -112,8 +112,16 @@ class MpfMcTestCase(unittest.TestCase):
         # so we just do our setup here since if we manually called setUp() then
         # it would be called again when we call super().run().
         self._test_name = name
+        print('----------')
+        print(MpfConfig)
+        print(MpfConfig.load_machine_config)
+
         mpf_config = MpfConfig.load_config_file(self.get_options()[
                                                     'mcconfigfile'])
+
+        print(MpfConfig)
+        print(MpfConfig.load_machine_config)
+
         mpf_config = MpfConfig.load_machine_config(
                 Util.string_to_list(self.get_config_file()),
                 self.get_machine_path(),
