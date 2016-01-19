@@ -6,6 +6,7 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     FadeTransition, WipeTransition,
                                     FallOutTransition, RiseInTransition)
 
+from mc.core.utils import set_position, get_insert_index
 from mc.uix.slide import Slide
 from mc.uix.widget import MpfWidget
 
@@ -37,14 +38,13 @@ class SlideFrameParent(FloatLayout):
         widget.config['z'] = abs(widget.config['z'])
 
         super().add_widget(widget=widget,
-                           index=Slide.get_insert_index(
-                                   z=abs(widget.config['z']),
-                                   target_widget=self))
+                           index=get_insert_index(z=abs(widget.config['z']),
+                                                  target_widget=self))
 
     def on_size(self, *args):
         for widget in self.children:
-            widget.pos = Slide.set_position(self.width, self.height,
-                                            widget.width, widget.height)
+            widget.pos = set_position(self.width, self.height,
+                                      widget.width, widget.height)
 
 
 class SlideFrame(MpfWidget, ScreenManager):
