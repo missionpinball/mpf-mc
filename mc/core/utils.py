@@ -24,6 +24,7 @@ def get_insert_index(z, target_widget):
 
     return index
 
+
 def set_position(parent_w, parent_h, w, h, x=None, y=None, h_pos=None,
                  v_pos=None):
     """Calculates the x,y position for the upper-left corner of this

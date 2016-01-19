@@ -168,8 +168,15 @@ class SlideFrame(MpfWidget, ScreenManager):
         if not isinstance(slide, Slide):
             return
 
+        if len(self.slides) == 1:
+            return
+
+        for widget in self.children:
+            widget.prepare_for_removal()
+
         self.mc.active_slides.pop(slide.name, None)
 
+        # TODO is this right? Is the screens list in priority order
         if self.current_screen == self.screens[0]:
             try:
                 self.current = self.screens[1].name
@@ -177,3 +184,6 @@ class SlideFrame(MpfWidget, ScreenManager):
                 pass
 
         self.remove_widget(slide)
+
+        # TODO check for memory leak. Should probably convert everything else
+        # to a weakref / proxyref

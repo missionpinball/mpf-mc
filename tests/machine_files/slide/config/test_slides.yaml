@@ -19,26 +19,33 @@ slides:
     text: SLIDE TEST - SLIDE 1 - TEXT 1
     y: -50
     color: ff0000
+    font_size: 100
   - type: text
     text: SLIDE TEST - SLIDE 1 - TEXT 2
     color: 00ff00
+    font_size: 500
   - type: text
     text: SLIDE TEST - SLIDE 1 - TEXT 3
     y: 50
     color: 0000ff
+    font_size: 100
   slide2:
     type: text
     text: SLIDE TEST - SLIDE 2
     color: 00ffff
+    font_size: 200
   slide3:
     type: text
     text: SLIDE TEST - SLIDE 3
     color: 00ff00
+    font_size: 300
   slide4:
     type: text
     text: SLIDE TEST - SLIDE 4
     color: ffff00
+    font_size: 200
   slide5:
     type: text
     text: SLIDE TEST - SLIDE 5
     color: ffaa00
+    font_size: 400

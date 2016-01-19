@@ -84,11 +84,14 @@ class Slide(Screen):
             except AttributeError:
                 widget_obj.size = (widget['width'], widget['height'])
 
-            widget_obj.pos = Slide.set_position(self.width, self.height,
-                                                widget_obj.width,
-                                                widget_obj.height, widget['x'],
-                                                widget['y'], widget['h_pos'],
-                                                widget['v_pos'])
+            widget_obj.pos = set_position(self.width,
+                                          self.height,
+                                          widget_obj.width,
+                                          widget_obj.height,
+                                          widget['x'],
+                                          widget['y'],
+                                          widget['h_pos'],
+                                          widget['v_pos'])
 
             widgets_added.append(widget_obj)
 
@@ -151,3 +154,5 @@ class Slide(Screen):
     def prepare_for_removal(self, widget=None):
         pass
 
+        # TODO what do we have to do here? I assume something? Remove from
+        # active slide list?

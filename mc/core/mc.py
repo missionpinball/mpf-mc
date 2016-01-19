@@ -8,15 +8,15 @@ import time
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
-from mc.core.bcp_processor import BcpProcessor
+from mpf.system.config import CaseInsensitiveDict
+from mpf.system.events import EventManager
+from mpf.system.player import Player
 
+from mc.core.bcp_processor import BcpProcessor
 from mc.core.config_processor import McConfig
 from mc.core.mode_controller import ModeController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
-from mpf.system.config import CaseInsensitiveDict
-from mpf.system.events import EventManager
-from mpf.system.player import Player
 
 
 class MpfMc(App):
@@ -34,6 +34,7 @@ class MpfMc(App):
 
         self.slide_configs = dict()
         self.widget_configs = dict()
+        self.animation_configs = dict()
         self.active_slides = dict()
 
         self.displays = CaseInsensitiveDict()
