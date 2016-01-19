@@ -93,7 +93,7 @@ class BCPServer(threading.Thread):
                             break
 
                     except:
-                        if self.mc.config['mpf-mc']['exit_on_disconnect']:
+                        if self.mc.config['mpf_mc']['exit_on_disconnect']:
                             self.mc.shutdown()
                         else:
                             break

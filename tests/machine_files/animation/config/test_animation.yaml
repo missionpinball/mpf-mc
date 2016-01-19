@@ -1,0 +1,105 @@
+#config_version=3
+
+displays:
+  default:
+    width: 400
+    height: 300
+
+slides:
+  slide1:
+    type: text
+    text: text
+    x: 0
+    animations:
+      entrance:
+        - property: x  # x, y, height, width, opacity, rotation?
+          value: 101
+          duration: 1s
+          repeat: -1
+        - property: x  # x, y, height, width, opacity, rotation?
+          value: 100
+          duration: 1s
+          timing: with_previous  # or after prev
+          repeat: True
+
+  slide2:
+    type: text
+    text: ANIMATION TEST
+    color: ff00ff
+    font_size: 100
+    y: 300
+    x: 400
+    animations:
+      entrance2:
+        property: x, y
+        value: 0, 0
+        duration: 1s
+        timing: with_previous  # or after prev
+        repeat: True
+
+  slide3:
+    type: text
+    text: text3
+    animations:
+      entrance3: fade_in, multi
+
+  slide4:
+    type: text
+    text: text4
+    animations:
+      entrance4: fade_in, multi
+      some_event4: multi
+
+  slide5:
+    type: text
+    text: text5
+    animations:
+      entrance5: fade_in, multi
+      event5:
+        property: x # x, y, height, width, opacity, rotation?
+        value: 98
+        duration: 1s
+        timing: with_previous  # or after prev
+        repeat: True
+
+  slide6:
+    type: text
+    text: text6
+
+  slide7:
+    type: text
+    text: slide7
+    x: 0
+    color: ffaa00
+    font_size: 200
+    animations:
+      entrance:
+        property: x
+        value: 400
+        duration: 500ms
+
+slide_player:
+  show_slide7:
+    slide: slide7
+  show_slide2:
+    slide: slide2
+  show_slide3:
+    slide: slide3
+
+animations:
+  fade_in:
+    property: opacity
+    value: 1
+    duration: 1s
+    timing: with_previous
+    repeat: True
+
+  multi:
+  - property: height
+    value: 1
+    duration: 1s
+  - property: width
+    value: 0
+    duration: 100ms
+    timing: after_previous
+    repeat: False

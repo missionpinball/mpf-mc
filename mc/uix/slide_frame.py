@@ -6,6 +6,7 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     FadeTransition, WipeTransition,
                                     FallOutTransition, RiseInTransition)
 
+from mc.core.utils import set_position, get_insert_index
 from mc.uix.slide import Slide
 from mc.uix.widget import MpfWidget
 
@@ -37,14 +38,13 @@ class SlideFrameParent(FloatLayout):
         widget.config['z'] = abs(widget.config['z'])
 
         super().add_widget(widget=widget,
-                           index=Slide.get_insert_index(
-                                   z=abs(widget.config['z']),
-                                   target_widget=self))
+                           index=get_insert_index(z=abs(widget.config['z']),
+                                                  target_widget=self))
 
     def on_size(self, *args):
         for widget in self.children:
-            widget.pos = Slide.set_position(self.width, self.height,
-                                            widget.width, widget.height)
+            widget.pos = set_position(self.width, self.height,
+                                      widget.width, widget.height)
 
 
 class SlideFrame(MpfWidget, ScreenManager):
@@ -168,8 +168,15 @@ class SlideFrame(MpfWidget, ScreenManager):
         if not isinstance(slide, Slide):
             return
 
+        if len(self.slides) == 1:
+            return
+
+        for widget in self.children:
+            widget.prepare_for_removal()
+
         self.mc.active_slides.pop(slide.name, None)
 
+        # TODO is this right? Is the screens list in priority order
         if self.current_screen == self.screens[0]:
             try:
                 self.current = self.screens[1].name
@@ -177,3 +184,6 @@ class SlideFrame(MpfWidget, ScreenManager):
                 pass
 
         self.remove_widget(slide)
+
+        # TODO check for memory leak. Should probably convert everything else
+        # to a weakref / proxyref

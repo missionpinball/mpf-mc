@@ -1,5 +1,5 @@
 """Contains the Display base class, which is a logical display in the
-mpf-mc.
+mpf_mc.
 
 """
 from kivy.clock import Clock
@@ -52,7 +52,7 @@ class Display(ScatterPlane, RelativeLayout):
         self.slide_frame.current_slide_name = value
 
     def _display_created(self, *args):
-        # There's a race condition since mpf-mc will continue while the display
+        # There's a race condition since mpf_mc will continue while the display
         # gets setup. So we need to wait to know that the display is done.
         # Easiest way to do that is to check to see if the display is the right
         # size, and when it is, we move on.

@@ -16,62 +16,76 @@ widgets:
     type: text
     text: widget1
     color: ffff00
+    font_size: 100
   widget2:
   - type: text
     text: widget2
     y: -50
     color: ff0000
+    font_size: 100
   widget3:
   - type: text
     text: widget3.1
     color: ff0000
+    font_size: 100
   - type: text
     text: widget3.2
     color: 00ff66
+    font_size: 100
   - type: text
     text: widget3.3
     color: ff00ff
+    font_size: 100
   widget4:
   - type: text
     text: widget4.1
     y: -150
     z: 1
     color: ff0000
+    font_size: 100
   - type: text
     text: widget4.2
     z: 1000
     y: -100
     color: ffff00
+    font_size: 100
   - type: text
     text: widget4.3
     y: -50
     color: 00ff00
+    font_size: 100
   - type: text
     text: widget4.4
     z: 1
     color: 00ffff
+    font_size: 100
   - type: text
     text: widget4.5
     z: 1000
     y: 50
     color: 0000ff
+    font_size: 100
   - type: text
     text: widget4.6
     color: ff00ff
+    font_size: 100
   - type: text
     text: widget4.7
     y: 100
     color: 888888
+    font_size: 100
   widget5:
     type: text
     text: widget5
     z: 200
     y: 150
+    font_size: 100
   widget6:
     type: text
     text: widget6
     z: -100
     color: 774303
+    font_size: 100
 
 widget_player:
   add_widget1_to_current:

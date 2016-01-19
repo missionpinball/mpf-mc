@@ -14,16 +14,20 @@ slides:
     name: frame1
     v_pos: top
     h_pos: right
+    font_size: 200
   - type: text
     text: SLIDE FRAME BASE
+    font_size: 100
   frame1_text:
   - type: text
     text: TEXT IN FRAME
     color: 00ff00
+    font_size: 200
   frame1_text2:
   - type: text
     text: MORE TEXT
     color: 00ffff
+    font_size: 100
 
 slide_player:
   show_frame_text:
@@ -32,4 +36,3 @@ slide_player:
   show_frame_text2:
     slide: frame1_text2
     target: frame1
-    color: ff0000

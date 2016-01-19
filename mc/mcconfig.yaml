@@ -1,5 +1,5 @@
 # config_version=3
-mpf-mc:
+mpf_mc:
     modules:
         mode_controller.ModeController
         language.Language

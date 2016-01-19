@@ -8,11 +8,12 @@ from kivy.logger import Logger
 from kivy.uix.video import Video
 from kivy.utils import get_color_from_hex
 from mpf.system.config import CaseInsensitiveDict, Config as MpfConfig
+from mpf.system.utility_functions import Util
 
 from mc.uix.display import Display
+from mc.uix.slide_frame import SlideFrame
 from mc.widgets.image import Image
 from mc.widgets.text import Text
-from mc.uix.slide_frame import SlideFrame
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=Image,
@@ -32,15 +33,17 @@ type_map = CaseInsensitiveDict(text=Text,
 class McConfig(MpfConfig):
     def __init__(self, machine):
         self.mc = machine
-        self.system_config = self.mc.machine_config['mpf-mc']
+        self.system_config = self.mc.machine_config['mpf_mc']
         self.log = Logger
 
         self.machine_sections = dict(slides=self.process_slides,
                                      widgets=self.process_widgets,
-                                     displays=self.process_displays)
+                                     displays=self.process_displays,
+                                     animations=self.process_animations)
 
         self.mode_sections = dict(slides=self.process_slides,
-                                  widgets=self.process_widgets)
+                                  widgets=self.process_widgets,
+                                  animations=self.process_animations)
 
         # process mode-based and machine-wide configs
         self.register_load_methods()
@@ -146,8 +149,6 @@ class McConfig(MpfConfig):
         if 'color' in config:
             config['color'] = get_color_from_hex(config['color'])
 
-        # validate_widget(config)
-
         config['_parsed_'] = True
 
         if 'v_pos' not in config:
@@ -159,8 +160,78 @@ class McConfig(MpfConfig):
         if 'y' not in config:
             config['y'] = 0
 
+        if 'animations' in config:
+            config['animations'] = self.process_animations_from_slide_config(
+                    config['animations'])
+
+        else:
+            config['animations'] = None
+
         return config
 
-    def validate_widget(self, config):
-        config['widget_cls'](mc=None, **config)
-        return
+    def process_animations_from_slide_config(self, config):
+        # config is localized to the slide's 'animations' section
+
+        for event_name, event_settings in config.items():
+
+            # str means it's a list of named animations
+            if type(event_settings) is str:
+                event_settings = Util.string_to_list(event_settings)
+
+            # dict means it's a single set of settings for one animation step
+            elif isinstance(event_settings, dict):
+                event_settings = [event_settings]
+
+            # ultimately we're producing a list of dicts, so build that list
+            # as we iterate
+            new_list = list()
+            for settings in event_settings:
+                new_list.append(self.process_animation(settings))
+
+            config[event_name] = new_list
+
+        return config
+
+    def process_animations(self, config):
+        # processes the 'animations' section of a config file to populate the
+        # mc.animation_configs dict.
+
+        # config is localized to 'animations' section
+
+        for name, settings in config.items():
+            # if a named animation's settings are dict, that means there's just
+            # a single step. We need a list
+            if type(settings) is not list:
+                settings = [settings]
+
+            # iterate and build our final processed list
+            new_list = list()
+            for s in settings:
+                new_list.append(self.process_animation(s))
+
+            config[name] = new_list
+
+        # add this config to the global dict. We don't support having the same
+        # named animation defined in multiple places, so we can blindly update.
+        self.mc.animation_configs.update(config)
+        config = None
+
+    def process_animation(self, config, mode=None):
+        # config is localized to a single animation's settings within a list
+
+        # str means it's a named animation
+        if type(config) is str:
+            config = dict(named_animation=config)
+
+        # dict is settings for an animation
+        elif type(config) is dict:
+            animation = self.process_config2('widgets:animations',
+                                             config)
+
+            if len(config['property']) != len(config['value']):
+                raise ValueError('Animation "property" list ({}) is not the '
+                                 'same length as the "end" list ({'
+                                 '}).'.format(config['property'], config[
+                                 'end']))
+
+        return config
