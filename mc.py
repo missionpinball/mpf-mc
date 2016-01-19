@@ -132,11 +132,11 @@ def preprocess_config(config):
 
 mpf_config = MpfConfig.load_config_file(args.mcconfigfile)
 machine_path = MpfConfig.set_machine_path(args.machine_path,
-                                          mpf_config['mpf-mc']['paths'][
+                                          mpf_config['mpc_mc']['paths'][
                                               'machine_files'])
 
 mpf_config = MpfConfig.load_machine_config(args.configfile, machine_path,
-                                           mpf_config['mpf-mc']['paths'][
+                                           mpf_config['mpc_mc']['paths'][
                                                'config'], mpf_config)
 
 preprocess_config(mpf_config)

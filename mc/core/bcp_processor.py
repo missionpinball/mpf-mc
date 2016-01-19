@@ -78,8 +78,8 @@ class BcpProcessor(object):
 
         Note this message is intended for testing. Usually BCP messages are
         handled by the BCP Server thread, but for test purposes it's possible
-        to run mpf-mc without the BCP Server, so in that case you can use this
-        method to send BCP messages into the mpf-mc.
+        to run mpc_mc without the BCP Server, so in that case you can use this
+        method to send BCP messages into the mpc_mc.
 
         Args:
             msg: A string of the BCP message (in the standard BCP format:
@@ -121,7 +121,7 @@ class BcpProcessor(object):
 
     def _bcp_goodbye(self, **kwargs):
         """Processes an incoming BCP 'goodbye' command."""
-        # if self.config['mpf-mc']['exit_on_disconnect']:
+        # if self.config['mpc_mc']['exit_on_disconnect']:
         #     self.socket_thread.sending_thread.stop()
         #     sys.exit()
 

@@ -1,4 +1,4 @@
-Mission Pinball Framework Media Controller (mpf-mc)
+Mission Pinball Framework Media Controller (mpf_mc)
 ===================================================
 
 <img align="right" height="128" src="mc/icons/128x128.png"/>
@@ -11,7 +11,7 @@ controls the pinball machine and runs the game logic is in the MPF package.
 Separate from that is the Media Controller which controls the display and sound,
 including the DMD, Color DMD, RGB LED DMD, and/or onscreen or LCD display.
 
-This package (mpf-mc) is MPF's "default" media controller which is based on Kivy and Python.
+This package (mpf_mc) is MPF's "default" media controller which is based on Kivy and Python.
 There's also another media controller option based on Unity 3D you can use instead.
 
 MPF-MC can run on Windows, OS X, and Linux. It can run on the same machine as

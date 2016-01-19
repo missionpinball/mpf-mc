@@ -33,7 +33,7 @@ type_map = CaseInsensitiveDict(text=Text,
 class McConfig(MpfConfig):
     def __init__(self, machine):
         self.mc = machine
-        self.system_config = self.mc.machine_config['mpf-mc']
+        self.system_config = self.mc.machine_config['mpc_mc']
         self.log = Logger
 
         self.machine_sections = dict(slides=self.process_slides,
