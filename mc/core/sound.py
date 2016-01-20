@@ -105,6 +105,25 @@ class SoundGroup(SoundInterface):
         pass
 
 
+class Playlist(SoundInterface):
+    """
+    The Playlist class represents a single sound playlist which allows for multiple sounds
+    to be played one right after another.  There are also several looping features available in
+    playlists.
+    """
+    def __init__(self, name):
+        super().__init__(name)
+
+    def play(self, track=None):
+        pass
+
+    def load(self):
+        pass
+
+    def unload(self):
+        pass
+
+
 class Track(object):
     """
     A Track is essentially an audio channel with it's own properties that corresponds to its own

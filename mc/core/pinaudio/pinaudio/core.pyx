@@ -230,13 +230,13 @@ cdef void mix_track_callback_s16sys(int channel, void *stream, int length, void 
             while index < length:
 
                 # Get source sample (2 bytes), combine into a 16-bit value and apply sample volume
-                src_sample.bytes.byte1 = src[mix_channel.sample_players[player].sample_pos]
-                src_sample.bytes.byte2 = src[mix_channel.sample_players[player].sample_pos + 1]
+                src_sample.bytes.byte0 = src[mix_channel.sample_players[player].sample_pos]
+                src_sample.bytes.byte1 = src[mix_channel.sample_players[player].sample_pos + 1]
                 src_sample.value = (src_sample.value * mix_channel.sample_players[player].volume) / MIX_MAX_VOLUME
 
                 # Get sample (2 bytes) already in the destination buffer and combine into 16-bit value
-                channel_sample.bytes.byte1 = dst8[index]
-                channel_sample.bytes.byte2 = dst8[index + 1]
+                channel_sample.bytes.byte0 = dst8[index]
+                channel_sample.bytes.byte1 = dst8[index + 1]
 
                 # Calculate the new destination sample (mix the existing destination sample with
                 # the new source sample).  The temp sample is a 32-bit value to avoid overflow.
@@ -252,8 +252,8 @@ cdef void mix_track_callback_s16sys(int channel, void *stream, int length, void 
                 # Write the new destination sample back to the destination buffer (from a 32-bit
                 # back to a 16-bit value that we know is in range)
                 dst_sample.value = temp_sample
-                dst8[index] = dst_sample.bytes.byte1
-                dst8[index + 1] = dst_sample.bytes.byte2
+                dst8[index] = dst_sample.bytes.byte0
+                dst8[index + 1] = dst_sample.bytes.byte1
 
                 # Advance the source sample pointer to the next sample (2 bytes)
                 mix_channel.sample_players[player].sample_pos += 2
@@ -369,6 +369,10 @@ cdef class AudioOutput:
     cdef list mixer_channels
     cdef Mix_Chunk *raw_chunk_silence
 
+    cdef object _sound_start_callback
+    cdef object _sound_stop_callback
+
+
     def __cinit__(self, *args, **kw):
         self.audio_init = 0
         self.raw_chunk_silence = NULL
@@ -384,6 +388,9 @@ cdef class AudioOutput:
         self.audio_format = 0
         self.supported_formats = formats
         self.mixer_channels = []
+
+        self._sound_start_callback = None
+        self._sound_stop_callback = None
 
         assert(encoding in (8, 16))
         assert(channels >= 1)
@@ -463,6 +470,26 @@ cdef class AudioOutput:
     @property
     def supports_flac(self):
         return self.audio_init == 1 and (self.supported_formats & MIX_INIT_FLAC) == MIX_INIT_FLAC
+
+    def set_sound_start_callback(self, callback=None):
+        """
+        Set the callback function that is called every time a sound start event is triggered.
+        The callback function should have the following parameters: channel, player, and
+        sample_number.
+        Args:
+            callback: Callback function
+        """
+        self._sound_start_callback = callback
+
+    def set_sound_stop_callback(self, callback=None):
+        """
+        Set the callback function that is called every time a sound stop event is triggered.
+        The callback function should have the following parameters: channel, player, and
+        sample_number.
+        Args:
+            callback: Callback function
+        """
+        self._sound_stop_callback = callback
 
     def load_sample(self, str file_name, float default_volume=1.0, int simultaneous_limit=-1):
         """
@@ -582,7 +609,7 @@ cdef class AudioOutput:
         if SDL_LockMutex(mix_channel.mutex) != 0:
             return False
 
-        cdef int player = get_open_sample_player_on_mixer_channel(mix_channel)
+        cdef int player = get_idle_sample_player_on_mixer_channel(mix_channel)
         if player == -1:
             return False
 
@@ -762,8 +789,6 @@ cdef class AudioOutput:
         for channel in range(len(self.mixer_channels)):
             self.set_mixer_channel_volume(channel, volume)
 
-    # TODO: Add process callbacks function designed to be called from MPF tick function
-
     def process_event_callbacks(self):
         """
         Designed to be called on every MPF tick, this function processes any state changes
@@ -771,22 +796,77 @@ cdef class AudioOutput:
         """
         cdef MixerChannel *mix_channel
 
+        events = []
+
         # Loop over mixer channels, looking for any unprocessed events
         for channel in range(len(self.mixer_channels)):
             mix_channel = <MixerChannel*>pycapsule.PyCapsule_GetPointer(self.mixer_channels[channel], NULL)
             if mix_channel == NULL:
                 continue
 
-            # Lock the mixer channel so it can't be accessed in another thread
+            # Lock the mixer channel so it can't be accessed in another thread.  We don't want
+            # to hold this lock very long as it will block the audio playback thread so we will
+            # temporarily store the events to be called and release the lock before actually
+            # calling them.
             SDL_LockMutex(mix_channel.mutex)
 
             for i in range(MAX_AUDIO_EVENTS):
                 if mix_channel.events[i].event != event_none:
-                    # TODO: implement event callbacks
-                    pass
+                    events.append({'channel': channel,
+                                   'event': mix_channel.events[i].event,
+                                   'player': mix_channel.events[i].player,
+                                   'sample_number': mix_channel.events[i].sample_number})
+                    mix_channel.events[i].event = event_none
 
             # Unlock the mixer channel
             SDL_UnlockMutex(mix_channel.mutex)
+
+        # Now process all the events received, calling the appropriate callback functions (if set)
+        for event in events:
+            if event['event'] is 1 and self._sound_start_callback is not None:
+                self._sound_start_callback(channel=event['channel'],
+                                           player=event['player'],
+                                           sample_number=event['sample_number'])
+            elif event['event'] is 2 and self._sound_stop_callback is not None:
+                self._sound_stop_callback(channel=event['channel'],
+                                           player=event['player'],
+                                           sample_number=event['sample_number'])
+
+    def get_mixer_channel_status(self, int channel):
+        """
+        Returns a list of mixer channel status dictionaries for the specified channel.
+        This function is really only intended for testing purposes and allows the
+        caller to receive the current status of each sample player in a channel.
+
+        Args:
+            channel: The mixer channel number
+
+        Returns:
+            A list of dictionaries that contain AudioSamplePlayer status attributes
+            and values.
+        """
+        if channel < 0 or channel >= len(self.mixer_channels):
+            return None
+
+        mix_channel = <MixerChannel*>pycapsule.PyCapsule_GetPointer(self.mixer_channels[channel], NULL)
+        if mix_channel == NULL:
+            return None
+
+        status = []
+
+        # Lock the mixer channel so it can't be accessed in another thread
+        SDL_LockMutex(mix_channel.mutex)
+
+        for i in range(mix_channel.max_simultaneous_sounds):
+            status.append({'player': i,
+                           'status': mix_channel.sample_players[i].status,
+                           'sample_number': mix_channel.sample_players[i].sample_number
+                           })
+
+        # Unlock the mixer channel
+        SDL_UnlockMutex(mix_channel.mutex)
+
+        return status
 
 
 def get_audio_output(**kwargs):
@@ -905,10 +985,10 @@ cdef void free_mixer_channel(MixerChannel* mix_channel) nogil:
     # Free mixer channel itself
     free(mix_channel)
 
-cdef int get_open_sample_player_on_mixer_channel(MixerChannel* mix_channel) nogil:
-    """ Returns the index of the first free audio sample player on the specified
+cdef int get_idle_sample_player_on_mixer_channel(MixerChannel* mix_channel) nogil:
+    """ Returns the index of the first idle audio sample player on the specified
     mixer channel.  If all players are currently busy playing, -1 is returned.
-    :param mix_channel: The mixer channel to check for open sample players.
+    :param mix_channel: The mixer channel to check for free sample players.
     """
     for i in range(mix_channel.max_simultaneous_sounds):
         if mix_channel.sample_players[i].status == player_idle:
@@ -930,6 +1010,7 @@ cdef int get_first_available_audio_event_on_mixer_channel(MixerChannel* mix_chan
     return -1
 
 cdef enum AudioSamplePlayerStatus:
+    # Enumeration of the possible AudioSamplePlayer status values.
     player_idle,
     player_pending,
     player_playing,
@@ -948,6 +1029,8 @@ ctypedef struct AudioSamplePlayer:
     int sample_number
 
 cdef enum DuckingEnvelopeSegment:
+    # Enumeration of the envelope segments in a ducking envelope.  These are used to track
+    # the current state of the envelope.
     pending_segment,
     delay_segment,
     attack_segment,
@@ -997,10 +1080,17 @@ ctypedef struct AudioEventData:
     int sample_number
 
 cdef struct Sample16Bytes:
+    # Structure that represents two bytes of a 16-bit sample.  This is used in
+    # the union below (nested structs are not permitted in Cython so it is
+    # declared separately here).
+    int8_t byte0
     int8_t byte1
-    int8_t byte2
 
 cdef union Sample16Bit:
+    # Union structure that represents a single 16-bit sample value.  A union is
+    # utilized to make it easy to access the individual bytes in the sample.
+    # This is needed since all samples are streamed as individual 8-bit (byte)
+    # values.
     int16_t value
     Sample16Bytes bytes
 
