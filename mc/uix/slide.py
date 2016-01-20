@@ -1,10 +1,11 @@
 from kivy.uix.screenmanager import Screen
+from kivy.uix.stencilview import StencilView
 
 from mc.core.mode import Mode
 from mc.core.utils import set_position, get_insert_index
 
 
-class Slide(Screen):
+class Slide(Screen, StencilView):
     next_id = 0
 
     @classmethod

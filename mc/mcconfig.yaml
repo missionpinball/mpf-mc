@@ -8,6 +8,9 @@ mpf_mc:
         show_controller.ShowController
         keyboard.Keyboard
 
+    mpf_transition_modules:
+        - push
+
     port: 5050
     exit_on_disconnect: yes
 

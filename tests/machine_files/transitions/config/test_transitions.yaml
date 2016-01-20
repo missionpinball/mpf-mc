@@ -1,0 +1,42 @@
+# config_version=3
+
+displays:
+  default:
+    width: 400
+    height: 300
+
+slides:
+  slide1:
+    - type: text
+      text: TRANSITION TEST
+      y: 20
+      color: ff0000
+      font_size: 50
+    - type: text
+      text: ========== SLIDE 1 ===========
+      y: -20
+      color: ff0000
+      font_size: 50
+
+  slide2:
+    - type: text
+      text: TRANSITION TEST
+      color: 00ff00
+      font_size: 50
+      y: 20
+    - type: text
+      text: ----------- SLIDE 2 ------------
+      color: 00ff00
+      font_size: 50
+      y: -20
+
+slide_player:
+  show_slide1:
+    slide: slide1
+  show_slide2:
+    slide: slide2
+    transition:
+      type: push
+      easing: out_bounce
+      duration: 2s
+      direction: right

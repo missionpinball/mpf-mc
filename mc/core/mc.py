@@ -8,15 +8,16 @@ import time
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
-from mpf.system.config import CaseInsensitiveDict
-from mpf.system.events import EventManager
-from mpf.system.player import Player
 
 from mc.core.bcp_processor import BcpProcessor
 from mc.core.config_processor import McConfig
 from mc.core.mode_controller import ModeController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
+from mc.uix.transitions import TransitionManager
+from mpf.system.config import CaseInsensitiveDict
+from mpf.system.events import EventManager
+from mpf.system.player import Player
 
 
 class MpfMc(App):
@@ -53,6 +54,7 @@ class MpfMc(App):
         self.config_processor = McConfig(self)
         self.slide_player = SlidePlayer(self)
         self.widget_player = WidgetPlayer(self)
+        self.transition_manager = TransitionManager(self)
         self.keyboard = None
         self.crash_queue = queue.Queue()
         self.ticks = 0
