@@ -3,6 +3,8 @@ import unittest
 from kivy.base import EventLoop
 from kivy.clock import Clock
 from kivy.config import Config
+
+from mc.core.utils import load_machine_config
 from mpf.system.config import Config as MpfConfig
 from mpf.system.utility_functions import Util
 
@@ -112,17 +114,11 @@ class MpfMcTestCase(unittest.TestCase):
         # so we just do our setup here since if we manually called setUp() then
         # it would be called again when we call super().run().
         self._test_name = name
-        print('----------')
-        print(MpfConfig)
-        print(MpfConfig.load_machine_config)
 
         mpf_config = MpfConfig.load_config_file(self.get_options()[
                                                     'mcconfigfile'])
 
-        print(MpfConfig)
-        print(MpfConfig.load_machine_config)
-
-        mpf_config = MpfConfig.load_machine_config(
+        mpf_config = load_machine_config(
                 Util.string_to_list(self.get_config_file()),
                 self.get_machine_path(),
                 mpf_config['mpf_mc']['paths']['config'], mpf_config)

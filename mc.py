@@ -15,6 +15,7 @@ from kivy.config import Config
 from kivy.logger import Logger
 import version
 from mc.core.mc import MpfMc
+from mc.core.utils import set_machine_path, load_machine_config
 
 parser = argparse.ArgumentParser(description='Starts the MPF Media Controller')
 
@@ -131,13 +132,13 @@ def preprocess_config(config):
 
 
 mpf_config = MpfConfig.load_config_file(args.mcconfigfile)
-machine_path = MpfConfig.set_machine_path(args.machine_path,
-                                          mpf_config['mpf_mc']['paths'][
-                                              'machine_files'])
+machine_path = set_machine_path(args.machine_path,
+                                mpf_config['mpf_mc']['paths'][
+                                    'machine_files'])
 
-mpf_config = MpfConfig.load_machine_config(args.configfile, machine_path,
-                                           mpf_config['mpf_mc']['paths'][
-                                               'config'], mpf_config)
+mpf_config = load_machine_config(args.configfile, machine_path,
+                                 mpf_config['mpf_mc']['paths'][
+                                     'config'], mpf_config)
 
 preprocess_config(mpf_config)
 
