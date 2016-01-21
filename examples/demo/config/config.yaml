@@ -1,0 +1,95 @@
+#config_version=3
+
+scriptlets:
+  demo_driver.DemoDriver
+
+keyboard:
+  right:
+    mc_event: next_slide
+  left:
+    mc_event: prev_slide
+
+displays:
+  default:
+    width: 800
+    height: 600
+
+slides:
+  slide1:
+    - type: text
+      text: I AM A TEXT WIDGET ON SLIDE1 WITH DEFAULT SETTINGS
+    - type: text
+      text: HIT THE RIGHT ARROW KEY TO CONTINUE -->
+      v_pos: top
+      y: 75%
+  slide2:
+    - type: text
+      text: I AM SLIDE 2. MY FONT SIZE IS 50
+      font_size: 50
+    - type: text
+      text: HIT THE RIGHT ARROW KEY TO CONTINUE (MY FONT SIZE IS 15) -->
+      v_pos: top
+      y: 75%
+  slide3:
+    - type: text
+      text: I AM SLIDE 3. I AM RED
+      font_size: 50
+      color: ff0000
+    - type: text
+      text: AGAIN, RIGHT ARROW -->
+      v_pos: top
+      y: 75%
+    - type: text
+      text: ( <-- ALSO LEFT ARROW GOES BACK)
+      v_pos: top
+      y: 85%
+  slide4:
+    - type: text
+      text: THIS DEMO IS DRIVEN BY A STANDARD MPF CONFIG FILE
+      font_size: 20
+      color: ff0000
+    - type: text
+      text: IT'S IN THE FOLDER /mpf_mc/examples/demo/config/config.yaml
+      font_size: 20
+      color: 00ff00
+      y: -50
+    - type: text
+      text: KEEP GOING. (WE'LL REMOVE THIS MESSAGE FROM NOW ON)
+      v_pos: top
+      y: 75%
+    - type: text
+      text: JUST KNOW YOU CAN ALWAYS HIT THE LEFT AND RIGHT ARROWS TO GO BACK AND FORTH
+      v_pos: top
+      y: 85%
+  slide5:
+    - type: text
+      text: HEY, THAT WAS A SLIDE TRANSITION
+      font_size: 45
+      color: ffaa00
+    - type: text
+      text: The transition was called "push", the direction is "right", and the duration is "1s"
+      font_size: 20
+      color: 00ff33
+      y: -50
+
+
+slide_player:
+  mc_reset_phase_3:
+    slide: slide1
+
+  show_slide1:
+    slide: slide1
+
+  show_slide2:
+    slide: slide2
+
+  show_slide3:
+    slide: slide3
+
+  show_slide4:
+    slide: slide4
+
+  show_slide5:
+    slide: slide5
+    transition:
+      type: push

@@ -36,7 +36,7 @@ mpf_mc:
     paths:
         shows: shows
         sounds: sounds
-        machine_files: machine_files
+        machine_files: examples
         config: config
         fonts: fonts
         images: images
