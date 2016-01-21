@@ -24,9 +24,8 @@ class TestTransitions(MpfMcTestCase):
         pass
 
 
-    def test_transition(self):
+    def test_mpf_transition(self):
         self.mc.events.post('show_slide1')
-        self.advance_time(1)
 
         # show a slide with a transition
         self.mc.events.post('show_slide2')
@@ -50,3 +49,76 @@ class TestTransitions(MpfMcTestCase):
 
     def test_target_transition_reset_when_doen(self):
         pass
+
+
+    def test_push_left(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('push_left')
+        self.advance_time(.5)
+
+    def test_push_right(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('push_right')
+        self.advance_time(.5)
+
+    def test_push_up(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('push_up')
+        self.advance_time(.5)
+
+    def test_push_down(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('push_down')
+        self.advance_time(.5)
+
+    def test_move_in_right(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('move_in_right')
+        self.advance_time(.5)
+
+    def test_move_in_left(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('move_in_left')
+        self.advance_time(.5)
+
+    def test_move_in_top(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('move_in_top')
+        self.advance_time(.5)
+
+    def test_move_in_down(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('move_in_down')
+        self.advance_time(.5)
+
+    def test_move_out_right(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('move_out_right')
+        self.advance_time(.5)
+
+    def test_move_out_left(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('move_out_left')
+        self.advance_time(.5)
+
+    def test_move_out_top(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('move_out_top')
+        self.advance_time(.5)
+
+    def test_move_out_bottom(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('move_out_bottom')
+        self.advance_time(.5)

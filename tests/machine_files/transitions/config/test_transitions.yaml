@@ -40,3 +40,63 @@ slide_player:
       easing: out_bounce
       duration: 2s
       direction: right
+  push_left:
+    slide: slide2
+    transition:
+      type: push
+      direction: left
+  push_right:
+    slide: slide2
+    transition:
+      type: push
+      direction: right
+  push_up:
+    slide: slide2
+    transition:
+      type: push
+      direction: up
+  push_down:
+    slide: slide2
+    transition:
+      type: push
+      direction: down
+  move_in_left:
+    slide: slide2
+    transition:
+      type: move_in
+      direction: left
+  move_in_right:
+    slide: slide2
+    transition:
+      type: move_in
+      direction: right
+  move_in_top:
+    slide: slide2
+    transition:
+      type: move_in
+      direction: top
+  move_in_bottom:
+    slide: slide2
+    transition:
+      type: move_in
+      direction: bottom
+  move_out_left:
+    slide: slide2
+    transition:
+      type: move_out
+      direction: left
+  move_out_right:
+    slide: slide2
+    transition:
+      type: move_out
+      direction: right
+  move_out_top:
+    slide: slide2
+    transition:
+      type: move_out
+      direction: top
+  move_out_bottom:
+    slide: slide2
+    transition:
+      type: move_out
+      direction: bottom

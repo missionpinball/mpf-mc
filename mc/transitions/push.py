@@ -1,8 +1,6 @@
-from kivy.animation import AnimationTransition
 from kivy.properties import OptionProperty
 
 from mc.uix.transitions import MpfTransition
-from kivy.properties import StringProperty
 
 
 class PushTransition(MpfTransition):
@@ -10,55 +8,36 @@ class PushTransition(MpfTransition):
     of the frame. Can be used from any direction."""
 
     direction = OptionProperty('left', options=('left', 'right', 'up', 'down'))
-    '''Direction of the transition.
+    """String name of the direction of the transition.
 
-    :attr:`direction` is an :class:`~kivy.properties.OptionProperty` and
-    defaults to 'left'. Can be one of 'left', 'right', 'up' or 'down'.
-    '''
+    Can be 'left', 'right', 'up', or 'down'. Default is 'left'.
 
-    easing = StringProperty('linear')
-
+    """
     def on_progress(self, progression):
-        sin = self.screen_in
-        sout = self.screen_out
 
-        # manager is the parent SlideFrame
-        manager = self.manager
-        x, y = manager.pos
-        width, height = manager.size
+        s_in, s_out, width, height, progress = self.get_vars(progression)
 
         direction = self.direction
-        # run the progression (which is 0 -> 1) through the easing formula
-        progression = getattr(AnimationTransition, self.easing)(progression)
 
         if direction == 'left':
-            sin.y = sout.y = y
-            sin.x = x + width * (1 - progression)
-            sout.x = x - width * progression
+            s_in.y = s_out.y
+            s_in.x = width * (1 - progress)
+            s_out.x = 0 - width * progress
 
         elif direction == 'right':
-            sin.y = sout.y = y
-            sout.x = x + width * progression
-            sin.x = x - width * (1 - progression)
+            s_in.y = s_out.y
+            s_out.x = width * progress
+            s_in.x = 0 - width * (1 - progress)
 
         elif direction == 'down':
-            sin.x = sout.x = x
-            sin.y = y + height * (1 - progression)
-            sout.y = y - height * progression
+            s_in.x = s_out.x
+            s_in.y = height * (1 - progress)
+            s_out.y = 0 - height * progress
 
         elif direction == 'up':
-            sin.x = sout.x = x
-            sout.y = y + height * progression
-            sin.y = y - height * (1 - progression)
-
-    def on_complete(self):
-        # reset the screen back to its original position
-        self.screen_in.pos = self.manager.pos
-        self.screen_out.pos = self.manager.pos
-        super().on_complete()
-
-        # todo test super().on_complete(). It removes the screen, but is
-        # that what we want?
+            s_in.x = s_out.x
+            s_out.y = height * progress
+            s_in.y = 0 - height * (1 - progress)
 
 
 transition_cls = PushTransition

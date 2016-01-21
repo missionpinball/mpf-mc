@@ -10,6 +10,8 @@ mpf_mc:
 
     mpf_transition_modules:
         - push
+        - move_in
+        - move_out
 
     port: 5050
     exit_on_disconnect: yes

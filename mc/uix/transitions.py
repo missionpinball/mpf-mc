@@ -1,10 +1,11 @@
 import importlib
 
+from kivy.animation import Animation, AnimationTransition
 from kivy.properties import StringProperty
+from kivy.uix.screenmanager import TransitionBase, ScreenManagerException
 from kivy.uix.screenmanager import WipeTransition, SwapTransition, \
     FadeTransition, FallOutTransition, RiseInTransition
-from kivy.uix.screenmanager import TransitionBase, ScreenManagerException
-from kivy.animation import Animation
+
 
 class TransitionManager(object):
     def __init__(self, mc):
@@ -29,8 +30,7 @@ class TransitionManager(object):
 
         else:
             pass
-        # set default? Or use current?
-
+            # set default? Or use current?
 
     def _register_mpf_transitions(self):
         for t in self.mc.machine_config['mpf_mc']['mpf_transition_modules']:
@@ -47,8 +47,17 @@ class TransitionManager(object):
 
 
 class MpfTransition(TransitionBase):
+    """Base class for slide transitions in MPF. Use this when writing your
+    own custom transitions.
 
+    """
     easing = StringProperty('linear')
+    """String name of the animation 'easing' function that is used to
+    control the shape of the curve of the animation.
+
+    Default is 'linear'.
+
+    """
 
     def __init__(self, **config):
         # Use ** here instead of dict so this constructor is compatible with
@@ -80,3 +89,37 @@ class MpfTransition(TransitionBase):
         self.is_active = True
         self._anim.start(self)
         self.dispatch('on_progress', 0)
+
+    def get_vars(self, progression):
+        """Convenience method you can call in your own transition's
+        on_progress() method to easily get the local vars you need to write
+        your own transition.
+
+        Args:
+            progression: Float from 0.0 to 1.0 that indicates how far along
+            the transition is.
+
+        Returns:
+            * Incoming slide object
+            * Outgoing slide object
+            * Width of the screen
+            * Height of the screen
+            * Modified progression value (0.0-1.0) which factors in the easing
+              setting that has been applied to this transition.
+
+        """
+        return (self.screen_in, self.screen_out,
+                self.manager.width, self.manager.height,
+                getattr(AnimationTransition, self.easing)(progression))
+
+    def on_complete(self):
+        # reset the screen back to its original position
+        self.screen_in.pos = self.manager.pos
+        self.screen_out.pos = self.manager.pos
+        super().on_complete()
+
+        # todo test super().on_complete(). It removes the screen, but is
+        # that what we want?
+
+    def on_progress(self, progression):
+        raise NotImplementedError
