@@ -125,3 +125,33 @@ class TestTransitions(MpfMcTestCase):
 
         self.mc.events.post('move_out_bottom')
         self.advance_time(.5)
+
+    def test_wipe(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('wipe')
+        self.advance_time(.5)
+
+    def test_swap(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('swap')
+        self.advance_time(.5)
+
+    def test_fade(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('fade')
+        self.advance_time(.5)
+
+    def test_fade_back(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('fade_back')
+        self.advance_time(.5)
+
+    def test_rise_in(self):
+        self.mc.events.post('show_slide1')
+
+        self.mc.events.post('rise_in')
+        self.advance_time(.5)

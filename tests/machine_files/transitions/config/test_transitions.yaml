@@ -100,3 +100,23 @@ slide_player:
     transition:
       type: move_out
       direction: bottom
+  wipe:
+    slide: slide2
+    transition:
+      type: wipe
+  swap:
+    slide: slide2
+    transition:
+      type: swap
+  fade:
+    slide: slide2
+    transition:
+      type: fade
+  fade_back:
+    slide: slide2
+    transition:
+      type: fade_back
+  rise_in:
+    slide: slide2
+    transition:
+      type: rise_in

@@ -25,8 +25,12 @@ class TransitionManager(object):
     def set_transition(self, target, transition_config=None):
 
         if transition_config:
+            # The kivy shader transitions can't accept unexpected kwargs
+            kwargs = transition_config.copy()
+            kwargs.pop('type')
+
             target.transition = self._transitions[transition_config['type']](
-                    **transition_config)
+                    **kwargs)
 
         else:
             pass
