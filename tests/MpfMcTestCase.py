@@ -8,6 +8,7 @@ from kivy.config import Config
 from mc.core.utils import load_machine_config
 from mpf.system.config import Config as MpfConfig
 from mpf.system.utility_functions import Util
+from kivy.logger import FileHandler
 
 Config.set('kivy', 'log_enable', '0')
 Config.set('kivy', 'log_level', 'warning')
@@ -17,10 +18,16 @@ from time import time, sleep
 
 
 class TestMpfMc(MpfMc):
-
     def __init__(self, options, config, machine_path, **kwargs):
         super().__init__(options, config, machine_path, **kwargs)
         sys.path.append(self.machine_path)
+
+        # Sometiems the purging takes too long and the next test fails because
+        # it can't open the log file, so disable purging for tests.
+        FileHandler.purge_logs = self.null_purge
+
+    def null_purge(self, *args, **kwargs):
+        pass
 
 
 class MpfMcTestCase(unittest.TestCase):

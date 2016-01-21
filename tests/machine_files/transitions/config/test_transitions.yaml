@@ -120,3 +120,13 @@ slide_player:
     slide: slide2
     transition:
       type: rise_in
+  no_transition_1:
+    slide: slide2
+    transition: None
+  no_transition_2:
+    slide: slide2
+    transition: false
+  no_transition_3:
+    slide: slide2
+    transition:
+      type: none

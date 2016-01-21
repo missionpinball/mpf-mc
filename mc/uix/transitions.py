@@ -4,7 +4,7 @@ from kivy.animation import Animation, AnimationTransition
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import TransitionBase, ScreenManagerException
 from kivy.uix.screenmanager import WipeTransition, SwapTransition, \
-    FadeTransition, FallOutTransition, RiseInTransition
+    FadeTransition, FallOutTransition, RiseInTransition, NoTransition
 
 
 class TransitionManager(object):
@@ -23,7 +23,6 @@ class TransitionManager(object):
         self._transitions[name] = transition_cls
 
     def set_transition(self, target, transition_config=None):
-
         if transition_config:
             # The kivy shader transitions can't accept unexpected kwargs
             kwargs = transition_config.copy()
@@ -48,6 +47,7 @@ class TransitionManager(object):
         self.register_transition('fade', FadeTransition)
         self.register_transition('fade_back', FallOutTransition)
         self.register_transition('rise_in', RiseInTransition)
+        self.register_transition('none', NoTransition)
 
 
 class MpfTransition(TransitionBase):
