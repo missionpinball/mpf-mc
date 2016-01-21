@@ -25,6 +25,18 @@ class SoundController(object):
 
         self._master_volume = 1.0
 
+        # TODO: Here is a list of processing steps/features to implement
+        # Load configuration for sound engine and sound assets
+        # Initialize PinAudio library (get audio output)
+        # Setup tracks/mixer channels (including initial volume levels)
+        # Establish machine tick function callback (calls PinAudio process_event_callbacks fn)
+        # Establish event callback functions
+        # Setup sounds
+        # Load sound assets
+        # Setup event triggers (sound events trigger BCP triggers)
+        # Start mixer channels processing
+        #
+
     @property
     def master_volume(self):
         return self._master_volume
