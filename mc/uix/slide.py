@@ -5,7 +5,7 @@ from mc.core.mode import Mode
 from mc.core.utils import set_position, get_insert_index
 
 
-class Slide(Screen, StencilView):
+class Slide(Screen):
     next_id = 0
 
     @classmethod

@@ -43,6 +43,7 @@ mpf_mc:
         animations: animations
         movies: movies
         modes: modes
+        scriptlets: mc_scriptlets
 
     allow_invalid_config_sections: true
     config_versions_file: tools/config_versions.yaml

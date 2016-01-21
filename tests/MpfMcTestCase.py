@@ -1,4 +1,5 @@
 import unittest
+import sys
 
 from kivy.base import EventLoop
 from kivy.clock import Clock
@@ -16,7 +17,10 @@ from time import time, sleep
 
 
 class TestMpfMc(MpfMc):
-    pass
+
+    def __init__(self, options, config, machine_path, **kwargs):
+        super().__init__(options, config, machine_path, **kwargs)
+        sys.path.append(self.machine_path)
 
 
 class MpfMcTestCase(unittest.TestCase):

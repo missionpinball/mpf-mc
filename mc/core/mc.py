@@ -37,6 +37,7 @@ class MpfMc(App):
         self.widget_configs = dict()
         self.animation_configs = dict()
         self.active_slides = dict()
+        self.scriptlets = list()
 
         self.displays = CaseInsensitiveDict()
 
@@ -88,6 +89,7 @@ class MpfMc(App):
         self.events._process_event_queue()
         self.events.post("init_phase_3")
         self.events._process_event_queue()
+        self._load_scriptlets()
         self.events.post("init_phase_4")
         self.events._process_event_queue()
         self.events.post("init_phase_5")
@@ -237,3 +239,17 @@ class MpfMc(App):
         self.events.post('timer_tick')
         self.ticks += 1
         self.events._process_event_queue()
+
+    def _load_scriptlets(self):
+        if 'scriptlets' in self.machine_config:
+            self.machine_config['scriptlets'] = self.machine_config['scriptlets'].split(' ')
+
+            for scriptlet in self.machine_config['scriptlets']:
+
+                i = __import__(self.machine_config['mpf_mc']['paths']['scriptlets']
+                               + '.'
+                               + scriptlet.split('.')[0], fromlist=[''])
+
+                self.scriptlets.append(getattr(i, scriptlet.split('.')[1])
+                                       (mc=self,
+                                        name=scriptlet.split('.')[1]))

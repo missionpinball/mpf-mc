@@ -50,6 +50,9 @@ class TestTransitions(MpfMcTestCase):
     def test_target_transition_reset_when_doen(self):
         pass
 
+    def test_none_transition_removing_current(self):
+        pass
+
 
     def test_push_left(self):
         self.mc.events.post('show_slide1')
