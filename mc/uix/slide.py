@@ -92,7 +92,9 @@ class Slide(Screen, StencilView):
                                           widget['x'],
                                           widget['y'],
                                           widget['h_pos'],
-                                          widget['v_pos'])
+                                          widget['v_pos'],
+                                          widget['anchor_x'],
+                                          widget['anchor_y'])
 
             widgets_added.append(widget_obj)
 
@@ -123,11 +125,16 @@ class Slide(Screen, StencilView):
 
         super().add_widget(widget, get_insert_index(z=z, target_widget=self))
 
-        widget.pos = set_position(self.size[0], self.size[1],
-                                  widget.width, widget.height,
-                                  widget.config['x'], widget.config[
-                                      'y'], widget.config['h_pos'],
-                                  widget.config['v_pos'])
+        widget.pos = set_position(self.size[0],
+                                  self.size[1],
+                                  widget.width,
+                                  widget.height,
+                                  widget.config['x'],
+                                  widget.config['y'],
+                                  widget.config['h_pos'],
+                                  widget.config['v_pos'],
+                                  widget.config['anchor_x'],
+                                  widget.config['anchor_y'])
 
     def remove_widgets_by_mode(self, mode):
         for widget in [x for x in self.children if x.mode == mode]:
