@@ -72,6 +72,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             self.config['z'] = 0
 
         self.transition = transition_map['none']()
+        self.default_transition = transition_map['none']()
 
         self.slide_frame_parent = SlideFrameParent(mc, name, self)
         self.slide_frame_parent.config = self.config

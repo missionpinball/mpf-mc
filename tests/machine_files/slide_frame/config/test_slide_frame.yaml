@@ -5,7 +5,6 @@ displays:
     width: 400
     height: 300
 
-
 slides:
   slide1:
   - type: slide_frame

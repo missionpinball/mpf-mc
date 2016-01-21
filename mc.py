@@ -7,8 +7,6 @@ import socket
 import sys
 from datetime import datetime
 
-sys.path.insert(0, '../mpf')  # temp until we get a proper install for mpf
-
 from mpf.system.utility_functions import Util
 from mpf.system.config import Config as MpfConfig
 from kivy.config import Config

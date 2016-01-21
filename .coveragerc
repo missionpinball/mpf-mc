@@ -7,7 +7,9 @@ exclude_lines =
     raise NotImplementedError
 
 [run]
-source = mc
+source =
+    mc
+    examples
 omit =
     mc/dmd_test.py
     mc/fbo.py

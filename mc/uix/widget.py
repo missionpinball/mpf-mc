@@ -21,6 +21,14 @@ class MpfWidget(object):
     slide = None
     """Slide that this widget will be used with."""
 
+    # We loop through the keys in a widget's config dict and check to see if
+    # the widget's base class has attributes for them, and if so, we set
+    # them. This is how any attribute from the base class can be exposed via
+    # our configs. However we use some config keys that Kivy also uses,
+    # and we use them for different purposes, so there are some keys that we
+    # use that we never want to set on widget base classes.
+    _dont_send_to_kivy = ('anchor_x', 'anchor_y', 'h_pos', 'v_pos', 'x', 'y')
+
     def __init__(self, mc, mode, slide=None, config=None, **kwargs):
         self.size_hint = (None, None)
         super().__init__()
@@ -34,7 +42,7 @@ class MpfWidget(object):
         self._animation_event_keys = set()
 
         for k, v in self.config.items():
-            if hasattr(self, k):
+            if k not in self._dont_send_to_kivy and hasattr(self, k):
                 setattr(self, k, v)
 
         # This is a weird way to do this, but I don't want to wrap the whole
@@ -57,7 +65,9 @@ class MpfWidget(object):
                                     self.config['x'],
                                     self.config['y'],
                                     self.config['h_pos'],
-                                    self.config['v_pos'])
+                                    self.config['v_pos'],
+                                    self.config['anchor_x'],
+                                    self.config['anchor_y'])
         except AttributeError:
             pass
 

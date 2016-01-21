@@ -235,3 +235,15 @@ class McConfig(MpfConfig):
                                  'end']))
 
         return config
+
+    def process_transition(self, config):
+        # config is localized to the 'transition' section
+
+        try:
+            config = self.process_config2(
+                    'transitions:{}'.format(config['type']), config)
+        except KeyError:
+            raise ValueError('transition: section of config requires a '
+                             '"type:" setting')
+
+        return config

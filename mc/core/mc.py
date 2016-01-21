@@ -8,9 +8,6 @@ import time
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
-from mpf.system.config import CaseInsensitiveDict
-from mpf.system.events import EventManager
-from mpf.system.player import Player
 
 from mc.core.bcp_processor import BcpProcessor
 from mc.core.config_processor import McConfig
@@ -18,6 +15,10 @@ from mc.core.mode_controller import ModeController
 from mc.core.sound import SoundController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
+from mc.uix.transitions import TransitionManager
+from mpf.system.config import CaseInsensitiveDict
+from mpf.system.events import EventManager
+from mpf.system.player import Player
 
 
 class MpfMc(App):
@@ -37,6 +38,7 @@ class MpfMc(App):
         self.widget_configs = dict()
         self.animation_configs = dict()
         self.active_slides = dict()
+        self.scriptlets = list()
 
         self.displays = CaseInsensitiveDict()
 
@@ -55,6 +57,7 @@ class MpfMc(App):
         self.config_processor = McConfig(self)
         self.slide_player = SlidePlayer(self)
         self.widget_player = WidgetPlayer(self)
+        self.transition_manager = TransitionManager(self)
         self.keyboard = None
         self.crash_queue = queue.Queue()
         self.ticks = 0
@@ -88,6 +91,7 @@ class MpfMc(App):
         self.events._process_event_queue()
         self.events.post("init_phase_3")
         self.events._process_event_queue()
+        self._load_scriptlets()
         self.events.post("init_phase_4")
         self.events._process_event_queue()
         self.events.post("init_phase_5")
@@ -237,3 +241,17 @@ class MpfMc(App):
         self.events.post('timer_tick')
         self.ticks += 1
         self.events._process_event_queue()
+
+    def _load_scriptlets(self):
+        if 'scriptlets' in self.machine_config:
+            self.machine_config['scriptlets'] = self.machine_config['scriptlets'].split(' ')
+
+            for scriptlet in self.machine_config['scriptlets']:
+
+                i = __import__(self.machine_config['mpf_mc']['paths']['scriptlets']
+                               + '.'
+                               + scriptlet.split('.')[0], fromlist=[''])
+
+                self.scriptlets.append(getattr(i, scriptlet.split('.')[1])
+                                       (mc=self,
+                                        name=scriptlet.split('.')[1]))

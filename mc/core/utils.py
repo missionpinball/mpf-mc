@@ -33,88 +33,129 @@ def get_insert_index(z, target_widget):
     return index
 
 
-def set_position(parent_w, parent_h, w, h, x=None, y=None, h_pos=None,
-                 v_pos=None):
-    """Calculates the x,y position for the upper-left corner of this
-    element
-    based on several positioning parameters.
+def set_position(parent_w, parent_h, w, h, x=0, y=0, h_pos='center',
+                 v_pos='center', anchor_x=None, anchor_y=None):
+    """Returns the x,y position for the lower-left corner of a widget
+    within a larger parent frame based on several positioning parameters.
 
     Args:
-        v_pos: String which describes the vertical anchor position this
-            calculation should be based on. Options include 'top',
-            'bottom',
-            and 'center' (or 'middle'). Default is 'center' if no `y`
-            parameter is given, and 'top' if there is a `y` parameter.
-        h_pos: String which describes the horizontal anchor position this
-            calculation should be based on. Options include 'left',
-            'right',
-            and 'center' (or 'middle'). Default is 'center' if no `x`
-            parameter is given, and 'left' if there is an `x` parameter.
-        x: The x (horizontal value) you'd like to position this element in.
-            If this is an positive integer, it will be the number of pixels
-            to the left of the h_pos anchor. If it's negative, it will be
-            the number of pixels to the right of the h_pos anchor. If this
-            is a float between -1.0 and 1.0, then this will be the percent
-            between the left edge and the h_pos anchor for positive values,
-            and the right edge and the h_pos anchor
-            for negative values.
-        y: The y (vertical value) you'd like to position this element in.
-            If this is an positive integer, it will be the number of pixels
-            below the v_pos anchor. If it's negative, it will be
-            the number of pixels above the v_pos anchor. If this
-            is a float between -1.0 and 1.0, then this will be the percent
-            between the bottom edge and the v_pos anchor for positive
-            values, and the top edge and the v_pos anchor for negative
-            values.
+        parent_w: Width of the parent frame.
+        parent_h: Height of the parent frame.
+        w: Width of the element you're placing.
+        h: Height of the element you're placing.
+        x: (Optional) shifts the x (horizontal) position. If x is a
+            number (int or float) then it will move the widget +/- that many
+            pixels (+ is right, - is left). If x is a string ending in a
+            percent sign (e.g. "80%"), then it will move the widget +/- that
+            percent of the slide's width. (e.g. 10% for a slide with a width of
+            800px will position the widget 80px to the right of where it would
+            otherwise be placed based on the h_pos and align_x values. The
+            default value is '0' which does not shift the widget.
+        y: (Optional) shifts the y (vertical) position. If y is a
+            number (int or float) then it will move the widget +/- that many
+            pixels (+ is up, - is down). If y is a string ending in a
+            percent sign (e.g. "80%"), then it will move the widget +/- that
+            percent of the slide's height. (e.g. 10% for a slide with a
+            height of 600px will position the widget 60px above of where it
+            would otherwise be placed based on the v_pos and align_y values.
+            The default value is '0' which does not shift the widget.
+        h_pos: (Optional) String which describes the horizontal position in the
+            parent frame this widget will be placed. Options include 'left',
+            'right', and 'center' (or 'middle'). Default is 'center'.
+        v_pos: (Optional) String which describes the vertical position in the
+            parent frame this widget will be placed. Options include 'top',
+            'bottom', and 'center' (or 'middle'). Default is 'center'.
+        anchor_x: (Optional) Which edge of the widget will be used for
+            positioning. If not specified, it will be set to match the 'h_pos'
+            value.
+        anchor_y: (Optional) Which edge of the widget will be used for
+            positioning. If not specified, it will be set to match the 'v_pos'
+            value.
+
+
+    Returns: Tuple of x, y coordinates for the lower-left corner of the
+        widget you're placing.
 
     """
 
-    # First figure out the anchor:
-    if not h_pos:
-        if x is not None:  # i.e. `if x:`
-            h_pos = 'left'
-        else:
-            h_pos = 'center'
+    # Set the anchors. The idea is that if a pos is set but not an anchor, the
+    # intention is that they should be the same. e.g. v_pos = top means the
+    # anchor should also be 'top
 
     if not v_pos:
-        if y is not None:  # i.e. `if y:`
-            v_pos = 'top'
-        else:
-            v_pos = 'center'
+        v_pos = 'center'
+    if not h_pos:
+        h_pos = 'center'
+    if not anchor_x:
+        anchor_x = h_pos
+    if not anchor_y:
+        anchor_y = v_pos
 
-    # Next get the starting point for x, y based on that anchor
-    if v_pos == 'bottom':
-        final_y = 0
+    # set the initial final position based on those anchors
+
+    final_x = 0
+    final_y = 0
+
+    if v_pos in ('center', 'middle'):
+        final_y = parent_h / 2
+
     elif v_pos == 'top':
-        final_y = parent_h - h
-    elif v_pos == 'center' or v_pos == 'middle':
-        final_y = (parent_h - h) / 2
-    else:
-        raise ValueError('Received invalid v_pos value:', v_pos)
+        final_y = parent_h
 
-    if h_pos == 'left':
-        final_x = 0
+    if h_pos in ('center', 'middle'):
+        final_x = parent_w / 2
+
     elif h_pos == 'right':
-        final_x = parent_w - w
-    elif h_pos == 'center' or h_pos == 'middle':
-        final_x = (parent_w - w) / 2
+        final_x = parent_w
+
+    # apply the x/y values to those positions
+
+    if not x:
+        x = 0
+    if not y:
+        y = 0
+
+    if str(x)[-1] == '%':
+        if h_pos == 'left':
+            final_x = (float(x[:-1]) * parent_w / 100) - final_x
+        elif h_pos in ('center', 'middle'):
+            final_x = (float(x[:-1]) * (parent_w - final_x) / 100)
+        elif h_pos == 'right':
+            final_x = ((float(x[:-1]) * parent_w / 100) - final_x) * -1
+
     else:
-        raise ValueError("Received invalid 'h_pos' value:", h_pos)
+        final_x += float(x)
 
-    # Finally shift x, y based on values passed.
-    if x is not None:
-        if -1.0 < x < 1.0:
-            final_x += x * parent_w
-        else:
-            final_x += x
+    if str(y)[-1] == '%':
+        if v_pos == 'bottom':
+            final_y = (float(y[:-1]) * parent_h / 100) - final_y
+        elif v_pos in ('center', 'middle'):
+            final_y = (float(y[:-1]) * (parent_h - final_y) / 100)
+        elif v_pos == 'top':
+            final_y = ((float(y[:-1]) * parent_h / 100) - final_y) * -1
+    else:
+        final_y += float(y)
 
-    if y is not None:
-        if -1.0 < y < 1.0:
-            final_y += y * parent_h
-        else:
-            final_y += y
+    # calculate and apply the offsets based on the anchors
+
+    x_offset = 0
+    y_offset = 0
+
+    if anchor_x in ('center', 'middle'):
+        x_offset = w / -2
+    elif anchor_x == 'right':
+        x_offset = -w
+
+    if anchor_y in ('center', 'middle'):
+        y_offset = h / -2
+    elif anchor_y == 'top':
+        y_offset = -h
+
+    final_x += x_offset
+    final_y += y_offset
 
     return final_x, final_y
+
 
 def set_machine_path(machine_path, machine_files_default='machine_files'):
     # If the machine folder value passed starts with a forward or
@@ -131,6 +172,7 @@ def set_machine_path(machine_path, machine_files_default='machine_files'):
     sys.path.append(machine_path)
     return machine_path
 
+
 def load_machine_config(config_file_list, machine_path,
                         config_path='config', existing_config=None):
     for num, config_file in enumerate(config_file_list):
@@ -145,9 +187,8 @@ def load_machine_config(config_file_list, machine_path,
             config_file = os.path.join(machine_path, config_path,
                                        config_file)
 
-
         machine_config = Util.dict_merge(machine_config,
                                          MpfConfig.load_config_file(
-                                             config_file))
+                                                 config_file))
 
     return machine_config

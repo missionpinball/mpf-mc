@@ -8,6 +8,11 @@ mpf_mc:
         show_controller.ShowController
         keyboard.Keyboard
 
+    mpf_transition_modules:
+        - push
+        - move_in
+        - move_out
+
     port: 5050
     exit_on_disconnect: yes
 
@@ -31,13 +36,14 @@ mpf_mc:
     paths:
         shows: shows
         sounds: sounds
-        machine_files: machine_files
+        machine_files: examples
         config: config
         fonts: fonts
         images: images
         animations: animations
         movies: movies
         modes: modes
+        scriptlets: mc_scriptlets
 
     allow_invalid_config_sections: true
     config_versions_file: tools/config_versions.yaml
