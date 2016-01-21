@@ -22,10 +22,10 @@ class MoveInTransition(MpfTransition):
         elif direction == 'right':
             s_in.x = 0 - width * (1 - progress)
 
-        elif direction == 'down':
+        elif direction == 'top':
             s_in.y = height * (1 - progress)
 
-        elif direction == 'up':
+        elif direction == 'bottom':
             s_in.y = 0 - height * (1 - progress)
 
 

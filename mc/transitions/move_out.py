@@ -25,24 +25,16 @@ class MoveOutTransition(MpfTransition):
         direction = self.direction
 
         if direction == 'left':
-            # s_in.y = s_out.y
-            # s_in.x = width * (1 - progress)
             s_out.x = 0 - width * progress
 
         elif direction == 'right':
-            # s_in.y = s_out.y
             s_out.x = width * progress
-            # s_in.x = 0 - width * (1 - progress)
 
-        elif direction == 'down':
-            # s_in.x = s_out.x
-            # s_in.y = height * (1 - progress)
+        elif direction == 'top':
             s_out.y = 0 - height * progress
 
-        elif direction == 'up':
-            # s_in.x = s_out.x
+        elif direction == 'bottom':
             s_out.y = height * progress
-            # s_in.y = 0 - height * (1 - progress)
 
 
 transition_cls = MoveOutTransition

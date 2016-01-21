@@ -93,10 +93,10 @@ class TestTransitions(MpfMcTestCase):
         self.mc.events.post('move_in_top')
         self.advance_time(.5)
 
-    def test_move_in_down(self):
+    def test_move_in_bottom(self):
         self.mc.events.post('show_slide1')
 
-        self.mc.events.post('move_in_down')
+        self.mc.events.post('move_in_bottom')
         self.advance_time(.5)
 
     def test_move_out_right(self):
