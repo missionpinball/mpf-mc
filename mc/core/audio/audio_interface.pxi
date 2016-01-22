@@ -13,8 +13,7 @@ cdef extern from "SDL.h" nogil:
     ctypedef signed short Sint16
     ctypedef unsigned short Uint16
 
-    cdef int SDL_INIT_AUDIO = 0x00000010
-
+    cdef int SDL_INIT_AUDIO
     cdef int AUDIO_S16SYS
 
     struct SDL_AudioSpec:
@@ -96,8 +95,11 @@ cdef extern from "SDL_mixer.h" nogil:
 
     cdef int MIX_MAX_VOLUME
 
-    ctypedef struct SDL_RWops:
-        pass
+    cdef struct SDL_RWops:
+        long (* seek) (SDL_RWops * context, long offset,int whence)
+        size_t(* read) ( SDL_RWops * context, void *ptr, size_t size, size_t maxnum)
+        size_t(* write) (SDL_RWops * context, void *ptr,size_t size, size_t num)
+        int (* close) (SDL_RWops * context)
 
     cdef enum MIX_InitFlags:
         MIX_INIT_FLAC        = 0x00000001,
@@ -127,6 +129,7 @@ cdef extern from "SDL_mixer.h" nogil:
     int Mix_AllocateChannels(int numchans)
     Mix_Chunk *Mix_QuickLoad_RAW(Uint8 *mem, Uint32 l)
     Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
+    Mix_Chunk *Mix_LoadWAV(char *file)
     void Mix_FreeChunk(Mix_Chunk *chunk)
     int Mix_QuerySpec(int *frequency, Uint16 *format,int *channels)
     int Mix_Volume(int chan, int volume)
@@ -180,11 +183,11 @@ ctypedef struct SoundPlayer:
     int volume
     int sample_pos
     int sound_id
+    int sound_priority
 
 ctypedef struct AudioCallbackData:
     int sample_rate
     int audio_channels
-    Uint16 audio_format
     int master_volume
     int track_count
     TrackAttributes **tracks

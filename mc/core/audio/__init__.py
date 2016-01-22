@@ -3,7 +3,8 @@ Audio module provides all the audio features (playing of sounds) for the media c
 """
 
 import logging
-from mc.core.audio.audio_interface import get_audio_interface, AudioInterface, AudioException, Track
+from mc.core.audio.audio_interface import get_audio_interface, AudioInterface, \
+    AudioException, Track, Sound
 
 __all__ = ('SoundController', )
 
@@ -69,3 +70,5 @@ class SoundController(object):
 
         self.tracks[name] = track
         return True
+
+
