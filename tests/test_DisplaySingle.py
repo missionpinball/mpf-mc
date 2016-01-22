@@ -69,9 +69,11 @@ class TestDisplaySingle(MpfMcTestCase):
                 self.mc.targets['window'].current_slide_name,
                 'slide1')
 
-        # make sure adding a slide at the same priority replaces the current
+        # make sure showing a slide at the same priority replaces the current
         # one.
         slide2 = Slide(mc=self.mc, name='slide2', config={})
+        self.mc.targets['window'].show_slide('slide2')
+
         self.assertEqual(self.mc.targets['window'].current_slide, slide2)
         self.assertEqual(self.mc.targets['window'].current_slide_name,
                          'slide2')
@@ -99,61 +101,52 @@ class TestDisplaySingle(MpfMcTestCase):
         self.mc.displays['window'].current_slide_name = 'slide2'
         self.assertEqual(self.mc.targets['window'].current_slide, slide2)
 
+         # we need to wait a tick to remove the slide we just added
+        self.advance_time()
+
         # now remove the current slide and make sure slide1 comes back
         self.mc.targets['window'].remove_slide(slide2)
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
 
         # add another slide so we have 2
         slide3 = Slide(mc=self.mc, name='slide3', config={})
+        self.assertEqual(len(self.mc.targets['window'].slides), 2)
 
         # also test removing by name
         self.mc.targets['window'].remove_slide('slide1')
         self.assertEqual(self.mc.targets['window'].current_slide, slide3)
 
     def test_priorities(self):
+        # show slide 1, p100
         slide1 = Slide(mc=self.mc, name='slide1', config={}, priority=100)
+        self.mc.targets['window'].show_slide('slide1')
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
 
+        # show slide 2, p0, it should not show
         slide2 = Slide(mc=self.mc, name='slide2', config={}, priority=0)
+        self.mc.targets['window'].show_slide('slide2')
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
 
+        # show slide 3, p200, it should show
         slide3 = Slide(mc=self.mc, name='slide3', config={}, priority=200)
+        self.mc.targets['window'].show_slide('slide3')
         self.assertEqual(self.mc.targets['window'].current_slide, slide3)
 
-        slide4 = copy(slide3)
-        # since slides add themselves on creation, we need to not run that
-        # again
-        slide4.priority = 199
+        # show slide 4, p199, it should not show
+        slide4 = Slide(mc=self.mc, name='slide4', config={}, priority=199)
+        self.mc.targets['window'].show_slide('slide4')
         self.assertLess(slide4.priority,
                         self.mc.targets['window'].current_slide.priority)
 
-        self.mc.targets['window'].add_widget(slide=slide4)
-
-        # slide should not show
+        # confirm that slide 3 is still current
         self.assertEqual(self.mc.targets['window'].current_slide, slide3)
 
-        # test force
-        slide5 = copy(slide3)
-        slide5.priority = 199
-        slide5.name = 'slide5'
-        self.assertLess(slide5.priority,
+        # force slide 4 to show
+        self.assertLess(slide4.priority,
                         self.mc.targets['window'].current_slide.priority)
-
-        self.mc.targets['window'].add_widget(slide=slide5,
-                                             force=True)
+        self.mc.targets['window'].show_slide('slide4', force=True)
 
         # slide should show
-        self.assertEqual(self.mc.targets['window'].current_slide, slide5)
+        self.assertEqual(self.mc.targets['window'].current_slide_name,
+                         'slide4')
 
-        # test not showing
-        slide6 = copy(slide3)
-        slide6.priority = 300
-        slide5.name = 'slide6'
-        self.assertGreater(slide6.priority,
-                           self.mc.targets['window'].current_slide.priority)
-
-        self.mc.targets['window'].add_widget(slide=slide6,
-                                             show=False)
-
-        # slide should not show
-        self.assertEqual(self.mc.targets['window'].current_slide, slide5)

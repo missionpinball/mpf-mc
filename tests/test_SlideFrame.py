@@ -14,6 +14,7 @@ class TestSlideFrame(MpfMcTestCase):
         self.mc.targets['default'].add_slide(name='slide1',
                                              config=self.mc.slide_configs[
                                                  'slide1'])
+        self.mc.targets['default'].show_slide('slide1')
 
         # make sure our slide frame is a valid target
         self.assertIn('frame1', self.mc.targets)

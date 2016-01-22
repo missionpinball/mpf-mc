@@ -67,7 +67,7 @@ class MpfWidget(object):
                 else:
                     self._register_animation_events(k)
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
     def on_size(self, *args):

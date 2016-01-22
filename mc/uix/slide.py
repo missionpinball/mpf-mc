@@ -14,7 +14,7 @@ class Slide(Screen):
         return Slide.next_id
 
     def __init__(self, mc, name, config, target='default', mode=None,
-                 priority=None, show=True, force=False, **kwargs):
+                 priority=None, **kwargs):
         self.mc = mc
         self.name = name
         self.priority = None
@@ -37,9 +37,6 @@ class Slide(Screen):
         else:
             self.mode = None
 
-        if self.mode:
-            self.priority += self.mode.priority
-
         target = mc.targets[target]
 
         self.size_hint = (None, None)
@@ -53,10 +50,11 @@ class Slide(Screen):
             pass
 
         self.mc.active_slides[name] = self
-        target.add_widget(slide=self, show=show, force=force)
+        target.add_widget(self)
 
     def __repr__(self):
-        return '<Slide name={}, priority={}>'.format(self.name, self.priority)
+        return '<Slide name={}, priority={}, id={}>'.format(self.name,
+            self.priority, self.creation_order)
 
     def add_widgets_from_library(self, name, mode=None):
         if name not in self.mc.widget_configs:

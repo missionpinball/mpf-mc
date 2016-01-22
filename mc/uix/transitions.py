@@ -32,8 +32,16 @@ class TransitionManager(object):
                     **kwargs)
 
         else:
-            pass
-            # set default? Or use current?
+            target.transition = NoTransition()
+
+    def get_transition(self, transition_config=None):
+        if transition_config:
+            # The kivy shader transitions can't accept unexpected kwargs
+            kwargs = transition_config.copy()
+            kwargs.pop('type')
+            return self._transitions[transition_config['type']](**kwargs)
+        else:
+            return NoTransition()
 
     def _register_mpf_transitions(self):
         for t in self.mc.machine_config['mpf_mc']['mpf_transition_modules']:
@@ -72,27 +80,6 @@ class MpfTransition(TransitionBase):
                 setattr(self, k, v)
 
         super().__init__()
-
-    def start(self, manager):
-
-        if self.is_active:
-            raise ScreenManagerException('start() is called twice!')
-        self.manager = manager
-        self._anim = Animation(d=self.duration, s=0)
-        self._anim.bind(on_progress=self._on_progress,
-                        on_complete=self._on_complete)
-
-        self.add_screen(self.screen_in)
-        self.screen_in.transition_progress = 0.
-        self.screen_in.transition_state = 'in'
-        self.screen_out.transition_progress = 0.
-        self.screen_out.transition_state = 'out'
-        self.screen_in.dispatch('on_pre_enter')
-        self.screen_out.dispatch('on_pre_leave')
-
-        self.is_active = True
-        self._anim.start(self)
-        self.dispatch('on_progress', 0)
 
     def get_vars(self, progression):
         """Convenience method you can call in your own transition's

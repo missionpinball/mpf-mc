@@ -69,7 +69,7 @@ class TestSlides(MpfMcTestCase):
 
         self.assertEqual(self.mc.modes['mode1'].priority, 500)
 
-        self.assertEqual(slide.priority, 623)
+        self.assertEqual(slide.priority, 123)
 
     def test_no_priority_no_mode(self):
         slide = Slide(mc=self.mc,
@@ -99,6 +99,7 @@ class TestSlides(MpfMcTestCase):
 
         # set a current slide
         self.mc.targets['display1'].add_slide(name='slide1', config={})
+        self.mc.targets['display1'].show_slide('slide1')
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'slide1')
 
@@ -106,6 +107,7 @@ class TestSlides(MpfMcTestCase):
         self.mc.modes['mode1'].start()
         self.mc.targets['display1'].add_slide(name='slide2', config={},
                                               mode=self.mc.modes['mode1'])
+        self.mc.targets['display1'].show_slide('slide2')
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'slide2')
         self.assertEqual(self.mc.targets['display1'].current_slide.priority,

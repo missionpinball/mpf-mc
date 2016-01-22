@@ -4,7 +4,9 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     SlideTransition, SwapTransition,
                                     FadeTransition, WipeTransition,
-                                    FallOutTransition, RiseInTransition)
+                                    FallOutTransition, RiseInTransition,
+                                    ScreenManagerException)
+from kivy.uix.widget import WidgetException
 
 from mc.core.utils import set_position, get_insert_index
 from mc.uix.slide import Slide
@@ -71,8 +73,9 @@ class SlideFrame(MpfWidget, ScreenManager):
         if 'z' not in self.config:
             self.config['z'] = 0
 
-        self.transition = transition_map['none']()
-        self.default_transition = transition_map['none']()
+        self.transition = NoTransition()
+        # Not implemented yet. Maybe some day?
+        # self.default_transition = NoTransition()
 
         self.slide_frame_parent = SlideFrameParent(mc, name, self)
         self.slide_frame_parent.config = self.config
@@ -93,10 +96,10 @@ class SlideFrame(MpfWidget, ScreenManager):
     def current_slide(self, value):
         """Sets the current slide. You can set it to a Slide object or a
         string of the slide name."""
-        if isinstance(value, Slide) and value in self.slides:
-            self.current = value.name
+        if isinstance(value, Slide):
+            self._set_current_slide(value)
         elif type(value) is str:
-            self.current = value
+            self._set_current_slide_name(value)
 
     @property
     def current_slide_name(self):
@@ -107,7 +110,7 @@ class SlideFrame(MpfWidget, ScreenManager):
     def current_slide_name(self, value):
         """Sets the current slide based on the string name of the slide you
         want to be shown."""
-        self.current = value
+        self._set_current_slide_name(value)
 
     @property
     def slides(self):
@@ -115,61 +118,55 @@ class SlideFrame(MpfWidget, ScreenManager):
         frame."""
         return self.screens
 
-    def get_slide_by_name(self, slide_name):
-        for slide in [x for x in self.screens if x.name == slide_name]:
-            return slide
+    def add_slide(self, name, config, priority=None, mode=None):
+        # Note this method just adds it. It doesn't show it.
 
-    def add_slide(self, name, config, priority=0, mode=None, show=True,
-                  force=False):
-        Slide(mc=self.mc, name=name, target=self.name, config=config,
-              mode=mode, show=show, force=force, priority=priority)
+        # Slide() created also adds it to this screen manager
+        return Slide(mc=self.mc, name=name, target=self.name, config=config,
+                     mode=mode, priority=priority)
 
-        if not self.current_screen or priority >= self.current_screen.priority:
-            self.current = name
+    def show_slide(self, slide_name, transition=None, mode=None, force=False,
+                   priority=None):
 
-    def add_widget(self, slide, show=True, force=False):
-        super().add_widget(screen=slide)
+        try:  # does this slide exist in this screen manager already?
+            slide = self.get_screen(slide_name)
+        except ScreenManagerException:  # create it if not
+            slide = self.add_slide(name=slide_name,
+                                   config=self.mc.slide_configs[slide_name],
+                                   priority=priority,
+                                   mode=mode)
 
-        self._sort_slides()
+        if slide.priority >= self.current_slide.priority or force:
+            # We need to show this slide
 
-        if force:
-            self.current = slide.name
-        elif show:
-            self.show_current_slide()
+            # Have to set a transition even if there's not one because we have
+            # to remove whatever transition was last used
+            self.transition = self.mc.transition_manager.get_transition(
+                    transition)
 
-    def _sort_slides(self):
-        # sort reverse order by priority, then by creation order (so if two
-        # slides have the same priority, the newest one is higher priority.
-        self.screens = sorted(self.screens, key=attrgetter('creation_order'),
-                              reverse=True)
-        self.screens = sorted(self.screens, key=attrgetter('priority'),
-                              reverse=True)
-
-    def show_current_slide(self):
-        if self.screens[0] != self.current_screen:
-            self.current = self.screens[0].name
-
-    def show_slide(self, slide_name, force=False):
-        slide = self.get_slide_by_name(slide_name)
-
-        if slide and (slide.priority <= self.current_slide.priority or force):
-            self.current_slide = slide_name
+            self._set_current_slide(slide)
             return True
 
-        else:
+        else:  # Not showing this slide
             return False
 
-    def remove_slide(self, slide):
+    def remove_slide(self, slide, transition_config=None):
         # note there has to be at least one slide, so you can't remove the last
         # one
-        if type(slide) is str:
-            for s in [x for x in self.screens if x.name == slide]:
-                slide = s
 
-        if not isinstance(slide, Slide):
-            return
+        # warning, if you just created a slide, you have to wait at least on
+        # tick before removing it. Can we prevent that? What if someone tilts
+        # at the exact perfect instant when a mode was starting or something?
 
-        if len(self.slides) == 1:
+        # maybe we make sure to run a kivy tick between bcp reads or something?
+
+        try:
+            slide = self.get_screen(slide)
+        except ScreenManagerException:  # no slide by that name
+            if not isinstance(slide, Slide):
+                return
+
+        if len(self.screens) == 1:
             return
 
         for widget in self.children:
@@ -177,14 +174,57 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         self.mc.active_slides.pop(slide.name, None)
 
-        # TODO is this right? Is the screens list in priority order
-        if self.current_screen == self.screens[0]:
-            try:
-                self.current = self.screens[1].name
-            except (IndexError, AttributeError):
-                pass
+        # If the current screen is the active one, find the next highest
+        # priority one to show instead.
+        print(self.current_screen, slide)
+        if self.current_screen == slide:
+            new_slide = self.get_next_highest_slide(slide)
+            self.transition = self.mc.transition_manager.get_transition(
+                transition_config)
+            self._set_current_slide(new_slide)
 
-        self.remove_widget(slide)
+        try:
+            self.remove_widget(slide)
+        except WidgetException:
+            pass
 
-        # TODO check for memory leak. Should probably convert everything else
-        # to a weakref / proxyref
+    def _set_current_slide(self, slide):
+        # I think there's a bug in Kivy 1.9.1. According to the docs, you
+        # should be able to set self.current to a screen name. But if that
+        # screen is already managed by this screen manager, it will raise
+        # an exception, and the source is way deep in their code and not
+        # easy to fix by subclassing. So this is sort of a hack that looks
+        # for that exception, and if it sees it, it just removes and
+        # re-adds the screen.
+        try:
+            self.current = slide.name
+        except WidgetException:
+            self.remove_widget(slide)
+            self.add_widget(slide)
+            self.current = slide.name
+
+    def _set_current_slide_name(self, slide_name):
+        try:
+            self._set_current_slide(self.get_screen(slide_name))
+        except ScreenManagerException:
+            raise ValueError('Cannot set current slide to "{}" as there is '
+                             'no slide in this slide_frame with that '
+                             'name'.format(slide_name))
+
+    def get_next_highest_slide(self, slide):
+        # TODO This should be a list comprehension?
+
+        new_slide = None
+
+        for s in self.slides:
+            if s == slide:
+                continue
+            elif not new_slide:
+                new_slide = s
+            elif s.priority > new_slide.priority:
+                new_slide = s
+            elif (s.priority == new_slide.priority and
+                    s.creation_order > new_slide.creation_order):
+                new_slide = s
+
+        return new_slide
