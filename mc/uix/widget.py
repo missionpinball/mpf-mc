@@ -27,7 +27,7 @@ class MpfWidget(object):
     # our configs. However we use some config keys that Kivy also uses,
     # and we use them for different purposes, so there are some keys that we
     # use that we never want to set on widget base classes.
-    _dont_send_to_kivy = ('anchor_x', 'anchor_y', 'h_pos', 'v_pos', 'x', 'y')
+    _dont_send_to_kivy = ('anchor_x', 'anchor_y', 'x', 'y')
 
     def __init__(self, mc, mode, slide=None, config=None, **kwargs):
         self.size_hint = (None, None)
@@ -64,8 +64,6 @@ class MpfWidget(object):
                                     self.width, self.height,
                                     self.config['x'],
                                     self.config['y'],
-                                    self.config['h_pos'],
-                                    self.config['v_pos'],
                                     self.config['anchor_x'],
                                     self.config['anchor_y'])
         except AttributeError:

@@ -91,8 +91,6 @@ class Slide(Screen):
                                           widget_obj.height,
                                           widget['x'],
                                           widget['y'],
-                                          widget['h_pos'],
-                                          widget['v_pos'],
                                           widget['anchor_x'],
                                           widget['anchor_y'])
 
@@ -131,8 +129,6 @@ class Slide(Screen):
                                   widget.height,
                                   widget.config['x'],
                                   widget.config['y'],
-                                  widget.config['h_pos'],
-                                  widget.config['v_pos'],
                                   widget.config['anchor_x'],
                                   widget.config['anchor_y'])
 

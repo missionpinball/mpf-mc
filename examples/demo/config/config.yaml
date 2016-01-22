@@ -24,8 +24,7 @@ slides:
       text: I AM A TEXT WIDGET ON SLIDE1 WITH DEFAULT SETTINGS
     - type: text  # This is the second widget
       text: HIT THE RIGHT ARROW KEY TO CONTINUE -->
-      v_pos: top
-      y: 75%
+      y: 33%
       animations:  # This widget has some animations for it.
         entrance:
           # The settings in the "entrance" section in the animations section
@@ -43,8 +42,7 @@ slides:
       font_size: 50  # Each type of widget has it's own settings. For example, font_size for text widgets
     - type: text
       text: HIT THE RIGHT ARROW KEY TO CONTINUE (MY FONT SIZE IS 15) -->
-      v_pos: top  # Widgets also take positional settings.
-      y: 75%
+      y: 33%
 
   slide3:
     - type: text
@@ -53,12 +51,12 @@ slides:
       color: ff0000  # You can use standard hex colors for widgets
     - type: text
       text: AGAIN, RIGHT ARROW -->
-      v_pos: top
-      y: 75%
+      y: 33%
+      x: 600
     - type: text
       text: ( <-- ALSO LEFT ARROW GOES BACK)
-      v_pos: top
-      y: 85%
+      y: 33%
+      x: 200
       animations:  # For this animation, we're animating the "x" property.
         entrance:  # "x" is the x position of the widget (like x,y coordinates)
           - property: x
@@ -79,11 +77,9 @@ slides:
       y: -50
     - type: text
       text: KEEP GOING. (WE'LL REMOVE THIS MESSAGE FROM NOW ON)
-      v_pos: top
       y: 75%
     - type: text
       text: JUST KNOW YOU CAN ALWAYS HIT THE LEFT AND RIGHT ARROWS TO GO BACK AND FORTH
-      v_pos: top
       y: 85%
 
   slide5:

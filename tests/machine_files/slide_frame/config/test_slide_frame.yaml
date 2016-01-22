@@ -11,8 +11,10 @@ slides:
     width: 200
     height: 100
     name: frame1
-    v_pos: top
-    h_pos: right
+    y: 100%
+    anchor_y: top
+    x: 100%
+    anchor_x: right
     font_size: 200
   - type: text
     text: SLIDE FRAME BASE

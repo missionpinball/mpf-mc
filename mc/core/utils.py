@@ -33,8 +33,8 @@ def get_insert_index(z, target_widget):
     return index
 
 
-def set_position(parent_w, parent_h, w, h, x=0, y=0, h_pos='center',
-                 v_pos='center', anchor_x=None, anchor_y=None):
+def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
+                 anchor_y='middle'):
     """Returns the x,y position for the lower-left corner of a widget
     within a larger parent frame based on several positioning parameters.
 
@@ -43,34 +43,28 @@ def set_position(parent_w, parent_h, w, h, x=0, y=0, h_pos='center',
         parent_h: Height of the parent frame.
         w: Width of the element you're placing.
         h: Height of the element you're placing.
-        x: (Optional) shifts the x (horizontal) position. If x is a
-            number (int or float) then it will move the widget +/- that many
-            pixels (+ is right, - is left). If x is a string ending in a
-            percent sign (e.g. "80%"), then it will move the widget +/- that
-            percent of the slide's width. (e.g. 10% for a slide with a width of
-            800px will position the widget 80px to the right of where it would
-            otherwise be placed based on the h_pos and align_x values. The
-            default value is '0' which does not shift the widget.
-        y: (Optional) shifts the y (vertical) position. If y is a
-            number (int or float) then it will move the widget +/- that many
-            pixels (+ is up, - is down). If y is a string ending in a
-            percent sign (e.g. "80%"), then it will move the widget +/- that
-            percent of the slide's height. (e.g. 10% for a slide with a
-            height of 600px will position the widget 60px above of where it
-            would otherwise be placed based on the v_pos and align_y values.
-            The default value is '0' which does not shift the widget.
-        h_pos: (Optional) String which describes the horizontal position in the
-            parent frame this widget will be placed. Options include 'left',
-            'right', and 'center' (or 'middle'). Default is 'center'.
-        v_pos: (Optional) String which describes the vertical position in the
-            parent frame this widget will be placed. Options include 'top',
-            'bottom', and 'center' (or 'middle'). Default is 'center'.
+        x: (Optional) Specifies the x (horizontal) position of the widget from
+            the left edge of the slide. Can be a numeric value which
+            represents the actual x value, or can be a percentage (string with
+            percent sign, like '20%') which is set taking into account the size
+            of the parent width. (e.g. parent width of 800 with x='20%'
+            results in x=160. Can also be negative to position the widget
+            partially off the left of the slide. Default value of None will
+            return the horizontal center (parent width / 2).
+        y: (Optional) Specifies the y (vertical) position of the widget from
+            the bottom edge of the slide. Can be a numeric value which
+            represents the actual y value, or can be a percentage (string with
+            percent sign, like '20%') which is set taking into account the size
+            of the parent height. (e.g. parent height of 600 with y='20%'
+            results in y=120. Can also be negative to position the widget
+            partially off the bottom of the slide. Default value of None will
+            return the vertical center (parent height / 2).
         anchor_x: (Optional) Which edge of the widget will be used for
-            positioning. If not specified, it will be set to match the 'h_pos'
-            value.
+            positioning. ('left', 'center' (or 'middle'), or 'right'. If None,
+            'center' will be used.
         anchor_y: (Optional) Which edge of the widget will be used for
-            positioning. If not specified, it will be set to match the 'v_pos'
-            value.
+            positioning. ('top', 'middle' (or 'center'), or 'bottom'. If None,
+            'center' will be used.
 
 
     Returns: Tuple of x, y coordinates for the lower-left corner of the
@@ -78,83 +72,39 @@ def set_position(parent_w, parent_h, w, h, x=0, y=0, h_pos='center',
 
     """
 
-    # Set the anchors. The idea is that if a pos is set but not an anchor, the
-    # intention is that they should be the same. e.g. v_pos = top means the
-    # anchor should also be 'top
-
-    if not v_pos:
-        v_pos = 'center'
-    if not h_pos:
-        h_pos = 'center'
+    # Want to force None to be the default too
     if not anchor_x:
-        anchor_x = h_pos
+        anchor_x = 'center'
     if not anchor_y:
-        anchor_y = v_pos
+        anchor_y = 'middle'
 
-    # set the initial final position based on those anchors
-
-    final_x = 0
-    final_y = 0
-
-    if v_pos in ('center', 'middle'):
-        final_y = parent_h / 2
-
-    elif v_pos == 'top':
-        final_y = parent_h
-
-    if h_pos in ('center', 'middle'):
-        final_x = parent_w / 2
-
-    elif h_pos == 'right':
-        final_x = parent_w
-
-    # apply the x/y values to those positions
-
-    if not x:
-        x = 0
-    if not y:
-        y = 0
-
-    if str(x)[-1] == '%':
-        if h_pos == 'left':
-            final_x = (float(x[:-1]) * parent_w / 100) - final_x
-        elif h_pos in ('center', 'middle'):
-            final_x = (float(x[:-1]) * (parent_w - final_x) / 100)
-        elif h_pos == 'right':
-            final_x = ((float(x[:-1]) * parent_w / 100) - final_x) * -1
-
+    # set x/y
+    if x is None:
+        x = parent_w / 2
+    elif str(x)[-1] == '%':
+        x = float(x[:-1]) * parent_w / 100
     else:
-        final_x += float(x)
+        x = float(x)
 
-    if str(y)[-1] == '%':
-        if v_pos == 'bottom':
-            final_y = (float(y[:-1]) * parent_h / 100) - final_y
-        elif v_pos in ('center', 'middle'):
-            final_y = (float(y[:-1]) * (parent_h - final_y) / 100)
-        elif v_pos == 'top':
-            final_y = ((float(y[:-1]) * parent_h / 100) - final_y) * -1
+    if y is None:
+        y = parent_h / 2
+    elif str(y)[-1] == '%':
+        y = float(y[:-1]) * parent_h / 100
     else:
-        final_y += float(y)
+        y = float(y)
 
-    # calculate and apply the offsets based on the anchors
-
-    x_offset = 0
-    y_offset = 0
-
+    # calculate the x/y offsets based on widget size and anchor
     if anchor_x in ('center', 'middle'):
-        x_offset = w / -2
+        x += w / -2
     elif anchor_x == 'right':
-        x_offset = -w
+        x += -w
 
-    if anchor_y in ('center', 'middle'):
-        y_offset = h / -2
+    if anchor_y in ('middle', 'center'):
+        y += h / -2
     elif anchor_y == 'top':
-        y_offset = -h
+        y += -h
 
-    final_x += x_offset
-    final_y += y_offset
-
-    return final_x, final_y
+    return x, y
 
 
 def set_machine_path(machine_path, machine_files_default='machine_files'):

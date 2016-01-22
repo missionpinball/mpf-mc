@@ -55,22 +55,6 @@ modes:
     - attract
     - game
 
-displaydefaults:
-    Text:
-        font: default
-        size: 10
-        opaque: false
-        v_pos: center
-        h_pos: center
-        x: 0
-        y: 0
-        time: 0s
-        text_color: ffffff
-        background_color: 000000
-        text_shade: 15
-        background_shade: 0
-        antialias: False
-
 fonts:
     default:
         file: Quadrit.ttf
@@ -168,14 +152,12 @@ asset_defaults:
 #      - type: text
 #        text: WAITING FOR
 #        font: small
-#        v_pos: center
-#        y: -4
 #        slide: waiting
+#        y: 60%
 #      - type: text
 #        text: CLIENT CONNECTION...
 #        font: small
-#        v_pos: center
-#        y: 4
+#        y: 40%
 
 debug_profiles:
     verbose:
