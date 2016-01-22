@@ -2,9 +2,8 @@
 Audio module provides all the audio features (playing of sounds) for the media controller.
 """
 
-import logging
-from mc.core.audio.audio_interface import get_audio_interface, AudioInterface, \
-    AudioException, Track, Sound
+from kivy.logger import Logger
+from mc.core.audio.audio_interface import AudioInterface, AudioException, Track, Sound
 
 __all__ = ('SoundController', )
 
@@ -13,7 +12,6 @@ class SoundController(object):
 
     def __init__(self, mc):
         self.mc = mc
-        self.log = logging.getLogger('SoundController')
 
         # The sounds dictionary contains all sounds specified in the config files keyed by name.
         # The actual audio data will be managed by the PinAudio extension library.  The sounds
@@ -33,8 +31,10 @@ class SoundController(object):
 
         # Initialize audio interface library (get audio output)
         try:
-            self.audio_interface = get_audio_interface()
+            self.audio_interface = AudioInterface.initialize()
         except AudioException:
+            Logger.error("SoundController: Could not initialize the audio interface. "
+                         "Audio features will not be available.")
             self.audio_interface = None
 
         # Setup tracks/mixer channels (including initial volume levels)
@@ -56,15 +56,16 @@ class SoundController(object):
         value = max(min(value, 1.0), 0.0)
         self._master_volume = value
 
-    def _add_track(self, name, max_simultaneous_sounds, volume=1.0):
+    def _create_track(self, name, max_simultaneous_sounds, volume=1.0):
         if self.audio_interface is None:
             return False
 
         if name in self.tracks:
-            print("Track {} already exists".format(name))
+            Logger.error("SoundController: Could not create '{}' track - a track with that name already exists"
+                         .format(name))
             return False
 
-        track = self.audio_interface.add_track(name, max_simultaneous_sounds, volume)
+        track = self.audio_interface.create_track(name, max_simultaneous_sounds, volume)
         if track is None:
             return False
 

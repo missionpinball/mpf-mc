@@ -5,7 +5,7 @@ Audio Library
 This library requires both the SDL2 and SDL_Mixer libraries.
 """
 
-__all__ = ('get_audio_interface',
+__all__ = ('audio_interface_instance',
            'AudioInterface',
            'AudioException',
            'Track',
@@ -13,7 +13,7 @@ __all__ = ('get_audio_interface',
            'Sound',
            )
 
-__version_info__ = ('0', '1', '0-dev2')
+__version_info__ = ('0', '1', '0-dev3')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -23,6 +23,8 @@ from time import time
 
 from queue import PriorityQueue, Empty
 import sys
+from kivy.logger import Logger
+
 
 include "audio_interface.pxi"
 
@@ -36,29 +38,6 @@ DEF MAX_AUDIO_VALUE_S16 = ((1 << (16 - 1)) - 1)
 DEF MIN_AUDIO_VALUE_S16 = -(1 << (16 - 1))
 
 cdef object audio_interface_instance = None
-
-def get_audio_interface(int rate=44100, int channels=2, int buffer_size=4096):
-    """
-    Initializes and retrieves the audio interface instance.
-    Args:
-        rate: The audio sample rate used in the library
-        channels: The number of channels to use (1=mono, 2=stereo)
-        buffer_size: The audio buffer size to use (must be power of two)
-
-    Returns:
-        An AudioInterface object instance.
-    """
-    global audio_interface_instance
-
-    # If instance has already been initialized, return it (we can't have more than one
-    # audio interface instance).
-    if audio_interface_instance is not None:
-        return audio_interface_instance
-
-    # Initialize the audio instance and return it
-    audio_interface_instance = AudioInterface(rate, channels, buffer_size)
-    return audio_interface_instance
-
 
 class AudioException(Exception):
     """Exception returned by the audio module
@@ -109,14 +88,18 @@ cdef class AudioInterface:
 
         # Initialize the SDL audio system
         if SDL_Init(SDL_INIT_AUDIO) < 0:
-            print('SDL_Init: %s' % SDL_GetError())
+            Logger.error('SDL_Init: %s' % SDL_GetError())
             raise AudioException('Unable to initialize SDL (SDL_Init call failed: %s)' % SDL_GetError())
 
         # Initialize the SDL_Mixer library to establish the output audio format and encoding
         # (sample rate, bit depth, buffer size)
         if Mix_OpenAudio(rate, AUDIO_S16SYS, channels, buffer_length):
-            print('Mix_OpenAudio: %s' % SDL_GetError())
+            Logger.error('Mix_OpenAudio: %s' % SDL_GetError())
             raise AudioException('Unable to open audio for output (Mix_OpenAudio failed: %s)' % SDL_GetError())
+
+        Logger.info("AudioInterface: Initialized AudioInterface {}".format(AudioInterface.get_version()))
+        Logger.info("AudioInterface: Loaded {}".format(AudioInterface.get_sdl_version()))
+        Logger.info("AudioInterface: Loaded {}".format(AudioInterface.get_sdl_mixer_version()))
 
         # Lock SDL from calling the audio callback functions
         SDL_LockAudio()
@@ -124,9 +107,10 @@ cdef class AudioInterface:
         # Determine the actual audio format in use by the opened audio device.  This may or may not match
         # the parameters used to initialize the audio interface.
         self.buffer_length = buffer_length
-        print('AudioInterface requested: ', rate, channels, buffer_length)
+        Logger.info('AudioInterface: requested {} {} {}'.format(rate, channels, buffer_length))
         Mix_QuerySpec(&self.sample_rate, NULL, &self.audio_channels)
-        print('AudioInterface received: ', self.sample_rate, self.audio_channels, self.buffer_length)
+        Logger.info('AudioInterface: received {} {} {}'
+                    .format(self.sample_rate, self.audio_channels, self.buffer_length))
 
         # Allocate memory for the audio callback data structure
         self.audio_callback_data = <AudioCallbackData*>calloc(1, sizeof(AudioCallbackData))
@@ -179,6 +163,28 @@ cdef class AudioInterface:
         # This is an SDL_Mixer library function call.
         Mix_RegisterEffect(self.mixer_channel, audio_callback_fn, NULL, <void *>self.audio_callback_data)
 
+    @staticmethod
+    def initialize(int rate=44100, int channels=2, int buffer_size=4096):
+        """
+        Initializes and retrieves the audio interface instance.
+        Args:
+            rate: The audio sample rate used in the library
+            channels: The number of channels to use (1=mono, 2=stereo)
+            buffer_size: The audio buffer size to use (must be power of two)
+
+        Returns:
+            An AudioInterface object instance.
+        """
+        global audio_interface_instance
+
+        # If instance has already been initialized, return it (we can't have more than one
+        # audio interface instance).
+        if audio_interface_instance is not None:
+            return audio_interface_instance
+
+        # Initialize the audio instance and return it
+        audio_interface_instance = AudioInterface(rate, channels, buffer_size)
+        return audio_interface_instance
 
     @staticmethod
     def get_version():
@@ -252,6 +258,15 @@ cdef class AudioInterface:
 
         SDL_UnlockAudio()
 
+    @staticmethod
+    def get_max_tracks():
+        """ Returns the maximum number of tracks allowed. """
+        return MAX_TRACKS
+
+    def get_track_count(self):
+        """ Returns the number of tracks that have been created. """
+        return len(self.tracks)
+
     def get_track(self, int track_num):
         """
         Returns the track with the specified track number.
@@ -276,28 +291,28 @@ cdef class AudioInterface:
 
         return None
 
-    def add_track(self, str name not None,
-                  int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT, float volume=1.0):
+    def create_track(self, str name not None,
+                     int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT, float volume=1.0):
         """
-        Adds a new track to the audio interface
+        Creates a new track in the audio interface
         Args:
             name: The name of the new track
             max_simultaneous_sounds: The maximum number of sounds that may be played at one time on the track
             volume: The track volume (0.0 to 1.0)
 
         Returns:
-            A Track object for the newly added track
+            A Track object for the newly created track
         """
         cdef int track_num = len(self.tracks)
         if track_num == MAX_TRACKS:
-            print("Add track failed: The maximum number of tracks ({}) has been reached.".format(MAX_TRACKS))
+            Logger.error("Add track failed: The maximum number of tracks ({}) has been reached.".format(MAX_TRACKS))
             return None
 
         # Make sure track name does not already exist (no duplicates allowed)
         name = name.lower()
         for track in self.tracks:
             if name == track.name:
-                print("Add track failed: The track name ({}) already exists.".format(name))
+                Logger.error("Add track failed: The track name '{}' already exists.".format(name))
                 return None
 
         # Make sure audio callback function cannot be called while we are changing the track data
@@ -313,6 +328,8 @@ cdef class AudioInterface:
 
         # Allow audio callback function to be called again
         SDL_UnlockAudio()
+
+        Logger.info("The '{}' track has successfully been created.".format(name))
 
         return new_track
 
@@ -497,8 +514,9 @@ cdef class Track:
     Track class
     """
     # The name of the track
-    cdef str name
+    cdef str _name
     cdef object _sound_queue
+    cdef float _volume
 
     # Track attributes need to be stored in a C struct in order for them to be accessible in
     # the SDL callback functions without the GIL (for performance reasons).  The TrackAttributes
@@ -520,8 +538,11 @@ cdef class Track:
 
         # Make sure the number of simultaneous sounds is within the allowable range
         if max_simultaneous_sounds > MAX_SIMULTANEOUS_SOUNDS_LIMIT:
+            Logger.warning("AudioInterface: The maximum number of simultaneous sounds per track is {}"
+                           .format(MAX_SIMULTANEOUS_SOUNDS_LIMIT))
             max_simultaneous_sounds = MAX_SIMULTANEOUS_SOUNDS_LIMIT
         elif max_simultaneous_sounds < 1:
+            Logger.warning("AudioInterface: The minimum number of simultaneous sounds per track is 1")
             max_simultaneous_sounds = 1
 
         # Allocate memory for the track attributes
@@ -529,7 +550,7 @@ cdef class Track:
         self.attributes.track_num = track_num
         self.attributes.max_simultaneous_sounds = max_simultaneous_sounds
         self.volume = volume
-        self.name = name
+        self._name = name
 
         # Create the SDL mutex for the track (used for multi-threaded locking/thread safety)
         self.attributes.mutex = SDL_CreateMutex()
@@ -574,30 +595,36 @@ cdef class Track:
             self.attributes = NULL
 
     def __repr__(self):
-        return '<Track.{}({})>'.format(self.name, self.track_num)
+        return '<Track.{}({})>'.format(self.name, self.number)
 
     property name:
         def __get__(self):
-            return self.name
-
-    property track_num:
-        def __get__(self):
-            if self.attributes != NULL:
-                return self.attributes.track_num
-            else:
-                return -1
-
-    property max_simultaneous_sounds:
-        def __get__(self):
-            return self.attributes.max_simultaneous_sounds
+            return self._name
 
     property volume:
         def __get__(self):
-            return self.attributes.volume / MIX_MAX_VOLUME
+            return self._volume
 
         def __set__(self, float value):
-            value = max(min(value, 1.0), 0.0)
-            self.attributes.volume = int(value * MIX_MAX_VOLUME)
+            if self.attributes != NULL:
+                value = max(min(value, 1.0), 0.0)
+                self._volume = value
+                # Volume used in SDL_Mixer is an integer between 0 and MIX_MAX_VOLUME (0 to 128)
+                self.attributes.volume = int(self._volume * MIX_MAX_VOLUME)
+
+    @property
+    def number(self):
+        if self.attributes != NULL:
+            return self.attributes.track_num
+        else:
+            return -1
+
+    @property
+    def max_simultaneous_sounds(self):
+        if self.attributes != NULL:
+            return self.attributes.max_simultaneous_sounds
+        else:
+            return 0
 
     cdef int get_idle_sound_player(self):
         """
@@ -751,18 +778,14 @@ class Sound(object):
     A Sound may only be played on one track
     """
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self._container = MixChunkContainer()
-        self.name = None
-        self.file_name = None
-        self.track = None
-        self.priority = 0
-        self.expiration_time = None
-        self.id = None
-        self.ducking_envelope = None
+        self._name = None
+
+        super(Sound, self).__init__(**kwargs)
 
     def __repr__(self):
-        return '<Sound.{}(Loaded={})>'.format(self.name, self.loaded)
+        return '<Sound.{}.{} (Loaded={})>'.format(self.id, self.name, self.loaded)
 
     def _initialize_asset(self):
         # Load attributes from config file
@@ -781,12 +804,19 @@ class Sound(object):
         return mc.chunk != NULL
 
     @property
-    def name(self):
-        return self._name
+    def id(self):
+        """
+        The id property contains a unique identifier for the sound (based on the Python id()
+        function).  This id is used in the audio interface to uniquely identify a sound
+        (rather than the name) due to the hassle of passing strings between Python and Cython.
+        Returns:
+            An integer uniquely identifying the sound
+        """
+        return id(self)
 
     @property
-    def file_name(self):
-        return self._file_name
+    def name(self):
+        return self._name
 
     def load(self):
         """
@@ -809,11 +839,11 @@ class Sound(object):
         # Attempt to load the file
         cdef Mix_Chunk *chunk = Mix_LoadWAV(c_file_name)
         if chunk == NULL:
-            print("Sound: Unable to load source file '{}' - {}".format(self._file_name, SDL_GetError()))
+            Logger.error("Sound: Unable to load source file '{}' - {}".format(self._file_name, SDL_GetError()))
             return False
 
         # Create a Python container object to wrap the Mix_Chunk C pointer
-        cdef MixChunkContainer mc = self.container
+        cdef MixChunkContainer mc = self._container
         mc.chunk = chunk
         return True
 
