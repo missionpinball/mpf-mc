@@ -125,7 +125,7 @@ slide_player:
       type: push
 
 
-scriptlets:
+mc_scriptlets:
   demo_driver.DemoDriver
 
 keyboard:

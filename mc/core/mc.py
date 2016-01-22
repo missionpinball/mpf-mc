@@ -241,10 +241,10 @@ class MpfMc(App):
         self.events._process_event_queue()
 
     def _load_scriptlets(self):
-        if 'scriptlets' in self.machine_config:
-            self.machine_config['scriptlets'] = self.machine_config['scriptlets'].split(' ')
+        if 'mc_scriptlets' in self.machine_config:
+            self.machine_config['mc_scriptlets'] = self.machine_config['mc_scriptlets'].split(' ')
 
-            for scriptlet in self.machine_config['scriptlets']:
+            for scriptlet in self.machine_config['mc_scriptlets']:
 
                 i = __import__(self.machine_config['mpf_mc']['paths']['scriptlets']
                                + '.'

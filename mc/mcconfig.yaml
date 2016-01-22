@@ -43,7 +43,7 @@ mpf_mc:
         animations: animations
         movies: movies
         modes: modes
-        scriptlets: mc_scriptlets
+        scriptlets: scriptlets
 
     allow_invalid_config_sections: true
     config_versions_file: tools/config_versions.yaml
@@ -207,7 +207,7 @@ kivy_config:
     maxfps: 60
     multisamples: 2
     position: auto  # auto, custom
-    show_cursor: 0
+    show_cursor: 1
 #    top: 0
     resizable: 1
     rotation: 0
