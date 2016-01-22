@@ -176,7 +176,6 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         # If the current screen is the active one, find the next highest
         # priority one to show instead.
-        print(self.current_screen, slide)
         if self.current_screen == slide:
             new_slide = self.get_next_highest_slide(slide)
             self.transition = self.mc.transition_manager.get_transition(

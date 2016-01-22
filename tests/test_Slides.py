@@ -129,3 +129,12 @@ class TestSlides(MpfMcTestCase):
         # Make sure we have one less active slide
         self.assertEqual(len(self.mc.active_slides), active_slides - 1)
         self.advance_time(0.01)
+
+    def test_quick_actions(self):
+        # There was a bug where immediately adding and then removing a slide
+        # would crash because the kivy event loop didn't get a chance to run.
+
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+        self.mc.targets['default'].remove_slide('slide1')
