@@ -149,17 +149,6 @@ class McConfig(MpfConfig):
         if 'color' in config:
             config['color'] = get_color_from_hex(config['color'])
 
-        config['_parsed_'] = True
-
-        if 'v_pos' not in config:
-            config['v_pos'] = 'center'
-        if 'h_pos' not in config:
-            config['h_pos'] = 'center'
-        if 'x' not in config:
-            config['x'] = 0
-        if 'y' not in config:
-            config['y'] = 0
-
         if 'animations' in config:
             config['animations'] = self.process_animations_from_slide_config(
                     config['animations'])

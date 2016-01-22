@@ -9,12 +9,12 @@ slides:
   slide1:
     - type: text
       text: TRANSITION TEST
-      y: 20
+      y: 33%
       color: ff0000
       font_size: 50
     - type: text
       text: ========== SLIDE 1 ===========
-      y: -20
+      y: 66%
       color: ff0000
       font_size: 50
 
@@ -23,12 +23,12 @@ slides:
       text: TRANSITION TEST
       color: 00ff00
       font_size: 50
-      y: 20
+      y: 33%
     - type: text
       text: ----------- SLIDE 2 ------------
       color: 00ff00
       font_size: 50
-      y: -20
+      y: 66%
 
 slide_player:
   show_slide1:
@@ -120,13 +120,22 @@ slide_player:
     slide: slide2
     transition:
       type: rise_in
-  no_transition_1:
-    slide: slide2
-    transition: None
-  no_transition_2:
-    slide: slide2
-    transition: false
-  no_transition_3:
-    slide: slide2
+#  no_transition_1:
+#    slide: slide2
+#    transition: None
+#  no_transition_2:
+#    slide: slide2
+#    transition: false
+#  no_transition_3:
+#    slide: slide2
+#    transition:
+#      type: none
+
+  show_slide1_with_push:
+    slide: slide1
     transition:
-      type: none
+      type: push
+      direction: right
+  show_slide2_no_transition:
+    slide: slide2
+

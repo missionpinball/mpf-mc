@@ -24,8 +24,7 @@ slides:
       text: I AM A TEXT WIDGET ON SLIDE1 WITH DEFAULT SETTINGS
     - type: text  # This is the second widget
       text: HIT THE RIGHT ARROW KEY TO CONTINUE -->
-      v_pos: top
-      y: 75%
+      y: 33%
       animations:  # This widget has some animations for it.
         entrance:
           # The settings in the "entrance" section in the animations section
@@ -43,8 +42,7 @@ slides:
       font_size: 50  # Each type of widget has it's own settings. For example, font_size for text widgets
     - type: text
       text: HIT THE RIGHT ARROW KEY TO CONTINUE (MY FONT SIZE IS 15) -->
-      v_pos: top  # Widgets also take positional settings.
-      y: 75%
+      y: 33%
 
   slide3:
     - type: text
@@ -53,19 +51,21 @@ slides:
       color: ff0000  # You can use standard hex colors for widgets
     - type: text
       text: AGAIN, RIGHT ARROW -->
-      v_pos: top
-      y: 75%
+      y: 33%
+      x: 66%
     - type: text
       text: ( <-- ALSO LEFT ARROW GOES BACK)
-      v_pos: top
-      y: 85%
+      y: 33%
+      x: 22%
       animations:  # For this animation, we're animating the "x" property.
         entrance:  # "x" is the x position of the widget (like x,y coordinates)
           - property: x
-            value: 225  # In step 1, we set x to 225
+            value: 20%  # In step 1, we set x to 225
+            duration: .25s
           - property: x
-            value: 200  # In step 2, we set it back to 200
+            value: 22%  # In step 2, we set it back to 200
             repeat: true  # and repeat!
+            duration: 250ms
 
   slide4:
     - type: text
@@ -79,11 +79,9 @@ slides:
       y: -50
     - type: text
       text: KEEP GOING. (WE'LL REMOVE THIS MESSAGE FROM NOW ON)
-      v_pos: top
       y: 75%
     - type: text
       text: JUST KNOW YOU CAN ALWAYS HIT THE LEFT AND RIGHT ARROWS TO GO BACK AND FORTH
-      v_pos: top
       y: 85%
 
   slide5:
@@ -125,7 +123,7 @@ slide_player:
       type: push
 
 
-scriptlets:
+mc_scriptlets:
   demo_driver.DemoDriver
 
 keyboard:

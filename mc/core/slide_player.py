@@ -11,10 +11,13 @@ class SlidePlayer(ConfigPlayer):
         # user could also entry 'no' or 'false' which would be processed by the
         # YAML processor as NoneType. So we need to look for that and convert
         # it.
-        if ('transition' in config and
-                    type(config['transition']) is str and
-                    config['transition'].lower() == 'none'):
-            config['transition'] = dict(type='none')
+
+        # This code can be used to force No Transition if we implement default
+        # transitions in the future
+        # if ('transition' in config and
+        #             type(config['transition']) is str and
+        #             config['transition'].lower() == 'none'):
+        #     config['transition'] = dict(type='none')
 
         if config.get('transition', None):
             config['transition'] = self.mc.config_processor.process_transition(
@@ -37,23 +40,11 @@ class SlidePlayer(ConfigPlayer):
 
             if s['target']:
                 target = self.mc.targets[s['target']]
-
             elif mode:
                 target = mode.target
             else:
                 target = self.mc.targets['default']
 
-            self.mc.transition_manager.set_transition(target, s['transition'])
-
-            # if the slide already exists and is not active, show it
-            if not target.show_slide(name, s['force']):
-                try:
-                    priority = s['priority']
-                except KeyError:
-                    priority = 0
-
-                config = self.mc.slide_configs[name]
-
-                target.add_slide(name=name, config=config,
-                                 show=s['show'], force=s['force'],
-                                 priority=priority, mode=mode)
+            target.show_slide(slide_name=name, transition=s['transition'],
+                              mode=mode, force=s['force'],
+                              priority=s['priority'])

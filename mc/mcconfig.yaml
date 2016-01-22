@@ -43,7 +43,7 @@ mpf_mc:
         animations: animations
         movies: movies
         modes: modes
-        scriptlets: mc_scriptlets
+        scriptlets: scriptlets
 
     allow_invalid_config_sections: true
     config_versions_file: tools/config_versions.yaml
@@ -54,22 +54,6 @@ timing:
 modes:
     - attract
     - game
-
-displaydefaults:
-    Text:
-        font: default
-        size: 10
-        opaque: false
-        v_pos: center
-        h_pos: center
-        x: 0
-        y: 0
-        time: 0s
-        text_color: ffffff
-        background_color: 000000
-        text_shade: 15
-        background_shade: 0
-        antialias: False
 
 fonts:
     default:
@@ -168,14 +152,12 @@ asset_defaults:
 #      - type: text
 #        text: WAITING FOR
 #        font: small
-#        v_pos: center
-#        y: -4
 #        slide: waiting
+#        y: 60%
 #      - type: text
 #        text: CLIENT CONNECTION...
 #        font: small
-#        v_pos: center
-#        y: 4
+#        y: 40%
 
 debug_profiles:
     verbose:
@@ -207,7 +189,7 @@ kivy_config:
     maxfps: 60
     multisamples: 2
     position: auto  # auto, custom
-    show_cursor: 0
+    show_cursor: 1
 #    top: 0
     resizable: 1
     rotation: 0

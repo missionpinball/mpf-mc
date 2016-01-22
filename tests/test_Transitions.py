@@ -1,6 +1,6 @@
 from tests.MpfMcTestCase import MpfMcTestCase
 from mc.transitions.push import PushTransition
-from kivy.uix.screenmanager import WipeTransition
+from kivy.uix.screenmanager import WipeTransition, NoTransition
 
 class TestTransitions(MpfMcTestCase):
     def get_machine_path(self):
@@ -43,16 +43,51 @@ class TestTransitions(MpfMcTestCase):
         self.assertEqual(transition.easing, 'out_bounce')
         self.assertTrue(isinstance(transition, PushTransition))
 
+    def test_target_transition_reset_when_done(self):
+        # Show slide1 with no transition
+        self.mc.events.post('show_slide1')
+        self.advance_time(1)
+        self.assertTrue(isinstance(self.mc.targets['default'].transition,
+                                   NoTransition))
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
 
-    def test_target_default_transition(self):
-        pass
+        # Show slide2 with a transition
+        self.mc.events.post('push_left')
+        self.advance_time(1)
+        self.assertTrue(isinstance(self.mc.targets['default'].transition,
+                                   PushTransition))
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide2')
 
-    def test_target_transition_reset_when_doen(self):
-        pass
+        # Go back to slide1 with a transition
+        self.mc.events.post('show_slide1_with_push')
+        self.advance_time(1)
+        self.assertTrue(isinstance(self.mc.targets['default'].transition,
+                                   PushTransition))
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
 
-    def test_none_transition_removing_current(self):
-        pass
+        self.mc.events.post('push_left')
+        self.advance_time(1)
+        self.assertTrue(isinstance(self.mc.targets['default'].transition,
+                                   PushTransition))
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide2')
 
+        self.mc.events.post('show_slide1')
+        self.advance_time(1)
+        self.assertTrue(isinstance(self.mc.targets['default'].transition,
+                                   NoTransition))
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('show_slide2_no_transition')
+        self.advance_time(1)
+        self.assertTrue(isinstance(self.mc.targets['default'].transition,
+                                   NoTransition))
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide2')
 
     def test_push_left(self):
         self.mc.events.post('show_slide1')
@@ -156,20 +191,20 @@ class TestTransitions(MpfMcTestCase):
         self.mc.events.post('rise_in')
         self.advance_time(.5)
 
-    def test_no_transition_1(self):
-        self.mc.events.post('show_slide1')
-        self.advance_time()
-        self.mc.events.post('no_transition_1')
-        self.advance_time(.5)
-
-    def test_no_transition_2(self):
-        self.mc.events.post('show_slide1')
-        self.advance_time()
-        self.mc.events.post('no_transition_2')
-        self.advance_time(.5)
-
-    def test_no_transition_3(self):
-        self.mc.events.post('show_slide1')
-        self.advance_time()
-        self.mc.events.post('no_transition_3')
-        self.advance_time(.5)
+    # def test_no_transition_1(self):
+    #     self.mc.events.post('show_slide1')
+    #     self.advance_time()
+    #     self.mc.events.post('no_transition_1')
+    #     self.advance_time(.5)
+    #
+    # def test_no_transition_2(self):
+    #     self.mc.events.post('show_slide1')
+    #     self.advance_time()
+    #     self.mc.events.post('no_transition_2')
+    #     self.advance_time(.5)
+    #
+    # def test_no_transition_3(self):
+    #     self.mc.events.post('show_slide1')
+    #     self.advance_time()
+    #     self.mc.events.post('no_transition_3')
+    #     self.advance_time(.5)

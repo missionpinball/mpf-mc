@@ -20,8 +20,8 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(len(s1w0['entrance']), 2)
         self.assertIs(type(s1w0['entrance'][0]), dict)
         self.assertIs(type(s1w0['entrance'][1]), dict)
-        self.assertEqual(s1w0['entrance'][0]['value'], [101])
-        self.assertEqual(s1w0['entrance'][1]['value'], [100])
+        self.assertEqual(s1w0['entrance'][0]['value'], ['101'])
+        self.assertEqual(s1w0['entrance'][1]['value'], ['100'])
 
         # slide def, single dict animation
         s2w0 = self.mc.slide_configs['slide2'][0]['animations']
@@ -29,7 +29,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertIs(type(s2w0['entrance2']), list)
         self.assertEqual(len(s2w0['entrance2']), 1)
         self.assertIs(type(s2w0['entrance2'][0]), dict)
-        self.assertEqual(s2w0['entrance2'][0]['value'], [0 ,0])
+        self.assertEqual(s2w0['entrance2'][0]['value'], ['0' ,'0'])
         self.assertEqual(s2w0['entrance2'][0]['property'], ['x', 'y'])
 
         # slide def, 1 event, list of 2 named animations
@@ -67,7 +67,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertIs(type(s5w0['event5']), list)
         self.assertEqual(len(s5w0['event5']), 1)
         self.assertIs(type(s5w0['event5'][0]), dict)
-        self.assertEqual(s5w0['event5'][0]['value'], [98])
+        self.assertEqual(s5w0['event5'][0]['value'], ['98'])
 
         # slide with 1 widget with no animations
         self.assertIn('animations', self.mc.slide_configs['slide6'][0])
@@ -86,7 +86,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(self.mc.animation_configs['fade_in'][0]['easing'],
                          'linear')
 
-        # two animations, list
+        # two animations, list, with values as percent strings
         self.assertIs(type(self.mc.animation_configs['multi']), list)
         self.assertEqual(len(self.mc.animation_configs['multi']), 2)
         self.assertIs(type(self.mc.animation_configs['multi'][0]), dict)
@@ -163,4 +163,4 @@ class TestAnimation(MpfMcTestCase):
 
         # post the event to animate it
         self.mc.events.post('entrance3')
-        self.advance_time()
+        self.advance_time(1)

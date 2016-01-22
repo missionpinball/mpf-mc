@@ -40,6 +40,7 @@ class TestWidget(MpfMcTestCase):
 
     def test_adding_widgets_to_slide(self):
         self.mc.targets['default'].add_slide(name='slide1', config={})
+        self.mc.targets['default'].show_slide('slide1')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 
@@ -78,6 +79,7 @@ class TestWidget(MpfMcTestCase):
     def test_widget_player_add_to_current_slide(self):
         # create a slide
         self.mc.targets['default'].add_slide(name='slide1', config={})
+        self.mc.targets['default'].show_slide('slide1')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 
@@ -93,10 +95,12 @@ class TestWidget(MpfMcTestCase):
     def test_widget_player_add_to_named_slide(self):
         # create two slides
         self.mc.targets['default'].add_slide(name='slide1', config={})
+        self.mc.targets['default'].show_slide('slide1')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 
         self.mc.targets['default'].add_slide(name='slide2', config={})
+        self.mc.targets['default'].show_slide('slide2')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide2')
 
@@ -122,10 +126,12 @@ class TestWidget(MpfMcTestCase):
     def test_widget_player_add_to_target(self):
         # create two slides
         self.mc.targets['display2'].add_slide(name='slide1', config={})
+        self.mc.targets['display2'].show_slide('slide1')
         self.assertEqual(self.mc.targets['display2'].current_slide_name,
                          'slide1')
 
         self.mc.targets['display2'].add_slide(name='slide2', config={})
+        self.mc.targets['display2'].show_slide('slide2')
         self.assertEqual(self.mc.targets['display2'].current_slide_name,
                          'slide2')
 
@@ -153,6 +159,7 @@ class TestWidget(MpfMcTestCase):
     def test_removing_mode_widget_on_mode_stop(self):
         # create a slide and add some base widgets
         self.mc.targets['default'].add_slide(name='slide1', config={})
+        self.mc.targets['default'].show_slide('slide1')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 
@@ -193,6 +200,7 @@ class TestWidget(MpfMcTestCase):
     def test_widgets_in_slide_frame_parent(self):
         # create a slide and add some base widgets
         self.mc.targets['default'].add_slide(name='slide1', config={})
+        self.mc.targets['default'].show_slide('slide1')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 
@@ -222,6 +230,7 @@ class TestWidget(MpfMcTestCase):
 
         # now switch the slide
         self.mc.targets['default'].add_slide(name='slide2', config={})
+        self.mc.targets['default'].show_slide('slide2')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide2')
 
@@ -238,6 +247,7 @@ class TestWidget(MpfMcTestCase):
     def test_removing_mode_widget_from_parent_frame_on_mode_stop(self):
         # create a slide and add some base widgets
         self.mc.targets['default'].add_slide(name='slide1', config={})
+        self.mc.targets['default'].show_slide('slide1')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 

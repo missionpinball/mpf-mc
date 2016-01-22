@@ -119,8 +119,8 @@ class TestSlidePlayer(MpfMcTestCase):
         # start the mode again (priority 500)
         self.mc.modes['mode1'].start()
 
-        # show a slide, but priority -450 which should equal priority 50 and
-        # mean the slide will not be shown
+        # show a slide, but priority -150 which means the slide will not be
+        # shown
         self.mc.events.post('show_mode1_slide_2')
         self.advance_time()
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
@@ -133,4 +133,4 @@ class TestSlidePlayer(MpfMcTestCase):
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'mode1_slide_2')
         self.assertEqual(self.mc.targets['display1'].current_slide.priority,
-                         50)
+                         150)

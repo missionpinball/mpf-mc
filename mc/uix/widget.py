@@ -4,7 +4,7 @@ from kivy.animation import Animation
 from kivy.properties import ObjectProperty
 from mpf.system.config import CaseInsensitiveDict
 
-from mc.core.utils import set_position
+from mc.core.utils import set_position, percent_to_float
 
 
 class MpfWidget(object):
@@ -27,7 +27,8 @@ class MpfWidget(object):
     # our configs. However we use some config keys that Kivy also uses,
     # and we use them for different purposes, so there are some keys that we
     # use that we never want to set on widget base classes.
-    _dont_send_to_kivy = ('anchor_x', 'anchor_y', 'h_pos', 'v_pos', 'x', 'y')
+    _dont_send_to_kivy = ('anchor_x', 'anchor_y', 'x', 'y')
+
 
     def __init__(self, mc, mode, slide=None, config=None, **kwargs):
         self.size_hint = (None, None)
@@ -40,6 +41,18 @@ class MpfWidget(object):
         self.ready = False
         self.animation = None
         self._animation_event_keys = set()
+
+        # some attributes can be expressed in percentages. This dict holds
+        # those, key is attribute name, val is max value
+        try:
+            self._percent_prop_dicts = dict(x=slide.width,
+                                            y=slide.height,
+                                            width=slide.width,
+                                            height=slide.height,
+                                            opacity=1,
+                                            line_height=1)
+        except AttributeError:
+            self._percent_prop_dicts = dict()
 
         for k, v in self.config.items():
             if k not in self._dont_send_to_kivy and hasattr(self, k):
@@ -54,7 +67,7 @@ class MpfWidget(object):
                 else:
                     self._register_animation_events(k)
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
     def on_size(self, *args):
@@ -64,8 +77,6 @@ class MpfWidget(object):
                                     self.width, self.height,
                                     self.config['x'],
                                     self.config['y'],
-                                    self.config['h_pos'],
-                                    self.config['v_pos'],
                                     self.config['anchor_x'],
                                     self.config['anchor_y'])
         except AttributeError:
@@ -95,6 +106,17 @@ class MpfWidget(object):
         for settings in animation_list:
             prop_dict = dict()
             for prop, val in zip(settings['property'], settings['value']):
+                try:
+                    val = percent_to_float(val, self._percent_prop_dicts[prop])
+                except KeyError:
+                    # because widget properties can include a % sign, they are
+                    # all strings, so even ones that aren't on the list to look
+                    # for percent signs have to be converted to numbers.
+                    if '.' in val:
+                        val = float(val)
+                    else:
+                        val = int(val)
+
                 prop_dict[prop] = val
 
             anim = Animation(duration=settings['duration'],

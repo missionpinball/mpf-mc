@@ -96,10 +96,10 @@ animations:
 
   multi:
   - property: height
-    value: 1
+    value: 100%
     duration: 1s
   - property: width
-    value: 0
+    value: 0%
     duration: 100ms
     timing: after_previous
     repeat: False
