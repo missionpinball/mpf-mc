@@ -15,7 +15,6 @@ slides:
     anchor_y: top
     x: 100%
     anchor_x: right
-    font_size: 200
   - type: text
     text: SLIDE FRAME BASE
     font_size: 100

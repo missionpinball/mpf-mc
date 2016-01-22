@@ -52,18 +52,20 @@ slides:
     - type: text
       text: AGAIN, RIGHT ARROW -->
       y: 33%
-      x: 600
+      x: 66%
     - type: text
       text: ( <-- ALSO LEFT ARROW GOES BACK)
       y: 33%
-      x: 200
+      x: 22%
       animations:  # For this animation, we're animating the "x" property.
         entrance:  # "x" is the x position of the widget (like x,y coordinates)
           - property: x
-            value: 225  # In step 1, we set x to 225
+            value: 20%  # In step 1, we set x to 225
+            duration: .25s
           - property: x
-            value: 200  # In step 2, we set it back to 200
+            value: 22%  # In step 2, we set it back to 200
             repeat: true  # and repeat!
+            duration: 250ms
 
   slide4:
     - type: text

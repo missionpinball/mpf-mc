@@ -111,7 +111,7 @@ class MpfMcTestCase(unittest.TestCase):
                            **kwargs)
 
     def run(self, name):
-        print("Running", name)
+        print("Running", self.id())
         # This setup is done in run() because we need to give control to the
         # kivy event loop which we can only do by returning from the run()
         # that's called. So we override run() and setup mpf_mc and then call

@@ -4,7 +4,7 @@ from kivy.animation import Animation
 from kivy.properties import ObjectProperty
 from mpf.system.config import CaseInsensitiveDict
 
-from mc.core.utils import set_position
+from mc.core.utils import set_position, percent_to_float
 
 
 class MpfWidget(object):
@@ -29,6 +29,7 @@ class MpfWidget(object):
     # use that we never want to set on widget base classes.
     _dont_send_to_kivy = ('anchor_x', 'anchor_y', 'x', 'y')
 
+
     def __init__(self, mc, mode, slide=None, config=None, **kwargs):
         self.size_hint = (None, None)
         super().__init__()
@@ -40,6 +41,18 @@ class MpfWidget(object):
         self.ready = False
         self.animation = None
         self._animation_event_keys = set()
+
+        # some attributes can be expressed in percentages. This dict holds
+        # those, key is attribute name, val is max value
+        try:
+            self._percent_prop_dicts = dict(x=slide.width,
+                                            y=slide.height,
+                                            width=slide.width,
+                                            height=slide.height,
+                                            opacity=1,
+                                            line_height=1)
+        except AttributeError:
+            self._percent_prop_dicts = dict()
 
         for k, v in self.config.items():
             if k not in self._dont_send_to_kivy and hasattr(self, k):
@@ -93,6 +106,17 @@ class MpfWidget(object):
         for settings in animation_list:
             prop_dict = dict()
             for prop, val in zip(settings['property'], settings['value']):
+                try:
+                    val = percent_to_float(val, self._percent_prop_dicts[prop])
+                except KeyError:
+                    # because widget properties can include a % sign, they are
+                    # all strings, so even ones that aren't on the list to look
+                    # for percent signs have to be converted to numbers.
+                    if '.' in val:
+                        val = float(val)
+                    else:
+                        val = int(val)
+
                 prop_dict[prop] = val
 
             anim = Animation(duration=settings['duration'],

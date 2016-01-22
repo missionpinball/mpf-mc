@@ -81,17 +81,13 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
     # set x/y
     if x is None:
         x = parent_w / 2
-    elif str(x)[-1] == '%':
-        x = float(x[:-1]) * parent_w / 100
     else:
-        x = float(x)
+        x = percent_to_float(x, parent_w)
 
     if y is None:
         y = parent_h / 2
-    elif str(y)[-1] == '%':
-        y = float(y[:-1]) * parent_h / 100
     else:
-        y = float(y)
+        y = percent_to_float(y, parent_h)
 
     # calculate the x/y offsets based on widget size and anchor
     if anchor_x in ('center', 'middle'):
@@ -105,6 +101,13 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
         y += -h
 
     return x, y
+
+
+def percent_to_float(number_str, total):
+    if str(number_str)[-1] == '%':
+        return float(number_str[:-1]) * total / 100
+    else:
+        return float(number_str)
 
 
 def set_machine_path(machine_path, machine_files_default='machine_files'):
