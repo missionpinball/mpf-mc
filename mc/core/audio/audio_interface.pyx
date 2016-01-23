@@ -13,18 +13,18 @@ __all__ = ('audio_interface_instance',
            'Sound',
            )
 
-__version_info__ = ('0', '1', '0-dev3')
+__version_info__ = ('0', '1', '0-dev4')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
 from libc.string cimport memset, memcpy
+cimport cpython.pycapsule as pycapsule
 import os.path
 from time import time
 
 from queue import PriorityQueue, Empty
 import sys
 from kivy.logger import Logger
-
 
 include "audio_interface.pxi"
 
@@ -52,10 +52,12 @@ cdef class AudioInterface:
     """
     cdef int sample_rate
     cdef int audio_channels
-    cdef int buffer_length
+    cdef int buffer_samples
+    cdef int buffer_size
     cdef int supported_formats
     cdef int mixer_channel
     cdef list tracks
+
 
     # In order to get the SDL_Mixer library to work with the desired features needed for the
     # media controller, a sound must be played at all times on a mixer channel.  A sound
@@ -68,23 +70,30 @@ cdef class AudioInterface:
     def __cinit__(self, *args, **kw):
         self.sample_rate = 0
         self.audio_channels = 0
-        self.buffer_length = 0
+        self.buffer_samples = 0
+        self.buffer_size = 0
         self.supported_formats = 0
         self.mixer_channel = -1
         self.raw_chunk_silence = NULL
         self.audio_callback_data = NULL
 
-    def __init__(self, rate=44100, channels=2, buffer_length=4096):
+    def __init__(self, rate=44100, channels=2, buffer_samples=4096):
         """
         Initializes the AudioInterface.
         Args:
             rate: The audio sample rate used in the library
             channels: The number of channels to use (1=mono, 2=stereo)
-            buffer_length: The audio buffer length to use (must be power of two)
+            buffer_samples: The audio buffer size to use (in number of samples, must be power of two)
         """
 
         # Initialize threading in the extension library and acquire the Python global interpreter lock
         PyEval_InitThreads()
+
+        # Make sure buffer samples is a power of two (required by SDL2)
+        if not AudioInterface.power_of_two(buffer_samples):
+            Logger.error('AudioInterface: Buffer samples is required to be a power of two')
+            raise AudioException("Unable to initialize Audio Interface: "
+                                 "Buffer samples is required to be a power of two")
 
         # Initialize the SDL audio system
         if SDL_Init(SDL_INIT_AUDIO) < 0:
@@ -93,7 +102,7 @@ cdef class AudioInterface:
 
         # Initialize the SDL_Mixer library to establish the output audio format and encoding
         # (sample rate, bit depth, buffer size)
-        if Mix_OpenAudio(rate, AUDIO_S16SYS, channels, buffer_length):
+        if Mix_OpenAudio(rate, AUDIO_S16SYS, channels, buffer_samples):
             Logger.error('Mix_OpenAudio: %s' % SDL_GetError())
             raise AudioException('Unable to open audio for output (Mix_OpenAudio failed: %s)' % SDL_GetError())
 
@@ -106,11 +115,14 @@ cdef class AudioInterface:
 
         # Determine the actual audio format in use by the opened audio device.  This may or may not match
         # the parameters used to initialize the audio interface.
-        self.buffer_length = buffer_length
-        Logger.info('AudioInterface: requested {} {} {}'.format(rate, channels, buffer_length))
+        self.buffer_samples = buffer_samples
+        Logger.info('AudioInterface: requested {} {} {}'.format(rate, channels, buffer_samples))
         Mix_QuerySpec(&self.sample_rate, NULL, &self.audio_channels)
         Logger.info('AudioInterface: received {} {} {}'
-                    .format(self.sample_rate, self.audio_channels, self.buffer_length))
+                    .format(self.sample_rate, self.audio_channels, self.buffer_samples))
+
+        # Set the size of the track audio buffers (samples * channels * 2 bytes/sample) for 16-bit audio
+        self.buffer_size = self.buffer_samples * self.audio_channels * 2
 
         # Allocate memory for the audio callback data structure
         self.audio_callback_data = <AudioCallbackData*>calloc(1, sizeof(AudioCallbackData))
@@ -121,6 +133,7 @@ cdef class AudioInterface:
         self.audio_callback_data.master_volume = 0
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackAttributes**>calloc(MAX_TRACKS, sizeof(TrackAttributes*))
+        self.audio_callback_data.mutex = SDL_CreateMutex()
 
         # Initialize the supported SDL_Mixer library formats
         self.supported_formats = Mix_Init(MIX_INIT_FLAC | MIX_INIT_OGG)
@@ -141,7 +154,7 @@ cdef class AudioInterface:
         """
         # Create the audio buffer containing silence
         cdef Uint8 *silence = NULL
-        cdef Uint32 length = self.sample_rate * self.buffer_length * self.audio_channels
+        cdef Uint32 length = self.buffer_size
         silence = <Uint8 *>calloc(1, length)
 
         # Instruct SDL_Mixer to load the silence into a chunk
@@ -152,7 +165,9 @@ cdef class AudioInterface:
     def _initialize_audio_callback(self):
         # Set the number of channels to mix (will cause existing channels to be stopped and restarted if playing)
         # This is an SDL_Mixer library function call.
-        self.mixer_channel = Mix_AllocateChannels(1)
+        channels = Mix_AllocateChannels(1)
+        Logger.debug("SDL_Mixer: Allocated {} channel(s)".format(channels))
+        self.mixer_channel = 0
 
         # Setup callback function for mixer channel depending upon the audio format used
         cdef Mix_EffectFunc_t audio_callback_fn = AudioInterface.audio_callback
@@ -164,13 +179,13 @@ cdef class AudioInterface:
         Mix_RegisterEffect(self.mixer_channel, audio_callback_fn, NULL, <void *>self.audio_callback_data)
 
     @staticmethod
-    def initialize(int rate=44100, int channels=2, int buffer_size=4096):
+    def initialize(int rate=44100, int channels=2, int buffer_samples=4096, **kwargs):
         """
         Initializes and retrieves the audio interface instance.
         Args:
             rate: The audio sample rate used in the library
             channels: The number of channels to use (1=mono, 2=stereo)
-            buffer_size: The audio buffer size to use (must be power of two)
+            buffer_samples: The audio buffer size in number of samples (must be power of two)
 
         Returns:
             An AudioInterface object instance.
@@ -183,8 +198,16 @@ cdef class AudioInterface:
             return audio_interface_instance
 
         # Initialize the audio instance and return it
-        audio_interface_instance = AudioInterface(rate, channels, buffer_size)
+        audio_interface_instance = AudioInterface(rate=rate,
+                                                  channels=channels,
+                                                  buffer_samples=buffer_samples,
+                                                  **kwargs)
         return audio_interface_instance
+
+    @staticmethod
+    def power_of_two(int num):
+        """ Returns whether or not the supplied number is a power of 2 """
+        return ((num & (num - 1)) == 0) and num != 0
 
     @staticmethod
     def get_version():
@@ -225,6 +248,10 @@ cdef class AudioInterface:
         if self.supported_formats & MIX_INIT_OGG:
             extensions.append("ogg")
         return extensions
+
+    @property
+    def enabled(self):
+        return Mix_Playing(self.mixer_channel) == 1
 
     def enable(self, int fade_sec=0):
         """
@@ -319,7 +346,13 @@ cdef class AudioInterface:
         SDL_LockAudio()
 
         # Create the new track
-        new_track = Track(name, track_num, max_simultaneous_sounds, volume)
+        new_track = Track(name,
+                          track_num,
+                          # Wrap the mutex pointer in a PyCapsule to pass it into the Track constructor
+                          pycapsule.PyCapsule_New(self.audio_callback_data.mutex, NULL, NULL),
+                          self.buffer_size,
+                          max_simultaneous_sounds,
+                          volume)
         self.tracks.append(new_track)
 
         # Update audio callback data with new track
@@ -332,6 +365,15 @@ cdef class AudioInterface:
         Logger.info("The '{}' track has successfully been created.".format(name))
 
         return new_track
+
+    def stop_sound(self, sound not None):
+        """
+        Stops all instances of the specified sound immediately on all tracks.
+        Args:
+            sound: The Sound to stop
+        """
+        for track in self.tracks:
+            track.stop_sound(sound)
 
     @staticmethod
     cdef void audio_callback(int channel, void *output_buffer, int length, void *data) nogil:
@@ -352,11 +394,15 @@ cdef class AudioInterface:
         # function which is used to read and mix the actual source audio.
         cdef AudioCallbackData *callback_data = <AudioCallbackData*>data
 
+        # Lock the mutex to ensure no audio data is changed during the playback processing
+        # (multi-threaded protection)
+        SDL_LockMutex(callback_data.mutex)
+
         # Loop over tracks, mixing the playing sounds into the track's audio buffer
         for track_num in range(callback_data.track_count):
 
             # Zero out track buffer (start with silence)
-            memset(callback_data.tracks[track_num].buffer, 0, callback_data.tracks[track_num].buffer_length)
+            memset(callback_data.tracks[track_num].buffer, 0, length)
 
             # Mix any playing sounds into the track buffer
             mix_sounds_to_track(callback_data.tracks[track_num],
@@ -365,28 +411,30 @@ cdef class AudioInterface:
 
         # Loop over tracks again, mixing down tracks to the master output buffer
         for track_num in range(callback_data.track_count):
-            pass
             # Apply ducking envelopes to track audio buffer
 
             # Apply track volume and mix to output buffer
+            mix_track_to_output(<Uint8*>callback_data.tracks[track_num].buffer,
+                                callback_data.tracks[track_num].volume,
+                                <Uint8*>output_buffer,
+                                length)
 
 
         # Apply master volume to output buffer
 
+        # Unlock the mutex since we are done accessing the audio data
+        SDL_UnlockMutex(callback_data.mutex)
 
-cdef void mix_sounds_to_track(TrackAttributes *track, void* buffer, int buffer_length) nogil:
+
+cdef void mix_sounds_to_track(TrackAttributes *track, void* buffer, int buffer_size) nogil:
     """
     Mixes any sounds that are playing on the specified track into the specified audio buffer.
     Args:
         track: A pointer to the TrackAttributes data structure for the track
         buffer: A pointer to the audio buffer to mix the playing sounds into
-        buffer_length: The length of the destination audio buffer (bytes)
+        buffer_size: The length of the destination audio buffer (bytes)
     """
     if track == NULL:
-        return
-
-    # Attempt to lock the track mutex while performing operations on the track
-    if SDL_LockMutex(track.mutex) != 0:
         return
 
     # Get the current clock from SDL (it is used for the audio timing master)
@@ -435,7 +483,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, void* buffer, int buffer_l
 
             # Loop over destination buffer, mixing in the source sample
             index = 0
-            while index < buffer_length:
+            while index < buffer_size:
 
                 # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
                 sound_sample.bytes.byte0 = sound_buffer[track.sound_players[player].sample_pos]
@@ -478,14 +526,50 @@ cdef void mix_sounds_to_track(TrackAttributes *track, void* buffer, int buffer_l
                     elif track.sound_players[player].loops_remaining == 0:
                         # At the end and not looping, the sample has finished playing
                         track.sound_players[player].status = player_finished
+                        track.sound_players[player].sample_pos = 0
                         break
                     else:
                         # Looping infinitely, loop back to the beginning
                         track.sound_players[player].sample_pos = 0
 
-    # Unlock the track mutex
-    SDL_UnlockMutex(track.mutex)
+cdef void mix_track_to_output(Uint8 *track_buffer, int track_volume, Uint8 *output_buffer, int buffer_size) nogil:
 
+    cdef Sample16Bit track_sample
+    cdef Sample16Bit output_sample
+
+    cdef int temp_sample
+    cdef int index
+
+    index = 0
+    while index < buffer_size:
+
+        # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
+        track_sample.bytes.byte0 = track_buffer[index]
+        track_sample.bytes.byte1 = track_buffer[index + 1]
+        track_sample.value = track_sample.value * track_volume / MIX_MAX_VOLUME
+
+        # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
+        output_sample.bytes.byte0 = output_buffer[index]
+        output_sample.bytes.byte1 = output_buffer[index + 1]
+
+        # Calculate the new output sample (mix the existing output sample with
+        # the track sample).  The temp sample is a 32-bit value to avoid overflow.
+        temp_sample = output_sample.value + track_sample.value
+
+        # Clip the temp sample back to a 16-bit value (will cause distortion if samples
+        # on channel are too loud)
+        if temp_sample > MAX_AUDIO_VALUE_S16:
+            temp_sample = MAX_AUDIO_VALUE_S16
+        elif temp_sample < MIN_AUDIO_VALUE_S16:
+            temp_sample = MIN_AUDIO_VALUE_S16
+
+        # Write the new output sample back to the output buffer (from
+        # a 32-bit value back to a 16-bit value that we know is in 16-bit value range)
+        output_sample.value = temp_sample
+        output_buffer[index] = output_sample.bytes.byte0
+        output_buffer[index + 1] = output_sample.bytes.byte1
+
+        index += 2
 
 cdef int get_open_sound_event_on_track(TrackAttributes* track) nogil:
     """
@@ -497,15 +581,10 @@ cdef int get_open_sound_event_on_track(TrackAttributes* track) nogil:
     if track == NULL:
         return -1
 
-    if SDL_LockMutex(track.mutex) != 0:
-        return -1
-
     for i in range(MAX_SOUND_EVENTS):
         if track.events[i].event == event_none:
-            SDL_UnlockMutex(track.mutex)
             return i
 
-    SDL_UnlockMutex(track.mutex)
     return -1
 
 
@@ -517,23 +596,32 @@ cdef class Track:
     cdef str _name
     cdef object _sound_queue
     cdef float _volume
+    cdef SDL_mutex *mutex
 
     # Track attributes need to be stored in a C struct in order for them to be accessible in
     # the SDL callback functions without the GIL (for performance reasons).  The TrackAttributes
     # struct is allocated during construction and freed during destruction.
     cdef TrackAttributes *attributes
 
-    def __init__(self, str name, int track_num,
-                 int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT, float volume=1.0):
+    def __init__(self, str name, int track_num, object mutex, int buffer_size,
+                 int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
+                 float volume=1.0):
         """
         Constructor
         Args:
             name: The track name
             track_num: The track number (corresponds to the SDL_Mixer channel number)
+            mutex: An SDL_mutex pointer wrapped in a PyCapsule.
+            buffer_size: The length of the track audio buffer in bytes
             max_simultaneous_sounds: The maximum number of sounds that can be played simultaneously
                 on the track
             volume: The track volume (0.0 to 1.0)
         """
+        # The easiest way to pass a C pointer in a constructor is to wrap it in a PyCapsule
+        # (see https://docs.python.org/3.4/c-api/capsule.html).  This basically wraps the
+        # pointer in a Python object. It can be extracted using PyCapsule_GetPointer.
+        self.mutex = <SDL_mutex*>pycapsule.PyCapsule_GetPointer(mutex, NULL)
+
         self._sound_queue = PriorityQueue()
 
         # Make sure the number of simultaneous sounds is within the allowable range
@@ -549,11 +637,11 @@ cdef class Track:
         self.attributes = <TrackAttributes*>calloc(1, sizeof(TrackAttributes))
         self.attributes.track_num = track_num
         self.attributes.max_simultaneous_sounds = max_simultaneous_sounds
+        self.attributes.buffer = calloc(buffer_size, sizeof(void*))
+        self.attributes.buffer_size = buffer_size
+        Logger.info("Track {}: allocated track audio buffer ({} bytes)".format(name, buffer_size))
         self.volume = volume
         self._name = name
-
-        # Create the SDL mutex for the track (used for multi-threaded locking/thread safety)
-        self.attributes.mutex = SDL_CreateMutex()
 
         # Allocate memory for the sound player structs needed for the desired number of
         # simultaneous sounds that can be played on the track.
@@ -565,6 +653,7 @@ cdef class Track:
             self.attributes.sound_players[i].status = player_idle
             self.attributes.sound_players[i].loops_remaining = 0
             self.attributes.sound_players[i].start_time = 0
+            self.attributes.sound_players[i].samples_elapsed = 0
             self.attributes.sound_players[i].volume = 0
             self.attributes.sound_players[i].sample_pos = 0
             self.attributes.sound_players[i].sound_id = 0
@@ -583,13 +672,17 @@ cdef class Track:
 
         # Free the attributes and other allocated memory
         if self.attributes != NULL:
-            if self.attributes.mutex != NULL:
-                SDL_DestroyMutex(self.attributes.mutex)
-                self.attributes.mutex = NULL
+            if self.attributes.buffer != NULL:
+                free(self.attributes.buffer)
+                self.attributes.buffer = NULL
 
             if self.attributes.sound_players != NULL:
                 free(self.attributes.sound_players)
                 self.attributes.sound_players = NULL
+
+            if self.attributes.events != NULL:
+                free(self.attributes.events)
+                self.attributes.events = NULL
 
             free(self.attributes)
             self.attributes = NULL
@@ -668,25 +761,37 @@ cdef class Track:
             else:
                 next_sound = None
 
-    def play_sound(self, sound not None, priority, **settings):
+    def play_sound(self, sound not None, int priority, **settings):
         """
         Plays a sound on the current track.
         Args:
-            sound:
-            priority:
-            **settings:
-
-        Returns:
-
+            sound: Sound to play
+            priority: The relative priority of the sound
+            **settings: Optional additional settings for playing the sound
         """
 
-        # Make sure sound is loaded
+        # Make sure sound is loaded.  If not, we assume the sound is being loaded and we
+        # add it to the queue so it will be picked up on the next loop.
+        if not sound.loaded:
+            self.queue_sound(sound, priority, **settings)
+            Logger.debug("play_sound: Sound was not loaded and therefore was queued for playback.")
+            return
 
         # If the sound can be played right away (available player) then play it.
-        # If there are no available sound players:
-        #     1) If the lowest priority of all the sounds currently playing is lower than
-        #        the requested sound, kill the lowest priority sound and replace it.
-        #     2) Add the requested sound to the priority queue
+        # Is there an available sound player?
+        player = self._get_available_sound_player()
+        if player >= 0:
+            Logger.debug("play_sound: Sound player {} is available for playback".format(player))
+            # Play the sound using the available player
+            self._play_sound_on_sound_player(sound, player)
+        else:
+            # No available sound players:
+            Logger.debug("play_sound: No sound player is available.")
+            #     1) If the lowest priority of all the sounds currently playing is lower than
+            #        the requested sound, kill the lowest priority sound and replace it.
+            #     2) Add the requested sound to the priority queue
+            pass
+
 
         # Add the sound to the queue
         # TODO: Implement me
@@ -712,18 +817,34 @@ cdef class Track:
         # higher priorities.
         self._sound_queue.put([-priority, sound, exp_time, settings])
 
+    def stop_sound(self, sound not None):
+        """
+        Stops all instances of the specified sound immediately on the track.
+        Args:
+            sound: The Sound to stop
+        """
+
+        SDL_LockMutex(self.mutex)
+
+        for i in range(self.max_simultaneous_sounds):
+            if self.attributes.sound_players[i].status != player_idle \
+                    and self.attributes.sound_players[i].sound_id == sound.id:
+                self.attributes.sound_players[i].status = player_finished
+
+        SDL_UnlockMutex(self.mutex)
+
     cdef int _get_available_sound_player(self):
         """
         Returns the index of the first available sound player or -1 if they are all busy.
         """
-        SDL_LockMutex(self.attributes.mutex)
+        SDL_LockMutex(self.mutex)
 
         for i in range(self.max_simultaneous_sounds):
             if self.attributes.sound_players[i].status == player_idle:
-                SDL_UnlockMutex(self.attributes.mutex)
+                SDL_UnlockMutex(self.mutex)
                 return i
 
-        SDL_UnlockMutex(self.attributes.mutex)
+        SDL_UnlockMutex(self.mutex)
         return -1
 
     cdef int _get_sound_player_with_lowest_priority(self):
@@ -738,18 +859,54 @@ cdef class Track:
         cdef int lowest_priority = sys.maxsize
         cdef int sound_player = -1
 
-        SDL_LockMutex(self.attributes.mutex)
+        SDL_LockMutex(self.mutex)
 
         for i in range(self.max_simultaneous_sounds):
             if self.attributes.sound_players[i].status == player_idle:
-                SDL_UnlockMutex(self.attributes.mutex)
+                SDL_UnlockMutex(self.mutex)
                 return i, -1
             elif self.attributes.sound_players[i].sound_priority < lowest_priority:
                 lowest_priority = self.attributes.sound_players[i].sound_priority
                 sound_player = i
 
-        SDL_UnlockMutex(self.attributes.mutex)
+        SDL_UnlockMutex(self.mutex)
         return i
+
+    cdef bint _play_sound_on_sound_player(self, sound, int player, int loops=0, int priority=0, force=True):
+        """
+        Plays a sound using the specified sound player
+        """
+        # Get the sound sample buffer container
+        cdef MixChunkContainer mc = sound.container
+
+        # Make sure the player in range
+        if player in range(self.max_simultaneous_sounds):
+            SDL_LockMutex(self.mutex)
+            # If the specified sound player is not idle do not play the sound if force is not set
+            if self.attributes.sound_players[player].status != player_idle and not force:
+                SDL_UnlockMutex(self.mutex)
+                Logger.debug("_play_sound_on_sound_player: Sound player is not available, cannot play sound.")
+                return False
+
+            # Play the sound
+            self.attributes.sound_players[player].chunk = mc.chunk
+            self.attributes.sound_players[player].status = player_pending
+            self.attributes.sound_players[player].volume = mc.chunk.volume
+            self.attributes.sound_players[player].loops_remaining = loops
+            self.attributes.sound_players[player].start_time = SDL_GetTicks()
+            self.attributes.sound_players[player].samples_elapsed = 0
+            self.attributes.sound_players[player].sample_pos = 0
+            self.attributes.sound_players[player].sound_id = sound.id
+            self.attributes.sound_players[player].sound_priority = priority
+            # TODO: Set other sound player attributes
+
+            SDL_UnlockMutex(self.mutex)
+
+            Logger.debug("_play_sound_on_sound_player: Sound is playing")
+
+            return True
+
+        return False
 
 
 cdef class MixChunkContainer:
@@ -818,6 +975,10 @@ class Sound(object):
     def name(self):
         return self._name
 
+    @property
+    def container(self):
+        return self._container
+
     def load(self):
         """
         Loads a sound file into memory in a format that is ready to play.
@@ -862,6 +1023,7 @@ class Sound(object):
         pass
 
     def play(self, loops=0, priority=0, fade_in=0, volume=1.0, **kwargs):
+
         pass
 
 

@@ -157,10 +157,8 @@ ctypedef struct TrackAttributes:
     int track_num
     int max_simultaneous_sounds
     int volume
-    SDL_mutex *mutex
-
     void *buffer
-    int buffer_length
+    int buffer_size
 
     SoundPlayer *sound_players
     SoundEventData *events
@@ -178,9 +176,10 @@ ctypedef struct SoundPlayer:
     # sound has finished playing.
     Mix_Chunk *chunk
     SoundPlayerStatus status
+    int volume
     int loops_remaining
     Uint32 start_time
-    int volume
+    Uint32 samples_elapsed
     int sample_pos
     int sound_id
     int sound_priority
@@ -191,6 +190,7 @@ ctypedef struct AudioCallbackData:
     int master_volume
     int track_count
     TrackAttributes **tracks
+    SDL_mutex *mutex
 
 cdef enum SoundEvent:
     event_none,
