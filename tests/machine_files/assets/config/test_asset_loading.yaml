@@ -1,0 +1,25 @@
+#config_version=3
+
+modes:
+  - mode1
+
+assets:
+    images:
+        default:
+            load: preload
+        preload:
+            load: preload
+            test_key: test_value
+        on_demand:
+            load: on_demand
+        mode_start:
+            load: mode_start
+
+images:
+  image_12_new_name:
+    file: image12.png
+    test_key: test_value_override12
+  image_13_new_name:
+    file: image13.png
+  image3:
+    test_key: test_value_override3

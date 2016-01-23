@@ -43,14 +43,16 @@ class Mode(object):
         # dict())
         #
         #     self.config[asset_manager.config_section] = (
-        #         asset_manager.register_assets(config=config_data,
+        #         asset_manager.create_assets(config=config_data,
         #                                       mode_path=self.path))
 
         # Call registered remote loader methods
         for item in self.mc.mode_controller.loader_methods:
-            if (item.config_section in self.config and
-                    self.config[item.config_section]):
-                item.method(config=self.config[item.config_section],
+            if ((item.config_section in self.config and
+                    self.config[item.config_section]) or not
+            item.config_section):
+                item.method(config=self.config.get(item.config_section),
+                            mode=self,
                             mode_path=self.path,
                             **item.kwargs)
 
@@ -128,12 +130,12 @@ class Mode(object):
         self.active = True
 
         for item in self.mc.mode_controller.start_methods:
-            if item.config_section in self.config:
-                self.stop_methods.append(
-                        item.method(config=self.config[item.config_section],
-                                    priority=self.priority,
-                                    mode=self,
-                                    **item.kwargs))
+            if item.config_section in self.config or not item.config_section:
+                self.stop_methods.append(item.method(
+                                config=self.config.get(item.config_section),
+                                priority=self.priority,
+                                mode=self,
+                                **item.kwargs))
 
     def stop(self, callback=None, **kwargs):
         """Stops this mode.

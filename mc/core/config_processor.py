@@ -65,17 +65,12 @@ class McConfig(MpfConfig):
                 self.process_localized_config_section(config=config[section],
                                                       section=section)
 
-    def process_mode_config(self, config, mode_path, section):
+    def process_mode_config(self, config, mode, mode_path, section):
         self.process_localized_config_section(config, section)
 
     def process_localized_config_section(self, config, section):
 
         config = self.machine_sections[section](config)
-
-        # try:
-        #     config = self.machine_sections[section](config)
-        # except KeyError:
-        #     config = self.mode_sections[section](config)
 
     def process_displays(self, config):
         # config is localized to 'displays' section
