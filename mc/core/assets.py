@@ -78,7 +78,7 @@ class AssetManager(object):
         if not hasattr(self.mc, attribute):
             setattr(self.mc, attribute, CaseInsensitiveDict())
 
-        else:
+        else:  # pragma no cover
             raise ValueError('Cannot set self.mc.{} as it already '
                              'exists.'.format(attribute))
 
@@ -313,7 +313,7 @@ class AssetManager(object):
                     try:
                         config[ac['config_section']][asset]['load'] = (
                             '{}_start'.format(mode.name))
-                    except AttributeError:
+                    except AttributeError:  # pragma: no cover
                         pass  # in case someone adds mode_start to machine cfg
 
                 getattr(self.mc, ac['attribute'])[asset] = ac['cls'](
@@ -464,7 +464,7 @@ class AssetLoader(threading.Thread):
                 # then just skip it if it's already loaded by the time the
                 # loader gets to it.
 
-        except Exception:
+        except Exception:  # pragma no cover
             exc_type, exc_value, exc_traceback = sys.exc_info()
             lines = traceback.format_exception(exc_type, exc_value,
                                                exc_traceback)

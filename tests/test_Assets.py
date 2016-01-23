@@ -141,3 +141,15 @@ class TestAssets(MpfMcTestCase):
         self.assertTrue(self.mc.images['image9'].loaded)
         self.assertFalse(self.mc.images['image9'].loading)
         self.assertFalse(self.mc.images['image9'].unloading)
+
+        # test mode stop which should unload those assets
+        self.mc.modes['mode1'].stop()
+
+        for x in range(10):
+            if self.mc.images['image9'].loaded:
+                self.assertTrue(self.mc.images['image9'].unloading)
+                self.advance_time(.1)
+
+        self.assertFalse(self.mc.images['image9'].loaded)
+        self.assertFalse(self.mc.images['image9'].loading)
+        self.assertFalse(self.mc.images['image9'].unloading)
