@@ -12,13 +12,14 @@ from kivy.logger import Logger
 from mc.core.bcp_processor import BcpProcessor
 from mc.core.config_processor import McConfig
 from mc.core.mode_controller import ModeController
-from mc.core.sound import SoundController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
 from mc.uix.transitions import TransitionManager
 from mpf.system.config import CaseInsensitiveDict
 from mpf.system.events import EventManager
 from mpf.system.player import Player
+from mc.core.assets import AssetManager
+from mc.assets.image import ImageAsset
 
 
 class MpfMc(App):
@@ -26,9 +27,9 @@ class MpfMc(App):
         super().__init__(**kwargs)
 
         self.options = options
-
         self.machine_config = config
         self.machine_path = machine_path
+
         self.modes = CaseInsensitiveDict()
         self.player_list = list()
         self.player = None
@@ -41,7 +42,6 @@ class MpfMc(App):
         self.scriptlets = list()
 
         self.displays = CaseInsensitiveDict()
-
         self.machine_vars = CaseInsensitiveDict()
         self.machine_var_monitor = False
         self.targets = dict()
@@ -50,14 +50,6 @@ class MpfMc(App):
         which will be used if a slide doesn't specify targeting.
         """
 
-        self.events = EventManager(self, setup_event_player=False)
-        self.mode_controller = ModeController(self)
-        self.sound_controller = SoundController(self)
-        McConfig.load_config_spec()
-        self.config_processor = McConfig(self)
-        self.slide_player = SlidePlayer(self)
-        self.widget_player = WidgetPlayer(self)
-        self.transition_manager = TransitionManager(self)
         self.keyboard = None
         self.crash_queue = queue.Queue()
         self.ticks = 0
@@ -65,7 +57,19 @@ class MpfMc(App):
         self.crash_queue = None
         self.init_done = False
 
+        # Core components
+        self.events = EventManager(self, setup_event_player=False)
+        self.mode_controller = ModeController(self)
+        McConfig.load_config_spec()
+        self.config_processor = McConfig(self)
+        self.slide_player = SlidePlayer(self)
+        self.widget_player = WidgetPlayer(self)
+        self.transition_manager = TransitionManager(self)
+        self.asset_manager = AssetManager(self)
         self.bcp_processor = BcpProcessor(self)
+
+        # Asset classes
+        ImageAsset.initialize(self)
 
     def validate_machine_config_section(self, section):
         if section not in McConfig.config_spec:

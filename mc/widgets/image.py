@@ -1,10 +1,9 @@
 
-from kivy.uix.image import Image as KivyImage
+from kivy.uix.image import Image
 
 from mc.uix.widget import MpfWidget
 
-
-class Image(MpfWidget, KivyImage):
+class Image(MpfWidget, Image):
 
     widget_type_name = 'Image'
 
