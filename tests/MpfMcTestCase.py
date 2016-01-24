@@ -9,6 +9,7 @@ from mc.core.utils import load_machine_config
 from mpf.system.config import Config as MpfConfig
 from mpf.system.utility_functions import Util
 from kivy.logger import FileHandler
+from kivy.graphics import Fbo
 
 Config.set('kivy', 'log_enable', '0')
 Config.set('kivy', 'log_level', 'warning')
@@ -84,6 +85,14 @@ class MpfMcTestCase(unittest.TestCase):
             sleep(.01)
             self.mc.events._process_event_queue()
             EventLoop.idle()
+
+    def get_pixel_color(self, x, y):
+        # do the imports here because we don't want to import Window at the
+        # top or else we won't be able to set window properties
+        # from kivy.core.window import Window
+        from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
+
+        return glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
 
     def setUp(self):
         # Most of the setup is done in run(). Explanation is there.

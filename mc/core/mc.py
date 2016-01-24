@@ -131,9 +131,6 @@ class MpfMc(App):
         self.events.add_handler('assets_to_load',
                                 self._bcp_client_asset_loader_tick)
 
-        # temp todo
-        # self.events.replace_handler('timer_tick', self.asset_loading_counter)
-
         self.events.post('mc_reset_phase_1')
         self.events._process_event_queue()
         self.events.post('mc_reset_phase_2')
@@ -242,7 +239,6 @@ class MpfMc(App):
                          prev_value=prev_value, change=change)
 
     def tick(self, time):
-        self.events.post('timer_tick')
         self.ticks += 1
         self.events._process_event_queue()
 

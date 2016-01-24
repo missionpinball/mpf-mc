@@ -73,15 +73,12 @@ class Slide(Screen):
 
             top_widget = widget_obj
 
+            # some widgets like slide frames have parents, so we need to make
+            # sure that we add the parent widget to the slide
             while top_widget.parent:
                 top_widget = top_widget.parent
 
             self.add_widget(top_widget)
-            try:  # text only? Need to change this. TODO
-                widget_obj.texture_update()
-                widget_obj.size = widget_obj.texture_size
-            except AttributeError:
-                widget_obj.size = (widget['width'], widget['height'])
 
             widget_obj.pos = set_position(self.width,
                                           self.height,
@@ -91,9 +88,7 @@ class Slide(Screen):
                                           widget['y'],
                                           widget['anchor_x'],
                                           widget['anchor_y'])
-
             widgets_added.append(widget_obj)
-
         return widgets_added
 
     def add_widget(self, widget):

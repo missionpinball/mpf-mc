@@ -12,11 +12,11 @@ from mpf.system.utility_functions import Util
 
 from mc.uix.display import Display
 from mc.uix.slide_frame import SlideFrame
-from mc.widgets.image import Image
+from mc.widgets.image import ImageWidget
 from mc.widgets.text import Text
 
 type_map = CaseInsensitiveDict(text=Text,
-                               image=Image,
+                               image=ImageWidget,
                                video=Video,
                                bezier=Bezier,
                                border=BorderImage,
@@ -96,7 +96,9 @@ class McConfig(MpfConfig):
             config = [config]
 
         for widget in config:
-            widget = self.process_widget(widget)
+
+            # since dict is mutable it updates in place
+            self.process_widget(widget)
 
         return config
 
