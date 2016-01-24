@@ -236,16 +236,20 @@ cdef class AudioInterface:
         cdef const SDL_version *version =  Mix_Linked_Version()
         return 'SDL_Mixer {}.{}.{}'.format(version.major, version.minor, version.patch)
 
-    def supported_extensions(self):
+    @staticmethod
+    def supported_extensions():
         """
         Get the file extensions that are supported by the audio interface.
         Returns:
             A list of file extensions supported.
         """
+        if audio_interface_instance is None:
+            return []
+
         extensions = ["wav"]
-        if self.supported_formats & MIX_INIT_FLAC:
+        if audio_interface_instance.supported_formats & MIX_INIT_FLAC:
             extensions.append("flac")
-        if self.supported_formats & MIX_INIT_OGG:
+        if audio_interface_instance.supported_formats & MIX_INIT_OGG:
             extensions.append("ogg")
         return extensions
 
@@ -365,6 +369,54 @@ cdef class AudioInterface:
         Logger.info("The '{}' track has successfully been created.".format(name))
 
         return new_track
+
+    @staticmethod
+    def load_sound(str file_name):
+        """
+        Loads an audio file into a MixChunkContainer wrapper object for use in a Sound object.
+        Used in asset loading for Sound objects.
+        Args:
+            file_name: The audio file name to load.
+
+        Returns:
+            A MixChunkContainer wrapper object containing a pointer to the sound sample
+            in memory.  None is returned if the sound file was unable to be loaded.
+        """
+        # String conversion from Python to char* (it takes a few steps)
+        # See http://docs.cython.org/src/tutorial/strings.html for more information.
+        # 1) convert the python string (str) to a byte string (use UTF-8 encoding)
+        # 2) convert the python byte string to a C char* (can just do an assign)
+        # 3) the C char* string is now ready for use in calls to the C library
+        py_byte_file_name = file_name.encode('UTF-8')
+        cdef char* c_file_name = py_byte_file_name
+
+        # Attempt to load the file
+        cdef Mix_Chunk *chunk = Mix_LoadWAV(c_file_name)
+        if chunk == NULL:
+            Logger.error("AudioInterface: Unable to load sound from source file '{}' - {}"
+                         .format(file_name, SDL_GetError()))
+            return None
+
+        # Create a Python container object to wrap the Mix_Chunk C pointer
+        cdef MixChunkContainer mc = MixChunkContainer()
+        mc.chunk = chunk
+        return mc
+
+    @staticmethod
+    def unload_sound(container):
+        """
+        Unloads the source sample (Mix_Chunk) from the supplied container (used in Sound
+        asset unloading).  The sound will no longer be in memory.
+        Args:
+            container: A MixChunkContainer object
+        """
+        if not isinstance(container, MixChunkContainer):
+            return
+
+        cdef MixChunkContainer mc = container
+        if mc.chunk != NULL:
+            Mix_FreeChunk(mc.chunk)
+            mc.chunk = NULL
 
     def stop_sound(self, sound not None):
         """
@@ -926,105 +978,9 @@ cdef class MixChunkContainer:
             Mix_FreeChunk(self.chunk)
             self.chunk = NULL
 
-
-class Sound(object):
-    """
-    A Sound represents a single sound in memory and is loaded from an audio file. Sounds are
-    specified in the config files where all the sound attributes are set.
-
-    A Sound may only be played on one track
-    """
-
-    def __init__(self, **kwargs):
-        self._container = MixChunkContainer()
-        self._name = None
-
-        super(Sound, self).__init__(**kwargs)
-
-    def __repr__(self):
-        return '<Sound.{}.{} (Loaded={})>'.format(self.id, self.name, self.loaded)
-
-    def _initialize_asset(self):
-        # Load attributes from config file
-
-        # Set default attribute values
-        pass
-
     @property
     def loaded(self):
-        """
-        Indicates whether or not the sound is loaded in memory.
-        Returns:
-            True if the sound is loaded in memory and ready to play, False otherwise
-        """
-        cdef MixChunkContainer mc = self._container
-        return mc.chunk != NULL
-
-    @property
-    def id(self):
-        """
-        The id property contains a unique identifier for the sound (based on the Python id()
-        function).  This id is used in the audio interface to uniquely identify a sound
-        (rather than the name) due to the hassle of passing strings between Python and Cython.
-        Returns:
-            An integer uniquely identifying the sound
-        """
-        return id(self)
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def container(self):
-        return self._container
-
-    def load(self):
-        """
-        Loads a sound file into memory in a format that is ready to play.
-        Returns:
-            True if the sound was loaded successfully, False otherwise
-        """
-        # If the sound has already been loaded, no need to load it again
-        if self.loaded:
-            return True
-
-        # String conversion from Python to char* (it takes a few steps)
-        # See http://docs.cython.org/src/tutorial/strings.html for more information.
-        # 1) convert the python string (str) to a byte string (use UTF-8 encoding)
-        # 2) convert the python byte string to a C char* (can just do an assign)
-        # 3) the C char* string is now ready for use in calls to the C library
-        py_byte_file_name = self._file_name.encode('UTF-8')
-        cdef char* c_file_name = py_byte_file_name
-
-        # Attempt to load the file
-        cdef Mix_Chunk *chunk = Mix_LoadWAV(c_file_name)
-        if chunk == NULL:
-            Logger.error("Sound: Unable to load source file '{}' - {}".format(self._file_name, SDL_GetError()))
-            return False
-
-        # Create a Python container object to wrap the Mix_Chunk C pointer
-        cdef MixChunkContainer mc = self._container
-        mc.chunk = chunk
-        return True
-
-    def unload(self):
-        """
-        Unloads the sound from memory.
-        """
-        cdef MixChunkContainer mc = self._container
-        self.stop()
-        if mc.chunk != NULL:
-            Mix_FreeChunk(mc.chunk)
-            mc.chunk = NULL
-
-    def stop(self):
-        # TODO: implement the function to stop all playing instances of the sound
-        pass
-
-    def play(self, loops=0, priority=0, fade_in=0, volume=1.0, **kwargs):
-
-        pass
+        return self.chunk != NULL
 
 
 class DuckingEnvelope(object):

@@ -20,6 +20,8 @@ from mpf.system.events import EventManager
 from mpf.system.player import Player
 from mc.core.assets import AssetManager
 from mc.assets.image import ImageAsset
+from mc.assets.sound import SoundAsset
+from mc.core.audio.sound_player import SoundPlayer
 
 
 class MpfMc(App):
@@ -65,11 +67,13 @@ class MpfMc(App):
         self.slide_player = SlidePlayer(self)
         self.widget_player = WidgetPlayer(self)
         self.transition_manager = TransitionManager(self)
+        self.sound_player = SoundPlayer(self)
         self.asset_manager = AssetManager(self)
         self.bcp_processor = BcpProcessor(self)
 
         # Asset classes
         ImageAsset.initialize(self)
+        SoundAsset.initialize(self)
 
     def validate_machine_config_section(self, section):
         if section not in McConfig.config_spec:
