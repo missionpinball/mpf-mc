@@ -17,7 +17,7 @@ class TestImage(MpfMcTestCase):
 
         # This tests includes images that preload and that load on demand, so
         # give it enough time to for the on demand ones to load
-        self.advance_time(1)
+        self.advance_time(2)
 
         # Now check a sample pixel from the screen where each image should be
         # to make sure they're really there.

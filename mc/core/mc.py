@@ -101,11 +101,13 @@ class MpfMc(App):
     def displays_initialized(self, *args):
         from mc.uix.window import Window
         Window.initialize(self)
-
+        self.events.post('displays_initialized')
+        # Have to do this manually during init since the run loop isn't running
+        self.events._process_event_queue()
         self._init()
 
     def _init(self):
-        # Since the Window is so critical in Kivy, we can't continue the
+        # Since the window is so critical in Kivy, we can't continue the
         # boot process until the window is setup, and we can't set the
         # window up until the displays are initialized.
         self.events.post("init_phase_1")

@@ -75,9 +75,6 @@ class MpfMcTestCase(unittest.TestCase):
                 except KeyError:
                     continue
 
-    def on_window_flip(self, window):
-        pass
-
     def advance_time(self, secs=.1):
         start = time()
         self.mc.events._process_event_queue()
@@ -91,7 +88,6 @@ class MpfMcTestCase(unittest.TestCase):
         # top or else we won't be able to set window properties
         # from kivy.core.window import Window
         from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
-
         return glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
 
     def setUp(self):

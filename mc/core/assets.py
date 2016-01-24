@@ -45,7 +45,6 @@ class AssetManager(object):
 
         self._start_loader_thread()
 
-
         self.mc.mode_controller.register_start_method(
                 start_method=self._load_mode_assets)
 
@@ -434,16 +433,6 @@ class AssetManager(object):
                         key_name='{}_start'.format(mode.name),
                         priority=priority))
 
-    def unload_assets(self, assets):
-        """Unloads multiple assets.
-
-            Args:
-                assets: An iterable of asset objects. You can safely mix
-                    different classes of assets.
-        """
-        for asset in assets:
-            asset.unload()
-
     def load_assets_by_load_key(self, key_name, priority=0):
         """Loads all the assets with a given load key.
 
@@ -465,6 +454,16 @@ class AssetManager(object):
                 assets.add(asset)
 
         return assets
+
+    def unload_assets(self, assets):
+        """Unloads multiple assets.
+
+            Args:
+                assets: An iterable of asset objects. You can safely mix
+                    different classes of assets.
+        """
+        for asset in assets:
+            asset.unload()
 
     def _load_asset(self, asset):
         # Internal method which handles the logistics of actually loading an
@@ -503,12 +502,13 @@ class AssetManager(object):
 
     def _startup_load_tracker(self, time):
         if self.num_assets_to_load:
-            pass
+            self.mc.events.post('boot_status',
+                                total_assets=self.num_assets_to_load,
+                                loaded=self.num_assets_loaded,
+                                percent=self.loading_percent)
         else:
             Clock.unschedule(self._startup_load_tracker)
             self.mc.clear_boot_hold('assets')
-
-
 
 
 class AssetLoader(threading.Thread):
