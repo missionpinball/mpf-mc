@@ -3,7 +3,7 @@ from tests.MpfMcTestCase import MpfMcTestCase
 
 class TestAssets(MpfMcTestCase):
     def get_machine_path(self):
-        return 'tests/machine_files/assets'
+        return 'tests/machine_files/assets_and_image'
 
     def get_config_file(self):
         return 'test_asset_loading.yaml'

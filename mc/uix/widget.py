@@ -12,6 +12,9 @@ class MpfWidget(object):
     a few extra attributes and methods we need for everything to work with MPF.
 
     """
+
+    widget_type_name = ''  # Give this a name in your subclass, e.g. 'Image'
+
     mode = ObjectProperty(None, allownone=True)
     """:class:`Mode` object, which is the mode that created this widget."""
 
@@ -29,7 +32,6 @@ class MpfWidget(object):
     # use that we never want to set on widget base classes.
     _dont_send_to_kivy = ('anchor_x', 'anchor_y', 'x', 'y')
 
-
     def __init__(self, mc, mode, slide=None, config=None, **kwargs):
         self.size_hint = (None, None)
         super().__init__()
@@ -38,7 +40,6 @@ class MpfWidget(object):
         self.slide = slide
         self.config = config
         self.mc = mc
-        self.ready = False
         self.animation = None
         self._animation_event_keys = set()
 
