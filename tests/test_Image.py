@@ -35,4 +35,3 @@ class TestImage(MpfMcTestCase):
         self.assertEqual(b'\xfb\xca\x00', self.get_pixel_color(640, 300))
         self.assertEqual(b'\xed\xd3\x01', self.get_pixel_color(700, 300))
         self.assertEqual(b'\xfb\xca\x00', self.get_pixel_color(760, 300))
-

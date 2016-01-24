@@ -45,18 +45,13 @@ class AssetManager(object):
 
         self._start_loader_thread()
 
-        # Mode assets are only processed when the mode initializes, so if you
-        # don't have a mode listed in the config then it won't waste time
-        # loading assets from it.
-        self.mc.mode_controller.register_load_method(self.create_assets)
 
         self.mc.mode_controller.register_start_method(
                 start_method=self._load_mode_assets)
 
-        # register & load system-wide assets
-        self.mc.events.add_handler('init_phase_4',
-                                   self.create_assets,
-                                   config=self.mc.machine_config)
+        # Modes load in init_phase_1, so by 2 we have everything to create
+        # the assets.
+        self.mc.events.add_handler('init_phase_2', self._create_assets)
 
     @property
     def loading_percent(self):
@@ -75,7 +70,6 @@ class AssetManager(object):
             return 100
 
     def _start_loader_thread(self):
-
         self.loader_thread = AssetLoader(self.loader_queue,
                                          self.loaded_queue,
                                          self.mc.crash_queue)
@@ -157,7 +151,134 @@ class AssetManager(object):
 
         asset_class['defaults'] = default_config_dict
 
-    def _process_assets_from_disk(self, asset_class, config, mode_name=None,
+    def _create_assets(self):
+        # Called once on boot to create all the asset objects
+
+        # Create the machine-wide assets
+        self._create_assets_from_disk(config=self.mc.machine_config)
+
+        # Create the mode assets
+        for mode in self.mc.modes.values():
+            self._create_assets_from_disk(config=mode.config, mode=mode)
+
+        # load the assets marked for preload:
+        preload_assets = list()
+
+        for ac in self._asset_classes:
+            preload_assets.extend(
+                [x for x in getattr(self.mc, ac['attribute']).values() if
+                 x.config['load'] == 'preload'])
+
+        for asset in preload_assets:
+            asset.load()
+
+        if preload_assets:
+            Clock.schedule_interval(self._startup_load_tracker, .1)
+        else:
+            self.mc.clear_boot_hold('assets')
+
+    def _create_assets_from_disk(self, config, mode=None):
+        """Walks a folder (and subfolders) and finds all the assets. Checks to
+        see if those assets have config entries in the passed config file, and
+        then builds a config for each asset based on its config entry, and/or
+        defaults based on the subfolder it was in or the general defaults.
+        Then it creates the asset objects based on the built-up config.
+
+            Args:
+                config: A config dictionary.
+                mode: Optional reference to the mode object which is used when
+                    assets are being created from mode folders.
+                mode_path: Optional full path to the base folder that will be
+                    traversed for the assets file on disk. If omitted, the
+                    base machine folder will be searched.
+
+            Returns: An updated config dictionary. (See the "How it works"
+                section below for details.
+
+        Note that this method merely creates the asset object so they can be
+        referenced in MPF. It does not actually load the asset files into
+        memory.
+
+        It's called on startup register machine-wide assets, and it's called
+        as modes initialize (also during the startup process) to find assets
+        in mode folders.
+
+        How it works
+        ============
+
+        Every asset class that's registered with the Asset Manager has a folder
+        associated it. (e.g. Images assets as associated wit the "images"
+        folder.)
+
+        This method will build a master config dict of all the assets of each
+        type. It does this by walking the folder, looking for files of each
+        asset type.
+
+        When it finds a file, it checks the config to see if either (1) any
+        entries exist with a name that matches the root of that file name, or
+        (2) to see if there's a config for an asset with a different name
+        but with a file: setting that matches this file name.
+
+        If it finds a match, that entry's file: setting is updated with the
+        default settings for assets in that folder as well as the full path to
+        the file. If it does not find a match, it creates a new entry for
+        that asset in the config.
+
+        To build up the config, it will base the config on any settings
+        specified in the "default" section of the "assets:" section for that
+        asset class. (e.g. images will get whatever key/value pairs are in the
+        assets:images:default section of the config.)
+
+        Then it will look to see what subfolder the asset it in and if there
+        are any custom default settings for that subfolder. For example, an
+        image found in the /custom1 subfolder will get any settings in the
+        assets:images:custom1 section of the config. These settings are merged
+        into the settings from the default section.
+
+        Finally it will merge in any settings that existed for this asset
+        specifically.
+
+        When this method is done, the config dict has been updated to include
+        every asset it found in that folder and subfolders (along with its
+        full path), and a config dict appropriately merged from default,
+        folder-specific, and asset specific settings
+
+        """
+
+        if not config:
+            config = dict()
+
+        try:
+            mode_name = mode.name
+            path = mode.path
+        except AttributeError:
+            mode_name = None
+            path = self.mc.machine_path
+
+        for ac in self._asset_classes:
+
+            if ac['config_section'] not in config:
+                config[ac['config_section']] = dict()
+
+            # Populate the config section for this asset class with all the
+            # assets found on disk
+            config[ac['config_section']] = self._create_asset_config_entries(
+                    asset_class=ac,
+                    config=config[ac['config_section']],
+                    mode_name=mode_name,
+                    path=path)
+
+            # create the actual instance of the AssetClass object and add it
+            # to the self.mc asset attribute dict for that asset class
+            for asset in config[ac['config_section']]:
+                getattr(self.mc, ac['attribute'])[asset] = ac['cls'](
+                        mc=self.mc, name=asset,
+                        file=config[ac['config_section']][asset]['file'],
+                        config=config[ac['config_section']][asset])
+
+        return config
+
+    def _create_asset_config_entries(self, asset_class, config, mode_name=None,
                                   path=None):
         """Scans a folder (and subfolders) and automatically creates or updates
         entries in the config dict for any asset files it finds.
@@ -273,104 +394,37 @@ class AssetManager(object):
 
         return config
 
-    def create_assets(self, config, mode=None, mode_path=None):
-        """Walks a folder (and subfolders) and finds all the assets. Checks to
-        see if those assets have config entries in the passed config file, and
-        then builds a config for each asset based on its config entry, and/or
-        defaults based on the subfolder it was in or the general defaults.
-        Then it creates the asset objects based on the built-up config.
+    def locate_asset_file(self, file_name, path_string, path=None):
+        """Takes a file name and a root path and returns a link to the absolute
+        path of the file
 
-            Args:
-                config: A config dictionary.
-                mode: Optional reference to the mode object which is used when
-                    assets are being created from mode folders.
-                mode_path: Optional full path to the base folder that will be
-                    traversed for the assets file on disk. If omitted, the
-                    base machine folder will be searched.
+        Args:
+            file_name: String of the file name
+            path: root of the path to check (without the specific asset path
+                string)
 
-            Returns: An updated config dictionary. (See the "How it works"
-                section below for details.
+        Returns: String of the full path (path + file name) of the asset.
 
-        Note that this method merely creates the asset object so they can be
-        referenced in MPF. It does not actually load the asset files into
-        memory.
-
-        It's called on startup register machine-wide assets, and it's called
-        as modes initialize (also during the startup process) to find assets
-        in mode folders.
-
-        How it works
-        ============
-
-        Every asset class that's registered with the Asset Manager has a folder
-        associated it. (e.g. Images assets as associated wit the "images"
-        folder.)
-
-        This method will build a master config dict of all the assets of each
-        type. It does this by walking the folder, looking for files of each
-        asset type.
-
-        When it finds a file, it checks the config to see if either (1) any
-        entries exist with a name that matches the root of that file name, or
-        (2) to see if there's a config for an asset with a different name
-        but with a file: setting that matches this file name.
-
-        If it finds a match, that entry's file: setting is updated with the
-        default settings for assets in that folder as well as the full path to
-        the file. If it does not find a match, it creates a new entry for
-        that asset in the config.
-
-        To build up the config, it will base the config on any settings
-        specified in the "default" section of the "assets:" section for that
-        asset class. (e.g. images will get whatever key/value pairs are in the
-        assets:images:default section of the config.)
-
-        Then it will look to see what subfolder the asset it in and if there
-        are any custom default settings for that subfolder. For example, an
-        image found in the /custom1 subfolder will get any settings in the
-        assets:images:custom1 section of the config. These settings are merged
-        into the settings from the default section.
-
-        Finally it will merge in any settings that existed for this asset
-        specifically.
-
-        When this method is done, the config dict has been updated to include
-        every asset it found in that folder and subfolders (along with its
-        full path), and a config dict appropriately merged from default,
-        folder-specific, and asset specific settings
+        Note this method will add the path string between the path you pass and
+        the file. Also if it can't find the file in the path you pass, it will
+        look for the file in the machine root plus the path string location.
 
         """
+        if path:
+            path_list = [path]
+        else:
+            path_list = list()
 
-        if not config:
-            config = dict()
+        path_list.append(self.mc.machine_path)
 
-        try:
-            mode_name = mode.name
-        except AttributeError:
-            mode_name = None
+        for path in path_list:
+            full_path = os.path.join(path, path_string, file_name)
+            if os.path.isfile(full_path):
+                return full_path
 
-        for ac in self._asset_classes:
-
-            if ac['config_section'] not in config:
-                config[ac['config_section']] = dict()
-
-            # Populate the config section for this asset class with all the
-            # assets found on disk
-            config[ac['config_section']] = self._process_assets_from_disk(
-                    asset_class=ac,
-                    config=config[ac['config_section']],
-                    mode_name=mode_name,
-                    path=mode_path)
-
-            # create the actual instance of the AssetClass object and add it
-            # to the self.mc asset attribute dict for that asset class
-            for asset in config[ac['config_section']]:
-                getattr(self.mc, ac['attribute'])[asset] = ac['cls'](
-                        mc=self.mc, name=asset,
-                        file=config[ac['config_section']][asset]['file'],
-                        config=config[ac['config_section']][asset])
-
-        return config
+        # self.log.critical("Could not locate asset file '%s'. Quitting...",
+        #                   file_name)
+        raise ValueError("Could not locate image '{}'".format(file_name))
 
     def _load_mode_assets(self, config, priority, mode):
         # Called on mode start to load the assets that are set to automatically
@@ -447,37 +501,14 @@ class AssetManager(object):
             Clock.unschedule(self._check_loader_status)
             self._loaded_watcher = False
 
-    def locate_asset_file(self, file_name, path_string, path=None):
-        """Takes a file name and a root path and returns a link to the absolute
-        path of the file
-
-        Args:
-            file_name: String of the file name
-            path: root of the path to check (without the specific asset path
-                string)
-
-        Returns: String of the full path (path + file name) of the asset.
-
-        Note this method will add the path string between the path you pass and
-        the file. Also if it can't find the file in the path you pass, it will
-        look for the file in the machine root plus the path string location.
-
-        """
-        if path:
-            path_list = [path]
+    def _startup_load_tracker(self, time):
+        if self.num_assets_to_load:
+            pass
         else:
-            path_list = list()
+            Clock.unschedule(self._startup_load_tracker)
+            self.mc.clear_boot_hold('assets')
 
-        path_list.append(self.mc.machine_path)
 
-        for path in path_list:
-            full_path = os.path.join(path, path_string, file_name)
-            if os.path.isfile(full_path):
-                return full_path
-
-        # self.log.critical("Could not locate asset file '%s'. Quitting...",
-        #                   file_name)
-        raise ValueError("Could not locate image '{}'".format(file_name))
 
 
 class AssetLoader(threading.Thread):
@@ -568,9 +599,6 @@ class AssetClass(object):
         self.loaded = False  # Is this asset loaded and ready to use?
         self.unloading = False  # Is this asset in the process of unloading?
 
-        if config['load'] == 'preload':
-            self.load()
-
     def __repr__(self):
         return '<Asset: {}>'.format(self.name)
 
@@ -615,7 +643,6 @@ class AssetClass(object):
         self.loading = False
         self.loaded = True
         self.unloading = False
-        print("loaded", self)
         self._call_callbacks()
 
     def unload(self):

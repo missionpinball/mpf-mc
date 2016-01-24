@@ -29,6 +29,7 @@ class MpfMc(App):
         self.options = options
         self.machine_config = config
         self.machine_path = machine_path
+        self._boot_holds = set()
 
         self.modes = CaseInsensitiveDict()
         self.player_list = list()
@@ -41,6 +42,8 @@ class MpfMc(App):
         self.active_slides = dict()
         self.scriptlets = list()
 
+        self.register_boot_hold('init')
+        self.register_boot_hold('assets')
         self.displays = CaseInsensitiveDict()
         self.machine_vars = CaseInsensitiveDict()
         self.machine_var_monitor = False
@@ -85,10 +88,26 @@ class MpfMc(App):
     def get_config(self):
         return self.machine_config
 
+    def register_boot_hold(self, hold):
+        # print('registering boot hold', hold)
+        self._boot_holds.add(hold)
+
+    def clear_boot_hold(self, hold):
+        # print('clearing boot hold', hold)
+        self._boot_holds.remove(hold)
+        if not self._boot_holds:
+            self._init_done()
+
     def displays_initialized(self, *args):
         from mc.uix.window import Window
         Window.initialize(self)
 
+        self._init()
+
+    def _init(self):
+        # Since the Window is so critical in Kivy, we can't continue the
+        # boot process until the window is setup, and we can't set the
+        # window up until the displays are initialized.
         self.events.post("init_phase_1")
         self.events._process_event_queue()
         self.events.post("init_phase_2")
@@ -100,10 +119,12 @@ class MpfMc(App):
         self.events._process_event_queue()
         self.events.post("init_phase_5")
         self.events._process_event_queue()
+        self.clear_boot_hold('init')
+
+    def _init_done(self):
+        self.init_done = True
         McConfig.unload_config_spec()
         self.reset()
-
-        self.init_done = True
 
     def build(self):
         self.start_time = time.time()
@@ -121,6 +142,7 @@ class MpfMc(App):
 
         try:
             self.bcp_processor.socket_thread.stop()
+            self.asset_manager.loader_thread.stop()
         except AttributeError:  # if we're running without BCP processor
             pass
 
