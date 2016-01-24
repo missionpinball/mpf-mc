@@ -149,7 +149,7 @@ def main():
               machine_path=machine_path).run()
         Logger.info("MC run loop ended.")
     except Exception as e:
-        Logger.exception(e)
+        Logger.exception("MC: An exception occurred - {}: {}".format(type(e).__name__, str(e)))
 
     sys.exit()
 
