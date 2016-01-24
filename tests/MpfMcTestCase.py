@@ -97,7 +97,6 @@ class MpfMcTestCase(unittest.TestCase):
     def tearDown(self):
         from kivy.base import stopTouchApp
         from kivy.core.window import Window
-        Window.unbind(on_flip=self.on_window_flip)
         stopTouchApp()
 
     def patch_bcp(self):
@@ -147,7 +146,6 @@ class MpfMcTestCase(unittest.TestCase):
         self.patch_bcp()
 
         from kivy.core.window import Window
-        Window.bind(on_flip=self.on_window_flip)
         Window.create_window()
         Window.canvas.clear()
 
