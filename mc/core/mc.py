@@ -54,7 +54,6 @@ class MpfMc(App):
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
-        self.crash_queue = None
         self.init_done = False
 
         # Core components
@@ -71,6 +70,8 @@ class MpfMc(App):
         # Asset classes
         ImageAsset.initialize(self)
 
+        Clock.schedule_interval(self._check_crash_queue, 1)
+
     def validate_machine_config_section(self, section):
         if section not in McConfig.config_spec:
             return
@@ -85,7 +86,6 @@ class MpfMc(App):
         return self.machine_config
 
     def displays_initialized(self, *args):
-        # print('Displays Initialized')
         from mc.uix.window import Window
         Window.initialize(self)
 
@@ -259,3 +259,13 @@ class MpfMc(App):
                 self.scriptlets.append(getattr(i, scriptlet.split('.')[1])
                                        (mc=self,
                                         name=scriptlet.split('.')[1]))
+
+    def _check_crash_queue(self, time):
+        try:
+            crash = self.crash_queue.get(block=False)
+        except queue.Empty:
+            pass
+        else:
+            print("MPF Shutting down due to child thread crash")
+            print("Crash details: %s", crash)
+            self.stop()

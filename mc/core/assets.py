@@ -1,10 +1,4 @@
-"""Contains AssetManager, AssetLoader, and Asset parent classes.
-
-Note this module is a copy of the assets module from mpf. Once this is updated
-for the new mpf_mc, I'll move it back to mpf and update mpf to use the new
-version.
-
-"""
+"""Contains AssetManager, AssetLoader, and AssetClass parent classes."""
 
 import copy
 import os
@@ -64,6 +58,22 @@ class AssetManager(object):
                                    self.create_assets,
                                    config=self.mc.machine_config)
 
+    @property
+    def loading_percent(self):
+        """The percent of assets that are in the process of loading that have
+        been loaded. This value is an integer between 0 and 100. It's reset
+        when all the assets have been loaded, so it will go from 0 to 100 when
+        MPF is starting up, and then go from 0 to 100 again when a mode starts,
+        etc.
+        """
+
+        try:
+            return round(self.num_assets_to_load / self.num_assets_loaded /
+                         100)
+
+        except ZeroDivisionError:
+            return 100
+
     def _start_loader_thread(self):
 
         self.loader_thread = AssetLoader(self.loader_queue,
@@ -74,6 +84,31 @@ class AssetManager(object):
 
     def register_asset_class(self, asset_class, attribute, config_section,
                              path_string, extensions, priority):
+        """Registers a a type of assets to be controlled by the AssetManager.
+
+        Args:
+            asset_class: Reference to the class you want to register, based on
+                mc.core.assets.AssetClass. e.g. mc.assets.images.ImageClass
+            attribute: String of the name of the attribute dict that will be
+                added to the main MpfMc instance. e.g. 'images' means that
+                the dict of image names to image asset class instances will be
+                at self.mc.images.
+            config_section: String name of this assets section in the config
+                files. e.g. 'images'
+            path_string: String name of the setting from mpf_mc:paths: which
+                controls the name of the folder that will hold this type of
+                assets in the machine folder. e.g. 'images
+            extensions: Tuple of strings, with no dots, of the types of file
+                extensions that are valid for this type of asset. e.g. ('jpg',
+                'gif', 'png')
+            priority: Integer of the relative priority of this asset class as
+                compared to other asset classes. This affects the order that
+                asset objects are created and loaded (when there's a tie)
+                because some asset classes depend on others to exist first.
+                e.g. 'slide_shows' assets need 'images', 'videos', and 'sounds'
+                to exist. Higher number is first.
+
+        """
 
         if not hasattr(self.mc, attribute):
             setattr(self.mc, attribute, CaseInsensitiveDict())
@@ -91,19 +126,14 @@ class AssetManager(object):
                   defaults=dict())
 
         self._asset_classes.append(ac)
-
-        # sort the list so highest priority is first. This lets them be loaded
-        # in their priority order, which is needed because some types of assets
-        # require that other types are loaded first. (e.g. slide_shows could
-        # require images, videos, or sounds.)
         self._asset_classes.sort(key=lambda x: x['priority'], reverse=True)
-
         self._set_asset_class_defaults(ac, self.mc.machine_config)
 
     def _set_asset_class_defaults(self, asset_class, config):
         # Creates the folder-based default configs for the asset class
         # starting with the default section and then created folder-specific
-        # entries based on that.
+        # entries based on that. Just runs once on startup for each asset
+        # class.
         default_config_dict = dict()
 
         if 'assets' in config and config['assets']:
@@ -127,13 +157,10 @@ class AssetManager(object):
 
         asset_class['defaults'] = default_config_dict
 
-    def _process_assets_from_disk(self, asset_class, config, path=None):
-        """Looks at a path and finds all the assets in the folder.
-        Looks in a subfolder based on the asset's path string.
-        Crawls subfolders too. The first subfolder it finds is used for the
-        asset's default config section.
-        If an asset has a related entry in the config file, it will create
-        the asset with that config. Otherwise it uses the default
+    def _process_assets_from_disk(self, asset_class, config, mode_name=None,
+                                  path=None):
+        """Scans a folder (and subfolders) and automatically creates or updates
+        entries in the config dict for any asset files it finds.
 
         Args:
             asset_class: An asset class entry from the self._asset_classes
@@ -141,16 +168,42 @@ class AssetManager(object):
             config: A dictionary which contains a list of asset names with
                 settings that will be used for the specific asset. (Note this
                 is not needed for all assets, as any asset file found not in
-                the
-                config dictionary will be set up with the folder it was found
-                in's asset_defaults settings.)
+                the config dictionary will be set up with the folder it was
+                found in's asset_defaults settings.)
             path: A full system path to the root folder that will be searched
-                for assetsk. This should *not* include the asset-specific path
-                string. If omitted, only the machine's root folder will be
-                searched.
+                for assets. This should *not* include the asset-specific path
+                string. If None, machine's root folder will be searched.
 
         Returns: Updated config dict that has all the new assets (and their
-            buit-up configs) that were found on disk.
+            built-up configs) that were found on disk.
+
+        Note that for each file found, this method will scan through the
+        entire config dict to see if any entry exists for that file based on an
+        entry's 'file:' setting. If it's not found, an entry is created based
+        on the file name. (This auto-created entry uses the lower-case stem of
+        the file, e.g. a file called Image1.png will result in an asset entry
+        called 'image1'.)
+
+        Examples (based on images):
+
+            asset_class defaults: section:
+                default:
+                    some_key: some_value
+                foo:
+                    some_key: some_value
+
+            Based on the above asset_class defaults: section, the following
+            files would get their 'defaults:' setting set to 'foo':
+                /images/foo/image1.png
+                /images/foo/bar/image2.png
+                /images/foo/bar/bar2/image3.png
+
+            And based on the above, the following files would get their
+            'defaults:' setting set to 'default:
+                /images/image4.png
+                /images/foo/image5.png
+                /images/other/images6.png
+                /images/other/big/image7.png
 
         """
         if not path:
@@ -173,37 +226,45 @@ class AssetManager(object):
                 name = os.path.splitext(file_name)[0].lower()
                 full_file_path = os.path.join(path, file_name)
 
-                if folder == asset_class['path_string'] or folder not in \
-                        asset_class['defaults']:
+                if (folder == asset_class['path_string'] or
+                                      folder not in asset_class['defaults']):
                     default_string = 'default'
                 else:
                     default_string = folder
 
-                # This is useful when troubleshooting
-                # print("------")
-                # print("path:", path)
-                # print("full_path", full_file_path)
-                # print("file:", file_name)
-                # print("name:", name)
-                # print("folder:", folder)
-                # print("default settings name:", default_string)
-                # print("default settings:",
-                #       asset_class['defaults'][default_string])
+                # built_up_config is the built-up config dict for that will be
+                # used for the entry for this asset.
 
+                # first deepcopy the default config for this asset based
+                # on it's default_string (folder) since we use it as the base
+                # for everything in case one of the custom folder configs
+                # doesn't include all settings
                 built_up_config = copy.deepcopy(
                         asset_class['defaults'][default_string])
 
+                # scan through the existing config to see if this file is used
+                # as the file setting for any entry.
                 for k, v in config.items():
 
                     if ('file' in v and v['file'] == file_name) or name == k:
-                        if name != k:
-                            name = k
-                            # print "NEW NAME:", name
+                        # if it's found, set the asset entry's name to whatever
+                        # the name of this entry is
+                        name = k
+                        # merge in the config settings for this asset, updating
+                        #  the defaults
                         built_up_config.update(config[k])
                         break
 
+                # need to send the full file path to the AssetClass that will
+                # be created so it will be able to load it later.
                 built_up_config['file'] = full_file_path
 
+                # If this asset is set to load on mode start, replace the load
+                # value with one based on mode name
+                if built_up_config['load'] == 'mode_start':
+                    built_up_config['load'] = '{}_start'.format(mode_name)
+
+                # Update the config for that asset
                 config[name] = built_up_config
 
                 # self.log.debug("Registering Asset: %s, File: %s, Default
@@ -221,7 +282,9 @@ class AssetManager(object):
 
             Args:
                 config: A config dictionary.
-                mode_path: The full path to the base folder that will be
+                mode: Optional reference to the mode object which is used when
+                    assets are being created from mode folders.
+                mode_path: Optional full path to the base folder that will be
                     traversed for the assets file on disk. If omitted, the
                     base machine folder will be searched.
 
@@ -244,12 +307,8 @@ class AssetManager(object):
         folder.)
 
         This method will build a master config dict of all the assets of each
-        type. First it starts with the asset section in the config file, e.g.
-        for image assets, it starts with the "images:" section of the config.
-
-        Then if walks the folder structure (starting with the asset folder, so
-        the search for image assets starts in /images) looking for files with
-        the extensions that are registered for that asset class.
+        type. It does this by walking the folder, looking for files of each
+        asset type.
 
         When it finds a file, it checks the config to see if either (1) any
         entries exist with a name that matches the root of that file name, or
@@ -257,12 +316,11 @@ class AssetManager(object):
         but with a file: setting that matches this file name.
 
         If it finds a match, that entry's file: setting is updated with the
-        full path to the file. If it does not find a match, it creates a new
-        entry for that asset in the config.
+        default settings for assets in that folder as well as the full path to
+        the file. If it does not find a match, it creates a new entry for
+        that asset in the config.
 
-        Once a file is found, the asset's entry in the config dict is built.
-
-        When it does this, it will base the config on any settings
+        To build up the config, it will base the config on any settings
         specified in the "default" section of the "assets:" section for that
         asset class. (e.g. images will get whatever key/value pairs are in the
         assets:images:default section of the config.)
@@ -277,45 +335,36 @@ class AssetManager(object):
         specifically.
 
         When this method is done, the config dict has been updated to include
-        every asset it found in that folder (along with its full path), and a
-        config dict appropriately merged from default, folder-specific, and
-        asset specific settings
+        every asset it found in that folder and subfolders (along with its
+        full path), and a config dict appropriately merged from default,
+        folder-specific, and asset specific settings
 
         """
 
         if not config:
             config = dict()
 
+        try:
+            mode_name = mode.name
+        except AttributeError:
+            mode_name = None
+
         for ac in self._asset_classes:
 
             if ac['config_section'] not in config:
                 config[ac['config_section']] = dict()
 
+            # Populate the config section for this asset class with all the
+            # assets found on disk
             config[ac['config_section']] = self._process_assets_from_disk(
                     asset_class=ac,
-                    config=config[ac['config_section']], path=mode_path)
+                    config=config[ac['config_section']],
+                    mode_name=mode_name,
+                    path=mode_path)
 
+            # create the actual instance of the AssetClass object and add it
+            # to the self.mc asset attribute dict for that asset class
             for asset in config[ac['config_section']]:
-
-                # set the config['file'] to the full path
-                if not os.path.isfile(config[ac['config_section']][asset][
-                                          'file']):
-                    config[ac['config_section']][asset]['file'] = \
-                        self.locate_asset_file(
-                                file_name=config[ac['config_section']][asset][
-                                    'file'],
-                                path_string=ac['path_string'],
-                                path=mode_path)
-
-                # if the config['load'] key is 'mode_start', update it to
-                # include the mode name so we can find it later.
-                if config[ac['config_section']][asset]['load'] == 'mode_start':
-                    try:
-                        config[ac['config_section']][asset]['load'] = (
-                            '{}_start'.format(mode.name))
-                    except AttributeError:  # pragma: no cover
-                        pass  # in case someone adds mode_start to machine cfg
-
                 getattr(self.mc, ac['attribute'])[asset] = ac['cls'](
                         mc=self.mc, name=asset,
                         file=config[ac['config_section']][asset]['file'],
@@ -324,12 +373,20 @@ class AssetManager(object):
         return config
 
     def _load_mode_assets(self, config, priority, mode):
-        return (self.unload_mode_assets,
+        # Called on mode start to load the assets that are set to automatically
+        # load based on that mode starting
+        return (self.unload_assets,
                 self.load_assets_by_load_key(
                         key_name='{}_start'.format(mode.name),
                         priority=priority))
 
-    def unload_mode_assets(self, assets):
+    def unload_assets(self, assets):
+        """Unloads multiple assets.
+
+            Args:
+                assets: An iterable of asset objects. You can safely mix
+                    different classes of assets.
+        """
         for asset in assets:
             asset.unload()
 
@@ -357,9 +414,17 @@ class AssetManager(object):
 
     def _load_asset(self, asset):
         # Internal method which handles the logistics of actually loading an
-        # asset
+        # asset. Should only be called by AssetClass.load() as that method does
+        # additional things that are needed.
 
         self.num_assets_to_load += 1
+
+        # It's ok for an asset to make it onto this queue twice as the loader
+        # thread will check the asset's loaded attribute to make sure it needs
+        # to load it.
+
+        # This is a PriorityQueue which will automatically put the asset into
+        # the proper position in the queue based on its priority.
         self.loader_queue.put(asset)
 
         if not self._loaded_watcher:
@@ -367,6 +432,7 @@ class AssetManager(object):
             self._loaded_watcher = True
 
     def _check_loader_status(self, *args):
+        # checks the loaded queue and updates loading stats
         while not self.loaded_queue.empty():
             self.loaded_queue.get_nowait()._loaded()
             self.num_assets_loaded += 1
@@ -447,22 +513,10 @@ class AssetLoader(threading.Thread):
             while True:
                 asset = self.loader_queue.get()  # blocks while empty
 
-                if not asset.loaded and not asset.loading:
+                if not asset.loaded:
                     asset._do_load()
 
                 self.loaded_queue.put(asset)
-
-                # If the asset is already loaded then we don't need to load it
-                # again, but we still need to call the callback because
-                # whatever put it on the queue the second time is probably
-                # waiting for it.
-
-                # I thought about trying to make sure that an asset isn't
-                # in the queue before it gets added, but since this is
-                # separate threads that would require all sorts of work.
-                # It's more efficient to add it to the queue anyway and
-                # then just skip it if it's already loaded by the time the
-                # loader gets to it.
 
         except Exception:  # pragma no cover
             exc_type, exc_value, exc_traceback = sys.exc_info()
