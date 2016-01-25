@@ -10,10 +10,9 @@ __all__ = ('audio_interface_instance',
            'AudioException',
            'Track',
            'MixChunkContainer',
-           'Sound',
            )
 
-__version_info__ = ('0', '1', '0-dev4')
+__version_info__ = ('0', '1', '0-dev5')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -29,6 +28,9 @@ from kivy.logger import Logger
 include "audio_interface.pxi"
 
 
+# ---------------------------------------------------------------------------
+#    Maximum values for various audio engine settings
+# ---------------------------------------------------------------------------
 DEF MAX_TRACKS = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
@@ -37,7 +39,9 @@ DEF MAX_SOUND_EVENTS = 50
 DEF MAX_AUDIO_VALUE_S16 = ((1 << (16 - 1)) - 1)
 DEF MIN_AUDIO_VALUE_S16 = -(1 << (16 - 1))
 
+# The global audio interface instance (there is only one instance)
 cdef object audio_interface_instance = None
+
 
 class AudioException(Exception):
     """Exception returned by the audio module
@@ -57,7 +61,6 @@ cdef class AudioInterface:
     cdef int supported_formats
     cdef int mixer_channel
     cdef list tracks
-
 
     # In order to get the SDL_Mixer library to work with the desired features needed for the
     # media controller, a sound must be played at all times on a mixer channel.  A sound
@@ -243,15 +246,23 @@ cdef class AudioInterface:
         Returns:
             A list of file extensions supported.
         """
-        if audio_interface_instance is None:
-            return []
+        return ["wav", "flac", "ogg"]
 
-        extensions = ["wav"]
-        if audio_interface_instance.supported_formats & MIX_INIT_FLAC:
-            extensions.append("flac")
-        if audio_interface_instance.supported_formats & MIX_INIT_OGG:
-            extensions.append("ogg")
-        return extensions
+    def get_settings(self):
+        """
+        Gets the current audio interface settings. This method is only intended for testing purposes.
+        Returns:
+            A dictionary containing the current audio interface settings or None if the
+            audio interface is not enabled.
+        """
+        if self.enabled:
+            return {'sample_rate': self.sample_rate,
+                    'audio_channels': self.audio_channels,
+                    'buffer_samples': self.buffer_samples,
+                    'buffer_size': self.buffer_size
+                    }
+        else:
+            return None
 
     @property
     def enabled(self):
@@ -323,7 +334,8 @@ cdef class AudioInterface:
         return None
 
     def create_track(self, str name not None,
-                     int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT, float volume=1.0):
+                     int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
+                     float volume=1.0):
         """
         Creates a new track in the audio interface
         Args:
