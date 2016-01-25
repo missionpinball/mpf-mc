@@ -83,6 +83,7 @@ class MpfMc(App):
         # Asset classes
         ImageAsset.initialize(self)
         if self.sound_system.enabled:
+            SoundAsset.extensions = tuple(self.sound_system.audio_interface.supported_extensions())
             SoundAsset.initialize(self)
 
         Clock.schedule_interval(self._check_crash_queue, 1)

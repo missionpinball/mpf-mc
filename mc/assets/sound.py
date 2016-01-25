@@ -22,9 +22,8 @@ class SoundAsset(AssetClass):
     attribute = 'sounds'  # attribute in MC, e.g. self.mc.images
     path_string = 'sounds'  # entry from mpf_mc:paths: for asset folder name
     config_section = 'sounds'  # section in the config files for this asset
-    extensions = tuple(AudioInterface.supported_extensions())
+    extensions = ('wav',)
     class_priority = 100  # Order asset classes will be loaded. Higher is first.
-
 
     def __init__(self, mc, name, file, config):
         super().__init__(mc, name, file, config)

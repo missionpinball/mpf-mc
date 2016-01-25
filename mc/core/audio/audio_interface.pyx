@@ -239,14 +239,18 @@ cdef class AudioInterface:
         cdef const SDL_version *version =  Mix_Linked_Version()
         return 'SDL_Mixer {}.{}.{}'.format(version.major, version.minor, version.patch)
 
-    @staticmethod
-    def supported_extensions():
+    def supported_extensions(self):
         """
         Get the file extensions that are supported by the audio interface.
         Returns:
             A list of file extensions supported.
         """
-        return ["wav", "flac", "ogg"]
+        extensions = ["wav"]
+        if self.supported_formats & MIX_INIT_FLAC:
+            extensions.append("flac")
+        if self.supported_formats & MIX_INIT_OGG:
+            extensions.append("ogg")
+        return extensions
 
     def get_settings(self):
         """
