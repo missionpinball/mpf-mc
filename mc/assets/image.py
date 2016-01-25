@@ -42,10 +42,10 @@ class ImageAsset(AssetClass):
         # all you have to do here is load and return.
 
         self._image = Image.load(filename=self.config['file'],
-                                keep_data=False,
-                                scale=1.0,
-                                mipmap=False,
-                                anim_delay=0.25)
+                                 keep_data=False,
+                                 scale=1.0,
+                                 mipmap=False,
+                                 anim_delay=0.25)
 
     def _do_unload(self):
         # This is the method that's called to unload the asset. It's called by

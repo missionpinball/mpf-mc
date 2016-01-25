@@ -38,6 +38,10 @@ class AssetManager(object):
         # Number of assets loaded so far. Reset to 0 when it hits
         # num_assets_to_load.
 
+        self.num_bcp_assets_to_load = 0
+        self.num_bcp_assets_loaded = 0
+        self.num_bcb_assets_remaining = 0
+
         self.loader_queue = PriorityQueue()  # assets for to the loader thread
         self.loaded_queue = Queue()  # assets loaded from the loader thread
         self.loader_thread = None
@@ -52,6 +56,14 @@ class AssetManager(object):
         # the assets.
         self.mc.events.add_handler('init_phase_2', self._create_assets)
 
+        # Picks up asset load information from connected BCP client(s)
+        self.mc.events.add_handler('assets_to_load',
+                                   self._bcp_client_asset_load)
+
+    @property
+    def num_assets_remaining(self):
+        return self.num_assets_to_load - self.num_assets_loaded
+
     @property
     def loading_percent(self):
         """The percent of assets that are in the process of loading that have
@@ -62,11 +74,18 @@ class AssetManager(object):
         """
 
         try:
-            return round(self.num_assets_to_load / self.num_assets_loaded /
-                         100)
+            return round((self.num_assets_loaded +
+                          self.num_bcp_assets_loaded) /
+                         (self.num_assets_to_load +
+                          self.num_bcp_assets_to_load) * 100)
 
         except ZeroDivisionError:
             return 100
+
+    def shutdown(self):
+        self.loader_queue = None
+        self.loaded_queue = None
+        self.loader_thread.stop()
 
     def _start_loader_thread(self):
         self.loader_thread = AssetLoader(self.loader_queue,
@@ -171,9 +190,7 @@ class AssetManager(object):
         for asset in preload_assets:
             asset.load()
 
-        if preload_assets:
-            Clock.schedule_interval(self._startup_load_tracker, .1)
-        else:
+        if not preload_assets:
             self.mc.clear_boot_hold('assets')
 
     def _create_assets_from_disk(self, config, mode=None):
@@ -491,8 +508,7 @@ class AssetManager(object):
         while not self.loaded_queue.empty():
             self.loaded_queue.get()._loaded()
             self.num_assets_loaded += 1
-            # print('Loading Status: {}/{}'.format(self.num_assets_loaded,
-            #                                      self.num_assets_to_load))
+            self._post_loading_event()
 
         if self.num_assets_to_load == self.num_assets_loaded:
             self.num_assets_loaded = 0
@@ -501,16 +517,30 @@ class AssetManager(object):
             Clock.unschedule(self._check_loader_status)
             self._loaded_watcher = False
 
-    def _startup_load_tracker(self, time):
-        if self.num_assets_to_load:
-            self.mc.events.post('boot_status',
-                                total_assets=self.num_assets_to_load,
-                                loaded=self.num_assets_loaded,
-                                percent=self.loading_percent)
-        else:
-            Clock.unschedule(self._startup_load_tracker)
-            self.mc.clear_boot_hold('assets')
+    def _bcp_client_asset_load(self, total, remaining):
+        self.num_bcp_assets_loaded = int(total) - int(remaining)
+        self.num_bcp_assets_to_load = int(total)
+        self.num_bcb_assets_remaining = int(remaining)
+        self._post_loading_event()
 
+    def _post_loading_event(self):
+        # called each time an asset is loaded
+
+        total = self.num_assets_to_load + self.num_bcp_assets_to_load
+        remaining = total - self.num_assets_loaded - self.num_bcp_assets_loaded
+
+        self.mc.events.post('loading_assets', total=total,
+                            loaded=self.num_assets_loaded +
+                                   self.num_bcp_assets_loaded,
+                            remaining=remaining,
+                            percent=self.loading_percent)
+
+        # TODO temp until logging is implemented properly
+        print('Loading assets: {}/{} ({}%)'.format(self.num_assets_loaded +
+              self.num_bcp_assets_loaded, total, self.loading_percent))
+
+        if not remaining and not self.mc.init_done:
+            self.mc.clear_boot_hold('assets')
 
 class AssetLoader(threading.Thread):
     """Base class for the Asset Loader thread and actually loads the assets
@@ -559,6 +589,9 @@ class AssetLoader(threading.Thread):
                 self.loaded_queue.get_nowait()
             except Empty:
                 pass
+
+        self.loaded_queue = None
+        self.loader_queue = None
 
     def run(self):
         """Run loop for the loader thread."""

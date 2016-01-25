@@ -110,6 +110,7 @@ class MpfMc(App):
         # Since the window is so critical in Kivy, we can't continue the
         # boot process until the window is setup, and we can't set the
         # window up until the displays are initialized.
+
         self.events.post("init_phase_1")
         self.events._process_event_queue()
         self.events.post("init_phase_2")
@@ -136,7 +137,7 @@ class MpfMc(App):
     def on_stop(self):
         print("Stopping ...")
         app = App.get_running_app()
-        app.asset_manager.loader_thread.stop()
+        app.asset_manager.shutdown()
 
         try:
             app.bcp_processor.socket_thread.stop()
@@ -155,9 +156,6 @@ class MpfMc(App):
     def reset(self, **kwargs):
         self.player = None
         self.player_list = list()
-
-        self.events.add_handler('assets_to_load',
-                                self._bcp_client_asset_loader_tick)
 
         self.events.post('mc_reset_phase_1')
         self.events._process_event_queue()
@@ -198,52 +196,6 @@ class MpfMc(App):
                 Logger.error('Received player turn start for player %s, but '
                              'only %s player(s) exist',
                              player_num, len(self.player_list))
-
-    def _bcp_client_asset_loader_tick(self, total, remaining):
-        self._pc_assets_to_load = int(remaining)
-        self._pc_total_assets = int(total)
-
-    # def asset_loading_counter(self):
-    #
-    #     if self.tick_num % 5 != 0:
-    #         return
-    #
-    #     if AssetManager.total_assets or self._pc_total_assets:
-    #         # max because this could go negative at first
-    #         percent = max(0, int(float(AssetManager.total_assets -
-    #                                    self._pc_assets_to_load -
-    #                                    AssetManager.loader_queue.qsize()) /
-    #                                    AssetManager.total_assets * 100))
-    #     else:
-    #         percent = 100
-    #
-    #     Logger.debug("Asset Loading Counter. PC remaining:{}, MC remaining:"
-    #                    "{}, Percent Complete: {}".format(
-    #                    self._pc_assets_to_load,
-    # AssetManager.loader_queue.qsize(),
-    #                    percent))
-    #
-    #     self.events.post('asset_loader',
-    #                      total=AssetManager.loader_queue.qsize() +
-    #                            self._pc_assets_to_load,
-    #                      pc=self._pc_assets_to_load,
-    #                      mc=AssetManager.loader_queue.qsize(),
-    #                      percent=percent)
-    #
-    #     if not AssetManager.loader_queue.qsize():
-    #
-    #     if True:
-    #
-    #         if not self.pc_connected:
-    #             self.events.post("waiting_for_client_connection")
-    #             self.events.remove_handler(self.asset_loading_counter)
-    #
-    #         elif not self._pc_assets_to_load:
-    #             Logger.debug("Asset Loading Complete")
-    #             self.events.post("asset_loading_complete")
-    #             self.bcp_processor.send('reset_complete')
-    #
-    #             self.events.remove_handler(self.asset_loading_counter)
 
     def set_machine_var(self, name, value, change, prev_value):
 
