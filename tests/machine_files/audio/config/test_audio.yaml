@@ -1,4 +1,30 @@
 #config_version=3
+sound_system:
+  buffer: 4096
+  frequency: 44100
+  channels: 2
+  master_volume: 0.7
+  tracks:
+    voice:
+      volume: 0.6
+      simultaneous_sounds: 1
+      preload: yes
+    sfx:
+      volume: 0.4
+      simultaneous_sounds: 8
+      preload: yes
+
 modes:
  - mode1
+
+assets:
+    sounds:
+        default:
+            load: preload
+        voice:
+            load: on_demand
+            track: voice
+        sfx:
+            load: preload
+            track: voice
 

@@ -2,7 +2,8 @@ from tests.MpfMcTestCase import MpfMcTestCase
 from mock import MagicMock
 import time
 
-from mc.core.audio import AudioInterface, SoundController
+from mc.core.audio import SoundSystem, AudioInterface
+from kivy.logger import Logger
 
 
 class TestAudio(MpfMcTestCase):
@@ -21,60 +22,67 @@ class TestAudio(MpfMcTestCase):
     def get_sound_file_path(self):
         return 'tests/machine_files/audio/sounds'
 
-    def test_audio_library(self):
-        """ Tests the basic audio library functions """
+    def test_typical_sound_system(self):
+        """ Tests the sound system and audio interface with typical settings """
 
-        # Load the audio interface
-        interface = AudioInterface.initialize()
+        # Turn on DEBUG logging
+        Logger.setLevel(10)
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
         self.assertIsNotNone(interface)
 
-        # Add a track
-        track = interface.create_track("test", 2)
-        self.assertIsNotNone(track)
-        self.assertEqual(track.number, 0)
-        self.assertEqual(track.volume, 1.0)
-        self.assertEqual(track.name, "test")
+        # Check basic audio interface settings
+        settings = interface.get_settings()
+        self.assertIsNotNone(settings)
+        self.assertEqual(settings['buffer_samples'], 4096)
+        self.assertEqual(settings['audio_channels'], 2)
+        self.assertEqual(settings['sample_rate'], 44100)
 
+        # Check tracks
+        self.assertEqual(interface.get_track_count(), 2)
+        track_voice = interface.get_track_by_name("voice")
+        self.assertIsNotNone(track_voice)
+        self.assertEqual(track_voice.name, "voice")
+        self.assertAlmostEqual(track_voice.volume, 0.6)
+        self.assertEqual(track_voice.max_simultaneous_sounds, 1)
+
+        track_sfx = interface.get_track_by_name("sfx")
+        self.assertIsNotNone(track_sfx)
+        self.assertEqual(track_sfx.name, "sfx")
+        self.assertAlmostEqual(track_sfx.volume, 0.4)
+        self.assertEqual(track_sfx.max_simultaneous_sounds, 8)
+
+        # Allow some time for sound assets to load
+        self.advance_time(2)
+
+        # /sounds/sfx
+        self.assertIn('198361_sfx-028', self.mc.sounds)     # .wav
+        self.assertIn('210871_synthping', self.mc.sounds)   # .wav
+        self.assertIn('264828_text', self.mc.sounds)        # .ogg
+
+        # /sounds/voice
+        self.assertIn('104457_moron_test', self.mc.sounds)  # .wav
+        self.assertIn('113690_test', self.mc.sounds)        # .wav
+        self.assertIn('170380_clear', self.mc.sounds)       # .flac
+
+        """
         # Add another track with the same name (should not be allowed)
-        track_duplicate = interface.create_track("test", 4)
-        self.assertIsNone(track_duplicate)
-
         # Add another track with the same name, but different casing (should not be allowed)
-        track_duplicate = interface.create_track("Test", 2)
-        self.assertIsNone(track_duplicate)
-
         # Attempt to create track with max_simultaneous_sounds > 32 (the current max)
-        track_max_sounds = interface.create_track("BIG", 33)
-        self.assertIsNotNone(track_max_sounds)
-        self.assertEqual(track_max_sounds.max_simultaneous_sounds, 32)
-        self.assertEqual(track_max_sounds.name, "big")
-
         # Attempt to create track with max_simultaneous_sounds < 1 (the current max)
-        track_min_sounds = interface.create_track("small", 0)
-        self.assertIsNotNone(track_min_sounds)
-        self.assertEqual(track_min_sounds.max_simultaneous_sounds, 1)
-
         # Add up to the maximum number of tracks allowed
-        while interface.get_track_count() < AudioInterface.get_max_tracks():
-            track = interface.create_track("track{}".format(interface.get_track_count()), 2)
-            self.assertIsNotNone(track)
-
         # There should now be the maximum number of tracks allowed
         # Try to add another track (more than the maximum allowed)
-        track = interface.create_track("toomany", 2)
-        self.assertIsNone(track)
 
-    def test_sound_controller(self):
-        controller = SoundController(self.mc)
-        self.assertIsNotNone(controller)
-
-    # TODO: Tests to write:
-    # Load sounds (wav, ogg, flac, unsupported format)
-    # Play a sound
-    # Play two sounds on track with max_simultaneous_sounds = 1 (test sound queue, time expiration, priority scenarios)
-    # Play a sound on each track simultaneously
-    # Stop all sounds on track
-    # Stop all sounds on all tracks
-    # Ducking
-    # Configuration file tests (audio interface, tracks, sounds, sound player, sound trigger events, etc.)
-    #
+        # TODO: Tests to write:
+        # Load sounds (wav, ogg, flac, unsupported format)
+        # Play a sound
+        # Play two sounds on track with max_simultaneous_sounds = 1 (test sound queue, time expiration, priority scenarios)
+        # Play a sound on each track simultaneously
+        # Stop all sounds on track
+        # Stop all sounds on all tracks
+        # Ducking
+        # Configuration file tests (audio interface, tracks, sounds, sound player, sound trigger events, etc.)
+        #
+        """

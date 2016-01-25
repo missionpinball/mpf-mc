@@ -1,0 +1,7 @@
+#config_version=3
+sound_system:
+  buffer: 1000 # Not a power or two as required
+
+modes:
+ - mode1
+

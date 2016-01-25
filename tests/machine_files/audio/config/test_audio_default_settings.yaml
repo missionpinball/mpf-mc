@@ -1,0 +1,7 @@
+#config_version=3
+
+# No sound_system section, default settings should be used
+
+modes:
+ - mode1
+
