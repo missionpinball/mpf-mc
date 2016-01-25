@@ -1,5 +1,14 @@
 from mc.core.assets import AssetClass
-from mc.core.audio.audio_interface import AudioInterface
+from mc.core.audio.audio_interface import AudioInterface, AudioException
+from kivy.logger import Logger
+
+
+# ---------------------------------------------------------------------------
+#    Default sound asset configuration parameter values
+# ---------------------------------------------------------------------------
+DEFAULT_VOLUME = 0.5
+DEFAULT_MAX_QUEUE_TIME = None
+DEFAULT_LOOPS = 0
 
 
 class SoundAsset(AssetClass):
@@ -16,13 +25,30 @@ class SoundAsset(AssetClass):
     extensions = tuple(AudioInterface.supported_extensions())
     class_priority = 100  # Order asset classes will be loaded. Higher is first.
 
+
     def __init__(self, mc, name, file, config):
         super().__init__(mc, name, file, config)
 
-        # do whatever else you want here. Remove the entire method if you
-        # don't need to do anything.
-
         self._container = None  # holds the actual sound samples in memory
+
+        # Make sure a legal track name has been specified.  If not, throw an exception
+        track = self.mc.sound_system.audio_interface.get_track_by_name(self.config['track'])
+        if 'track' not in self.config or track is None:
+            Logger.error("SoundAsset: sound must have a valid track name. "
+                         "Could not create sound '{}' asset.".format(name))
+            raise AudioException("Sound must have a valid track name. "
+                                 "Could not create sound '{}' asset".format(name))
+
+        self.track = track
+
+        if 'volume' not in self.config:
+            self.config['volume'] = DEFAULT_VOLUME
+
+        if 'max_queue_time' not in self.config or self.config['max_queue_time'] is None:
+            self.config['volume'] = DEFAULT_MAX_QUEUE_TIME
+
+        if 'loops' not in self.config:
+            self.config['loops'] = DEFAULT_LOOPS
 
     def __repr__(self):
         # String that's returned if someone prints this object
@@ -38,11 +64,6 @@ class SoundAsset(AssetClass):
             An integer uniquely identifying the sound
         """
         return id(self)
-
-    @property
-    def loaded(self):
-        """ Indicates whether or not the sound asset has been loaded into memory """
-        return self._container is not None and self._container.loaded()
 
     @property
     def container(self):
@@ -67,10 +88,7 @@ class SoundAsset(AssetClass):
         AudioInterface.unload_sound(self._container)
         self._container = None
 
-    def stop(self):
-        # TODO: implement the function to stop all playing instances of the sound
-        pass
+    def _loaded(self):
+        super()._loaded()
+        Logger.debug("SoundAsset: Loaded {} (Track {})".format(self.name, self.track))
 
-    def play(self, loops=0, priority=0, fade_in=0, volume=1.0, **kwargs):
-        # TODO: implement play function
-        pass
