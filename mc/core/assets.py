@@ -5,7 +5,7 @@ import os
 import sys
 import threading
 import traceback
-from queue import PriorityQueue, Queue
+from queue import PriorityQueue, Queue, Empty
 
 from kivy.clock import Clock
 
@@ -72,7 +72,7 @@ class AssetManager(object):
         self.loader_thread = AssetLoader(self.loader_queue,
                                          self.loaded_queue,
                                          self.mc.crash_queue)
-        self.loader_thread.daemon = True
+        # self.loader_thread.daemon = True
         self.loader_thread.start()
 
     def register_asset_class(self, asset_class, attribute, config_section,
@@ -165,8 +165,8 @@ class AssetManager(object):
 
         for ac in self._asset_classes:
             preload_assets.extend(
-                [x for x in getattr(self.mc, ac['attribute']).values() if
-                 x.config['load'] == 'preload'])
+                    [x for x in getattr(self.mc, ac['attribute']).values() if
+                     x.config['load'] == 'preload'])
 
         for asset in preload_assets:
             asset.load()
@@ -278,7 +278,7 @@ class AssetManager(object):
         return config
 
     def _create_asset_config_entries(self, asset_class, config, mode_name=None,
-                                  path=None):
+                                     path=None):
         """Scans a folder (and subfolders) and automatically creates or updates
         entries in the config dict for any asset files it finds.
 
@@ -347,7 +347,7 @@ class AssetManager(object):
                 full_file_path = os.path.join(path, file_name)
 
                 if (folder == asset_class['path_string'] or
-                                      folder not in asset_class['defaults']):
+                            folder not in asset_class['defaults']):
                     default_string = 'default'
                 else:
                     default_string = folder
@@ -461,6 +461,7 @@ class AssetManager(object):
             Args:
                 assets: An iterable of asset objects. You can safely mix
                     different classes of assets.
+
         """
         for asset in assets:
             asset.unload()
@@ -478,6 +479,7 @@ class AssetManager(object):
 
         # This is a PriorityQueue which will automatically put the asset into
         # the proper position in the queue based on its priority.
+
         self.loader_queue.put(asset)
 
         if not self._loaded_watcher:
@@ -487,16 +489,15 @@ class AssetManager(object):
     def _check_loader_status(self, *args):
         # checks the loaded queue and updates loading stats
         while not self.loaded_queue.empty():
-            self.loaded_queue.get_nowait()._loaded()
+            self.loaded_queue.get()._loaded()
             self.num_assets_loaded += 1
-
-            print('Loading Status: {}/{}'.format(self.num_assets_loaded,
-                                                 self.num_assets_to_load))
+            # print('Loading Status: {}/{}'.format(self.num_assets_loaded,
+            #                                      self.num_assets_to_load))
 
         if self.num_assets_to_load == self.num_assets_loaded:
-            print("All assets loaded. Resetting counters")
             self.num_assets_loaded = 0
             self.num_assets_to_load = 0
+            # print('Resetting loading counters')
             Clock.unschedule(self._check_loader_status)
             self._loaded_watcher = False
 
@@ -528,7 +529,6 @@ class AssetLoader(threading.Thread):
             which is super annoying. :)
 
     """
-
     def __init__(self, loader_queue, loaded_queue, exception_queue):
 
         threading.Thread.__init__(self)
@@ -536,18 +536,48 @@ class AssetLoader(threading.Thread):
         self.loader_queue = loader_queue
         self.loaded_queue = loaded_queue
         self.exception_queue = exception_queue
+        self._run = True
+
+    def stop(self):
+        """Stops the AssetLoader thread, blocking until the thread is stopped.
+        This method also clears out the loader and loaded queues.
+
+        """
+        self._run = False
+
+        if self.is_alive():
+            self.join()
+
+        while not self.loader_queue.empty():
+            try:
+                self.loader_queue.get_nowait()
+            except Empty:
+                pass
+
+        while not self.loaded_queue.empty():
+            try:
+                self.loaded_queue.get_nowait()
+            except Empty:
+                pass
 
     def run(self):
         """Run loop for the loader thread."""
 
         try:  # wrap the so we can send exceptions to the main thread
             while True:
-                asset = self.loader_queue.get()  # blocks while empty
+                try:
+                    asset = self.loader_queue.get(block=True, timeout=.1)
+                except Empty:
+                    asset = None
 
-                if not asset.loaded:
-                    asset._do_load()
+                if not self._run:
+                    break
 
-                self.loaded_queue.put(asset)
+                if asset:
+                    if not asset.loaded:
+                        asset._do_load()
+
+                    self.loaded_queue.put(asset)
 
         except Exception:  # pragma no cover
             exc_type, exc_value, exc_traceback = sys.exc_info()

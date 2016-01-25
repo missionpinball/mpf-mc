@@ -134,19 +134,23 @@ class MpfMc(App):
         Clock.schedule_interval(self.tick, 0)
 
     def on_stop(self):
-        # try:
-        #     print("loop rate {}Hz".format(
-        #             round(self.ticks / (time.time() - self.start_time), 2)))
-        # except ZeroDivisionError:
-        #     pass
-        #
-        # print("stopping...")
+        print("Stopping ...")
+        app = App.get_running_app()
+        app.asset_manager.loader_thread.stop()
 
         try:
-            self.bcp_processor.socket_thread.stop()
-            self.asset_manager.loader_thread.stop()
+            app.bcp_processor.socket_thread.stop()
         except AttributeError:  # if we're running without BCP processor
             pass
+
+        try:
+            print("Loop rate {}Hz".format(
+                    round(self.ticks / (time.time() - self.start_time), 2)))
+        except ZeroDivisionError:
+            pass
+
+    def stop(self):
+        self.on_stop()
 
     def reset(self, **kwargs):
         self.player = None
@@ -268,13 +272,14 @@ class MpfMc(App):
 
     def _load_scriptlets(self):
         if 'mc_scriptlets' in self.machine_config:
-            self.machine_config['mc_scriptlets'] = self.machine_config['mc_scriptlets'].split(' ')
+            self.machine_config['mc_scriptlets'] = self.machine_config[
+                'mc_scriptlets'].split(' ')
 
             for scriptlet in self.machine_config['mc_scriptlets']:
-
-                i = __import__(self.machine_config['mpf_mc']['paths']['scriptlets']
-                               + '.'
-                               + scriptlet.split('.')[0], fromlist=[''])
+                i = __import__(
+                    self.machine_config['mpf_mc']['paths']['scriptlets']
+                    + '.'
+                    + scriptlet.split('.')[0], fromlist=[''])
 
                 self.scriptlets.append(getattr(i, scriptlet.split('.')[1])
                                        (mc=self,

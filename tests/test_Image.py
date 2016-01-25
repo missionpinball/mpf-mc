@@ -11,7 +11,7 @@ class TestImage(MpfMcTestCase):
     def get_config_file(self):
         return 'test_image.yaml'
 
-    def _test_image(self):
+    def test_image(self):
         # This test doesn't run on travis for some reason, but it works fine
         # locally, so I'm just skipping it but appending an underscore to the
         # test name.
@@ -21,21 +21,11 @@ class TestImage(MpfMcTestCase):
 
         # This tests includes images that preload and that load on demand, so
         # give it enough time to for the on demand ones to load
-        self.advance_time(2)
+        self.advance_time(1)
 
-        # Now check a sample pixel from the screen where each image should be
-        # to make sure they're really there.
+        # Make sure that all the images are showing.
+        active_widget_names = [
+            x.image.name for x in self.mc.targets['default'].current_slide.children]
 
-        # window is 800x600, display is 400x300, so we have to double each val
-        self.assertEqual(b'\xed\xd3\x01', self.get_pixel_color(100, 300))
-        self.assertEqual(b'\xfe\xc7\x0f', self.get_pixel_color(160, 300))
-        self.assertEqual(b'\xfb\xca\x00', self.get_pixel_color(220, 300))
-        self.assertEqual(b'\xf0\xd2\x0c', self.get_pixel_color(280, 300))
-        self.assertEqual(b'\xf1\xcb\x0c', self.get_pixel_color(340, 300))
-        self.assertEqual(b'\xf6\xca\x0c', self.get_pixel_color(400, 300))
-        self.assertEqual(b'\xf8\xd2\x0c', self.get_pixel_color(460, 300))
-        self.assertEqual(b'\xed\xd3\x01', self.get_pixel_color(520, 300))
-        self.assertEqual(b'\xfe\xc7\x0f', self.get_pixel_color(580, 300))
-        self.assertEqual(b'\xfb\xca\x00', self.get_pixel_color(640, 300))
-        self.assertEqual(b'\xed\xd3\x01', self.get_pixel_color(700, 300))
-        self.assertEqual(b'\xfb\xca\x00', self.get_pixel_color(760, 300))
+        for x in range(12):
+            self.assertIn('image{}'.format(x+1), active_widget_names)
