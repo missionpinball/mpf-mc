@@ -106,7 +106,7 @@ class AssetManager(object):
 
     def register_asset_class(self, asset_class, attribute, config_section,
                              path_string, extensions, priority,
-                             group_config_section):
+                             pool_config_section):
         """Registers a a type of assets to be controlled by the AssetManager.
 
         Args:
@@ -130,7 +130,7 @@ class AssetManager(object):
                 because some asset classes depend on others to exist first.
                 e.g. 'slide_shows' assets need 'images', 'videos', and 'sounds'
                 to exist. Higher number is first.
-            group_config_section: String which specifies the config file
+            pool_config_section: String which specifies the config file
                 section for associated asset groups.
 
         """
@@ -147,7 +147,7 @@ class AssetManager(object):
                   config_section=config_section,
                   extensions=extensions,
                   priority=priority,
-                  group_config_section=group_config_section,
+                  pool_config_section=pool_config_section,
                   defaults=dict())
 
         self._asset_classes.append(ac)
@@ -459,12 +459,12 @@ class AssetManager(object):
         # creates named groups of assets and adds them to to the mc's asset
         # dicts
         for ac in [x for x in self._asset_classes
-                   if x['group_config_section']]:
+                   if x['pool_config_section']]:
 
-            if (ac['group_config_section']) not in config:
+            if (ac['pool_config_section']) not in config:
                 return
 
-            for name, settings in config[ac['group_config_section']].items():
+            for name, settings in config[ac['pool_config_section']].items():
                 getattr(self.mc, ac['attribute'])[name] = (
                     ac['cls'].asset_group_class(self.mc, name, settings,
                                                 ac['cls']))
@@ -657,7 +657,7 @@ class AssetLoader(threading.Thread):
             self.exception_queue.put(msg)
 
 
-class AssetGroup(object):
+class AssetPool(object):
     def __init__(self, mc, name, config, member_cls):
         self.mc = mc
         self.name = name
@@ -700,7 +700,7 @@ class AssetGroup(object):
 
     def __repr__(self):
         # String that's returned if someone prints this object
-        return '<AssetGroup: {}>'.format(self.name)
+        return '<AssetPool: {}>'.format(self.name)
 
     @property
     def asset(self):
@@ -714,7 +714,6 @@ class AssetGroup(object):
             return self._get_random_force_all_asset()
 
     def _configure_return_asset(self):
-
         self._total_weights = sum([x[1] for x in self.assets])
 
         if self.config['type'] == 'sequence':
@@ -795,8 +794,8 @@ class Asset(object):
     config_section = ''  # section in the config files for this asset
     extensions = ('', '', '')  # tuple of strings, no dots
     class_priority = 0  # Order asset classes will be loaded. Higher is first.
-    group_config_section = None  # Create an associated AssetGroup instance
-    asset_group_class = AssetGroup  # replace with your own asset group class
+    pool_config_section = None  # Create an associated AssetPool instance
+    asset_group_class = AssetPool  # replace with your own asset group class
 
     _next_id = 0
 
@@ -819,7 +818,7 @@ class Asset(object):
                 config_section=cls.config_section,
                 extensions=cls.extensions,
                 priority=cls.class_priority,
-                group_config_section=cls.group_config_section)
+                pool_config_section=cls.pool_config_section)
 
     def __init__(self, mc, name, file, config):
         self.mc = mc

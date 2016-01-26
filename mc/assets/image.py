@@ -1,17 +1,20 @@
 import random
 
 from kivy.core.image import Image
-from mc.core.assets import Asset, AssetGroup
+from mc.core.assets import Asset, AssetPool
 
 
 # This module has extra comments since it's what we tell people to use as an
 # example of an Asset implementation.
 
-class ImageGroup(AssetGroup):
+class ImagePool(AssetPool):
+
+    # Be sure the pool group, if you use it, is first in the file ahead of the
+    # asset class.
 
     def __repr__(self):
         # String that's returned if someone prints this object
-        return '<ImageGroup: {}>'.format(self.name)
+        return '<ImagePool: {}>'.format(self.name)
 
     @property
     def image(self):
@@ -24,8 +27,8 @@ class ImageAsset(Asset):
     config_section='images'  # section in the config files for this asset
     extensions=('png', 'jpg', 'jpeg')  # pretty obvious. No dots.
     class_priority=100  # Order asset classes will be loaded. Higher is first.
-    group_config_section='image_groups'  # Will setup groups if present
-    asset_group_class=ImageGroup
+    pool_config_section='image_pools'  # Will setup groups if present
+    asset_group_class=ImagePool  # Class or None to not use pools
 
     def __init__(self, mc, name, file, config):
         super().__init__(mc, name, file, config)  # be sure to call super

@@ -24,7 +24,7 @@ images:
   image3:
     test_key: test_value_override3
 
-image_groups:
+image_pools:
   group1:
     load: preload
     images:
