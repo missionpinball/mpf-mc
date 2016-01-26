@@ -1,7 +1,8 @@
 import unittest
 import sys
+from queue import Empty
 
-from kivy.base import EventLoop
+from kivy.base import EventLoop, stopTouchApp
 from kivy.clock import Clock
 from kivy.config import Config
 
@@ -9,7 +10,7 @@ from mc.core.utils import load_machine_config
 from mpf.system.config import Config as MpfConfig
 from mpf.system.utility_functions import Util
 from kivy.logger import FileHandler
-from kivy.graphics import Fbo
+from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 
 Config.set('kivy', 'log_enable', '0')
 Config.set('kivy', 'log_level', 'warning')
@@ -84,10 +85,25 @@ class MpfMcTestCase(unittest.TestCase):
             EventLoop.idle()
 
     def get_pixel_color(self, x, y):
-        # do the imports here because we don't want to import Window at the
+        """Returns a binary string of the RGB bytes that make up the slide
+        pixel at the passed x,y coordinates. 2 bytes per pixel, 6 bytes total.
+        This method *does* compensate for different window sizes.
+
+        Note: This method does not work yet.
+
+        """
+        raise NotImplementedError  # remove when we fix it. :)
+
+        # do the Window import here because we don't want to import it at the
         # top or else we won't be able to set window properties
-        # from kivy.core.window import Window
-        from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
+        from kivy.core.window import Window
+
+        # convert the passed x/y to the actual x/y of the Window since it's
+        # possible for the mpf_mc display size to be different than the Window
+        # size
+        x *= Window.width / Window.children[0].width
+        y *= Window.height / Window.children[0].height
+
         return glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
 
     def setUp(self):
@@ -95,8 +111,6 @@ class MpfMcTestCase(unittest.TestCase):
         Config._named_configs.pop('app', None)
 
     def tearDown(self):
-        from kivy.base import stopTouchApp
-        from kivy.core.window import Window
         stopTouchApp()
 
     def patch_bcp(self):
@@ -115,7 +129,9 @@ class MpfMcTestCase(unittest.TestCase):
                            **kwargs)
 
     def run(self, name):
-        print("Running", self.id())
+        self._test_name = self.id()
+        self._test = name
+        print("Running", self._test_name)
         # This setup is done in run() because we need to give control to the
         # kivy event loop which we can only do by returning from the run()
         # that's called. So we override run() and setup mpf_mc and then call
@@ -128,7 +144,7 @@ class MpfMcTestCase(unittest.TestCase):
         # calls setUp(), so since we were overriding it ours doesn't call it
         # so we just do our setup here since if we manually called setUp() then
         # it would be called again when we call super().run().
-        self._test_name = name
+
 
         mpf_config = MpfConfig.load_config_file(self.get_options()[
                                                     'mcconfigfile'])
@@ -160,4 +176,4 @@ class MpfMcTestCase(unittest.TestCase):
             Clock.schedule_once(self.run_test, 0)
             return
 
-        return super().run(self._test_name)
+        return super().run(self._test)

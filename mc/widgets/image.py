@@ -16,7 +16,7 @@ class ImageWidget(MpfWidget, Image):
             raise ValueError("Cannot add Image widget. Image '{}' is not a "
                              "valid image name.".format(self.config['image']))
 
-        # Ff the associated image asset exists, that means it's loaded already.
+        # If the associated image asset exists, that means it's loaded already.
         if self.image.image:
             self._image_loaded()
         else:
@@ -35,7 +35,7 @@ class ImageWidget(MpfWidget, Image):
             return '<Image (loading...), size={}, pos={}>'.format(self.size,
                                                                   self.pos)
 
-    def _image_loaded(self):
+    def _image_loaded(self, *args):
         self.texture = self.image.image.texture
         self.size = self.texture_size  # will re-position automatically
 
@@ -50,7 +50,7 @@ class ImageWidget(MpfWidget, Image):
         if self._coreimage is not None:
             self._coreimage.unbind(on_texture=self._on_tex_change)
 
-        self._coreimage = ci = self.image
+        self._coreimage = ci = self.image.image
 
         ci.bind(on_texture=self._on_tex_change)
         self.texture = ci.texture

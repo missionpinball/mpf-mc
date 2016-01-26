@@ -123,6 +123,7 @@ class MpfMc(App):
         # Since the window is so critical in Kivy, we can't continue the
         # boot process until the window is setup, and we can't set the
         # window up until the displays are initialized.
+
         self.events.post("init_phase_1")
         self.events._process_event_queue()
         self.events.post("init_phase_2")
@@ -147,26 +148,27 @@ class MpfMc(App):
         Clock.schedule_interval(self.tick, 0)
 
     def on_stop(self):
-        # try:
-        #     print("loop rate {}Hz".format(
-        #             round(self.ticks / (time.time() - self.start_time), 2)))
-        # except ZeroDivisionError:
-        #     pass
-        #
-        # print("stopping...")
+        print("Stopping ...")
+        app = App.get_running_app()
+        app.asset_manager.shutdown()
 
         try:
-            self.bcp_processor.socket_thread.stop()
-            self.asset_manager.loader_thread.stop()
+            app.bcp_processor.socket_thread.stop()
         except AttributeError:  # if we're running without BCP processor
             pass
+
+        try:
+            print("Loop rate {}Hz".format(
+                    round(self.ticks / (time.time() - self.start_time), 2)))
+        except ZeroDivisionError:
+            pass
+
+    def stop(self):
+        self.on_stop()
 
     def reset(self, **kwargs):
         self.player = None
         self.player_list = list()
-
-        self.events.add_handler('assets_to_load',
-                                self._bcp_client_asset_loader_tick)
 
         self.events.post('mc_reset_phase_1')
         self.events._process_event_queue()
@@ -208,52 +210,6 @@ class MpfMc(App):
                              'only %s player(s) exist',
                              player_num, len(self.player_list))
 
-    def _bcp_client_asset_loader_tick(self, total, remaining):
-        self._pc_assets_to_load = int(remaining)
-        self._pc_total_assets = int(total)
-
-    # def asset_loading_counter(self):
-    #
-    #     if self.tick_num % 5 != 0:
-    #         return
-    #
-    #     if AssetManager.total_assets or self._pc_total_assets:
-    #         # max because this could go negative at first
-    #         percent = max(0, int(float(AssetManager.total_assets -
-    #                                    self._pc_assets_to_load -
-    #                                    AssetManager.loader_queue.qsize()) /
-    #                                    AssetManager.total_assets * 100))
-    #     else:
-    #         percent = 100
-    #
-    #     Logger.debug("Asset Loading Counter. PC remaining:{}, MC remaining:"
-    #                    "{}, Percent Complete: {}".format(
-    #                    self._pc_assets_to_load,
-    # AssetManager.loader_queue.qsize(),
-    #                    percent))
-    #
-    #     self.events.post('asset_loader',
-    #                      total=AssetManager.loader_queue.qsize() +
-    #                            self._pc_assets_to_load,
-    #                      pc=self._pc_assets_to_load,
-    #                      mc=AssetManager.loader_queue.qsize(),
-    #                      percent=percent)
-    #
-    #     if not AssetManager.loader_queue.qsize():
-    #
-    #     if True:
-    #
-    #         if not self.pc_connected:
-    #             self.events.post("waiting_for_client_connection")
-    #             self.events.remove_handler(self.asset_loading_counter)
-    #
-    #         elif not self._pc_assets_to_load:
-    #             Logger.debug("Asset Loading Complete")
-    #             self.events.post("asset_loading_complete")
-    #             self.bcp_processor.send('reset_complete')
-    #
-    #             self.events.remove_handler(self.asset_loading_counter)
-
     def set_machine_var(self, name, value, change, prev_value):
 
         if type(change) is not bool and change.lower() in ('false', '0'):
@@ -281,13 +237,14 @@ class MpfMc(App):
 
     def _load_scriptlets(self):
         if 'mc_scriptlets' in self.machine_config:
-            self.machine_config['mc_scriptlets'] = self.machine_config['mc_scriptlets'].split(' ')
+            self.machine_config['mc_scriptlets'] = self.machine_config[
+                'mc_scriptlets'].split(' ')
 
             for scriptlet in self.machine_config['mc_scriptlets']:
-
-                i = __import__(self.machine_config['mpf_mc']['paths']['scriptlets']
-                               + '.'
-                               + scriptlet.split('.')[0], fromlist=[''])
+                i = __import__(
+                    self.machine_config['mpf_mc']['paths']['scriptlets']
+                    + '.'
+                    + scriptlet.split('.')[0], fromlist=[''])
 
                 self.scriptlets.append(getattr(i, scriptlet.split('.')[1])
                                        (mc=self,

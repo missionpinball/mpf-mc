@@ -1,16 +1,34 @@
+import random
+
 from kivy.core.image import Image
-from mc.core.assets import AssetClass
+from mc.core.assets import Asset, AssetPool
+
 
 # This module has extra comments since it's what we tell people to use as an
-# example of an AssetClass implementation.
+# example of an Asset implementation.
 
-class ImageAsset(AssetClass):
+class ImagePool(AssetPool):
+
+    # Be sure the pool group, if you use it, is first in the file ahead of the
+    # asset class.
+
+    def __repr__(self):
+        # String that's returned if someone prints this object
+        return '<ImagePool: {}>'.format(self.name)
+
+    @property
+    def image(self):
+        return self.asset
+
+class ImageAsset(Asset):
 
     attribute='images'  # attribute in MC, e.g. self.mc.images
     path_string='images'  # entry from mpf_mc:paths: for asset folder name
     config_section='images'  # section in the config files for this asset
     extensions=('png', 'jpg', 'jpeg')  # pretty obvious. No dots.
     class_priority=100  # Order asset classes will be loaded. Higher is first.
+    pool_config_section='image_pools'  # Will setup groups if present
+    asset_group_class=ImagePool  # Class or None to not use pools
 
     def __init__(self, mc, name, file, config):
         super().__init__(mc, name, file, config)  # be sure to call super
@@ -29,6 +47,7 @@ class ImageAsset(AssetClass):
         # Since self._image will change depending on whether the image is
         # loaded or not, set a property so external methods can just use
         # ImageAsset.image
+
         return self._image
 
     def _do_load(self):
@@ -42,10 +61,11 @@ class ImageAsset(AssetClass):
         # all you have to do here is load and return.
 
         self._image = Image.load(filename=self.config['file'],
-                                keep_data=False,
-                                scale=1.0,
-                                mipmap=False,
-                                anim_delay=0.25)
+                                 keep_data=False,
+                                 scale=1.0,
+                                 mipmap=False,
+                                 anim_delay=0.25,
+                                 nocache=True)
 
     def _do_unload(self):
         # This is the method that's called to unload the asset. It's called by
@@ -54,4 +74,3 @@ class ImageAsset(AssetClass):
         # return quickly.
 
         self._image = None
-

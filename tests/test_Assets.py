@@ -27,7 +27,6 @@ class TestAssets(MpfMcTestCase):
         self.assertIn('image4', self.mc.images)  # /images/preload
         self.assertIn('image5', self.mc.images)  # /images/on_demand
 
-
         # test images from subfolder not listed in assets:images
         self.assertIn('image11', self.mc.images)  # /images/custom1
 
@@ -55,8 +54,9 @@ class TestAssets(MpfMcTestCase):
 
         # same as above, but test that it also works when the asset name is
         # different from the file name
-        self.assertEqual(self.mc.images['image_12_new_name'].config['test_key'],
-                         'test_value_override12')
+        self.assertEqual(
+                self.mc.images['image_12_new_name'].config['test_key'],
+                'test_value_override12')
 
         # Test that mode assets were loaded properly
         self.assertIn('image6', self.mc.images)
@@ -67,7 +67,7 @@ class TestAssets(MpfMcTestCase):
 
         # Make sure all the assets are loaded. Wait if not
         while (self.mc.asset_manager.num_assets_to_load <
-               self.mc.asset_manager.num_assets_loaded):
+                   self.mc.asset_manager.num_assets_loaded):
             self.advance_time()
 
         # Need to wait a bit since the loading was a separate thread
@@ -153,3 +153,127 @@ class TestAssets(MpfMcTestCase):
         self.assertFalse(self.mc.images['image9'].loaded)
         self.assertFalse(self.mc.images['image9'].loading)
         self.assertFalse(self.mc.images['image9'].unloading)
+
+    def test_random_asset_group(self):
+        # three assets, no weights
+
+        # make sure the asset group was created
+        self.assertIn('group1', self.mc.images)
+
+        # make sure the randomness is working. To test this, we request the
+        # asset 10,000 times and then count the results and assume that each
+        # should be 3,333 +- 500 just to make sure the test never fails/
+        res = list()
+        for x in range(10000):
+            res.append(self.mc.images['group1'].image)
+
+        self.assertAlmostEqual(3333, res.count(self.mc.images['image1']),
+                               delta=500)
+        self.assertAlmostEqual(3333, res.count(self.mc.images['image2']),
+                               delta=500)
+        self.assertAlmostEqual(3333, res.count(self.mc.images['image3']),
+                               delta=500)
+
+    def test_random_asset_group_with_weighting(self):
+        # three assets, third one has a weight of 2
+
+        # make sure the asset group was created
+        self.assertIn('group2', self.mc.images)
+
+        # make sure the randomness is working. To test this, we request the
+        # asset 10,000 times and then count the results and assume that each
+        # should be 3,333 +- 500 just to make sure the test never fails/
+        res = list()
+        for x in range(10000):
+            res.append(self.mc.images['group2'].image)
+
+        self.assertAlmostEqual(2500, res.count(self.mc.images['image1']),
+                               delta=500)
+        self.assertAlmostEqual(2500, res.count(self.mc.images['image2']),
+                               delta=500)
+        self.assertAlmostEqual(5000, res.count(self.mc.images['image3']),
+                               delta=500)
+
+    def test_sequence_asset_group(self):
+        # three assets, no weights
+
+        self.assertIn('group3', self.mc.images)
+
+        # Should always return in order, 1, 2, 3, 1, 2, 3...
+        self.assertIs(self.mc.images['group3'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group3'].image, self.mc.images['image2'])
+        self.assertIs(self.mc.images['group3'].image, self.mc.images['image3'])
+        self.assertIs(self.mc.images['group3'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group3'].image, self.mc.images['image2'])
+        self.assertIs(self.mc.images['group3'].image, self.mc.images['image3'])
+        self.assertIs(self.mc.images['group3'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group3'].image, self.mc.images['image2'])
+        self.assertIs(self.mc.images['group3'].image, self.mc.images['image3'])
+
+    def test_sequence_asset_group_with_count(self):
+        # three assets, no weights
+
+        self.assertIn('group4', self.mc.images)
+
+        # Should always return in order, 1, 1, 1, 1, 2, 2, 3, 1, 1, 1, 1 ...
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image2'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image2'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image3'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image1'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image2'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image2'])
+        self.assertIs(self.mc.images['group4'].image, self.mc.images['image3'])
+
+    def test_random_force_next(self):
+        # random, except it ensures the same one does not show up twice in a
+        # row
+
+        self.assertIn('group5', self.mc.images)
+
+        # do it 10,000 times just to be sure. :)
+        last = self.mc.images['group5'].image
+        res = list()
+
+        for x in range(10000):
+            image = self.mc.images['group5'].image
+            self.assertIsNot(last, image)
+            last = image
+
+            res.append(image)
+
+        # Also check that the weights were right
+
+        # BTW these weights are non-intuitive since the last asset is not
+        # considered for the next round. e.g. image1 = 1, image2 = 5,
+        # image3 = 1, so you'd think they would be 1400, 7200, 1400, but in
+        # reality, 50% of the time, asset2 is not in contention, so really
+        # asset2 has a 6-to-1 (84%) chance of being selected 66% of the time,
+        # but a 0% chance of being selected 33% of the time, etc. So trust that
+        # these numbers are right. :)
+        self.assertAlmostEqual(2733, res.count(self.mc.images['image1']),
+                               delta=500)
+        self.assertAlmostEqual(4533, res.count(self.mc.images['image2']),
+                               delta=500)
+        self.assertAlmostEqual(2733, res.count(self.mc.images['image3']),
+                               delta=500)
+
+    def test_random_force_all(self):
+        # random, except it ensures the same one does not show up twice before
+        # they're all shown
+
+        self.assertIn('group6', self.mc.images)
+
+        for x in range(1000):
+            this_set = set()
+            this_set.add(self.mc.images['group6'].image)
+            this_set.add(self.mc.images['group6'].image)
+            this_set.add(self.mc.images['group6'].image)
+
+            self.assertEqual(len(this_set), 3)
