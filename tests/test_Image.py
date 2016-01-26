@@ -1,4 +1,4 @@
-# Tests the Image AssetClass and the Image widget
+# Tests the Image Asset and the Image widget
 
 
 from tests.MpfMcTestCase import MpfMcTestCase
@@ -11,7 +11,7 @@ class TestImage(MpfMcTestCase):
     def get_config_file(self):
         return 'test_image.yaml'
 
-    def _test_image(self):
+    def test_image(self):
         # This test doesn't run on travis for some reason, but it works fine
         # locally, so I'm just skipping it but appending an underscore to the
         # test name.
