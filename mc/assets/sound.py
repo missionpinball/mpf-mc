@@ -1,4 +1,4 @@
-from mc.core.assets import AssetClass
+from mc.core.assets import Asset, AssetPool
 from mc.core.audio.audio_interface import AudioInterface, AudioException
 from kivy.logger import Logger
 
@@ -11,7 +11,21 @@ DEFAULT_MAX_QUEUE_TIME = None
 DEFAULT_LOOPS = 0
 
 
-class SoundAsset(AssetClass):
+class SoundPool(AssetPool):
+
+    # Be sure the pool group, if you use it, is first in the file ahead of the
+    # asset class.
+
+    def __repr__(self):
+        # String that's returned if someone prints this object
+        return '<SoundPool: {}>'.format(self.name)
+
+    @property
+    def sound(self):
+        return self.asset
+
+
+class SoundAsset(Asset):
     """
     Sound asset class contains a single sound that may be played using the audio engine.
 
@@ -22,8 +36,11 @@ class SoundAsset(AssetClass):
     attribute = 'sounds'  # attribute in MC, e.g. self.mc.images
     path_string = 'sounds'  # entry from mpf_mc:paths: for asset folder name
     config_section = 'sounds'  # section in the config files for this asset
-    extensions = ('wav',)
+    extensions = ('wav',)  # Additional extensions may be added at runtime ('ogg',
+    # 'flac') depending upon the SDL_Mixer plug-ins installed on the system
     class_priority = 100  # Order asset classes will be loaded. Higher is first.
+    pool_config_section = 'sound_pools'  # Will setup groups if present
+    asset_group_class = SoundPool  # Class or None to not use pools
 
     def __init__(self, mc, name, file, config):
         super().__init__(mc, name, file, config)
@@ -69,21 +86,13 @@ class SoundAsset(AssetClass):
         return self._container
 
     def _do_load(self):
-        # This is the method that's actually called to load the asset from
-        # disk. It's called by the loader thread so it's ok to block. However
-        # since it is a separate thread, don't update any other attributes.
-
-        # When you're done loading and return, the asset will be processed and
-        # the ready loaded attribute will be updated automatically,
-        # and anything that was waiting for it to load will be called.
+        # This is the method that's actually called to load the asset from disk.
 
         # Load the sound file into memory
         self._container = AudioInterface.load_sound(self.file)
 
     def _do_unload(self):
-        # This is the method that's called to unload the asset. It's called by
-        # the main thread so go nuts, but don't block since it's in the main
-        # thread.
+        # This is the method that's called to unload the asset.
         AudioInterface.unload_sound(self._container)
         self._container = None
 
