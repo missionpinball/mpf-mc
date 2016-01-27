@@ -9,6 +9,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
 
+from mc.assets.video import VideoAsset
 from mc.core.bcp_processor import BcpProcessor
 from mc.core.config_processor import McConfig
 from mc.core.mode_controller import ModeController
@@ -72,6 +73,7 @@ class MpfMc(App):
 
         # Asset classes
         ImageAsset.initialize(self)
+        VideoAsset.initialize(self)
 
         Clock.schedule_interval(self._check_crash_queue, 1)
 
