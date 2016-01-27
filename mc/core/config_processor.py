@@ -143,7 +143,7 @@ class McConfig(MpfConfig):
         except (KeyError, TypeError):
             config['priority'] = priority
 
-        if 'color' in config:
+        if 'color' in config and config['color']:
             config['color'] = get_color_from_hex(config['color'])
 
         if 'animations' in config:

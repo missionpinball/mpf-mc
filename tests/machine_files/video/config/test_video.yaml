@@ -12,6 +12,7 @@ slides:
     - type: text
       text: Video Test
 
+
 slide_player:
   show_slide1:
     slide: video_test
@@ -29,7 +30,7 @@ assets:
             load: mode_start
     videos:
         default:
-            load: preload
+            load: on_demand
         preload:
             load: preload
             test_key: test_value

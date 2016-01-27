@@ -4,7 +4,6 @@ from mc.core.assets import Asset, AssetPool
 class VideoPool(AssetPool):
 
     def __repr__(self):
-        # String that's returned if someone prints this object
         return '<VideoPool: {}>'.format(self.name)
 
     @property
@@ -34,7 +33,7 @@ class VideoAsset(Asset):
         return self._video
 
     def _do_load(self):
-        self._video = Video(filename=self.config['file'])
+        self._video = Video(filename=self.file)
 
     def _do_unload(self):
         if self._video:
