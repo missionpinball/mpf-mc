@@ -30,7 +30,7 @@ assets:
             load: mode_start
     videos:
         default:
-            load: on_demand
+            load: preload
         preload:
             load: preload
             test_key: test_value

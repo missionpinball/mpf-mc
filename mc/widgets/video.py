@@ -13,11 +13,15 @@ class VideoWidget(MpfWidget, Video):
 
         self.video = self.mc.videos[self.config['video']]
 
+        # Set it to (0,0) while it's loading so we don't see a white
+        # box on the slide
+        self.size = (0,0)
+
         if not self.video.video:
+
             self.video.load(callback=self._do_video_load)
-            # Set it to transparent while it's loading so we don't see a white
-            # box on the slide
-            self.color = (1,1,1,0)
+
+
         else:
             self._do_video_load()
 
@@ -52,6 +56,9 @@ class VideoWidget(MpfWidget, Video):
             self.position = 0.
 
             self.state = 'play'
-            self.size = (400, 300)
-            # set it back to the final transparency / tint
-            self.color = (1,1,1,1)
+
+    def on_texture(self, instance, value):
+        # Overrides the base method to put the size into self.size instead of
+        # self.texture_size
+        if value is not None:
+            self.size = list(value.size)

@@ -14,14 +14,13 @@ class TestVideo(MpfMcTestCase):
         self.assertIn('mpf_video_small_test', self.mc.videos)
 
         self.mc.events.post('show_slide1')
-        self.advance_time(1)
+        self.advance_time(2)
 
         video_widget = self.mc.targets['default'].current_slide.children[0]
 
         self.assertEqual(video_widget.state, 'play')
-        self.assertTrue(video_widget.loaded)
-        self.assertAlmostEqual(video_widget.position, .7, delta=.3)
         self.assertAlmostEqual(video_widget.duration, 7.9, delta=.1)
         self.assertEqual(video_widget.volume, 1.0)
+        self.assertEqual(video_widget.size, [398, 248])
 
-        self.advance_time(5)
+        self.advance_time(1)
