@@ -5,7 +5,6 @@ controller.
 from kivy.graphics import (Rectangle, Triangle, Quad, Point, Mesh, Line,
                            BorderImage, Bezier, Ellipse)
 from kivy.logger import Logger
-from kivy.uix.video import Video
 from kivy.utils import get_color_from_hex
 from mpf.system.config import CaseInsensitiveDict, Config as MpfConfig
 from mpf.system.utility_functions import Util
@@ -14,10 +13,11 @@ from mc.uix.display import Display
 from mc.uix.slide_frame import SlideFrame
 from mc.widgets.image import ImageWidget
 from mc.widgets.text import Text
+from mc.widgets.video import VideoWidget
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=ImageWidget,
-                               video=Video,
+                               video=VideoWidget,
                                bezier=Bezier,
                                border=BorderImage,
                                ellipse=Ellipse,
@@ -143,7 +143,7 @@ class McConfig(MpfConfig):
         except (KeyError, TypeError):
             config['priority'] = priority
 
-        if 'color' in config:
+        if 'color' in config and config['color']:
             config['color'] = get_color_from_hex(config['color'])
 
         if 'animations' in config:
