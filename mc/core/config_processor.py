@@ -123,15 +123,21 @@ class McConfig(MpfConfig):
 
     def process_widget(self, config, mode=None):
         # config is localized widget settings
-        self.process_config2('widgets:{}'.format(config['type']).lower(),
-                             config)
 
         try:
-            config['widget_cls'] = type_map[config['type']]
-            del config['type']
+            config['_widget_cls'] = type_map[config['type']]
         except KeyError:
             raise AssertionError('"{}" is not a valid MPF display widget type'
                                  .format(config['type']))
+
+        config['_default_settings'] = set()
+
+        for default_setting_name in config['_widget_cls'].merge_settings:
+            if default_setting_name in config:
+                config['_default_settings'].add(default_setting_name)
+
+        self.process_config2('widgets:{}'.format(config['type']).lower(),
+                             config, base_spec='widgets:common')
 
         if not mode:
             priority = 0

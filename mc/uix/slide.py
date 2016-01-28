@@ -68,7 +68,7 @@ class Slide(Screen):
         widgets_added = list()
 
         for widget in config:
-            widget_obj = widget['widget_cls'](mc=self.mc, config=widget,
+            widget_obj = widget['_widget_cls'](mc=self.mc, config=widget,
                                               slide=self, mode=mode)
 
             top_widget = widget_obj

@@ -40,7 +40,7 @@ class MpfWidget(object):
 
         self.mode = mode
         self.slide = slide
-        self.config = config
+        self.config = config.copy()  # make optional? TODO
         self.mc = mc
         self.animation = None
         self._animation_event_keys = set()
@@ -73,14 +73,11 @@ class MpfWidget(object):
     def __repr__(self):  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
-    def get_merged_asset_config(self, asset):
-        new_config = self.config.copy()
-
-        for setting in self.merge_settings:
-            if not new_config[setting] and setting in asset.config:
-                new_config[setting] = asset.config[setting]
-
-        return new_config
+    def merge_asset_config(self, asset):
+        for setting in [x for x in self.merge_settings if (
+                        x not in self.config['_default_settings'] and
+                        x in asset.config)]:
+            self.config[setting] = asset.config[setting]
 
     def on_size(self, *args):
         try:

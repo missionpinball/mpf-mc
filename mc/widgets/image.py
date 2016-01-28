@@ -19,7 +19,7 @@ class ImageWidget(MpfWidget, Image):
 
         # Updates the config for this widget to pull in any defaults that were
         # in the asset config
-        self.config = self.get_merged_asset_config(self.image)
+        self.merge_asset_config(self.image)
 
         # If the associated image asset exists, that means it's loaded already.
         if self.image.image:

@@ -18,7 +18,7 @@ class VideoWidget(MpfWidget, Video):
             raise ValueError("Cannot add Video widget. Video '{}' is not a "
                              "valid video name.".format(self.config['video']))
 
-        self.config = self.get_merged_asset_config(self.video)
+        self.merge_asset_config(self.video)
 
         # Set it to (0,0) while it's loading so we don't see a white
         # box on the slide
