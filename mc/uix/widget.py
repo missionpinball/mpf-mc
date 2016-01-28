@@ -32,6 +32,8 @@ class MpfWidget(object):
     # use that we never want to set on widget base classes.
     _dont_send_to_kivy = ('anchor_x', 'anchor_y', 'x', 'y')
 
+    merge_settings = tuple()
+
     def __init__(self, mc, mode, slide=None, config=None, **kwargs):
         self.size_hint = (None, None)
         super().__init__()
@@ -70,6 +72,15 @@ class MpfWidget(object):
 
     def __repr__(self):  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
+
+    def get_merged_asset_config(self, asset):
+        new_config = self.config.copy()
+
+        for setting in self.merge_settings:
+            if not new_config[setting] and setting in asset.config:
+                new_config[setting] = asset.config[setting]
+
+        return new_config
 
     def on_size(self, *args):
         try:

@@ -9,6 +9,8 @@ slides:
   video_test:
     - type: video
       video: mpf_video_small_test
+#      width: 200
+#      height: 150
     - type: text
       text: Video Test
 
@@ -38,3 +40,8 @@ assets:
             load: on_demand
         mode_start:
             load: mode_start
+
+videos:
+  mpf_video_small_test:
+    width: 100
+    height: 70
