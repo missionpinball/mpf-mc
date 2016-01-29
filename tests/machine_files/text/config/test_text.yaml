@@ -1,0 +1,63 @@
+#config_version=3
+
+
+slides:
+  static_text:
+    - type: text
+      text: TEST
+  text_from_event_param1:
+    - type: text
+      text: "%param1%"
+  text_from_event_param2:
+    - type: text
+      text: HI %param1%
+  text_from_event_param3:
+    - type: text
+      text: MIX %param1% MATCH
+  text_from_event_param4:
+    - type: text
+      text: NO%param1%
+  text_from_event_param5:
+    - type: text
+      text: NUMBER %param1%
+  text_from_event_param6:
+    - type: text
+      text: "%param1%"
+  text_from_event_param7:
+    - type: text
+      text: 100%
+  text_from_event_param8:
+    - type: text
+      text: "%param1%%"
+
+  text_with_player_var:
+    - type: text
+      text: "%player|test_var%"
+  text_with_numbered_player_var:
+    - type: text
+      text: TEST
+  text_with_machine_var:
+    - type: text
+      text: TEST
+
+slide_player:
+  static_text:
+    slide: static_text
+  text_from_event_param1:
+    slide: text_from_event_param1
+  text_from_event_param2:
+    slide: text_from_event_param2
+  text_from_event_param3:
+    slide: text_from_event_param3
+  text_from_event_param4:
+    slide: text_from_event_param4
+  text_from_event_param5:
+    slide: text_from_event_param5
+  text_from_event_param6:
+    slide: text_from_event_param6
+  text_from_event_param7:
+    slide: text_from_event_param7
+  text_from_event_param8:
+    slide: text_from_event_param8
+  text_with_player_var:
+    slide: text_with_player_var

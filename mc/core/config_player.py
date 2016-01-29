@@ -61,5 +61,7 @@ class ConfigPlayer(object):
     def additional_processing(self, config):
         return config
 
-    def play(self, settings, mode=None):
+    def play(self, settings, mode=None, **kwargs):
+        # Be sure to include **kwargs in your subclass since events could come
+        # in with any parameters
         raise NotImplementedError

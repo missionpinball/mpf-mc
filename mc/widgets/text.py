@@ -10,18 +10,19 @@ class Text(MpfWidget, Label):
     var_finder = re.compile("(?<=%)[a-zA-Z_0-9|]+(?=%)")
 
     def __init__(self, mc, config, slide, text_variables=None, mode=None,
-                 priority=0):
+                 priority=0, **kwargs):
+
+        super().__init__(mc=mc, mode=mode, slide=slide, config=config)
+
         self.original_text = config.get('text', '')
 
         self.text_variables = dict()
 
-        self._process_text(self.text, local_replacements=text_variables,
+        self._process_text(self.text, local_replacements=kwargs,
                            local_type='event')
 
         if not config['font_size']:
             config['font_size'] = 15
-
-        super().__init__(mc=mc, mode=mode, slide=slide, config=config)
 
         self.texture_update()
         self.size = self.texture_size
@@ -68,21 +69,21 @@ class Text(MpfWidget, Label):
             if var_string.startswith('machine|'):
                 try:
                     text = text.replace('%' + var_string + '%',
-                                        str(self.machine.machine_vars[
+                                        str(self.mc.machine_vars[
                                                 var_string.split('|')[1]]))
                 except KeyError:
                     text = ''
 
-            elif self.machine.player:
+            elif self.mc.player:
                 if var_string.startswith('player|'):
                     text = text.replace('%' + var_string + '%',
-                                        str(self.machine.player[
+                                        str(self.mc.player[
                                                 var_string.split('|')[1]]))
                 elif var_string.startswith('player'):
                     player_num, var_name = var_string.lstrip('player').split(
                             '|')
                     try:
-                        value = self.machine.player_list[int(player_num) - 1][
+                        value = self.mc.player_list[int(player_num) - 1][
                             var_name]
 
                         if value is not None:
@@ -94,7 +95,7 @@ class Text(MpfWidget, Label):
                         text = ''
                 else:
                     text = text.replace('%' + var_string + '%',
-                                        str(self.machine.player[var_string]))
+                                        str(self.mc.player[var_string]))
 
         self.update_text(text)
 
@@ -145,26 +146,26 @@ class Text(MpfWidget, Label):
                                                             'player'))
                     else:
                         self.add_player_var_handler(name=var_string,
-                                                    player=self.machine.player[
+                                                    player=self.mc.player[
                                                         'number'])
 
                 elif source.lower() == 'machine':
                     self.add_machine_var_handler(name=variable_name)
 
     def add_player_var_handler(self, name, player):
-        self.machine.events.add_handler('player_' + name,
+        self.mc.events.add_handler('player_' + name,
                                         self._player_var_change,
                                         target_player=player,
                                         var_name=name)
 
     def add_machine_var_handler(self, name):
-        self.machine.events.add_handler('machine_var_' + name,
+        self.mc.events.add_handler('machine_var_' + name,
                                         self._machine_var_change,
                                         var_name=name)
 
     def scrub(self):
-        self.machine.events.remove_handler(self._player_var_change)
-        self.machine.events.remove_handler(self._machine_var_change)
+        self.mc.events.remove_handler(self._player_var_change)
+        self.mc.events.remove_handler(self._machine_var_change)
 
     @staticmethod
     def group_digits(self, text, separator=',', group_size=3):
