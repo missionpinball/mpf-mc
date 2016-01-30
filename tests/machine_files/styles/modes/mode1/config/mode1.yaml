@@ -1,0 +1,25 @@
+#config_version=3
+
+mode:
+  priority: 100
+
+text_styles:
+  default:
+    font_size: 50
+
+slides:
+  slide2:
+    - type: text
+      text: MODE1 DEFAULT STYLE
+      y: 75
+    - type: text
+      style: big
+      text: BIG FROM BASE
+      y: 225
+    - type: text
+      text: TESTING INVALID STYLE
+      style: bogus
+
+slide_player:
+  slide2:
+    slide: slide2

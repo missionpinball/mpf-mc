@@ -91,13 +91,13 @@ class TestText(MpfMcTestCase):
         self.advance_time()
 
         self.assertEqual(self.get_widget().text, '1')
-        self.assertEqual(self.get_widget().size, [8, 18])
+        old_width = self.get_widget().width
 
         # update var, should update widget
         self.mc.player.test_var = 200
         self.advance_time()
         self.assertEqual(self.get_widget().text, '200')
-        self.assertEqual(self.get_widget().size, [24, 18])
+        self.assertGreater(self.get_widget().width, old_width)
 
     def test_player_var2(self):
         # 'player' specified

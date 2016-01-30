@@ -1,0 +1,30 @@
+#config_version=3
+
+modes:
+  - mode1
+
+displays:
+  default:
+    width: 400
+    height: 300
+
+text_styles:
+  default:
+    font_name: times
+  big:
+    font_size: 100
+    font_name: times
+
+slides:
+  slide1:
+    - type: text
+      text: HELLO
+      style: big
+      font_name: arial
+    - type: text
+      text: Default Style
+      y: 100
+
+slide_player:
+  slide1:
+    slide: slide1

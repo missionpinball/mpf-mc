@@ -196,3 +196,7 @@ kivy_config:
     width: 800
     minimum_width: 100
     minimum_height: 100
+
+text_styles:
+  default:
+    font_size: 20

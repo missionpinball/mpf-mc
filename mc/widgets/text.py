@@ -1,7 +1,5 @@
 import re
-
 from kivy.uix.label import Label
-
 from mc.uix.widget import MpfWidget
 
 
@@ -9,11 +7,18 @@ class Text(MpfWidget, Label):
     widget_type_name = 'Text'
     var_finder = re.compile("(?<=%)[a-zA-Z_0-9|]+(?=%)")
     string_finder = re.compile("(?<=\$)[a-zA-Z_0-9]+")
+    merge_settings = ('font_name', 'font_size', 'bold', 'italic', 'halign',
+                      'valign', 'padding_x', 'padding_y', 'text_size',
+                      'shorten', 'mipmap', 'markup', 'line_height',
+                      'max_lines', 'strip', 'shorten_from', 'split_str',
+                      'unicode_errors', 'color')
 
     def __init__(self, mc, config, slide, text_variables=None, mode=None,
                  priority=0, **kwargs):
 
         super().__init__(mc=mc, mode=mode, slide=slide, config=config)
+
+        self._apply_style()
 
         self.original_text = self._get_text_string(config.get('text', ''),
                                                    mode=mode)
@@ -30,6 +35,50 @@ class Text(MpfWidget, Label):
         super().texture_update(*largs)
         self.size = self.texture_size
 
+    def _apply_style(self, force_default=False):
+        if not self.config['style'] or force_default:
+            style = 'default'
+        else:
+            style = self.config['style']
+            # todo enhance with defaults per mode, or slide, or target, or??
+
+        found = False
+
+        try:
+            # This looks crazy but it's not too bad... The list comprehension
+            # builds a list of attributes (settings) that are in the style
+            # definition but that were not manually set in the widget.
+
+            # Then it sets the attributes directly since the config was already
+            # processed.
+
+            # First it applies machine-wide style settings, then mode styles on
+            # top of those
+            for attr in [x for x in
+                         self.mc.machine_config['text_styles'][style] if
+                           x not in self.config['_default_settings']]:
+                setattr(self, attr,
+                        self.mc.machine_config['text_styles'][style][attr])
+
+            found = True
+
+        except (AttributeError, KeyError):
+            pass
+
+        try:
+            for attr in [x for x in self.mode.config['text_styles'][style] if
+                            x not in self.config['_default_settings']]:
+                setattr(self, attr,
+                        self.mode.config['text_styles'][style][attr])
+
+            found = True
+
+        except (AttributeError, KeyError):
+            pass
+
+        if not found:
+            self._apply_style(force_default=True)
+
     def _get_text_string(self, text, mode=None):
         if not '$' in text:
             return text
@@ -40,7 +89,7 @@ class Text(MpfWidget, Label):
 
         return text
 
-    def _do_get_text_string(self, text_string, mode=None):
+    def _do_get_text_string(self, text_string, mode):
         try:
             return str(mode.config['text_strings'][text_string])
         except (AttributeError, KeyError):
@@ -73,7 +122,8 @@ class Text(MpfWidget, Label):
 
             elif local_type and var_string.startswith(local_type + '|'):
                 text = text.replace('%{}%'.format(var_string),
-                    str(local_replacements[var_string.split('|')[1]]))
+                                    str(local_replacements[
+                                            var_string.split('|')[1]]))
                 self.original_text = text
 
         if self._get_text_vars():
@@ -165,14 +215,14 @@ class Text(MpfWidget, Label):
 
     def add_player_var_handler(self, name, player):
         self.mc.events.add_handler('player_' + name,
-                                        self._player_var_change,
-                                        target_player=player,
-                                        var_name=name)
+                                   self._player_var_change,
+                                   target_player=player,
+                                   var_name=name)
 
     def add_machine_var_handler(self, name):
         self.mc.events.add_handler('machine_var_' + name,
-                                        self._machine_var_change,
-                                        var_name=name)
+                                   self._machine_var_change,
+                                   var_name=name)
 
     def prepare_for_removal(self, widget):
         self.mc.events.remove_handler(self._player_var_change)

@@ -39,11 +39,13 @@ class McConfig(MpfConfig):
         self.machine_sections = dict(slides=self.process_slides,
                                      widgets=self.process_widgets,
                                      displays=self.process_displays,
-                                     animations=self.process_animations)
+                                     animations=self.process_animations,
+                                     text_styles=self.process_text_styles)
 
         self.mode_sections = dict(slides=self.process_slides,
                                   widgets=self.process_widgets,
-                                  animations=self.process_animations)
+                                  animations=self.process_animations,
+                                  text_styles=self.process_text_styles)
 
         # process mode-based and machine-wide configs
         self.register_load_methods()
@@ -230,12 +232,23 @@ class McConfig(MpfConfig):
 
     def process_transition(self, config):
         # config is localized to the 'transition' section
-
         try:
             config = self.process_config2(
                     'transitions:{}'.format(config['type']), config)
         except KeyError:
             raise ValueError('transition: section of config requires a '
                              '"type:" setting')
+
+        return config
+
+    def process_text_styles(self, config):
+        # config is localized to the 'text_styles' section
+        for name, settings in config.items():
+            self.process_text_style(settings)
+
+        return config
+
+    def process_text_style(self, config):
+        self.process_config2('text_styles', config, add_missing_keys=False)
 
         return config
