@@ -1,5 +1,13 @@
 #config_version=3
 
+modes:
+  - mode1
+
+displays:
+  default:
+    width: 400
+    height: 300
+
 
 slides:
   static_text:
@@ -30,15 +38,37 @@ slides:
     - type: text
       text: "%param1%%"
 
-  text_with_player_var:
+  text_with_player_var1:
+    - type: text
+      text: "%test_var%"
+  text_with_player_var2:
     - type: text
       text: "%player|test_var%"
-  text_with_numbered_player_var:
+  text_with_player_var3:
     - type: text
-      text: TEST
-  text_with_machine_var:
+      text: "%player1|test_var%"
+  text_with_player_var4:
     - type: text
-      text: TEST
+      text: "%player2|test_var%"
+
+  text_string1:
+    - type: text
+      text: $greeting
+  text_string2:
+    - type: text
+      text: $greeting $name
+  text_string3:
+    - type: text
+      text: $money
+  text_string4:
+    - type: text
+      text: $$dollar
+
+  number_grouping:
+    - type: text
+      text: 0
+      min_digits: 2
+      number_grouping: yes
 
 slide_player:
   static_text:
@@ -59,5 +89,27 @@ slide_player:
     slide: text_from_event_param7
   text_from_event_param8:
     slide: text_from_event_param8
-  text_with_player_var:
-    slide: text_with_player_var
+  text_with_player_var1:
+    slide: text_with_player_var1
+  text_with_player_var2:
+    slide: text_with_player_var2
+  text_with_player_var3:
+    slide: text_with_player_var3
+  text_with_player_var4:
+    slide: text_with_player_var4
+  number_grouping:
+    slide: number_grouping
+  text_string1:
+    slide: text_string1
+  text_string2:
+    slide: text_string2
+  text_string3:
+    slide: text_string3
+  text_string4:
+    slide: text_string4
+
+text_strings:
+  greeting: HELLO
+  ball: "%ball%"
+  name: PLAYER
+  dollar: 100

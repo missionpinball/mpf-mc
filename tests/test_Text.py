@@ -74,3 +74,145 @@ class TestText(MpfMcTestCase):
 
         self.assertEqual(self.get_widget().text, '100%')
 
+    def test_player_var1(self):
+        # staight var, no player specified
+        self.mc.game_start()
+        self.advance_time()
+        self.mc.add_player(1)
+        self.advance_time()
+        self.mc.player_start_turn(1)
+        self.advance_time()
+
+        self.assertTrue(self.mc.player)
+
+        self.mc.player.test_var = 1
+
+        self.mc.events.post('text_with_player_var1')
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, '1')
+        self.assertEqual(self.get_widget().size, [8, 18])
+
+        # update var, should update widget
+        self.mc.player.test_var = 200
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, '200')
+        self.assertEqual(self.get_widget().size, [24, 18])
+
+    def test_player_var2(self):
+        # 'player' specified
+        self.mc.game_start()
+        self.advance_time()
+        self.mc.add_player(1)
+        self.advance_time()
+        self.mc.player_start_turn(1)
+        self.advance_time()
+
+        self.assertTrue(self.mc.player)
+
+        self.mc.player.test_var = 1
+
+        self.mc.events.post('text_with_player_var2')
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, '1')
+
+    def test_player_var3(self):
+        # 'player1' specified
+        self.mc.game_start()
+        self.advance_time()
+        self.mc.add_player(1)
+        self.advance_time()
+        self.mc.player_start_turn(1)
+        self.advance_time()
+
+        self.assertTrue(self.mc.player)
+
+        self.mc.player.test_var = 1
+
+        self.mc.events.post('text_with_player_var3')
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, '1')
+
+    def test_player_var4(self):
+        # 'player2' specified with no player 2. Should be blank.
+        self.mc.game_start()
+        self.advance_time()
+        self.mc.add_player(1)
+        self.advance_time()
+        self.mc.player_start_turn(1)
+        self.advance_time()
+
+        self.assertTrue(self.mc.player)
+
+        self.mc.player.test_var = 1
+
+        self.mc.events.post('text_with_player_var4')
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, '')
+
+        # Add player 2 & set the value. Widget should update
+        self.mc.add_player(2)
+        self.mc.player_list[1].test_var = 0
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, '0')
+
+    def test_number_grouping(self):
+        self.mc.events.post('number_grouping')
+        self.advance_time()
+
+        # should be 00 even though text is 0
+        self.assertEqual(self.get_widget().text, '00')
+        self.advance_time(1)
+
+        self.get_widget().update_text('2000000')
+        self.assertEqual(self.get_widget().text, '2,000,000')
+        self.advance_time(1)
+
+    def test_text_string1(self):
+        # simple text string in machine config
+        self.mc.events.post('text_string1')
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, 'HELLO')
+
+    def test_text_string2(self):
+        # two text strings in machine config
+        self.mc.events.post('text_string2')
+        self.advance_time()
+
+        # should be 00 even though text is 0
+        self.assertEqual(self.get_widget().text, 'HELLO PLAYER')
+
+    def test_text_string3(self):
+        # text string not found
+        self.mc.events.post('text_string3')
+        self.advance_time()
+
+        # should be 00 even though text is 0
+        self.assertEqual(self.get_widget().text, '$money')
+
+    def test_text_string4(self):
+        # text string found with extra dollar sign in text
+        self.mc.events.post('text_string4')
+        self.advance_time()
+
+        # should be 00 even though text is 0
+        self.assertEqual(self.get_widget().text, '$100')
+
+    def test_mode1_text_string1(self):
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+
+        self.mc.events.post('text_string1_mode1')
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, 'HELLO FROM MODE 1')
+        self.mc.modes['mode1'].stop()
+        self.advance_time()
+
+        self.mc.events.post('text_string1')
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'HELLO')

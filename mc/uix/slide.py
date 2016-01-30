@@ -45,7 +45,7 @@ class Slide(Screen):
         self.orig_w, self.orig_h = self.size
 
         try:
-            self.add_widgets_from_config(config, **kwargs)
+            self.add_widgets_from_config(config, self.mode, **kwargs)
         except KeyError:
             pass
 
