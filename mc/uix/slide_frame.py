@@ -118,7 +118,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         frame."""
         return self.screens
 
-    def add_slide(self, name, config, priority=None, mode=None, **kwargs):
+    def add_slide(self, name, config=None, priority=None, mode=None, **kwargs):
         # Note this method just adds it. It doesn't show it.
 
         # Slide() created also adds it to this screen manager
@@ -234,7 +234,3 @@ class SlideFrame(MpfWidget, ScreenManager):
                 new_slide = s
 
         return new_slide
-
-    def get_blank_slide(self, name='_default'):
-        return Slide(mc=self.mc, name=name, config=dict(), target=self,
-                     mode=None, priority=-1)

@@ -13,13 +13,16 @@ class Slide(Screen):
         Slide.next_id += 1
         return Slide.next_id
 
-    def __init__(self, mc, name, config, target='default', mode=None,
+    def __init__(self, mc, name, config=None, target='default', mode=None,
                  priority=None, **kwargs):
         self.mc = mc
         self.name = name
         self.priority = None
         self.creation_order = Slide.get_id()
         self.pending_widgets = set()
+
+        if not config:
+            config=dict()
 
         if priority is None:
             try:
