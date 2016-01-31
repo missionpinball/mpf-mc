@@ -6,7 +6,9 @@ from kivy.graphics import (Rectangle, Triangle, Quad, Point, Mesh, Line,
                            BorderImage, Bezier, Ellipse)
 from kivy.logger import Logger
 from kivy.utils import get_color_from_hex
-from mpf.system.config import CaseInsensitiveDict, Config as MpfConfig
+from mpf.system.case_insensitive_dict import CaseInsensitiveDict
+from mpf.system.config import Config as MpfConfig
+from mpf.system.rgb_color import named_rgb_colors
 from mpf.system.utility_functions import Util
 
 from mc.uix.display import Display
@@ -151,9 +153,6 @@ class McConfig(MpfConfig):
         except (KeyError, TypeError):
             config['priority'] = priority
 
-        if 'color' in config and config['color']:
-            config['color'] = get_color_from_hex(config['color'])
-
         if 'animations' in config:
             config['animations'] = self.process_animations_from_slide_config(
                     config['animations'])
@@ -252,3 +251,25 @@ class McConfig(MpfConfig):
         self.process_config2('text_styles', config, add_missing_keys=False)
 
         return config
+
+    def color_from_string(self, color_string):
+        color_string = str(color_string)
+
+        if color_string in named_rgb_colors:
+            color = list(named_rgb_colors[color_string])
+
+        elif Util.is_hex_string(color_string):
+            return get_color_from_hex(color_string)
+
+        else:
+            color = Util.string_to_list(color_string)
+            if len(color) < 3:
+                pass  # todo error?
+
+        if len(color) == 3:
+            color += [255]
+
+        for i, x in enumerate(color):
+            color[i] = int(x)/255
+
+        return color

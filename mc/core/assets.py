@@ -11,7 +11,7 @@ from queue import PriorityQueue, Queue, Empty
 
 from kivy.clock import Clock
 
-from mpf.system.config import CaseInsensitiveDict
+from mpf.system.case_insensitive_dict import CaseInsensitiveDict
 from mpf.system.utility_functions import Util
 
 

@@ -2,7 +2,7 @@ from copy import deepcopy
 
 from kivy.animation import Animation
 from kivy.properties import ObjectProperty
-from mpf.system.config import CaseInsensitiveDict
+from mpf.system.case_insensitive_dict import CaseInsensitiveDict
 
 from mc.core.utils import set_position, percent_to_float
 

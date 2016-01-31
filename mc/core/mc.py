@@ -16,7 +16,7 @@ from mc.core.mode_controller import ModeController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
 from mc.uix.transitions import TransitionManager
-from mpf.system.config import CaseInsensitiveDict
+from mpf.system.case_insensitive_dict import CaseInsensitiveDict
 from mpf.system.events import EventManager
 from mpf.system.player import Player
 from mc.core.assets import AssetManager
