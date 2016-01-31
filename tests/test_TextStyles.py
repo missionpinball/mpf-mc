@@ -23,12 +23,11 @@ class TestTextStyles(MpfMcTestCase):
         # font size set in style
         self.assertEqual(self.get_widget().font_size, 100)
 
-        # font name set in style and widget, widget should win
-        self.assertEqual(self.get_widget().font_name, "arial")
+        # halign set in style and widget, widget should win
+        self.assertEqual(self.get_widget().halign, 'right')
 
         # second widget has no style set, so it should get the default
-        self.assertEqual(self.get_widget(1).font_name, "times")
-        self.assertEqual(self.get_widget(1).font_size, 20)
+        self.assertEqual(self.get_widget(1).font_size, 21)
 
     def test_mode_style(self):
         self.mc.modes['mode1'].start()

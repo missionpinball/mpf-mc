@@ -10,17 +10,17 @@ displays:
 
 text_styles:
   default:
-    font_name: times
+    font_size: 21
   big:
     font_size: 100
-    font_name: times
+    halign: left
 
 slides:
   slide1:
     - type: text
       text: HELLO
       style: big
-      font_name: arial
+      halign: right
     - type: text
       text: Default Style
       y: 100
