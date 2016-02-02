@@ -2,8 +2,7 @@
 controller.
 
 """
-from kivy.graphics import (Rectangle, Triangle, Quad, Point, Mesh, Line,
-                           BorderImage, Bezier, Ellipse)
+
 from kivy.logger import Logger
 from kivy.utils import get_color_from_hex
 from mpf.system.case_insensitive_dict import CaseInsensitiveDict
@@ -16,20 +15,29 @@ from mc.uix.slide_frame import SlideFrame
 from mc.widgets.image import ImageWidget
 from mc.widgets.text import Text
 from mc.widgets.video import VideoWidget
+from mc.widgets.line import Line
+from mc.widgets.triangle import Triangle
+from mc.widgets.quad import Quad
+from mc.widgets.rectangle import Rectangle
+from mc.widgets.ellipse import Ellipse
+from mc.widgets.bezier import Bezier
+from mc.widgets.point import Point
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=ImageWidget,
                                video=VideoWidget,
+                               slide_frame=SlideFrame,
                                bezier=Bezier,
-                               border=BorderImage,
+                               # border=Shape,
                                ellipse=Ellipse,
                                line=Line,
-                               mesh=Mesh,
+                               # mesh=Shape,
                                point=Point,
+                               points=Point,
                                quad=Quad,
                                rectangle=Rectangle,
-                               triangle=Triangle,
-                               slide_frame=SlideFrame)
+                               triangle=Triangle
+                                )
 
 
 class McConfig(MpfConfig):

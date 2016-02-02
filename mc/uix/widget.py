@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 from kivy.animation import Animation
 from kivy.properties import ObjectProperty
 from mpf.system.case_insensitive_dict import CaseInsensitiveDict
@@ -14,15 +12,6 @@ class MpfWidget(object):
     """
 
     widget_type_name = ''  # Give this a name in your subclass, e.g. 'Image'
-
-    mode = ObjectProperty(None, allownone=True)
-    """:class:`Mode` object, which is the mode that created this widget."""
-
-    config = CaseInsensitiveDict()
-    """Dict which holds the settings for this widget."""
-
-    slide = None
-    """Slide that this widget will be used with."""
 
     # We loop through the keys in a widget's config dict and check to see if
     # the widget's base class has attributes for them, and if so, we set
