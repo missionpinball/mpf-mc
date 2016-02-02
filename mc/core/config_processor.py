@@ -2,11 +2,12 @@
 controller.
 
 """
-from kivy.graphics import (Rectangle, Triangle, Quad, Point, Mesh, Line,
-                           BorderImage, Bezier, Ellipse)
+
 from kivy.logger import Logger
 from kivy.utils import get_color_from_hex
-from mpf.system.config import CaseInsensitiveDict, Config as MpfConfig
+from mpf.system.case_insensitive_dict import CaseInsensitiveDict
+from mpf.system.config import Config as MpfConfig
+from mpf.system.rgb_color import named_rgb_colors
 from mpf.system.utility_functions import Util
 
 from mc.uix.display import Display
@@ -14,20 +15,29 @@ from mc.uix.slide_frame import SlideFrame
 from mc.widgets.image import ImageWidget
 from mc.widgets.text import Text
 from mc.widgets.video import VideoWidget
+from mc.widgets.line import Line
+from mc.widgets.triangle import Triangle
+from mc.widgets.quad import Quad
+from mc.widgets.rectangle import Rectangle
+from mc.widgets.ellipse import Ellipse
+from mc.widgets.bezier import Bezier
+from mc.widgets.point import Point
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=ImageWidget,
                                video=VideoWidget,
+                               slide_frame=SlideFrame,
                                bezier=Bezier,
-                               border=BorderImage,
+                               # border=Shape,
                                ellipse=Ellipse,
                                line=Line,
-                               mesh=Mesh,
+                               # mesh=Shape,
                                point=Point,
+                               points=Point,
                                quad=Quad,
                                rectangle=Rectangle,
-                               triangle=Triangle,
-                               slide_frame=SlideFrame)
+                               triangle=Triangle
+                                )
 
 
 class McConfig(MpfConfig):
@@ -39,11 +49,13 @@ class McConfig(MpfConfig):
         self.machine_sections = dict(slides=self.process_slides,
                                      widgets=self.process_widgets,
                                      displays=self.process_displays,
-                                     animations=self.process_animations)
+                                     animations=self.process_animations,
+                                     text_styles=self.process_text_styles)
 
         self.mode_sections = dict(slides=self.process_slides,
                                   widgets=self.process_widgets,
-                                  animations=self.process_animations)
+                                  animations=self.process_animations,
+                                  text_styles=self.process_text_styles)
 
         # process mode-based and machine-wide configs
         self.register_load_methods()
@@ -123,15 +135,21 @@ class McConfig(MpfConfig):
 
     def process_widget(self, config, mode=None):
         # config is localized widget settings
-        self.process_config2('widgets:{}'.format(config['type']).lower(),
-                             config)
 
         try:
-            config['widget_cls'] = type_map[config['type']]
-            del config['type']
+            config['_widget_cls'] = type_map[config['type']]
         except KeyError:
             raise AssertionError('"{}" is not a valid MPF display widget type'
                                  .format(config['type']))
+
+        config['_default_settings'] = set()
+
+        for default_setting_name in config['_widget_cls'].merge_settings:
+            if default_setting_name in config:
+                config['_default_settings'].add(default_setting_name)
+
+        self.process_config2('widgets:{}'.format(config['type']).lower(),
+                             config, base_spec='widgets:common')
 
         if not mode:
             priority = 0
@@ -142,9 +160,6 @@ class McConfig(MpfConfig):
             config['priority'] += priority
         except (KeyError, TypeError):
             config['priority'] = priority
-
-        if 'color' in config and config['color']:
-            config['color'] = get_color_from_hex(config['color'])
 
         if 'animations' in config:
             config['animations'] = self.process_animations_from_slide_config(
@@ -224,7 +239,6 @@ class McConfig(MpfConfig):
 
     def process_transition(self, config):
         # config is localized to the 'transition' section
-
         try:
             config = self.process_config2(
                     'transitions:{}'.format(config['type']), config)
@@ -233,3 +247,37 @@ class McConfig(MpfConfig):
                              '"type:" setting')
 
         return config
+
+    def process_text_styles(self, config):
+        # config is localized to the 'text_styles' section
+        for name, settings in config.items():
+            self.process_text_style(settings)
+
+        return config
+
+    def process_text_style(self, config):
+        self.process_config2('text_styles', config, add_missing_keys=False)
+
+        return config
+
+    def color_from_string(self, color_string):
+        color_string = str(color_string)
+
+        if color_string in named_rgb_colors:
+            color = list(named_rgb_colors[color_string])
+
+        elif Util.is_hex_string(color_string):
+            return get_color_from_hex(color_string)
+
+        else:
+            color = Util.string_to_list(color_string)
+            if len(color) < 3:
+                pass  # todo error?
+
+        if len(color) == 3:
+            color += [255]
+
+        for i, x in enumerate(color):
+            color[i] = int(x)/255
+
+        return color

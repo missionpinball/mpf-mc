@@ -13,13 +13,16 @@ class Slide(Screen):
         Slide.next_id += 1
         return Slide.next_id
 
-    def __init__(self, mc, name, config, target='default', mode=None,
+    def __init__(self, mc, name, config=None, target='default', mode=None,
                  priority=None, **kwargs):
         self.mc = mc
         self.name = name
         self.priority = None
         self.creation_order = Slide.get_id()
         self.pending_widgets = set()
+
+        if not config:
+            config=dict()
 
         if priority is None:
             try:
@@ -40,12 +43,12 @@ class Slide(Screen):
         target = mc.targets[target]
 
         self.size_hint = (None, None)
-        super().__init__(**kwargs)
+        super().__init__()
         self.size = target.native_size
         self.orig_w, self.orig_h = self.size
 
         try:
-            self.add_widgets_from_config(config)
+            self.add_widgets_from_config(config, self.mode, **kwargs)
         except KeyError:
             pass
 
@@ -56,20 +59,23 @@ class Slide(Screen):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
             self.priority, self.creation_order)
 
-    def add_widgets_from_library(self, name, mode=None):
+    def add_widgets_from_library(self, name, mode=None, **kwargs):
         if name not in self.mc.widget_configs:
             return
 
-        return self.add_widgets_from_config(self.mc.widget_configs[name], mode)
+        return self.add_widgets_from_config(self.mc.widget_configs[name], mode,
+                                            **kwargs)
 
-    def add_widgets_from_config(self, config, mode=None):
+    def add_widgets_from_config(self, config, mode=None, **kwargs):
+
         if type(config) is not list:
             config = [config]
         widgets_added = list()
 
         for widget in config:
-            widget_obj = widget['widget_cls'](mc=self.mc, config=widget,
-                                              slide=self, mode=mode)
+            widget_obj = widget['_widget_cls'](mc=self.mc, config=widget,
+                                              slide=self, mode=mode,
+                                               **kwargs)
 
             top_widget = widget_obj
 

@@ -1,56 +1,127 @@
 import re
-
 from kivy.uix.label import Label
-
 from mc.uix.widget import MpfWidget
 
 
 class Text(MpfWidget, Label):
     widget_type_name = 'Text'
     var_finder = re.compile("(?<=%)[a-zA-Z_0-9|]+(?=%)")
+    string_finder = re.compile("(?<=\$)[a-zA-Z_0-9]+")
+    merge_settings = ('font_name', 'font_size', 'bold', 'italic', 'halign',
+                      'valign', 'padding_x', 'padding_y', 'text_size',
+                      'shorten', 'mipmap', 'markup', 'line_height',
+                      'max_lines', 'strip', 'shorten_from', 'split_str',
+                      'unicode_errors', 'color')
 
     def __init__(self, mc, config, slide, text_variables=None, mode=None,
-                 priority=0):
-        self.original_text = config.get('text', '')
-
-        self.text_variables = dict()
-
-        self._process_text(self.text, local_replacements=text_variables,
-                           local_type='event')
-
-        if not config['font_size']:
-            config['font_size'] = 15
+                 priority=0, **kwargs):
 
         super().__init__(mc=mc, mode=mode, slide=slide, config=config)
 
-        self.texture_update()
-        self.size = self.texture_size
+        self._apply_style()
+
+        self.original_text = self._get_text_string(config.get('text', ''),
+                                                   mode=mode)
+
+        self.text_variables = dict()
+
+        self._process_text(self.text, local_replacements=kwargs,
+                           local_type='event', mode=mode)
 
     def __repr__(self):
         return '<Text Widget text={}>'.format(self.text)
 
+    def texture_update(self, *largs):
+        super().texture_update(*largs)
+        self.size = self.texture_size
+
+    def _apply_style(self, force_default=False):
+        if not self.config['style'] or force_default:
+            style = 'default'
+        else:
+            style = self.config['style']
+            # todo enhance with defaults per mode, or slide, or target, or??
+
+        found = False
+
+        try:
+            # This looks crazy but it's not too bad... The list comprehension
+            # builds a list of attributes (settings) that are in the style
+            # definition but that were not manually set in the widget.
+
+            # Then it sets the attributes directly since the config was already
+            # processed.
+
+            # First it applies machine-wide style settings, then mode styles on
+            # top of those
+            for attr in [x for x in
+                         self.mc.machine_config['text_styles'][style] if
+                           x not in self.config['_default_settings']]:
+                setattr(self, attr,
+                        self.mc.machine_config['text_styles'][style][attr])
+
+            found = True
+
+        except (AttributeError, KeyError):
+            pass
+
+        try:
+            for attr in [x for x in self.mode.config['text_styles'][style] if
+                            x not in self.config['_default_settings']]:
+                setattr(self, attr,
+                        self.mode.config['text_styles'][style][attr])
+
+            found = True
+
+        except (AttributeError, KeyError):
+            pass
+
+        if not found:
+            self._apply_style(force_default=True)
+
+    def _get_text_string(self, text, mode=None):
+        if not '$' in text:
+            return text
+
+        for text_string in Text.string_finder.findall(text):
+            text = text.replace('${}'.format(text_string),
+                                self._do_get_text_string(text_string, mode))
+
+        return text
+
+    def _do_get_text_string(self, text_string, mode):
+        try:
+            return str(mode.config['text_strings'][text_string])
+        except (AttributeError, KeyError):
+            pass
+
+        try:
+            return str(self.mc.machine_config['text_strings'][text_string])
+        except (KeyError):
+            # if the text string is not found, put the $ back on
+            return '${}'.format(text_string)
+
     def _get_text_vars(self):
         return Text.var_finder.findall(self.original_text)
 
-    def _process_text(self, text, local_replacements=None, local_type=None):
+    def _process_text(self, text, local_replacements=None, local_type=None,
+                      mode=None):
         # text: source text with placeholder vars
         # local_replacements: dict of var names & their replacements
         # local_type: type specifier of local replacements. e.g. "event" means
         # it will look for %event|var_name% in the text string
-
-        text = str(text)
 
         if not local_replacements:
             local_replacements = list()
 
         for var_string in self._get_text_vars():
             if var_string in local_replacements:
-                text = text.replace('%' + var_string + '%',
+                text = text.replace('%{}%'.format(var_string),
                                     str(local_replacements[var_string]))
                 self.original_text = text
 
             elif local_type and var_string.startswith(local_type + '|'):
-                text = text.replace('%' + var_string + '%',
+                text = text.replace('%{}%'.format(var_string),
                                     str(local_replacements[
                                             var_string.split('|')[1]]))
                 self.original_text = text
@@ -68,21 +139,21 @@ class Text(MpfWidget, Label):
             if var_string.startswith('machine|'):
                 try:
                     text = text.replace('%' + var_string + '%',
-                                        str(self.machine.machine_vars[
+                                        str(self.mc.machine_vars[
                                                 var_string.split('|')[1]]))
                 except KeyError:
                     text = ''
 
-            elif self.machine.player:
+            elif self.mc.player:
                 if var_string.startswith('player|'):
                     text = text.replace('%' + var_string + '%',
-                                        str(self.machine.player[
+                                        str(self.mc.player[
                                                 var_string.split('|')[1]]))
                 elif var_string.startswith('player'):
                     player_num, var_name = var_string.lstrip('player').split(
                             '|')
                     try:
-                        value = self.machine.player_list[int(player_num) - 1][
+                        value = self.mc.player_list[int(player_num) - 1][
                             var_name]
 
                         if value is not None:
@@ -94,21 +165,16 @@ class Text(MpfWidget, Label):
                         text = ''
                 else:
                     text = text.replace('%' + var_string + '%',
-                                        str(self.machine.player[var_string]))
+                                        str(self.mc.player[var_string]))
 
         self.update_text(text)
 
     def update_text(self, text):
-        # todo auto-fit text to a certain size bounding box
-
-        text = str(text)
-
         if text:
-            if 'min_digits' in self.config:
+            if self.config['min_digits']:
                 text = text.zfill(self.config['min_digits'])
 
-            if ('number_grouping' in self.config and
-                    self.config['number_grouping']):
+            if self.config['number_grouping']:
 
                 # find the numbers in the string
                 number_list = [s for s in text.split() if s.isdigit()]
@@ -118,12 +184,8 @@ class Text(MpfWidget, Label):
                     grouped_item = Text.group_digits(item)
                     text = text.replace(str(item), grouped_item)
 
-                    # Are we set up for multi-language?
-                    # if self.language:
-                    #     text = self.language.text(text)
-
         self.text = text
-        # self.render()
+        self.texture_update()
 
     def _player_var_change(self, **kwargs):
         self.update_vars_in_text()
@@ -145,29 +207,29 @@ class Text(MpfWidget, Label):
                                                             'player'))
                     else:
                         self.add_player_var_handler(name=var_string,
-                                                    player=self.machine.player[
+                                                    player=self.mc.player[
                                                         'number'])
 
                 elif source.lower() == 'machine':
                     self.add_machine_var_handler(name=variable_name)
 
     def add_player_var_handler(self, name, player):
-        self.machine.events.add_handler('player_' + name,
-                                        self._player_var_change,
-                                        target_player=player,
-                                        var_name=name)
+        self.mc.events.add_handler('player_' + name,
+                                   self._player_var_change,
+                                   target_player=player,
+                                   var_name=name)
 
     def add_machine_var_handler(self, name):
-        self.machine.events.add_handler('machine_var_' + name,
-                                        self._machine_var_change,
-                                        var_name=name)
+        self.mc.events.add_handler('machine_var_' + name,
+                                   self._machine_var_change,
+                                   var_name=name)
 
-    def scrub(self):
-        self.machine.events.remove_handler(self._player_var_change)
-        self.machine.events.remove_handler(self._machine_var_change)
+    def prepare_for_removal(self, widget):
+        self.mc.events.remove_handler(self._player_var_change)
+        self.mc.events.remove_handler(self._machine_var_change)
 
     @staticmethod
-    def group_digits(self, text, separator=',', group_size=3):
+    def group_digits(text, separator=',', group_size=3):
         """Enables digit grouping (i.e. adds comma separators between
         thousands digits).
 

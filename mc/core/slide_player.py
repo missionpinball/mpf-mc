@@ -27,7 +27,7 @@ class SlidePlayer(ConfigPlayer):
 
         return config
 
-    def play(self, settings, mode=None):
+    def play(self, settings, mode=None, **kwargs):
         try:
             if not mode.active:
                 return
@@ -47,4 +47,4 @@ class SlidePlayer(ConfigPlayer):
 
             target.show_slide(slide_name=name, transition=s['transition'],
                               mode=mode, force=s['force'],
-                              priority=s['priority'])
+                              priority=s['priority'], **kwargs)

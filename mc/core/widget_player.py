@@ -4,7 +4,7 @@ from mc.uix.slide import Slide
 class WidgetPlayer(ConfigPlayer):
     config_file_section = 'widget_player'
 
-    def play(self, settings, mode=None):
+    def play(self, settings, mode=None, **kwargs):
         if mode and not mode.active:
             return  # pragma: no cover
 
@@ -32,5 +32,6 @@ class WidgetPlayer(ConfigPlayer):
                 return  # pragma: no cover
 
             for widget in s['widget']:
-                slide.add_widgets_from_library(name=widget, mode=mode)
+                slide.add_widgets_from_library(name=widget, mode=mode,
+                                               **kwargs)
 

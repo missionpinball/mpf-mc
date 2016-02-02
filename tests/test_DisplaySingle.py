@@ -39,7 +39,7 @@ class TestDisplaySingle(MpfMcTestCase):
         self.assertTrue(isinstance(widget, SlideFrameParent))
 
     def test_current_slide_properties(self):
-        slide1 = Slide(mc=self.mc, name='slide1', config={})
+        slide1 = Slide(mc=self.mc, name='slide1')
 
         # test display properties
         self.assertEqual(self.mc.displays['window'].current_slide, slide1)
@@ -71,7 +71,7 @@ class TestDisplaySingle(MpfMcTestCase):
 
         # make sure showing a slide at the same priority replaces the current
         # one.
-        slide2 = Slide(mc=self.mc, name='slide2', config={})
+        slide2 = Slide(mc=self.mc, name='slide2')
         self.mc.targets['window'].show_slide('slide2')
 
         self.assertEqual(self.mc.targets['window'].current_slide, slide2)
@@ -118,12 +118,12 @@ class TestDisplaySingle(MpfMcTestCase):
 
     def test_priorities(self):
         # show slide 1, p100
-        slide1 = Slide(mc=self.mc, name='slide1', config={}, priority=100)
+        slide1 = Slide(mc=self.mc, name='slide1', priority=100)
         self.mc.targets['window'].show_slide('slide1')
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
 
         # show slide 2, p0, it should not show
-        slide2 = Slide(mc=self.mc, name='slide2', config={}, priority=0)
+        slide2 = Slide(mc=self.mc, name='slide2', priority=0)
         self.mc.targets['window'].show_slide('slide2')
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
 

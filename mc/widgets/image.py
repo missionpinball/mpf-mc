@@ -7,7 +7,7 @@ class ImageWidget(MpfWidget, Image):
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
 
-    def __init__(self, mc, config, slide, mode=None, priority=None):
+    def __init__(self, mc, config, slide, mode=None, priority=None, **kwargs):
         super().__init__(mc=mc, mode=mode, priority=priority, slide=slide,
                          config=config)
 
@@ -19,7 +19,7 @@ class ImageWidget(MpfWidget, Image):
 
         # Updates the config for this widget to pull in any defaults that were
         # in the asset config
-        self.config = self.get_merged_asset_config(self.image)
+        self.merge_asset_config(self.image)
 
         # If the associated image asset exists, that means it's loaded already.
         if self.image.image:

@@ -1,0 +1,30 @@
+#config_version=3
+
+modes:
+  - mode1
+
+displays:
+  default:
+    width: 400
+    height: 300
+
+text_styles:
+  default:
+    font_size: 21
+  big:
+    font_size: 100
+    halign: left
+
+slides:
+  slide1:
+    - type: text
+      text: HELLO
+      style: big
+      halign: right
+    - type: text
+      text: Default Style
+      y: 100
+
+slide_player:
+  slide1:
+    slide: slide1

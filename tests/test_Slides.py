@@ -10,7 +10,7 @@ class TestSlides(MpfMcTestCase):
         return 'test_slides.yaml'
 
     def test_slide(self):
-        slide = Slide(mc=self.mc, name='slide1', config={}, priority=100)
+        slide = Slide(mc=self.mc, name='slide1', priority=100)
 
         self.assertEqual(slide.mc, self.mc)
         self.assertEqual(slide.name, 'slide1')
@@ -98,14 +98,14 @@ class TestSlides(MpfMcTestCase):
         self.assertIn('mode1_slide1', self.mc.slide_configs)
 
         # set a current slide
-        self.mc.targets['display1'].add_slide(name='slide1', config={})
+        self.mc.targets['display1'].add_slide(name='slide1')
         self.mc.targets['display1'].show_slide('slide1')
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'slide1')
 
         # start a mode and add a slide from that mode
         self.mc.modes['mode1'].start()
-        self.mc.targets['display1'].add_slide(name='slide2', config={},
+        self.mc.targets['display1'].add_slide(name='slide2',
                                               mode=self.mc.modes['mode1'])
         self.mc.targets['display1'].show_slide('slide2')
         self.assertEqual(self.mc.targets['display1'].current_slide_name,

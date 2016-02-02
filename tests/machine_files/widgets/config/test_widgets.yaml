@@ -39,39 +39,41 @@ widgets:
   widget4:
   - type: text
     text: widget4.1
-    y: -150
+    y: 300
     z: 1
     color: ff0000
     font_size: 100
   - type: text
     text: widget4.2
     z: 1000
-    y: -100
+    y: 250
     color: ffff00
     font_size: 100
   - type: text
     text: widget4.3
-    y: -50
+    y: 200
     color: 00ff00
     font_size: 100
   - type: text
     text: widget4.4
     z: 1
+    y: 150
     color: 00ffff
     font_size: 100
   - type: text
     text: widget4.5
     z: 1000
-    y: 50
+    y: 100
     color: 0000ff
     font_size: 100
   - type: text
     text: widget4.6
     color: ff00ff
     font_size: 100
+    y: 50
   - type: text
     text: widget4.7
-    y: 100
+    y: 0
     color: 888888
     font_size: 100
   widget5:

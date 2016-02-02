@@ -1,0 +1,115 @@
+#config_version=3
+
+modes:
+  - mode1
+
+displays:
+  default:
+    width: 400
+    height: 300
+
+
+slides:
+  static_text:
+    - type: text
+      text: TEST
+  text_from_event_param1:
+    - type: text
+      text: "%param1%"
+  text_from_event_param2:
+    - type: text
+      text: HI %param1%
+  text_from_event_param3:
+    - type: text
+      text: MIX %param1% MATCH
+  text_from_event_param4:
+    - type: text
+      text: NO%param1%
+  text_from_event_param5:
+    - type: text
+      text: NUMBER %param1%
+  text_from_event_param6:
+    - type: text
+      text: "%param1%"
+  text_from_event_param7:
+    - type: text
+      text: 100%
+  text_from_event_param8:
+    - type: text
+      text: "%param1%%"
+
+  text_with_player_var1:
+    - type: text
+      text: "%test_var%"
+  text_with_player_var2:
+    - type: text
+      text: "%player|test_var%"
+  text_with_player_var3:
+    - type: text
+      text: "%player1|test_var%"
+  text_with_player_var4:
+    - type: text
+      text: "%player2|test_var%"
+
+  text_string1:
+    - type: text
+      text: $greeting
+  text_string2:
+    - type: text
+      text: $greeting $name
+  text_string3:
+    - type: text
+      text: $money
+  text_string4:
+    - type: text
+      text: $$dollar
+
+  number_grouping:
+    - type: text
+      text: 0
+      min_digits: 2
+      number_grouping: yes
+
+slide_player:
+  static_text:
+    slide: static_text
+  text_from_event_param1:
+    slide: text_from_event_param1
+  text_from_event_param2:
+    slide: text_from_event_param2
+  text_from_event_param3:
+    slide: text_from_event_param3
+  text_from_event_param4:
+    slide: text_from_event_param4
+  text_from_event_param5:
+    slide: text_from_event_param5
+  text_from_event_param6:
+    slide: text_from_event_param6
+  text_from_event_param7:
+    slide: text_from_event_param7
+  text_from_event_param8:
+    slide: text_from_event_param8
+  text_with_player_var1:
+    slide: text_with_player_var1
+  text_with_player_var2:
+    slide: text_with_player_var2
+  text_with_player_var3:
+    slide: text_with_player_var3
+  text_with_player_var4:
+    slide: text_with_player_var4
+  number_grouping:
+    slide: number_grouping
+  text_string1:
+    slide: text_string1
+  text_string2:
+    slide: text_string2
+  text_string3:
+    slide: text_string3
+  text_string4:
+    slide: text_string4
+
+text_strings:
+  greeting: HELLO
+  ball: "%ball%"
+  name: PLAYER
+  dollar: 100

@@ -1,8 +1,6 @@
-from copy import deepcopy
-
 from kivy.animation import Animation
 from kivy.properties import ObjectProperty
-from mpf.system.config import CaseInsensitiveDict
+from mpf.system.case_insensitive_dict import CaseInsensitiveDict
 
 from mc.core.utils import set_position, percent_to_float
 
@@ -14,15 +12,6 @@ class MpfWidget(object):
     """
 
     widget_type_name = ''  # Give this a name in your subclass, e.g. 'Image'
-
-    mode = ObjectProperty(None, allownone=True)
-    """:class:`Mode` object, which is the mode that created this widget."""
-
-    config = CaseInsensitiveDict()
-    """Dict which holds the settings for this widget."""
-
-    slide = None
-    """Slide that this widget will be used with."""
 
     # We loop through the keys in a widget's config dict and check to see if
     # the widget's base class has attributes for them, and if so, we set
@@ -40,7 +29,7 @@ class MpfWidget(object):
 
         self.mode = mode
         self.slide = slide
-        self.config = config
+        self.config = config.copy()  # make optional? TODO
         self.mc = mc
         self.animation = None
         self._animation_event_keys = set()
@@ -73,14 +62,11 @@ class MpfWidget(object):
     def __repr__(self):  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
-    def get_merged_asset_config(self, asset):
-        new_config = self.config.copy()
-
-        for setting in self.merge_settings:
-            if not new_config[setting] and setting in asset.config:
-                new_config[setting] = asset.config[setting]
-
-        return new_config
+    def merge_asset_config(self, asset):
+        for setting in [x for x in self.merge_settings if (
+                        x not in self.config['_default_settings'] and
+                        x in asset.config)]:
+            self.config[setting] = asset.config[setting]
 
     def on_size(self, *args):
         try:

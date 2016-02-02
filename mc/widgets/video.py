@@ -8,7 +8,7 @@ class VideoWidget(MpfWidget, Video):
     widget_type_name = 'Video'
     merge_settings = ('height', 'width')
 
-    def __init__(self, mc, config, slide, mode=None, priority=None):
+    def __init__(self, mc, config, slide, mode=None, priority=None, **kwargs):
         super().__init__(mc=mc, mode=mode, priority=priority, slide=slide,
                          config=config)
 
@@ -18,7 +18,7 @@ class VideoWidget(MpfWidget, Video):
             raise ValueError("Cannot add Video widget. Video '{}' is not a "
                              "valid video name.".format(self.config['video']))
 
-        self.config = self.get_merged_asset_config(self.video)
+        self.merge_asset_config(self.video)
 
         # Set it to (0,0) while it's loading so we don't see a white
         # box on the slide

@@ -118,23 +118,23 @@ class SlideFrame(MpfWidget, ScreenManager):
         frame."""
         return self.screens
 
-    def add_slide(self, name, config, priority=None, mode=None):
+    def add_slide(self, name, config=None, priority=None, mode=None, **kwargs):
         # Note this method just adds it. It doesn't show it.
 
         # Slide() created also adds it to this screen manager
         return Slide(mc=self.mc, name=name, target=self.name, config=config,
-                     mode=mode, priority=priority)
+                     mode=mode, priority=priority, **kwargs)
 
     def show_slide(self, slide_name, transition=None, mode=None, force=False,
-                   priority=None):
-
+                   priority=None, **kwargs):
         try:  # does this slide exist in this screen manager already?
             slide = self.get_screen(slide_name)
         except ScreenManagerException:  # create it if not
             slide = self.add_slide(name=slide_name,
                                    config=self.mc.slide_configs[slide_name],
                                    priority=priority,
-                                   mode=mode)
+                                   mode=mode,
+                                   **kwargs)
 
         if slide.priority >= self.current_slide.priority or force:
             # We need to show this slide
@@ -151,8 +151,8 @@ class SlideFrame(MpfWidget, ScreenManager):
             return False
 
     def remove_slide(self, slide, transition_config=None):
-        # note there has to be at least one slide, so you can't remove the last
-        # one
+        # Note that you can't remove the last slide, but if you try it will
+        # change the priority so it gets removed by whatever comes next
 
         # warning, if you just created a slide, you have to wait at least on
         # tick before removing it. Can we prevent that? What if someone tilts
@@ -165,9 +165,6 @@ class SlideFrame(MpfWidget, ScreenManager):
         except ScreenManagerException:  # no slide by that name
             if not isinstance(slide, Slide):
                 return
-
-        if len(self.screens) == 1:
-            return
 
         for widget in self.children:
             widget.prepare_for_removal()
@@ -188,6 +185,10 @@ class SlideFrame(MpfWidget, ScreenManager):
             pass
 
     def _set_current_slide(self, slide):
+        # slide frame requires at least one slide, so if you try to set current
+        # to None, it will just mark the current slide as the lowest priority
+        # so it can be overwritten by anything
+
         # I think there's a bug in Kivy 1.9.1. According to the docs, you
         # should be able to set self.current to a screen name. But if that
         # screen is already managed by this screen manager, it will raise
@@ -195,6 +196,12 @@ class SlideFrame(MpfWidget, ScreenManager):
         # easy to fix by subclassing. So this is sort of a hack that looks
         # for that exception, and if it sees it, it just removes and
         # re-adds the screen.
+
+        if not slide:
+            self.current_slide.priority = 0
+            self.current_slide.creation_order = 0
+            return
+
         try:
             self.current = slide.name
         except WidgetException:
