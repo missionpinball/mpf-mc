@@ -6,7 +6,7 @@ class TestDmd(MpfMcTestCase):
         return 'tests/machine_files/dmd'
 
     def get_config_file(self):
-        return 'test_dmd.yaml'
+        return 'test_color_dmd.yaml'
 
     def test_something(self):
 

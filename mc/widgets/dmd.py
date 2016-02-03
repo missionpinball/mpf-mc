@@ -17,7 +17,7 @@ class Dmd(MpfWidget, Widget):
         self.source = self.mc.displays[self.config['source_display']]
 
         self.dmd_frame = EffectWidget()
-        self.dmd_frame.effects = [DmdLook(128, 32)]
+        self.dmd_frame.effects = [DmdLook(self.source.size)]
         self.add_widget(self.dmd_frame)
 
         self.dmd_frame.add_widget(DmdSource(mc, config, slide, mode, priority))
@@ -32,12 +32,31 @@ class Dmd(MpfWidget, Widget):
                                           self.config['anchor_x'],
                                           self.config['anchor_y'])
 
+    def __repr__(self):  # pragma: no cover
+        try:
+            return '<DMD size={}, source_size={}>'.format(
+                    self.size, self.source.size)
+        except AttributeError:
+            return '<DMD size={}, source_size=(none)>'.format(
+                    self.size)
+
+
+class ColorDmd(Dmd):
+    widget_type_name = 'Color DMD'
+
+    def __repr__(self):  # pragma: no cover
+        try:
+            return '<Color DMD size={}, source_size={}>'.format(
+                    self.size, self.source.size)
+        except AttributeError:
+            return '<Color DMD size={}, source_size=(none)>'.format(
+                    self.size)
+
 
 class DmdSource(MpfWidget, Scatter, Widget):
     widget_type_name = 'DMD Source'
 
     def __init__(self, mc, config, slide, mode=None, priority=None, **kwargs):
-
         super().__init__(mc=mc, mode=mode, priority=priority, slide=slide,
                          config=config)
 
@@ -49,16 +68,19 @@ class DmdSource(MpfWidget, Scatter, Widget):
 
         # Add the effects to make this look like a DMD
         effect_list = list()
-        effect_list.append(Monochrome(r=self.config['luminosity'][0],
-                                      g=self.config['luminosity'][1],
-                                      b=self.config['luminosity'][2]))
+
+        if 'luminosity' in self.config:
+            effect_list.append(Monochrome(r=self.config['luminosity'][0],
+                                          g=self.config['luminosity'][1],
+                                          b=self.config['luminosity'][2]))
 
         if self.config['shades']:
             effect_list.append(Reduce(shades=self.config['shades']))
 
-        effect_list.append(Colorize(r=self.config['color'][0],
-                                    g=self.config['color'][1],
-                                    b=self.config['color'][2]))
+        if self.config['color']:
+            effect_list.append(Colorize(r=self.config['color'][0],
+                                        g=self.config['color'][1],
+                                        b=self.config['color'][2]))
 
         if self.config['gain'] != 1.0:
             effect_list.append(Gain(gain=self.config['gain']))
