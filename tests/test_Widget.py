@@ -60,9 +60,9 @@ class TestWidget(MpfMcTestCase):
         # config. The entire list should be backwards, lowest, priority first.
 
         target_order = ['4.7', '4.6', '4.3', '4.4', '4.1', '4.5', '4.2']
-        for widget, index in zip(self.mc.targets[
-                                     'default'].current_slide.children,
-                                 target_order):
+        for widget, index in zip(
+                self.mc.targets['default'].current_slide.children[0].children,
+                target_order):
             self.assertEqual(widget.text, 'widget{}'.format(index))
 
         # add widget 5 which is z order 200
@@ -71,9 +71,9 @@ class TestWidget(MpfMcTestCase):
 
         # should be inserted between 4.1 and 4.5
         target_order = ['4.7', '4.6', '4.3', '4.4', '4.1', '5', '4.5', '4.2']
-        for widget, index in zip(self.mc.targets[
-                                     'default'].current_slide.children,
-                                 target_order):
+        for widget, index in zip(
+                self.mc.targets['default'].current_slide.children[0].children,
+                target_order):
             self.assertEqual(widget.text, 'widget{}'.format(index))
 
     def test_widget_player_add_to_current_slide(self):
@@ -90,7 +90,7 @@ class TestWidget(MpfMcTestCase):
         # A widget with text that reads 'widget1' should be on the default
         # slide
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
     def test_widget_player_add_to_named_slide(self):
         # create two slides
@@ -110,18 +110,21 @@ class TestWidget(MpfMcTestCase):
 
         # widget1 should be in slide1, not slide2, not current slide
         self.assertIn('widget1',
-                      [x.text for x in self.mc.active_slides['slide1'].children])
+                      [x.text for x in
+                       self.mc.active_slides['slide1'].children[0].children])
         self.assertNotIn('widget1',
-                      [x.text for x in self.mc.active_slides['slide2'].children])
+                         [x.text for x in
+                          self.mc.active_slides['slide2'].children[
+                              0].children])
         self.assertNotIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
         # show slide1 and make sure the widget is there
         self.mc.targets['default'].current_slide = 'slide1'
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
     def test_widget_player_add_to_target(self):
         # create two slides
@@ -142,19 +145,21 @@ class TestWidget(MpfMcTestCase):
         # widget1 should be in slide2, the current on display2. It should
         # not be in slide1
         self.assertIn('widget1',
-                      [x.text for x in self.mc.active_slides['slide2'].children])
+                      [x.text for x in
+                       self.mc.active_slides['slide2'].children[0].children])
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'display2'].current_slide.children])
+            'display2'].current_slide.children[0].children])
         self.assertNotIn('widget1',
-                      [x.text for x in self.mc.active_slides['slide1'].children])
-
+                         [x.text for x in
+                          self.mc.active_slides['slide1'].children[
+                              0].children])
 
         # show slide1 and make sure the widget is not there
         self.mc.targets['display2'].current_slide = 'slide1'
         self.assertEqual(self.mc.targets['display2'].current_slide_name,
                          'slide1')
         self.assertNotIn('widget1', [x.text for x in self.mc.targets[
-            'display2'].current_slide.children])
+            'display2'].current_slide.children[0].children])
 
     def test_removing_mode_widget_on_mode_stop(self):
         # create a slide and add some base widgets
@@ -168,9 +173,9 @@ class TestWidget(MpfMcTestCase):
 
         # verify widget 1 is there but not widget 2
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
         self.assertNotIn('widget2', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
         # start a mode
         self.mc.modes['mode1'].start()
@@ -183,9 +188,9 @@ class TestWidget(MpfMcTestCase):
 
         # make sure the new widget is there, and the old one is still there
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
         self.assertIn('widget2', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
         # stop the mode
         self.mc.modes['mode1'].stop()
@@ -193,9 +198,9 @@ class TestWidget(MpfMcTestCase):
 
         # make sure the mode widget is gone, but the first one is still there
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
         self.assertNotIn('widget2', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
     def test_widgets_in_slide_frame_parent(self):
         # create a slide and add some base widgets
@@ -209,19 +214,18 @@ class TestWidget(MpfMcTestCase):
 
         # verify widget 1 is there but not widget 6
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
         self.assertNotIn('widget6', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
-
+            'default'].current_slide.children[0].children])
 
         self.mc.events.post('add_widget6')
         self.advance_time()
 
         # verify widget1 is in the slide but not widget 6
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
         self.assertNotIn('widget6', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
         # verify widget6 is the highest priority in the parent frame
         # (highest priority is the last element in the list)
@@ -236,9 +240,9 @@ class TestWidget(MpfMcTestCase):
 
         # make sure neither widget is in this slide
         self.assertNotIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
         self.assertNotIn('widget6', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
         # make sure widget6 is still in the SlideFrameParent
         self.assertEqual('widget6', self.mc.targets[
@@ -256,9 +260,9 @@ class TestWidget(MpfMcTestCase):
 
         # verify widget 1 is there but not widget 6
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
         self.assertNotIn('widget6', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
         # start a mode
         self.mc.modes['mode1'].start()
@@ -270,15 +274,15 @@ class TestWidget(MpfMcTestCase):
 
         # make sure the new widget is not there, but the old one is
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
         self.assertNotIn('widget6', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
         # verify widget6 is the highest priority in the parent frame
         self.assertEqual('widget6', self.mc.targets[
             'default'].parent.children[-1].text)
         self.assertTrue(isinstance(self.mc.targets[
-            'default'].parent.children[-1], Text))
+                                       'default'].parent.children[-1], Text))
 
         # stop the mode
         self.mc.modes['mode1'].stop()
@@ -286,13 +290,11 @@ class TestWidget(MpfMcTestCase):
 
         # make sure the the first one is still there
         self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'default'].current_slide.children])
+            'default'].current_slide.children[0].children])
 
         # verify widget6 is gone
         self.assertFalse(isinstance(self.mc.targets[
-            'default'].parent.children[-1], Text))
-
-
+                                        'default'].parent.children[-1], Text))
 
     def test_widget_player_errors(self):
         pass

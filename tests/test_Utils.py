@@ -225,5 +225,5 @@ class TestUtils(MpfMcTestCase):
         self.mc.events.post('show_slide1')
         self.advance_time()
 
-        index = get_insert_index(75, self.mc.targets['default'].current_slide)
+        index = get_insert_index(75, self.mc.targets['default'].current_slide.children[0])
         self.assertEqual(index, 2)

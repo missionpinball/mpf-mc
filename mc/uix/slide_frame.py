@@ -6,6 +6,7 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     FadeTransition, WipeTransition,
                                     FallOutTransition, RiseInTransition,
                                     ScreenManagerException)
+from kivy.uix.stencilview import StencilView
 from kivy.uix.widget import WidgetException
 
 from mc.core.utils import set_position, get_insert_index
@@ -30,6 +31,12 @@ class SlideFrameParent(FloatLayout):
         self.size_hint = (None, None)
         super().__init__()
         self.size = slide_frame.native_size
+
+        self.stencil = StencilView(size_hint=(None, None),
+                                   size=self.size)
+        self.stencil.config = dict()
+        self.stencil.config['z'] = 0
+        super().add_widget(self.stencil)
         self.add_widget(slide_frame)
 
     def __repr__(self):
@@ -39,9 +46,9 @@ class SlideFrameParent(FloatLayout):
     def add_widget(self, widget):
         widget.config['z'] = abs(widget.config['z'])
 
-        super().add_widget(widget=widget,
+        self.stencil.add_widget(widget=widget,
                            index=get_insert_index(z=abs(widget.config['z']),
-                                                  target_widget=self))
+                                                  target_widget=self.stencil))
 
     def on_size(self, *args):
         for widget in self.children:

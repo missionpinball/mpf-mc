@@ -86,7 +86,7 @@ class TestSlides(MpfMcTestCase):
                       priority=0)
 
         widget_tree = list()
-        for s in slide.walk():
+        for s in slide.children[0].walk():
             widget_tree.append(s)
 
         # last widget is drawn last (on top), so the order should be flipped

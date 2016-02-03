@@ -9,7 +9,7 @@ class TestText(MpfMcTestCase):
         return 'test_text.yaml'
 
     def get_widget(self):
-        return self.mc.targets['default'].current_slide.children[0]
+        return self.mc.targets['default'].current_slide.children[0].children[0]
 
     def test_static_text(self):
         # Very basic test

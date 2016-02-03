@@ -9,7 +9,7 @@ class TestTextStyles(MpfMcTestCase):
         return 'test_text_styles.yaml'
 
     def get_widget(self, index=0):
-        return self.mc.targets['default'].current_slide.children[index]
+        return self.mc.targets['default'].current_slide.children[0].children[index]
 
     def test_style_loading(self):
         self.assertIn('default', self.mc.machine_config['text_styles'])

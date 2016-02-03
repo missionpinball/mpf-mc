@@ -1,5 +1,7 @@
 from copy import copy
 
+from kivy.uix.stencilview import StencilView
+
 from mc.uix.display import Display
 from mc.uix.slide import Slide
 from mc.uix.slide_frame import SlideFrame, SlideFrameParent
@@ -23,13 +25,16 @@ class TestDisplaySingle(MpfMcTestCase):
             'window'])
 
         # walk the display's widget tree and make sure everything is right
-        widget_hierarchy = ['display', 'slide_frame_parent', 'slide_frame']
+        widget_hierarchy = ['display', 'slide_frame_parent', 'stencil', 'slide_frame']
         for widget, name in zip(self.mc.displays['window'].walk(),
                                 widget_hierarchy):
             getattr(self, 'check_{}'.format(name))(widget=widget)
 
     def check_display(self, widget):
         self.assertTrue(isinstance(widget, Display))
+
+    def check_stencil(self, widget):
+        self.assertTrue(isinstance(widget, StencilView))
 
     def check_slide_frame(self, widget):
         self.assertTrue(isinstance(widget, SlideFrame))
