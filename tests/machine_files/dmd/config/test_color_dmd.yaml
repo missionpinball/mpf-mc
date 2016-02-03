@@ -24,7 +24,7 @@ slides:
 #      shades: 4
 #      gain: 2
     - type: text
-      text: DMD TEST
+      text: COLOR DMD TEST
       y: 200
     - type: rectangle
       width: 642

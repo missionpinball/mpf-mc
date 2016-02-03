@@ -17,7 +17,13 @@ class Dmd(MpfWidget, Widget):
         self.source = self.mc.displays[self.config['source_display']]
 
         self.dmd_frame = EffectWidget()
-        self.dmd_frame.effects = [DmdLook(self.source.size)]
+        self.dmd_frame.effects = [DmdLook(width=self.width,
+                                          height=self.height,
+                                          dmd_width=self.source.width,
+                                          dmd_height=self.source.height,
+                                          tolerance=0.1,
+                                          pixel_size=0.5,
+                                          bg_color=self.config['bg_color'])]
         self.add_widget(self.dmd_frame)
 
         self.dmd_frame.add_widget(DmdSource(mc, config, slide, mode, priority))
@@ -269,26 +275,38 @@ class DmdLook(EffectBase):
 
     """
 
-    def __init__(self, w=128, h=32):
+    def __init__(self, width, height, dmd_width, dmd_height, tolerance=0.1,
+                 pixel_size=0.6, bg_color=(0.1, 0.1, 0.1, 1.0)):
         super().__init__()
+
+        tolerance = float(tolerance)
+        pixel_radius = pixel_size / 2.0
+        new_pixel_size = width / dmd_width
+        width = float(width)
+        height = float(height)
+
+        print(tolerance, pixel_radius, new_pixel_size, width, height)
+
+
 
         self.glsl = '''
 
-        float tolerance = 0.0;
-        float pixelRadius = .3;
-        int pixelSize = 5;
+        float tolerance = {};
+        float pixelRadius = {};
+        float pixelSize = {};
 
         vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
-        {
-            vec2 texCoordsStep = 1.0/(vec2(float(600),float(160))/float(pixelSize));
+        {{
+            vec2 texCoordsStep = 1.0/(vec2({},{})/pixelSize);
             vec2 pixelRegionCoords = fract(tex_coords.xy/texCoordsStep);
 
             vec2 powers = pow(abs(pixelRegionCoords - 0.5),vec2(2.0));
             float radiusSqrd = pow(pixelRadius,2.0);
             float gradient = smoothstep(radiusSqrd-tolerance, radiusSqrd+tolerance, powers.x+powers.y);
 
-            vec4 newColor = mix(color, vec4(0.1, 0.1, 0.1, 1.0), gradient);
+            vec4 newColor = mix(color, vec4({}, {}, {}, {}), gradient);
             return newColor;
-        }
+        }}
 
-        '''
+        '''.format(tolerance, pixel_radius, new_pixel_size, width, height,
+                   *bg_color)

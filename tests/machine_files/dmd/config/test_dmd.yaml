@@ -23,8 +23,9 @@ slides:
 #      source_display: dmd
 #      shades: 16
 #      gain: 2
+#      bg_color: 303030
     - type: text
-      text: DMD TEST
+      text: TRADITIONAL DMD TEST
       y: 200
     - type: rectangle
       width: 642
