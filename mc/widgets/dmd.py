@@ -17,7 +17,17 @@ class Dmd(MpfWidget, Widget):
         self.source = self.mc.displays[self.config['source_display']]
 
         self.dmd_frame = EffectWidget()
-        self.dmd_frame.effects = [DmdLook(128, 32)]
+
+        if self.config['dot_filter']:
+            self.dmd_frame.effects = [
+                DmdLook(width=self.width,
+                        height=self.height,
+                        dmd_width=self.source.width,
+                        dmd_height=self.source.height,
+                        blur=self.config['blur'],
+                        pixel_size=self.config['pixel_size'],
+                        bg_color=self.config['bg_color'])]
+
         self.add_widget(self.dmd_frame)
 
         self.dmd_frame.add_widget(DmdSource(mc, config, slide, mode, priority))
@@ -32,12 +42,31 @@ class Dmd(MpfWidget, Widget):
                                           self.config['anchor_x'],
                                           self.config['anchor_y'])
 
+    def __repr__(self):  # pragma: no cover
+        try:
+            return '<DMD size={}, source_size={}>'.format(
+                    self.size, self.source.size)
+        except AttributeError:
+            return '<DMD size={}, source_size=(none)>'.format(
+                    self.size)
+
+
+class ColorDmd(Dmd):
+    widget_type_name = 'Color DMD'
+
+    def __repr__(self):  # pragma: no cover
+        try:
+            return '<Color DMD size={}, source_size={}>'.format(
+                    self.size, self.source.size)
+        except AttributeError:
+            return '<Color DMD size={}, source_size=(none)>'.format(
+                    self.size)
+
 
 class DmdSource(MpfWidget, Scatter, Widget):
     widget_type_name = 'DMD Source'
 
     def __init__(self, mc, config, slide, mode=None, priority=None, **kwargs):
-
         super().__init__(mc=mc, mode=mode, priority=priority, slide=slide,
                          config=config)
 
@@ -49,16 +78,19 @@ class DmdSource(MpfWidget, Scatter, Widget):
 
         # Add the effects to make this look like a DMD
         effect_list = list()
-        effect_list.append(Monochrome(r=self.config['luminosity'][0],
-                                      g=self.config['luminosity'][1],
-                                      b=self.config['luminosity'][2]))
+
+        if 'luminosity' in self.config:
+            effect_list.append(Monochrome(r=self.config['luminosity'][0],
+                                          g=self.config['luminosity'][1],
+                                          b=self.config['luminosity'][2]))
 
         if self.config['shades']:
             effect_list.append(Reduce(shades=self.config['shades']))
 
-        effect_list.append(Colorize(r=self.config['color'][0],
-                                    g=self.config['color'][1],
-                                    b=self.config['color'][2]))
+        if self.config['color']:
+            effect_list.append(Colorize(r=self.config['color'][0],
+                                        g=self.config['color'][1],
+                                        b=self.config['color'][2]))
 
         if self.config['gain'] != 1.0:
             effect_list.append(Gain(gain=self.config['gain']))
@@ -96,7 +128,6 @@ class Monochrome(EffectBase):
     http://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
 
     """
-
     def __init__(self, r=.299, g=.587, b=.114):
         super().__init__()
 
@@ -122,7 +153,6 @@ class Reduce(EffectBase):
             16.
 
     """
-
     def __init__(self, shades=16):
         super().__init__()
 
@@ -155,7 +185,6 @@ class Colorize(EffectBase):
     Note that r, g, b, input values expect a float from 0.0 to 1.0.
 
     """
-
     def __init__(self, r=1.0, g=.4, b=0.0):
         super().__init__()
 
@@ -182,7 +211,6 @@ class Gain(EffectBase):
             channel.
 
     """
-
     def __init__(self, gain=1.0):
         super().__init__()
 
@@ -200,73 +228,70 @@ class Gain(EffectBase):
 
 
 class DmdLook(EffectBase):
-    """This method currently does nothing and needs to be written by someone
-    who knows C and/or GLSL.
+    """GLSL effect to render an on-screen DMD to look like individual round
+    pixels.
 
-    This effect is passed the texture after it's been scaled up for the on-
-    screen window. It's also passed w and h parameters which are the original
-    width and height of the DMD.
+    Args:
+        width: The width in pixels of the DMD widget on the screen. Typically
+            this is larger than the dmd_width.
+        height: The height in pixels of the DMD widget on the screen.
+        dmd_width: The width in pixels of the original DMD that you're
+            emulating. (e.g. 128)
+        dmd_height: The height in pixels of the original DMD that you're
+            emulating. (e.g. 32)
+        blur: A floating point value that represents the size of the blue
+            around each pixel where it's blended with the background. The value
+            is relative to the pixel. (e.g. a value of 0.1 will add a 10% blur
+            around the edge of each pixel.) Default is 0.1.
+        pixel_size: The size of the circle for the pixel relative to the size
+            of the square bounding box of the pixel. A size of 1.0 means that
+            the diameter of the pixel will be the same as its bounding box, in
+            other words a size of 1.0 means that the pixels will touch each
+            other. Default is 0.5.
+        bg_color: A four-item tuple or list that represents the color of the
+            space between the pixels, in RGBA format with individual values as
+            floats between 0.0 - 1.0. the default is (0.1, 0.1, 0.1, 1.0) which
+            is 10% gray with 100% alpha (fully opaque). If you want the
+            background to be transparent, set it to (0.0, 0.0, 0.0, 0.0)
 
-    For example, for a standard 128x32 DMD which is displayed on the screen at
-    640x160, w will be 128 and h will be 32. The pixel indices will be from
-    (0,0) -> (639,159).
 
-    So we need to figure out how to look at a pixel and decide what color to
-    set it based on whether it's in the center of a pixel or whether it's in
-    a gap between pixels.
+    This shader is based on code from a tutorial by Jason Gorski.
+    http://www.lighthouse3d.com/opengl/ledshader/
 
-    Eventually we can have settings for pixel size and aliasing and stuff, but
-    for now if we can just make some pixels black that would be good.
-
-    Details about how the code here plugs into Kivy:
-    https://kivy.org/docs/api-kivy.uix.effectwidget.html#creating-effects
-
-    For now if anyone can figure out how to write the GLSL code, you can just
-    hard-code with a DMD size of 128x32 and an on screen size of 640x160. I'll
-    convert it to be dynamic later.
-
-    There's a simple test you can run to see the results:
-    python -m unittest tests.test_Dmd
-
-    Or if you are using the Kivy Python:
-    kivy -m unittest tests.test_Dmd
-
-    You can confirm that this GLSL code is being called by, for example,
-    changing the "color.z" to "1.0" below and seeing that the DMD on screen has
-    it's blue channel set to 100%.
-
-    BTW, there's another GLSL option where we could create a texture with
-    circular dots that are white on alpha transparent background and then do a
-    pixel-by-pixel blending, but I don't know how to do that. (In that case we
-    can dynamically generate the mask texture based on the original and on-
-    screen size of the DMD.) But I don't know how to write a function in GLSL
-    that would receive this. We might have to use a different base class other
-    than EffectBase. There's an example of that here:
-
-    https://github.com/kivy/kivy/blob/master/examples/canvas/multitexture.py
+    Potential bug: This GLSL filter seems to not work on Windows 10 running on
+    VMware Fusion on Mac OS X. It works fine on Windows 10 native as well as
+    Mac OS X Native.
 
     """
-
-    def __init__(self, w=128, h=32):
+    def __init__(self, width, height, dmd_width, dmd_height, blur=0.1,
+                 pixel_size=0.6, bg_color=(0.1, 0.1, 0.1, 1.0)):
         super().__init__()
+
+        blur = float(blur)
+        pixel_radius = pixel_size / 2.0
+        new_pixel_size = width / dmd_width
+        width = float(width)
+        height = float(height)
+        bg_color = tuple(map(float, bg_color))
 
         self.glsl = '''
 
-        float tolerance = 0.0;
-        float pixelRadius = .3;
-        int pixelSize = 5;
+        float blur = {};
+        float pixelRadius = {};
+        float pixelSize = {};
 
         vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
-        {
-            vec2 texCoordsStep = 1.0/(vec2(float(600),float(160))/float(pixelSize));
+        {{
+            vec2 texCoordsStep = 1.0/(vec2({},{})/pixelSize);
             vec2 pixelRegionCoords = fract(tex_coords.xy/texCoordsStep);
 
             vec2 powers = pow(abs(pixelRegionCoords - 0.5),vec2(2.0));
             float radiusSqrd = pow(pixelRadius,2.0);
-            float gradient = smoothstep(radiusSqrd-tolerance, radiusSqrd+tolerance, powers.x+powers.y);
+            float gradient = smoothstep(radiusSqrd-blur, radiusSqrd+blur, powers.x+powers.y);
 
-            vec4 newColor = mix(color, vec4(0.1, 0.1, 0.1, 1.0), gradient);
+            vec4 newColor = mix(color, vec4({}, {}, {}, {}), gradient);
             return newColor;
-        }
+        }}
 
-        '''
+        '''.format(blur, pixel_radius, new_pixel_size, width, height,
+                   *bg_color)

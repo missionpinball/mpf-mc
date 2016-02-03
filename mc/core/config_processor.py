@@ -22,7 +22,7 @@ from mc.widgets.rectangle import Rectangle
 from mc.widgets.ellipse import Ellipse
 from mc.widgets.bezier import Bezier
 from mc.widgets.point import Point
-from mc.widgets.dmd import Dmd
+from mc.widgets.dmd import Dmd, ColorDmd
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=ImageWidget,
@@ -37,7 +37,8 @@ type_map = CaseInsensitiveDict(text=Text,
                                quad=Quad,
                                rectangle=Rectangle,
                                triangle=Triangle,
-                               dmd=Dmd)
+                               dmd=Dmd,
+                               color_dmd=ColorDmd)
 
 
 class McConfig(MpfConfig):
@@ -261,6 +262,10 @@ class McConfig(MpfConfig):
         return config
 
     def color_from_string(self, color_string):
+
+        if not color_string:
+            return None
+
         color_string = str(color_string)
 
         if color_string in named_rgb_colors:

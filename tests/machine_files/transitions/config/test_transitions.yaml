@@ -17,6 +17,10 @@ slides:
       y: 66%
       color: ff0000
       font_size: 50
+    - type: rectangle
+      width: 400
+      height: 300
+      color: 330000
 
   slide2:
     - type: text
@@ -25,10 +29,14 @@ slides:
       font_size: 50
       y: 33%
     - type: text
-      text: ----------- SLIDE 2 ------------
+      text: ---------- SLIDE 2 -----------
       color: 00ff00
       font_size: 50
       y: 66%
+    - type: rectangle
+      width: 400
+      height: 300
+      color: 003300
 
 slide_player:
   show_slide1:

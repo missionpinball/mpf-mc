@@ -13,62 +13,122 @@ slides:
   static_text:
     - type: text
       text: TEST
+    - type: text
+      text: STATIC TEXT
+      y: 200
   text_from_event_param1:
     - type: text
       text: "%param1%"
+    - type: text
+      text: TEXT FROM EVENT PARAMETER
+      y: 200
   text_from_event_param2:
     - type: text
       text: HI %param1%
+    - type: text
+      text: MIX STATIC AND DYNAMIC FROM EVENT
+      y: 200
   text_from_event_param3:
     - type: text
       text: MIX %param1% MATCH
+    - type: text
+      text: MIX STATIC SURROUNDING DYNAMIC
+      y: 200
   text_from_event_param4:
     - type: text
       text: NO%param1%
+    - type: text
+      text: MIX WITH NO SPACE
+      y: 200
   text_from_event_param5:
     - type: text
       text: NUMBER %param1%
+    - type: text
+      text: DYNAMIC INTEGER
+      y: 200
   text_from_event_param6:
     - type: text
       text: "%param1%"
+    - type: text
+      text: PURELY DYNAMIC NO MIX
+      y: 200
   text_from_event_param7:
     - type: text
       text: 100%
+    - type: text
+      text: PERCENT SIGN IN STRING
+      y: 200
   text_from_event_param8:
     - type: text
       text: "%param1%%"
+    - type: text
+      text: COMBINE PERCENT SIGN AND DYNAMIC
+      y: 200
 
   text_with_player_var1:
     - type: text
       text: "%test_var%"
+      font_size: 100
+    - type: text
+      text: TESTING WIDGET AUTO UPDATE
+      y: 90
+      color: pink
+    - type: text
+      text: FROM PLAYER VAR
+      y: 70
+      color: pink
   text_with_player_var2:
     - type: text
       text: "%player|test_var%"
+    - type: text
+      text: DEFAULT PLAYER
+      y: 200
   text_with_player_var3:
     - type: text
       text: "%player1|test_var%"
+    - type: text
+      text: NAMED PLAYER
+      y: 200
   text_with_player_var4:
     - type: text
       text: "%player2|test_var%"
+    - type: text
+      text: NAMED PLAYER THAT DOESN'T EXIST
+      y: 200
 
   text_string1:
     - type: text
       text: $greeting
+    - type: text
+      text: TEST text_string
+      y: 200
   text_string2:
     - type: text
       text: $greeting $name
+    - type: text
+      text: TEST 2 text_strings
+      y: 200
   text_string3:
     - type: text
       text: $money
+    - type: text
+      text: TEST text_string without dollar sign
+      y: 200
   text_string4:
     - type: text
       text: $$dollar
+    - type: text
+      text: TEST text_string with dollar sign
+      y: 200
 
   number_grouping:
     - type: text
       text: 0
       min_digits: 2
       number_grouping: yes
+    - type: text
+      text: TEST NUMBER GROUPING & DOUBLE ZEROS
+      y: 200
 
 slide_player:
   static_text:

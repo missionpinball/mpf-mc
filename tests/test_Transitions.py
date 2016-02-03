@@ -171,7 +171,7 @@ class TestTransitions(MpfMcTestCase):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('swap')
-        self.advance_time(.5)
+        self.advance_time(2)
 
     def test_fade(self):
         self.mc.events.post('show_slide1')

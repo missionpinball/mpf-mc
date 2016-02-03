@@ -16,19 +16,15 @@ physical_dmd:  # not yet implemented
 
 slides:
   slide1:
-    - type: dmd
+    - type: color_dmd
       width: 640
       height: 160
-#      color: ff00aa
+#      color: ffcccc
 #      source_display: dmd
-#      shades: 16
+#      shades: 4
 #      gain: 2
-#      bg_color: 303030
-#      blur: .5
-#      pixel_size: .7
-#      dot_filter: false
     - type: text
-      text: TRADITIONAL DMD TEST
+      text: COLOR DMD TEST
       y: 200
     - type: rectangle
       width: 642
@@ -51,57 +47,57 @@ slides:
     - type: rectangle
       width: 8
       height: 32
-      color: ffffff
+      color: red
       x: 4
     - type: rectangle
       width: 8
       height: 32
-      color: eeeeee
+      color: orange
       x: 12
     - type: rectangle
       width: 8
       height: 32
-      color: dddddd
+      color: yellow
       x: 20
     - type: rectangle
       width: 8
       height: 32
-      color: cccccc
+      color: green
       x: 28
     - type: rectangle
       width: 8
       height: 32
-      color: bbbbbb
+      color: blue
       x: 36
     - type: rectangle
       width: 8
       height: 32
-      color: aaaaaa
+      color: purple
       x: 44
     - type: rectangle
       width: 8
       height: 32
-      color: 999999
+      color: pink
       x: 52
     - type: rectangle
       width: 8
       height: 32
-      color: 888888
+      color: dddddd
       x: 60
     - type: rectangle
       width: 8
       height: 32
-      color: 777777
+      color: bbbbbb
       x: 68
     - type: rectangle
       width: 8
       height: 32
-      color: 666666
+      color: 888888
       x: 76
     - type: rectangle
       width: 8
       height: 32
-      color: 555555
+      color: 666666
       x: 84
     - type: rectangle
       width: 8
