@@ -1,3 +1,5 @@
+from kivy.graphics.context_instructions import Color
+from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
 
@@ -47,6 +49,12 @@ class Slide(Screen):
         self.size = target.native_size
         self.orig_w, self.orig_h = self.size
 
+        self.stencil = StencilView(size_hint=(None, None),
+                                   size=self.size)
+        self.stencil.config = dict()
+        self.stencil.config['z'] = 0
+        super().add_widget(self.stencil)
+
         try:
             self.add_widgets_from_config(config, self.mode, **kwargs)
         except KeyError:
@@ -54,6 +62,12 @@ class Slide(Screen):
 
         self.mc.active_slides[name] = self
         target.add_widget(self)
+
+        # Make the slide not transparent. (Widgets are drawn in reverse order,
+        # so the before method draws it on the bottom.)
+        with self.canvas.before:
+            Color(0, 0, 0, 1)
+            Rectangle(size=self.size, pos=(0,0))
 
     def __repr__(self):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
@@ -120,7 +134,7 @@ class Slide(Screen):
             self.add_widget_to_parent_frame(widget)
             return
 
-        super().add_widget(widget, get_insert_index(z=z, target_widget=self))
+        self.stencil.add_widget(widget, get_insert_index(z=z, target_widget=self.stencil))
 
         widget.pos = set_position(self.size[0],
                                   self.size[1],
@@ -132,8 +146,8 @@ class Slide(Screen):
                                   widget.config['anchor_y'])
 
     def remove_widgets_by_mode(self, mode):
-        for widget in [x for x in self.children if x.mode == mode]:
-            self.remove_widget(widget)
+        for widget in [x for x in self.stencil.children if x.mode == mode]:
+            self.stencil.remove_widget(widget)
 
     def add_widget_to_parent_frame(self, widget):
         """Adds this widget to this slide's parent frame instead of to this
@@ -152,7 +166,7 @@ class Slide(Screen):
         of a -50 widget.
 
         """
-        self.parent.parent.add_widget(widget)
+        self.parent.parent.parent.add_widget(widget)
 
     def prepare_for_removal(self, widget=None):
         pass

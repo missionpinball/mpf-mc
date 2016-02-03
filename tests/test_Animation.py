@@ -107,7 +107,7 @@ class TestAnimation(MpfMcTestCase):
                          'slide7')
 
         # grab this widget
-        widget = self.mc.targets['default'].current_slide.children[0]
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
         self.assertTrue(widget.text == 'slide7')
 
         # make sure it's animating as we expect
@@ -129,7 +129,7 @@ class TestAnimation(MpfMcTestCase):
                          'slide2')
 
         # grab this widget
-        widget = self.mc.targets['default'].current_slide.children[0]
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
         self.assertTrue(widget.text == 'ANIMATION TEST')
 
         # make sure it's not animating
@@ -155,7 +155,7 @@ class TestAnimation(MpfMcTestCase):
                          'slide3')
 
         # grab this widget
-        widget = self.mc.targets['default'].current_slide.children[0]
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
         self.assertTrue(widget.text == 'text3')
 
         # make sure it's not animating

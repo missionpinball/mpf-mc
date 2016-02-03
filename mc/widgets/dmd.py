@@ -252,10 +252,21 @@ class DmdLook(EffectBase):
 
         self.glsl = '''
 
-        vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
+        float tolerance = 0.0;
+        float pixelRadius = .3;
+        int pixelSize = 5;
 
+        vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
         {
-        vec4 newColor = vec4(color.x, color.y, color.z, color.w);
-        return newColor;
+            vec2 texCoordsStep = 1.0/(vec2(float(600),float(160))/float(pixelSize));
+            vec2 pixelRegionCoords = fract(tex_coords.xy/texCoordsStep);
+
+            vec2 powers = pow(abs(pixelRegionCoords - 0.5),vec2(2.0));
+            float radiusSqrd = pow(pixelRadius,2.0);
+            float gradient = smoothstep(radiusSqrd-tolerance, radiusSqrd+tolerance, powers.x+powers.y);
+
+            vec4 newColor = mix(color, vec4(0.1, 0.1, 0.1, 1.0), gradient);
+            return newColor;
         }
+
         '''

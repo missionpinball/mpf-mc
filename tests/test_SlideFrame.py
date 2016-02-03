@@ -20,15 +20,14 @@ class TestSlideFrame(MpfMcTestCase):
         self.assertIn('frame1', self.mc.targets)
 
         # the slide frame's parent should be the first widget in slide1
-        self.assertEqual(
-                self.mc.targets['default'].current_slide.children[0].name,
-                'frame1')
+        self.assertEqual(self.mc.targets['default'].current_slide.
+                         children[0].children[0].name, 'frame1')
 
         # grab some references which are easy to follow
         default_frame = self.mc.targets['default']
         frame1_frame = self.mc.targets['frame1']
-        default_frame_parent = self.mc.targets['default'].parent
-        frame1_frame_parent = self.mc.targets['frame1'].parent
+        default_frame_parent = self.mc.targets['default'].parent.parent
+        frame1_frame_parent = self.mc.targets['frame1'].parent.parent
 
         # make sure they're right. :)
         self.assertEqual(default_frame.name, 'default')
@@ -57,20 +56,23 @@ class TestSlideFrame(MpfMcTestCase):
         self.advance_time()
 
         # make sure the text is in the frame
-        self.assertEqual(frame1_frame.current_slide.children[0].text,
-                         'TEXT IN FRAME')
+        self.assertEqual(
+            frame1_frame.current_slide.children[0].children[0].text,
+            'TEXT IN FRAME')
 
         # flip frame to a different slide
         self.mc.events.post('show_frame_text2')
         self.advance_time()
 
         # make sure the next text is there
-        self.assertEqual(frame1_frame.current_slide.children[0].text,
-                         'MORE TEXT')
+        self.assertEqual(
+            frame1_frame.current_slide.children[0].children[0].text,
+            'MORE TEXT')
 
         # flip back to the first frame and make sure that text is there
         self.mc.events.post('show_frame_text')
         self.advance_time()
 
-        self.assertEqual(frame1_frame.current_slide.children[0].text,
-                         'TEXT IN FRAME')
+        self.assertEqual(
+            frame1_frame.current_slide.children[0].children[0].text,
+            'TEXT IN FRAME')
