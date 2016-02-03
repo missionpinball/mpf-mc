@@ -24,6 +24,9 @@ slides:
 #      shades: 16
 #      gain: 2
 #      bg_color: 303030
+#      blur: .5
+#      pixel_size: .7
+#      dot_filter: false
     - type: text
       text: TRADITIONAL DMD TEST
       y: 200
