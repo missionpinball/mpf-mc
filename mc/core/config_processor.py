@@ -22,22 +22,22 @@ from mc.widgets.rectangle import Rectangle
 from mc.widgets.ellipse import Ellipse
 from mc.widgets.bezier import Bezier
 from mc.widgets.point import Point
+from mc.widgets.dmd import Dmd
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=ImageWidget,
                                video=VideoWidget,
                                slide_frame=SlideFrame,
                                bezier=Bezier,
-                               # border=Shape,
+                               # imageborder=Shape,
                                ellipse=Ellipse,
                                line=Line,
-                               # mesh=Shape,
                                point=Point,
                                points=Point,
                                quad=Quad,
                                rectangle=Rectangle,
-                               triangle=Triangle
-                                )
+                               triangle=Triangle,
+                               dmd=Dmd)
 
 
 class McConfig(MpfConfig):

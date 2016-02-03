@@ -100,6 +100,12 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
     elif anchor_y == 'top':
         y += -h
 
+    # Helpful for debugging placement
+    # print("SET POS. Final: {},{}, Parent: {}x{}".format(
+    #         x, y, parent_w, parent_h))
+    # print("widget: {}x{}, pos: {},{}, achors: {},{}".format(
+    #     w, h, x, y, anchor_x, anchor_y))
+
     return x, y
 
 

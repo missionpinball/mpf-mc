@@ -33,5 +33,3 @@ class Rectangle(MpfWidget, Widget):
                                  segments=self.config['corner_segments'])
             else:
                 KivyRectangle(pos=pos, size=self.size)
-
-

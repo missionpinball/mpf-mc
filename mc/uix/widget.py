@@ -77,6 +77,7 @@ class MpfWidget(object):
                                     self.config['y'],
                                     self.config['anchor_x'],
                                     self.config['anchor_y'])
+
         except AttributeError:
             pass
 
