@@ -64,7 +64,6 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         super().__init__(mc=mc, mode=mode, slide=slide, config=config)
         self.slide_frame_parent = None
-        # self.init_callback = init_callback
 
         # minimal config needed if this is a widget
         if not config:

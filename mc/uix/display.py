@@ -4,12 +4,12 @@ mpf_mc.
 """
 from kivy.clock import Clock
 from kivy.uix.relativelayout import RelativeLayout
-from kivy.uix.scatter import ScatterPlane
+from kivy.uix.scatter import Scatter
 
 from mc.uix.slide_frame import SlideFrame
 
 
-class Display(ScatterPlane, RelativeLayout):
+class Display(Scatter, RelativeLayout):
     displays_to_initialize = 0
 
     @staticmethod
