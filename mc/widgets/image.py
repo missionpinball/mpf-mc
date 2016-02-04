@@ -82,21 +82,23 @@ class ImageWidget(MpfWidget, Image):
     def fps(self, value):
         self._coreimage.anim_delay = 1 / value
 
-    @property
-    def current_frame(self):
-        return self._coreimage.anim_index + 1
+    # for some reason setting the @property here didn't work with the getter,
+    # it simply wasn't called and I have no idea why. So I just setup a classic
+    # style getter/setter below these two methods.
+    def _get_current_frame(self):
+        return self._coreimage._anim_index + 1
 
-    @fps.setter
-    def current_frame(self, value):
-        frame = (value - 1) % len(self._coreimage.image.textures)
-
-        if frame == self._coreimage.anim_index:
+    def _set_current_frame(self, value):
+        frame = (int(value) - 1) % len(self._coreimage.image.textures)
+        if frame == self._coreimage._anim_index:
             return
         else:
-            self._coreimage.anim_index = frame
+            self._coreimage._anim_index = frame
             self._coreimage._texture = (
-                self._coreimage.image.textures[self._coreimage.anim_index])
+                self._coreimage.image.textures[self._coreimage._anim_index])
             self._coreimage.dispatch('on_texture')
+
+    current_frame = property(_get_current_frame, _set_current_frame)
 
     @property
     def loops(self):

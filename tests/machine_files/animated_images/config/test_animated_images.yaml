@@ -11,12 +11,6 @@ slides:
       image: ball
       y: 250
       fps: 30
-#      animations:
-#        entrance:
-#          - property: frame
-#            value: +1
-#            duration: .25s
-#            repeat: -1
     - image: busy-stick-figures-animated
       type: image
       y: 100
