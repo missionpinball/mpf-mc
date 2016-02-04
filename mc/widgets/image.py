@@ -44,6 +44,17 @@ class ImageWidget(MpfWidget, Image):
         self.texture = self.image.image.texture
         self.size = self.texture_size  # will re-position automatically
 
+        self._coreimage = self.image.image
+        self._coreimage.bind(on_texture=self._on_tex_change)
+
+        if self._coreimage.anim_available:
+            self.fps = self.config['fps']
+            self.loops = self.config['anim_loops']
+            if self.config['auto_play']:
+                self.play()
+            else:
+                self.stop()
+
     def texture_update(self, *largs):
         # overrides base method to pull the texture from our ImageClass instead
         # of from a file
@@ -59,3 +70,44 @@ class ImageWidget(MpfWidget, Image):
 
         ci.bind(on_texture=self._on_tex_change)
         self.texture = ci.texture
+
+    @property
+    def fps(self):
+        if self._coreimage.anim_available:
+            return 1 / self._coreimage.anim_delay
+        else:
+            return None
+
+    @fps.setter
+    def fps(self, value):
+        self._coreimage.anim_delay = 1 / value
+
+    @property
+    def current_frame(self):
+        return self._coreimage.anim_index + 1
+
+    @fps.setter
+    def current_frame(self, value):
+        frame = (value - 1) % len(self._coreimage.image.textures)
+
+        if frame == self._coreimage.anim_index:
+            return
+        else:
+            self._coreimage.anim_index = frame
+            self._coreimage._texture = (
+                self._coreimage.image.textures[self._coreimage.anim_index])
+            self._coreimage.dispatch('on_texture')
+
+    @property
+    def loops(self):
+        return self._coreimage.anim_loop
+
+    @loops.setter
+    def loops(self, value):
+        self._coreimage.anim_loop = value
+
+    def play(self, start_frame=None):
+        self._coreimage.anim_reset(True)
+
+    def stop(self):
+        self._coreimage.anim_reset(False)

@@ -1,5 +1,3 @@
-import random
-
 from kivy.core.image import Image
 from mc.core.assets import Asset, AssetPool
 
@@ -25,7 +23,7 @@ class ImageAsset(Asset):
     attribute='images'  # attribute in MC, e.g. self.mc.images
     path_string='images'  # entry from mpf_mc:paths: for asset folder name
     config_section='images'  # section in the config files for this asset
-    extensions=('png', 'jpg', 'jpeg')  # pretty obvious. No dots.
+    extensions=('png', 'jpg', 'jpeg', 'gif', 'zip')  # pretty obvious. No dots.
     class_priority=100  # Order asset classes will be loaded. Higher is first.
     pool_config_section='image_pools'  # Will setup groups if present
     asset_group_class=ImagePool  # Class or None to not use pools
@@ -60,12 +58,14 @@ class ImageAsset(Asset):
         # and anything that was waiting for it to load will be called. So
         # all you have to do here is load and return.
 
-        self._image = Image.load(filename=self.config['file'],
-                                 keep_data=False,
-                                 scale=1.0,
-                                 mipmap=False,
-                                 anim_delay=0.25,
-                                 nocache=True)
+        self._image = Image(self.config['file'],
+                            keep_data=False,
+                            scale=1.0,
+                            mipmap=False,
+                            anim_delay=-1,
+                            nocache=True)
+
+        self._image.anim_reset(False)
 
     def _do_unload(self):
         # This is the method that's called to unload the asset. It's called by

@@ -8,7 +8,7 @@ class TestDmd(MpfMcTestCase):
     def get_config_file(self):
         return 'test_dmd.yaml'
 
-    def test_something(self):
+    def test_dmd(self):
 
         self.assertIn('dmd', self.mc.targets)
 

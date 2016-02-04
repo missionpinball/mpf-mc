@@ -135,11 +135,10 @@ class AssetManager(object):
 
         """
         if not hasattr(self.mc, attribute):
+            # some assets of different classes use the same mc attribute, like
+            # images and animated_images
             setattr(self.mc, attribute, CaseInsensitiveDict())
 
-        else:  # pragma no cover
-            raise ValueError('Cannot set self.mc.{} as it already '
-                             'exists.'.format(attribute))
 
         ac = dict(attribute=attribute,
                   cls=asset_class,
@@ -862,7 +861,6 @@ class Asset(object):
 
     def _call_callbacks(self):
         for callback in self._callbacks:
-
             if callable(callback):
                 callback(self)
 

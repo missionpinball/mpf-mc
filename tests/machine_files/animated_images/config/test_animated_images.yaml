@@ -1,0 +1,47 @@
+#config_version=3
+
+displays:
+  default:
+    width: 400
+    height: 300
+
+slides:
+  slide1:
+    - type: image
+      image: ball
+      y: 250
+      fps: 30
+#      animations:
+#        entrance:
+#          - property: frame
+#            value: +1
+#            duration: .25s
+#            repeat: -1
+    - image: busy-stick-figures-animated
+      type: image
+      y: 100
+#      auto_play: no
+      x: 250
+    - type: text
+      text: ZIP FILE OF PNGs
+      y: 260
+    - type: text
+      text: ANIMATED GIF
+      x: 10
+      y: 100
+      anchor_x: left
+slide_player:
+  slide1:
+    slide: slide1
+
+assets:
+    images:
+        default:
+            load: preload
+        preload:
+            load: preload
+            test_key: test_value
+        on_demand:
+            load: on_demand
+        mode_start:
+            load: mode_start
