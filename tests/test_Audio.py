@@ -25,6 +25,10 @@ class TestAudio(MpfMcTestCase):
     def test_typical_sound_system(self):
         """ Tests the sound system and audio interface with typical settings """
 
+        if not hasattr(self.mc, 'sound_system'):
+            print("Sound system is not enabled - unable to run audio tests")
+            return
+
         # Turn on DEBUG logging
         Logger.setLevel(10)
 
