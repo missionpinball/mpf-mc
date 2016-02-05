@@ -67,8 +67,9 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('170380_clear', self.mc.sounds)       # .flac
 
         # Test sound_player
+        self.mc.events.post('play_sound_2')
         self.mc.events.post('play_sound_1')
-        self.advance_time(3)
+        self.advance_time(2)
 
         """
         # Add another track with the same name (should not be allowed)

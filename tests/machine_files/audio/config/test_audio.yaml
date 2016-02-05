@@ -26,10 +26,14 @@ assets:
             track: voice
         sfx:
             load: preload
-            track: voice
+            track: sfx
 
 sound_player:
     play_sound_1:
         sound: 210871_synthping
         loops: 1
         priority: 25
+    play_sound_2:
+        sound: 264828_text
+        track: voice
+
