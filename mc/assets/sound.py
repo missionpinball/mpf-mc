@@ -7,6 +7,7 @@ from kivy.logger import Logger
 #    Default sound asset configuration parameter values
 # ---------------------------------------------------------------------------
 DEFAULT_VOLUME = 0.5
+DEFAULT_PRIORITY = 0
 DEFAULT_MAX_QUEUE_TIME = None
 DEFAULT_LOOPS = 0
 
@@ -60,8 +61,11 @@ class SoundAsset(Asset):
         if 'volume' not in self.config:
             self.config['volume'] = DEFAULT_VOLUME
 
+        if 'priority' not in self.config:
+            self.config['priority'] = DEFAULT_PRIORITY
+
         if 'max_queue_time' not in self.config or self.config['max_queue_time'] is None:
-            self.config['volume'] = DEFAULT_MAX_QUEUE_TIME
+            self.config['max_queue_time'] = DEFAULT_MAX_QUEUE_TIME
 
         if 'loops' not in self.config:
             self.config['loops'] = DEFAULT_LOOPS
@@ -86,17 +90,19 @@ class SoundAsset(Asset):
         return self._container
 
     def _do_load(self):
-        # This is the method that's actually called to load the asset from disk.
+        """Loads the sound asset from disk."""
 
         # Load the sound file into memory
         self._container = AudioInterface.load_sound(self.file)
 
     def _do_unload(self):
-        # This is the method that's called to unload the asset.
+        """Unloads the asset from memory"""
+
         AudioInterface.unload_sound(self._container)
         self._container = None
 
     def _loaded(self):
+        """Called when the asset has finished loading"""
         super()._loaded()
         Logger.debug("SoundAsset: Loaded {} (Track {})".format(self.name, self.track))
 

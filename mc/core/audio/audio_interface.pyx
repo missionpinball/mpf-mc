@@ -12,7 +12,7 @@ __all__ = ('audio_interface_instance',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '1', '0-dev5')
+__version_info__ = ('0', '1', '0-dev6')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -443,6 +443,13 @@ cdef class AudioInterface:
         for track in self.tracks:
             track.stop_sound(sound)
 
+    def process(self):
+        """Process tick function for the audio interface."""
+
+        # Process tracks
+        for track in self.tracks:
+            track.process()
+
     @staticmethod
     cdef void audio_callback(int channel, void *output_buffer, int length, void *data) nogil:
         """
@@ -452,6 +459,12 @@ cdef class AudioInterface:
             output_buffer: The SDL_Mixer audio buffer for the mixer channel to process
             length: The length (bytes) of the audio buffer
             data: A pointer to the Track class for the channel
+
+        Notes:
+            This static function is responsible for filling the supplied audio buffer with sound.
+            The function is called during an audio channel effect callback.  This audio library
+            only uses a single SDL_Mixer channel for all output.  Individual track buffers are
+            maintained in each Track object and are processed during this callback.
         """
 
         if data == NULL:
@@ -489,6 +502,7 @@ cdef class AudioInterface:
 
 
         # Apply master volume to output buffer
+        # TODO: implement master volume
 
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockMutex(callback_data.mutex)
@@ -501,6 +515,9 @@ cdef void mix_sounds_to_track(TrackAttributes *track, void* buffer, int buffer_s
         track: A pointer to the TrackAttributes data structure for the track
         buffer: A pointer to the audio buffer to mix the playing sounds into
         buffer_size: The length of the destination audio buffer (bytes)
+
+    Notes:
+        Sound events are generated
     """
     if track == NULL:
         return
@@ -532,7 +549,6 @@ cdef void mix_sounds_to_track(TrackAttributes *track, void* buffer, int buffer_s
             event_index = get_open_sound_event_on_track(track)
             if event_index != -1:
                 track.events[event_index].event = event_sound_start
-                track.events[event_index].track_num = track.track_num
                 track.events[event_index].player = player
                 track.events[event_index].sound_id = track.sound_players[player].sound_id
                 track.events[event_index].time = sdl_ticks
@@ -556,7 +572,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, void* buffer, int buffer_s
                 # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
                 sound_sample.bytes.byte0 = sound_buffer[track.sound_players[player].sample_pos]
                 sound_sample.bytes.byte1 = sound_buffer[track.sound_players[player].sample_pos + 1]
-                sound_sample.value = (sound_sample.value * track.sound_players[player].volume) / MIX_MAX_VOLUME
+                sound_sample.value = (sound_sample.value * track.sound_players[player].volume) // MIX_MAX_VOLUME
 
                 # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
                 output_sample.bytes.byte0 = output_buffer[index]
@@ -601,6 +617,15 @@ cdef void mix_sounds_to_track(TrackAttributes *track, void* buffer, int buffer_s
                         track.sound_players[player].sample_pos = 0
 
 cdef void mix_track_to_output(Uint8 *track_buffer, int track_volume, Uint8 *output_buffer, int buffer_size) nogil:
+    """
+    Mixes a track buffer into the master audio output buffer.
+    Args:
+        track_buffer: A track's audio buffer
+        track_volume: The track volume (0 to 128)
+        output_buffer: The master audio output buffer.
+        buffer_size: The audio buffer size to process.
+
+    """
 
     cdef Sample16Bit track_sample
     cdef Sample16Bit output_sample
@@ -614,7 +639,7 @@ cdef void mix_track_to_output(Uint8 *track_buffer, int track_volume, Uint8 *outp
         # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
         track_sample.bytes.byte0 = track_buffer[index]
         track_sample.bytes.byte1 = track_buffer[index + 1]
-        track_sample.value = track_sample.value * track_volume / MIX_MAX_VOLUME
+        track_sample.value = track_sample.value * track_volume // MIX_MAX_VOLUME
 
         # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
         output_sample.bytes.byte0 = output_buffer[index]
@@ -731,7 +756,6 @@ cdef class Track:
         self.attributes.events = <SoundEventData*>calloc(MAX_SOUND_EVENTS, sizeof(SoundEventData))
         for i in range(MAX_SOUND_EVENTS):
             self.attributes.events[i].event = event_none
-            self.attributes.events[i].track_num = 0
             self.attributes.events[i].player = 0
             self.attributes.events[i].sound_id = 0
             self.attributes.events[i].time = 0
@@ -798,6 +822,38 @@ cdef class Track:
 
         return -1
 
+    def process(self):
+        """Processes the track queue each tick."""
+
+        # Lock the mutex to ensure no audio data is changed during the playback processing
+        # (multi-threaded protection)
+        SDL_LockMutex(self.mutex)
+
+        # See if there are now any idle sound players
+        cdef int idle_sound_player = self.get_idle_sound_player()
+        if idle_sound_player >= 0:
+            # Found an idle player, check if there are any sounds queued for playback
+            next_sound = self._get_next_sound()
+
+            if next_sound is not None:
+                self._play_sound_on_sound_player(sound=next_sound[1],
+                                                 player=idle_sound_player,
+                                                 loops=next_sound[3]['loops'],
+                                                 priority=next_sound[0])
+
+        # Process any track events that were generated during the audio playback process
+        for i in range(MAX_SOUND_EVENTS):
+            if self.attributes.events[i].event != event_none:
+                # TODO: React to event
+                Logger.debug("AudioInterface.process: Processing {} event on track {}"
+                             .format(self.attributes.events[i].event, self.number))
+
+                # Reset event struct so it can be used again
+                self.attributes.events[i].event = event_none
+
+        # Unlock the mutex since we are done accessing the audio data
+        SDL_UnlockMutex(self.mutex)
+
     def _get_next_sound(self):
         """
         Returns the next sound in the priority queue ready for playback.
@@ -829,40 +885,70 @@ cdef class Track:
             else:
                 next_sound = None
 
-    def play_sound(self, sound not None, int priority, **settings):
+    def play_sound(self, sound not None, **settings):
         """
         Plays a sound on the current track.
         Args:
-            sound: Sound to play
+            sound: The Sound object to play
             priority: The relative priority of the sound
+            loops:
             **settings: Optional additional settings for playing the sound
         """
+        Logger.debug("play_sound: Processing sound '{}' for playback.".format(sound.name))
+
+        if 'priority' not in settings:
+            settings['priority'] = sound.config['priority']
+
+        if 'loops' not in settings:
+            settings['loops'] = sound.config['loops']
+
+        if 'max_queue_time' not in settings:
+            settings['max_queue_time'] = sound.config['max_queue_time']
 
         # Make sure sound is loaded.  If not, we assume the sound is being loaded and we
         # add it to the queue so it will be picked up on the next loop.
         if not sound.loaded:
-            self.queue_sound(sound, priority, **settings)
+            self.queue_sound(sound=sound,
+                             priority=settings['priority'],
+                             max_queue_time=settings['max_queue_time'],
+                             **settings)
             Logger.debug("play_sound: Sound was not loaded and therefore was queued for playback.")
             return
 
         # If the sound can be played right away (available player) then play it.
         # Is there an available sound player?
-        player = self._get_available_sound_player()
-        if player >= 0:
+        sound_player = self._get_sound_player_with_lowest_priority()
+        player = sound_player[0]
+        lowest_priority = sound_player[1]
+
+        if lowest_priority is None:
             Logger.debug("play_sound: Sound player {} is available for playback".format(player))
             # Play the sound using the available player
-            self._play_sound_on_sound_player(sound, player)
+            return self._play_sound_on_sound_player(sound=sound,
+                                                    player=player,
+                                                    loops=settings['loops'],
+                                                    priority=settings['priority'])
         else:
-            # No available sound players:
-            Logger.debug("play_sound: No sound player is available.")
-            #     1) If the lowest priority of all the sounds currently playing is lower than
-            #        the requested sound, kill the lowest priority sound and replace it.
-            #     2) Add the requested sound to the priority queue
-            pass
+            # All sound players are currently busy:
+            Logger.debug("play_sound: No idle sound player is available.")
 
-
-        # Add the sound to the queue
-        # TODO: Implement me
+            # If the lowest priority of all the sounds currently playing is lower than
+            # the requested sound, kill the lowest priority sound and replace it.
+            if settings['priority'] > lowest_priority:
+                Logger.debug("play_sound: Sound priority is higher than the lowest "
+                             "sound currently playing. Forcing playback.")
+                return self._play_sound_on_sound_player(sound=sound,
+                                                        player=player,
+                                                        loops=settings['loops'],
+                                                        priority=settings['priority'],
+                                                        force=True)
+            else:
+                # Add the requested sound to the priority queue
+                self.queue_sound(sound=sound,
+                                 priority=settings['priority'],
+                                 max_queue_time=settings['max_queue_time'],
+                                 **settings)
+                Logger.debug("play_sound: Sound was queued for playback.")
 
     def queue_sound(self, sound, priority, exp_time=None, **settings):
         """Adds a sound to the queue to be played when a sound player becomes available.
@@ -915,16 +1001,16 @@ cdef class Track:
         SDL_UnlockMutex(self.mutex)
         return -1
 
-    cdef int _get_sound_player_with_lowest_priority(self):
+    cdef tuple _get_sound_player_with_lowest_priority(self):
         """
         Retrieves the sound player currently with the lowest priority.
 
         Returns:
             A tuple consisting of the sound player index and the priority of
-            the sound playing on that player (or -1 if the player is idle).
+            the sound playing on that player (or None if the player is idle).
 
         """
-        cdef int lowest_priority = sys.maxsize
+        cdef int lowest_priority = 2147483647
         cdef int sound_player = -1
 
         SDL_LockMutex(self.mutex)
@@ -932,20 +1018,21 @@ cdef class Track:
         for i in range(self.max_simultaneous_sounds):
             if self.attributes.sound_players[i].status == player_idle:
                 SDL_UnlockMutex(self.mutex)
-                return i, -1
+                return i, None
             elif self.attributes.sound_players[i].sound_priority < lowest_priority:
                 lowest_priority = self.attributes.sound_players[i].sound_priority
                 sound_player = i
 
         SDL_UnlockMutex(self.mutex)
-        return i
+        return i, lowest_priority
 
-    cdef bint _play_sound_on_sound_player(self, sound, int player, int loops=0, int priority=0, force=True):
+    cdef bint _play_sound_on_sound_player(self, sound, int player, int loops=0, int priority=0, force=False):
         """
         Plays a sound using the specified sound player
         """
         # Get the sound sample buffer container
         cdef MixChunkContainer mc = sound.container
+        cdef int event_index
 
         # Make sure the player in range
         if player in range(self.max_simultaneous_sounds):
@@ -955,6 +1042,20 @@ cdef class Track:
                 SDL_UnlockMutex(self.mutex)
                 Logger.debug("_play_sound_on_sound_player: Sound player is not available, cannot play sound.")
                 return False
+
+            # TODO: Handle force=True more gracefully (quick fade out 10ms before starting sound)
+
+            # If we are forcing the sound over an existing sound, notification must be sent
+            if self.attributes.sound_players[player].status != player_idle:
+                # Send sound stop event notification
+                event_index = get_open_sound_event_on_track(self.attributes)
+                if event_index != -1:
+                    self.attributes.events[event_index].event = event_sound_stop
+                    self.attributes.events[event_index].player = player
+                    self.attributes.events[event_index].sound_id = self.attributes.sound_players[player].sound_id
+                    self.attributes.events[event_index].time = SDL_GetTicks()
+
+                # TODO: Log error if track events are full
 
             # Play the sound
             self.attributes.sound_players[player].chunk = mc.chunk
@@ -970,7 +1071,7 @@ cdef class Track:
 
             SDL_UnlockMutex(self.mutex)
 
-            Logger.debug("_play_sound_on_sound_player: Sound is playing")
+            Logger.debug("_play_sound_on_sound_player: Sound is pending playback")
 
             return True
 

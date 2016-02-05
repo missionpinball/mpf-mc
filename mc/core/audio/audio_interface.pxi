@@ -195,11 +195,11 @@ ctypedef struct AudioCallbackData:
 cdef enum SoundEvent:
     event_none,
     event_sound_start,
-    event_sound_stop
+    event_sound_stop,
+    event_sound_marker,
 
 ctypedef struct SoundEventData:
     SoundEvent event
-    int track_num
     int player
     int sound_id
     Uint32 time

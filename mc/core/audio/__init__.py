@@ -20,7 +20,6 @@ DEFAULT_AUDIO_BUFFER_SAMPLE_SIZE = 2048
 DEFAULT_SAMPLE_RATE = 44100
 DEFAULT_AUDIO_CHANNELS = 1
 DEFAULT_MASTER_VOLUME = 0.5
-DEFAULT_INTERNAL_EVENT_PROCESSING_RATE = 30
 DEFAULT_TRACK_MAX_SIMULTANEOUS_SOUNDS = 1
 DEFAULT_TRACK_VOLUME = 0.5
 
@@ -77,14 +76,11 @@ class SoundSystem(object):
         if 'master_volume' not in self.config:
             self.config['master_volume'] = DEFAULT_MASTER_VOLUME
 
-        if 'event_processing_rate' not in self.config:
-            self.config['event_processing_rate'] = DEFAULT_INTERNAL_EVENT_PROCESSING_RATE
-
         # Initialize audio interface library (get audio output)
         try:
             self.audio_interface = AudioInterface.initialize(rate=self.config['frequency'],
-                                                              channels=self.config['channels'],
-                                                              buffer_samples=self.config['buffer'])
+                                                             channels=self.config['channels'],
+                                                             buffer_samples=self.config['buffer'])
         except AudioException:
             Logger.error("SoundController: Could not initialize the audio interface. "
                          "Audio features will not be available.")
@@ -102,7 +98,7 @@ class SoundSystem(object):
         self.master_volume = self.config['master_volume']
 
         # Establish machine tick function callback (will process internal audio events)
-        Clock.schedule_interval(self._tick, self.config['event_processing_rate'] / 1000.0)
+        Clock.schedule_interval(self._tick, 0)
 
         # Establish event callback functions
         # Setup event triggers (sound events trigger BCP triggers)
@@ -124,6 +120,10 @@ class SoundSystem(object):
         # Constrain volume to the range 0.0 to 1.0
         value = max(min(value, 1.0), 0.0)
         self._master_volume = value
+
+    @property
+    def default_track(self):
+        return self.audio_interface.get_track(0)
 
     def master_volume_increase(self):
         # TODO: Implement me
@@ -168,8 +168,8 @@ class SoundSystem(object):
 
         # Create the track
         track = self.audio_interface.create_track(name,
-                                                   config['simultaneous_sounds'],
-                                                   config['volume'])
+                                                  config['simultaneous_sounds'],
+                                                  config['volume'])
         if track is None:
             return False
 
@@ -181,4 +181,4 @@ class SoundSystem(object):
 
     def _tick(self, delta_time):
         # TODO: Implement tick function (trigger the processing of internal audio events and track queues)
-        pass
+        self.audio_interface.process()
