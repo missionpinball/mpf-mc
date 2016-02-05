@@ -22,18 +22,21 @@ assets:
         default:
             load: preload
         voice:
-            load: on_demand
+            load: preload
             track: voice
         sfx:
             load: preload
             track: sfx
 
 sound_player:
-    play_sound_1:
+    play_sound_synthping:
         sound: 210871_synthping
         loops: 1
         priority: 25
-    play_sound_2:
+    play_sound_text:
         sound: 264828_text
         track: voice
-
+    play_sound_moron_test:
+        sound: 104457_moron_test
+    play_sound_test:
+        sound: 113690_test

@@ -67,9 +67,17 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('170380_clear', self.mc.sounds)       # .flac
 
         # Test sound_player
-        self.mc.events.post('play_sound_2')
-        self.mc.events.post('play_sound_1')
-        self.advance_time(2)
+        self.mc.events.post('play_sound_text')
+        self.advance_time(1)
+
+        # Test two sounds at the same time on the voice track (only
+        # 1 sound at a time max).  Second sound should be queued and
+        # play immediately after the first one ends.
+        self.mc.events.post('play_sound_test')
+        self.mc.events.post('play_sound_moron_test')
+        self.advance_time(3)
+        self.mc.events.post('play_sound_synthping')
+        self.advance_time(13)
 
         """
         # Add another track with the same name (should not be allowed)
