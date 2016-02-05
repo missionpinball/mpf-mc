@@ -21,9 +21,6 @@ class TestAudio(MpfMcTestCase):
     def test_typical_sound_system(self):
         """ Tests the sound system and audio interface with typical settings """
 
-        # Turn on DEBUG logging
-        Logger.setLevel(10)
-
         if self.mc.sound_system is None:
             Logger.warning("Sound system is not enabled - unable to run audio tests")
             return

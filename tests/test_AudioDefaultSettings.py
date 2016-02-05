@@ -1,4 +1,5 @@
 from tests.MpfMcTestCase import MpfMcTestCase
+from kivy.logger import Logger
 
 
 class TestAudioDefaultSettings(MpfMcTestCase):
@@ -14,6 +15,11 @@ class TestAudioDefaultSettings(MpfMcTestCase):
 
     def test_default_sound_system(self):
         """ Tests the sound system and audio interface with default settings """
+
+        if self.mc.sound_system is None:
+            Logger.warning("Sound system is not enabled - unable to run audio tests")
+            return
+
         self.assertIsNotNone(self.mc.sound_system)
         self.assertIsNotNone(self.mc.sound_system.audio_interface)
         settings = self.mc.sound_system.audio_interface.get_settings()
