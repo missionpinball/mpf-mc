@@ -66,6 +66,10 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('113690_test', self.mc.sounds)        # .wav
         self.assertIn('170380_clear', self.mc.sounds)       # .flac
 
+        # Test sound_player
+        self.mc.events.post('play_sound_1')
+        self.advance_time(3)
+
         """
         # Add another track with the same name (should not be allowed)
         # Add another track with the same name, but different casing (should not be allowed)

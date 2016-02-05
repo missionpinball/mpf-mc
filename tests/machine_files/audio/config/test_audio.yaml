@@ -28,3 +28,8 @@ assets:
             load: preload
             track: voice
 
+sound_player:
+    play_sound_1:
+        sound: 210871_synthping
+        loops: 1
+        priority: 25
