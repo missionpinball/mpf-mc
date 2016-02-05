@@ -1,8 +1,4 @@
 from tests.MpfMcTestCase import MpfMcTestCase
-from mock import MagicMock
-import time
-
-from mc.core.audio import SoundSystem, AudioInterface
 from kivy.logger import Logger
 
 
@@ -25,12 +21,12 @@ class TestAudio(MpfMcTestCase):
     def test_typical_sound_system(self):
         """ Tests the sound system and audio interface with typical settings """
 
-        if not hasattr(self.mc, 'sound_system'):
-            print("Sound system is not enabled - unable to run audio tests")
-            return
-
         # Turn on DEBUG logging
         Logger.setLevel(10)
+
+        if self.mc.sound_system is None:
+            Logger.warning("Sound system is not enabled - unable to run audio tests")
+            return
 
         self.assertIsNotNone(self.mc.sound_system)
         interface = self.mc.sound_system.audio_interface

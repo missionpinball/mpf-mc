@@ -20,14 +20,16 @@ from mpf.system.events import EventManager
 from mpf.system.player import Player
 from mc.core.assets import AssetManager
 from mc.assets.image import ImageAsset
-from mc.assets.sound import SoundAsset
 
 try:
     from mc.core.audio import SoundSystem
     from mc.core.audio.sound_player import SoundPlayer
-    use_audio = True
+    from mc.assets.sound import SoundAsset
 except ImportError:
-    use_audio = False
+    SoundSystem = None
+    SoundPlayer = None
+    SoundAsset = None
+    Logger.warning("mc.core.audio library could not be loaded - audio features will not be available")
 
 
 class MpfMc(App):
@@ -78,7 +80,9 @@ class MpfMc(App):
 
         # Initialize the sound system (must be done prior to creating the AssetManager).
         # If the sound system is not available, do not load any other sound-related modules.
-        if use_audio:
+        if SoundSystem is None:
+            self.sound_system = None
+        else:
             self.sound_system = SoundSystem(self)
             if self.sound_system.enabled:
                 self.sound_player = SoundPlayer(self)
@@ -88,7 +92,7 @@ class MpfMc(App):
 
         # Asset classes
         ImageAsset.initialize(self)
-        if use_audio and self.sound_system.enabled:
+        if self.sound_system is not None and self.sound_system.enabled:
             SoundAsset.extensions = tuple(self.sound_system.audio_interface.supported_extensions())
             SoundAsset.initialize(self)
 
