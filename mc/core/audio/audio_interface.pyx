@@ -616,6 +616,20 @@ cdef void mix_sounds_to_track(TrackAttributes *track, void* buffer, int buffer_s
                         # Looping infinitely, loop back to the beginning
                         track.sound_players[player].sample_pos = 0
 
+        # Check if the sound has finished
+        if track.sound_players[player].status is player_finished:
+            # Send finished event
+            event_index = get_open_sound_event_on_track(track)
+            if event_index != -1:
+                track.events[event_index].event = event_sound_stop
+                track.events[event_index].player = player
+                track.events[event_index].sound_id = track.sound_players[player].sound_id
+                track.events[event_index].time = sdl_ticks
+
+            # TODO: Log error if events are full
+
+            track.sound_players[player].status = player_idle
+
 cdef void mix_track_to_output(Uint8 *track_buffer, int track_volume, Uint8 *output_buffer, int buffer_size) nogil:
     """
     Mixes a track buffer into the master audio output buffer.
@@ -833,13 +847,14 @@ cdef class Track:
         cdef int idle_sound_player = self.get_idle_sound_player()
         if idle_sound_player >= 0:
             # Found an idle player, check if there are any sounds queued for playback
+            # Sound is returned as a tuple (sound, priority, settings)
             next_sound = self._get_next_sound()
 
             if next_sound is not None:
-                self._play_sound_on_sound_player(sound=next_sound[1],
+                self._play_sound_on_sound_player(sound=next_sound[0],
                                                  player=idle_sound_player,
-                                                 loops=next_sound[3]['loops'],
-                                                 priority=next_sound[0])
+                                                 loops=next_sound[2]['loops'],
+                                                 priority=next_sound[1])
 
         # Process any track events that were generated during the audio playback process
         for i in range(MAX_SOUND_EVENTS):
@@ -866,8 +881,7 @@ cdef class Track:
         If the next sound in the queue has expired, it is discarded and the
         next sound that has not expired is returned.
         """
-        next_sound = None
-        while next_sound is None:
+        while True:
             try:
                 next_sound = self._sound_queue.get_nowait()
             except Empty:
@@ -881,39 +895,44 @@ cdef class Track:
 
             # Return the next sound from the priority queue if it has not expired
             if not next_sound[2] or next_sound[2] > time.time():
+                Logger.debug("Track {} ({}): Returning pending sound from queue".format(self.number, self.name))
                 return next_sound[1], -next_sound[0], next_sound[3]
-            else:
-                next_sound = None
 
     def play_sound(self, sound not None, **settings):
         """
         Plays a sound on the current track.
         Args:
             sound: The Sound object to play
-            priority: The relative priority of the sound
-            loops:
             **settings: Optional additional settings for playing the sound
         """
-        Logger.debug("play_sound: Processing sound '{}' for playback.".format(sound.name))
+        Logger.debug("play_sound: Processing sound '{}' for playback ({}).".format(sound.name, settings))
 
-        if 'priority' not in settings:
-            settings['priority'] = sound.config['priority']
+        if 'priority' in settings:
+            priority = settings['priority']
+            del settings['priority']
+        else:
+            priority = sound.config['priority']
 
         if 'loops' not in settings:
             settings['loops'] = sound.config['loops']
 
-        if 'max_queue_time' not in settings:
-            settings['max_queue_time'] = sound.config['max_queue_time']
+        if 'max_queue_time' in settings:
+            max_queue_time = settings['max_queue_time']
+            del settings['max_queue_time']
+        else:
+            max_queue_time = sound.config['max_queue_time']
 
         # Make sure sound is loaded.  If not, we assume the sound is being loaded and we
         # add it to the queue so it will be picked up on the next loop.
         if not sound.loaded:
             self.queue_sound(sound=sound,
-                             priority=settings['priority'],
-                             max_queue_time=settings['max_queue_time'],
+                             priority=priority,
+                             max_queue_time=max_queue_time,
                              **settings)
             Logger.debug("play_sound: Sound was not loaded and therefore was queued for playback.")
             return
+
+        self.get_status()
 
         # If the sound can be played right away (available player) then play it.
         # Is there an available sound player?
@@ -927,26 +946,26 @@ cdef class Track:
             return self._play_sound_on_sound_player(sound=sound,
                                                     player=player,
                                                     loops=settings['loops'],
-                                                    priority=settings['priority'])
+                                                    priority=priority)
         else:
             # All sound players are currently busy:
             Logger.debug("play_sound: No idle sound player is available.")
 
             # If the lowest priority of all the sounds currently playing is lower than
             # the requested sound, kill the lowest priority sound and replace it.
-            if settings['priority'] > lowest_priority:
+            if priority > lowest_priority:
                 Logger.debug("play_sound: Sound priority is higher than the lowest "
                              "sound currently playing. Forcing playback.")
                 return self._play_sound_on_sound_player(sound=sound,
                                                         player=player,
                                                         loops=settings['loops'],
-                                                        priority=settings['priority'],
+                                                        priority=priority,
                                                         force=True)
             else:
                 # Add the requested sound to the priority queue
                 self.queue_sound(sound=sound,
-                                 priority=settings['priority'],
-                                 max_queue_time=settings['max_queue_time'],
+                                 priority=priority,
+                                 max_queue_time=max_queue_time,
                                  **settings)
                 Logger.debug("play_sound: Sound was queued for playback.")
 
@@ -1076,6 +1095,18 @@ cdef class Track:
             return True
 
         return False
+
+    def get_status(self):
+            SDL_LockMutex(self.mutex)
+            Logger.debug("Track {} ({}) Status: ".format(self.number, self.name))
+            for player in range(self.max_simultaneous_sounds):
+                Logger.debug("    Player {}: Status={}, Sound={}, Priority={}, Loops={}"
+                      .format(player,
+                              self.attributes.sound_players[player].status,
+                              self.attributes.sound_players[player].sound_id,
+                              self.attributes.sound_players[player].sound_priority,
+                              self.attributes.sound_players[player].loops_remaining))
+            SDL_UnlockMutex(self.mutex)
 
 
 cdef class MixChunkContainer:
