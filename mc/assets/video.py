@@ -25,9 +25,6 @@ class VideoAsset(Asset):
 
         self._video = None
 
-    def __repr__(self):
-        return '<Video: {}>'.format(self.name)
-
     @property
     def video(self):
         return self._video

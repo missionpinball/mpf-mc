@@ -36,10 +36,6 @@ class ImageAsset(Asset):
 
         self._image = None  # holds the actual image in memory
 
-    def __repr__(self):
-        # String that's returned if someone prints this object
-        return '<Image: {}>'.format(self.name)
-
     @property
     def image(self):
         # Since self._image will change depending on whether the image is
