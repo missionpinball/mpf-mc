@@ -19,7 +19,7 @@ class SoundPlayer(ConfigPlayer):
         for s in settings:  # settings is a list of one or more sound configs
 
             # Retrieve sound asset by name
-            sound_name = s['sound']
+            sound_name = s.pop('sound')
             try:
                 sound = self.mc.sounds[sound_name]
             except KeyError:
@@ -33,5 +33,5 @@ class SoundPlayer(ConfigPlayer):
             else:
                 track = sound.track
 
-            track.play_sound(sound=sound, settings=s)
+            track.play_sound(sound=sound, **s)
 

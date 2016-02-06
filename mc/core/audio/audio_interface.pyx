@@ -23,6 +23,7 @@ from time import time
 
 from queue import PriorityQueue, Empty
 import sys
+from copy import copy
 from kivy.logger import Logger
 
 include "audio_interface.pxi"
@@ -851,6 +852,7 @@ cdef class Track:
             next_sound = self._get_next_sound()
 
             if next_sound is not None:
+                Logger.debug("Getting sound from queue: {}".format(next_sound))
                 self._play_sound_on_sound_player(sound=next_sound[0],
                                                  player=idle_sound_player,
                                                  loops=next_sound[2]['loops'],
@@ -889,46 +891,68 @@ cdef class Track:
 
             # Each item in the queue is a list containing the following items:
             #    0 (priority): The priority of the returned sound
-            #    1 (sound): The Sound object ready for playback
-            #    2 (exp_time): The time (in ticks) after which the sound expires and should not be played
+            #    1 (exp_time): The time (in ticks) after which the sound expires and should not be played
+            #    2 (sound): The Sound object ready for playback
             #    3 (settings): A dictionary of any additional settings for this sound's playback (ducking, etc.)
 
-            # Return the next sound from the priority queue if it has not expired
-            if not next_sound[2] or next_sound[2] > time.time():
-                Logger.debug("Track {} ({}): Returning pending sound from queue".format(self.number, self.name))
-                return next_sound[1], -next_sound[0], next_sound[3]
+            # If the sound is still loading and not expired, put it back in the queue
+            if not next_sound[2].loaded and next_sound[2].loading and \
+                    (next_sound[1] is None or next_sound[1] > time.time()):
+                    self._sound_queue.put(next_sound)
+                    Logger.debug("Re-queueing sound: {}".format(next_sound))
 
-    def play_sound(self, sound not None, **settings):
+            # Return the next sound from the priority queue if it has not expired
+            if not next_sound[1] or next_sound[1] > time.time():
+                return next_sound[2], -next_sound[0], next_sound[3]
+
+    def play_sound(self, sound not None, **kwargs):
         """
         Plays a sound on the current track.
         Args:
             sound: The Sound object to play
-            **settings: Optional additional settings for playing the sound
+            **kwargs: Optional additional arguments for overriding sound defaults
         """
-        Logger.debug("play_sound: Processing sound '{}' for playback ({}).".format(sound.name, settings))
+        Logger.debug("play_sound: Processing sound '{}' for playback ({}).".format(sound.name, kwargs))
 
-        if 'priority' in settings:
-            priority = settings['priority']
-            del settings['priority']
+        settings = {}
+
+        # Validate settings that can be overridden
+        if 'priority' in kwargs and kwargs['priority'] is not None:
+            priority = kwargs['priority']
         else:
             priority = sound.config['priority']
 
-        if 'loops' not in settings:
+        if 'loops' in kwargs and kwargs['loops'] is not None:
+            settings['loops'] = kwargs['loops']
+        else:
             settings['loops'] = sound.config['loops']
 
-        if 'max_queue_time' in settings:
-            max_queue_time = settings['max_queue_time']
-            del settings['max_queue_time']
+        if 'max_queue_time' in kwargs:
+            settings['max_queue_time'] = kwargs['max_queue_time']
         else:
-            max_queue_time = sound.config['max_queue_time']
+            settings['max_queue_time'] = sound.config['max_queue_time']
+
+        if 'volume' in kwargs and kwargs['volume'] is not None:
+            settings['volume'] = kwargs['volume']
+        else:
+            settings['volume'] = sound.config['volume']
+
+        if settings['max_queue_time'] is None:
+           exp_time = None
+        else:
+            exp_time = time.time() + settings['max_queue_time']
 
         # Make sure sound is loaded.  If not, we assume the sound is being loaded and we
         # add it to the queue so it will be picked up on the next loop.
         if not sound.loaded:
+            # If the sound is not already loading, load it now
+            if not sound.loading:
+                sound.load()
+
             self.queue_sound(sound=sound,
                              priority=priority,
-                             max_queue_time=max_queue_time,
-                             **settings)
+                             exp_time=exp_time,
+                             settings=settings)
             Logger.debug("play_sound: Sound was not loaded and therefore was queued for playback.")
             return
 
@@ -965,11 +989,11 @@ cdef class Track:
                 # Add the requested sound to the priority queue
                 self.queue_sound(sound=sound,
                                  priority=priority,
-                                 max_queue_time=max_queue_time,
-                                 **settings)
+                                 exp_time=exp_time,
+                                 settings=settings)
                 Logger.debug("play_sound: Sound was queued for playback.")
 
-    def queue_sound(self, sound, priority, exp_time=None, **settings):
+    def queue_sound(self, sound, priority, exp_time=None, settings=None):
         """Adds a sound to the queue to be played when a sound player becomes available.
 
         Args:
@@ -978,7 +1002,7 @@ cdef class Track:
             exp_time: Real world time of when this sound will expire.  It will not play
                 if the queue is freed up after it expires.  None indicates the sound
                 never expires and will eventually be played.
-            **settings: Additional settings for the sound's playback.
+            settings: Additional settings for the sound's playback.
 
         Note that this method will insert this sound into a position in the
         queue based on its priority, so highest-priority sounds are played
@@ -988,7 +1012,8 @@ cdef class Track:
         # Note the negative operator in front of priority since this queue
         # retrieves the lowest values first, and MPF uses higher values for
         # higher priorities.
-        self._sound_queue.put([-priority, sound, exp_time, settings])
+        self._sound_queue.put([-priority, exp_time, sound, settings])
+        Logger.debug("Queueing sound: {}".format([-priority, exp_time, sound, settings]))
 
     def stop_sound(self, sound not None):
         """
@@ -1046,6 +1071,7 @@ cdef class Track:
         return i, lowest_priority
 
     cdef bint _play_sound_on_sound_player(self, sound, int player, int loops=0, int priority=0, force=False):
+        # TODO: Add more playback attributes (volume)
         """
         Plays a sound using the specified sound player
         """
@@ -1090,7 +1116,7 @@ cdef class Track:
 
             SDL_UnlockMutex(self.mutex)
 
-            Logger.debug("_play_sound_on_sound_player: Sound is pending playback")
+            Logger.warning("_play_sound_on_sound_player: Sound is pending playback (loops={})".format(loops))
 
             return True
 
