@@ -91,7 +91,7 @@ textstrings:
     volume_zero: OFF
     volume_max: MAX
 
-asset_defaults:
+assets:
     images:
         default:
             load: preload

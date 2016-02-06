@@ -35,7 +35,7 @@ class ModeController(object):
         self.start_methods = list()
 
         if 'modes' in self.mc.machine_config:
-            self.mc.events.add_handler('init_phase_1',
+            self.mc.events.add_handler('init_phase_2',
                                        self._load_modes)
 
     def _load_modes(self):

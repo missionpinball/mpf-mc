@@ -3,6 +3,7 @@ mpf_mc.
 
 """
 import queue
+import threading
 import time
 
 from kivy.app import App
@@ -19,7 +20,7 @@ from mc.uix.transitions import TransitionManager
 from mpf.system.case_insensitive_dict import CaseInsensitiveDict
 from mpf.system.events import EventManager
 from mpf.system.player import Player
-from mc.core.assets import AssetManager
+from mpf.system.assets import AssetManager
 from mc.assets.image import ImageAsset
 
 
@@ -30,6 +31,7 @@ class MpfMc(App):
         self.options = options
         self.machine_config = config
         self.machine_path = machine_path
+        self.clock = Clock
         self._boot_holds = set()
 
         self.modes = CaseInsensitiveDict()
@@ -44,7 +46,6 @@ class MpfMc(App):
         self.scriptlets = list()
 
         self.register_boot_hold('init')
-        self.register_boot_hold('assets')
         self.displays = CaseInsensitiveDict()
         self.machine_vars = CaseInsensitiveDict()
         self.machine_var_monitor = False
@@ -58,7 +59,8 @@ class MpfMc(App):
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
-        self.init_done = False
+        self._init_done = False
+        self.thread_stopper = threading.Event()
 
         # Core components
         self.events = EventManager(self, setup_event_player=False)
@@ -75,7 +77,7 @@ class MpfMc(App):
         ImageAsset.initialize(self)
         VideoAsset.initialize(self)
 
-        Clock.schedule_interval(self._check_crash_queue, 1)
+        self.clock.schedule_interval(self._check_crash_queue, 1)
 
     def validate_machine_config_section(self, section):
         if section not in McConfig.config_spec:
@@ -98,7 +100,7 @@ class MpfMc(App):
         # print('clearing boot hold', hold)
         self._boot_holds.remove(hold)
         if not self._boot_holds:
-            self._init_done()
+            self.init_done()
 
     def displays_initialized(self, *args):
         from mc.uix.window import Window
@@ -126,25 +128,20 @@ class MpfMc(App):
         self.events._process_event_queue()
         self.clear_boot_hold('init')
 
-    def _init_done(self):
-        self.init_done = True
+    def init_done(self):
+        self._init_done = True
         McConfig.unload_config_spec()
         self.reset()
 
     def build(self):
         self.start_time = time.time()
         self.ticks = 0
-        Clock.schedule_interval(self.tick, 0)
+        self.clock.schedule_interval(self.tick, 0)
 
     def on_stop(self):
         print("Stopping ...")
         app = App.get_running_app()
-        app.asset_manager.shutdown()
-
-        try:
-            app.bcp_processor.socket_thread.stop()
-        except AttributeError:  # if we're running without BCP processor
-            pass
+        app.thread_stopper.set()
 
         try:
             print("Loop rate {}Hz".format(
