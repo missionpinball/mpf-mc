@@ -1,9 +1,9 @@
 import os
 import sys
 
-from mpf.system.case_insensitive_dict import CaseInsensitiveDict
-from mpf.system.config import Config as MpfConfig
-from mpf.system.utility_functions import Util
+from mpf.core.case_insensitive_dict import CaseInsensitiveDict
+from mpf.core.config import Config as MpfConfig
+from mpf.core.utility_functions import Util
 
 
 def get_insert_index(z, target_widget):

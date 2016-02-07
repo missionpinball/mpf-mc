@@ -1,5 +1,5 @@
 from kivy.core.image import Image
-from mpf.system.assets import Asset, AssetPool
+from mpf.core.assets import Asset, AssetPool
 
 
 # This module has extra comments since it's what we tell people to use as an

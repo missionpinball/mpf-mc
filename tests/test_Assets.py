@@ -1,3 +1,4 @@
+from mpf.core.config import Config
 from tests.MpfMcTestCase import MpfMcTestCase
 
 
@@ -7,6 +8,13 @@ class TestAssets(MpfMcTestCase):
 
     def get_config_file(self):
         return 'test_asset_loading.yaml'
+
+    def run(self, name):
+        Config.load_config_spec()
+        if not Config.config_spec['assets']['images']:
+            Config.config_spec['assets']['images'] = dict()
+        Config.config_spec['assets']['images']['test_key'] = 'single|str|None'
+        super().run(name)
 
     def test_machine_wide_asset_loading(self):
 

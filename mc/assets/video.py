@@ -1,5 +1,5 @@
 from kivy.core.video import Video
-from mpf.system.assets import Asset, AssetPool
+from mpf.core.assets import Asset, AssetPool
 
 class VideoPool(AssetPool):
 

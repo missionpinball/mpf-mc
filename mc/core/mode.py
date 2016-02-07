@@ -3,7 +3,7 @@
 import logging
 from collections import namedtuple
 
-from mpf.system.utility_functions import Util
+from mpf.core.utility_functions import Util
 
 RemoteMethod = namedtuple('RemoteMethod',
                           'method config_section kwargs priority',

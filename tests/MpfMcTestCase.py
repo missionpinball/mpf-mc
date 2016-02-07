@@ -7,8 +7,8 @@ from kivy.clock import Clock
 from kivy.config import Config
 
 from mc.core.utils import load_machine_config
-from mpf.system.config import Config as MpfConfig
-from mpf.system.utility_functions import Util
+from mpf.core.config import Config as MpfConfig
+from mpf.core.utility_functions import Util
 from kivy.logger import FileHandler
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 

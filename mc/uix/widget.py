@@ -1,6 +1,6 @@
 from kivy.animation import Animation
 from kivy.properties import ObjectProperty
-from mpf.system.case_insensitive_dict import CaseInsensitiveDict
+from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 
 from mc.core.utils import set_position, percent_to_float
 

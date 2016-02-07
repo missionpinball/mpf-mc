@@ -5,10 +5,10 @@ controller.
 
 from kivy.logger import Logger
 from kivy.utils import get_color_from_hex
-from mpf.system.case_insensitive_dict import CaseInsensitiveDict
-from mpf.system.config import Config as MpfConfig
-from mpf.system.rgb_color import named_rgb_colors
-from mpf.system.utility_functions import Util
+from mpf.core.case_insensitive_dict import CaseInsensitiveDict
+from mpf.core.config import Config as MpfConfig
+from mpf.core.rgb_color import named_rgb_colors
+from mpf.core.utility_functions import Util
 
 from mc.uix.display import Display
 from mc.uix.slide_frame import SlideFrame

@@ -17,10 +17,10 @@ from mc.core.mode_controller import ModeController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
 from mc.uix.transitions import TransitionManager
-from mpf.system.case_insensitive_dict import CaseInsensitiveDict
-from mpf.system.events import EventManager
-from mpf.system.player import Player
-from mpf.system.assets import AssetManager
+from mpf.core.case_insensitive_dict import CaseInsensitiveDict
+from mpf.core.events import EventManager
+from mpf.core.player import Player
+from mpf.core.assets import AssetManager
 from mc.assets.image import ImageAsset
 
 

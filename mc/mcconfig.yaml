@@ -161,7 +161,7 @@ assets:
 
 debug_profiles:
     verbose:
-        system_modules:
+        core_modules:
             events
             mode_controller
         device_collections:

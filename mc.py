@@ -7,8 +7,8 @@ import socket
 import sys
 from datetime import datetime
 
-from mpf.system.utility_functions import Util
-from mpf.system.config import Config as MpfConfig
+from mpf.core.utility_functions import Util
+from mpf.core.config import Config as MpfConfig
 from kivy.config import Config
 from kivy.logger import Logger
 import version

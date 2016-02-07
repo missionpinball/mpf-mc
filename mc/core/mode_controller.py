@@ -5,8 +5,8 @@ import os
 from collections import namedtuple
 
 from mc.core.mode import Mode
-from mpf.system.config import Config
-from mpf.system.utility_functions import Util
+from mpf.core.config import Config
+from mpf.core.utility_functions import Util
 
 RemoteMethod = namedtuple('RemoteMethod',
                           'method config_section kwargs priority',

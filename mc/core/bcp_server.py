@@ -7,7 +7,7 @@ import threading
 import time
 import traceback
 
-import mpf.system.bcp as bcp
+import mpf.core.bcp as bcp
 
 
 class BCPServer(threading.Thread):
