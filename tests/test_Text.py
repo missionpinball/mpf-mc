@@ -25,6 +25,27 @@ class TestText(MpfMcTestCase):
 
         self.assertEqual(self.get_widget().text, 'HELLO')
 
+        # now make sure if we post the event again, the text updates
+        self.mc.events.post('text_from_event_param1', param1='THIS')
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'THIS')
+
+        self.mc.events.post('text_from_event_param1', param1='IS')
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'IS')
+
+        self.mc.events.post('text_from_event_param1', param1='A')
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'A')
+
+        self.mc.events.post('text_from_event_param1', param1='NEW')
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'NEW')
+
+        self.mc.events.post('text_from_event_param1', param1='EVENT')
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'EVENT')
+
     def test_text_from_event_param2(self):
         # widget text puts static text before param text
         self.mc.events.post('text_from_event_param2', param1='HELLO')
@@ -161,6 +182,33 @@ class TestText(MpfMcTestCase):
         self.mc.player_list[1].test_var = 0
         self.advance_time()
         self.assertEqual(self.get_widget().text, '0')
+
+    def test_mix_player_var_and_event_param(self):
+        self.mc.game_start()
+        self.advance_time()
+        self.mc.add_player(1)
+        self.advance_time()
+        self.mc.player_start_turn(1)
+        self.advance_time()
+
+        self.assertTrue(self.mc.player)
+
+        self.mc.player.player_var = 'PLAYER VAR'
+
+        self.mc.events.post('text_with_player_var_and_event',
+                            test_param="EVENT PARAM")
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'PLAYER VAR EVENT PARAM')
+
+        self.mc.player.player_var = 'NEW PLAYER VAR'
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'NEW PLAYER VAR EVENT PARAM')
+
+        self.mc.events.post('text_with_player_var_and_event',
+                            test_param="NEW EVENT PARAM")
+        self.advance_time()
+        self.assertEqual(self.get_widget().text,
+                         'NEW PLAYER VAR NEW EVENT PARAM')
 
     def test_number_grouping(self):
         self.mc.events.post('number_grouping')

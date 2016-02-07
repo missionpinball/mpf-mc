@@ -22,11 +22,10 @@ class Text(MpfWidget, Label):
 
         self.original_text = self._get_text_string(config.get('text', ''),
                                                    mode=mode)
-
         self.text_variables = dict()
+        self.event_replacements = kwargs
 
-        self._process_text(self.text, local_replacements=kwargs,
-                           local_type='event', mode=mode)
+        self._process_text(self.text, mode=mode)
 
     def __repr__(self):
         return '<Text Widget text={}>'.format(self.text)
@@ -34,6 +33,11 @@ class Text(MpfWidget, Label):
     def texture_update(self, *largs):
         super().texture_update(*largs)
         self.size = self.texture_size
+
+    def update_kwargs(self, **kwargs):
+        self.event_replacements.update(kwargs)
+
+        self._process_text(self.original_text)
 
     def _apply_style(self, force_default=False):
         if not self.config['style'] or force_default:
@@ -101,41 +105,23 @@ class Text(MpfWidget, Label):
             # if the text string is not found, put the $ back on
             return '${}'.format(text_string)
 
-    def _get_text_vars(self):
-        return Text.var_finder.findall(self.original_text)
+    def _get_text_vars(self, text):
+        return Text.var_finder.findall(text)
 
-    def _process_text(self, text, local_replacements=None, local_type=None,
-                      mode=None):
-        # text: source text with placeholder vars
-        # local_replacements: dict of var names & their replacements
-        # local_type: type specifier of local replacements. e.g. "event" means
-        # it will look for %event|var_name% in the text string
-
-        if not local_replacements:
-            local_replacements = list()
-
-        for var_string in self._get_text_vars():
-            if var_string in local_replacements:
+    def _process_text(self, text, mode=None):
+        for var_string in self._get_text_vars(text):
+            if var_string in self.event_replacements:
                 text = text.replace('%{}%'.format(var_string),
-                                    str(local_replacements[var_string]))
-                self.original_text = text
+                                    str(self.event_replacements[var_string]))
 
-            elif local_type and var_string.startswith(local_type + '|'):
-                text = text.replace('%{}%'.format(var_string),
-                                    str(local_replacements[
-                                            var_string.split('|')[1]]))
-                self.original_text = text
+        if self._get_text_vars(text):
+            # monitors won't be added twice, so it's ok to blindly call this
+            self._setup_variable_monitors(text)
 
-        if self._get_text_vars():
-            self._setup_variable_monitors()
+        self.update_vars_in_text(text)
 
-        self.update_vars_in_text()
-
-    def update_vars_in_text(self):
-
-        text = self.original_text
-
-        for var_string in self._get_text_vars():
+    def update_vars_in_text(self, text):
+        for var_string in self._get_text_vars(text):
             if var_string.startswith('machine|'):
                 try:
                     text = text.replace('%' + var_string + '%',
@@ -149,7 +135,8 @@ class Text(MpfWidget, Label):
                     text = text.replace('%' + var_string + '%',
                                         str(self.mc.player[
                                                 var_string.split('|')[1]]))
-                elif var_string.startswith('player'):
+                    continue
+                elif var_string.startswith('player') and '|' in var_string:
                     player_num, var_name = var_string.lstrip('player').split(
                             '|')
                     try:
@@ -163,9 +150,14 @@ class Text(MpfWidget, Label):
                             text = ''
                     except IndexError:
                         text = ''
-                else:
+                    continue
+                elif self.mc.player.is_player_var(var_string):
                     text = text.replace('%' + var_string + '%',
                                         str(self.mc.player[var_string]))
+
+            if var_string in self.event_replacements:
+                text = text.replace('%{}%'.format(var_string),
+                    str(self.event_replacements[var_string]))
 
         self.update_text(text)
 
@@ -188,13 +180,13 @@ class Text(MpfWidget, Label):
         self.texture_update()
 
     def _player_var_change(self, **kwargs):
-        self.update_vars_in_text()
+        self.update_vars_in_text(self.original_text)
 
     def _machine_var_change(self, **kwargs):
-        self.update_vars_in_text()
+        self.update_vars_in_text(self.original_text)
 
-    def _setup_variable_monitors(self):
-        for var_string in self._get_text_vars():
+    def _setup_variable_monitors(self, text):
+        for var_string in self._get_text_vars(text):
             if '|' not in var_string:
                 self.add_player_var_handler(name=var_string, player=None)
             else:

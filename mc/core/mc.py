@@ -38,6 +38,7 @@ class MpfMc(App):
         self.player_list = list()
         self.player = None
         self.num_players = 0
+        self.bcp_client_connected = False
 
         self.slide_configs = dict()
         self.widget_configs = dict()

@@ -166,3 +166,6 @@ class MpfWidget(object):
     def _remove_animation_events(self):
         self.mc.events.remove_handlers_by_keys(self._animation_event_keys)
         self._animation_event_keys = set()
+
+    def update_kwargs(self, **kwargs):
+        pass

@@ -142,6 +142,13 @@ class SlideFrame(MpfWidget, ScreenManager):
                                    mode=mode,
                                    **kwargs)
 
+        # update the widgets with whatever kwargs came through here
+        for widget in slide.walk():
+            try:
+                widget.update_kwargs(**kwargs)
+            except AttributeError:
+                pass
+
         if slide.priority >= self.current_slide.priority or force:
             # We need to show this slide
 
@@ -150,7 +157,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             self.transition = self.mc.transition_manager.get_transition(
                     transition)
 
-            self._set_current_slide(slide)
+            self._set_current_slide(slide, **kwargs)
             return True
 
         else:  # Not showing this slide
@@ -190,7 +197,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         except WidgetException:
             pass
 
-    def _set_current_slide(self, slide):
+    def _set_current_slide(self, slide, **kwargs):
         # slide frame requires at least one slide, so if you try to set current
         # to None, it will just mark the current slide as the lowest priority
         # so it can be overwritten by anything
