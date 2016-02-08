@@ -12,12 +12,13 @@ from kivy.logger import Logger
 
 from mc.assets.video import VideoAsset
 from mc.core.bcp_processor import BcpProcessor
-from mc.core.config_processor import McConfig
+from mc.core.config_processor import ConfigProcessor
 from mc.core.mode_controller import ModeController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
 from mc.uix.transitions import TransitionManager
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
+from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
 from mpf.core.player import Player
 from mpf.core.assets import AssetManager
@@ -64,10 +65,11 @@ class MpfMc(App):
         self.thread_stopper = threading.Event()
 
         # Core components
+        self.config_validator = ConfigValidator(self)
         self.events = EventManager(self, setup_event_player=False)
         self.mode_controller = ModeController(self)
-        McConfig.load_config_spec()
-        self.config_processor = McConfig(self)
+        ConfigValidator.load_config_spec()
+        self.config_processor = ConfigProcessor(self)
         self.slide_player = SlidePlayer(self)
         self.widget_player = WidgetPlayer(self)
         self.transition_manager = TransitionManager(self)
@@ -80,14 +82,17 @@ class MpfMc(App):
 
         self.clock.schedule_interval(self._check_crash_queue, 1)
 
+    def get_system_config(self):
+        return self.machine_config['mpf_mc']
+
     def validate_machine_config_section(self, section):
-        if section not in McConfig.config_spec:
+        if section not in ConfigValidator.config_spec:
             return
 
         if section not in self.machine_config:
             self.config[section] = dict()
 
-        self.machine_config[section] = self.config_processor.process_config2(
+        self.machine_config[section] = self.config_validator.process_config2(
                 section, self.machine_config[section], section)
 
     def get_config(self):
@@ -131,7 +136,7 @@ class MpfMc(App):
 
     def init_done(self):
         self._init_done = True
-        McConfig.unload_config_spec()
+        ConfigValidator.unload_config_spec()
         self.reset()
 
     def build(self):

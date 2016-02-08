@@ -1,12 +1,11 @@
-from mc.core.config_player import ConfigPlayer
+from mpf.core.config_player import ConfigPlayer
 from mc.uix.slide import Slide
 
 class WidgetPlayer(ConfigPlayer):
     config_file_section = 'widget_player'
 
     def play(self, settings, mode=None, **kwargs):
-        if mode and not mode.active:
-            return  # pragma: no cover
+        super().play(settings, mode, **kwargs)
 
         for s in settings:  # settings is a list of widget configs
 
@@ -15,18 +14,18 @@ class WidgetPlayer(ConfigPlayer):
 
             if s['target']:
                 try:
-                    slide = self.mc.targets[s['target']].current_slide
+                    slide = self.machine.targets[s['target']].current_slide
                 except KeyError:  # pragma: no cover
                     pass
 
             if s['slide']:
                 try:
-                    slide = self.mc.active_slides[s['slide']]
+                    slide = self.machine.active_slides[s['slide']]
                 except KeyError:  # pragma: no cover
                     pass
 
             if not slide:
-                slide = self.mc.targets['default'].current_slide
+                slide = self.machine.targets['default'].current_slide
 
             if not slide:
                 return  # pragma: no cover

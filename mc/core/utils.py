@@ -2,7 +2,7 @@ import os
 import sys
 
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
-from mpf.core.config import Config as MpfConfig
+from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
 
 
@@ -147,7 +147,7 @@ def load_machine_config(config_file_list, machine_path,
                                        config_file)
 
         machine_config = Util.dict_merge(machine_config,
-                                         MpfConfig.load_config_file(
+                                         ConfigProcessor.load_config_file(
                                                  config_file))
 
     return machine_config

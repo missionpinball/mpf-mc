@@ -6,7 +6,7 @@ controller.
 from kivy.logger import Logger
 from kivy.utils import get_color_from_hex
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
-from mpf.core.config import Config as MpfConfig
+from mpf.core.config_processor import ConfigProcessorBase
 from mpf.core.rgb_color import named_rgb_colors
 from mpf.core.utility_functions import Util
 
@@ -41,15 +41,18 @@ type_map = CaseInsensitiveDict(text=Text,
                                color_dmd=ColorDmd)
 
 
-class McConfig(MpfConfig):
+class ConfigProcessor(ConfigProcessorBase):
     def __init__(self, machine):
         self.mc = machine
+        self.machine = machine
         self.system_config = self.mc.machine_config['mpf_mc']
         self.log = Logger
+        self.machine_sections = None
+        self.mode_sections = None
 
         self.machine_sections = dict(slides=self.process_slides,
                                      widgets=self.process_widgets,
-                                     displays=self.process_displays,
+                                     # displays=self.process_displays,
                                      animations=self.process_animations,
                                      text_styles=self.process_text_styles)
 
@@ -60,30 +63,21 @@ class McConfig(MpfConfig):
 
         # process mode-based and machine-wide configs
         self.register_load_methods()
-        self.process_config_file(section_dict=self.machine_sections,
-                                 config=self.mc.machine_config)
+
+        self.mc.events.add_handler('init_phase_1', self._init)
+
+        # todo need to clean this up
+        try:
+            self.process_displays(config=self.mc.machine_config['displays'])
+        except KeyError:
+            pass
 
         if not self.mc.displays:
             Display.create_default_display(self.mc)
 
-    def register_load_methods(self):
-        for section in self.mode_sections:
-            self.mc.mode_controller.register_load_method(
-                    load_method=self.process_mode_config,
-                    config_section_name=section, section=section)
-
-    def process_config_file(self, section_dict, config):
-        for section in section_dict:
-            if section in section_dict and section in config:
-                self.process_localized_config_section(config=config[section],
-                                                      section=section)
-
-    def process_mode_config(self, config, mode, mode_path, section):
-        self.process_localized_config_section(config, section)
-
-    def process_localized_config_section(self, config, section):
-
-        config = self.machine_sections[section](config)
+    def _init(self):
+        self.process_config_file(section_dict=self.machine_sections,
+                                 config=self.mc.machine_config)
 
     def process_displays(self, config):
         # config is localized to 'displays' section
@@ -93,7 +87,8 @@ class McConfig(MpfConfig):
     def create_display(self, name, config):
         # config is localized display settings
         return Display(self.mc, name,
-                       **self.process_config2('displays', config))
+            **self.machine.config_validator.process_config2('displays',
+                                                            config))
 
     def process_slides(self, config):
         # config is localized to 'slides' section
@@ -149,7 +144,7 @@ class McConfig(MpfConfig):
             if default_setting_name in config:
                 config['_default_settings'].add(default_setting_name)
 
-        self.process_config2('widgets:{}'.format(config['type']).lower(),
+        self.machine.config_validator.process_config2('widgets:{}'.format(config['type']).lower(),
                              config, base_spec='widgets:common')
 
         if not mode:
@@ -227,7 +222,7 @@ class McConfig(MpfConfig):
 
         # dict is settings for an animation
         elif type(config) is dict:
-            animation = self.process_config2('widgets:animations',
+            animation = self.machine.config_validator.process_config2('widgets:animations',
                                              config)
 
             if len(config['property']) != len(config['value']):
@@ -241,7 +236,7 @@ class McConfig(MpfConfig):
     def process_transition(self, config):
         # config is localized to the 'transition' section
         try:
-            config = self.process_config2(
+            config = self.machine.config_validator.process_config2(
                     'transitions:{}'.format(config['type']), config)
         except KeyError:
             raise ValueError('transition: section of config requires a '
@@ -257,12 +252,12 @@ class McConfig(MpfConfig):
         return config
 
     def process_text_style(self, config):
-        self.process_config2('text_styles', config, add_missing_keys=False)
+        self.machine.config_validator.process_config2('text_styles', config,
+                                                      add_missing_keys=False)
 
         return config
 
     def color_from_string(self, color_string):
-
         if not color_string:
             return None
 

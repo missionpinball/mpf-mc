@@ -1,4 +1,4 @@
-from mc.core.config_player import ConfigPlayer
+from mpf.core.config_player import ConfigPlayer
 
 
 class SlidePlayer(ConfigPlayer):
@@ -20,30 +20,27 @@ class SlidePlayer(ConfigPlayer):
         #     config['transition'] = dict(type='none')
 
         if config.get('transition', None):
-            config['transition'] = self.mc.config_processor.process_transition(
-                        config['transition'])
+            config['transition'] = (
+                self.machine.config_processor.process_transition(
+                        config['transition']))
         else:
             config['transition'] = None
 
         return config
 
     def play(self, settings, mode=None, **kwargs):
-        try:
-            if not mode.active:
-                return
-        except AttributeError:
-            pass
+        super().play(settings, mode, **kwargs)
 
         for s in settings:  # settings is a list of one or more slide configs
 
             name = s['slide']
 
             if s['target']:
-                target = self.mc.targets[s['target']]
+                target = self.machine.targets[s['target']]
             elif mode:
                 target = mode.target
             else:
-                target = self.mc.targets['default']
+                target = self.machine.targets['default']
 
             target.show_slide(slide_name=name, transition=s['transition'],
                               mode=mode, force=s['force'],

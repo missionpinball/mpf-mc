@@ -5,7 +5,7 @@ import os
 from collections import namedtuple
 
 from mc.core.mode import Mode
-from mpf.core.config import Config
+from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
 
 RemoteMethod = namedtuple('RemoteMethod',
@@ -78,7 +78,7 @@ class ModeController(object):
                 mode_string + '.yaml')
 
         if os.path.isfile(mpf_mode_config):
-            config = Config.load_config_file(mpf_mode_config)
+            config = ConfigProcessor.load_config_file(mpf_mode_config)
 
         # Now figure out if there's a machine-specific config for this mode,
         #  and
@@ -96,7 +96,7 @@ class ModeController(object):
 
                 if file_root == mode_string:
                     config = Util.dict_merge(config,
-                                             Config.load_config_file(
+                                             ConfigProcessor.load_config_file(
                                                      os.path.join(path, file)))
                     found_file = True
                     break
