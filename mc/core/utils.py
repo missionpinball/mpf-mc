@@ -5,34 +5,6 @@ from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
 
-
-def get_insert_index(z, target_widget):
-    index = 0
-
-    # this might be able to be a count of a list comprehension or something
-
-    for i, w in enumerate(target_widget.children):
-
-        try:
-            if w.config['z'] <= z:
-                index = i + 1
-                # need to increment index until we hit the next priority
-                if z < w.config['z']:
-                    break
-
-                    # BTW I have no idea why this simpler code doesn't
-                    # work:
-                    # for i, w in enumerate(self.children):
-                    #     if w.config['z'] > my_priority:
-                    #         index = i
-                    #         break
-        except TypeError:
-            # have to save to index in case this is the last loop
-            index = i + 1
-
-    return index
-
-
 def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
                  anchor_y='middle'):
     """Returns the x,y position for the lower-left corner of a widget
@@ -108,13 +80,11 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
 
     return x, y
 
-
 def percent_to_float(number_str, total):
     if str(number_str)[-1] == '%':
         return float(number_str[:-1]) * total / 100
     else:
         return float(number_str)
-
 
 def set_machine_path(machine_path, machine_files_default='machine_files'):
     # If the machine folder value passed starts with a forward or
@@ -130,7 +100,6 @@ def set_machine_path(machine_path, machine_files_default='machine_files'):
     # Add the machine folder to sys.path so we can import modules from it
     sys.path.append(machine_path)
     return machine_path
-
 
 def load_machine_config(config_file_list, machine_path,
                         config_path='config', existing_config=None):

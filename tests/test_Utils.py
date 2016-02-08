@@ -1,4 +1,4 @@
-from mc.core.utils import set_position, get_insert_index, percent_to_float
+from mc.core.utils import set_position, percent_to_float
 from tests.MpfMcTestCase import MpfMcTestCase
 
 
@@ -220,10 +220,3 @@ class TestUtils(MpfMcTestCase):
         num = '200%'
         total = 1
         self.assertEqual(percent_to_float(num, total), 2.0)
-
-    def test_get_insert_index(self):
-        self.mc.events.post('show_slide1')
-        self.advance_time()
-
-        index = get_insert_index(75, self.mc.targets['default'].current_slide.children[0])
-        self.assertEqual(index, 2)

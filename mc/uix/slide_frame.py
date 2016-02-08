@@ -1,4 +1,4 @@
-from operator import attrgetter
+from bisect import bisect
 
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
@@ -9,7 +9,7 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
 from kivy.uix.stencilview import StencilView
 from kivy.uix.widget import WidgetException
 
-from mc.core.utils import set_position, get_insert_index
+from mc.core.utils import set_position
 from mc.uix.slide import Slide
 from mc.uix.widget import MpfWidget
 
@@ -46,9 +46,7 @@ class SlideFrameParent(FloatLayout):
     def add_widget(self, widget):
         widget.config['z'] = abs(widget.config['z'])
 
-        self.stencil.add_widget(widget=widget,
-                           index=get_insert_index(z=abs(widget.config['z']),
-                                                  target_widget=self.stencil))
+        self.stencil.add_widget(widget, bisect(self.stencil.children, widget))
 
     def on_size(self, *args):
         for widget in self.children:

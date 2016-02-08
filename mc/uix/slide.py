@@ -1,10 +1,12 @@
+from bisect import bisect
+
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
 
 from mc.core.mode import Mode
-from mc.core.utils import set_position, get_insert_index
+from mc.core.utils import set_position
 
 
 class Slide(Screen):
@@ -134,7 +136,8 @@ class Slide(Screen):
             self.add_widget_to_parent_frame(widget)
             return
 
-        self.stencil.add_widget(widget, get_insert_index(z=z, target_widget=self.stencil))
+
+        self.stencil.add_widget(widget, bisect(self.stencil.children, widget))
 
         widget.pos = set_position(self.size[0],
                                   self.size[1],

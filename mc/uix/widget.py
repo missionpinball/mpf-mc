@@ -62,6 +62,9 @@ class MpfWidget(object):
     def __repr__(self):  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
+    def __lt__(self, other):
+        return abs(self.config['z']) < abs(other.config['z'])
+
     def merge_asset_config(self, asset):
         for setting in [x for x in self.merge_settings if (
                         x not in self.config['_default_settings'] and
