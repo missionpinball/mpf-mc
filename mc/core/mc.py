@@ -66,7 +66,7 @@ class MpfMc(App):
 
         # Core components
         self.config_validator = ConfigValidator(self)
-        self.events = EventManager(self, setup_event_player=False)
+        self.events = EventManager(self)
         self.mode_controller = ModeController(self)
         ConfigValidator.load_config_spec()
         self.config_processor = ConfigProcessor(self)
@@ -92,7 +92,7 @@ class MpfMc(App):
         if section not in self.machine_config:
             self.config[section] = dict()
 
-        self.machine_config[section] = self.config_validator.process_config2(
+        self.machine_config[section] = self.config_validator.validate_config(
                 section, self.machine_config[section], section)
 
     def get_config(self):

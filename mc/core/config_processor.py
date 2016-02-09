@@ -87,7 +87,7 @@ class ConfigProcessor(ConfigProcessorBase):
     def create_display(self, name, config):
         # config is localized display settings
         return Display(self.mc, name,
-            **self.machine.config_validator.process_config2('displays',
+            **self.machine.config_validator.validate_config('displays',
                                                             config))
 
     def process_slides(self, config):
@@ -144,7 +144,7 @@ class ConfigProcessor(ConfigProcessorBase):
             if default_setting_name in config:
                 config['_default_settings'].add(default_setting_name)
 
-        self.machine.config_validator.process_config2('widgets:{}'.format(config['type']).lower(),
+        self.machine.config_validator.validate_config('widgets:{}'.format(config['type']).lower(),
                              config, base_spec='widgets:common')
 
         if not mode:
@@ -222,7 +222,7 @@ class ConfigProcessor(ConfigProcessorBase):
 
         # dict is settings for an animation
         elif type(config) is dict:
-            animation = self.machine.config_validator.process_config2('widgets:animations',
+            animation = self.machine.config_validator.validate_config('widgets:animations',
                                              config)
 
             if len(config['property']) != len(config['value']):
@@ -236,7 +236,7 @@ class ConfigProcessor(ConfigProcessorBase):
     def process_transition(self, config):
         # config is localized to the 'transition' section
         try:
-            config = self.machine.config_validator.process_config2(
+            config = self.machine.config_validator.validate_config(
                     'transitions:{}'.format(config['type']), config)
         except KeyError:
             raise ValueError('transition: section of config requires a '
@@ -252,7 +252,7 @@ class ConfigProcessor(ConfigProcessorBase):
         return config
 
     def process_text_style(self, config):
-        self.machine.config_validator.process_config2('text_styles', config,
+        self.machine.config_validator.validate_config('text_styles', config,
                                                       add_missing_keys=False)
 
         return config
