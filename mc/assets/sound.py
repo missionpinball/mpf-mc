@@ -47,6 +47,7 @@ class SoundAsset(Asset):
         super().__init__(mc, name, file, config)
 
         self._container = None  # holds the actual sound samples in memory
+        self._ducking = None
 
         # Make sure a legal track name has been specified.  If not, throw an exception
         track = self.mc.sound_system.audio_interface.get_track_by_name(self.config['track'])
@@ -58,17 +59,35 @@ class SoundAsset(Asset):
 
         self.track = track
 
-        if 'volume' not in self.config:
+        # Validate sound attributes and provide default values
+        if 'volume' in self.config:
+            self.config['volume'] = max(min(float(self.config['volume']), 1.0), 0.0)
+        else:
             self.config['volume'] = DEFAULT_VOLUME
 
-        if 'priority' not in self.config:
+        if 'priority' in self.config:
+            self.config['priority'] = int(self.config['priority'])
+        else:
             self.config['priority'] = DEFAULT_PRIORITY
 
         if 'max_queue_time' not in self.config or self.config['max_queue_time'] is None:
             self.config['max_queue_time'] = DEFAULT_MAX_QUEUE_TIME
+        else:
+            self.config['max_queue_time'] = AudioInterface.string_to_secs(self.config['max_queue_time'])
 
-        if 'loops' not in self.config:
+        if 'loops' in self.config:
+            self.config['loops'] = int(self.config['loops'])
+        else:
             self.config['loops'] = DEFAULT_LOOPS
+
+        if 'ducking' in self.config:
+            self._ducking = DuckingSettings(self.mc, self.config['ducking'])
+
+            # An attenuation value of exactly 1.0 does absolutely nothing so
+            # there is no point in keeping the ducking settings for this
+            # sound when attenuation is 1.0.
+            if self._ducking.attenuation == 1.0:
+                self._ducking = None
 
     def __repr__(self):
         # String that's returned if someone prints this object
@@ -89,6 +108,10 @@ class SoundAsset(Asset):
     def container(self):
         return self._container
 
+    @property
+    def ducking(self):
+        return self._ducking
+
     def _do_load(self):
         """Loads the sound asset from disk."""
 
@@ -106,3 +129,68 @@ class SoundAsset(Asset):
         super()._loaded()
         Logger.debug("SoundAsset: Loaded {} (Track {})".format(self.name, self.track))
 
+
+class DuckingSettings(object):
+    """ DuckingSettings contains the parameters needed to control audio ducking
+    for a sound.
+    """
+
+    def __init__(self, mc, config):
+        """
+        Constructor
+        Args:
+            mc: The media controller instance.
+            config: The ducking configuration file section that contains all the ducking
+                settings for the sound.
+
+        Notes:
+            The config section should contain the following attributes:
+                target: The track name to apply the ducking to when the sound is played.
+                delay: The duration (in samples) of the delay period (time before attack starts)
+                attack: The duration (in samples) of the attack stage of the ducking envelope
+                attenuation: The attenuation (gain) (0.0 to 1.0) to apply to the target track while
+                    ducking
+                release_point: The point (in samples) relative to the end of the sound at which
+                    to start the release stage.  A positive value indicates prior to the end of
+                    the sound while a negative value indicates to start the release after the
+                    end of the sound.
+                release: The duration (in samples) of the release stage of the ducking process.
+        """
+        if config is None:
+            raise AudioException("The 'ducking' configuration must include the following "
+                                 "attributes: track, delay, attack, attenuation, "
+                                 "release_point, and release")
+
+        if 'target' not in config:
+            raise AudioException("'ducking.target' must contain a valid audio track name")
+
+        track = mc.sound_system.audio_interface.get_track_by_name(config['target'])
+        if track is None:
+            raise AudioException("'ducking.target' must contain a valid audio track name")
+        self.track = track
+
+        # Delay is optional (defaults to 0, must be >= 0)
+        if 'delay' in config:
+            self.delay = max(mc.sound_system.audio_interface.string_to_samples(config['delay']), 0)
+        else:
+            self.delay = 0
+
+        if 'attack' not in config:
+            raise AudioException("'ducking.attack' must contain a valid attack value (time "
+                                 "string or number of samples)")
+        self.attack = max(mc.sound_system.audio_interface.string_to_samples(config['attack']), 0)
+
+        if 'attenuation' not in config:
+            raise AudioException("'ducking.attenuation' must contain valid attenuation "
+                                 "value (0.0 to 1.0)")
+        self.attenuation = max(min(float(AudioInterface.string_to_gain(config['attenuation'])), 1.0), 0.0)
+
+        if 'release_point' not in config:
+            raise AudioException("'ducking.release_point' must contain a valid release point "
+                                 "value (time string or number of samples)")
+        self.release_point = mc.sound_system.audio_interface.string_to_samples(config['release_point'])
+
+        if 'release' not in config:
+            raise AudioException("'ducking.release' must contain a valid release "
+                                 "value (time string or number of samples)")
+        self.release = max(mc.sound_system.audio_interface.string_to_samples(config['release']), 0)
