@@ -3,7 +3,7 @@
 import logging
 from collections import namedtuple
 
-from mpf.system.utility_functions import Util
+from mpf.core.utility_functions import Util
 
 RemoteMethod = namedtuple('RemoteMethod',
                           'method config_section kwargs priority',
@@ -34,17 +34,6 @@ class Mode(object):
 
         if 'mode' in self.config:
             self.configure_mode_settings(config['mode'])
-
-        # todo
-
-        # for asset_manager in self.mc.asset_managers.values():
-        #
-        #     config_data = self.config.get(asset_manager.config_section,
-        # dict())
-        #
-        #     self.config[asset_manager.config_section] = (
-        #         asset_manager.create_assets(config=config_data,
-        #                                       mode_path=self.path))
 
         # Call registered remote loader methods
         for item in self.mc.mode_controller.loader_methods:

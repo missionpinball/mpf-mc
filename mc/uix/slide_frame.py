@@ -1,4 +1,4 @@
-from operator import attrgetter
+from bisect import bisect
 
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
@@ -9,7 +9,7 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
 from kivy.uix.stencilview import StencilView
 from kivy.uix.widget import WidgetException
 
-from mc.core.utils import set_position, get_insert_index
+from mc.core.utils import set_position
 from mc.uix.slide import Slide
 from mc.uix.widget import MpfWidget
 
@@ -46,9 +46,7 @@ class SlideFrameParent(FloatLayout):
     def add_widget(self, widget):
         widget.config['z'] = abs(widget.config['z'])
 
-        self.stencil.add_widget(widget=widget,
-                           index=get_insert_index(z=abs(widget.config['z']),
-                                                  target_widget=self.stencil))
+        self.stencil.add_widget(widget, bisect(self.stencil.children, widget))
 
     def on_size(self, *args):
         for widget in self.children:
@@ -142,6 +140,13 @@ class SlideFrame(MpfWidget, ScreenManager):
                                    mode=mode,
                                    **kwargs)
 
+        # update the widgets with whatever kwargs came through here
+        for widget in slide.walk():
+            try:
+                widget.update_kwargs(**kwargs)
+            except AttributeError:
+                pass
+
         if slide.priority >= self.current_slide.priority or force:
             # We need to show this slide
 
@@ -150,7 +155,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             self.transition = self.mc.transition_manager.get_transition(
                     transition)
 
-            self._set_current_slide(slide)
+            self._set_current_slide(slide, **kwargs)
             return True
 
         else:  # Not showing this slide
@@ -190,7 +195,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         except WidgetException:
             pass
 
-    def _set_current_slide(self, slide):
+    def _set_current_slide(self, slide, **kwargs):
         # slide frame requires at least one slide, so if you try to set current
         # to None, it will just mark the current slide as the lowest priority
         # so it can be overwritten by anything

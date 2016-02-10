@@ -5,8 +5,8 @@ import os
 from collections import namedtuple
 
 from mc.core.mode import Mode
-from mpf.system.config import Config
-from mpf.system.utility_functions import Util
+from mpf.core.config_processor import ConfigProcessor
+from mpf.core.utility_functions import Util
 
 RemoteMethod = namedtuple('RemoteMethod',
                           'method config_section kwargs priority',
@@ -35,7 +35,7 @@ class ModeController(object):
         self.start_methods = list()
 
         if 'modes' in self.mc.machine_config:
-            self.mc.events.add_handler('init_phase_1',
+            self.mc.events.add_handler('init_phase_2',
                                        self._load_modes)
 
     def _load_modes(self):
@@ -78,7 +78,7 @@ class ModeController(object):
                 mode_string + '.yaml')
 
         if os.path.isfile(mpf_mode_config):
-            config = Config.load_config_file(mpf_mode_config)
+            config = ConfigProcessor.load_config_file(mpf_mode_config)
 
         # Now figure out if there's a machine-specific config for this mode,
         #  and
@@ -96,7 +96,7 @@ class ModeController(object):
 
                 if file_root == mode_string:
                     config = Util.dict_merge(config,
-                                             Config.load_config_file(
+                                             ConfigProcessor.load_config_file(
                                                      os.path.join(path, file)))
                     found_file = True
                     break

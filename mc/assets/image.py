@@ -1,5 +1,5 @@
 from kivy.core.image import Image
-from mc.core.assets import Asset, AssetPool
+from mpf.core.assets import Asset, AssetPool
 
 
 # This module has extra comments since it's what we tell people to use as an
@@ -35,10 +35,6 @@ class ImageAsset(Asset):
         # you don't need to do anything.
 
         self._image = None  # holds the actual image in memory
-
-    def __repr__(self):
-        # String that's returned if someone prints this object
-        return '<Image: {}>'.format(self.name)
 
     @property
     def image(self):

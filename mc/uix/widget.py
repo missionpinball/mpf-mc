@@ -1,6 +1,6 @@
 from kivy.animation import Animation
 from kivy.properties import ObjectProperty
-from mpf.system.case_insensitive_dict import CaseInsensitiveDict
+from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 
 from mc.core.utils import set_position, percent_to_float
 
@@ -61,6 +61,9 @@ class MpfWidget(object):
 
     def __repr__(self):  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
+
+    def __lt__(self, other):
+        return abs(self.config['z']) < abs(other.config['z'])
 
     def merge_asset_config(self, asset):
         for setting in [x for x in self.merge_settings if (
@@ -166,3 +169,6 @@ class MpfWidget(object):
     def _remove_animation_events(self):
         self.mc.events.remove_handlers_by_keys(self._animation_event_keys)
         self._animation_event_keys = set()
+
+    def update_kwargs(self, **kwargs):
+        pass

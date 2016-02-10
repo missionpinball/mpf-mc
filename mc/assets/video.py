@@ -1,5 +1,5 @@
 from kivy.core.video import Video
-from mc.core.assets import Asset, AssetPool
+from mpf.core.assets import Asset, AssetPool
 
 class VideoPool(AssetPool):
 
@@ -24,9 +24,6 @@ class VideoAsset(Asset):
         super().__init__(mc, name, file, config)
 
         self._video = None
-
-    def __repr__(self):
-        return '<Video: {}>'.format(self.name)
 
     @property
     def video(self):

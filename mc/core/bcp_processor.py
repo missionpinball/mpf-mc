@@ -5,7 +5,7 @@ from kivy.clock import Clock
 from kivy.logger import Logger
 
 from mc.core.bcp_server import BCPServer
-import mpf.system.bcp as bcp
+import mpf.core.bcp as bcp
 import version
 
 class BcpProcessor(object):
@@ -48,7 +48,7 @@ class BcpProcessor(object):
         Clock.schedule_interval(self._get_from_queue, 0)
 
     def _start_socket_thread(self):
-        self.socket_thread = BCPServer(self, self.receive_queue,
+        self.socket_thread = BCPServer(self.mc, self.receive_queue,
                                        self.sending_queue)
         self.socket_thread.daemon = True
         self.socket_thread.start()
@@ -67,7 +67,7 @@ class BcpProcessor(object):
                 command string.
 
         """
-        if self.enabled:
+        if self.enabled and self.mc.bcp_client_connected:
             self.sending_queue.put(bcp.encode_command_string(bcp_command,
                                                              **kwargs))
         if callback:
@@ -192,7 +192,6 @@ class BcpProcessor(object):
 
     def _bcp_trigger(self, name, **kwargs):
         """Processes an incoming BCP 'trigger' command."""
-
         self.mc.events.post(name, **kwargs)
 
     def _bcp_switch(self, name, state, **kwargs):

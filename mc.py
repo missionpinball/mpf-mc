@@ -7,8 +7,9 @@ import socket
 import sys
 from datetime import datetime
 
-from mpf.system.utility_functions import Util
-from mpf.system.config import Config as MpfConfig
+from mc.core.config_processor import ConfigProcessor
+from mpf.core.utility_functions import Util
+from mpf.core.config_processor import ConfigProcessor as MpfConfig
 from kivy.config import Config
 from kivy.logger import Logger
 import version
@@ -129,7 +130,7 @@ def preprocess_config(config):
                 continue
 
 
-mpf_config = MpfConfig.load_config_file(args.mcconfigfile)
+mpf_config = ConfigProcessor.load_config_file(args.mcconfigfile)
 machine_path = set_machine_path(args.machine_path,
                                 mpf_config['mpf_mc']['paths'][
                                     'machine_files'])

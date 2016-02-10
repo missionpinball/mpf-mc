@@ -7,8 +7,8 @@ from kivy.clock import Clock
 from kivy.config import Config
 
 from mc.core.utils import load_machine_config
-from mpf.system.config import Config as MpfConfig
-from mpf.system.utility_functions import Util
+from mpf.core.config_processor import ConfigProcessor
+from mpf.core.utility_functions import Util
 from kivy.logger import FileHandler
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 
@@ -146,8 +146,8 @@ class MpfMcTestCase(unittest.TestCase):
         # it would be called again when we call super().run().
 
 
-        mpf_config = MpfConfig.load_config_file(self.get_options()[
-                                                    'mcconfigfile'])
+        mpf_config = ConfigProcessor.load_config_file(self.get_options()[
+                                                      'mcconfigfile'])
 
         mpf_config = load_machine_config(
                 Util.string_to_list(self.get_config_file()),
@@ -172,7 +172,7 @@ class MpfMcTestCase(unittest.TestCase):
         # set the title bar, just for fun. :)
         self.mc.title = str(self._test_name)
 
-        if not self.mc.init_done:
+        if not self.mc._init_done:
             Clock.schedule_once(self.run_test, 0)
             return
 

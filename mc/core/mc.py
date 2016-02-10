@@ -3,6 +3,7 @@ mpf_mc.
 
 """
 import queue
+import threading
 import time
 
 from kivy.app import App
@@ -10,15 +11,16 @@ from kivy.clock import Clock
 from kivy.logger import Logger
 
 from mc.core.bcp_processor import BcpProcessor
-from mc.core.config_processor import McConfig
+from mc.core.config_processor import ConfigProcessor
 from mc.core.mode_controller import ModeController
 from mc.core.slide_player import SlidePlayer
 from mc.core.widget_player import WidgetPlayer
 from mc.uix.transitions import TransitionManager
-from mpf.system.case_insensitive_dict import CaseInsensitiveDict
-from mpf.system.events import EventManager
-from mpf.system.player import Player
-from mc.core.assets import AssetManager
+from mpf.core.case_insensitive_dict import CaseInsensitiveDict
+from mpf.core.config_validator import ConfigValidator
+from mpf.core.events import EventManager
+from mpf.core.player import Player
+from mpf.core.assets import AssetManager
 from mc.assets.image import ImageAsset
 
 try:
@@ -39,12 +41,14 @@ class MpfMc(App):
         self.options = options
         self.machine_config = config
         self.machine_path = machine_path
+        self.clock = Clock
         self._boot_holds = set()
 
         self.modes = CaseInsensitiveDict()
         self.player_list = list()
         self.player = None
         self.num_players = 0
+        self.bcp_client_connected = False
 
         self.slide_configs = dict()
         self.widget_configs = dict()
@@ -53,7 +57,6 @@ class MpfMc(App):
         self.scriptlets = list()
 
         self.register_boot_hold('init')
-        self.register_boot_hold('assets')
         self.displays = CaseInsensitiveDict()
         self.machine_vars = CaseInsensitiveDict()
         self.machine_var_monitor = False
@@ -67,13 +70,15 @@ class MpfMc(App):
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
-        self.init_done = False
+        self._init_done = False
+        self.thread_stopper = threading.Event()
 
         # Core components
-        self.events = EventManager(self, setup_event_player=False)
+        self.config_validator = ConfigValidator(self)
+        self.events = EventManager(self)
         self.mode_controller = ModeController(self)
-        McConfig.load_config_spec()
-        self.config_processor = McConfig(self)
+        ConfigValidator.load_config_spec()
+        self.config_processor = ConfigProcessor(self)
         self.slide_player = SlidePlayer(self)
         self.widget_player = WidgetPlayer(self)
         self.transition_manager = TransitionManager(self)
@@ -96,16 +101,19 @@ class MpfMc(App):
             SoundAsset.extensions = tuple(self.sound_system.audio_interface.supported_extensions())
             SoundAsset.initialize(self)
 
-        Clock.schedule_interval(self._check_crash_queue, 1)
+        self.clock.schedule_interval(self._check_crash_queue, 1)
+
+    def get_system_config(self):
+        return self.machine_config['mpf_mc']
 
     def validate_machine_config_section(self, section):
-        if section not in McConfig.config_spec:
+        if section not in ConfigValidator.config_spec:
             return
 
         if section not in self.machine_config:
             self.config[section] = dict()
 
-        self.machine_config[section] = self.config_processor.process_config2(
+        self.machine_config[section] = self.config_validator.validate_config(
                 section, self.machine_config[section], section)
 
     def get_config(self):
@@ -119,7 +127,7 @@ class MpfMc(App):
         # print('clearing boot hold', hold)
         self._boot_holds.remove(hold)
         if not self._boot_holds:
-            self._init_done()
+            self.init_done()
 
     def displays_initialized(self, *args):
         from mc.uix.window import Window
@@ -147,25 +155,20 @@ class MpfMc(App):
         self.events._process_event_queue()
         self.clear_boot_hold('init')
 
-    def _init_done(self):
-        self.init_done = True
-        McConfig.unload_config_spec()
+    def init_done(self):
+        self._init_done = True
+        ConfigValidator.unload_config_spec()
         self.reset()
 
     def build(self):
         self.start_time = time.time()
         self.ticks = 0
-        Clock.schedule_interval(self.tick, 0)
+        self.clock.schedule_interval(self.tick, 0)
 
     def on_stop(self):
         print("Stopping ...")
         app = App.get_running_app()
-        app.asset_manager.shutdown()
-
-        try:
-            app.bcp_processor.socket_thread.stop()
-        except AttributeError:  # if we're running without BCP processor
-            pass
+        app.thread_stopper.set()
 
         try:
             print("Loop rate {}Hz".format(
