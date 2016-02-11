@@ -169,6 +169,33 @@ cdef enum SoundPlayerStatus:
     player_finished,
     player_stopping,
 
+ctypedef struct DuckingSettings:
+    Uint32 attack_start_pos
+    Uint32 attack_duration
+    Uint8 attenuation_volume
+    Uint32 finish_start_pos
+    Uint32 finish_duration
+
+ctypedef struct DuckingEnvelope:
+    DuckingEnvelopeStage stage
+    int source_sound_id
+    int source_track
+    int source_player
+    int target_track
+    Uint32 attack_start_pos
+    Uint32 attack_finish_pos
+    Uint8 sustain_volume
+    Uint32 release_start_pos
+    Uint32 release_finish_pos
+
+cdef enum DuckingEnvelopeStage:
+    envelope_stage_idle,
+    envelope_stage_delay,
+    envelope_stage_attack,
+    envelope_stage_sustain,
+    envelope_stage_release,
+    envelope_stage_finished
+
 ctypedef struct SoundPlayer:
     # The SoundPlayer keeps track of the current sample position in the source audio
     # chunk and is also keeps track of variables for sound looping and determining when the
@@ -182,9 +209,8 @@ ctypedef struct SoundPlayer:
     int sample_pos
     int sound_id
     int sound_priority
-    int ducking_envelope_num
     int sound_has_ducking
-
+    DuckingSettings ducking_settings
 
 ctypedef struct AudioCallbackData:
     int sample_rate
@@ -193,6 +219,7 @@ ctypedef struct AudioCallbackData:
     int track_count
     TrackAttributes **tracks
     AudioEventContainer **events
+    DuckingEnvelope **ducking_envelopes
     SDL_mutex *mutex
 
 cdef enum AudioEvent:
@@ -237,32 +264,3 @@ ctypedef struct AudioEventContainer:
     Uint32 time
     AudioEventData data
 
-ctypedef struct DuckingEnvelope:
-    DuckingEnvelopeStage stage
-    int source_sound_id
-    int source_track
-    int source_player
-    int target_track
-    Uint32 attack_start_pos
-    Uint32 attack_finish_pos
-    Uint8 sustain_volume
-    Uint32 release_start_pos
-    Uint32 release_finish_pos
-    Uint32 source_pos
-    Uint32 control_buffer_size
-    Uint8* control_buffer
-
-cdef enum DuckingEnvelopeStage:
-    envelope_stage_idle,
-    envelope_stage_delay,
-    envelope_stage_attack,
-    envelope_stage_sustain,
-    envelope_stage_release,
-    envelope_stage_finished
-
-ctypedef struct DuckingEnvelopeSource:
-    int active
-    int source_track
-    int source_player
-    Uint32 control_buffer_size
-    Uint8* control_buffer

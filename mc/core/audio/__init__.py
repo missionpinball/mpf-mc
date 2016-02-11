@@ -35,7 +35,6 @@ class SoundSystem(object):
         self.mc = mc
         self._initialized = False
         self.audio_interface = None
-        self._master_volume = 1.0
         self.config = {}
         self.tracks = {}
         self.sound_events = {}
@@ -113,13 +112,13 @@ class SoundSystem(object):
 
     @property
     def master_volume(self):
-        return self._master_volume
+        return self.audio_interface.get_master_volume()
 
     @master_volume.setter
     def master_volume(self, value):
         # Constrain volume to the range 0.0 to 1.0
-        value = max(min(value, 1.0), 0.0)
-        self._master_volume = value
+        value = min(max(value, 0.0), 1.0)
+        self.audio_interface.set_master_volume(value)
 
     @property
     def default_track(self):

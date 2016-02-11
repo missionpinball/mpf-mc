@@ -11,7 +11,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '1', '0-dev6')
+__version_info__ = ('0', '1', '0-dev7')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -129,10 +129,12 @@ cdef class AudioInterface:
         # Initialize the audio callback data structure
         self.audio_callback_data.sample_rate = self.sample_rate
         self.audio_callback_data.audio_channels = self.audio_channels
-        self.audio_callback_data.master_volume = 0
+        self.audio_callback_data.master_volume = MIX_MAX_VOLUME // 2
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackAttributes**> calloc(MAX_TRACKS, sizeof(TrackAttributes*))
         self.audio_callback_data.events = <AudioEventContainer**> calloc(MAX_AUDIO_EVENTS, sizeof(AudioEventContainer*))
+        self.audio_callback_data.ducking_envelopes = <DuckingEnvelope**> calloc(MAX_DUCKING_ENVELOPES,
+                                                                                sizeof(DuckingEnvelope*))
 
         # Initialize audio events
         for i in range(MAX_AUDIO_EVENTS):
@@ -142,6 +144,20 @@ cdef class AudioInterface:
             self.audio_callback_data.events[i].track = 0
             self.audio_callback_data.events[i].player = 0
             self.audio_callback_data.events[i].time = 0
+
+        # Initialize ducking envelopes
+        for i in range(MAX_DUCKING_ENVELOPES):
+            self.audio_callback_data.ducking_envelopes[i] = <DuckingEnvelope*> malloc(sizeof(DuckingEnvelope))
+            self.audio_callback_data.ducking_envelopes[i].stage = envelope_stage_idle
+            self.audio_callback_data.ducking_envelopes[i].source_sound_id = 0
+            self.audio_callback_data.ducking_envelopes[i].source_track = 0
+            self.audio_callback_data.ducking_envelopes[i].source_player = 0
+            self.audio_callback_data.ducking_envelopes[i].target_track = 0
+            self.audio_callback_data.ducking_envelopes[i].attack_start_pos = 0
+            self.audio_callback_data.ducking_envelopes[i].attack_finish_pos = 0
+            self.audio_callback_data.ducking_envelopes[i].sustain_volume = 0
+            self.audio_callback_data.ducking_envelopes[i].release_start_pos = 0
+            self.audio_callback_data.ducking_envelopes[i].release_finish_pos = 0
 
         self.audio_callback_data.mutex = SDL_CreateMutex()
 
@@ -214,6 +230,7 @@ cdef class AudioInterface:
 
     @staticmethod
     def db_to_gain(float db):
+        """Converts a value in decibels (-inf to 0.0) to a gain (0.0 to 1.0)"""
         return pow(10, db / 20.0)
 
     @staticmethod
@@ -340,6 +357,18 @@ cdef class AudioInterface:
             extensions.append("ogg")
         return extensions
 
+    def get_master_volume(self):
+        cdef float master_volume
+        SDL_LockMutex(self.audio_callback_data.mutex)
+        master_volume = self.audio_callback_data.master_volume / MIX_MAX_VOLUME
+        SDL_UnlockMutex(self.audio_callback_data.mutex)
+        return master_volume
+
+    def set_master_volume(self, float volume):
+        SDL_LockMutex(self.audio_callback_data.mutex)
+        self.audio_callback_data.master_volume = min(max(int(volume * MIX_MAX_VOLUME), 0), MIX_MAX_VOLUME)
+        SDL_UnlockMutex(self.audio_callback_data.mutex)
+
     def get_settings(self):
         """
         Gets the current audio interface settings. This method is only intended for testing purposes.
@@ -446,14 +475,14 @@ cdef class AudioInterface:
         """
         cdef int track_num = len(self.tracks)
         if track_num == MAX_TRACKS:
-            Logger.error("Add track failed: The maximum number of tracks ({}) has been reached.".format(MAX_TRACKS))
+            Logger.error("AudioInterface: Add track failed - the maximum number of tracks ({}) has been reached.".format(MAX_TRACKS))
             return None
 
         # Make sure track name does not already exist (no duplicates allowed)
         name = name.lower()
         for track in self.tracks:
             if name == track.name:
-                Logger.error("Add track failed: The track name '{}' already exists.".format(name))
+                Logger.error("AudioInterface: Add track failed - the track name '{}' already exists.".format(name))
                 return None
 
         # Make sure audio callback function cannot be called while we are changing the track data
@@ -475,7 +504,7 @@ cdef class AudioInterface:
         # Allow audio callback function to be called again
         SDL_UnlockAudio()
 
-        Logger.info("The '{}' track has successfully been created.".format(name))
+        Logger.info("AudioInterface: The '{}' track has successfully been created.".format(name))
 
         return new_track
 
@@ -566,13 +595,15 @@ cdef class AudioInterface:
             channel: The SDL_Mixer channel number (corresponds to the audio interface channel number)
             output_buffer: The SDL_Mixer audio buffer for the mixer channel to process
             length: The length (bytes) of the audio buffer
-            data: A pointer to the Track class for the channel
+            data: A pointer to the AudioCallbackData class for the channel (contains all audio
+                processing-related settings and state, ex: interface settings, tracks, sound
+                players, ducking envelopes, etc.)
 
         Notes:
             This static function is responsible for filling the supplied audio buffer with sound.
-            The function is called during an audio channel effect callback.  This audio library
-            only uses a single SDL_Mixer channel for all output.  Individual track buffers are
-            maintained in each Track object and are processed during this callback.
+            samples. The function is called during an audio channel effect callback.  This audio
+            library only uses a single SDL_Mixer channel for all output.  Individual track buffers
+            are maintained in each Track object and are processed during this callback.
         """
 
         if data == NULL:
@@ -587,7 +618,7 @@ cdef class AudioInterface:
         # (multi-threaded protection)
         SDL_LockMutex(callback_data.mutex)
 
-        # Process any sound play and stop events
+        # Process any internal sound events that may affect sound playback (play and stop events)
         process_sound_events(callback_data)
 
         # Loop over tracks, mixing the playing sounds into the track's audio buffer
@@ -612,7 +643,7 @@ cdef class AudioInterface:
                                 length)
 
         # Apply master volume to output buffer
-        # TODO: implement master volume
+        apply_volume_to_buffer(<Uint8*> output_buffer, length, callback_data.master_volume)
 
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockMutex(callback_data.mutex)
@@ -620,7 +651,7 @@ cdef class AudioInterface:
 cdef void process_sound_events(AudioCallbackData *callback_data) nogil:
     """
     Processes any new sound events that should be processed prior to the main
-    audio loop processing (such as sound play and sound stop events).
+    audio callback processing (such as sound play and sound stop events).
     Args:
         callback_data: The audio callback data structure
     """
@@ -793,8 +824,35 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
 
             track.sound_players[player].status = player_idle
 
-cdef inline void mix_sound_sample_to_buffer(Uint8*sound_buffer, int sample_pos, Uint8 sound_volume,
-                                            Uint8*output_buffer, int buffer_pos) nogil:
+cdef void apply_volume_to_buffer(Uint8 *buffer, int buffer_length, Uint8 volume) nogil:
+    cdef int temp_sample
+    cdef Sample16Bit sample
+    cdef int buffer_pos = 0
+
+    while buffer_pos < buffer_length:
+
+        # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
+        sample.bytes.byte0 = buffer[buffer_pos]
+        sample.bytes.byte1 = buffer[buffer_pos + 1]
+        temp_sample = (sample.value * volume) // MIX_MAX_VOLUME
+
+        # Clip the temp sample back to a 16-bit value (will cause distortion if samples
+        # on channel are too loud)
+        if temp_sample > MAX_AUDIO_VALUE_S16:
+            temp_sample = MAX_AUDIO_VALUE_S16
+        elif temp_sample < MIN_AUDIO_VALUE_S16:
+            temp_sample = MIN_AUDIO_VALUE_S16
+
+        # Put the new sample back into the output buffer (from a 32-bit value
+        # back to a 16-bit value that we know is in 16-bit value range)
+        sample.value = temp_sample
+        buffer[buffer_pos] = sample.bytes.byte0
+        buffer[buffer_pos + 1] = sample.bytes.byte1
+
+        buffer_pos += 2
+
+cdef inline void mix_sound_sample_to_buffer(Uint8 *sound_buffer, int sample_pos, Uint8 sound_volume,
+                                            Uint8 *output_buffer, int buffer_pos) nogil:
     """
     Mixes a single sample into a buffer at the specified volume
     Args:
@@ -998,7 +1056,7 @@ cdef class Track:
             self.attributes.sound_players[i].sample_pos = 0
             self.attributes.sound_players[i].sound_id = 0
             self.attributes.sound_players[i].sound_priority = 0
-            self.attributes.sound_players[i].ducking_envelope_num = -1
+            self.attributes.sound_players[i].sound_has_ducking = 0
 
     def __dealloc__(self):
 
@@ -1116,6 +1174,8 @@ cdef class Track:
             # Return the next sound from the priority queue if it has not expired
             if not next_sound[1] or next_sound[1] > time.time():
                 return next_sound[2], -next_sound[0], next_sound[3]
+            else:
+                Logger.debug("Discarding expired sound from queue: {}".format(next_sound))
 
     def play_sound(self, sound not None, **kwargs):
         """
@@ -1342,29 +1402,25 @@ cdef class Track:
                 # samples are 16 bits)
                 samples_to_pos_factor = self._audio_callback_data.audio_channels * 2
 
-                """
-                envelope = self._audio_interface.get_available_ducking_envelope()
-                if ducking_envelope_num >= 0:
-                    # Set initial ducking envelope state values
-                    if sound.ducking.delay > 0:
-                        self._audio_interface.audio_callback_data.ducking_envelopes[
-                            envelope].stage = envelope_stage_delay
-                    else:
-                        self._audio_interface.audio_callback_data.ducking_envelopes[
-                            envelope].stage = envelope_stage_attack
+                self.attributes.sound_players[player].sound_has_ducking = 1
+                self.attributes.sound_players[
+                    player].ducking_settings.attack_start_pos = sound.ducking.delay * samples_to_pos_factor
+                self.attributes.sound_players[
+                    player].ducking_settings.attack_duration = sound.ducking.attack * samples_to_pos_factor
+                self.attributes.sound_players[player].ducking_settings.attenuation_volume = int(
+                    sound.ducking.attenuation * MIX_MAX_VOLUME)
+                self.attributes.sound_players[
+                    player].ducking_settings.attack_start_pos = sound.ducking.delay * samples_to_pos_factor
+                self.attributes.sound_players[
+                    player].ducking_settings.attack_duration = sound.ducking.attack * samples_to_pos_factor
+                self.attributes.sound_players[player].ducking_settings.finish_start_pos = mc.chunk.alen - (
+                    sound.ducking.release_point * samples_to_pos_factor)
+                self.attributes.sound_players[
+                    player].ducking_settings.finish_duration = sound.ducking.release * samples_to_pos_factor
 
-                    self._audio_interface.audio_callback_data.ducking_envelopes[
-                        envelope].attack_start_pos = sound.ducking.delay * samples_to_pos_factor
-                    self._audio_interface.audio_callback_data.ducking_envelopes[envelope].attack_finish_pos = \
-                        (sound.ducking.delay + sound.ducking.attack) * samples_to_pos_factor
-                    self._audio_interface.audio_callback_data.ducking_envelopes[envelope].sustain_volume = int(
-                        sound.ducking.attenuation * MIX_MAX_VOLUME)
-                    self._audio_interface.audio_callback_data.ducking_envelopes[envelope].release_start_pos = \
-                        mc.chunk.alen - (sound.ducking.release_point * samples_to_pos_factor)
-                    self._audio_interface.audio_callback_data.ducking_envelopes[envelope].release_finish_pos = \
-                        mc.chunk.alen - ((sound.ducking.release_point + sound.ducking.release) * samples_to_pos_factor)
-                    self._audio_interface.audio_callback_data.ducking_envelopes[envelope].source_pos = 0
-                """
+                Logger.debug("Track: Adding ducking settings to sound {}".format(sound.name))
+            else:
+                self.attributes.sound_players[player].sound_has_ducking = 0
 
             SDL_UnlockMutex(self.mutex)
 
