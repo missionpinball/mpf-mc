@@ -154,21 +154,20 @@ cdef union Sample16Bit:
     Sample16Bytes bytes
 
 ctypedef struct TrackAttributes:
-    int track_num
+    int number
     int max_simultaneous_sounds
     int volume
     void *buffer
     int buffer_size
-
     SoundPlayer *sound_players
-    SoundEventData *events
 
 cdef enum SoundPlayerStatus:
     # Enumeration of the possible AudioSamplePlayer status values.
     player_idle,
     player_pending,
     player_playing,
-    player_finished
+    player_finished,
+    player_stopping,
 
 ctypedef struct SoundPlayer:
     # The SoundPlayer keeps track of the current sample position in the source audio
@@ -183,6 +182,9 @@ ctypedef struct SoundPlayer:
     int sample_pos
     int sound_id
     int sound_priority
+    int ducking_envelope_num
+    int sound_has_ducking
+
 
 ctypedef struct AudioCallbackData:
     int sample_rate
@@ -190,17 +192,77 @@ ctypedef struct AudioCallbackData:
     int master_volume
     int track_count
     TrackAttributes **tracks
+    AudioEventContainer **events
     SDL_mutex *mutex
 
-cdef enum SoundEvent:
-    event_none,
-    event_sound_start,
-    event_sound_stop,
-    event_sound_marker,
+cdef enum AudioEvent:
+    event_none,                     # Event is not in use and is available
+    event_sound_play,               # Request to play a sound
+    event_sound_replace,            # Request to play a sound that replaces a sound in progress
+    event_sound_stop,               # Request to stop a sound that is playing
+    event_sound_started,            # Notification that a sound has started playing
+    event_sound_stopped,            # Notification that a sound has stopped
+    event_sound_marker,             # Notification that a sound marker has been reached
+    event_track_ducking_start,      # Request to start ducking on a track (fade down)
+    event_track_ducking_stop,       # Request to stop ducking on a track (fade up)
 
-ctypedef struct SoundEventData:
-    SoundEvent event
+ctypedef struct AudioEventDataPlaySound:
+    Mix_Chunk *chunk
+    int volume
+    int loops
+
+ctypedef struct AudioEventDataStopSound:
+    int track
     int player
-    int sound_id
-    Uint32 time
 
+ctypedef struct AudioEventDataDucking:
+    int target_track
+    Uint32 duration
+    Uint8 target_volume
+
+ctypedef struct AudioEventDataMarker:
+    int id
+
+ctypedef union AudioEventData:
+    AudioEventDataPlaySound play
+    AudioEventDataStopSound stop
+    AudioEventDataDucking ducking
+    AudioEventDataMarker marker
+
+ctypedef struct AudioEventContainer:
+    AudioEvent event
+    int sound_id
+    int track
+    int player
+    Uint32 time
+    AudioEventData data
+
+ctypedef struct DuckingEnvelope:
+    DuckingEnvelopeStage stage
+    int source_sound_id
+    int source_track
+    int source_player
+    int target_track
+    Uint32 attack_start_pos
+    Uint32 attack_finish_pos
+    Uint8 sustain_volume
+    Uint32 release_start_pos
+    Uint32 release_finish_pos
+    Uint32 source_pos
+    Uint32 control_buffer_size
+    Uint8* control_buffer
+
+cdef enum DuckingEnvelopeStage:
+    envelope_stage_idle,
+    envelope_stage_delay,
+    envelope_stage_attack,
+    envelope_stage_sustain,
+    envelope_stage_release,
+    envelope_stage_finished
+
+ctypedef struct DuckingEnvelopeSource:
+    int active
+    int source_track
+    int source_player
+    Uint32 control_buffer_size
+    Uint8* control_buffer
