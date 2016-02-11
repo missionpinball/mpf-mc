@@ -1,6 +1,6 @@
 
 from kivy.logger import Logger
-from mc.core.config_player import ConfigPlayer
+from mpf.core.config_player import ConfigPlayer
 
 
 class SoundPlayer(ConfigPlayer):
@@ -21,7 +21,7 @@ class SoundPlayer(ConfigPlayer):
             # Retrieve sound asset by name
             sound_name = s.pop('sound')
             try:
-                sound = self.mc.sounds[sound_name]
+                sound = self.machine.sounds[sound_name]
             except KeyError:
                 Logger.warning("SoundPlayer: The specified sound does not exist ('{}') - "
                                "sound could not be played.".format(sound_name))
@@ -29,7 +29,7 @@ class SoundPlayer(ConfigPlayer):
 
             # Get track by name. If track was not provided, use the default track name from the sound.
             if s['track'] and s['track'] in self.mc.sound_system.tracks.keys():
-                track = self.mc.sound_system.tracks[s['track']]
+                track = self.machine.sound_system.tracks[s['track']]
             else:
                 track = sound.track
 

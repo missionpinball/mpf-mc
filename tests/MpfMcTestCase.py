@@ -78,10 +78,10 @@ class MpfMcTestCase(unittest.TestCase):
 
     def advance_time(self, secs=.1):
         start = time()
-        self.mc.events._process_event_queue()
+        self.mc.events.process_event_queue()
         while time() < start + secs:
             sleep(.01)
-            self.mc.events._process_event_queue()
+            self.mc.events.process_event_queue()
             EventLoop.idle()
 
     def get_pixel_color(self, x, y):

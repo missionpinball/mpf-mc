@@ -1,4 +1,4 @@
-from mc.core.assets import Asset, AssetPool
+from mpf.core.assets import Asset, AssetPool
 from mc.core.audio.audio_interface import AudioInterface, AudioException
 from kivy.logger import Logger
 
@@ -50,7 +50,7 @@ class SoundAsset(Asset):
         self._ducking = None
 
         # Make sure a legal track name has been specified.  If not, throw an exception
-        track = self.mc.sound_system.audio_interface.get_track_by_name(self.config['track'])
+        track = self.machine.sound_system.audio_interface.get_track_by_name(self.config['track'])
         if 'track' not in self.config or track is None:
             Logger.error("SoundAsset: sound must have a valid track name. "
                          "Could not create sound '{}' asset.".format(name))
@@ -81,7 +81,7 @@ class SoundAsset(Asset):
             self.config['loops'] = DEFAULT_LOOPS
 
         if 'ducking' in self.config:
-            self._ducking = DuckingSettings(self.mc, self.config['ducking'])
+            self._ducking = DuckingSettings(self.machine, self.config['ducking'])
 
             # An attenuation value of exactly 1.0 does absolutely nothing so
             # there is no point in keeping the ducking settings for this
