@@ -36,8 +36,25 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(settings['audio_channels'], 2)
         self.assertEqual(settings['sample_rate'], 44100)
 
+        # Check static conversion functions (gain, samples)
+        self.assertEqual(interface.string_to_gain('0db'), 1.0)
+        self.assertAlmostEqual(interface.string_to_gain('-3 db'), 0.707945784)
+        self.assertAlmostEqual(interface.string_to_gain('-6 db'), 0.501187233)
+        self.assertAlmostEqual(interface.string_to_gain('-17.5 db'), 0.133352143)
+        self.assertEqual(interface.string_to_gain('3db'), 1.0)
+        self.assertEqual(interface.string_to_gain('0.25'), 0.25)
+        self.assertEqual(interface.string_to_gain('-3'), 0.0)
+
+        self.assertEqual(interface.string_to_samples("234"), 234)
+        self.assertEqual(interface.string_to_samples("234.73"), 234)
+        self.assertEqual(interface.string_to_samples("-23"), -23)
+        self.assertEqual(interface.string_to_samples("2s"), 88200)
+        self.assertEqual(interface.string_to_samples("2 ms"), 88)
+        self.assertEqual(interface.string_to_samples("23.5 ms"), 1036)
+        self.assertEqual(interface.string_to_samples("-2 ms"), -88)
+
         # Check tracks
-        self.assertEqual(interface.get_track_count(), 2)
+        self.assertEqual(interface.get_track_count(), 3)
         track_voice = interface.get_track_by_name("voice")
         self.assertIsNotNone(track_voice)
         self.assertEqual(track_voice.name, "voice")
@@ -49,6 +66,12 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(track_sfx.name, "sfx")
         self.assertAlmostEqual(track_sfx.volume, 0.4)
         self.assertEqual(track_sfx.max_simultaneous_sounds, 8)
+
+        track_music = interface.get_track_by_name("music")
+        self.assertIsNotNone(track_music)
+        self.assertEqual(track_music.name, "music")
+        self.assertAlmostEqual(track_music.volume, 0.5)
+        self.assertEqual(track_music.max_simultaneous_sounds, 1)
 
         # Allow some time for sound assets to load
         self.advance_time(2)
@@ -63,8 +86,12 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('113690_test', self.mc.sounds)        # .wav
         self.assertIn('170380_clear', self.mc.sounds)       # .flac
 
+        # /sounds/music
+        self.assertIn('263774_music', self.mc.sounds)       # .wav
+
         # Test sound_player
         self.mc.events.post('play_sound_text')
+        self.mc.events.post('play_sound_music')
         self.advance_time(1)
 
         # Test two sounds at the same time on the voice track (only

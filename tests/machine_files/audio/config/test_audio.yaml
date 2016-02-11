@@ -13,6 +13,9 @@ sound_system:
       volume: 0.4
       simultaneous_sounds: 8
       preload: yes
+    music:
+      volume: 0.5
+      simultaneous_sounds: 1
 
 modes:
  - mode1
@@ -27,10 +30,21 @@ assets:
         sfx:
             load: on_demand
             track: sfx
+        music:
+            load: on_demand
+            track: music
 
 sounds:
     264828_text:
         loops: 7
+    104457_moron_test:
+        ducking:
+            target: music
+            delay: 10ms
+            attack: 75ms
+            attenuation: -9db
+            release_point: 1sec
+            release: 0.75sec
 
 sound_player:
     play_sound_synthping:
@@ -43,3 +57,6 @@ sound_player:
         sound: 104457_moron_test
     play_sound_test:
         sound: 113690_test
+        volume: 0.25
+    play_sound_music:
+        sound: 263774_music
