@@ -479,10 +479,10 @@ text_styles:
     font_size: 20
   chalk:
     font_size: 50
-    font_name: Chalkduster
+#    font_name: Chalkduster
   typewriter:
     font_size: 30
-    font_name: Courier New
+#    font_name: Courier New
 
 
 
