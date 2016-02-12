@@ -113,7 +113,7 @@ class MpfMc(App):
         Window.initialize(self)
         self.events.post('displays_initialized')
         # Have to do this manually during init since the run loop isn't running
-        self.events._process_event_queue()
+        self.events.process_event_queue()
         self._init()
 
     def _init(self):
@@ -122,16 +122,16 @@ class MpfMc(App):
         # window up until the displays are initialized.
 
         self.events.post("init_phase_1")
-        self.events._process_event_queue()
+        self.events.process_event_queue()
         self.events.post("init_phase_2")
-        self.events._process_event_queue()
+        self.events.process_event_queue()
         self.events.post("init_phase_3")
-        self.events._process_event_queue()
+        self.events.process_event_queue()
         self._load_scriptlets()
         self.events.post("init_phase_4")
-        self.events._process_event_queue()
+        self.events.process_event_queue()
         self.events.post("init_phase_5")
-        self.events._process_event_queue()
+        self.events.process_event_queue()
         self.clear_boot_hold('init')
 
     def init_done(self):
@@ -163,11 +163,11 @@ class MpfMc(App):
         self.player_list = list()
 
         self.events.post('mc_reset_phase_1')
-        self.events._process_event_queue()
+        self.events.process_event_queue()
         self.events.post('mc_reset_phase_2')
-        self.events._process_event_queue()
+        self.events.process_event_queue()
         self.events.post('mc_reset_phase_3')
-        self.events._process_event_queue()
+        self.events.process_event_queue()
 
     def game_start(self, **kargs):
         self.player = None
@@ -225,7 +225,7 @@ class MpfMc(App):
 
     def tick(self, time):
         self.ticks += 1
-        self.events._process_event_queue()
+        self.events.process_event_queue()
 
     def _load_scriptlets(self):
         if 'mc_scriptlets' in self.machine_config:
