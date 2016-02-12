@@ -6,7 +6,7 @@ from kivy.logger import Logger
 
 from mpf.mc.core.bcp_server import BCPServer
 import mpf.core.bcp as bcp
-import version
+import mpf.mc
 
 class BcpProcessor(object):
 
@@ -111,8 +111,8 @@ class BcpProcessor(object):
         """Processes an incoming BCP 'hello' command."""
         try:
             if LooseVersion(kwargs['version']) == (
-                    LooseVersion(version.__bcp_version__)):
-                self.send('hello', version=version.__bcp_version__)
+                    LooseVersion(mpf.mc.__bcp_version__)):
+                self.send('hello', version=mpf.mc.__bcp_version__)
             else:
                 self.send('hello', version='unknown protocol version')
         except KeyError:

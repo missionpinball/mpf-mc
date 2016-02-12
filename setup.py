@@ -3,8 +3,6 @@
 from platform import system
 from setuptools import setup, find_packages
 
-import version
-
 install_requires=['ruamel.yaml',
                   'kivy.deps.sdl2',
                   'kivy.deps.glew',
@@ -19,7 +17,7 @@ if system() == 'Windows':
 setup(
 
     name='mpf_mc',
-    version=version.__version__,
+    version='0.30.0dev7',
     description='Mission Pinball Framework Media Controller',
     long_description='''Graphics, video, and audio engine for the
         Mission Pinball Framework.
@@ -76,10 +74,6 @@ community.''',
     # zip_safe=True,
 
     install_requires=install_requires,
-
-    # setup_requires=['kivy.deps.gstreamer'],
-
-    # dependency_links=['https://missionpinball.com'],
 
     tests_require=['mock']
 )
