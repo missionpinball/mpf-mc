@@ -5,7 +5,7 @@ class DemoDriver(Scriptlet):
 
     def on_load(self):
         self.current_slide_index = 1
-        self.total_slides = 5
+        self.total_slides = 30
         self.mc.demo_driver = self
 
         self.mc.events.add_handler('next_slide', self.next_slide)
@@ -16,7 +16,7 @@ class DemoDriver(Scriptlet):
             return
 
         self.current_slide_index += 1
-        self.mc.events.post('show_slide{}'.format(self.current_slide_index))
+        self.mc.events.post('event{}'.format(self.current_slide_index))
 
     def prev_slide(self):
 
@@ -24,4 +24,4 @@ class DemoDriver(Scriptlet):
             return
 
         self.current_slide_index -= 1
-        self.mc.events.post('show_slide{}'.format(self.current_slide_index))
+        self.mc.events.post('event{}'.format(self.current_slide_index))
