@@ -1,4 +1,4 @@
-from mc.uix.slide_frame import SlideFrame, SlideFrameParent
+from mpf.mc.uix.slide_frame import SlideFrame, SlideFrameParent
 from tests.MpfMcTestCase import MpfMcTestCase
 
 

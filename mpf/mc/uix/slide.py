@@ -5,8 +5,8 @@ from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
 
-from mc.core.mode import Mode
-from mc.core.utils import set_position
+from mpf.mc.core.mode import Mode
+from mpf.mc.core.utils import set_position
 
 
 class Slide(Screen):

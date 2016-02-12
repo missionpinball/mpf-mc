@@ -7,14 +7,14 @@ import socket
 import sys
 from datetime import datetime
 
-from mc.core.config_processor import ConfigProcessor
+from mpf.mc.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
 from mpf.core.config_processor import ConfigProcessor as MpfConfig
 from kivy.config import Config
 from kivy.logger import Logger
 import version
-from mc.core.mc import MpfMc
-from mc.core.utils import set_machine_path, load_machine_config
+from mpf.mc.core.mc import MpfMc
+from mpf.mc.core.utils import set_machine_path, load_machine_config
 
 parser = argparse.ArgumentParser(description='Starts the MPF Media Controller')
 
@@ -48,7 +48,8 @@ parser.add_argument("-V",
 
 parser.add_argument("-C",
                     action="store", dest="mcconfigfile",
-                    default=os.path.join("mc", "mcconfig.yaml"),
+                    default=os.path.abspath(os.path.join("mpf", "mc",
+                                                  "mcconfig.yaml")),
                     metavar='config_file',
                     help="The MPF framework default config file. Default is "
                          "mc/mcconfig.yaml")
@@ -143,7 +144,7 @@ preprocess_config(mpf_config)
 
 
 def main():
-    # from mc.core.mc import MpfMc
+    # from mpf.mc.core.mc import MpfMc
 
     try:
         MpfMc(options=vars(args), config=mpf_config,

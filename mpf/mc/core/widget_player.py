@@ -1,5 +1,5 @@
 from mpf.core.config_player import ConfigPlayer
-from mc.uix.slide import Slide
+from mpf.mc.uix.slide import Slide
 
 class WidgetPlayer(ConfigPlayer):
     config_file_section = 'widget_player'

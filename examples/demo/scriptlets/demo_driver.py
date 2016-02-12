@@ -1,4 +1,4 @@
-from mc.core.scriptlet import Scriptlet
+from mpf.mc.core.scriptlet import Scriptlet
 
 
 class DemoDriver(Scriptlet):

@@ -1,6 +1,6 @@
 from kivy.uix.image import Image
 
-from mc.uix.widget import MpfWidget
+from mpf.mc.uix.widget import MpfWidget
 
 
 class ImageWidget(MpfWidget, Image):

@@ -2,7 +2,7 @@ from kivy.animation import Animation
 from kivy.properties import ObjectProperty
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 
-from mc.core.utils import set_position, percent_to_float
+from mpf.mc.core.utils import set_position, percent_to_float
 
 
 class MpfWidget(object):

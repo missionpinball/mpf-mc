@@ -10,19 +10,19 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
 
-from mc.assets.video import VideoAsset
-from mc.core.bcp_processor import BcpProcessor
-from mc.core.config_processor import ConfigProcessor
-from mc.core.mode_controller import ModeController
-from mc.core.slide_player import SlidePlayer
-from mc.core.widget_player import WidgetPlayer
-from mc.uix.transitions import TransitionManager
+from mpf.mc.assets.video import VideoAsset
+from mpf.mc.core.bcp_processor import BcpProcessor
+from mpf.mc.core.config_processor import ConfigProcessor
+from mpf.mc.core.mode_controller import ModeController
+from mpf.mc.core.slide_player import SlidePlayer
+from mpf.mc.core.widget_player import WidgetPlayer
+from mpf.mc.uix.transitions import TransitionManager
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
 from mpf.core.player import Player
 from mpf.core.assets import AssetManager
-from mc.assets.image import ImageAsset
+from mpf.mc.assets.image import ImageAsset
 
 
 class MpfMc(App):
@@ -109,7 +109,7 @@ class MpfMc(App):
             self.init_done()
 
     def displays_initialized(self, *args):
-        from mc.uix.window import Window
+        from mpf.mc.uix.window import Window
         Window.initialize(self)
         self.events.post('displays_initialized')
         # Have to do this manually during init since the run loop isn't running

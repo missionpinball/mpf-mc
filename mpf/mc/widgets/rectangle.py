@@ -3,8 +3,8 @@ from kivy.graphics import RoundedRectangle
 from kivy.graphics.context_instructions import Color
 from kivy.uix.widget import Widget
 
-from mc.core.utils import set_position
-from mc.uix.widget import MpfWidget
+from mpf.mc.core.utils import set_position
+from mpf.mc.uix.widget import MpfWidget
 
 
 class Rectangle(MpfWidget, Widget):

@@ -1,4 +1,4 @@
-from mc.uix.display import Display
+from mpf.mc.uix.display import Display
 from tests.MpfMcTestCase import MpfMcTestCase
 
 

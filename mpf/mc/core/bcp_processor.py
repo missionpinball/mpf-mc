@@ -4,7 +4,7 @@ from distutils.version import LooseVersion
 from kivy.clock import Clock
 from kivy.logger import Logger
 
-from mc.core.bcp_server import BCPServer
+from mpf.mc.core.bcp_server import BCPServer
 import mpf.core.bcp as bcp
 import version
 

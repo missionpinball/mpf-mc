@@ -9,9 +9,9 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
 from kivy.uix.stencilview import StencilView
 from kivy.uix.widget import WidgetException
 
-from mc.core.utils import set_position
-from mc.uix.slide import Slide
-from mc.uix.widget import MpfWidget
+from mpf.mc.core.utils import set_position
+from mpf.mc.uix.slide import Slide
+from mpf.mc.uix.widget import MpfWidget
 
 transition_map = dict(none=NoTransition,
                       slide=SlideTransition,
@@ -40,7 +40,7 @@ class SlideFrameParent(MpfWidget, FloatLayout):
         super().add_widget(self.stencil)
         self.add_widget(slide_frame)
 
-        self.stencil.pos = set_position(800, 600,
+        self.stencil.pos = set_position(self.width, self.height,
                                 slide_frame.native_size[0],
                                 slide_frame.native_size[1],
                                 slide_frame.config['x'],

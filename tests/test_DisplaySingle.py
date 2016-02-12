@@ -2,9 +2,9 @@ from copy import copy
 
 from kivy.uix.stencilview import StencilView
 
-from mc.uix.display import Display
-from mc.uix.slide import Slide
-from mc.uix.slide_frame import SlideFrame, SlideFrameParent
+from mpf.mc.uix.display import Display
+from mpf.mc.uix.slide import Slide
+from mpf.mc.uix.slide_frame import SlideFrame, SlideFrameParent
 from tests.MpfMcTestCase import MpfMcTestCase
 
 

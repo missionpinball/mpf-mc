@@ -1,4 +1,4 @@
-from mc.widgets.text import Text
+from mpf.mc.widgets.text import Text
 from tests.MpfMcTestCase import MpfMcTestCase
 
 

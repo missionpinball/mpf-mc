@@ -1,6 +1,6 @@
 from kivy.properties import OptionProperty
 
-from mc.uix.transitions import MpfTransition
+from mpf.mc.uix.transitions import MpfTransition
 
 
 class PushTransition(MpfTransition):

@@ -1,4 +1,4 @@
-from mc.uix.slide import Slide
+from mpf.mc.uix.slide import Slide
 from tests.MpfMcTestCase import MpfMcTestCase
 
 

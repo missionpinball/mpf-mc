@@ -1,21 +1,22 @@
-import unittest
+import os
 import sys
-from queue import Empty
+import unittest
 
 from kivy.base import EventLoop, stopTouchApp
 from kivy.clock import Clock
 from kivy.config import Config
+from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
+from kivy.logger import FileHandler
 
-from mc.core.utils import load_machine_config
+import mpf.core
 from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
-from kivy.logger import FileHandler
-from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
+from mpf.mc.core.utils import load_machine_config
 
 Config.set('kivy', 'log_enable', '0')
 Config.set('kivy', 'log_level', 'warning')
 
-from mc.core.mc import MpfMc
+from mpf.mc.core.mc import MpfMc
 from time import time, sleep
 
 
@@ -38,9 +39,8 @@ class MpfMcTestCase(unittest.TestCase):
         super().__init__(*args)
 
     def get_options(self):
-
         return dict(machine_path=self.get_machine_path(),
-                    mcconfigfile='mc/mcconfig.yaml',
+                    mcconfigfile=os.path.abspath('mpf/mc/mcconfig.yaml'),
                     configfile=Util.string_to_list(self.get_config_file()),
                     bcp=False)
 

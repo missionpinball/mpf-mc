@@ -1,4 +1,4 @@
-from mc.core.utils import set_position, percent_to_float
+from mpf.mc.core.utils import set_position, percent_to_float
 from tests.MpfMcTestCase import MpfMcTestCase
 
 
