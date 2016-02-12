@@ -22,14 +22,15 @@ transition_map = dict(none=NoTransition,
                       rise_in=RiseInTransition)
 
 
-class SlideFrameParent(FloatLayout):
-    def __init__(self, mc, name, slide_frame):
+class SlideFrameParent(MpfWidget, FloatLayout):
+    def __init__(self, mc, name, config, slide_frame):
         self.mc = mc
         self.name = slide_frame.name
+        self.config = config
 
         self.ready = False
         self.size_hint = (None, None)
-        super().__init__()
+        super().__init__(mc=mc, mode=None, config=config)
         self.size = slide_frame.native_size
 
         self.stencil = StencilView(size_hint=(None, None),
@@ -39,26 +40,39 @@ class SlideFrameParent(FloatLayout):
         super().add_widget(self.stencil)
         self.add_widget(slide_frame)
 
+        self.stencil.pos = set_position(800, 600,
+                                slide_frame.native_size[0],
+                                slide_frame.native_size[1],
+                                slide_frame.config['x'],
+                                slide_frame.config['y'],
+                                slide_frame.config['anchor_x'],
+                                slide_frame.config['anchor_y'])
+
     def __repr__(self):
         return '<SlideFrameParent name={}, parent={}>'.format(self.name,
                                                               self.parent)
 
+    # def __lt__(self, other):
+    #     return self.stencil.config['z'] < other.stencil.config['z']
+
     def add_widget(self, widget):
         widget.config['z'] = abs(widget.config['z'])
 
+        widget.pos = set_position(self.width, self.height,
+                                  widget.width, widget.height)
+
         self.stencil.add_widget(widget, bisect(self.stencil.children, widget))
 
-    def on_size(self, *args):
-        for widget in self.children:
-            widget.pos = set_position(self.width, self.height,
-                                      widget.width, widget.height)
+    # def on_size(self, *args):
+    #     for widget in self.children:
+    #         widget.pos = set_position(self.width, self.height,
+    #                                   widget.width, widget.height)
 
 
 class SlideFrame(MpfWidget, ScreenManager):
     def __init__(self, mc, name=None, config=None, slide=None, mode=None):
 
         self.name = name  # needs to be set before super()
-
         # If this is a the main SlideFrame of a display, it will get its size
         # from its parent. If this is a widget, it will get its size from
         # the config.
@@ -73,15 +87,23 @@ class SlideFrame(MpfWidget, ScreenManager):
         # minimal config needed if this is a widget
         if not config:
             self.config = dict()
-
+        if 'x' not in config:
+            self.config['x'] = None
+        if 'y' not in config:
+            self.config['y'] = None
+        if 'anchor_y' not in config:
+            self.config['anchor_y'] = 'middle'
+        if 'anchor_x' not in config:
+            self.config['anchor_x'] = 'center'
         if 'z' not in self.config:
             self.config['z'] = 0
 
         self.transition = NoTransition()
+
         # Not implemented yet. Maybe some day?
         # self.default_transition = NoTransition()
 
-        self.slide_frame_parent = SlideFrameParent(mc, name, self)
+        self.slide_frame_parent = SlideFrameParent(mc, name, self.config, self)
         self.slide_frame_parent.config = self.config
 
         self.mc.targets[self.name] = self

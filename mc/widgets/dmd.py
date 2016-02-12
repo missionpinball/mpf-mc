@@ -1,6 +1,6 @@
 from kivy.uix.effectwidget import EffectWidget, EffectBase
 from kivy.uix.scatter import Scatter
-from kivy.uix.widget import Widget
+from kivy.uix.widget import Widget, WidgetException
 
 from mc.core.utils import set_position
 from mc.uix.widget import MpfWidget
@@ -102,7 +102,13 @@ class DmdSource(MpfWidget, Scatter, Widget):
 
         self.add_widget(stencil)
 
-        effect.add_widget(self.source)
+        try:
+            effect.add_widget(self.source)
+        except WidgetException:
+            self.source.parent = None
+            effect.add_widget(self.source)
+
+
         effect.size = (self.config['width'], self.config['height'])
 
         effect.texture.mag_filter = 'nearest'

@@ -15,7 +15,7 @@ class VideoAsset(Asset):
     attribute='videos'
     path_string='videos'
     config_section='videos'
-    extensions=('mkv', 'avi', 'mpg', 'mp4', 'm4v')
+    extensions=('mkv', 'avi', 'mpg', 'mp4', 'm4v', 'mov')
     class_priority=100
     pool_config_section='video_pools'
     asset_group_class=VideoPool

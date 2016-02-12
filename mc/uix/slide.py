@@ -136,7 +136,6 @@ class Slide(Screen):
             self.add_widget_to_parent_frame(widget)
             return
 
-
         self.stencil.add_widget(widget, bisect(self.stencil.children, widget))
 
         widget.pos = set_position(self.size[0],
