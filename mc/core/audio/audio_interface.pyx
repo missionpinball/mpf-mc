@@ -16,6 +16,7 @@ __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
 from libc.string cimport memset, memcpy
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
 cimport cpython.pycapsule as pycapsule
 
 from queue import PriorityQueue, Empty
@@ -124,21 +125,21 @@ cdef class AudioInterface:
         self.buffer_size = self.buffer_samples * self.audio_channels * sizeof(Uint16*)
 
         # Allocate memory for the audio callback data structure
-        self.audio_callback_data = <AudioCallbackData*> calloc(1, sizeof(AudioCallbackData))
+        self.audio_callback_data = <AudioCallbackData*> PyMem_Malloc(sizeof(AudioCallbackData))
 
         # Initialize the audio callback data structure
         self.audio_callback_data.sample_rate = self.sample_rate
         self.audio_callback_data.audio_channels = self.audio_channels
         self.audio_callback_data.master_volume = MIX_MAX_VOLUME // 2
         self.audio_callback_data.track_count = 0
-        self.audio_callback_data.tracks = <TrackAttributes**> calloc(MAX_TRACKS, sizeof(TrackAttributes*))
-        self.audio_callback_data.events = <AudioEventContainer**> calloc(MAX_AUDIO_EVENTS, sizeof(AudioEventContainer*))
-        self.audio_callback_data.ducking_envelopes = <DuckingEnvelope**> calloc(MAX_DUCKING_ENVELOPES,
+        self.audio_callback_data.tracks = <TrackAttributes**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackAttributes*))
+        self.audio_callback_data.events = <AudioEventContainer**> PyMem_Malloc(MAX_AUDIO_EVENTS * sizeof(AudioEventContainer*))
+        self.audio_callback_data.ducking_envelopes = <DuckingEnvelope**> PyMem_Malloc(MAX_DUCKING_ENVELOPES *
                                                                                 sizeof(DuckingEnvelope*))
 
         # Initialize audio events
         for i in range(MAX_AUDIO_EVENTS):
-            self.audio_callback_data.events[i] = <AudioEventContainer*> malloc(sizeof(AudioEventContainer))
+            self.audio_callback_data.events[i] = <AudioEventContainer*> PyMem_Malloc(sizeof(AudioEventContainer))
             self.audio_callback_data.events[i].event = event_none
             self.audio_callback_data.events[i].sound_id = 0
             self.audio_callback_data.events[i].track = 0
@@ -147,7 +148,7 @@ cdef class AudioInterface:
 
         # Initialize ducking envelopes
         for i in range(MAX_DUCKING_ENVELOPES):
-            self.audio_callback_data.ducking_envelopes[i] = <DuckingEnvelope*> malloc(sizeof(DuckingEnvelope))
+            self.audio_callback_data.ducking_envelopes[i] = <DuckingEnvelope*> PyMem_Malloc(sizeof(DuckingEnvelope))
             self.audio_callback_data.ducking_envelopes[i].stage = envelope_stage_idle
             self.audio_callback_data.ducking_envelopes[i].source_sound_id = 0
             self.audio_callback_data.ducking_envelopes[i].source_track = 0
@@ -171,6 +172,31 @@ cdef class AudioInterface:
         SDL_UnlockAudio()
 
         self.tracks = []
+
+    def __del__(self):
+
+        # Stop audio processing (will stop all SDL callbacks)
+        self.disable()
+
+        # Remove tracks
+        self.tracks.clear()
+
+        # Free all allocated memory
+        for i in range(MAX_DUCKING_ENVELOPES):
+            PyMem_Free(self.audio_callback_data.ducking_envelopes[i])
+
+        for i in range(MAX_AUDIO_EVENTS):
+            PyMem_Free(self.audio_callback_data.events[i])
+
+        PyMem_Free(self.audio_callback_data.ducking_envelopes)
+        PyMem_Free(self.audio_callback_data.events)
+        PyMem_Free(self.audio_callback_data.tracks)
+        SDL_DestroyMutex(self.audio_callback_data.mutex)
+        PyMem_Free(self.audio_callback_data)
+
+        # SDL_Mixer and SDL no longer needed
+        Mix_Quit()
+        SDL_Quit()
 
     def _initialize_silence(self):
         """
@@ -667,6 +693,7 @@ cdef void process_sound_events(AudioCallbackData *callback_data) nogil:
             track = callback_data.events[i].track
             player = callback_data.events[i].player
             callback_data.tracks[track].sound_players[player].status = player_pending
+            callback_data.tracks[track].sound_players[player].sample_pos = 0
             callback_data.tracks[track].sound_players[player].sound_id = callback_data.events[i].sound_id
             callback_data.tracks[track].sound_players[player].chunk = callback_data.events[i].data.play.chunk
             callback_data.tracks[track].sound_players[player].volume = callback_data.events[i].data.play.volume
@@ -1032,10 +1059,10 @@ cdef class Track:
             max_simultaneous_sounds = 1
 
         # Allocate memory for the track attributes
-        self.attributes = <TrackAttributes*> calloc(1, sizeof(TrackAttributes))
+        self.attributes = <TrackAttributes*> PyMem_Malloc(sizeof(TrackAttributes))
         self.attributes.number = track_num
         self.attributes.max_simultaneous_sounds = max_simultaneous_sounds
-        self.attributes.buffer = calloc(buffer_size, sizeof(void*))
+        self.attributes.buffer = PyMem_Malloc(buffer_size)
         self.attributes.buffer_size = buffer_size
         Logger.info("Track {}: allocated track audio buffer ({} bytes)".format(name, buffer_size))
         self.volume = volume
@@ -1043,7 +1070,7 @@ cdef class Track:
 
         # Allocate memory for the sound player structs needed for the desired number of
         # simultaneous sounds that can be played on the track.
-        self.attributes.sound_players = <SoundPlayer*> calloc(self.max_simultaneous_sounds, sizeof(SoundPlayer))
+        self.attributes.sound_players = <SoundPlayer*> PyMem_Malloc(self.max_simultaneous_sounds * sizeof(SoundPlayer))
 
         # Initialize sound player attributes
         for i in range(self.max_simultaneous_sounds):
@@ -1063,14 +1090,14 @@ cdef class Track:
         # Free the attributes and other allocated memory
         if self.attributes != NULL:
             if self.attributes.buffer != NULL:
-                free(self.attributes.buffer)
+                PyMem_Free(self.attributes.buffer)
                 self.attributes.buffer = NULL
 
             if self.attributes.sound_players != NULL:
-                free(self.attributes.sound_players)
+                PyMem_Free(self.attributes.sound_players)
                 self.attributes.sound_players = NULL
 
-            free(self.attributes)
+            PyMem_Free(self.attributes)
             self.attributes = NULL
 
     def __repr__(self):

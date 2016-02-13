@@ -68,6 +68,7 @@ cdef extern from "SDL.h" nogil:
     int SDL_PushEvent(SDL_Event *event)
     void SDL_Delay(int)
     int SDL_Init(int)
+    void SDL_Quit()
     void SDL_LockAudio()
     void SDL_UnlockAudio()
 
@@ -110,6 +111,7 @@ cdef extern from "SDL_mixer.h" nogil:
     SDL_RWops *SDL_RWFromFile(const char *file, const char *mode)
 
     int Mix_Init(int)
+    void Mix_Quit()
     int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
     void Mix_Pause(int channel)
     void Mix_Resume(int channel)
