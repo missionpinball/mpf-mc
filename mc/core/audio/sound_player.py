@@ -10,11 +10,10 @@ class SoundPlayer(ConfigPlayer):
         return config
 
     def play(self, settings, mode=None, **kwargs):
-        try:
-            if not mode.active:
-                return
-        except AttributeError:
-            pass
+        del kwargs
+
+        if mode and not mode.active:
+            return
 
         for s in settings:  # settings is a list of one or more sound configs
 
@@ -27,6 +26,8 @@ class SoundPlayer(ConfigPlayer):
                                "sound could not be played.".format(sound_name))
                 return
 
+            # Make a copy of the settings since we need to remove the 'sound' entry
+            # before playing the sound.
             config = s.copy()
             del config['sound']
 
