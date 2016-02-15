@@ -34,7 +34,7 @@ DEF MAX_TRACKS = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
 DEF MAX_TRACK_DUCKING_ENVELOPES = 32
-DEF MAX_AUDIO_EVENTS = 50
+DEF MAX_AUDIO_EVENTS = 32
 DEF CONTROL_RATE = 32
 
 DEF MAX_AUDIO_VALUE_S16 = ((1 << (16 - 1)) - 1)
@@ -140,7 +140,8 @@ cdef class AudioInterface:
         self.audio_callback_data.master_volume = MIX_MAX_VOLUME // 2
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackAttributes**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackAttributes*))
-        self.audio_callback_data.events = <AudioEventContainer**> PyMem_Malloc(MAX_AUDIO_EVENTS * sizeof(AudioEventContainer*))
+        self.audio_callback_data.events = <AudioEventContainer**> PyMem_Malloc(
+            MAX_AUDIO_EVENTS * sizeof(AudioEventContainer*))
 
         # Initialize audio events
         for i in range(MAX_AUDIO_EVENTS):
@@ -482,14 +483,16 @@ cdef class AudioInterface:
         """
         cdef int track_num = len(self.tracks)
         if track_num == MAX_TRACKS:
-            Logger.error("AudioInterface: Add track failed - the maximum number of tracks ({}) has been reached.".format(MAX_TRACKS))
+            Logger.error("AudioInterface: Add track failed - "
+                         "the maximum number of tracks ({}) has been reached.".format(MAX_TRACKS))
             return None
 
         # Make sure track name does not already exist (no duplicates allowed)
         name = name.lower()
         for track in self.tracks:
             if name == track.name:
-                Logger.error("AudioInterface: Add track failed - the track name '{}' already exists.".format(name))
+                Logger.error("AudioInterface: Add track failed - "
+                             "the track name '{}' already exists.".format(name))
                 return None
 
         # Make sure audio callback function cannot be called while we are changing the track data
@@ -789,7 +792,10 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
 
             if track.sound_players[player].sound_has_ducking:
                 ducking_settings = cython.address(track.sound_players[player].ducking_settings)
-                if track.sound_players[player].current_loop == 0 and track.sound_players[player].sample_pos <= ducking_settings.attack_start_pos < track.sound_players[player].sample_pos + buffer_size:
+                if track.sound_players[player].current_loop == 0 and track.sound_players[
+                    player].sample_pos <= ducking_settings.attack_start_pos < track.sound_players[
+                    player].sample_pos + buffer_size:
+
                     # Ducking attack starts in this callback frame, set ducking envelope settings
                     target_track = callback_data.tracks[ducking_settings.track]
                     envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
@@ -799,7 +805,10 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                     envelope.stage_target_volume = ducking_settings.attenuation_volume
                     envelope.stage_pos = track.sound_players[player].sample_pos - ducking_settings.attack_start_pos
 
-                if track.sound_players[player].loops_remaining == 0 and track.sound_players[player].sample_pos <= ducking_settings.release_start_pos < track.sound_players[player].sample_pos + buffer_size:
+                if track.sound_players[player].loops_remaining == 0 and track.sound_players[
+                    player].sample_pos <= ducking_settings.release_start_pos < track.sound_players[
+                    player].sample_pos + buffer_size:
+
                     # Ducking release starts in this callback frame, set ducking envelope settings
                     target_track = callback_data.tracks[ducking_settings.track]
                     envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
@@ -1551,7 +1560,8 @@ cdef class Track:
                 self.attributes.sound_players[player].status = player_pending
             else:
                 Logger.warning(
-                    "Track: All internal audio events are currently in use, could not play sound {}".format(sound.name))
+                    "Track: All internal audio events are currently in use, "
+                    "could not play sound {}".format(sound.name))
 
             # If the sound has a ducking envelope, apply it to the target track
             if sound.ducking is not None and sound.ducking.track is not None:
