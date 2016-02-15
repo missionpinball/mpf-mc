@@ -183,8 +183,8 @@ ctypedef struct DuckingSettings:
 
 ctypedef struct DuckingEnvelope:
     DuckingEnvelopeStage stage
-    Uint32 stage_pos
-    Uint32 stage_duration
+    int stage_pos
+    int stage_duration
     Uint8 stage_initial_volume
     Uint8 stage_target_volume
     Uint8 current_volume
@@ -243,20 +243,12 @@ ctypedef struct AudioEventDataStopSound:
     int track
     int player
 
-ctypedef struct AudioEventDataDucking:
-    int track
-    int envelope_num
-    int buffer_event_pos
-    Uint32 duration
-    Uint8 target_volume
-
 ctypedef struct AudioEventDataMarker:
     int id
 
 ctypedef union AudioEventData:
     AudioEventDataPlaySound play
     AudioEventDataStopSound stop
-    AudioEventDataDucking ducking
     AudioEventDataMarker marker
 
 ctypedef struct AudioEventContainer:

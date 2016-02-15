@@ -623,9 +623,6 @@ cdef class AudioInterface:
                                 length,
                                 callback_data)
 
-        # Process any track ducking events created during the sound generation process
-        process_track_ducking_events(callback_data)
-
         # Loop over tracks again, mixing down tracks to the master output buffer
         for track_num in range(callback_data.track_count):
 
@@ -780,34 +777,24 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
             if track.sound_players[player].sound_has_ducking:
                 ducking_settings = cython.address(track.sound_players[player].ducking_settings)
                 if track.sound_players[player].current_loop == 0 and track.sound_players[player].sample_pos <= ducking_settings.attack_start_pos < track.sound_players[player].sample_pos + buffer_size:
-                    # Send ducking attack start event
-                    event_index = get_available_audio_event(callback_data.events)
-                    if event_index != -1:
-                        callback_data.events[event_index].event = event_track_ducking_start
-                        callback_data.events[event_index].track = track.number
-                        callback_data.events[event_index].player = player
-                        callback_data.events[event_index].sound_id = track.sound_players[player].sound_id
-                        callback_data.events[event_index].time = sdl_ticks
-                        callback_data.events[event_index].data.ducking.track = ducking_settings.track
-                        callback_data.events[event_index].data.ducking.envelope_num = ducking_settings.envelope_num
-                        callback_data.events[event_index].data.ducking.buffer_event_pos = track.sound_players[player].sample_pos - ducking_settings.attack_start_pos
-                        callback_data.events[event_index].data.ducking.duration = ducking_settings.attack_duration
-                        callback_data.events[event_index].data.ducking.target_volume = ducking_settings.attenuation_volume
+                    # Ducking attack starts in this callback frame, set ducking envelope settings
+                    target_track = callback_data.tracks[ducking_settings.track]
+                    envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
+                    envelope.stage = envelope_stage_attack
+                    envelope.stage_duration = ducking_settings.attack_duration
+                    envelope.stage_initial_volume = envelope.current_volume
+                    envelope.stage_target_volume = ducking_settings.attenuation_volume
+                    envelope.stage_pos = track.sound_players[player].sample_pos - ducking_settings.attack_start_pos
 
                 if track.sound_players[player].loops_remaining == 0 and track.sound_players[player].sample_pos <= ducking_settings.release_start_pos < track.sound_players[player].sample_pos + buffer_size:
-                    # Send ducking attack start event
-                    event_index = get_available_audio_event(callback_data.events)
-                    if event_index != -1:
-                        callback_data.events[event_index].event = event_track_ducking_stop
-                        callback_data.events[event_index].track = track.number
-                        callback_data.events[event_index].player = player
-                        callback_data.events[event_index].sound_id = track.sound_players[player].sound_id
-                        callback_data.events[event_index].time = sdl_ticks
-                        callback_data.events[event_index].data.ducking.track = ducking_settings.track
-                        callback_data.events[event_index].data.ducking.envelope_num = ducking_settings.envelope_num
-                        callback_data.events[event_index].data.ducking.buffer_event_pos = track.sound_players[player].sample_pos - ducking_settings.release_start_pos
-                        callback_data.events[event_index].data.ducking.duration = ducking_settings.release_duration
-                        callback_data.events[event_index].data.ducking.target_volume = MIX_MAX_VOLUME
+                    # Ducking release starts in this callback frame, set ducking envelope settings
+                    target_track = callback_data.tracks[ducking_settings.track]
+                    envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
+                    envelope.stage = envelope_stage_release
+                    envelope.stage_duration = ducking_settings.release_duration
+                    envelope.stage_initial_volume = envelope.current_volume
+                    envelope.stage_target_volume = MIX_MAX_VOLUME
+                    envelope.stage_pos = track.sound_players[player].sample_pos - ducking_settings.release_start_pos
 
             # Loop over destination buffer, mixing in the source sample
             index = 0
@@ -966,32 +953,6 @@ cdef inline float in_out_quad(float progress) nogil:
         return 0.5 * p * p
     p -= 1.0
     return -0.5 * (p * (p - 2.0) - 1.0)
-
-cdef void process_track_ducking_events(AudioCallbackData *callback_data) nogil:
-    cdef AudioEventContainer *event
-    cdef TrackAttributes* track
-    cdef DuckingEnvelope *envelope
-
-    for i in range(MAX_AUDIO_EVENTS):
-        event = callback_data.events[i]
-        if event.event == event_track_ducking_start:
-            track = callback_data.tracks[event.data.ducking.track]
-            envelope = track.ducking_envelopes[event.data.ducking.envelope_num]
-            envelope.stage = envelope_stage_attack
-            envelope.stage_duration = event.data.ducking.duration
-            envelope.stage_initial_volume = envelope.current_volume
-            envelope.stage_target_volume = event.data.ducking.target_volume
-            envelope.stage_pos = event.data.ducking.buffer_event_pos
-            event.event = event_none
-        elif event.event == event_track_ducking_stop:
-            track = callback_data.tracks[event.data.ducking.track]
-            envelope = track.ducking_envelopes[event.data.ducking.envelope_num]
-            envelope.stage = envelope_stage_release
-            envelope.stage_duration = event.data.ducking.duration
-            envelope.stage_initial_volume = envelope.current_volume
-            envelope.stage_target_volume = event.data.ducking.target_volume
-            envelope.stage_pos = event.data.ducking.buffer_event_pos
-            event.event = event_none
 
 cdef void apply_track_ducking_envelopes(TrackAttributes* track, int buffer_size, int audio_channels) nogil:
     """
@@ -1234,7 +1195,7 @@ cdef class Track:
             self.attributes = NULL
 
     def __repr__(self):
-        return '<Track.{}({})>'.format(self.name, self.number)
+        return '<Track.{}.{}>'.format(self.number, self.name)
 
     property name:
         def __get__(self):
