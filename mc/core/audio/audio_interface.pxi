@@ -168,6 +168,7 @@ cdef enum SoundPlayerStatus:
     # Enumeration of the possible AudioSamplePlayer status values.
     player_idle,
     player_pending,
+    player_replacing,
     player_playing,
     player_finished,
     player_stopping,
@@ -197,12 +198,8 @@ cdef enum DuckingEnvelopeStage:
     envelope_stage_release,
     envelope_stage_finished
 
-ctypedef struct SoundPlayer:
-    # The SoundPlayer keeps track of the current sample position in the source audio
-    # chunk and is also keeps track of variables for sound looping and determining when the
-    # sound has finished playing.
+ctypedef struct SoundSettings:
     Mix_Chunk *chunk
-    SoundPlayerStatus status
     int volume
     int loops_remaining
     int current_loop
@@ -213,6 +210,14 @@ ctypedef struct SoundPlayer:
     int sound_priority
     int sound_has_ducking
     DuckingSettings ducking_settings
+
+ctypedef struct SoundPlayer:
+    # The SoundPlayer keeps track of the current sample position in the source audio
+    # chunk and is also keeps track of variables for sound looping and determining when the
+    # sound has finished playing.
+    SoundPlayerStatus status
+    SoundSettings current
+    SoundSettings next
 
 ctypedef struct AudioCallbackData:
     int sample_rate
