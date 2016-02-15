@@ -3,7 +3,7 @@ sound_system:
   buffer: 4096
   frequency: 44100
   channels: 2
-  master_volume: 0.7
+  master_volume: 0.9
   tracks:
     voice:
       volume: 0.6
@@ -40,11 +40,19 @@ sounds:
     104457_moron_test:
         ducking:
             target: music
-            delay: 10ms
-            attack: 75ms
+            delay: 0
+            attack: 0.4sec
             attenuation: -9db
             release_point: 1sec
-            release: 0.75sec
+            release: 1.25sec
+    210871_synthping:
+        ducking:
+            target: music
+            delay: 0
+            attack: 0.2sec
+            attenuation: -9db
+            release_point: 0.5sec
+            release: 0.6sec
 
 sound_player:
     play_sound_synthping:
