@@ -98,10 +98,13 @@ class TestAudio(MpfMcTestCase):
         # 1 sound at a time max).  Second sound should be queued and
         # play immediately after the first one ends.
         self.mc.events.post('play_sound_test')
+        self.advance_time(2)
         self.mc.events.post('play_sound_moron_test')
         self.advance_time(3)
         self.mc.events.post('play_sound_synthping')
-        self.advance_time(13)
+        self.advance_time(3)
+        self.mc.events.post('play_sound_synthping')
+        self.advance_time(10)
 
         """
         # Add another track with the same name (should not be allowed)
