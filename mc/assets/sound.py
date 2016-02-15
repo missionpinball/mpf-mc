@@ -184,7 +184,7 @@ class DuckingSettings(object):
         if 'attenuation' not in config:
             raise AudioException("'ducking.attenuation' must contain valid attenuation "
                                  "value (0.0 to 1.0)")
-        self.attenuation = max(min(float(AudioInterface.string_to_gain(config['attenuation'])), 1.0), 0.0)
+        self.attenuation = min(max(float(AudioInterface.string_to_gain(config['attenuation'])), 0.0), 1.0)
 
         if 'release_point' not in config:
             raise AudioException("'ducking.release_point' must contain a valid release point "
