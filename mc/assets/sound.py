@@ -10,7 +10,7 @@ DEFAULT_VOLUME = 0.5
 DEFAULT_PRIORITY = 0
 DEFAULT_MAX_QUEUE_TIME = None
 DEFAULT_LOOPS = 0
-
+MINIMUM_DUCKING_DURATION = "10ms"
 
 class SoundPool(AssetPool):
 
@@ -178,7 +178,8 @@ class DuckingSettings(object):
         if 'attack' not in config:
             raise AudioException("'ducking.attack' must contain a valid attack value (time "
                                  "string or number of samples)")
-        self.attack = max(mc.sound_system.audio_interface.string_to_samples(config['attack']), 0)
+        self.attack = max(mc.sound_system.audio_interface.string_to_samples(config['attack']),
+                          mc.sound_system.audio_interface.string_to_samples(MINIMUM_DUCKING_DURATION))
 
         if 'attenuation' not in config:
             raise AudioException("'ducking.attenuation' must contain valid attenuation "
@@ -188,9 +189,11 @@ class DuckingSettings(object):
         if 'release_point' not in config:
             raise AudioException("'ducking.release_point' must contain a valid release point "
                                  "value (time string or number of samples)")
-        self.release_point = mc.sound_system.audio_interface.string_to_samples(config['release_point'])
+        # Release point cannot be negative (must be before or at the end of the sound)
+        self.release_point = max(mc.sound_system.audio_interface.string_to_samples(config['release_point']), 0)
 
         if 'release' not in config:
             raise AudioException("'ducking.release' must contain a valid release "
                                  "value (time string or number of samples)")
-        self.release = max(mc.sound_system.audio_interface.string_to_samples(config['release']), 0)
+        self.release = max(mc.sound_system.audio_interface.string_to_samples(config['release']),
+                           mc.sound_system.audio_interface.string_to_samples(MINIMUM_DUCKING_DURATION))
