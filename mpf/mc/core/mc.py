@@ -1,5 +1,5 @@
 """Contains the MpfMc base class, which is the main App instance for the
-mpf_mc.
+mpf-mc.
 
 """
 import queue
@@ -83,7 +83,7 @@ class MpfMc(App):
         self.clock.schedule_interval(self._check_crash_queue, 1)
 
     def get_system_config(self):
-        return self.machine_config['mpf_mc']
+        return self.machine_config['mpf-mc']
 
     def validate_machine_config_section(self, section):
         if section not in ConfigValidator.config_spec:
@@ -234,7 +234,7 @@ class MpfMc(App):
 
             for scriptlet in self.machine_config['mc_scriptlets']:
                 i = __import__(
-                    self.machine_config['mpf_mc']['paths']['scriptlets']
+                    self.machine_config['mpf-mc']['paths']['scriptlets']
                     + '.'
                     + scriptlet.split('.')[0], fromlist=[''])
 

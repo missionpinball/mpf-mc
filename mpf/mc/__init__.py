@@ -9,6 +9,6 @@ __config_version__ = '.'.join(__config_version_info__)
 __config_version_url__ = "https://missionpinball.com/docs/configuration-file" \
                          "-reference/config-version-3/"
 
-version_str = "MPF_MC v{} (config_version={}, BCP v{})".format(__version__,
+version_str = "MPF-MC v{} (config_version={}, BCP v{})".format(__version__,
                                                                __config_version__,
                                                                __bcp_version__)

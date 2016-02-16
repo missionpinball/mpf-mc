@@ -45,7 +45,7 @@ class ConfigProcessor(ConfigProcessorBase):
     def __init__(self, machine):
         self.mc = machine
         self.machine = machine
-        self.system_config = self.mc.machine_config['mpf_mc']
+        self.system_config = self.mc.machine_config['mpf-mc']
         self.log = Logger
         self.machine_sections = None
         self.mode_sections = None

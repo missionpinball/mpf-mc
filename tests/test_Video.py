@@ -12,7 +12,7 @@ class TestVideo(MpfMcTestCase):
     def test_video(self):
 
         # Note the green bar on the bottom of this video is part of it. It is
-        # VERY low quality to keep the mpf_mc package small. :)
+        # VERY low quality to keep the mpf-mc package small. :)
         self.assertIn('mpf_video_small_test', self.mc.videos)
 
         self.mc.events.post('show_slide1')

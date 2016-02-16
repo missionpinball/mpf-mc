@@ -21,7 +21,7 @@ class ImagePool(AssetPool):
 class ImageAsset(Asset):
 
     attribute='images'  # attribute in MC, e.g. self.mc.images
-    path_string='images'  # entry from mpf_mc:paths: for asset folder name
+    path_string='images'  # entry from mpf-mc:paths: for asset folder name
     config_section='images'  # section in the config files for this asset
     extensions=('png', 'jpg', 'jpeg', 'gif', 'zip')  # pretty obvious. No dots.
     class_priority=100  # Order asset classes will be loaded. Higher is first.

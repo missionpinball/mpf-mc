@@ -1,4 +1,4 @@
-"""Mission Pinball Framework Media Controller (mpf_mc) setup.py"""
+"""Mission Pinball Framework Media Controller (mpf-mc) setup.py"""
 
 from platform import system
 
@@ -21,7 +21,7 @@ if system() == 'Windows':
 
 setup(
 
-    name='mpf_mc',
+    name='mpf-mc',
     version=mpf.mc.__version__,
     description='Mission Pinball Framework Media Controller',
     long_description='''Graphics, video, and audio engine for the
@@ -30,13 +30,13 @@ setup(
 The Mission Pinball Framework (MPF) is an open source, cross-platform,
 Python-based software framework for powering real pinball machines.
 
-The Mission Pinball Framework Media Controller (MPF_MC, this package) is the
+The Mission Pinball Framework Media Controller (MPF-MC, this package) is the
 component of MPF that controls graphics and sound, including DMDs,
 architecture is modular, with multiple options for driving graphics and
-sound. This MPF_MC package is one option, and there's another option based
+sound. This MPF-MC package is one option, and there's another option based
 on Unity 3D.
 
-The MPF_MC is built on Kivy and leverages SDL2, OpenGL, and GPU-accelerated
+The MPF-MC is built on Kivy and leverages SDL2, OpenGL, and GPU-accelerated
 hardware.
 
 MPF is a work-in-progress that is not yet complete, though we're actively

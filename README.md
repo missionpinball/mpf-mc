@@ -1,4 +1,4 @@
-Mission Pinball Framework Media Controller (mpf_mc)
+Mission Pinball Framework Media Controller (mpf-mc)
 ===================================================
 
 <img align="right" height="128" src="mc/icons/128x128.png"/>

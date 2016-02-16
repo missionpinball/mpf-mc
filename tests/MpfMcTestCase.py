@@ -99,7 +99,7 @@ class MpfMcTestCase(unittest.TestCase):
         from kivy.core.window import Window
 
         # convert the passed x/y to the actual x/y of the Window since it's
-        # possible for the mpf_mc display size to be different than the Window
+        # possible for the mpf-mc display size to be different than the Window
         # size
         x *= Window.width / Window.children[0].width
         y *= Window.height / Window.children[0].height
@@ -118,7 +118,7 @@ class MpfMcTestCase(unittest.TestCase):
         self.orig_bcp_send = self.mc.bcp_processor.send
         self.mc.bcp_processor.send = self._bcp_send
 
-        # this is used to send BCP commands to mpf_mc
+        # this is used to send BCP commands to mpf-mc
         self.send = self.mc.bcp_processor._process_command
 
     def _bcp_send(self, bcp_command, callback=None, **kwargs):
@@ -134,7 +134,7 @@ class MpfMcTestCase(unittest.TestCase):
         print("Running", self._test_name)
         # This setup is done in run() because we need to give control to the
         # kivy event loop which we can only do by returning from the run()
-        # that's called. So we override run() and setup mpf_mc and then call
+        # that's called. So we override run() and setup mpf-mc and then call
         # our own run_test() on a callback. Then we can wait until the
         # environment is setup (which can take a few frames), then we call
         # super().run() to get the actual TestCase.run() method to run and
@@ -152,7 +152,7 @@ class MpfMcTestCase(unittest.TestCase):
         mpf_config = load_machine_config(
                 Util.string_to_list(self.get_config_file()),
                 self.get_machine_path(),
-                mpf_config['mpf_mc']['paths']['config'], mpf_config)
+                mpf_config['mpf-mc']['paths']['config'], mpf_config)
         self.preprocess_config(mpf_config)
 
         self.mc = TestMpfMc(options=self.get_options(),

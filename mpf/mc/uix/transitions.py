@@ -31,7 +31,7 @@ class TransitionManager(object):
             return NoTransition()
 
     def _register_mpf_transitions(self):
-        for t in self.mc.machine_config['mpf_mc']['mpf_transition_modules']:
+        for t in self.mc.machine_config['mpf-mc']['mpf_transition_modules']:
             i = importlib.import_module('mpf.mc.transitions.{}'.format(t))
             self.register_transition(getattr(i, 'name'),
                                      getattr(i, 'transition_cls'))

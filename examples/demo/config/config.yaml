@@ -95,7 +95,7 @@ slides:
       font_size: 20
       color: ff0000
     - type: text
-      text: IT'S IN THE FOLDER /mpf_mc/examples/demo/config/config.yaml
+      text: IT'S IN THE FOLDER /mpf-mc/examples/demo/config/config.yaml
       font_size: 20
       color: 00ff00
       y: -50
