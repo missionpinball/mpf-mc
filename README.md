@@ -1,21 +1,19 @@
-Mission Pinball Framework Media Controller (mpf_mc)
+Mission Pinball Framework Media Controller (mpf-mc)
 ===================================================
 
 <img align="right" height="128" src="mc/icons/128x128.png"/>
 
 This package is for the "Media Controller" for the Mission Pinball Framework (MPF).
 
-The architecture of MPF breaks the pinball software into two pieces. The core engine which
-controls the pinball machine and runs the game logic is in the MPF package.
+The architecture of MPF breaks the pinball software into two pieces. The core engine which controls the pinball machine
+and runs the game logic is in the MPF package. Separate from that is the Media Controller which controls the display and
+sound, including the DMD, Color DMD, RGB LED DMD, and/or onscreen or LCD display.
 
-Separate from that is the Media Controller which controls the display and sound,
-including the DMD, Color DMD, RGB LED DMD, and/or onscreen or LCD display.
+This package (mpf-mc) is MPF's "default" media controller which is based on Kivy and Python. It leverages OpenGL and the
+GPU in the computer running it. There's also another media controller option based on Unity 3D you can use instead.
 
-This package (mpf_mc) is MPF's "default" media controller which is based on Kivy and Python.
-There's also another media controller option based on Unity 3D you can use instead.
-
-MPF_MC can run on Windows, OS X, and Linux. It can run on the same machine as
-the core MPF engine, or it can be a separate machine.
+MPF-MC can run on Windows, OS X, and Linux. It can run on the same machine as the core MPF engine, or it can be a
+separate machine. It runs as a separate process from MPF, so it works well on a multi-core computer.
 
 More details about MPF are here : https://missionpinball.com/mpf/
 

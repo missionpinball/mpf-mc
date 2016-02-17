@@ -1,0 +1,202 @@
+# config_version=3
+mpf-mc:
+    modules:
+        mode_controller.ModeController
+        language.Language
+        display.DisplayController
+        sound.SoundController
+        show_controller.ShowController
+        keyboard.Keyboard
+
+    mpf_transition_modules:
+        - push
+        - move_in
+        - move_out
+
+    port: 5050
+    exit_on_disconnect: yes
+
+    display_modules:
+        elements:
+            - text
+            - virtualdmd
+            - image
+            - animation
+            - shape
+            - movie
+            - character_picker
+            - entered_chars
+        modules:
+            dmd.DMD
+        transitions:
+            move_out: move_out.MoveOut
+            move_in: move_in.MoveIn
+        decorators:
+            blink: blink.Blink
+    paths:
+        shows: shows
+        sounds: sounds
+        machine_files: examples
+        config: config
+        fonts: fonts
+        images: images
+        animations: animations
+        movies: movies
+        modes: modes
+        scriptlets: scriptlets
+
+    allow_invalid_config_sections: true
+    config_versions_file: tools/config_versions.yaml
+
+timing:
+    hz: 30
+
+modes:
+    - attract
+    - game
+
+fonts:
+    default:
+        file: Quadrit.ttf
+        size: 10
+        crop_top: 2
+        crop_bottom: 3
+    space title huge:
+        file: DEADJIM.TTF
+        size: 29
+        antialias: yes
+        crop_top: 3
+        crop_bottom: 3
+    space title:
+        file: DEADJIM.TTF
+        size: 21
+        antialias: yes
+        crop_top: 2
+        crop_bottom: 3
+    medium:
+        file: pixelmix.ttf
+        size: 8
+        crop_top: 1
+        crop_bottom: 1
+    small:
+        file: smallest_pixel-7.ttf
+        size: 9
+        crop_top: 2
+        crop_bottom: 3
+    tall title:
+       file: big_noodle_titling.ttf
+       size: 20
+
+textstrings:
+    volume_zero: OFF
+    volume_max: MAX
+
+assets:
+    images:
+        default:
+            load: preload
+        slide:
+            target: slide
+        dmd:
+            target: dmd
+    animations:
+        default:
+            load: preload
+            target: dmd
+        slide:
+            load: preload
+            target: slide
+    sounds:
+        default:
+            track: sfx
+            load: preload
+        voice:
+            track: voice
+            load: preload
+        sfx:
+            track: sfx
+            load: preload
+        music:
+            track: music
+            load: preload
+    shows:
+        default:
+            load: preload
+    movies:
+        default:
+            load: preload
+
+#slide_player:
+#    client_connected:
+#      - type: Text
+#        text: CLIENT CONNECTED
+#        font: small
+#        expire: 1s
+#    client_disconnected:
+#      - type: Text
+#        text: CLIENT DISCONNECTED
+#        font: small
+#        expire: 1s
+#    volume_change:
+#        type: Text
+#        text: "VOLUME: %display_volume%"
+#        expire: 2s
+#        slide_priority: 10000
+#    asset_loader:
+#      type: text
+#      text: "LOADING: %percent%%"
+#      font: small
+#    asset_loading_complete:
+#
+#    waiting_for_client_connection:
+#      - type: text
+#        text: WAITING FOR
+#        font: small
+#        slide: waiting
+#        y: 60%
+#      - type: text
+#        text: CLIENT CONNECTION...
+#        font: small
+#        y: 40%
+
+debug_profiles:
+    verbose:
+        core_modules:
+            events
+            mode_controller
+        device_collections:
+        individual_devices:
+        plugins:
+
+mpf:
+  allow_invalid_config_sections: false
+  config_versions_file: tools/config_versions.yaml
+
+kivy_config:
+  kivy:
+    desktop: 1
+    exit_on_escape: 1
+    pause_on_minimize: 0
+    log_dir:
+    window_icon:
+  graphics:
+    borderless: 0
+    window_state: visible  # visible, hidden, maximized, minimized
+    fbo: hardware  # hardware, software, force-hardware
+    fullscreen: 0
+    height: 600
+#    left: 0
+    maxfps: 60
+    multisamples: 2
+    position: auto  # auto, custom
+    show_cursor: 1
+#    top: 0
+    resizable: 1
+    rotation: 0
+    width: 800
+    minimum_width: 100
+    minimum_height: 100
+
+text_styles:
+  default:
+    font_size: 20
