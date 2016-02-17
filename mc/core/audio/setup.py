@@ -77,10 +77,7 @@ def determine_sdl2():
 sdl2_flags = determine_sdl2()
 print(sdl2_flags)
 
-if platform is 'win32':
-    libraries = ['libSDL2', 'libSDL2_mixer']
-else:
-    libraries = ['SDL2', 'SDL2_mixer']
+libraries = ['SDL2', 'SDL2_mixer']
 
 library_dirs = [join(dirname(sys.executable), 'libs')]
 include_dirs = sdl2_flags['include_dirs']
