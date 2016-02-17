@@ -11,7 +11,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '1', '0-dev7')
+__version_info__ = ('0', '1', '0-dev8')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -28,14 +28,13 @@ from kivy.logger import Logger
 include "audio_interface.pxi"
 
 # ---------------------------------------------------------------------------
-#    Maximum values for various audio engine settings
+#    Various audio engine setting values
 # ---------------------------------------------------------------------------
 DEF MAX_TRACKS = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
 DEF MAX_TRACK_DUCKING_ENVELOPES = 32
 DEF MAX_AUDIO_EVENTS = 32
-DEF CONTROL_RATE = 32
 DEF QUICK_FADE_DURATION_SECS = 0.05
 
 DEF MAX_AUDIO_VALUE_S16 = ((1 << (16 - 1)) - 1)
@@ -167,6 +166,8 @@ cdef class AudioInterface:
         self.tracks = []
 
     def __del__(self):
+
+        Logger.info("AudioInterface: Shutting down and cleaning up allocated memory...")
 
         # Stop audio processing (will stop all SDL callbacks)
         self.disable()
@@ -402,7 +403,11 @@ cdef class AudioInterface:
 
     @property
     def enabled(self):
-        return Mix_Playing(self.mixer_channel) == 1
+        cdef int channel
+        SDL_LockAudio()
+        channel = Mix_Playing(self.mixer_channel) == 1
+        SDL_UnlockAudio()
+        return channel
 
     def enable(self, int fade_sec=0):
         """
@@ -411,6 +416,9 @@ cdef class AudioInterface:
             fade_sec:  The number of seconds over which to fade in the audio
         """
         cdef int fade_ms = 0
+
+        Logger.info("AudioInterface: Enabling audio playback")
+
         SDL_LockAudio()
         if fade_sec > 0:
             fade_ms = fade_sec // 1000
@@ -427,6 +435,9 @@ cdef class AudioInterface:
             fade_sec:  The number of seconds over which to fade out the audio
         """
         cdef int fade_ms = 0
+
+        Logger.info("AudioInterface: Disabling audio playback")
+
         SDL_LockAudio()
         if fade_sec > 0:
             fade_ms = fade_sec // 1000
@@ -544,6 +555,7 @@ cdef class AudioInterface:
         if chunk == NULL:
             Logger.error("AudioInterface: Unable to load sound from source file '{}' - {}"
                          .format(file_name, SDL_GetError()))
+            SDL_UnlockAudio()
             return None
 
         # Create a Python container object to wrap the Mix_Chunk C pointer
@@ -648,6 +660,11 @@ cdef class AudioInterface:
 # ---------------------------------------------------------------------------
 #    Global C functions designed to be called from the static audio callback
 #    function (these functions do not use the GIL).
+#
+#    Note: Because these functions are only called from the audio callback
+#    function, we do not need to lock and unlock the mutex in these functions
+#    (locking/unlocking of the mutex is already performed in the audio
+#    callback function.
 # ---------------------------------------------------------------------------
 
 cdef void process_sound_events(AudioCallbackData *callback_data) nogil:
@@ -1274,6 +1291,8 @@ cdef class Track:
         self._audio_callback_data = <AudioCallbackData*>pycapsule.PyCapsule_GetPointer(audio_callback_data, NULL)
         self.mutex = self._audio_callback_data.mutex
 
+        SDL_LockMutex(self.mutex)
+
         self._sound_queue = PriorityQueue()
 
         # Make sure the number of simultaneous sounds is within the allowable range
@@ -1336,7 +1355,11 @@ cdef class Track:
             self.attributes.ducking_envelopes[i].stage_target_volume = MIX_MAX_VOLUME
             self.attributes.ducking_envelopes[i].current_volume = MIX_MAX_VOLUME
 
+        SDL_UnlockMutex(self.mutex)
+
     def __dealloc__(self):
+
+        SDL_LockMutex(self.mutex)
 
         # Free the attributes and other allocated memory
         if self.attributes != NULL:
@@ -1349,6 +1372,8 @@ cdef class Track:
             PyMem_Free(self.attributes.ducking_envelopes)
             PyMem_Free(self.attributes)
             self.attributes = NULL
+
+        SDL_UnlockMutex(self.mutex)
 
     def __repr__(self):
         return '<Track.{}.{}>'.format(self.number, self.name)
@@ -1365,32 +1390,44 @@ cdef class Track:
             if self.attributes != NULL:
                 value = max(min(value, 1.0), 0.0)
                 self._volume = value
+
+                SDL_LockMutex(self.mutex)
+
                 # Volume used in SDL_Mixer is an integer between 0 and MIX_MAX_VOLUME (0 to 128)
                 self.attributes.volume = int(self._volume * MIX_MAX_VOLUME)
 
+                SDL_UnlockMutex(self.mutex)
+
     @property
     def number(self):
+        cdef int number = -1
         if self.attributes != NULL:
-            return self.attributes.number
-        else:
-            return -1
+            SDL_LockMutex(self.mutex)
+            number = self.attributes.number
+            SDL_UnlockMutex(self.mutex)
+        return number
 
     @property
     def max_simultaneous_sounds(self):
+        cdef int max_simultaneous_sounds = 0
         if self.attributes != NULL:
-            return self.attributes.max_simultaneous_sounds
-        else:
-            return 0
+            SDL_LockMutex(self.mutex)
+            max_simultaneous_sounds = self.attributes.max_simultaneous_sounds
+            SDL_UnlockMutex(self.mutex)
+        return max_simultaneous_sounds
 
     cdef int _get_idle_sound_player(self):
         """
         Returns the index of the first idle sound player on the track.  If all
         players are currently busy playing, -1 is returned.
         """
+        SDL_LockMutex(self.mutex)
         for index in range(self.max_simultaneous_sounds):
             if self.attributes.sound_players[index].status == player_idle:
+                SDL_UnlockMutex(self.mutex)
                 return index
 
+        SDL_UnlockMutex(self.mutex)
         return -1
 
     def process(self):
@@ -1650,9 +1687,9 @@ cdef class Track:
             SDL_LockMutex(self.mutex)
             # If the specified sound player is not idle do not play the sound if force is not set
             if self.attributes.sound_players[player].status != player_idle and not force:
-                SDL_UnlockMutex(self.mutex)
                 Logger.debug(
                     "Track: All sound players are currently in use, could not play sound {}".format(sound.name))
+                SDL_UnlockMutex(self.mutex)
                 return False
 
             # Set play sound event
@@ -1727,10 +1764,15 @@ cdef class Track:
         :return: The index of the first available audio event.  -1 if all
             are in use.
         """
+        cdef AudioEventContainer *event
+        SDL_LockMutex(self.mutex)
         for i in range(MAX_AUDIO_EVENTS):
             if self._audio_callback_data.events[i].event == event_none:
-                return <AudioEventContainer*> self._audio_callback_data.events[i]
+                event = <AudioEventContainer*> self._audio_callback_data.events[i]
+                SDL_UnlockMutex(self.mutex)
+                return event
 
+        SDL_UnlockMutex(self.mutex)
         return NULL
 
     def get_available_ducking_envelope(self):
@@ -1740,10 +1782,13 @@ cdef class Track:
         :return: The index of the first available ducking envelope.  -1 if all
             are in use.
         """
+        SDL_LockMutex(self.mutex)
         for i in range(MAX_TRACK_DUCKING_ENVELOPES):
             if self.attributes.ducking_envelopes[i].stage == envelope_stage_idle:
+                SDL_UnlockMutex(self.mutex)
                 return i
 
+        SDL_UnlockMutex(self.mutex)
         return -1
 
     def set_ducking_envelope_stage(self, int envelope_num, int stage):
@@ -1756,11 +1801,13 @@ cdef class Track:
             A pointer to the specified ducking envelope
         """
         if envelope_num in range(MAX_TRACK_DUCKING_ENVELOPES):
+            SDL_LockMutex(self.mutex)
             self.attributes.ducking_envelopes[envelope_num].stage = <DuckingEnvelopeStage>stage
+            SDL_UnlockMutex(self.mutex)
 
     def get_status(self):
         SDL_LockMutex(self.mutex)
-        Logger.debug("Track {} ({}) Status: ".format(self.number, self.name))
+        Logger.debug("Track.{}.{} Status: ".format(self.number, self.name))
         for player in range(self.max_simultaneous_sounds):
             Logger.debug("    Player {}: Status={}, Sound={}, Priority={}, Loops={}"
                          .format(player,
