@@ -1,5 +1,5 @@
 """Contains the MpfMc base class, which is the main App instance for the
-mpf_mc.
+mpf-mc.
 
 """
 import queue
@@ -10,23 +10,25 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
 
-from mc.core.bcp_processor import BcpProcessor
-from mc.core.config_processor import ConfigProcessor
-from mc.core.mode_controller import ModeController
-from mc.core.slide_player import SlidePlayer
-from mc.core.widget_player import WidgetPlayer
-from mc.uix.transitions import TransitionManager
+from mpf.mc.assets.video import VideoAsset
+from mpf.mc.core.bcp_processor import BcpProcessor
+from mpf.mc.core.config_processor import ConfigProcessor
+from mpf.mc.core.mode_controller import ModeController
+from mpf.mc.core.slide_player import SlidePlayer
+from mpf.mc.core.widget_player import WidgetPlayer
+from mpf.mc.uix.transitions import TransitionManager
+
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
 from mpf.core.player import Player
 from mpf.core.assets import AssetManager
-from mc.assets.image import ImageAsset
+from mpf.mc.assets.image import ImageAsset
 
 try:
-    from mc.core.audio import SoundSystem
-    from mc.core.audio.sound_player import SoundPlayer
-    from mc.assets.sound import SoundAsset
+    from mpf.mc.core.audio import SoundSystem
+    from mpf.mc.core.audio.sound_player import SoundPlayer
+    from mpf.mc.assets.sound import SoundAsset
 except ImportError:
     SoundSystem = None
     SoundPlayer = None
@@ -104,7 +106,7 @@ class MpfMc(App):
         self.clock.schedule_interval(self._check_crash_queue, 1)
 
     def get_system_config(self):
-        return self.machine_config['mpf_mc']
+        return self.machine_config['mpf-mc']
 
     def validate_machine_config_section(self, section):
         if section not in ConfigValidator.config_spec:
@@ -130,7 +132,7 @@ class MpfMc(App):
             self.init_done()
 
     def displays_initialized(self, *args):
-        from mc.uix.window import Window
+        from mpf.mc.uix.window import Window
         Window.initialize(self)
         self.events.post('displays_initialized')
         # Have to do this manually during init since the run loop isn't running
@@ -255,7 +257,7 @@ class MpfMc(App):
 
             for scriptlet in self.machine_config['mc_scriptlets']:
                 i = __import__(
-                    self.machine_config['mpf_mc']['paths']['scriptlets']
+                    self.machine_config['mpf-mc']['paths']['scriptlets']
                     + '.'
                     + scriptlet.split('.')[0], fromlist=[''])
 
