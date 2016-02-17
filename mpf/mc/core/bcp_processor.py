@@ -4,12 +4,12 @@ from distutils.version import LooseVersion
 from kivy.clock import Clock
 from kivy.logger import Logger
 
-from mpf.mc.core.bcp_server import BCPServer
 import mpf.core.bcp as bcp
-import mpf.mc
+from mpf.mc._version import __bcp_version__
+from mpf.mc.core.bcp_server import BCPServer
+
 
 class BcpProcessor(object):
-
     def __init__(self, mc):
         self.mc = mc
 
@@ -43,7 +43,7 @@ class BcpProcessor(object):
                              'switch': self._bcp_switch,
                              'timer': self._bcp_timer,
                              'trigger': self._bcp_trigger,
-                            }
+                             }
 
         Clock.schedule_interval(self._get_from_queue, 0)
 
@@ -98,7 +98,6 @@ class BcpProcessor(object):
     def _process_command(self, bcp_command, **kwargs):
         Logger.debug("Processing command: %s %s", bcp_command, kwargs)
 
-
         # Can't use try/except KeyError here becasue there could be a KeyError
         # in the callback which we don't want it to swallow.
         if bcp_command in self.bcp_commands:
@@ -111,13 +110,13 @@ class BcpProcessor(object):
         """Processes an incoming BCP 'hello' command."""
         try:
             if LooseVersion(kwargs['version']) == (
-                    LooseVersion(mpf.mc.__bcp_version__)):
-                self.send('hello', version=mpf.mc.__bcp_version__)
+                    LooseVersion(__bcp_version__)):
+                self.send('hello', version=__bcp_version__)
             else:
                 self.send('hello', version='unknown protocol version')
         except KeyError:
             Logger.warning("Received invalid 'version' parameter with "
-                             "'hello'")
+                           "'hello'")
 
     def _bcp_goodbye(self, **kwargs):
         """Processes an incoming BCP 'goodbye' command."""
@@ -125,13 +124,13 @@ class BcpProcessor(object):
         #     self.socket_thread.sending_thread.stop()
         #     sys.exit()
 
-        pass #todo
+        pass  # todo
 
     def _bcp_mode_start(self, name=None, priority=0, **kwargs):
         """Processes an incoming BCP 'mode_start' command."""
         if not name:
             return
-            #todo raise error
+            # todo raise error
 
         if name == 'game':
             self.mc.game_start()
@@ -139,13 +138,13 @@ class BcpProcessor(object):
         if name in self.mc.modes:
             self.mc.modes[name].start(priority=int(priority))
 
-        pass #todo
+        pass  # todo
 
     def _bcp_mode_stop(self, name, **kwargs):
         """Processes an incoming BCP 'mode_stop' command."""
         if not name:
             return
-            #todo raise error
+            # todo raise error
 
         if name == 'game':
             self.mc.game_end()
@@ -172,7 +171,7 @@ class BcpProcessor(object):
         self.mc.add_player(int(player_num))
 
     def _bcp_player_variable(self, name, value, prev_value, change, player_num,
-                            **kwargs):
+                             **kwargs):
         """Processes an incoming BCP 'player_variable' command."""
         self.mc.update_player_var(name, value, int(player_num))
 
@@ -182,7 +181,7 @@ class BcpProcessor(object):
         self.mc.set_machine_var(name, value, change, prev_value)
 
     def _bcp_player_score(self, value, prev_value, change, player_num,
-                         **kwargs):
+                          **kwargs):
         """Processes an incoming BCP 'player_score' command."""
         self.mc.update_player_var('score', value, int(player_num))
 
@@ -210,7 +209,7 @@ class BcpProcessor(object):
         # for name in Util.string_to_list(names):
         #     self.mc.events.post('bcp_get_{}'.format(name))
 
-        pass #todo
+        pass  # todo
 
     def _bcp_set(self, **kwargs):
         """Processes an incoming BCP 'set' command by posting an event
@@ -235,7 +234,7 @@ class BcpProcessor(object):
         #     if k.startswith('volume_'):
         #         self.bcp_set_volume(track=k.split('volume_')[1], value=v)
 
-        pass #todo
+        pass  # todo
 
     def _bcp_timer(self, name, action, **kwargs):
         """Processes an incoming BCP 'timer' command."""
@@ -255,8 +254,8 @@ class BcpProcessor(object):
         if track == 'master':
             self.sound.set_volume(value)
 
-        #if track in self.sound.tracks:
-            #self.sound.tracks[track]
+            # if track in self.sound.tracks:
+            # self.sound.tracks[track]
 
             # todo add per-track volume support to sound system
 

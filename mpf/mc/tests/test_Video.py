@@ -1,5 +1,5 @@
 
-from tests.MpfMcTestCase import MpfMcTestCase
+from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestVideo(MpfMcTestCase):

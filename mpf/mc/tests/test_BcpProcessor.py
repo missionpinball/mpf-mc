@@ -1,7 +1,7 @@
 from mock import MagicMock
 
-import mpf.mc
-from tests.MpfMcTestCase import MpfMcTestCase
+from mpf.mc._version import __version__
+from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestBcpProcessor(MpfMcTestCase):
@@ -18,7 +18,7 @@ class TestBcpProcessor(MpfMcTestCase):
     def test_game_flow(self):
         self.send('hello',
                   version='1.0',
-                  controller_version=mpf.mc.__version__,
+                  controller_version=__version__,
                   controller_name='Mission Pinball Framework')
         self.advance_time()
 

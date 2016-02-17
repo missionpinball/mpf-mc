@@ -1,5 +1,5 @@
 from mpf.mc.uix.slide import Slide
-from tests.MpfMcTestCase import MpfMcTestCase
+from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestSlides(MpfMcTestCase):

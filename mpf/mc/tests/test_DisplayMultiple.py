@@ -1,5 +1,5 @@
 from mpf.mc.uix.display import Display
-from tests.MpfMcTestCase import MpfMcTestCase
+from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestDisplayMultiple(MpfMcTestCase):

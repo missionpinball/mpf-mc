@@ -1,5 +1,5 @@
 from mpf.core.config_validator import ConfigValidator
-from tests.MpfMcTestCase import MpfMcTestCase
+from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestAssets(MpfMcTestCase):

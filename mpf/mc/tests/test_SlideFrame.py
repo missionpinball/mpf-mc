@@ -1,5 +1,5 @@
 from mpf.mc.uix.slide_frame import SlideFrame, SlideFrameParent
-from tests.MpfMcTestCase import MpfMcTestCase
+from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestSlideFrame(MpfMcTestCase):
