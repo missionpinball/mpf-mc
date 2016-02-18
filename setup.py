@@ -95,7 +95,7 @@ community.''',
 
     packages=['mpf'],
 
-    # zip_safe=True,
+    zip_safe=False,
 
     install_requires=install_requires,
 
