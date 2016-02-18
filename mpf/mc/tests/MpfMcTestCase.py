@@ -54,6 +54,9 @@ class MpfMcTestCase(unittest.TestCase):
     def get_config_file(self):
         raise NotImplementedError
 
+    def get_abs_path(self, path):
+        return os.path.join(os.path.abspath(os.curdir), path)
+
     def preprocess_config(self, config):
         # TODO this method is copied from the mc.py launcher. Prob a better way
         kivy_config = config['kivy_config']
