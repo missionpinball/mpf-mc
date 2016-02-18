@@ -1,4 +1,4 @@
-from MpfMcTestCase import MpfMcTestCase
+from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestColor(MpfMcTestCase):

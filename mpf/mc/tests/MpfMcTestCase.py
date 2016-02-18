@@ -44,7 +44,7 @@ class MpfMcTestCase(unittest.TestCase):
         #     mpf.core.__path__[0], os.pardir, 'mpfconfig.yaml'))
 
         return dict(machine_path=self.get_machine_path(),
-                    mcconfigfile=os.path.abspath('mpf/mc/mcconfig.yaml'),
+                    mcconfigfile='mc/mcconfig.yaml',
                     configfile=Util.string_to_list(self.get_config_file()),
                     bcp=False)
 
@@ -150,8 +150,9 @@ class MpfMcTestCase(unittest.TestCase):
         # it would be called again when we call super().run().
 
 
-        mpf_config = ConfigProcessor.load_config_file(self.get_options()[
-                                                      'mcconfigfile'])
+        mpf_config = ConfigProcessor.load_config_file(os.path.abspath(
+            os.path.join(mpf.mc.__path__[0], os.pardir,
+                         self.get_options()['mcconfigfile'])))
 
         machine_path = os.path.abspath(os.path.join(
             mpf.mc.__path__[0], os.pardir, 'mc', self.get_machine_path()))
