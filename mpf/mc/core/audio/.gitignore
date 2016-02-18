@@ -1,7 +1,0 @@
-*.pyc
-*.pyo
-*.c
-*.swp
-build
-
-*.egg-info

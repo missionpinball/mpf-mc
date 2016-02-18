@@ -1,9 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
-
-# C extensions
-*.so
+*.py[co]
 
 # Distribution / packaging
 .Python
@@ -62,3 +59,6 @@ target/
 # MPF
 _cache
 *.p
+
+# C files are from Cython in mpf-mc. Don't need them.
+*.c

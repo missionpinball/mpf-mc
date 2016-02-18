@@ -1,9 +1,21 @@
 """Mission Pinball Framework Media Controller (mpf-mc) setup.py"""
 
 import re
-from platform import system
+import platform
 
+import sys
+
+import shutil
 from setuptools import setup
+from setuptools.dist import Distribution
+
+# Hack to force creating platform wheels since we're manually managing the
+# compiled audio files for now.
+# http://lucumr.pocoo.org/2014/1/27/python-on-wheels/
+
+class BinaryDistribution(Distribution):
+    def is_pure(self):
+        return False
 
 # Get the version number of mpf-mc and the required version of MPF by reading
 # the file directly. We can't import it because that would import mpf and
@@ -28,11 +40,40 @@ else:
     raise RuntimeError("Unable to find MPF version string in %s." % (
                        version_file,))
 
+# figure out the system we're on so we can include the proper binaries
+
+system = None
+extension = None
+
+if platform.system() == 'Darwin':
+    system = 'osx'
+    extension = 'so'
+elif platform.system() == 'Windows':
+    extension = 'pyd'
+    if platform.architecture()[0] == '64bit':
+        system = 'win_x64'
+    elif platform.architecture()[0] == '32bit':
+        system = 'win_x86'
+
+    # Detect 32-bit Python on 64-bit Windows
+    if system == 'win_x64' and sys.maxsize < 2 ** 32:
+        # now what???
+        print("WARNING! It appears that you're running 32-bit Python on "
+              "64-bit Windows. For best performance, you should use 64-bit "
+              "Python too.")
+        system = 'win_x86'
+
+if system:
+    shutil.copyfile('mpf/mc/core/audio/binaries/{}/audio_interface.{'
+                    '}'.format(system, extension),
+                    'mpf/mc/core/audio/audio_interface.{}'.format(extension))
+
+
 install_requires = ['ruamel.yaml',
                     'mpf>={}'.format(mpf_version),
                     ]
 
-if system() == 'Windows':
+if platform.system() == 'Windows':
     install_requires += ['pypiwin32',
                          'kivy.deps.sdl2',
                          'kivy.deps.glew',
@@ -99,5 +140,7 @@ community.''',
 
     install_requires=install_requires,
 
-    tests_require=['mock']
+    tests_require=['mock'],
+
+    distclass=BinaryDistribution
 )
