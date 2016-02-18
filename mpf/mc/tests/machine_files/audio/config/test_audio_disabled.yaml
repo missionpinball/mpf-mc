@@ -1,0 +1,7 @@
+#config_version=3
+sound_system:
+  enabled: False
+
+modes:
+ - mode1
+

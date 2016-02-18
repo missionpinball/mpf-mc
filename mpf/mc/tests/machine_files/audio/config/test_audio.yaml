@@ -1,0 +1,70 @@
+#config_version=3
+sound_system:
+  buffer: 4096
+  frequency: 44100
+  channels: 2
+  master_volume: 0.9
+  tracks:
+    voice:
+      volume: 0.6
+      simultaneous_sounds: 1
+      preload: yes
+    sfx:
+      volume: 0.4
+      simultaneous_sounds: 8
+      preload: yes
+    music:
+      volume: 0.5
+      simultaneous_sounds: 1
+
+modes:
+ - mode1
+
+assets:
+    sounds:
+        default:
+            load: preload
+        voice:
+            load: preload
+            track: voice
+        sfx:
+            load: on_demand
+            track: sfx
+        music:
+            load: on_demand
+            track: music
+
+sounds:
+    264828_text:
+        loops: 7
+    104457_moron_test:
+        ducking:
+            target: music
+            delay: 0
+            attack: 0.4sec
+            attenuation: -9db
+            release_point: 1sec
+            release: 1.25sec
+    210871_synthping:
+        ducking:
+            target: music
+            delay: 0
+            attack: 0.2sec
+            attenuation: -9db
+            release_point: 0.5sec
+            release: 0.6sec
+
+sound_player:
+    play_sound_synthping:
+        sound: 210871_synthping
+    play_sound_text:
+        sound: 264828_text
+        loops: 3
+        priority: 100
+    play_sound_moron_test:
+        sound: 104457_moron_test
+    play_sound_test:
+        sound: 113690_test
+        volume: 0.25
+    play_sound_music:
+        sound: 263774_music
