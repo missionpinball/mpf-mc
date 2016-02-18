@@ -99,6 +99,8 @@ class MpfMc(App):
 
         # Asset classes
         ImageAsset.initialize(self)
+        VideoAsset.initialize(self)
+
         if self.sound_system is not None and self.sound_system.enabled:
             SoundAsset.extensions = tuple(self.sound_system.audio_interface.supported_extensions())
             SoundAsset.initialize(self)
