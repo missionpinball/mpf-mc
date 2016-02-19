@@ -22,6 +22,8 @@ from time import time, sleep
 
 class TestMpfMc(MpfMc):
     def __init__(self, options, config, machine_path, **kwargs):
+        print('TESTMPFMC sys.path', sys.path)
+
         super().__init__(options, config, machine_path, **kwargs)
         sys.path.append(self.machine_path)
 
