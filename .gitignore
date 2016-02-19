@@ -1,6 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[co]
+*.py[cod]
 
 # Distribution / packaging
 .Python
@@ -60,5 +60,5 @@ target/
 _cache
 *.p
 
-# C files are from Cython in mpf-mc. Don't need them.
-*.c
+# MPF build files
+build_scripts/wheels
