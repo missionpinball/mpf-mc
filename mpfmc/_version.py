@@ -1,4 +1,4 @@
-__version__ = '0.30.0.dev194'
+__version__ = '0.30.0.dev195'
 __bcp_version__ = '1.0'
 __config_version__ = '3'
 __mpf_version_required__ = '0.30.0.dev474'
