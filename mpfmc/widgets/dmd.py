@@ -2,8 +2,8 @@ from kivy.uix.effectwidget import EffectWidget, EffectBase
 from kivy.uix.scatter import Scatter
 from kivy.uix.widget import Widget, WidgetException
 
-from mpf.mc.core.utils import set_position
-from mpf.mc.uix.widget import MpfWidget
+from mpfmc.core.utils import set_position
+from mpfmc.uix.widget import MpfWidget
 from kivy.uix.stencilview import StencilView
 
 

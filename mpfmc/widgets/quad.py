@@ -1,7 +1,7 @@
 from kivy.graphics import Quad as KivyQuad
 from kivy.graphics.context_instructions import Color
 from kivy.uix.widget import Widget
-from mpf.mc.uix.widget import MpfWidget
+from mpfmc.uix.widget import MpfWidget
 
 
 class Quad(MpfWidget, Widget):

@@ -6,7 +6,7 @@ from kivy.clock import Clock
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.scatter import Scatter
 
-from mpf.mc.uix.slide_frame import SlideFrame
+from mpfmc.uix.slide_frame import SlideFrame
 
 
 class Display(Scatter, RelativeLayout):

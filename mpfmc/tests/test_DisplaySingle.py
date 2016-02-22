@@ -2,10 +2,10 @@ from copy import copy
 
 from kivy.uix.stencilview import StencilView
 
-from mpf.mc.uix.display import Display
-from mpf.mc.uix.slide import Slide
-from mpf.mc.uix.slide_frame import SlideFrame, SlideFrameParent
-from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc.uix.display import Display
+from mpfmc.uix.slide import Slide
+from mpfmc.uix.slide_frame import SlideFrame, SlideFrameParent
+from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestDisplaySingle(MpfMcTestCase):

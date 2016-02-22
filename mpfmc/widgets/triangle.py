@@ -1,7 +1,7 @@
 from kivy.graphics import Triangle as KivyTriangle
 from kivy.graphics.context_instructions import Color
 from kivy.uix.widget import Widget
-from mpf.mc.uix.widget import MpfWidget
+from mpfmc.uix.widget import MpfWidget
 
 
 class Triangle(MpfWidget, Widget):

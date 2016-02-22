@@ -1,5 +1,5 @@
 from mpf.core.assets import Asset, AssetPool
-from mc.core.audio.audio_interface import AudioInterface, AudioException
+from mpfmc.core.audio.audio_interface import AudioInterface, AudioException
 from kivy.logger import Logger
 
 

@@ -4,7 +4,7 @@ import logging
 import os
 from collections import namedtuple
 
-from mpf.mc.core.mode import Mode
+from mpfmc.core.mode import Mode
 from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
 

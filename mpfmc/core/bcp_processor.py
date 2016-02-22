@@ -5,8 +5,8 @@ from kivy.clock import Clock
 from kivy.logger import Logger
 
 import mpf.core.bcp as bcp
-from mpf.mc._version import __bcp_version__
-from mpf.mc.core.bcp_server import BCPServer
+from mpfmc._version import __bcp_version__
+from mpfmc.core.bcp_server import BCPServer
 
 
 class BcpProcessor(object):

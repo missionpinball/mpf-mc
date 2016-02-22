@@ -1,5 +1,5 @@
-from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
-from mpf.mc.transitions.push import PushTransition
+from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc.transitions.push import PushTransition
 from kivy.uix.screenmanager import WipeTransition, NoTransition
 
 class TestTransitions(MpfMcTestCase):

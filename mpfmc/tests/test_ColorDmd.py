@@ -1,4 +1,4 @@
-from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestDmd(MpfMcTestCase):

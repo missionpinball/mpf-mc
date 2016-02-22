@@ -1,7 +1,7 @@
 from mock import MagicMock
 
-from mpf.mc._version import __version__
-from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc._version import __version__
+from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestBcpProcessor(MpfMcTestCase):

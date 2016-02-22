@@ -8,15 +8,15 @@ from kivy.config import Config
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 from kivy.logger import FileHandler
 
-import mpf.mc
+import mpfmc
 from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
-from mpf.mc.core.utils import load_machine_config
+from mpfmc.core.utils import load_machine_config
 
 Config.set('kivy', 'log_enable', '0')
 Config.set('kivy', 'log_level', 'warning')
 
-from mpf.mc.core.mc import MpfMc
+from mpfmc.core.mc import MpfMc
 from time import time, sleep
 
 
@@ -44,7 +44,7 @@ class MpfMcTestCase(unittest.TestCase):
         #     mpf.core.__path__[0], os.pardir, 'mpfconfig.yaml'))
 
         return dict(machine_path=self.get_machine_path(),
-                    mcconfigfile='mc/mcconfig.yaml',
+                    mcconfigfile='mpfmc/mcconfig.yaml',
                     configfile=Util.string_to_list(self.get_config_file()),
                     bcp=False)
 
@@ -154,11 +154,11 @@ class MpfMcTestCase(unittest.TestCase):
 
 
         mpf_config = ConfigProcessor.load_config_file(os.path.abspath(
-            os.path.join(mpf.mc.__path__[0], os.pardir,
+            os.path.join(mpfmc.__path__[0], os.pardir,
                          self.get_options()['mcconfigfile'])))
 
         machine_path = os.path.abspath(os.path.join(
-            mpf.mc.__path__[0], os.pardir, 'mc', self.get_machine_path()))
+            mpfmc.__path__[0], os.pardir, 'mpfmc', self.get_machine_path()))
 
         mpf_config = load_machine_config(
                 Util.string_to_list(self.get_config_file()),

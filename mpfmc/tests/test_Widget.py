@@ -1,5 +1,5 @@
-from mpf.mc.widgets.text import Text
-from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc.widgets.text import Text
+from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestWidget(MpfMcTestCase):

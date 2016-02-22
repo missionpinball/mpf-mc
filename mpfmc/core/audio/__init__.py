@@ -4,7 +4,7 @@ Audio module provides all the audio features (playing of sounds) for the media c
 
 from kivy.logger import Logger
 from kivy.clock import Clock
-from mpf.mc.core.audio.audio_interface import AudioInterface, AudioException, Track
+from mpfmc.core.audio.audio_interface import AudioInterface, AudioException, Track
 
 __all__ = ('SoundSystem',
            'AudioInterface',

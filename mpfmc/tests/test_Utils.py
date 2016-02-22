@@ -1,5 +1,5 @@
-from mpf.mc.core.utils import set_position, percent_to_float
-from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc.core.utils import set_position, percent_to_float
+from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestUtils(MpfMcTestCase):

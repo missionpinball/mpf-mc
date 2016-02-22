@@ -1,7 +1,7 @@
 # Tests the Image Asset and the Image widget
 
 
-from mpf.mc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
 class TestImage(MpfMcTestCase):

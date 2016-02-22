@@ -1,7 +1,7 @@
 from kivy.core.window import Window as KivyWindow
 from kivy.clock import Clock
-from mpf.mc.core.keyboard import Keyboard
-from mpf.mc.uix.display import Display
+from mpfmc.core.keyboard import Keyboard
+from mpfmc.uix.display import Display
 
 
 class Window(object):

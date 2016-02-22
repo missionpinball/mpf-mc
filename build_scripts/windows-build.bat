@@ -7,12 +7,12 @@ python -m pip install cython docutils pygments pypiwin32 kivy.deps.sdl2 kivy.dep
 
 git clone file:///z/git/mpf-mc c:\mpf-mc
 c:
-cd /mpf-mc/mpf/mc/core/audio
+cd /mpf-mc/mpfmc/core/audio
 
 python setup.py build_ext --inplace --compiler=mingw32
 cd /mpf-mc
 pip install .
-python -m unittest discover mpf
+python -m unittest discover mpfmc
 
 
 IF EXIST "%PROGRAMFILES(X86)%" (GOTO 64BIT) ELSE (GOTO 32BIT)

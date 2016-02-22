@@ -9,9 +9,9 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
 from kivy.uix.stencilview import StencilView
 from kivy.uix.widget import WidgetException
 
-from mpf.mc.core.utils import set_position
-from mpf.mc.uix.slide import Slide
-from mpf.mc.uix.widget import MpfWidget
+from mpfmc.core.utils import set_position
+from mpfmc.uix.slide import Slide
+from mpfmc.uix.widget import MpfWidget
 
 transition_map = dict(none=NoTransition,
                       slide=SlideTransition,

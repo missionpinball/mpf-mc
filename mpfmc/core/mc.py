@@ -10,25 +10,25 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
 
-from mpf.mc.assets.video import VideoAsset
-from mpf.mc.core.bcp_processor import BcpProcessor
-from mpf.mc.core.config_processor import ConfigProcessor
-from mpf.mc.core.mode_controller import ModeController
-from mpf.mc.core.slide_player import SlidePlayer
-from mpf.mc.core.widget_player import WidgetPlayer
-from mpf.mc.uix.transitions import TransitionManager
+from mpfmc.assets.video import VideoAsset
+from mpfmc.core.bcp_processor import BcpProcessor
+from mpfmc.core.config_processor import ConfigProcessor
+from mpfmc.core.mode_controller import ModeController
+from mpfmc.core.slide_player import SlidePlayer
+from mpfmc.core.widget_player import WidgetPlayer
+from mpfmc.uix.transitions import TransitionManager
 
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
 from mpf.core.player import Player
 from mpf.core.assets import AssetManager
-from mpf.mc.assets.image import ImageAsset
+from mpfmc.assets.image import ImageAsset
 
 try:
-    from mpf.mc.core.audio import SoundSystem
-    from mpf.mc.core.audio.sound_player import SoundPlayer
-    from mpf.mc.assets.sound import SoundAsset
+    from mpfmc.core.audio import SoundSystem
+    from mpfmc.core.audio.sound_player import SoundPlayer
+    from mpfmc.assets.sound import SoundAsset
 except ImportError:
     SoundSystem = None
     SoundPlayer = None
@@ -134,7 +134,7 @@ class MpfMc(App):
             self.init_done()
 
     def displays_initialized(self, *args):
-        from mpf.mc.uix.window import Window
+        from mpfmc.uix.window import Window
         Window.initialize(self)
         self.events.post('displays_initialized')
         # Have to do this manually during init since the run loop isn't running

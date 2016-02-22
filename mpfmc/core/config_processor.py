@@ -10,19 +10,19 @@ from mpf.core.config_processor import ConfigProcessorBase
 from mpf.core.rgb_color import named_rgb_colors
 from mpf.core.utility_functions import Util
 
-from mpf.mc.uix.display import Display
-from mpf.mc.uix.slide_frame import SlideFrame
-from mpf.mc.widgets.image import ImageWidget
-from mpf.mc.widgets.text import Text
-from mpf.mc.widgets.video import VideoWidget
-from mpf.mc.widgets.line import Line
-from mpf.mc.widgets.triangle import Triangle
-from mpf.mc.widgets.quad import Quad
-from mpf.mc.widgets.rectangle import Rectangle
-from mpf.mc.widgets.ellipse import Ellipse
-from mpf.mc.widgets.bezier import Bezier
-from mpf.mc.widgets.point import Point
-from mpf.mc.widgets.dmd import Dmd, ColorDmd
+from mpfmc.uix.display import Display
+from mpfmc.uix.slide_frame import SlideFrame
+from mpfmc.widgets.image import ImageWidget
+from mpfmc.widgets.text import Text
+from mpfmc.widgets.video import VideoWidget
+from mpfmc.widgets.line import Line
+from mpfmc.widgets.triangle import Triangle
+from mpfmc.widgets.quad import Quad
+from mpfmc.widgets.rectangle import Rectangle
+from mpfmc.widgets.ellipse import Ellipse
+from mpfmc.widgets.bezier import Bezier
+from mpfmc.widgets.point import Point
+from mpfmc.widgets.dmd import Dmd, ColorDmd
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=ImageWidget,

@@ -10,7 +10,7 @@ from setuptools import setup, Extension
 # break the setup. Details here:
 # http://stackoverflow.com/questions/458550/standard-way-to-embed-version
 # -into-python-package
-version_file = "mpf/mc/_version.py"
+version_file = "mpfmc/_version.py"
 version_file_content = open(version_file, "rt").read()
 version_re = r"^__version__ = ['\"]([^'\"]*)['\"]"
 mo = re.search(version_re, version_file_content, re.M)
@@ -40,7 +40,7 @@ else:
 
 if binary_extension:
     package_data = {'audio_interface':
-        'mpf/mc/core/audio/audio_interface.{}'.format(binary_extension)}
+        'mpfmc/core/audio/audio_interface.{}'.format(binary_extension)}
 else:
     package_data = dict()
 
@@ -105,7 +105,7 @@ setup(
 
     package_data=package_data,
 
-    packages=['mpf'],
+    packages=['mpfmc'],
 
     zip_safe=False,
 

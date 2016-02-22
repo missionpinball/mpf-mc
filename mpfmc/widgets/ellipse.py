@@ -2,8 +2,8 @@ from kivy.graphics.vertex_instructions import Ellipse as KivyEllipse
 from kivy.graphics.context_instructions import Color
 from kivy.uix.widget import Widget
 
-from mpf.mc.core.utils import set_position
-from mpf.mc.uix.widget import MpfWidget
+from mpfmc.core.utils import set_position
+from mpfmc.uix.widget import MpfWidget
 
 
 class Ellipse(MpfWidget, Widget):

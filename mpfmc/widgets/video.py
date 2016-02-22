@@ -1,7 +1,7 @@
 from kivy.uix.video import Video
 from kivy.core.video import Video as CoreVideo
 
-from mpf.mc.uix.widget import MpfWidget
+from mpfmc.uix.widget import MpfWidget
 
 
 class VideoWidget(MpfWidget, Video):

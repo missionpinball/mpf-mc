@@ -1,6 +1,6 @@
 import re
 from kivy.uix.label import Label
-from mpf.mc.uix.widget import MpfWidget
+from mpfmc.uix.widget import MpfWidget
 
 
 class Text(MpfWidget, Label):
