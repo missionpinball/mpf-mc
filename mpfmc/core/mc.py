@@ -33,7 +33,7 @@ except ImportError:
     SoundSystem = None
     SoundPlayer = None
     SoundAsset = None
-    Logger.warning("mc.core.audio library could not be loaded - audio features will not be available")
+    Logger.warning("mpfmc.core.audio library could not be loaded - audio features will not be available")
 
 
 class MpfMc(App):
@@ -72,7 +72,7 @@ class MpfMc(App):
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
-        self._init_done = False
+        self.is_init_done = False
         self.thread_stopper = threading.Event()
 
         # Core components
@@ -160,7 +160,7 @@ class MpfMc(App):
         self.clear_boot_hold('init')
 
     def init_done(self):
-        self._init_done = True
+        self.is_init_done = True
         ConfigValidator.unload_config_spec()
         self.reset()
 

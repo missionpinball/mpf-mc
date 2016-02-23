@@ -1,6 +1,7 @@
 from kivy.core.video import Video
 from mpf.core.assets import Asset, AssetPool
 
+
 class VideoPool(AssetPool):
 
     def __repr__(self):
@@ -9,6 +10,7 @@ class VideoPool(AssetPool):
     @property
     def video(self):
         return self.asset
+
 
 class VideoAsset(Asset):
 
@@ -29,7 +31,7 @@ class VideoAsset(Asset):
     def video(self):
         return self._video
 
-    def _do_load(self):
+    def do_load(self):
         self._video = Video(filename=self.file)
 
     def _do_unload(self):

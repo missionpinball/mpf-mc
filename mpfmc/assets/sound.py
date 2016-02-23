@@ -12,6 +12,7 @@ DEFAULT_MAX_QUEUE_TIME = None
 DEFAULT_LOOPS = 0
 MINIMUM_DUCKING_DURATION = "10ms"
 
+
 class SoundPool(AssetPool):
 
     # Be sure the pool group, if you use it, is first in the file ahead of the
@@ -112,7 +113,7 @@ class SoundAsset(Asset):
     def ducking(self):
         return self._ducking
 
-    def _do_load(self):
+    def do_load(self):
         """Loads the sound asset from disk."""
 
         # Load the sound file into memory
@@ -124,9 +125,9 @@ class SoundAsset(Asset):
         AudioInterface.unload_sound(self._container)
         self._container = None
 
-    def _loaded(self):
+    def is_loaded(self):
         """Called when the asset has finished loading"""
-        super()._loaded()
+        super().is_loaded()
         Logger.debug("SoundAsset: Loaded {} (Track {})".format(self.name, self.track))
 
 

@@ -18,6 +18,7 @@ class ImagePool(AssetPool):
     def image(self):
         return self.asset
 
+
 class ImageAsset(Asset):
 
     attribute='images'  # attribute in MC, e.g. self.mc.images
@@ -44,7 +45,7 @@ class ImageAsset(Asset):
 
         return self._image
 
-    def _do_load(self):
+    def do_load(self):
         # This is the method that's actually called to load the asset from
         # disk. It's called by the loader thread so it's ok to block. However
         # since it's a separate thread, don't update any other attributes.
