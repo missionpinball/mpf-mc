@@ -11,7 +11,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '1', '0-dev8')
+__version_info__ = ('0', '1', '0-dev9')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -155,7 +155,7 @@ cdef class AudioInterface:
         self.audio_callback_data.mutex = SDL_CreateMutex()
 
         # Initialize the supported SDL_Mixer library formats
-        self.supported_formats = Mix_Init(MIX_INIT_FLAC | MIX_INIT_OGG)
+        self.supported_formats = Mix_Init(MIX_INIT_OGG)
 
         self._initialize_silence()
         self._initialize_audio_callback()
@@ -551,11 +551,12 @@ cdef class AudioInterface:
         cdef char*c_file_name = py_byte_file_name
 
         # Attempt to load the file
+        SDL_LockAudio()
         cdef Mix_Chunk *chunk = Mix_LoadWAV(c_file_name)
+        SDL_UnlockAudio()
         if chunk == NULL:
             Logger.error("AudioInterface: Unable to load sound from source file '{}' - {}"
                          .format(file_name, SDL_GetError()))
-            SDL_UnlockAudio()
             return None
 
         # Create a Python container object to wrap the Mix_Chunk C pointer
