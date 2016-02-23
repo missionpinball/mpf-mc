@@ -72,7 +72,7 @@ cdef extern from "SDL.h" nogil:
     void SDL_LockAudio()
     void SDL_UnlockAudio()
 
-    ctypedef Uint16 SDL_AudioFormat;
+    ctypedef Uint16 SDL_AudioFormat
 
     void SDL_MixAudio(Uint8 *dst, const Uint8 *src, Uint32 len, int volume)
     void SDL_MixAudioFormat(Uint8 *dst, const Uint8 *src, SDL_AudioFormat format,
