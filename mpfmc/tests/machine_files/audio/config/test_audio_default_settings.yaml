@@ -5,3 +5,16 @@
 modes:
  - mode1
 
+assets:
+    sounds:
+        default:
+            load: preload
+        voice:
+            load: preload
+            track: default
+        sfx:
+            load: on_demand
+            track: default
+        music:
+            load: on_demand
+            track: default

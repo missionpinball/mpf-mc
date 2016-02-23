@@ -20,6 +20,8 @@ class TestAudioBadBufferSetting(MpfMcTestCase):
             Logger.warning("Sound system is not enabled - unable to run audio tests")
             return
 
+        Logger.setLevel(10)
+
         self.assertIsNotNone(self.mc.sound_system)
         self.assertIsNotNone(self.mc.sound_system.audio_interface)
         settings = self.mc.sound_system.audio_interface.get_settings()

@@ -84,7 +84,6 @@ class TestAudio(MpfMcTestCase):
         # /sounds/voice
         self.assertIn('104457_moron_test', self.mc.sounds)  # .wav
         self.assertIn('113690_test', self.mc.sounds)        # .wav
-        self.assertIn('170380_clear', self.mc.sounds)       # .flac
 
         # /sounds/music
         self.assertIn('263774_music', self.mc.sounds)       # .wav
