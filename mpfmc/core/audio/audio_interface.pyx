@@ -551,9 +551,7 @@ cdef class AudioInterface:
         cdef char*c_file_name = py_byte_file_name
 
         # Attempt to load the file
-        SDL_LockAudio()
         cdef Mix_Chunk *chunk = Mix_LoadWAV(c_file_name)
-        SDL_UnlockAudio()
         if chunk == NULL:
             Logger.error("AudioInterface: Unable to load sound from source file '{}' - {}"
                          .format(file_name, SDL_GetError()))
@@ -577,7 +575,9 @@ cdef class AudioInterface:
 
         cdef MixChunkContainer mc = container
         if mc.chunk != NULL:
+            SDL_LockAudio()
             Mix_FreeChunk(mc.chunk)
+            SDL_UnlockAudio()
             mc.chunk = NULL
 
     def stop_sound(self, sound not None):
@@ -889,7 +889,8 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
             track.sound_players[player].status = player_playing
 
         # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
-        if track.sound_players[player].status is player_playing and track.sound_players[player].current.volume > 0:
+        if track.sound_players[player].status is player_playing and track.sound_players[player].current.volume > 0 and \
+                        track.sound_players[player].current.chunk != NULL:
 
             # Get source sound buffer (read one byte at a time, bytes will be combined into a
             # 16-bit sample value before being mixed)
@@ -1682,6 +1683,11 @@ cdef class Track:
         cdef AudioEventContainer *audio_event
         cdef DuckingEnvelope *ducking_envelope
         cdef DuckingSettings *ducking_settings
+
+        if not sound.loaded:
+            Logger.debug(
+                "Track: Specified sound is not loaded, could not play sound {}".format(sound.name))
+            return False
 
         # Make sure the player in range
         if player in range(self.max_simultaneous_sounds):
