@@ -1,4 +1,4 @@
-# config_version=3
+# config_version=4
 mpf-mc:
     modules:
         mode_controller.ModeController
@@ -16,23 +16,23 @@ mpf-mc:
     port: 5050
     exit_on_disconnect: yes
 
-    display_modules:
-        elements:
-            - text
-            - virtualdmd
-            - image
-            - animation
-            - shape
-            - movie
-            - character_picker
-            - entered_chars
-        modules:
-            dmd.DMD
-        transitions:
-            move_out: move_out.MoveOut
-            move_in: move_in.MoveIn
-        decorators:
-            blink: blink.Blink
+#    display_modules:
+#        elements:
+#            - text
+#            - virtualdmd
+#            - image
+#            - animation
+#            - shape
+#            - movie
+#            - character_picker
+#            - entered_chars
+#        modules:
+#            dmd.DMD
+#        transitions:
+#            move_out: move_out.MoveOut
+#            move_in: move_in.MoveIn
+#        decorators:
+#            blink: blink.Blink
     paths:
         shows: shows
         sounds: sounds
@@ -46,14 +46,11 @@ mpf-mc:
         scriptlets: scriptlets
 
     allow_invalid_config_sections: true
-    config_versions_file: tools/config_versions.yaml
+#    config_versions_file: tools/config_versions.yaml
 
-timing:
-    hz: 30
-
-modes:
-    - attract
-    - game
+#modes:
+#    - attract
+#    - game
 
 fonts:
     default:
@@ -159,14 +156,14 @@ assets:
 #        font: small
 #        y: 40%
 
-debug_profiles:
-    verbose:
-        core_modules:
-            events
-            mode_controller
-        device_collections:
-        individual_devices:
-        plugins:
+#debug_profiles:
+#    verbose:
+#        core_modules:
+#            events
+#            mode_controller
+#        device_collections:
+#        individual_devices:
+#        plugins:
 
 mpf:
   allow_invalid_config_sections: false
@@ -175,23 +172,23 @@ mpf:
 kivy_config:
   kivy:
     desktop: 1
-    exit_on_escape: 1
+    exit_on_escape: true
     pause_on_minimize: 0
     log_dir:
     window_icon:
   graphics:
-    borderless: 0
+    borderless: false
     window_state: visible  # visible, hidden, maximized, minimized
     fbo: hardware  # hardware, software, force-hardware
-    fullscreen: 0
+    fullscreen: false
     height: 600
 #    left: 0
     maxfps: 60
     multisamples: 2
     position: auto  # auto, custom
-    show_cursor: 1
+    show_cursor: true
 #    top: 0
-    resizable: 1
+    resizable: true
     rotation: 0
     width: 800
     minimum_width: 100
