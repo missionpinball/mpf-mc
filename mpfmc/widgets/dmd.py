@@ -87,10 +87,10 @@ class DmdSource(MpfWidget, Scatter, Widget):
         if self.config['shades']:
             effect_list.append(Reduce(shades=self.config['shades']))
 
-        if self.config['color']:
-            effect_list.append(Colorize(r=self.config['color'][0],
-                                        g=self.config['color'][1],
-                                        b=self.config['color'][2]))
+        if self.config['pixel_color']:
+            effect_list.append(Colorize(r=self.config['pixel_color'][0],
+                                        g=self.config['pixel_color'][1],
+                                        b=self.config['pixel_color'][2]))
 
         if self.config['gain'] != 1.0:
             effect_list.append(Gain(gain=self.config['gain']))

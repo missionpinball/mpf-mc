@@ -49,7 +49,7 @@ class ImageWidget(MpfWidget, Image):
 
         if self._coreimage.anim_available:
             self.fps = self.config['fps']
-            self.loops = self.config['anim_loops']
+            self.loops = self.config['loops']
             if self.config['auto_play']:
                 self.play()
             else:
