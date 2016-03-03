@@ -23,6 +23,8 @@ from mpfmc.widgets.ellipse import Ellipse
 from mpfmc.widgets.bezier import Bezier
 from mpfmc.widgets.point import Point
 from mpfmc.widgets.dmd import Dmd, ColorDmd
+from mpfmc.widgets.character_picker import CharacterPicker
+from mpfmc.widgets.entered_chars import EnteredChars
 
 type_map = CaseInsensitiveDict(text=Text,
                                image=ImageWidget,
@@ -38,7 +40,9 @@ type_map = CaseInsensitiveDict(text=Text,
                                rectangle=Rectangle,
                                triangle=Triangle,
                                dmd=Dmd,
-                               color_dmd=ColorDmd)
+                               color_dmd=ColorDmd,
+                               character_picker=CharacterPicker,
+                               entered_chars=EnteredChars)
 
 
 class ConfigProcessor(ConfigProcessorBase):
