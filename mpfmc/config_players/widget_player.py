@@ -1,7 +1,12 @@
 from mpf.core.config_player import ConfigPlayer
-from mpfmc.uix.slide import Slide
 
 class WidgetPlayer(ConfigPlayer):
+    """
+
+    Note: This class is loaded by MPF and everything in it is in the context of
+    MPF.
+
+    """
     config_file_section = 'widget_player'
 
     def play(self, settings, mode=None, **kwargs):
@@ -34,3 +39,7 @@ class WidgetPlayer(ConfigPlayer):
                 slide.add_widgets_from_library(name=widget, mode=mode,
                                                **kwargs)
 
+player_cls = WidgetPlayer
+
+def register_with_mpf(machine):
+    return 'widget', WidgetPlayer(machine)

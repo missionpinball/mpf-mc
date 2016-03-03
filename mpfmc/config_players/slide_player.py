@@ -2,6 +2,12 @@ from mpf.core.config_player import ConfigPlayer
 
 
 class SlidePlayer(ConfigPlayer):
+    """
+
+    Note: This class is loaded by MPF and everything in it is in the context of
+    MPF.
+
+    """
     config_file_section = 'slide_player'
 
     def additional_processing(self, config):
@@ -45,3 +51,8 @@ class SlidePlayer(ConfigPlayer):
             target.show_slide(slide_name=name, transition=s['transition'],
                               mode=mode, force=s['force'],
                               priority=s['priority'], **kwargs)
+
+player_cls = SlidePlayer
+
+def register_with_mpf(machine):
+    return 'slide', SlidePlayer(machine)

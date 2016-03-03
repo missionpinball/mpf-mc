@@ -14,8 +14,8 @@ from mpfmc.assets.video import VideoAsset
 from mpfmc.core.bcp_processor import BcpProcessor
 from mpfmc.core.config_processor import ConfigProcessor
 from mpfmc.core.mode_controller import ModeController
-from mpfmc.core.slide_player import SlidePlayer
-from mpfmc.core.widget_player import WidgetPlayer
+from mpfmc.config_players.slide_player import SlidePlayer
+from mpfmc.config_players.widget_player import WidgetPlayer
 from mpfmc.uix.transitions import TransitionManager
 
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
