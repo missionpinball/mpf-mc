@@ -7,19 +7,22 @@ import socket
 import sys
 from datetime import datetime
 
-from kivy.config import Config
-from kivy.logger import Logger
-
-import mpfmc
-from mpf.core.utility_functions import Util
-from mpfmc.core.config_processor import ConfigProcessor
-from mpfmc.core.mc import MpfMc
-from mpfmc.core.utils import set_machine_path, load_machine_config
-
 
 class Command(object):
 
     def __init__(self, mpf_path, machine_path, args):
+
+        # Need to have these in here because we don't want them to load when
+        # the module is loaded as an mpf.command
+
+        from kivy.logger import Logger
+        import mpfmc
+        from mpf.core.utility_functions import Util
+        from mpfmc.core.config_processor import ConfigProcessor
+        from mpfmc.core.mc import MpfMc
+        from mpfmc.core.utils import set_machine_path, load_machine_config
+
+
         del mpf_path
         parser = argparse.ArgumentParser(description='Starts the MPF Media Controller')
 
@@ -134,6 +137,9 @@ class Command(object):
         sys.exit()
 
     def preprocess_config(self, config):
+
+        from kivy.config import Config
+
         kivy_config = config['kivy_config']
 
         try:
