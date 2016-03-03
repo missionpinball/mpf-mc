@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 
 modes:
   - mode1
@@ -48,8 +48,7 @@ slides:
       x: 380
 
 slide_player:
-  show_slide1:
-    slide: image_test
+  show_slide1: image_test
 
 assets:
     images:

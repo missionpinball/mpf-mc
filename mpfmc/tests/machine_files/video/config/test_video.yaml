@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 
 displays:
   default:
@@ -16,8 +16,7 @@ slides:
 
 
 slide_player:
-  show_slide1:
-    slide: video_test
+  show_slide1: video_test
 
 assets:
     images:

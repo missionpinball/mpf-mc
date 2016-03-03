@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 
 modes:
   - mode1
@@ -26,5 +26,4 @@ slides:
       y: 100
 
 slide_player:
-  slide1:
-    slide: slide1
+  slide1: slide1

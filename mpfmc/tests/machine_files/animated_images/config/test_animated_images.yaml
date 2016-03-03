@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 
 displays:
   default:
@@ -25,17 +25,16 @@ slides:
       y: 100
       anchor_x: left
 slide_player:
-  slide1:
-    slide: slide1
+  slide1: slide1
 
-assets:
-    images:
-        default:
-            load: preload
-        preload:
-            load: preload
-            test_key: test_value
-        on_demand:
-            load: on_demand
-        mode_start:
-            load: mode_start
+#assets:
+#    images:
+#        default:
+#            load: preload
+#        preload:
+#            load: preload
+#            test_key: test_value
+#        on_demand:
+#            load: on_demand
+#        mode_start:
+#            load: mode_start

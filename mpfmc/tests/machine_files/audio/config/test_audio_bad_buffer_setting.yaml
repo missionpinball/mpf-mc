@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 sound_system:
   buffer: 1000 # Not a power or two as required
   tracks:

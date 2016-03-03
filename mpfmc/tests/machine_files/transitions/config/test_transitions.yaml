@@ -1,4 +1,4 @@
-# config_version=3
+# config_version=4
 
 displays:
   default:
@@ -39,8 +39,7 @@ slides:
       color: 003300
 
 slide_player:
-  show_slide1:
-    slide: slide1
+  show_slide1: slide1
   show_slide2:
     slide: slide2
     transition:
@@ -144,6 +143,5 @@ slide_player:
     transition:
       type: push
       direction: right
-  show_slide2_no_transition:
-    slide: slide2
+  show_slide2_no_transition: slide2
 

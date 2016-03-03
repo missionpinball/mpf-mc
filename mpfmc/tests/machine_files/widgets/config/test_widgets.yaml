@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 
 modes:
 - mode1
@@ -98,5 +98,4 @@ widget_player:
   add_widget1_to_display2:
     widget: widget1
     target: display2
-  add_widget6:
-    widget: widget6
+  add_widget6: widget6

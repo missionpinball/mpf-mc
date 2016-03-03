@@ -1,4 +1,4 @@
-# config_version=3
+# config_version=4
 
 mode:
   priority: 500
@@ -16,8 +16,7 @@ slides:
     font_size: 250
 
 slide_player:
-  show_mode1_slide:
-    slide: mode1_slide
+  show_mode1_slide: mode1_slide
   show_mode1_slide_2:
     slide: mode1_slide_2
     priority: 150

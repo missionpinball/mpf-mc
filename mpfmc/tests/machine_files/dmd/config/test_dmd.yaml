@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 
 displays:
   default:
@@ -130,8 +130,7 @@ slides:
       x: 124
 
 slide_player:
-  slide1:
-    slide: slide1
+  slide1: slide1
   dmd_slide:
     slide: dmd_slide
     target: dmd

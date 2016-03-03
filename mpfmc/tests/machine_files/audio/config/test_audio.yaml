@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 sound_system:
   buffer: 4096
   frequency: 44100
@@ -55,14 +55,12 @@ sounds:
             release: 0.6sec
 
 sound_player:
-    play_sound_synthping:
-        sound: 210871_synthping
+    play_sound_synthping: 210871_synthping
     play_sound_text:
         sound: 264828_text
         loops: 3
         priority: 100
-    play_sound_moron_test:
-        sound: 104457_moron_test
+    play_sound_moron_test: 104457_moron_test
     play_sound_test:
         sound: 113690_test
         volume: 0.25

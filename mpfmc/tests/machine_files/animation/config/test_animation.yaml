@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 
 displays:
   default:
@@ -79,12 +79,9 @@ slides:
         duration: 500ms
 
 slide_player:
-  show_slide7:
-    slide: slide7
-  show_slide2:
-    slide: slide2
-  show_slide3:
-    slide: slide3
+  show_slide7: slide7
+  show_slide2: slide2
+  show_slide3: slide3
 
 animations:
   fade_in:

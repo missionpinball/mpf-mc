@@ -1,4 +1,4 @@
-#config_version=3
+#config_version=4
 
 modes:
   - mode1
@@ -18,64 +18,64 @@ slides:
       y: 200
   text_from_event_param1:
     - type: text
-      text: "%param1%"
+      text: (param1)
     - type: text
       text: TEXT FROM EVENT PARAMETER
       y: 200
       color: red
   text_from_event_param2:
     - type: text
-      text: HI %param1%
+      text: HI (param1)
     - type: text
       text: MIX STATIC AND DYNAMIC FROM EVENT
       y: 200
       color: orange
   text_from_event_param3:
     - type: text
-      text: MIX %param1% MATCH
+      text: MIX (param1) MATCH
     - type: text
       text: MIX STATIC SURROUNDING DYNAMIC
       y: 200
       color: yellow
   text_from_event_param4:
     - type: text
-      text: NO%param1%
+      text: NO(param1)
     - type: text
       text: MIX WITH NO SPACE
       y: 200
       color: green
   text_from_event_param5:
     - type: text
-      text: NUMBER %param1%
+      text: NUMBER (param1)
     - type: text
       text: DYNAMIC INTEGER
       y: 200
       color: lightblue
   text_from_event_param6:
     - type: text
-      text: "%param1%"
+      text: (param1)
     - type: text
       text: PURELY DYNAMIC NO MIX
       y: 200
       color: blue
   text_from_event_param7:
     - type: text
-      text: 100%
+      text: 100)
     - type: text
-      text: PERCENT SIGN IN STRING
+      text: PARENTHESIS IN STRING
       y: 200
       color: pink
   text_from_event_param8:
     - type: text
-      text: "%param1%%"
+      text: ((param1))
     - type: text
-      text: COMBINE PERCENT SIGN AND DYNAMIC
+      text: COMBINE PARENTHESIS AND DYNAMIC
       y: 200
       color: purple
 
   text_with_player_var1:
     - type: text
-      text: "%test_var%"
+      text: (test_var)
       font_size: 100
     - type: text
       text: TESTING WIDGET AUTO UPDATE
@@ -87,28 +87,28 @@ slides:
       color: pink
   text_with_player_var2:
     - type: text
-      text: "%player|test_var%"
+      text: (player|test_var)
     - type: text
       text: DEFAULT PLAYER
       y: 200
       color: red
   text_with_player_var3:
     - type: text
-      text: "%player1|test_var%"
+      text: (player1|test_var)
     - type: text
       text: NAMED PLAYER
       y: 200
       color: blue
   text_with_player_var4:
     - type: text
-      text: "%player2|test_var%"
+      text: (player2|test_var)
     - type: text
       text: NAMED PLAYER THAT DOESN'T EXIST
       y: 200
       color: brown
   text_with_player_var_and_event:
     - type: text
-      text: "%player_var% %test_param%"
+      text: (player_var% (test_param)
     - type: text
       text: MIX EVENT PARAM AND PLAYER VAR
       y: 200
@@ -193,6 +193,6 @@ slide_player:
 
 text_strings:
   greeting: HELLO
-  ball: "%ball%"
+  ball: (ball)
   name: PLAYER
   dollar: 100
