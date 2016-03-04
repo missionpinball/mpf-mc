@@ -95,8 +95,8 @@ class MpfWidget(object):
         for entry in config_list:
             if 'named_animation' in entry:
 
-                for named_anim_settings in self.mc.animation_configs[entry[
-                        'named_animation']]:
+                for named_anim_settings in (
+                        self.mc.animations[entry['named_animation']]):
                     animation_list.append(named_anim_settings)
 
             else:

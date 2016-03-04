@@ -1,20 +1,13 @@
-from collections import namedtuple
+from mpfmc.core.config_collection import ConfigCollection
 
-from mpfmc.core.device import Device
-from mpfmc.devices.widget import Widget
 
-SlideDevice = namedtuple('SlideDevice',
-                          'widgets transition tags label mode',
-                         verbose=False)
-
-class Slide(Device):
+class Slide(ConfigCollection):
 
     config_section = 'slides'
     collection = 'slides'
     class_label = 'SlideConfig'
 
-    @classmethod
-    def process_config(cls, config):
+    def process_config(self, config):
         # config is localized to an single slide name entry
 
         if isinstance(config, list):
@@ -33,28 +26,31 @@ class Slide(Device):
 
         for i, widget in enumerate(config['widgets']):
             # since dict is mutable it updates in place
-            config['widgets'][i] = Widget.process_widget(widget)
+            config['widgets'][i] = self.mc.widgets.process_widget(widget)
 
         if 'transition' in config:
-            config['transition'] = cls.process_transition(config['transition'])
+            config['transition'] = self.process_transition(
+                config['transition'])
         else:
             config['transition'] = None
 
         return config
         # return SlideDevice(**config)
 
-    @classmethod
-    def process_transition(cls, config):
+    def process_transition(self, config):
         # config is localized to the 'transition' section
 
         if not isinstance(config, dict):
             config = dict(type=config)
 
         try:
-            config = cls.mc.config_validator.validate_config(
+            config = self.mc.config_validator.validate_config(
                     'transitions:{}'.format(config['type']), config)
         except KeyError:
             raise ValueError('transition: section of config requires a '
                              '"type:" setting')
 
         return config
+
+
+collection_cls = Slide

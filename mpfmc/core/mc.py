@@ -14,11 +14,9 @@ from kivy.logger import Logger
 from mpfmc.assets.video import VideoAsset
 from mpfmc.core.bcp_processor import BcpProcessor
 from mpfmc.core.config_processor import ConfigProcessor
-from mpfmc.core.device import DeviceManager
 from mpfmc.core.mode_controller import ModeController
-from mpfmc.config_players.slide_player import McSlidePlayer as SlidePlayer
-from mpfmc.config_players.widget_player import McWidgetPlayer as WidgetPlayer
 from mpfmc.uix.transitions import TransitionManager
+from mpfmc.core.config_collection import create_config_collections
 
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
@@ -81,12 +79,11 @@ class MpfMc(App):
         self.config_validator = ConfigValidator(self)
         self.events = EventManager(self)
         self.mode_controller = ModeController(self)
-        self.device_manager = DeviceManager(self)
+        create_config_collections(self, self.machine_config['mpf-mc'][
+            'config_collections'])
         ConfigValidator.load_config_spec()
 
         self.config_processor = ConfigProcessor(self)
-        # self.slide_player = SlidePlayer(self)
-        # self.widget_player = WidgetPlayer(self)
         self.transition_manager = TransitionManager(self)
 
         # Initialize the sound system (must be done prior to creating the AssetManager).

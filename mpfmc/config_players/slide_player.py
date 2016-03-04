@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 from mpf.config_players.plugin_player import PluginPlayer
 from mpfmc.core.mc_config_player import McConfigPlayer
 
@@ -34,8 +32,6 @@ class McSlidePlayer(McConfigPlayer):
 
     def play(self, settings, mode=None, caller=None, **kwargs):
         super().play(settings, mode, caller, **kwargs)
-
-        settings = deepcopy(settings)
 
         if 'slides' in settings:
             settings = settings['slides']

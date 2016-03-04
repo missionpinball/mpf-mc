@@ -164,7 +164,6 @@ class SlideFrame(MpfWidget, ScreenManager):
                                    **kwargs)
 
         # update the widgets with whatever kwargs came through here
-        # todo bug? Should deepcopy?
         for widget in slide.walk():
             try:
                 widget.update_kwargs(**kwargs)

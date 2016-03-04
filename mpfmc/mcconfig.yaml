@@ -6,9 +6,11 @@ mpf-mc:
         widget: mpfmc.config_players.widget_player
 #        sound: mpfmc.config_players.sound_player
 
-    device_modules:
-        slide.Slide
-        widget.Widget
+    config_collections:
+        slide: mpfmc.config_collections.slide
+        widget: mpfmc.config_collections.widget
+        animation: mpfmc.config_collections.animation
+        text_styles: mpfmc.config_collections.text_styles
 
     mpf_transition_modules:
         - push
