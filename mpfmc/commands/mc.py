@@ -159,8 +159,12 @@ class Command(object):
                 except KeyError:
                     continue
 
-        if config['window']['exit_on_escape']:
-            Config.set('kivy', 'exit_on_escape', '1')
+        try:  # config not validated yet, so we use try
+            if config['window']['exit_on_escape']:
+                Config.set('kivy', 'exit_on_escape', '1')
+        except KeyError:
+            pass
+
 
 def get_command():
     return 'mc', Command

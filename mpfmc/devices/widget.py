@@ -62,11 +62,6 @@ class Widget(Device):
             widget_list.append(cls.process_widget(widget))
 
         return widget_list
-        # config = dict(widgets=widget_list)
-        # config['tags'] = []
-        # config['mode'] = None
-        # config['label'] = None
-        # return WidgetDevice(**config)
 
     @classmethod
     def process_widget(cls, config, mode=None):

@@ -22,7 +22,8 @@ class McConfigPlayer(ConfigPlayer):
 
         # Look through the machine config for config_player sections and
         # for shows to validate and process
-        if self.config_file_section in self.machine.machine_config:
+        if (self.config_file_section in self.machine.machine_config and
+                    self.machine.machine_config[self.config_file_section]):
             # Validate
             self.machine.machine_config[self.config_file_section] = (
                 self.validate_config(

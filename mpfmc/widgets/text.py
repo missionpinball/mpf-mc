@@ -111,7 +111,7 @@ class Text(MpfWidget, Label):
     def _process_text(self, text, mode=None):
         for var_string in self._get_text_vars(text):
             if var_string in self.event_replacements:
-                text = text.replace('%{}%'.format(var_string),
+                text = text.replace('({})'.format(var_string),
                                     str(self.event_replacements[var_string]))
 
         if self._get_text_vars(text):
