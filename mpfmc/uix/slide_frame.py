@@ -183,6 +183,22 @@ class SlideFrame(MpfWidget, ScreenManager):
         else:  # Not showing this slide
             return False
 
+    def add_and_show_slide(self, widgets=None, slide_name=None,
+                           transition=None, priority=None, mode=None,
+                           force=False, **kwargs):
+        # creates a new slide and shows it right away
+        # todo need a test
+
+        # create the slide. If a slide with this name already exists, it will
+        # be replaced
+
+        slide_obj = self.add_slide(name=slide_name, config=widgets,
+                                   priority=priority, mode=mode, **kwargs)
+
+        self.show_slide(slide_name=slide_obj.name, transition=transition,
+                        priority=priority, mode=mode, force=force, **kwargs)
+
+
     def remove_slide(self, slide, transition_config=None):
         # Note that you can't remove the last slide, but if you try it will
         # change the priority so it gets removed by whatever comes next
