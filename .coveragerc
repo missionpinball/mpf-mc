@@ -6,11 +6,10 @@ exclude_lines =
     raise AssertionError
     raise NotImplementedError
 
-[run]
-source =
-    mc
-    examples
+
 omit =
-    mc/dmd_test.py
-    mc/fbo.py
-    mc/core/bcp_server.py
+    *__init__.py
+    mpfmc/tests/*
+
+[run]
+source = mc
