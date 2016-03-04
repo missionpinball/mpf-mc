@@ -24,28 +24,29 @@ class TestSlides(MpfMcTestCase):
         self.assertIn('slide5', self.mc.machine_config['slides'])
 
     def test_mode_by_name(self):
+
         slide = Slide(mc=self.mc,
                       name='slide1',
                       config=self.mc.machine_config['slides']['slide1'],
-                      mode='attract',
+                      mode='mode1',
                       priority=0)
 
-        self.assertIs(slide.mode, self.mc.modes['attract'])
+        self.assertIs(slide.mode, self.mc.modes['mode1'])
 
     def test_mode_by_object(self):
         slide = Slide(mc=self.mc,
                       name='slide1',
                       config=self.mc.machine_config['slides']['slide1'],
-                      mode=self.mc.modes['attract'],
+                      mode=self.mc.modes['mode1'],
                       priority=0)
 
-        self.assertIs(slide.mode, self.mc.modes['attract'])
+        self.assertIs(slide.mode, self.mc.modes['mode1'])
 
     def test_priority_passed(self):
         slide = Slide(mc=self.mc,
                       name='slide1',
                       config=self.mc.machine_config['slides']['slide1'],
-                      mode=self.mc.modes['attract'],
+                      mode=self.mc.modes['mode1'],
                       priority=123)
 
         self.assertEqual(slide.priority, 123)
@@ -54,9 +55,9 @@ class TestSlides(MpfMcTestCase):
         slide = Slide(mc=self.mc,
                       name='slide1',
                       config=self.mc.machine_config['slides']['slide1'],
-                      mode=self.mc.modes['attract'])
+                      mode=self.mc.modes['mode1'])
 
-        self.assertEqual(slide.priority, self.mc.modes['attract'].priority)
+        self.assertEqual(slide.priority, self.mc.modes['mode1'].priority)
 
     def test_priority_merged_with_mode(self):
         self.mc.modes['mode1'].start()
@@ -82,7 +83,7 @@ class TestSlides(MpfMcTestCase):
         slide = Slide(mc=self.mc,
                       name='slide1',
                       config=self.mc.machine_config['slides']['slide1'],
-                      mode='attract',
+                      mode='mode1',
                       priority=0)
 
         widget_tree = list()
@@ -90,12 +91,25 @@ class TestSlides(MpfMcTestCase):
             widget_tree.append(s)
 
         # last widget is drawn last (on top), so the order should be flipped
-        self.assertEqual(widget_tree[1].text, 'SLIDE TEST - SLIDE 1 - TEXT 3')
-        self.assertEqual(widget_tree[2].text, 'SLIDE TEST - SLIDE 1 - TEXT 2')
-        self.assertEqual(widget_tree[3].text, 'SLIDE TEST - SLIDE 1 - TEXT 1')
+        self.assertEqual(widget_tree[1].text, 'SLIDE TEST 1-3')
+        self.assertEqual(widget_tree[2].text, 'SLIDE TEST 1-2')
+        self.assertEqual(widget_tree[3].text, 'SLIDE TEST 1-1')
+
+    def test_slides_from_config(self):
+
+        self.assertIn('slide1', self.mc.slides)
+        self.assertIn('slide2', self.mc.slides)
+        self.assertIn('slide3', self.mc.slides)
+        self.assertIn('slide4', self.mc.slides)
+        self.assertIn('transition', self.mc.slides['slide4'])
+        self.assertIn('slide5', self.mc.slides)
+        self.assertIn('transition', self.mc.slides['slide5'])
+
+        # make sure it also works by attribute
+        self.assertIsNotNone(self.mc.slides.slide1)
 
     def test_slides_from_modes(self):
-        self.assertIn('mode1_slide1', self.mc.slide_configs)
+        self.assertIn('mode1_slide1', self.mc.slides)
 
         # set a current slide
         self.mc.targets['display1'].add_slide(name='slide1')

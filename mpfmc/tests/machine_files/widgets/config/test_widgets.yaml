@@ -90,12 +90,11 @@ widgets:
     font_size: 100
 
 widget_player:
-  add_widget1_to_current:
-    widget: widget1
+  add_widget1_to_current: widget1
   add_widget2_to_slide1:
-    widget: widget1
-    slide: slide1
+    widget1:
+      slide: slide1
   add_widget1_to_display2:
-    widget: widget1
-    target: display2
+    widget1:
+      target: display2
   add_widget6: widget6

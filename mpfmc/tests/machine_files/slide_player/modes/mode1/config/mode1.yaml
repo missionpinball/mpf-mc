@@ -13,7 +13,7 @@ slides:
     type: text
     text: MODE 1 SLIDE 2
     color: 00ffff
-    font_size: 250
+    font_size: 150
 
 slide_player:
   show_mode1_slide: mode1_slide
