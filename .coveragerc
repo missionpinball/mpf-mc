@@ -12,4 +12,4 @@ omit =
     mpfmc/tests/*
 
 [run]
-source = mc
+source = mpfmc
