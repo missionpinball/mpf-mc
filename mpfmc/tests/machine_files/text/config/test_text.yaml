@@ -60,7 +60,7 @@ slides:
       color: blue
   text_from_event_param7:
     - type: text
-      text: 100)
+      text: 1)
     - type: text
       text: PARENTHESIS IN STRING
       y: 200
@@ -108,7 +108,7 @@ slides:
       color: brown
   text_with_player_var_and_event:
     - type: text
-      text: (player_var% (test_param)
+      text: (player_var) (test_param)
     - type: text
       text: MIX EVENT PARAM AND PLAYER VAR
       y: 200
@@ -152,44 +152,25 @@ slides:
       y: 200
 
 slide_player:
-  static_text:
-    slide: static_text
-  text_from_event_param1:
-    slide: text_from_event_param1
-  text_from_event_param2:
-    slide: text_from_event_param2
-  text_from_event_param3:
-    slide: text_from_event_param3
-  text_from_event_param4:
-    slide: text_from_event_param4
-  text_from_event_param5:
-    slide: text_from_event_param5
-  text_from_event_param6:
-    slide: text_from_event_param6
-  text_from_event_param7:
-    slide: text_from_event_param7
-  text_from_event_param8:
-    slide: text_from_event_param8
-  text_with_player_var1:
-    slide: text_with_player_var1
-  text_with_player_var2:
-    slide: text_with_player_var2
-  text_with_player_var3:
-    slide: text_with_player_var3
-  text_with_player_var4:
-    slide: text_with_player_var4
-  text_with_player_var_and_event:
-    slide: text_with_player_var_and_event
-  number_grouping:
-    slide: number_grouping
-  text_string1:
-    slide: text_string1
-  text_string2:
-    slide: text_string2
-  text_string3:
-    slide: text_string3
-  text_string4:
-    slide: text_string4
+  static_text: static_text
+  text_from_event_param1: text_from_event_param1
+  text_from_event_param2: text_from_event_param2
+  text_from_event_param3: text_from_event_param3
+  text_from_event_param4: text_from_event_param4
+  text_from_event_param5: text_from_event_param5
+  text_from_event_param6: text_from_event_param6
+  text_from_event_param7: text_from_event_param7
+  text_from_event_param8: text_from_event_param8
+  text_with_player_var1: text_with_player_var1
+  text_with_player_var2: text_with_player_var2
+  text_with_player_var3: text_with_player_var3
+  text_with_player_var4: text_with_player_var4
+  text_with_player_var_and_event: text_with_player_var_and_event
+  number_grouping: number_grouping
+  text_string1: text_string1
+  text_string2: text_string2
+  text_string3: text_string3
+  text_string4: text_string4
 
 text_strings:
   greeting: HELLO

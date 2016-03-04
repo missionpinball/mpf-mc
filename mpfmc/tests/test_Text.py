@@ -79,21 +79,21 @@ class TestText(MpfMcTestCase):
         self.mc.events.post('text_from_event_param6')
         self.advance_time()
 
-        self.assertEqual(self.get_widget().text, '%param1%')
+        self.assertEqual(self.get_widget().text, '(param1)')
 
     def test_text_from_event_param7(self):
         # test percent sign hard coded
         self.mc.events.post('text_from_event_param7')
         self.advance_time()
 
-        self.assertEqual(self.get_widget().text, '100%')
+        self.assertEqual(self.get_widget().text, '1)')
 
     def test_text_from_event_param8(self):
-        # test perent next to placeholder text
+        # test parenthesis next to placeholder text
         self.mc.events.post('text_from_event_param8', param1=100)
         self.advance_time()
 
-        self.assertEqual(self.get_widget().text, '100%')
+        self.assertEqual(self.get_widget().text, '(100)')
 
     def test_player_var1(self):
         # staight var, no player specified

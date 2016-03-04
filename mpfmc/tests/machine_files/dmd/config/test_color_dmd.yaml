@@ -128,5 +128,5 @@ slides:
 slide_player:
   slide1: slide1
   dmd_slide:
-    slide: dmd_slide
-    target: dmd
+    dmd_slide:
+      target: dmd

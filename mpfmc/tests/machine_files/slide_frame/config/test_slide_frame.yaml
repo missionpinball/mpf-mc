@@ -31,8 +31,8 @@ slides:
 
 slide_player:
   show_frame_text:
-    slide: frame1_text
-    target: frame1
+    frame1_text:
+      target: frame1
   show_frame_text2:
-    slide: frame1_text2
-    target: frame1
+    frame1_text2:
+      target: frame1

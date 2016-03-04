@@ -24,6 +24,18 @@ slides:
       x: 10
       y: 100
       anchor_x: left
+    - type: text
+      text: (ALSO TESTING STOPPING
+      x: 10
+      y: 80
+      font_size: 10
+      anchor_x: left
+    - type: text
+      text: SKIPPING, & STARTING)
+      font_size: 10
+      x: 14
+      y: 68
+      anchor_x: left
 slide_player:
   slide1: slide1
 

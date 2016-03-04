@@ -40,19 +40,19 @@ slides:
 slide_player:
   show_slide_1: machine_slide_1
   show_slide_2:
-    slide: machine_slide_2
-    target: display1
+    machine_slide_2:
+      target: display1
   show_slide_3:
-    slide: machine_slide_3
-    target: display2
+    machine_slide_3:
+      target: display2
   show_slide_4: machine_slide_4
   show_slide_5: machine_slide_5
   show_slide_4_p200:
-    slide: machine_slide_4
-    priority: 200
+    machine_slide_4:
+      priority: 200
   show_slide_1_force:
-    slide: machine_slide_1
-    force: true
+    machine_slide_1:
+      force: true
   add_slide_5_dont_show:
-    slide: slide1
-    show: false
+    slide1:
+      show: false

@@ -12,5 +12,4 @@ slides:
       text: $greeting
 
 slide_player:
-  text_string1_mode1:
-    slide: text_string1_mode1
+  text_string1_mode1: text_string1_mode1
