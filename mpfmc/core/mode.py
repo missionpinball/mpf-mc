@@ -39,10 +39,11 @@ class Mode(object):
         for item in self.mc.mode_controller.loader_methods:
             if ((item.config_section in self.config and
                     self.config[item.config_section]) or not
-            item.config_section):
+                    item.config_section):
                 item.method(config=self.config.get(item.config_section),
                             mode=self,
                             mode_path=self.path,
+                            root_config_dict=self.config,
                             **item.kwargs)
 
     def __repr__(self):

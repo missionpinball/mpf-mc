@@ -5,44 +5,10 @@ controller.
 
 from kivy.logger import Logger
 from kivy.utils import get_color_from_hex
-from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_processor import ConfigProcessorBase
 from mpf.core.rgb_color import named_rgb_colors
 from mpf.core.utility_functions import Util
-
 from mpfmc.uix.display import Display
-from mpfmc.uix.slide_frame import SlideFrame
-from mpfmc.widgets.image import ImageWidget
-from mpfmc.widgets.text import Text
-from mpfmc.widgets.video import VideoWidget
-from mpfmc.widgets.line import Line
-from mpfmc.widgets.triangle import Triangle
-from mpfmc.widgets.quad import Quad
-from mpfmc.widgets.rectangle import Rectangle
-from mpfmc.widgets.ellipse import Ellipse
-from mpfmc.widgets.bezier import Bezier
-from mpfmc.widgets.point import Point
-from mpfmc.widgets.dmd import Dmd, ColorDmd
-from mpfmc.widgets.character_picker import CharacterPicker
-from mpfmc.widgets.entered_chars import EnteredChars
-
-type_map = CaseInsensitiveDict(text=Text,
-                               image=ImageWidget,
-                               video=VideoWidget,
-                               slide_frame=SlideFrame,
-                               bezier=Bezier,
-                               # imageborder=Shape,
-                               ellipse=Ellipse,
-                               line=Line,
-                               point=Point,
-                               points=Point,
-                               quad=Quad,
-                               rectangle=Rectangle,
-                               triangle=Triangle,
-                               dmd=Dmd,
-                               color_dmd=ColorDmd,
-                               character_picker=CharacterPicker,
-                               entered_chars=EnteredChars)
 
 
 class ConfigProcessor(ConfigProcessorBase):
@@ -54,16 +20,8 @@ class ConfigProcessor(ConfigProcessorBase):
         self.machine_sections = None
         self.mode_sections = None
 
-        self.machine_sections = dict(slides=self.process_slides,
-                                     widgets=self.process_widgets,
-                                     # displays=self.process_displays,
-                                     animations=self.process_animations,
-                                     text_styles=self.process_text_styles)
-
-        self.mode_sections = dict(slides=self.process_slides,
-                                  widgets=self.process_widgets,
-                                  animations=self.process_animations,
-                                  text_styles=self.process_text_styles)
+        self.machine_sections = dict()
+        self.mode_sections = dict()
 
         # process mode-based and machine-wide configs
         self.register_load_methods()
@@ -93,173 +51,6 @@ class ConfigProcessor(ConfigProcessorBase):
         return Display(self.mc, name,
             **self.machine.config_validator.validate_config('displays',
                                                             config))
-
-    def process_slides(self, config):
-        # config is localized to 'slides' section
-        for slide_name in config:
-            config[slide_name] = self.process_slide(config[slide_name])
-
-        self.mc.slide_configs.update(config)
-        config = None
-
-    def process_slide(self, config):
-        # config is localized to an single slide name entry
-        if isinstance(config, dict):
-            config = [config]
-
-        for widget in config:
-
-            # since dict is mutable it updates in place
-            self.process_widget(widget)
-
-        return config
-
-    def process_widgets(self, config):
-        # config is localized to 'widgets' section
-        for widget_name, widget_settings in config.items():
-
-            if isinstance(widget_settings, dict):
-                widget_settings = [widget_settings]
-            else:
-                widget_settings.reverse()
-
-            widget_list = list()
-
-            for widget in widget_settings:
-                widget_list.append(self.process_widget(widget))
-
-            config[widget_name] = widget_list
-
-        self.mc.widget_configs.update(config)
-        config = None
-
-    def process_widget(self, config, mode=None):
-        # config is localized widget settings
-
-        try:
-            config['_widget_cls'] = type_map[config['type']]
-        except KeyError:
-            raise AssertionError('"{}" is not a valid MPF display widget type'
-                                 .format(config['type']))
-
-        config['_default_settings'] = set()
-
-        for default_setting_name in config['_widget_cls'].merge_settings:
-            if default_setting_name in config:
-                config['_default_settings'].add(default_setting_name)
-
-        self.machine.config_validator.validate_config('widgets:{}'.format(config['type']).lower(),
-                             config, base_spec='widgets:common')
-
-        if not mode:
-            priority = 0
-        else:
-            priority = mode.priority
-
-        try:
-            config['priority'] += priority
-        except (KeyError, TypeError):
-            config['priority'] = priority
-
-        if 'animations' in config:
-            config['animations'] = self.process_animations_from_slide_config(
-                    config['animations'])
-
-        else:
-            config['animations'] = None
-
-        return config
-
-    def process_animations_from_slide_config(self, config):
-        # config is localized to the slide's 'animations' section
-
-        for event_name, event_settings in config.items():
-
-            # str means it's a list of named animations
-            if type(event_settings) is str:
-                event_settings = Util.string_to_list(event_settings)
-
-            # dict means it's a single set of settings for one animation step
-            elif isinstance(event_settings, dict):
-                event_settings = [event_settings]
-
-            # ultimately we're producing a list of dicts, so build that list
-            # as we iterate
-            new_list = list()
-            for settings in event_settings:
-                new_list.append(self.process_animation(settings))
-
-            config[event_name] = new_list
-
-        return config
-
-    def process_animations(self, config):
-        # processes the 'animations' section of a config file to populate the
-        # mc.animation_configs dict.
-
-        # config is localized to 'animations' section
-
-        for name, settings in config.items():
-            # if a named animation's settings are dict, that means there's just
-            # a single step. We need a list
-            if type(settings) is not list:
-                settings = [settings]
-
-            # iterate and build our final processed list
-            new_list = list()
-            for s in settings:
-                new_list.append(self.process_animation(s))
-
-            config[name] = new_list
-
-        # add this config to the global dict. We don't support having the same
-        # named animation defined in multiple places, so we can blindly update.
-        self.mc.animation_configs.update(config)
-        config = None
-
-    def process_animation(self, config, mode=None):
-        # config is localized to a single animation's settings within a list
-
-        # str means it's a named animation
-        if type(config) is str:
-            config = dict(named_animation=config)
-
-        # dict is settings for an animation
-        elif type(config) is dict:
-            animation = self.machine.config_validator.validate_config('widgets:animations',
-                                             config)
-
-            if len(config['property']) != len(config['value']):
-                raise ValueError('Animation "property" list ({}) is not the '
-                                 'same length as the "end" list ({'
-                                 '}).'.format(config['property'], config[
-                                 'end']))
-
-        return config
-
-    def process_transition(self, config):
-        # config is localized to the 'transition' section
-        try:
-            config = self.machine.config_validator.validate_config(
-                    'transitions:{}'.format(config['type']), config)
-        except KeyError:
-            raise ValueError('transition: section of config requires a '
-                             '"type:" setting')
-
-        return config
-
-    def process_text_styles(self, config):
-        # config is localized to the 'text_styles' section
-        for name, settings in config.items():
-            self.process_text_style(settings)
-
-        return config
-
-    def process_text_style(self, config):
-        self.machine.config_validator.validate_config('text_styles', config,
-                                                      add_missing_keys=False)
-
-        return config
 
     def color_from_string(self, color_string):
         if not color_string:

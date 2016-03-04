@@ -25,6 +25,9 @@ class Slide(Screen):
         self.creation_order = Slide.get_id()
         self.pending_widgets = set()
 
+        if not name:
+            self.name = 'Anon_{}'.format(self.creation_order)
+
         if not config:
             config=dict()
 
@@ -75,15 +78,13 @@ class Slide(Screen):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
             self.priority, self.creation_order)
 
-    def add_widgets_from_library(self, name, mode=None, **kwargs):
-        if name not in self.mc.widget_configs:
+    def add_widgets_from_library(self, name, mode=None):
+        if name not in self.mc.widgets:
             return
 
-        return self.add_widgets_from_config(self.mc.widget_configs[name], mode,
-                                            **kwargs)
+        return self.add_widgets_from_config(self.mc.widgets[name], mode)
 
     def add_widgets_from_config(self, config, mode=None, **kwargs):
-
         if type(config) is not list:
             config = [config]
         widgets_added = list()

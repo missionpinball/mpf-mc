@@ -12,7 +12,7 @@ class TestSlideFrame(MpfMcTestCase):
     def test_slide_frame(self):
         # put slide1 on the default displays
         self.mc.targets['default'].add_slide(name='slide1',
-                                             config=self.mc.slide_configs[
+                                             config=self.mc.slides[
                                                  'slide1'])
         self.mc.targets['default'].show_slide('slide1')
 

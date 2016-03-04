@@ -157,7 +157,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             slide = self.get_screen(slide_name)
         except ScreenManagerException:  # create it if not
             slide = self.add_slide(name=slide_name,
-                                   config=self.mc.slide_configs[slide_name],
+                                   config=self.mc.slides[slide_name],
                                    priority=priority,
                                    mode=mode,
                                    **kwargs)

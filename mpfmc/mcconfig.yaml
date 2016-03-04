@@ -1,12 +1,14 @@
 # config_version=4
+
 mpf-mc:
-    modules:
-        mode_controller.ModeController
-        language.Language
-        display.DisplayController
-        sound.SoundController
-        show_controller.ShowController
-        keyboard.Keyboard
+    config_players:
+        slide: mpfmc.config_players.slide_player
+        widget: mpfmc.config_players.widget_player
+#        sound: mpfmc.config_players.sound_player
+
+    device_modules:
+        slide.Slide
+        widget.Widget
 
     mpf_transition_modules:
         - push
@@ -16,23 +18,6 @@ mpf-mc:
     port: 5050
     exit_on_disconnect: yes
 
-#    display_modules:
-#        elements:
-#            - text
-#            - virtualdmd
-#            - image
-#            - animation
-#            - shape
-#            - movie
-#            - character_picker
-#            - entered_chars
-#        modules:
-#            dmd.DMD
-#        transitions:
-#            move_out: move_out.MoveOut
-#            move_in: move_in.MoveIn
-#        decorators:
-#            blink: blink.Blink
     paths:
         shows: shows
         sounds: sounds
@@ -46,11 +31,6 @@ mpf-mc:
         scriptlets: scriptlets
 
     allow_invalid_config_sections: true
-#    config_versions_file: tools/config_versions.yaml
-
-#modes:
-#    - attract
-#    - game
 
 fonts:
     default:
@@ -122,48 +102,6 @@ assets:
     movies:
         default:
             load: preload
-
-#slide_player:
-#    client_connected:
-#      - type: Text
-#        text: CLIENT CONNECTED
-#        font: small
-#        expire: 1s
-#    client_disconnected:
-#      - type: Text
-#        text: CLIENT DISCONNECTED
-#        font: small
-#        expire: 1s
-#    volume_change:
-#        type: Text
-#        text: "VOLUME: %display_volume%"
-#        expire: 2s
-#        slide_priority: 10000
-#    asset_loader:
-#      type: text
-#      text: "LOADING: %percent%%"
-#      font: small
-#    asset_loading_complete:
-#
-#    waiting_for_client_connection:
-#      - type: text
-#        text: WAITING FOR
-#        font: small
-#        slide: waiting
-#        y: 60%
-#      - type: text
-#        text: CLIENT CONNECTION...
-#        font: small
-#        y: 40%
-
-#debug_profiles:
-#    verbose:
-#        core_modules:
-#            events
-#            mode_controller
-#        device_collections:
-#        individual_devices:
-#        plugins:
 
 mpf:
   allow_invalid_config_sections: false

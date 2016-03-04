@@ -1,6 +1,8 @@
-from mpf.core.config_player import ConfigPlayer
+from mpf.config_players.plugin_player import PluginPlayer
+from mpfmc.core.mc_config_player import McConfigPlayer
 
-class WidgetPlayer(ConfigPlayer):
+
+class MpfWidgetPlayer(PluginPlayer):
     """
 
     Note: This class is loaded by MPF and everything in it is in the context of
@@ -12,9 +14,26 @@ class WidgetPlayer(ConfigPlayer):
     def play(self, settings, mode=None, **kwargs):
         super().play(settings, mode, **kwargs)
 
-        for s in settings:  # settings is a list of widget configs
 
-            # figure out the target slide. If there is a slide, it will win
+class McWidgetPlayer(McConfigPlayer):
+    """Base class for the Widget Player that runs on the mpf-mc side of things.
+    It receives all of its instructions via BCP from an MpfWidgetPlayer
+    instance
+    running as part of MPF.
+    """
+
+    config_file_section = 'widget_player'
+    show_section = 'widgets'
+    machine_collection_name = 'widgets'
+
+    def play(self, settings, mode=None, caller=None, **kwargs):
+        super().play(settings, mode, caller, **kwargs)
+
+        if 'widgets' in settings:
+            settings = settings['widgets']
+
+        for widget, s in settings.items():
+
             slide = None
 
             if s['target']:
@@ -33,13 +52,17 @@ class WidgetPlayer(ConfigPlayer):
                 slide = self.machine.targets['default'].current_slide
 
             if not slide:
-                return  # pragma: no cover
+                continue  # pragma: no cover
 
-            for widget in s['widget']:
-                slide.add_widgets_from_library(name=widget, mode=mode,
-                                               **kwargs)
+            slide.add_widgets_from_library(name=widget, mode=mode)
 
-player_cls = WidgetPlayer
+
+    def get_express_config(self, value):
+        return dict(widget=value)
+
+
+player_cls = MpfWidgetPlayer
+mc_player_cls = McWidgetPlayer
 
 def register_with_mpf(machine):
-    return 'widget', WidgetPlayer(machine)
+    return 'widget', MpfWidgetPlayer(machine)

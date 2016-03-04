@@ -2,6 +2,7 @@
 mpf-mc.
 
 """
+import importlib
 import queue
 import threading
 import time
@@ -13,9 +14,10 @@ from kivy.logger import Logger
 from mpfmc.assets.video import VideoAsset
 from mpfmc.core.bcp_processor import BcpProcessor
 from mpfmc.core.config_processor import ConfigProcessor
+from mpfmc.core.device import DeviceManager
 from mpfmc.core.mode_controller import ModeController
-from mpfmc.config_players.slide_player import SlidePlayer
-from mpfmc.config_players.widget_player import WidgetPlayer
+from mpfmc.config_players.slide_player import McSlidePlayer as SlidePlayer
+from mpfmc.config_players.widget_player import McWidgetPlayer as WidgetPlayer
 from mpfmc.uix.transitions import TransitionManager
 
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
@@ -52,8 +54,8 @@ class MpfMc(App):
         self.num_players = 0
         self.bcp_client_connected = False
 
-        self.slide_configs = dict()
-        self.widget_configs = dict()
+        # self.slides = dict()
+        # self.widget_configs = dict()
         self.animation_configs = dict()
         self.active_slides = dict()
         self.scriptlets = list()
@@ -79,10 +81,12 @@ class MpfMc(App):
         self.config_validator = ConfigValidator(self)
         self.events = EventManager(self)
         self.mode_controller = ModeController(self)
+        self.device_manager = DeviceManager(self)
         ConfigValidator.load_config_spec()
+
         self.config_processor = ConfigProcessor(self)
-        self.slide_player = SlidePlayer(self)
-        self.widget_player = WidgetPlayer(self)
+        # self.slide_player = SlidePlayer(self)
+        # self.widget_player = WidgetPlayer(self)
         self.transition_manager = TransitionManager(self)
 
         # Initialize the sound system (must be done prior to creating the AssetManager).
@@ -133,6 +137,14 @@ class MpfMc(App):
         if not self._boot_holds:
             self.init_done()
 
+    def _register_config_players(self):
+        # todo move this to config_player module
+        for name, module in self.machine_config['mpf-mc'][
+                'config_players'].items():
+            imported_module = importlib.import_module(module)
+            setattr(self, '{}_player'.format(name),
+                    imported_module.mc_player_cls(self))
+
     def displays_initialized(self, *args):
         from mpfmc.uix.window import Window
         Window.initialize(self)
@@ -146,6 +158,7 @@ class MpfMc(App):
         # boot process until the window is setup, and we can't set the
         # window up until the displays are initialized.
 
+        self._register_config_players()
         self.events.post("init_phase_1")
         self.events.process_event_queue()
         self.events.post("init_phase_2")

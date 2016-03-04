@@ -1,14 +1,20 @@
-from mpf.core.config_player import ConfigPlayer
+from mpf.config_players.plugin_player import PluginPlayer
+from mpfmc.core.mc_config_player import McConfigPlayer
 
 
-class SlidePlayer(ConfigPlayer):
-    """
+class MpfSlidePlayer(PluginPlayer):
+    """Base class for the slide player which runs as part of MPF.
 
     Note: This class is loaded by MPF and everything in it is in the context of
-    MPF.
+    MPF, not the mpf-mc. MPF finds this instance because the mpf-mc setup.py has the following
+    entry_point configured:
+
+        slide_player=mpfmc.config_players.slide_player:register_with_mpf
 
     """
     config_file_section = 'slide_player'
+    show_section = 'slides'
+    machine_collection_name = None
 
     def additional_processing(self, config):
 
@@ -37,22 +43,60 @@ class SlidePlayer(ConfigPlayer):
     def play(self, settings, mode=None, **kwargs):
         super().play(settings, mode, **kwargs)
 
-        for s in settings:  # settings is a list of one or more slide configs
+        print('PLAY SLIDE', settings)
+
+
+class McSlidePlayer(McConfigPlayer):
+    """Base class for the Slide Player that runs on the mpf-mc side of things.
+    It receives all of its instructions via BCP from a MpfSlidePlayer instance
+    running as part of MPF.
+    """
+
+    config_file_section = 'slide_player'
+    show_section = 'slides'
+    machine_collection_name = 'slides'
+
+
+    def play(self, settings, mode=None, caller=None, **kwargs):
+        super().play(settings, mode, caller, **kwargs)
+
+        if 'slides' in settings:
+            settings = settings['slides']
+
+        for slide, s in settings.items():
 
             name = s['slide']
 
             if s['target']:
-                target = self.machine.targets[s['target']]
+                target = self.mc.targets[s['target']]
             elif mode:
                 target = mode.target
             else:
-                target = self.machine.targets['default']
+                target = self.mc.targets['default']
 
             target.show_slide(slide_name=name, transition=s['transition'],
                               mode=mode, force=s['force'],
                               priority=s['priority'], **kwargs)
 
-player_cls = SlidePlayer
+    def get_express_config(self, value):
+        # express config for slides can either be a string (slide name) or a
+        # list (widgets which are put on a new slide)
+        if isinstance(value, list):
+            return dict(widgets=value, slide=None)
+        else:
+            return dict(slide=value)
+
+    def validate_config(self, config):
+        super().validate_config(config)
+
+
+
+
+
+
+
+player_cls = MpfSlidePlayer
+mc_player_cls = McSlidePlayer
 
 def register_with_mpf(machine):
-    return 'slide', SlidePlayer(machine)
+    return 'slide', MpfSlidePlayer(machine)

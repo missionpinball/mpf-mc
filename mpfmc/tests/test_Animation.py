@@ -14,7 +14,7 @@ class TestAnimation(MpfMcTestCase):
         # config file validator.
 
         # slide def, list of animations
-        s1w0 = self.mc.slide_configs['slide1'][0]['animations']
+        s1w0 = self.mc.slides['slide1'][0]['animations']
 
         self.assertIs(type(s1w0['entrance']), list)
         self.assertEqual(len(s1w0['entrance']), 2)
@@ -24,7 +24,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(s1w0['entrance'][1]['value'], ['100'])
 
         # slide def, single dict animation
-        s2w0 = self.mc.slide_configs['slide2'][0]['animations']
+        s2w0 = self.mc.slides['slide2'][0]['animations']
 
         self.assertIs(type(s2w0['entrance2']), list)
         self.assertEqual(len(s2w0['entrance2']), 1)
@@ -33,7 +33,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(s2w0['entrance2'][0]['property'], ['x', 'y'])
 
         # slide def, 1 event, list of 2 named animations
-        s3w0 = self.mc.slide_configs['slide3'][0]['animations']
+        s3w0 = self.mc.slides['slide3'][0]['animations']
         self.assertIs(type(s3w0['entrance3']), list)
         self.assertEqual(len(s3w0['entrance3']), 2)
         self.assertIs(type(s3w0['entrance3'][0]), dict)
@@ -42,7 +42,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(s3w0['entrance3'][1]['named_animation'], 'multi')
 
         # slide def, 2 events, list of named animations
-        s4w0 = self.mc.slide_configs['slide4'][0]['animations']
+        s4w0 = self.mc.slides['slide4'][0]['animations']
         self.assertIs(type(s4w0['entrance4']), list)
         self.assertEqual(len(s4w0['entrance4']), 2)
         self.assertIs(type(s4w0['entrance4'][0]), dict)
@@ -56,7 +56,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(s4w0['some_event4'][0]['named_animation'], 'multi')
 
         # slide def, 2 events, 1 named animation, 1 dict
-        s5w0 = self.mc.slide_configs['slide5'][0]['animations']
+        s5w0 = self.mc.slides['slide5'][0]['animations']
         self.assertIs(type(s5w0['entrance5']), list)
         self.assertEqual(len(s5w0['entrance5']), 2)
         self.assertIs(type(s5w0['entrance5'][0]), dict)
@@ -70,8 +70,8 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(s5w0['event5'][0]['value'], ['98'])
 
         # slide with 1 widget with no animations
-        self.assertIn('animations', self.mc.slide_configs['slide6'][0])
-        self.assertIsNone(self.mc.slide_configs['slide6'][0]['animations'])
+        self.assertIn('animations', self.mc.slides['slide6'][0])
+        self.assertIsNone(self.mc.slides['slide6'][0]['animations'])
 
         # Move on to test the named animations section
 

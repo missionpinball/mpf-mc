@@ -81,9 +81,7 @@ class ModeController(object):
             config = ConfigProcessor.load_config_file(mpf_mode_config)
 
         # Now figure out if there's a machine-specific config for this mode,
-        #  and
-        # if so, merge it into the config
-
+        # and if so, merge it into the config
         mode_config_folder = os.path.join(self.mc.machine_path,
                                           self.mc.machine_config['mpf-mc'][
                                               'paths']['modes'], mode_string,

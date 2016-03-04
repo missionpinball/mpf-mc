@@ -11,32 +11,32 @@ class TestWidget(MpfMcTestCase):
 
     def test_widget_loading_from_config(self):
         # check that all were loaded. First is a dict
-        self.assertIn('widget1', self.mc.widget_configs)
-        self.assertIs(type(self.mc.widget_configs['widget1']), list)
+        self.assertIn('widget1', self.mc.widgets)
+        self.assertIs(type(self.mc.widgets['widget1']), list)
 
         # List with one item
-        self.assertIn('widget2', self.mc.widget_configs)
-        self.assertIs(type(self.mc.widget_configs['widget2']), list)
+        self.assertIn('widget2', self.mc.widgets)
+        self.assertIs(type(self.mc.widgets['widget2']), list)
 
         # Lists with multiple items.
-        self.assertIn('widget3', self.mc.widget_configs)
-        self.assertIs(type(self.mc.widget_configs['widget3']), list)
-        self.assertEqual(len(self.mc.widget_configs['widget3']), 3)
+        self.assertIn('widget3', self.mc.widgets)
+        self.assertIs(type(self.mc.widgets['widget3']), list)
+        self.assertEqual(len(self.mc.widgets['widget3']), 3)
 
         # Ensure they're in order. Order is the order they're drawn,
         # so the highest priority one is last. We don't care about z values
         # at this point since those are threaded in when the widgets are
         # added to the slides, but we want to make sure that widgets of the
         # same z are in the order based on their order in the config file.
-        self.assertEqual(self.mc.widget_configs['widget3'][0]['text'],
+        self.assertEqual(self.mc.widgets['widget3'][0]['text'],
                          'widget3.3')
-        self.assertEqual(self.mc.widget_configs['widget3'][1]['text'],
+        self.assertEqual(self.mc.widgets['widget3'][1]['text'],
                          'widget3.2')
-        self.assertEqual(self.mc.widget_configs['widget3'][2]['text'],
+        self.assertEqual(self.mc.widgets['widget3'][2]['text'],
                          'widget3.1')
 
         # List with multiple items and custom z orders
-        self.assertIn('widget4', self.mc.widget_configs)
+        self.assertIn('widget4', self.mc.widgets)
 
     def test_adding_widgets_to_slide(self):
         self.mc.targets['default'].add_slide(name='slide1')
