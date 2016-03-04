@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from mpf.config_players.plugin_player import PluginPlayer
 from mpfmc.core.mc_config_player import McConfigPlayer
 
@@ -14,36 +16,9 @@ class MpfSlidePlayer(PluginPlayer):
     """
     config_file_section = 'slide_player'
     show_section = 'slides'
-    machine_collection_name = None
-
-    def additional_processing(self, config):
-
-        # The config validator is set to ignore the 'transitions' setting,
-        # meaning that a value of 'None' is read as string 'None.' However, the
-        # user could also entry 'no' or 'false' which would be processed by the
-        # YAML processor as NoneType. So we need to look for that and convert
-        # it.
-
-        # This code can be used to force No Transition if we implement default
-        # transitions in the future
-        # if ('transition' in config and
-        #             type(config['transition']) is str and
-        #             config['transition'].lower() == 'none'):
-        #     config['transition'] = dict(type='none')
-
-        if config.get('transition', None):
-            config['transition'] = (
-                self.machine.config_processor.process_transition(
-                        config['transition']))
-        else:
-            config['transition'] = None
-
-        return config
 
     def play(self, settings, mode=None, **kwargs):
         super().play(settings, mode, **kwargs)
-
-        print('PLAY SLIDE', settings)
 
 
 class McSlidePlayer(McConfigPlayer):
@@ -60,40 +35,54 @@ class McSlidePlayer(McConfigPlayer):
     def play(self, settings, mode=None, caller=None, **kwargs):
         super().play(settings, mode, caller, **kwargs)
 
+        settings = deepcopy(settings)
+
         if 'slides' in settings:
             settings = settings['slides']
 
         for slide, s in settings.items():
 
-            name = s['slide']
-
             if s['target']:
-                target = self.mc.targets[s['target']]
+                target = self.machine.targets[s['target']]
             elif mode:
                 target = mode.target
             else:
-                target = self.mc.targets['default']
+                target = self.machine.targets['default']
 
-            target.show_slide(slide_name=name, transition=s['transition'],
-                              mode=mode, force=s['force'],
-                              priority=s['priority'], **kwargs)
+            s.update(kwargs)
+            s.pop('target', None)
+            s.pop('slide', None)
+
+            target.show_slide(slide_name=slide, mode=mode, **s)
 
     def get_express_config(self, value):
         # express config for slides can either be a string (slide name) or a
         # list (widgets which are put on a new slide)
         if isinstance(value, list):
-            return dict(widgets=value, slide=None)
+            return dict(widgets=value)
         else:
             return dict(slide=value)
 
-    def validate_config(self, config):
-        super().validate_config(config)
+    def validate_show_config(self, device, device_settings):
+        validated_dict = super().validate_show_config(device, device_settings)
 
+        for v in validated_dict.values():
 
+            if 'transition' in v:
+                if not isinstance(v['transition'], dict):
+                    v['transition'] = dict(type=v['transition'])
 
+                try:
+                    v['transition'] = (
+                        self.machine.config_validator.validate_config(
+                            'transitions:{}'.format(
+                                v['transition']['type']), v['transition']))
 
+                except KeyError:
+                    raise ValueError('transition: section of config requires a'
+                                     ' "type:" setting')
 
-
+        return validated_dict
 
 player_cls = MpfSlidePlayer
 mc_player_cls = McSlidePlayer

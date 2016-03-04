@@ -37,6 +37,8 @@ class Slide(Device):
 
         if 'transition' in config:
             config['transition'] = cls.process_transition(config['transition'])
+        else:
+            config['transition'] = None
 
         return config
         # return SlideDevice(**config)

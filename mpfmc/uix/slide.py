@@ -19,6 +19,7 @@ class Slide(Screen):
 
     def __init__(self, mc, name, config=None, target='default', mode=None,
                  priority=None, **kwargs):
+
         self.mc = mc
         self.name = name
         self.priority = None
@@ -61,7 +62,8 @@ class Slide(Screen):
         super().add_widget(self.stencil)
 
         try:
-            self.add_widgets_from_config(config, self.mode, **kwargs)
+            self.add_widgets_from_config(config['widgets'], self.mode,
+                                         **kwargs)
         except KeyError:
             pass
 

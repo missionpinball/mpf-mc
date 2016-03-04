@@ -153,6 +153,7 @@ class SlideFrame(MpfWidget, ScreenManager):
 
     def show_slide(self, slide_name, transition=None, mode=None, force=False,
                    priority=None, **kwargs):
+
         try:  # does this slide exist in this screen manager already?
             slide = self.get_screen(slide_name)
         except ScreenManagerException:  # create it if not
@@ -163,10 +164,17 @@ class SlideFrame(MpfWidget, ScreenManager):
                                    **kwargs)
 
         # update the widgets with whatever kwargs came through here
+        # todo bug? Should deepcopy?
         for widget in slide.walk():
             try:
                 widget.update_kwargs(**kwargs)
             except AttributeError:
+                pass
+
+        if not transition:
+            try:  # anon slides are in the collection
+                transition = self.mc.slides[slide_name]['transition']
+            except KeyError:
                 pass
 
         if slide.priority >= self.current_slide.priority or force:
@@ -177,7 +185,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             self.transition = self.mc.transition_manager.get_transition(
                     transition)
 
-            self._set_current_slide(slide, **kwargs)
+            self._set_current_slide(slide)
             return True
 
         else:  # Not showing this slide
@@ -193,7 +201,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         # be replaced
 
         slide_obj = self.add_slide(name=slide_name, config=widgets,
-                                   priority=priority, mode=mode, **kwargs)
+                                   priority=priority, mode=mode)
 
         self.show_slide(slide_name=slide_obj.name, transition=transition,
                         priority=priority, mode=mode, force=force, **kwargs)
@@ -233,7 +241,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         except WidgetException:
             pass
 
-    def _set_current_slide(self, slide, **kwargs):
+    def _set_current_slide(self, slide):
         # slide frame requires at least one slide, so if you try to set current
         # to None, it will just mark the current slide as the lowest priority
         # so it can be overwritten by anything
