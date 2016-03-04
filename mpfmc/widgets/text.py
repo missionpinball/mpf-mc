@@ -5,7 +5,7 @@ from mpfmc.uix.widget import MpfWidget
 
 class Text(MpfWidget, Label):
     widget_type_name = 'Text'
-    var_finder = re.compile("(?<=%)[a-zA-Z_0-9|]+(?=%)")
+    var_finder = re.compile("(?<=\()[a-zA-Z_0-9|]+(?=\))")
     string_finder = re.compile("(?<=\$)[a-zA-Z_0-9]+")
     merge_settings = ('font_name', 'font_size', 'bold', 'italic', 'halign',
                       'valign', 'padding_x', 'padding_y', 'text_size',
@@ -124,7 +124,7 @@ class Text(MpfWidget, Label):
         for var_string in self._get_text_vars(text):
             if var_string.startswith('machine|'):
                 try:
-                    text = text.replace('%' + var_string + '%',
+                    text = text.replace('(' + var_string + ')',
                                         str(self.mc.machine_vars[
                                                 var_string.split('|')[1]]))
                 except KeyError:
@@ -132,7 +132,7 @@ class Text(MpfWidget, Label):
 
             elif self.mc.player:
                 if var_string.startswith('player|'):
-                    text = text.replace('%' + var_string + '%',
+                    text = text.replace('(' + var_string + ')',
                                         str(self.mc.player[
                                                 var_string.split('|')[1]]))
                     continue
@@ -144,7 +144,7 @@ class Text(MpfWidget, Label):
                             var_name]
 
                         if value is not None:
-                            text = text.replace('%' + var_string + '%',
+                            text = text.replace('(' + var_string + ')',
                                                 str(value))
                         else:
                             text = ''
@@ -152,11 +152,11 @@ class Text(MpfWidget, Label):
                         text = ''
                     continue
                 elif self.mc.player.is_player_var(var_string):
-                    text = text.replace('%' + var_string + '%',
+                    text = text.replace('(' + var_string + ')',
                                         str(self.mc.player[var_string]))
 
             if var_string in self.event_replacements:
-                text = text.replace('%{}%'.format(var_string),
+                text = text.replace('({})'.format(var_string),
                     str(self.event_replacements[var_string]))
 
         self.update_text(text)
