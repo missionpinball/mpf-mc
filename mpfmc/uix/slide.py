@@ -20,14 +20,15 @@ class Slide(Screen):
     def __init__(self, mc, name, config=None, target='default', mode=None,
                  priority=None, **kwargs):
 
+        self.creation_order = Slide.get_id()
+
+        if not name:
+            name = 'Anon_{}'.format(self.creation_order)
+
         self.mc = mc
         self.name = name
         self.priority = None
-        self.creation_order = Slide.get_id()
         self.pending_widgets = set()
-
-        if not name:
-            self.name = 'Anon_{}'.format(self.creation_order)
 
         if not config:
             config=dict()
