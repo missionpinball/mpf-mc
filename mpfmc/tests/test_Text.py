@@ -22,7 +22,6 @@ class TestText(MpfMcTestCase):
         # widget text is only from event param
         self.mc.events.post('text_from_event_param1', param1='HELLO')
         self.advance_time()
-
         self.assertEqual(self.get_widget().text, 'HELLO')
 
         # now make sure if we post the event again, the text updates

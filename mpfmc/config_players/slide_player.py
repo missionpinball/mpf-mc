@@ -160,6 +160,8 @@ class McSlidePlayer(McConfigPlayer):
                 else:
                     target = self.machine.targets['default']
 
+            s.update(kwargs)  # need to mix-in any kwargs
+
             # is this a named slide, or a new slide?
             if 'widgets' in s:
                 target.add_and_show_slide(mode=mode, slide_name=slide, **s)
