@@ -152,6 +152,8 @@ class MpfMcTestCase(unittest.TestCase):
         # so we just do our setup here since if we manually called setUp() then
         # it would be called again when we call super().run().
 
+        from mpf.core.player import Player
+        Player.monitor_enabled = False
 
         mpf_config = ConfigProcessor.load_config_file(os.path.abspath(
             os.path.join(mpfmc.__path__[0], os.pardir,
