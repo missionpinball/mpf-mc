@@ -218,6 +218,10 @@ class McSlidePlayer(McConfigPlayer):
 
         # device is slide name
 
+        print("VSC")
+        print(device)
+        print(device_settings)
+
         for v in validated_dict.values():
 
             if 'transition' in v:
