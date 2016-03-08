@@ -20,6 +20,8 @@ class Slide(Screen):
     def __init__(self, mc, name, config=None, target='default', mode=None,
                  priority=None, **kwargs):
 
+        # config is a dict. widgets will be in a key
+
         self.creation_order = Slide.get_id()
 
         if not name:
@@ -93,9 +95,14 @@ class Slide(Screen):
         widgets_added = list()
 
         for widget in config:
-            widget_obj = widget['_widget_cls'](mc=self.mc, config=widget,
-                                              slide=self, mode=mode,
-                                               **kwargs)
+            try:
+                # This is probably premature optimization
+                widget_obj = widget['_widget_cls'](mc=self.mc, config=widget,
+                                                   slide=self, mode=mode,
+                                                   **kwargs)
+            except KeyError:
+                widget_obj = self.mc.widgets.type_map['text'](mc=self.mc,
+                    config=widget, slide=self, mode=mode, **kwargs)
 
             top_widget = widget_obj
 

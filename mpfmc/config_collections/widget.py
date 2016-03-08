@@ -41,7 +41,7 @@ class Widget(ConfigCollection):
                                    character_picker=CharacterPicker,
                                    entered_chars=EnteredChars)
 
-    def process_config(self, config):
+    def process_config(self, config, serializable=True):
         # config is localized to a specific widget section
         if isinstance(config, dict):
             config = [config]
@@ -51,11 +51,12 @@ class Widget(ConfigCollection):
         widget_list = list()
 
         for widget in config:
-            widget_list.append(self.process_widget(widget))
+            widget_list.append(self.process_widget(widget,
+                                                   serializable=serializable))
 
         return widget_list
 
-    def process_widget(self, config, mode=None):
+    def process_widget(self, config, mode=None, serializable=True):
         # config is localized widget settings
         try:
             config['_widget_cls'] = Widget.type_map[config['type']]
@@ -63,11 +64,11 @@ class Widget(ConfigCollection):
             raise AssertionError('"{}" is not a valid MPF display widget type'
                                  .format(config['type']))
 
-        config['_default_settings'] = set()
+        config['_default_settings'] = list()
 
         for default_setting_name in config['_widget_cls'].merge_settings:
             if default_setting_name in config:
-                config['_default_settings'].add(default_setting_name)
+                config['_default_settings'].append(default_setting_name)
 
         self.mc.config_validator.validate_config('widgets:{}'.format(
             config['type']).lower(),
@@ -88,6 +89,10 @@ class Widget(ConfigCollection):
 
         else:
             config['animations'] = None
+
+        if not serializable:
+            # we still try the mapping above to make sure the widget is valid
+            del config['_widget_cls']
 
         return config
 

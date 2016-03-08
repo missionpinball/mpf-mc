@@ -1,5 +1,4 @@
 from mpf.core.config_player import ConfigPlayer
-from mpf.core.device_manager import DeviceCollection
 
 
 class McConfigPlayer(ConfigPlayer):
@@ -31,3 +30,11 @@ class McConfigPlayer(ConfigPlayer):
 
             self.register_player_events(
                 self.machine.machine_config[self.config_file_section])
+
+        self.machine.events.add_handler(
+            event='{}_play'.format(self.show_section),
+            handler=self.play_from_trigger)
+
+
+    def play_from_trigger(self, **kwargs):
+        self.play(settings=kwargs)

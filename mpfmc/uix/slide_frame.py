@@ -193,13 +193,12 @@ class SlideFrame(MpfWidget, ScreenManager):
     def add_and_show_slide(self, widgets=None, slide_name=None,
                            transition=None, priority=None, mode=None,
                            force=False, **kwargs):
-        # creates a new slide and shows it right away
-        # todo need a test
 
         # create the slide. If a slide with this name already exists, it will
         # be replaced
 
-        slide_obj = self.add_slide(name=slide_name, config=widgets,
+        slide_obj = self.add_slide(name=slide_name,
+                                   config=dict(widgets=widgets),
                                    priority=priority, mode=mode)
 
         self.show_slide(slide_name=slide_obj.name, transition=transition,
