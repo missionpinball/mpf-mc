@@ -81,7 +81,10 @@ class Text(MpfWidget, Label):
             pass
 
         if not found:
-            self._apply_style(force_default=True)
+
+            if not force_default:
+                self._apply_style(force_default=True)
+            print("Couldn't find default style. This is a bug.")  #todo
 
     def _get_text_string(self, text, mode=None):
         if not '$' in text:
