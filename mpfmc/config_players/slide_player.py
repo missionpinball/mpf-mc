@@ -5,23 +5,6 @@ from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
 
 
-class MpfSlidePlayer(PluginPlayer):
-    """Base class for the slide player which runs as part of MPF.
-
-    Note: This class is loaded by MPF and everything in it is in the context of
-    MPF, not the mpf-mc. MPF finds this instance because the mpf-mc setup.py has the following
-    entry_point configured:
-
-        slide_player=mpfmc.config_players.slide_player:register_with_mpf
-
-    """
-    config_file_section = 'slide_player'
-    show_section = 'slides'
-
-    def play(self, settings, mode=None, **kwargs):
-        super().play(settings, mode, **kwargs)
-
-
 class McSlidePlayer(McConfigPlayer):
     """Base class for the Slide Player that runs on the mpf-mc side of things.
     It receives all of its instructions via BCP from a MpfSlidePlayer instance
@@ -256,6 +239,71 @@ class McSlidePlayer(McConfigPlayer):
                     v['widgets'], serializable=serializable)
 
         return validated_dict
+
+
+class MpfSlidePlayer(PluginPlayer):
+    """Base class for the slide player which runs as part of MPF.
+
+    Note: This class is loaded by MPF and everything in it is in the context of
+    MPF, not the mpf-mc. MPF finds this instance because the mpf-mc setup.py has the following
+    entry_point configured:
+
+        slide_player=mpfmc.config_players.slide_player:register_with_mpf
+
+    """
+    config_file_section = 'slide_player'
+    show_section = 'slides'
+
+    def play(self, settings, mode=None, **kwargs):
+        super().play(settings, mode, **kwargs)
+
+    def validate_show_config(self, device, device_settings, serializable=True):
+
+        # device is slide name, device_settings
+        dict_is_widgets = False
+
+        # if settings is list, it's widgets
+        if isinstance(device_settings, list):
+            device_settings = dict(widgets=device_settings)
+
+        # Now check to see if all the settings are valid
+        # slide settings. If not, assume it's a single widget settings.
+        if isinstance(device_settings, dict):
+
+            for key in device_settings.keys():
+                if key not in ConfigValidator.config_spec['slide_player']:
+                    dict_is_widgets = True
+                    break
+
+
+            if dict_is_widgets:
+                device_settings = dict(widgets=[device_settings])
+
+        for v in device_settings.values():
+
+            if 'transition' in v:
+                if not isinstance(v['transition'], dict):
+                    v['transition'] = dict(type=v['transition'])
+
+                try:
+                    v['transition'] = (
+                        self.machine.config_validator.validate_config(
+                            'transitions:{}'.format(
+                                v['transition']['type']), v['transition']))
+
+                except KeyError:
+                    raise ValueError('transition: section of config requires a'
+                                     ' "type:" setting')
+
+            if 'widgets' in v:
+                v['widgets'] = self.machine.widgets.process_config(
+                    v['widgets'], serializable=True)
+
+        return_dict = dict()
+        return_dict[device] = device_settings
+
+        return return_dict
+
 
 player_cls = MpfSlidePlayer
 mc_player_cls = McSlidePlayer
