@@ -147,9 +147,12 @@ class SlideFrame(MpfWidget, ScreenManager):
     def add_slide(self, name, config=None, priority=None, mode=None, **kwargs):
         # Note this method just adds it. It doesn't show it.
 
-        # Slide() created also adds it to this screen manager
-        return Slide(mc=self.mc, name=name, target=self.name, config=config,
-                     mode=mode, priority=priority, **kwargs)
+        try:
+            return self.get_screen(name)
+        except ScreenManagerException:
+            # Slide() created also adds it to this screen manager
+            return Slide(mc=self.mc, name=name, target=self.name,
+                         config=config, mode=mode, priority=priority, **kwargs)
 
     def show_slide(self, slide_name, transition=None, mode=None, force=False,
                    priority=None, **kwargs):
