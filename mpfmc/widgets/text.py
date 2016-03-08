@@ -58,9 +58,11 @@ class Text(MpfWidget, Label):
 
             # First it applies machine-wide style settings, then mode styles on
             # top of those
+
             for attr in [x for x in
                          self.mc.machine_config['text_styles'][style] if
                            x not in self.config['_default_settings']]:
+
                 setattr(self, attr,
                         self.mc.machine_config['text_styles'][style][attr])
 
@@ -80,11 +82,8 @@ class Text(MpfWidget, Label):
         except (AttributeError, KeyError):
             pass
 
-        if not found:
-
-            if not force_default:
-                self._apply_style(force_default=True)
-            print("Couldn't find default style. This is a bug.")  #todo
+        if not found and not force_default:
+            self._apply_style(force_default=True)
 
     def _get_text_string(self, text, mode=None):
         if not '$' in text:
