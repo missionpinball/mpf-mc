@@ -58,6 +58,8 @@ class Widget(ConfigCollection):
 
     def process_widget(self, config, mode=None, serializable=True):
         # config is localized widget settings
+        print("PROCESS WIDGET")
+        print(config)
         try:
             config['_widget_cls'] = Widget.type_map[config['type']]
         except KeyError:
