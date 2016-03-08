@@ -50,9 +50,6 @@ class Widget(ConfigCollection):
 
         widget_list = list()
 
-        print("PROCESS CONFIG")
-        print(config)
-
         for widget in config:
             widget_list.append(self.process_widget(widget,
                                                    serializable=serializable))
@@ -61,9 +58,6 @@ class Widget(ConfigCollection):
 
     def process_widget(self, config, mode=None, serializable=True):
         # config is localized widget settings
-
-        print("PROCESS WIDGET")
-        print(config)
 
         try:
             config['_widget_cls'] = Widget.type_map[config['type']]
