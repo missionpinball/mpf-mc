@@ -52,9 +52,9 @@ class ConfigCollection(CaseInsensitiveDict):
         del kwargs
 
         for name, settings in config.items():
-            if not settings:
-                raise AssertionError("{} entry '{}' has an empty config."
-                                     .format(self.config_section, name))
+            # if not settings:
+            #     raise AssertionError("{} entry '{}' has an empty config."
+            #                          .format(self.config_section, name))
 
             self[name] = self.process_config(settings)
 
