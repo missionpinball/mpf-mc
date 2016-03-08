@@ -101,8 +101,8 @@ class Slide(Screen):
                                                    slide=self, mode=mode,
                                                    **kwargs)
             except KeyError:
-                widget_obj = self.mc.widgets.type_map['text'](mc=self.mc,
-                    config=widget, slide=self, mode=mode, **kwargs)
+                widget_obj = self.mc.widgets.type_map[widget['type']](
+                    mc=self.mc, config=widget, slide=self, mode=mode, **kwargs)
 
             top_widget = widget_obj
 
