@@ -85,8 +85,6 @@ class TestMpfPluginConfigPlayerValidation(MpfTestCase):
         #     print(step)
         #     print()
 
-        print(self.machine.shows)
-
         self.assertIn('show1', self.machine.shows)
 
         step_0 = self.machine.shows['show1'].show_steps[0]['slides']['slide1']
