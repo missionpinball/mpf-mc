@@ -19,12 +19,10 @@ class Text(MpfWidget, Label):
         super().__init__(mc=mc, mode=mode, slide=slide, config=config)
 
         self._apply_style()
-
         self.original_text = self._get_text_string(config.get('text', ''),
                                                    mode=mode)
         self.text_variables = dict()
         self.event_replacements = kwargs
-
         self._process_text(self.text, mode=mode)
 
     def __repr__(self):

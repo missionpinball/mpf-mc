@@ -11,8 +11,8 @@ class MpfWidgetPlayer(PluginPlayer):
     """
     config_file_section = 'widget_player'
 
-    def play(self, settings, mode=None, **kwargs):
-        super().play(settings, mode, **kwargs)
+    def play(self, settings, mode=None, play_kwargs=None):
+        super().play(settings, mode, play_kwargs)
 
 
 class McWidgetPlayer(McConfigPlayer):
@@ -26,8 +26,8 @@ class McWidgetPlayer(McConfigPlayer):
     show_section = 'widgets'
     machine_collection_name = 'widgets'
 
-    def play(self, settings, mode=None, caller=None, **kwargs):
-        super().play(settings, mode, caller, **kwargs)
+    def play(self, settings, mode=None, caller=None, play_kwargs=None):
+        super().play(settings, mode, caller, play_kwargs)
 
         if 'widgets' in settings:
             settings = settings['widgets']

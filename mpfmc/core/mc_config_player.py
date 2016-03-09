@@ -35,6 +35,5 @@ class McConfigPlayer(ConfigPlayer):
             event='{}_play'.format(self.show_section),
             handler=self.play_from_trigger)
 
-
     def play_from_trigger(self, **kwargs):
         self.play(settings=kwargs)

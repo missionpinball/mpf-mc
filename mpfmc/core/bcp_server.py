@@ -154,7 +154,7 @@ class BCPServer(threading.Thread):
 
         """
         self.log.debug('Received "%s"', message)
-        print('received', message)
+        # print('received', message)
 
         cmd, kwargs = bcp.decode_command_string(message)
 

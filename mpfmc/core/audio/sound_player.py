@@ -9,8 +9,9 @@ class SoundPlayer(ConfigPlayer):
     def additional_processing(self, config):
         return config
 
-    def play(self, settings, mode=None, **kwargs):
-        del kwargs
+    def play(self, settings, mode=None, caller=None,
+             priority=None, play_kwargs=None):
+        super().play(settings, mode, caller, priority, play_kwargs)
 
         if mode and not mode.active:
             return

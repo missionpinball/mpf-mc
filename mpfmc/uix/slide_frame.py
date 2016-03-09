@@ -144,7 +144,8 @@ class SlideFrame(MpfWidget, ScreenManager):
         frame."""
         return self.screens
 
-    def add_slide(self, name, config=None, priority=None, mode=None, **kwargs):
+    def add_slide(self, name, config=None, priority=None, mode=None,
+                  play_kwargs=None):
         # Note this method just adds it. It doesn't show it.
 
         try:
@@ -152,10 +153,15 @@ class SlideFrame(MpfWidget, ScreenManager):
         except ScreenManagerException:
             # Slide() created also adds it to this screen manager
             return Slide(mc=self.mc, name=name, target=self.name,
-                         config=config, mode=mode, priority=priority, **kwargs)
+                         config=config, mode=mode, priority=priority,
+                         play_kwargs=play_kwargs)
 
     def show_slide(self, slide_name, transition=None, mode=None, force=False,
-                   priority=None, **kwargs):
+                   priority=None, show=True, play_kwargs=None, **kwargs):
+
+        del kwargs
+
+        # todo implement show= kwarg
 
         try:  # does this slide exist in this screen manager already?
             slide = self.get_screen(slide_name)
@@ -164,14 +170,15 @@ class SlideFrame(MpfWidget, ScreenManager):
                                    config=self.mc.slides[slide_name],
                                    priority=priority,
                                    mode=mode,
-                                   **kwargs)
+                                   play_kwargs=play_kwargs)
 
         # update the widgets with whatever kwargs came through here
-        for widget in slide.walk():
-            try:
-                widget.update_kwargs(**kwargs)
-            except AttributeError:
-                pass
+        if play_kwargs:
+            for widget in slide.walk():
+                try:
+                    widget.update_kwargs(play_kwargs)
+                except AttributeError:
+                    pass
 
         if not transition:
             try:  # anon slides are in the collection
@@ -195,7 +202,9 @@ class SlideFrame(MpfWidget, ScreenManager):
 
     def add_and_show_slide(self, widgets=None, slide_name=None,
                            transition=None, priority=None, mode=None,
-                           force=False, **kwargs):
+                           force=False, play_kwargs=None, **kwargs):
+
+        del kwargs
 
         # create the slide. If a slide with this name already exists, it will
         # be replaced
@@ -205,7 +214,8 @@ class SlideFrame(MpfWidget, ScreenManager):
                                    priority=priority, mode=mode)
 
         self.show_slide(slide_name=slide_obj.name, transition=transition,
-                        priority=priority, mode=mode, force=force, **kwargs)
+                        priority=priority, mode=mode, force=force,
+                        play_kwargs=play_kwargs)
 
 
     def remove_slide(self, slide, transition_config=None):
@@ -266,6 +276,11 @@ class SlideFrame(MpfWidget, ScreenManager):
             self.remove_widget(slide)
             self.add_widget(slide)
             self.current = slide.name
+
+        print("NEW CURRENT SLIDE", self, self.current)
+        for widget in self.current_slide.walk():
+            print(widget)
+        print()
 
     def _set_current_slide_name(self, slide_name):
         try:
