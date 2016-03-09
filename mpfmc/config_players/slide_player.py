@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
+from mpf.core.utility_functions import Util
 from mpfmc.core.mc_config_player import McConfigPlayer
 
 
@@ -100,7 +101,8 @@ class McSlidePlayer(McConfigPlayer):
     show_section = 'slides'
     machine_collection_name = 'slides'
 
-    def play(self, settings, mode=None, caller=None, **kwargs):
+    def play(self, settings, mode=None, caller=None,
+             priority=None, play_kwargs=None):
         """Plays a validated slides: section from a slide_player: section of a
         config file or the slides: section of a show.
 
@@ -123,17 +125,24 @@ class McSlidePlayer(McConfigPlayer):
         the slide to show.
 
         """
-        super().play(settings, mode, caller, **kwargs)
+        super().play(settings, mode, caller, priority, play_kwargs)
 
         # todo figure out where the settings are coming from and see if we can
         # move the deepcopy there?
         settings = deepcopy(settings)
+
+        if 'play_kwargs' in settings:
+            play_kwargs = settings.pop('play_kwargs')
+            # todo should we merge in play_kwargs from the actual kwargs?
 
         if 'slides' in settings:
             settings = settings['slides']
 
         for slide, s in settings.items():
             # figure out target first since we need that to make a slide
+
+            if play_kwargs:
+                s.update(play_kwargs)
 
             try:
                 target = self.machine.targets[s.pop('target')]
@@ -143,13 +152,13 @@ class McSlidePlayer(McConfigPlayer):
                 else:
                     target = self.machine.targets['default']
 
-            s.update(kwargs)  # need to mix-in any kwargs
-
             # is this a named slide, or a new slide?
             if 'widgets' in s:
-                target.add_and_show_slide(mode=mode, slide_name=slide, **s)
+                target.add_and_show_slide(mode=mode, slide_name=slide,
+                                          **s)
             else:
-                target.show_slide(slide_name=slide, mode=mode, **s)
+                target.show_slide(slide_name=slide, mode=mode,
+                                  **s)
 
     def get_express_config(self, value):
         # express config for slides can either be a string (slide name) or a
@@ -242,11 +251,11 @@ class McSlidePlayer(McConfigPlayer):
 
 
 class MpfSlidePlayer(PluginPlayer):
-    """Base class for the slide player which runs as part of MPF.
+    """Base class for part of the slide player which runs as part of MPF.
 
     Note: This class is loaded by MPF and everything in it is in the context of
-    MPF, not the mpf-mc. MPF finds this instance because the mpf-mc setup.py has the following
-    entry_point configured:
+    MPF, not the mpf-mc. MPF finds this instance because the mpf-mc setup.py
+    has the following entry_point configured:
 
         slide_player=mpfmc.config_players.slide_player:register_with_mpf
 
@@ -254,11 +263,7 @@ class MpfSlidePlayer(PluginPlayer):
     config_file_section = 'slide_player'
     show_section = 'slides'
 
-    def play(self, settings, mode=None, **kwargs):
-        super().play(settings, mode, **kwargs)
-
     def validate_show_config(self, device, device_settings, serializable=True):
-
         # device is slide name, device_settings
         dict_is_widgets = False
 
@@ -279,30 +284,107 @@ class MpfSlidePlayer(PluginPlayer):
             if dict_is_widgets:
                 device_settings = dict(widgets=[device_settings])
 
-        for v in device_settings.values():
+        if 'transition' in device_settings:
+            if not isinstance(device_settings['transition'], dict):
+                device_settings['transition'] = dict(type=device_settings['transition'])
 
-            if 'transition' in v:
-                if not isinstance(v['transition'], dict):
-                    v['transition'] = dict(type=v['transition'])
+            try:
+                device_settings['transition'] = (
+                    self.machine.config_validator.validate_config(
+                        'transitions:{}'.format(
+                            device_settings['transition']['type']), device_settings['transition']))
 
-                try:
-                    v['transition'] = (
-                        self.machine.config_validator.validate_config(
-                            'transitions:{}'.format(
-                                v['transition']['type']), v['transition']))
+            except KeyError:
+                raise ValueError('transition: section of config requires a'
+                                 ' "type:" setting')
 
-                except KeyError:
-                    raise ValueError('transition: section of config requires a'
-                                     ' "type:" setting')
-
-            if 'widgets' in v:
-                v['widgets'] = self.machine.widgets.process_config(
-                    v['widgets'], serializable=True)
+        if 'widgets' in device_settings:
+            device_settings['widgets'] = self.process_widgets(
+                device_settings['widgets'])
 
         return_dict = dict()
         return_dict[device] = device_settings
 
         return return_dict
+
+    def process_widgets(self, config):
+        # config is localized to a specific widget section
+
+        # This method is based on
+        # mpfmc.core.config_collections.widget.Widget.process_config()
+
+        # We can't use that one though because there are lots of other imports
+        # that module does.
+
+        # todo we could move that to a central location
+
+        if isinstance(config, dict):
+            config = [config]
+
+        config.reverse()
+
+        widget_list = list()
+
+        for widget in config:
+            widget_list.append(self.process_widget(widget))
+
+        return widget_list
+
+    def process_widget(self, config, serializable=True):
+        # config is localized widget settings
+
+        self.machine.config_validator.validate_config('widgets:{}'.format(
+            config['type']).lower(), config, base_spec='widgets:common')
+
+        if 'animations' in config:
+            config['animations'] = self.process_animations(config['animations'])
+
+        else:
+            config['animations'] = None
+
+        return config
+
+    def process_animations(self, config):
+        # config is localized to the slide's 'animations' section
+
+        for event_name, event_settings in config.items():
+
+            # str means it's a list of named animations
+            if type(event_settings) is str:
+                event_settings = Util.string_to_list(event_settings)
+
+            # dict means it's a single set of settings for one animation step
+            elif isinstance(event_settings, dict):
+                event_settings = [event_settings]
+
+            # ultimately we're producing a list of dicts, so build that list
+            # as we iterate
+            new_list = list()
+            for settings in event_settings:
+                new_list.append(self.process_animation(settings))
+
+            config[event_name] = new_list
+
+        return config
+
+    def process_animation(self, config, mode=None):
+        # config is localized to a single animation's settings within a list
+
+        # str means it's a named animation
+        if type(config) is str:
+            config = dict(named_animation=config)
+
+        # dict is settings for an animation
+        elif type(config) is dict:
+            self.machine.config_validator.validate_config('widgets:animations',
+                                                          config)
+
+            if len(config['property']) != len(config['value']):
+                raise ValueError('Animation "property" list ({}) is not the '
+                                 'same length as the "end" list ({}).'.
+                                 format(config['property'], config['end']))
+
+        return config
 
 
 player_cls = MpfSlidePlayer
