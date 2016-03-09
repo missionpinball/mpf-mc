@@ -9,20 +9,20 @@ from distutils.version import LooseVersion
 from time import sleep
 from setuptools import setup, Extension
 
+platform = sys.platform
+
 
 def ver_equal(self, other):
     return self.version == other
 
 LooseVersion.__eq__ = ver_equal
 
-
+"""
 MIN_CYTHON_STRING = '0.20'
 MIN_CYTHON_VERSION = LooseVersion(MIN_CYTHON_STRING)
 MAX_CYTHON_STRING = '0.23.3'
 MAX_CYTHON_VERSION = LooseVersion(MAX_CYTHON_STRING)
 CYTHON_UNSUPPORTED = ()
-
-platform = sys.platform
 
 # Detect 32/64bit for OSX (http://stackoverflow.com/a/1405971/798575)
 if sys.platform == 'darwin':
@@ -96,6 +96,7 @@ except ImportError:
     print('\nCython is missing, its required for compiling mpf-mc!\n\n')
     raise
 
+"""
 
 # Get the version number of mpf-mc and the required version of MPF by reading
 # the file directly. We can't import it because that would import mpf and
@@ -178,7 +179,7 @@ sdl2_flags = determine_sdl2()
 extensions = [
     # Custom audio library
     Extension('mpfmc.core.audio.audio_interface',
-              ['mpfmc/core/audio/audio_interface.pyx'],
+              ['mpfmc/core/audio/audio_interface.c'],
               include_dirs=sdl2_flags['include_dirs'],
               library_dirs=[join(dirname(sys.executable), 'libs')],
               libraries=sdl2_flags['libraries'],
@@ -188,7 +189,7 @@ extensions = [
               )
 ]
 
-ext_modules = cythonize(extensions)
+ext_modules = extensions
 
 install_requires = ['ruamel.yaml>=0.10,<0.11',
                     'mpf>={}'.format(mpf_version),
@@ -251,18 +252,17 @@ setup(
 
     include_package_data=True,
 
-    package_data={'mpfmc': ['core/audio/*.pxd', 'core/audio/*.pxi']},
+    package_data={'mpfmc': ['core/audio/*.pxd', 'core/audio/*.pxi', 'core/audio/*.c']},
 
     packages=[
         'mpfmc',
-        'mpfmc.core.audio'
     ],
 
     zip_safe=False,
 
     install_requires=install_requires,
 
-    setup_requires=['cython>=' + MIN_CYTHON_STRING],
+    # setup_requires=['cython>=' + MIN_CYTHON_STRING],
 
     tests_require=['mock'],
 
