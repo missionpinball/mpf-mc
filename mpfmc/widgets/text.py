@@ -21,9 +21,10 @@ class Text(MpfWidget, Label):
         self._apply_style()
         self.original_text = self._get_text_string(config.get('text', ''),
                                                    mode=mode)
+
         self.text_variables = dict()
         self.event_replacements = kwargs
-        self._process_text(self.text, mode=mode)
+        self._process_text(self.original_text, mode=mode)
 
     def __repr__(self):
         return '<Text Widget text={}>'.format(self.text)
@@ -175,7 +176,6 @@ class Text(MpfWidget, Label):
                 for item in number_list:
                     grouped_item = Text.group_digits(item)
                     text = text.replace(str(item), grouped_item)
-
         self.text = text
         self.texture_update()
 
