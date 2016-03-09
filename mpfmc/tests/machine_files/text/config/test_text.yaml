@@ -8,7 +8,6 @@ displays:
     width: 400
     height: 300
 
-
 slides:
   static_text:
     - type: text

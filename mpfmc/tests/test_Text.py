@@ -22,7 +22,6 @@ class TestText(MpfMcTestCase):
         # widget text is only from event param
         self.mc.events.post('text_from_event_param1', param1='HELLO')
         self.advance_time()
-
         self.assertEqual(self.get_widget().text, 'HELLO')
 
         # now make sure if we post the event again, the text updates
@@ -234,7 +233,6 @@ class TestText(MpfMcTestCase):
         self.mc.events.post('text_string2')
         self.advance_time()
 
-        # should be 00 even though text is 0
         self.assertEqual(self.get_widget().text, 'HELLO PLAYER')
 
     def test_text_string3(self):
@@ -242,7 +240,6 @@ class TestText(MpfMcTestCase):
         self.mc.events.post('text_string3')
         self.advance_time()
 
-        # should be 00 even though text is 0
         self.assertEqual(self.get_widget().text, '$money')
 
     def test_text_string4(self):
@@ -250,7 +247,6 @@ class TestText(MpfMcTestCase):
         self.mc.events.post('text_string4')
         self.advance_time()
 
-        # should be 00 even though text is 0
         self.assertEqual(self.get_widget().text, '$100')
 
     def test_mode1_text_string1(self):

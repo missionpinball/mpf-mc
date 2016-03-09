@@ -1,4 +1,3 @@
-from mpf.core.utility_functions import Util
 from mpfmc.core.config_collection import ConfigCollection
 
 

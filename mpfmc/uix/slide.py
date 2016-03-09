@@ -18,16 +18,19 @@ class Slide(Screen):
         return Slide.next_id
 
     def __init__(self, mc, name, config=None, target='default', mode=None,
-                 priority=None, **kwargs):
+                 priority=None, play_kwargs=None):
+
+        # config is a dict. widgets will be in a key
+
+        self.creation_order = Slide.get_id()
+
+        if not name:
+            name = 'Anon_{}'.format(self.creation_order)
 
         self.mc = mc
         self.name = name
         self.priority = None
-        self.creation_order = Slide.get_id()
         self.pending_widgets = set()
-
-        if not name:
-            self.name = 'Anon_{}'.format(self.creation_order)
 
         if not config:
             config=dict()
@@ -61,11 +64,9 @@ class Slide(Screen):
         self.stencil.config['z'] = 0
         super().add_widget(self.stencil)
 
-        try:
+        if 'widgets' in config:  # don't want try, swallows too much
             self.add_widgets_from_config(config['widgets'], self.mode,
-                                         **kwargs)
-        except KeyError:
-            pass
+                                         play_kwargs)
 
         self.mc.active_slides[name] = self
         target.add_widget(self)
@@ -86,19 +87,26 @@ class Slide(Screen):
 
         return self.add_widgets_from_config(self.mc.widgets[name], mode)
 
-    def add_widgets_from_config(self, config, mode=None, **kwargs):
+    def add_widgets_from_config(self, config, mode=None, play_kwargs=None):
         if type(config) is not list:
             config = [config]
         widgets_added = list()
 
+        if not play_kwargs:
+            play_kwargs = dict()
+
         for widget in config:
-            widget_obj = widget['_widget_cls'](mc=self.mc, config=widget,
-                                              slide=self, mode=mode,
-                                               **kwargs)
+            if '_widget_cls' in widget:  # don't want try, swallows too much
+                widget_obj = widget['_widget_cls'](mc=self.mc, config=widget,
+                                                   slide=self, mode=mode,
+                                                   **play_kwargs)
+            else:
+                widget_obj = self.mc.widgets.type_map[widget['type']](
+                    mc=self.mc, config=widget, slide=self, mode=mode, **play_kwargs)
 
             top_widget = widget_obj
 
-            # some widgets like slide frames have parents, so we need to make
+            # some widgets (like slide frames) have parents, so we need to make
             # sure that we add the parent widget to the slide
             while top_widget.parent:
                 top_widget = top_widget.parent
@@ -114,6 +122,7 @@ class Slide(Screen):
                                           widget['anchor_x'],
                                           widget['anchor_y'])
             widgets_added.append(widget_obj)
+
         return widgets_added
 
     def add_widget(self, widget):
@@ -133,9 +142,8 @@ class Slide(Screen):
         priority.
 
         """
-        z = widget.config['z']
 
-        if z < 0:
+        if widget.config['z'] < 0:
             self.add_widget_to_parent_frame(widget)
             return
 

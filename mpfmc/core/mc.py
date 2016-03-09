@@ -62,6 +62,7 @@ class MpfMc(App):
         self.displays = CaseInsensitiveDict()
         self.machine_vars = CaseInsensitiveDict()
         self.machine_var_monitor = False
+        self.monitors = dict()
         self.targets = dict()
         """Dict which contains all the active slide frames in the machine that
         a slide can target. Will always contain an entry called 'default'
@@ -286,3 +287,29 @@ class MpfMc(App):
             print("MPF Shutting down due to child thread crash")
             print("Crash details: %s", crash)
             self.stop()
+
+    def register_monitor(self, monitor_class, monitor):
+        """Registers a monitor.
+
+        Args:
+            monitor_class: String name of the monitor class for this monitor
+                that's being registered.
+            monitor: String name of the monitor.
+
+        MPF uses monitors to allow components to monitor certain internal
+        elements of MPF.
+
+        For example, a player variable monitor could be setup to be notified of
+        any changes to a player variable, or a switch monitor could be used to
+        allow a plugin to be notified of any changes to any switches.
+
+        The MachineController's list of registered monitors doesn't actually
+        do anything. Rather it's a dictionary of sets which the monitors
+        themselves can reference when they need to do something. We just needed
+        a central registry of monitors.
+
+        """
+        if monitor_class not in self.monitors:
+            self.monitors[monitor_class] = set()
+
+        self.monitors[monitor_class].add(monitor)

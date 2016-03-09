@@ -1,6 +1,5 @@
 from kivy.animation import Animation
-from kivy.properties import ObjectProperty
-from mpf.core.case_insensitive_dict import CaseInsensitiveDict
+from mpf.core.rgb_color import RGBColor
 
 from mpfmc.core.utils import set_position, percent_to_float
 
@@ -45,6 +44,10 @@ class MpfWidget(object):
                                             line_height=1)
         except AttributeError:
             self._percent_prop_dicts = dict()
+
+        if 'color' in self.config and not isinstance(self.config['color'],
+                                                     RGBColor):
+            self.config['color'] = RGBColor(self.config['color'])
 
         for k, v in self.config.items():
             if k not in self._dont_send_to_kivy and hasattr(self, k):

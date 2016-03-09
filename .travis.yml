@@ -17,6 +17,7 @@ install:
  - pip install kivy
 # - pip install mpf
  - pip install https://github.com/missionpinball/mpf/zipball/dev
+ - python setup.py install
 
 before_script:
  - export DISPLAY=:99.0

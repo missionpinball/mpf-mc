@@ -1,3 +1,7 @@
+import json
+
+from mpf.core.bcp import decode_command_string
+from mpf.core.config_player import ConfigPlayer
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
@@ -134,3 +138,34 @@ class TestSlidePlayer(MpfMcTestCase):
                          'mode1_slide_2')
         self.assertEqual(self.mc.targets['display1'].current_slide.priority,
                          150)
+
+    def test_from_show_via_bcp(self):
+        from mpf.core.bcp import encode_command_string
+
+        show_slide_section = dict()
+        show_slide_section['widgets'] = list()
+
+        show_slide_section['widgets'].append(dict(
+            type='text', text='TEST FROM SHOW'))
+
+        show_slide_section = ConfigPlayer.show_players[
+            'slides'].validate_show_config('slide1', show_slide_section, False)
+
+        bcp_string = encode_command_string('trigger', name='slides_play',
+                                           **show_slide_section)
+
+        self.mc.bcp_processor.receive_bcp_message(bcp_string)
+        self.advance_time(1)
+
+    def test_slides_created_in_slide_player(self):
+        # Anon slides are where the widgets are listed in the slide_player
+        # section of a config file or the slides section of a show
+
+        self.mc.events.post('anon_slide_dict')
+        self.advance_time(1)
+
+        self.mc.events.post('anon_slide_list')
+        self.advance_time(1)
+
+        self.mc.events.post('anon_slide_widgets')
+        self.advance_time(1)
