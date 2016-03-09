@@ -175,7 +175,6 @@ def determine_sdl2():
 # Get the build flags for compiling/building against the SDL2 libraries
 sdl2_flags = determine_sdl2()
 
-
 extensions = [
     # Custom audio library
     Extension('mpfmc.core.audio.audio_interface',

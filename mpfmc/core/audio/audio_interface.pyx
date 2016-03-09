@@ -1,3 +1,4 @@
+#!python
 #cython: embedsignature=True, language_level=3
 """
 Audio Library
@@ -11,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '1', '0-dev9')
+__version_info__ = ('0', '30', '0-dev9')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
