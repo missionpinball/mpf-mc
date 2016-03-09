@@ -159,9 +159,12 @@ class SlideFrame(MpfWidget, ScreenManager):
     def show_slide(self, slide_name, transition=None, mode=None, force=False,
                    priority=None, show=True, play_kwargs=None, **kwargs):
 
-        del kwargs
-
         # todo implement show= kwarg
+
+        if not play_kwargs:
+            play_kwargs = kwargs
+        else:
+            play_kwargs.update(kwargs)
 
         try:  # does this slide exist in this screen manager already?
             slide = self.get_screen(slide_name)
@@ -176,7 +179,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         if play_kwargs:
             for widget in slide.walk():
                 try:
-                    widget.update_kwargs(play_kwargs)
+                    widget.update_kwargs(**play_kwargs)
                 except AttributeError:
                     pass
 
@@ -203,11 +206,13 @@ class SlideFrame(MpfWidget, ScreenManager):
     def add_and_show_slide(self, widgets=None, slide_name=None,
                            transition=None, priority=None, mode=None,
                            force=False, play_kwargs=None, **kwargs):
-
-        del kwargs
-
         # create the slide. If a slide with this name already exists, it will
         # be replaced
+
+        if not play_kwargs:
+            play_kwargs = kwargs
+        else:
+            play_kwargs.update(kwargs)
 
         slide_obj = self.add_slide(name=slide_name,
                                    config=dict(widgets=widgets),

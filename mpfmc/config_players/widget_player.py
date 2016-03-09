@@ -11,7 +11,13 @@ class MpfWidgetPlayer(PluginPlayer):
     """
     config_file_section = 'widget_player'
 
-    def play(self, settings, mode=None, play_kwargs=None):
+    def play(self, settings, mode=None, play_kwargs=None, **kwargs):
+
+        if not play_kwargs:
+            play_kwargs = kwargs
+        else:
+            play_kwargs.update(kwargs)
+
         super().play(settings, mode, play_kwargs)
 
 
@@ -26,7 +32,11 @@ class McWidgetPlayer(McConfigPlayer):
     show_section = 'widgets'
     machine_collection_name = 'widgets'
 
-    def play(self, settings, mode=None, caller=None, play_kwargs=None):
+    def play(self, settings, mode=None, caller=None, play_kwargs=None,
+             **kwargs):
+
+        # todo add play_kwargs and kwargs, use McSlidePlayer as example
+
         super().play(settings, mode, caller, play_kwargs)
 
         if 'widgets' in settings:
