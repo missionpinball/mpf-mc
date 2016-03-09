@@ -78,6 +78,7 @@ cython_unsupported = '''\
 try:
     # check for cython
     from Cython.Distutils import build_ext
+    from Cython.Build import cythonize
     import Cython
     cy_version_str = Cython.__version__
     cy_ver = LooseVersion(cy_version_str)
@@ -175,33 +176,20 @@ def determine_sdl2():
 sdl2_flags = determine_sdl2()
 
 
-class CythonExtension(Extension):
-
-    def __init__(self, *args, **kwargs):
-        Extension.__init__(self, *args, **kwargs)
-        self.cython_directives = {
-            'c_string_encoding': 'utf-8',
-            'profile': 'USE_PROFILE' in environ,
-            'embedsignature': 'USE_EMBEDSIGNATURE' in environ}
-        # XXX with pip, setuptools is imported before distutils, and change
-        # our pyx to c, then, cythonize doesn't happen. So force again our
-        # sources
-        self.sources = args[1]
-
-
-ext_modules = [
+extensions = [
     # Custom audio library
-    CythonExtension('mpfmc.core.audio.audio_interface',
-                    ['mpfmc/core/audio/audio_interface.pyx'],
-                    include_dirs=sdl2_flags['include_dirs'],
-                    library_dirs=[join(dirname(sys.executable), 'libs')],
-                    libraries=sdl2_flags['libraries'],
-                    extra_objects=[],
-                    extra_compile_args=['-ggdb', '-O2'],
-                    extra_link_args=[]
-                    )
+    Extension('mpfmc.core.audio.audio_interface',
+              ['mpfmc/core/audio/audio_interface.pyx'],
+              include_dirs=sdl2_flags['include_dirs'],
+              library_dirs=[join(dirname(sys.executable), 'libs')],
+              libraries=sdl2_flags['libraries'],
+              extra_objects=[],
+              extra_compile_args=['-ggdb', '-O2'],
+              extra_link_args=[]
+              )
 ]
 
+ext_modules = cythonize(extensions)
 
 install_requires = ['ruamel.yaml>=0.10,<0.11',
                     'mpf>={}'.format(mpf_version),
