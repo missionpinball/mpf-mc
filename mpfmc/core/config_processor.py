@@ -4,10 +4,7 @@ controller.
 """
 
 from kivy.logger import Logger
-from kivy.utils import get_color_from_hex
-from mpf.core.config_processor import ConfigProcessorBase
-from mpf.core.rgb_color import named_rgb_colors
-from mpf.core.utility_functions import Util
+from mpf.core.config_processor import ConfigProcessor as ConfigProcessorBase
 from mpfmc.uix.display import Display
 
 
@@ -51,28 +48,3 @@ class ConfigProcessor(ConfigProcessorBase):
         return Display(self.mc, name,
             **self.machine.config_validator.validate_config('displays',
                                                             config))
-
-    def color_from_string(self, color_string):
-        if not color_string:
-            return None
-
-        color_string = str(color_string)
-
-        if color_string in named_rgb_colors:
-            color = list(named_rgb_colors[color_string])
-
-        elif Util.is_hex_string(color_string):
-            return get_color_from_hex(color_string)
-
-        else:
-            color = Util.string_to_list(color_string)
-            if len(color) < 3:
-                pass  # todo error?
-
-        if len(color) == 3:
-            color += [255]
-
-        for i, x in enumerate(color):
-            color[i] = int(x)/255
-
-        return color

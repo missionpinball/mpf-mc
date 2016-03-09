@@ -96,8 +96,7 @@ class Slide(Screen):
             play_kwargs = dict()
 
         for widget in config:
-
-            if '_widget_cls' in widget:
+            if '_widget_cls' in widget:  # don't want try, swallows too much
                 widget_obj = widget['_widget_cls'](mc=self.mc, config=widget,
                                                    slide=self, mode=mode,
                                                    **play_kwargs)

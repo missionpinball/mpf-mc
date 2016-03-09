@@ -321,7 +321,8 @@ class MpfSlidePlayer(PluginPlayer):
         if isinstance(config, dict):
             config = [config]
 
-        config.reverse()
+        # Note that we don't reverse the order of the widgets here since
+        # they'll be reversed when they're played
 
         widget_list = list()
 
@@ -335,6 +336,8 @@ class MpfSlidePlayer(PluginPlayer):
 
         self.machine.config_validator.validate_config('widgets:{}'.format(
             config['type']).lower(), config, base_spec='widgets:common')
+
+        config['_default_settings'] = list()
 
         if 'animations' in config:
             config['animations'] = self.process_animations(config['animations'])

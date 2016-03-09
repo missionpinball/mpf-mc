@@ -277,11 +277,6 @@ class SlideFrame(MpfWidget, ScreenManager):
             self.add_widget(slide)
             self.current = slide.name
 
-        print("NEW CURRENT SLIDE", self, self.current)
-        for widget in self.current_slide.walk():
-            print(widget)
-        print()
-
     def _set_current_slide_name(self, slide_name):
         try:
             self._set_current_slide(self.get_screen(slide_name))
