@@ -93,7 +93,7 @@ class TestMpfPluginConfigPlayerValidation(MpfTestCase):
         self.assertEqual(1, len(step_0['widgets']))
         self.assertEqual('text', step_0['widgets'][0]['type'])
         self.assertEqual('TEST 1', step_0['widgets'][0]['text'])
-        self.assertEqual('ff0000', step_0['widgets'][0]['color'])
+        self.assertEqual([1.0, 0, 0, 1.0], step_0['widgets'][0]['color'])
         self.assertEqual(100, step_0['widgets'][0]['font_size'])
 
         self.machine.events.post('event1')
