@@ -5,8 +5,22 @@ import re
 
 from os import environ
 from os.path import join, dirname, exists, isdir
+from distutils.version import LooseVersion
+from time import sleep
 from setuptools import setup, Extension
 
+
+def ver_equal(self, other):
+    return self.version == other
+
+LooseVersion.__eq__ = ver_equal
+
+
+MIN_CYTHON_STRING = '0.20'
+MIN_CYTHON_VERSION = LooseVersion(MIN_CYTHON_STRING)
+MAX_CYTHON_STRING = '0.23.3'
+MAX_CYTHON_VERSION = LooseVersion(MAX_CYTHON_STRING)
+CYTHON_UNSUPPORTED = ()
 
 platform = sys.platform
 
@@ -16,6 +30,70 @@ if sys.platform == 'darwin':
         osx_arch = 'x86_64'
     else:
         osx_arch = 'i386'
+
+
+# -----------------------------------------------------------------------------
+# Cython check
+# on python-for-android and kivy-ios, cython usage is external
+
+cython_unsupported_append = '''
+  Please note that the following versions of Cython are not supported
+  at all: {}
+'''.format(', '.join(map(str, CYTHON_UNSUPPORTED)))
+
+cython_min = '''\
+  This version of Cython is not compatible with mpf-mc. Please upgrade to
+  at least version {0}, preferably the newest supported version {1}.
+  If your platform provides a Cython package, make sure you have upgraded
+  to the newest version. If the newest version available is still too low,
+  please remove it and install the newest supported Cython via pip:
+    pip install -I Cython=={1}{2}\
+'''.format(MIN_CYTHON_STRING, MAX_CYTHON_STRING,
+           cython_unsupported_append if CYTHON_UNSUPPORTED else '')
+
+cython_max = '''\
+  This version of Cython is untested with mpf-mc. While this version may
+  work perfectly fine, it is possible that you may experience issues. If
+  you do have issues, please downgrade to a supported version. It is
+  best to use the newest supported version, {1}, but the minimum
+  supported version is {0}.
+  If your platform provides a Cython package, check if you can downgrade
+  to a supported version. Otherwise, uninstall the platform package and
+  install Cython via pip:
+    pip install -I Cython=={1}{2}\
+'''.format(MIN_CYTHON_STRING, MAX_CYTHON_STRING,
+           cython_unsupported_append if CYTHON_UNSUPPORTED else '')
+
+cython_unsupported = '''\
+  This version of Cython suffers from known bugs and is unsupported.
+  Please install the newest supported version, {1}, if possible, but
+  the minimum supported version is {0}.
+  If your platform provides a Cython package, check if you can install
+  a supported version. Otherwise, uninstall the platform package and
+  install Cython via pip:
+    pip install -I Cython=={1}{2}\
+'''.format(MIN_CYTHON_STRING, MAX_CYTHON_STRING,
+           cython_unsupported_append)
+
+try:
+    # check for cython
+    from Cython.Distutils import build_ext
+    import Cython
+    cy_version_str = Cython.__version__
+    cy_ver = LooseVersion(cy_version_str)
+    print('\nDetected Cython version {}'.format(cy_version_str))
+    if cy_ver < MIN_CYTHON_VERSION:
+        print(cython_min)
+        raise ImportError('Incompatible Cython Version')
+    if cy_ver in CYTHON_UNSUPPORTED:
+        print(cython_unsupported)
+        raise ImportError('Incompatible Cython Version')
+    if cy_ver > MAX_CYTHON_VERSION:
+        print(cython_max)
+        sleep(1)
+except ImportError:
+    print('\nCython is missing, its required for compiling mpf-mc!\n\n')
+    raise
 
 
 # Get the version number of mpf-mc and the required version of MPF by reading
@@ -178,7 +256,6 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Topic :: Artistic Software',
         'Topic :: Games/Entertainment :: Arcade'
-
     ],
 
     keywords='pinball',
@@ -197,6 +274,8 @@ setup(
     zip_safe=False,
 
     install_requires=install_requires,
+
+    setup_requires=['cython>=' + MIN_CYTHON_STRING],
 
     tests_require=['mock'],
 
