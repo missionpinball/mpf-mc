@@ -109,9 +109,10 @@ class SlideFrame(MpfWidget, ScreenManager):
         self.mc.targets[self.name] = self
 
     def __repr__(self):
-        return '<SlideFrame name={}, current slide={}, total slides={' \
+        return '<SlideFrame {}{}, current slide={}, total slides={' \
                '}>'.format(
-                self.name, self.current_slide_name, len(self.screens))
+                self.name, self.size, self.current_slide_name,
+                len(self.screens))
 
     @property
     def current_slide(self):
