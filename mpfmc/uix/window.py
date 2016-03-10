@@ -30,15 +30,17 @@ class Window(object):
         except KeyError:
             mc.title = "Mission Pinball Framework"
 
-        # if there's window: section in the machine config, and if it
-        # contains a 'source_display' section, then we'll try to use that.
-        # Otherwise we'll use display that has the default target
+        # Set the source based on the window: source_display: setting.
+        # If that's not valid, and there's a display called "window", use it
+        # Otherwise use the default.
         try:
             display = mc.displays[mc.machine_config['window'][
                 'source_display']]
         except KeyError:
-            display = mc.targets['default'].parent
-            # print("Selecting source display", display)
+            if 'window' in mc.targets:
+                display = mc.targets['window'].parent
+            else:
+                display = mc.targets['default'].parent
 
         # We need the window to map to a Display instance, so no matter what
         # we're passed, we keep on moving up until we find the actual display.
