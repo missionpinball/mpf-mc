@@ -155,6 +155,7 @@ class Text(MpfWidget, Label):
                 elif self.mc.player.is_player_var(var_string):
                     text = text.replace('(' + var_string + ')',
                                         str(self.mc.player[var_string]))
+                    continue
 
             if var_string in self.event_replacements:
                 text = text.replace('({})'.format(var_string),
