@@ -3,6 +3,7 @@ mpf-mc.
 
 """
 import importlib
+import os
 import queue
 import threading
 import time
@@ -18,6 +19,7 @@ from mpfmc.core.mode_controller import ModeController
 from mpfmc.uix.transitions import TransitionManager
 from mpfmc.core.config_collection import create_config_collections
 
+import mpf
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
@@ -45,6 +47,7 @@ class MpfMc(App):
         self.machine_path = machine_path
         self.clock = Clock
         self._boot_holds = set()
+        self.mpf_path = os.path.dirname(mpf.__file__)
 
         self.modes = CaseInsensitiveDict()
         self.player_list = list()
