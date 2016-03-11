@@ -1,4 +1,4 @@
-""" """
+""" ModeController for MPF-MC"""
 
 import logging
 import os
@@ -15,6 +15,7 @@ RemoteMethod = namedtuple('RemoteMethod',
 be called on mode_start or mode_stop.
 """
 
+# todo create a single ModeController base class for MPF and MPF-MC
 
 class ModeController(object):
     """Parent class for the Mode Controller. There is one instance of this in
@@ -26,6 +27,8 @@ class ModeController(object):
         self.mc = mc
         self.log = logging.getLogger('ModeController')
 
+        self.debug = False
+
         self.active_modes = list()
         self.mode_stop_count = 0
 
@@ -34,13 +37,18 @@ class ModeController(object):
         self.loader_methods = list()
         self.start_methods = list()
 
+        self._machine_mode_folders = dict()
+        self._mpf_mode_folders = dict()
+
         if 'modes' in self.mc.machine_config:
             self.mc.events.add_handler('init_phase_2',
                                        self._load_modes)
 
     def _load_modes(self):
-        # Loads the modes from the Modes: section of the machine configuration
+        # Loads the modes from the modes: section of the machine configuration
         # file.
+
+        self._build_mode_folder_dicts()
 
         for mode in set(self.mc.machine_config['modes']):
             self.mc.modes[mode] = self._load_mode(mode)
@@ -53,56 +61,106 @@ class ModeController(object):
                 the mode's folder in your game's machine_files/modes folder.
 
         """
-        self.log.debug('Processing mode: %s', mode_string)
+
+        mode_string = mode_string.lower()
+
+        if self.debug:
+            self.log.debug('Processing mode: %s', mode_string)
 
         config = dict()
 
-        # find the folder for this mode:
-        mode_path = os.path.join(self.mc.machine_path,
-                                 self.mc.machine_config['mpf-mc']['paths'][
-                                     'modes'], mode_string)
+        if mode_string in self._machine_mode_folders:
+            mode_path = os.path.join(
+                self.mc.machine_path,
+                self.mc.machine_config['mpf-mc']['paths']['modes'],
+                self._machine_mode_folders[mode_string])
+        elif mode_string in self._mpf_mode_folders:
+            mode_path = os.path.join(
+                self.mc.mpf_path,
+                self.mc.machine_config['mpf-mc']['paths']['modes'],
+                self._mpf_mode_folders[mode_string])
+        else:
+            raise ValueError("No folder found for mode '{}'. Is your mode "
+                             "folder in your machine's 'modes' folder?"
+                             .format(mode_string))
 
-        if not os.path.exists(mode_path):
-            mode_path = os.path.abspath(os.path.join('mpf',
-                                                     self.mc.machine_config[
-                                                         'mpf-mc']['paths'][
-                                                         'modes'],
-                                                     mode_string))
+        print(mode_path)
 
         # Is there an MPF default config for this mode? If so, load it first
-        mpf_mode_config = os.path.join(
-                'mpf',
+        try:
+            mpf_mode_config = os.path.join(
+                self.mc.mpf_path,
                 self.mc.machine_config['mpf-mc']['paths']['modes'],
-                mode_string,
+                self._mpf_mode_folders[mode_string],
                 'config',
-                mode_string + '.yaml')
+                self._mpf_mode_folders[mode_string] + '.yaml')
 
-        if os.path.isfile(mpf_mode_config):
-            config = ConfigProcessor.load_config_file(mpf_mode_config)
+            if os.path.isfile(mpf_mode_config):
+                config = ConfigProcessor.load_config_file(mpf_mode_config)
+
+                if self.debug:
+                    self.log.debug("Loading config from %s", mpf_mode_config)
+
+        except KeyError:
+            pass
 
         # Now figure out if there's a machine-specific config for this mode,
         # and if so, merge it into the config
-        mode_config_folder = os.path.join(self.mc.machine_path,
-                                          self.mc.machine_config['mpf-mc'][
-                                              'paths']['modes'], mode_string,
-                                          'config')
+        try:
+            mode_config_file = os.path.join(
+                self.mc.machine_path,
+                self.mc.machine_config['mpf-mc']['paths']['modes'],
+                self._machine_mode_folders[mode_string],
+                'config',
+                self._machine_mode_folders[mode_string] + '.yaml')
 
-        found_file = False
-        for path, _, files in os.walk(mode_config_folder):
-            for file in files:
-                file_root, file_ext = os.path.splitext(file)
+            if os.path.isfile(mode_config_file):
+                config = Util.dict_merge(config,
+                            ConfigProcessor.load_config_file(mode_config_file))
 
-                if file_root == mode_string:
-                    config = Util.dict_merge(config,
-                                             ConfigProcessor.load_config_file(
-                                                     os.path.join(path, file)))
-                    found_file = True
-                    break
+                if self.debug:
+                    self.log.debug("Loading config from %s", mode_config_file)
 
-            if found_file:
-                break
+        except KeyError:
+            pass
+
+        # validate config
+        if 'mode' not in config:
+            config['mode'] = dict()
+
+        self.mc.config_validator.validate_config("mode", config['mode'])
 
         return Mode(self.mc, config, mode_string, mode_path)
+
+    def _build_mode_folder_dicts(self):
+        self._mpf_mode_folders = self._get_mode_folder(self.mc.mpf_path)
+        self.log.debug("Found MPF Mode folders: %s", self._mpf_mode_folders)
+
+        self._machine_mode_folders = (
+            self._get_mode_folder(self.mc.machine_path))
+        self.log.debug("Found Machine-specific Mode folders: %s",
+                       self._machine_mode_folders)
+
+    def _get_mode_folder(self, base_folder):
+        try:
+            mode_folders = os.listdir(os.path.join(
+                base_folder, self.mc.machine_config['mpf-mc']['paths']['modes']))
+        except FileNotFoundError:
+            return dict()
+
+        final_mode_folders = dict()
+
+        for folder in mode_folders:
+
+            this_mode_folder = os.path.join(
+                    base_folder,
+                    self.mc.machine_config['mpf-mc']['paths']['modes'],
+                    folder)
+
+            if os.path.isdir(this_mode_folder) and not folder.startswith('_'):
+                final_mode_folders[folder.lower()] = folder
+
+        return final_mode_folders
 
     def register_load_method(self, load_method, config_section_name=None,
                              priority=0, **kwargs):
