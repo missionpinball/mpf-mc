@@ -5,8 +5,8 @@ from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
 
-def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
-                 anchor_y='middle'):
+def set_position(parent_w, parent_h, w, h, x=None, y=None,
+                 anchor_x=None, anchor_y=None):
     """Returns the x,y position for the lower-left corner of a widget
     within a larger parent frame based on several positioning parameters.
 
@@ -22,7 +22,9 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
             of the parent width. (e.g. parent width of 800 with x='20%'
             results in x=160. Can also be negative to position the widget
             partially off the left of the slide. Default value of None will
-            return the horizontal center (parent width / 2).
+            return the horizontal center (parent width / 2). Can also start
+            with the strings "left", "center", or "right" which can be combined
+            with values.
         y: (Optional) Specifies the y (vertical) position of the widget from
             the bottom edge of the slide. Can be a numeric value which
             represents the actual y value, or can be a percentage (string with
@@ -30,7 +32,9 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
             of the parent height. (e.g. parent height of 600 with y='20%'
             results in y=120. Can also be negative to position the widget
             partially off the bottom of the slide. Default value of None will
-            return the vertical center (parent height / 2).
+            return the vertical center (parent height / 2). Can also start
+            with the strings "top", "middle", or "bottom" which can be combined
+            with values.
         anchor_x: (Optional) Which edge of the widget will be used for
             positioning. ('left', 'center' (or 'middle'), or 'right'. If None,
             'center' will be used.
@@ -38,45 +42,91 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None, anchor_x='center',
             positioning. ('top', 'middle' (or 'center'), or 'bottom'. If None,
             'center' will be used.
 
-
     Returns: Tuple of x, y coordinates for the lower-left corner of the
         widget you're placing.
 
-    """
+    See the widgets documentation for examples.
 
-    # Want to force None to be the default too
+    """
+    # Set defaults
+    if x is None:
+        x = 'center'
     if not anchor_x:
         anchor_x = 'center'
+    if y is None:
+        y = 'middle'
     if not anchor_y:
         anchor_y = 'middle'
 
-    # set x/y
-    if x is None:
-        x = parent_w / 2
-    else:
+    # X / width / horizontal
+
+    # Set position
+    if type(x) is str:
+
+        x = str(x).replace(' ','')
+        start_x = 0
+
+        if x.startswith('right'):
+            x = x.strip('right')
+            start_x = parent_w
+
+        elif x.startswith('middle'):
+            x = x.strip('middle')
+            start_x = parent_w / 2
+
+        elif x.startswith('center'):
+            x = x.strip('center')
+            start_x = parent_w / 2
+
+        elif x.startswith('left'):
+            x = x.strip('left')
+
+        if not x:
+            x = '0'
+
         x = percent_to_float(x, parent_w)
+        x += start_x
 
-    if y is None:
-        y = parent_h / 2
-    else:
-        y = percent_to_float(y, parent_h)
-
-    # calculate the x/y offsets based on widget size and anchor
+    # Adjust for anchor
     if anchor_x in ('center', 'middle'):
-        x += w / -2
+        x -= w / 2
     elif anchor_x == 'right':
-        x += -w
+        x -= w
 
+    # Y / height / verical
+
+    # Set position
+    if type(y) is str:
+
+        y = str(y).replace(' ', '')
+        start_y = 0
+
+        if y.startswith('top'):
+            y = y.strip('top')
+            start_y = parent_h
+
+        elif y.startswith('middle'):
+            y = y.strip('middle')
+            start_y = parent_h / 2
+
+        elif y.startswith('center'):
+            y = y.strip('center')
+            start_y = parent_h / 2
+
+        elif y.startswith('bottom'):
+            y = y.strip('bottom')
+
+        if not y:
+            y = '0'
+
+        y = percent_to_float(y, parent_h)
+        y += start_y
+
+    # Adjust for anchor
     if anchor_y in ('middle', 'center'):
-        y += h / -2
+        y -= h / 2
     elif anchor_y == 'top':
-        y += -h
-
-    # Helpful for debugging placement
-    # print("SET POS. Final: {},{}, Parent: {}x{}".format(
-    #         x, y, parent_w, parent_h))
-    # print("widget: {}x{}, pos: {},{}, achors: {},{}".format(
-    #     w, h, x, y, anchor_x, anchor_y))
+        y -= h
 
     return x, y
 

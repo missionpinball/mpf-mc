@@ -9,6 +9,9 @@ class McConfigPlayer(ConfigPlayer):
     show_players = dict()
     config_file_players = dict()
 
+    def __repr__(self):
+        return 'McConfigPlayer.{}'.format(self.show_section)
+
     def _initialize(self):
         if self.machine_collection_name:
             self.device_collection = getattr(self.machine,
