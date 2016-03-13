@@ -84,8 +84,6 @@ class ModeController(object):
                              "folder in your machine's 'modes' folder?"
                              .format(mode_string))
 
-        print(mode_path)
-
         # Is there an MPF default config for this mode? If so, load it first
         try:
             mpf_mode_config = os.path.join(
