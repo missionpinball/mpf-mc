@@ -176,6 +176,40 @@ class TestUtils(MpfMcTestCase):
                                     anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-90, -30))
 
+        # test positioning strings
+        anchor_x = None
+        anchor_y = None
+
+        x = 'center'
+        y = 'center'
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y)
+        self.assertEqual((res_x, res_y), (45, 45))
+
+        x = 'center+10'
+        y = 'center + 10'
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y)
+        self.assertEqual((res_x, res_y), (55, 55))
+
+        x = 'middle-10'
+        y = 'middle - 10'
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y)
+        self.assertEqual((res_x, res_y), (35, 35))
+
+        x = 'left'
+        y = 'bottom'
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y)
+        self.assertEqual((res_x, res_y), (-5, -5))
+
+        x = 'right'
+        y = 'top'
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y)
+        self.assertEqual((res_x, res_y), (95, 95))
+
     def test_percent_to_float(self):
         num = 1
         total = 1
