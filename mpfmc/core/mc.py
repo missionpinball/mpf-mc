@@ -29,11 +29,9 @@ from mpfmc.assets.image import ImageAsset
 
 try:
     from mpfmc.core.audio import SoundSystem
-    from mpfmc.core.audio.sound_player import SoundPlayer
     from mpfmc.assets.sound import SoundAsset
 except ImportError:
     SoundSystem = None
-    SoundPlayer = None
     SoundAsset = None
     Logger.warning("mpfmc.core.audio library could not be loaded - audio features will not be available")
 
@@ -96,8 +94,6 @@ class MpfMc(App):
             self.sound_system = None
         else:
             self.sound_system = SoundSystem(self)
-            if self.sound_system.enabled:
-                self.sound_player = SoundPlayer(self)
 
         self.asset_manager = AssetManager(self)
         self.bcp_processor = BcpProcessor(self)
@@ -106,9 +102,14 @@ class MpfMc(App):
         ImageAsset.initialize(self)
         VideoAsset.initialize(self)
 
+        # Only initialize sound assets if the sound system is loaded and enabled
         if self.sound_system is not None and self.sound_system.enabled:
             SoundAsset.extensions = tuple(self.sound_system.audio_interface.supported_extensions())
             SoundAsset.initialize(self)
+        else:
+            # If the sound system is not loaded or enabled, remove the sound_player
+            # from the list of config_player modules to setup
+            del self.machine_config['mpf-mc']['config_players']['sound']
 
         self.clock.schedule_interval(self._check_crash_queue, 1)
 
@@ -140,6 +141,7 @@ class MpfMc(App):
 
     def _register_config_players(self):
         # todo move this to config_player module
+
         for name, module in self.machine_config['mpf-mc'][
                 'config_players'].items():
             imported_module = importlib.import_module(module)

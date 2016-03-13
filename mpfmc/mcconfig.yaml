@@ -4,7 +4,7 @@ mpf-mc:
     config_players:
         slide: mpfmc.config_players.slide_player
         widget: mpfmc.config_players.widget_player
-#        sound: mpfmc.config_players.sound_player
+        sound: mpfmc.config_players.sound_player
 
     config_collections:
         slide: mpfmc.config_collections.slide
