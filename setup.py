@@ -56,7 +56,7 @@ def determine_sdl2():
     sdl2_path = environ.get('KIVY_SDL2_PATH', None)
 
     if not sdl2_path and platform == 'darwin':
-        return flags
+        return dict(libraries=[], include_dirs=['/usr/local/include/SDL2'])
 
     # no pkgconfig info, or we want to use a specific sdl2 path, so perform
     # manual configuration

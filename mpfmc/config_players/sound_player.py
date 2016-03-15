@@ -148,7 +148,7 @@ Here are several various examples:
             for sound, sound_settings in settings.items():
 
                 # Now check to see if all the settings are valid
-                # slide settings. If not, assume it's a single widget settings.
+                # sound settings. If not, assume it's a single sound settings.
                 if isinstance(sound_settings, dict):
                     for key in sound_settings.keys():
                         if key not in ConfigValidator.config_spec['sound_player']:
