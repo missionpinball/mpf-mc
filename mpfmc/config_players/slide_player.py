@@ -102,7 +102,7 @@ class McSlidePlayer(McConfigPlayer):
     machine_collection_name = 'slides'
 
     def play(self, settings, mode=None, caller=None,
-             priority=None, play_kwargs=None, **kwargs):
+             priority=0, play_kwargs=None, **kwargs):
         """Plays a validated slides: section from a slide_player: section of a
         config file or the slides: section of a show.
 
@@ -129,7 +129,7 @@ class McSlidePlayer(McConfigPlayer):
         # **kwargs here are things that would have been passed as event
         # params to the slide_player section
 
-        super().play(settings, mode, caller, priority, play_kwargs)
+        # super().play(settings, mode, caller, priority, play_kwargs)
 
         # todo figure out where the settings are coming from and see if we can
         # move the deepcopy there?
@@ -148,6 +148,11 @@ class McSlidePlayer(McConfigPlayer):
                 s.update(play_kwargs)
 
             s.update(kwargs)
+
+            try:
+                s['priority'] += priority
+            except KeyError:
+                s['priority'] = priority
 
             try:
                 target = self.machine.targets[s.pop('target')]

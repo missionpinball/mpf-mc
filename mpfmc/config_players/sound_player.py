@@ -55,7 +55,7 @@ Here are several various examples:
     machine_collection_name = 'sounds'
 
     def play(self, settings, mode=None, caller=None,
-             priority=None, play_kwargs=None, **kwargs):
+             priority=0, play_kwargs=None, **kwargs):
         """Plays a validated sounds: section from a sound_player: section of a
         config file or the sounds: section of a show.
 
@@ -77,7 +77,7 @@ Here are several various examples:
             must be specified in the sounds section of a config file.
 
         """
-        super().play(settings, mode, caller, priority, play_kwargs)
+        # super().play(settings, mode, caller, priority, play_kwargs)
 
         # todo figure out where the settings are coming from and see if we can
         # move the deepcopy there?
@@ -90,6 +90,12 @@ Here are several various examples:
             settings = settings['sounds']
 
         for sound_name, s in settings.items():
+
+            try:
+                s['priority'] += priority
+            except KeyError:
+                s['priority'] = priority
+
             # figure out track first since we need that to play a sound
 
             # Retrieve sound asset by name

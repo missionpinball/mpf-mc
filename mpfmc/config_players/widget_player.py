@@ -33,16 +33,21 @@ class McWidgetPlayer(McConfigPlayer):
     machine_collection_name = 'widgets'
 
     def play(self, settings, mode=None, caller=None, play_kwargs=None,
-             **kwargs):
+             priority=0, **kwargs):
 
         # todo add play_kwargs and kwargs, use McSlidePlayer as example
 
-        super().play(settings, mode, caller, play_kwargs)
+        # super().play(settings, mode, caller, play_kwargs)
 
         if 'widgets' in settings:
             settings = settings['widgets']
 
         for widget, s in settings.items():
+
+            try:
+                s['priority'] += priority
+            except KeyError:
+                s['priority'] = priority
 
             slide = None
 
