@@ -38,7 +38,6 @@ class BCPServer(threading.Thread):
         self.sending_thread.daemon = True
         self.sending_thread.start()
 
-
     def setup_server_socket(self, interface='localhost', port=5050):
         """Sets up the socket listener.
 
@@ -93,8 +92,9 @@ class BCPServer(threading.Thread):
                             break
 
                     except:
-                        if self.mc.config['mpf-mc']['exit_on_disconnect']:
-                            self.mc.shutdown()
+                        if self.mc.machine_config['mpf-mc'][
+                                'exit_on_disconnect']:
+                            self.mc.stop()
                         else:
                             break
 
