@@ -155,17 +155,17 @@ class TestSlidePlayer(MpfMcTestCase):
                                            **show_slide_section)
 
         self.mc.bcp_processor.receive_bcp_message(bcp_string)
-        self.advance_time(1)
+        self.advance_time()
 
     def test_slides_created_in_slide_player(self):
         # Anon slides are where the widgets are listed in the slide_player
         # section of a config file or the slides section of a show
 
         self.mc.events.post('anon_slide_dict')
-        self.advance_time(1)
+        self.advance_time()
 
         self.mc.events.post('anon_slide_list')
-        self.advance_time(1)
+        self.advance_time()
 
         self.mc.events.post('anon_slide_widgets')
-        self.advance_time(1)
+        self.advance_time()

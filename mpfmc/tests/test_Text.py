@@ -215,11 +215,11 @@ class TestText(MpfMcTestCase):
 
         # should be 00 even though text is 0
         self.assertEqual(self.get_widget().text, '00')
-        self.advance_time(1)
+        self.advance_time()
 
         self.get_widget().update_text('2000000')
         self.assertEqual(self.get_widget().text, '2,000,000')
-        self.advance_time(1)
+        self.advance_time()
 
     def test_text_string1(self):
         # simple text string in machine config

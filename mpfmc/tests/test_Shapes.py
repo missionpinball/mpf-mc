@@ -10,4 +10,4 @@ class TestLine(MpfMcTestCase):
 
     def test_line(self):
         self.mc.events.post('slide1')
-        self.advance_time(1)
+        self.advance_time()

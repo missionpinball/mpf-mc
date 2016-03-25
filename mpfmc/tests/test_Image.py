@@ -19,7 +19,7 @@ class TestImage(MpfMcTestCase):
 
         # This tests includes images that preload and that load on demand, so
         # give it enough time to for the on demand ones to load
-        self.advance_time(1)
+        self.advance_time()
 
         # Make sure that all the images are showing.
         active_widget_names = [

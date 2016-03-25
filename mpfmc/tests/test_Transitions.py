@@ -46,7 +46,7 @@ class TestTransitions(MpfMcTestCase):
     def test_target_transition_reset_when_done(self):
         # Show slide1 with no transition
         self.mc.events.post('show_slide1')
-        self.advance_time(1)
+        self.advance_time()
         self.assertTrue(isinstance(self.mc.targets['default'].transition,
                                    NoTransition))
         self.assertEqual(self.mc.targets['default'].current_slide_name,
@@ -54,7 +54,7 @@ class TestTransitions(MpfMcTestCase):
 
         # Show slide2 with a transition
         self.mc.events.post('push_left')
-        self.advance_time(1)
+        self.advance_time()
         self.assertTrue(isinstance(self.mc.targets['default'].transition,
                                    PushTransition))
         self.assertEqual(self.mc.targets['default'].current_slide_name,
@@ -62,28 +62,28 @@ class TestTransitions(MpfMcTestCase):
 
         # Go back to slide1 with a transition
         self.mc.events.post('show_slide1_with_push')
-        self.advance_time(1)
+        self.advance_time()
         self.assertTrue(isinstance(self.mc.targets['default'].transition,
                                    PushTransition))
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 
         self.mc.events.post('push_left')
-        self.advance_time(1)
+        self.advance_time()
         self.assertTrue(isinstance(self.mc.targets['default'].transition,
                                    PushTransition))
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide2')
 
         self.mc.events.post('show_slide1')
-        self.advance_time(1)
+        self.advance_time()
         self.assertTrue(isinstance(self.mc.targets['default'].transition,
                                    NoTransition))
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 
         self.mc.events.post('show_slide2_no_transition')
-        self.advance_time(1)
+        self.advance_time()
         self.assertTrue(isinstance(self.mc.targets['default'].transition,
                                    NoTransition))
         self.assertEqual(self.mc.targets['default'].current_slide_name,
@@ -93,103 +93,103 @@ class TestTransitions(MpfMcTestCase):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('push_left')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_push_right(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('push_right')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_push_up(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('push_up')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_push_down(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('push_down')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_move_in_right(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('move_in_right')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_move_in_left(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('move_in_left')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_move_in_top(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('move_in_top')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_move_in_bottom(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('move_in_bottom')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_move_out_right(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('move_out_right')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_move_out_left(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('move_out_left')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_move_out_top(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('move_out_top')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_move_out_bottom(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('move_out_bottom')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_wipe(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('wipe')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_swap(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('swap')
-        self.advance_time(2)
+        self.advance_time()
 
     def test_fade(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('fade')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_fade_back(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('fade_back')
-        self.advance_time(.5)
+        self.advance_time()
 
     def test_rise_in(self):
         self.mc.events.post('show_slide1')
         self.advance_time()
         self.mc.events.post('rise_in')
-        self.advance_time(.5)
+        self.advance_time()
 
     # def test_no_transition_1(self):
     #     self.mc.events.post('show_slide1')

@@ -163,4 +163,4 @@ class TestAnimation(MpfMcTestCase):
 
         # post the event to animate it
         self.mc.events.post('entrance3')
-        self.advance_time(1)
+        self.advance_time()

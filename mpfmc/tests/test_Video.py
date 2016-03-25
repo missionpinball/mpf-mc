@@ -16,7 +16,7 @@ class TestVideo(MpfMcTestCase):
         self.assertIn('mpf_video_small_test', self.mc.videos)
 
         self.mc.events.post('show_slide1')
-        self.advance_time(1)
+        self.advance_time()
 
         # This works locally but not on travis. I need to figure out the right
         # library & format that can run on travis.

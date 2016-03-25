@@ -26,7 +26,7 @@ class TestAnimatedImages(MpfMcTestCase):
         ball = self.mc.targets['default'].children[0].children[0].children[0]
         stick_figures = self.mc.targets['default'].children[0].children[0].children[1]
 
-        self.advance_time(1)
+        self.advance_time()
 
         # make sure they're playing as they should
         self.assertEqual(ball.fps, 30)
@@ -45,9 +45,9 @@ class TestAnimatedImages(MpfMcTestCase):
 
         # test jumping to a new frame
         stick_figures.current_frame = 5
-        self.advance_time(1)
+        self.advance_time()
         self.assertEqual(stick_figures.current_frame, 5)
 
         # test starting
         stick_figures.play()
-        self.advance_time(1)
+        self.advance_time()
