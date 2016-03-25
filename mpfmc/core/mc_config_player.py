@@ -24,12 +24,15 @@ class McConfigPlayer(ConfigPlayer):
             self.device_collection = None
 
         self.machine.mode_controller.register_load_method(
-                self.process_mode_config, self.config_file_section)
+            self.process_mode_config, self.config_file_section)
+
+        self.machine.mode_controller.register_start_method(
+            self.mode_start, self.config_file_section)
 
         # Look through the machine config for config_player sections and
         # for shows to validate and process
         if (self.config_file_section in self.machine.machine_config and
-                    self.machine.machine_config[self.config_file_section]):
+                self.machine.machine_config[self.config_file_section]):
             # Validate
             self.machine.machine_config[self.config_file_section] = (
                 self.validate_config(
