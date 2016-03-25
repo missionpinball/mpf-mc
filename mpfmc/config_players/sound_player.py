@@ -3,8 +3,6 @@ from copy import deepcopy
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
-from kivy.logger import Logger
-
 
 class McSoundPlayer(McConfigPlayer):
     """Base class for the Sound Player that runs on the mpf-mc side of things.
