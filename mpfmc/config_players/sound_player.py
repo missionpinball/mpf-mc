@@ -91,7 +91,7 @@ Here are several various examples:
 
             try:
                 s['priority'] += priority
-            except KeyError:
+            except (KeyError, TypeError):
                 s['priority'] = priority
 
             # figure out track first since we need that to play a sound

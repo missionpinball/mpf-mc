@@ -46,7 +46,7 @@ class McWidgetPlayer(McConfigPlayer):
 
             try:
                 s['priority'] += priority
-            except KeyError:
+            except (KeyError, TypeError):
                 s['priority'] = priority
 
             slide = None
