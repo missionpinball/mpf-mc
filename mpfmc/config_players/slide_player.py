@@ -151,7 +151,7 @@ class McSlidePlayer(McConfigPlayer):
 
             try:
                 s['priority'] += priority
-            except KeyError:
+            except (KeyError, TypeError):
                 s['priority'] = priority
 
             try:
@@ -290,19 +290,20 @@ class MpfSlidePlayer(PluginPlayer):
                     dict_is_widgets = True
                     break
 
-
             if dict_is_widgets:
                 device_settings = dict(widgets=[device_settings])
 
         if 'transition' in device_settings:
             if not isinstance(device_settings['transition'], dict):
-                device_settings['transition'] = dict(type=device_settings['transition'])
+                device_settings['transition'] = dict(
+                    type=device_settings['transition'])
 
             try:
                 device_settings['transition'] = (
                     self.machine.config_validator.validate_config(
                         'transitions:{}'.format(
-                            device_settings['transition']['type']), device_settings['transition']))
+                            device_settings['transition']['type']),
+                            device_settings['transition']))
 
             except KeyError:
                 raise ValueError('transition: section of config requires a'
@@ -350,7 +351,8 @@ class MpfSlidePlayer(PluginPlayer):
         config['_default_settings'] = list()
 
         if 'animations' in config:
-            config['animations'] = self.process_animations(config['animations'])
+            config['animations'] = self.process_animations(
+                config['animations'])
 
         else:
             config['animations'] = None
@@ -402,6 +404,7 @@ class MpfSlidePlayer(PluginPlayer):
 
 player_cls = MpfSlidePlayer
 mc_player_cls = McSlidePlayer
+
 
 def register_with_mpf(machine):
     return 'slide', MpfSlidePlayer(machine)
