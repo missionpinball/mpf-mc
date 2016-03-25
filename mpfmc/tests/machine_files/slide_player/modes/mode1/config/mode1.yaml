@@ -19,4 +19,4 @@ slide_player:
   show_mode1_slide: mode1_slide
   show_mode1_slide_2:
     mode1_slide_2:
-      priority: 150
+      priority: -350

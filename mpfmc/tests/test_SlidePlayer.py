@@ -123,7 +123,7 @@ class TestSlidePlayer(MpfMcTestCase):
         # start the mode again (priority 500)
         self.mc.modes['mode1'].start()
 
-        # show a slide, but priority -150 which means the slide will not be
+        # show a slide, but priority 150 which means the slide will not be
         # shown
         self.mc.events.post('show_mode1_slide_2')
         self.advance_time()
