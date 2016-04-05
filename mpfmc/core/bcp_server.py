@@ -66,7 +66,9 @@ class BCPServer(threading.Thread):
         try:
             while True:
                 self.log.info("Waiting for a connection...")
-                self.mc.events.post('client_disconnected')
+                self.mc.events.post('client_disconnected',
+                                    host=self.socket.getsockname()[0],
+                                    port=self.socket.getsockname()[1])
                 self.mc.bcp_client_connected = False
                 self.connection, client_address = self.socket.accept()
 

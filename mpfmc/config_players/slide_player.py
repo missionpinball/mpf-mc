@@ -129,8 +129,6 @@ class McSlidePlayer(McConfigPlayer):
         # **kwargs here are things that would have been passed as event
         # params to the slide_player section
 
-        # super().play(settings, mode, caller, priority, play_kwargs)
-
         # todo figure out where the settings are coming from and see if we can
         # move the deepcopy there?
         settings = deepcopy(settings)
