@@ -27,8 +27,8 @@ Installation, Documentation, and Examples
 -----------------------------------------
 * Getting started tutorial : https://missionpinball.com/tutorial
 * Installation : https://missionpinball.com/docs/installing-mpf
-* User documentation : https://missionpinball.com/docs/ ([PDF](https://missionpinball.com/mpf/pdf))
-* API documentation : http://missionpinball.github.io/mpf_mc/
+* User documentation : http://docs.missionpinball.com
+* API documentation : http://missionpinball.github.io/mpf_mc
 
 Support
 -------
