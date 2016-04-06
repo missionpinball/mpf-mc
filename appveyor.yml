@@ -25,6 +25,7 @@ install:
   - "%PYTHON%\\python.exe -m pip install git+git://github.com/missionpinball/mpf.git@%MPF_BRANCH%"
 
   - "copy c:\\projects\\mpf-mc\\build_scripts\\distutils.cfg %PYTHON%\\Lib\\distutils\\distutils.cfg"
+  - "type %PYTHON%\\Lib\\distutils\\distutils.cfg"  # verify this file is correct in the log
   - "%PYTHON%\\python.exe -m pip install -i https://pypi.anaconda.org/carlkl/simple mingwpy"
   - "set USE_SDL2=1"
   - "set USE_GSTREAMER=1"
