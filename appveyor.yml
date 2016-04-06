@@ -31,6 +31,7 @@ install:
   - "set USE_GSTREAMER=1"
   - "%PYTHON%\\python.exe -m pip install cython docutils pygments pypiwin32 kivy.deps.sdl2 kivy.deps.glew kivy.deps.gstreamer kivy.deps.glew_dev kivy.deps.sdl2_dev kivy.deps.gstreamer_dev --extra-index-url https://kivy.org/downloads/packages/simple/"
   # - "%PYTHON%\\python.exe -m pip install ."
+  - "set PATH=%PATH%;C:\mingw32"
   - "%PYTHON%\\python.exe setup.py build --compiler=mingw32 install"
 
 build: off
