@@ -4,27 +4,31 @@
 environment:
 
   matrix:
-
-    # For Python versions available on Appveyor, see
-    # http://www.appveyor.com/docs/installed-software#python
-    # The list here is complete (excluding Python 2.6, which
-    # isn't covered by this document) at the time of writing.
-
     - PYTHON: "C:\\Python34"
+      PLAT_NAME: "win32"
     - PYTHON: "C:\\Python34-x64"
-      DISTUTILS_USE_SDK: "1"
+      PLAT_NAME: "win_amd64"
+
+  pypi_user:
+    secure: kxNKBuVMdOz6LjJPQb7PMQ==
+
+  pypi_password:
+    secure: nmmwU7UgFbrGUJwIr0Vo6cHzCuxlvW4vjg9TjkwrjmE=
 
 install:
   - "%PYTHON%\\python.exe -m pip install -U setuptools wheel pip mock"
 
-  # todo get the latest mpf
+  # todo write a script to set these two things
+  - "set MPF_BRANCH=dev"
+  - "set DEPLOY_TO_PYPI=1"
+
+  - "%PYTHON%\\python.exe -m pip install git+git://github.com/missionpinball/mpf.git@%MPF_BRANCH%"
 
   - "copy c:\\projects\\mpf-mc\\build_scripts\\distutils.cfg %PYTHON%\\Lib\\distutils\\distutils.cfg"
   - "%PYTHON%\\python.exe -m pip install -i https://pypi.anaconda.org/carlkl/simple mingwpy"
   - "set USE_SDL2=1"
   - "set USE_GSTREAMER=1"
   - "%PYTHON%\\python.exe -m pip install cython docutils pygments pypiwin32 kivy.deps.sdl2 kivy.deps.glew kivy.deps.gstreamer kivy.deps.glew_dev kivy.deps.sdl2_dev kivy.deps.gstreamer_dev --extra-index-url https://kivy.org/downloads/packages/simple/"
-
   - "%PYTHON%\\python.exe -m pip install ."
 
 build: off
@@ -33,8 +37,15 @@ test_script:
   - "%PYTHON%\\python.exe -m unittest discover mpfmc"
 
 after_test:
-  - "%PYTHON%\\python.exe setup.py bdist_wheel"
+  - "%PYTHON%\\python.exe setup.py bdist_wheel --plat-name %PLAT_NAME%"
+  - "if %PLAT_NAME% == win32 %PYTHON%\\python.exe setup.py sdist --dist-dir=%~dp0%/dist --formats=gztar"
 
 artifacts:
   # bdist_wheel puts your built wheel in the dist directory
   - path: dist\*
+
+deploy_script:
+  - "if not %DEPLOY_TO_PYPI% == 1 exit /B 0"
+  - "cd dist"
+  - "%PYTHON%\\python.exe -m pip install twine"
+  - "twine upload -u %pypi_user% -p %pypi_password%"
