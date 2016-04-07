@@ -18,9 +18,13 @@ environment:
 install:
   - "%PYTHON%\\python.exe -m pip install -U setuptools wheel pip mock"
 
-  # todo write a script to set these two things
+  # todo write a script to set this
+
   - "set MPF_BRANCH=dev"
-  - "set DEPLOY_TO_PYPI=1"
+  - "cd build_scripts"
+  - "%PYTHON%\\python.exe set_build_env_vars.py"
+  - "set_env_vars.bat"
+  - "cd .."
 
   - "%PYTHON%\\python.exe -m pip install git+git://github.com/missionpinball/mpf.git@%MPF_BRANCH%"
 

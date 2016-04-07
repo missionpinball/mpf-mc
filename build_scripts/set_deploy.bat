@@ -1,0 +1,1 @@
+set DEPLOY_TO_PYPI=0
