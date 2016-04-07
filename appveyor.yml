@@ -58,4 +58,4 @@ deploy_script:
   - "%PYTHON%\\python.exe ../build_scripts/rename_wheels.py"
   - "dir"
   - "if %DEPLOY_TO_PYPI% == 1 %PYTHON%\\python.exe -m pip install twine"
-  - "if %DEPLOY_TO_PYPI% == 1 %PYTHON%\\python.exe -m twine upload -u %pypi_user% -p %pypi_password%"
+  - "if %DEPLOY_TO_PYPI% == 1 %PYTHON%\\python.exe -m twine upload -u %pypi_user% -p %pypi_password% *"
