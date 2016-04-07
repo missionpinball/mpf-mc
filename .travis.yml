@@ -86,7 +86,7 @@ script:
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       pip3 install .;
-      coverage run -m unittest discover -s mpfmc/tests;
+      python3 -m unittest discover -s mpfmc/tests;
       python3 setup.py bdist_wheel;
     fi;
 
