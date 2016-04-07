@@ -44,7 +44,7 @@ build: off
 test_script:
 #  - "%PYTHON%\\python.exe -m unittest discover mpfmc"
   - "echo SKIPPING TESTS"
-  
+
 after_test:
   - "%PYTHON%\\python.exe setup.py bdist_wheel --plat-name %PLAT_NAME%"
   - "if %PLAT_NAME% == win32 %PYTHON%\\python.exe setup.py sdist --formats=gztar"
@@ -54,7 +54,8 @@ artifacts:
   - path: dist\*
 
 deploy_script:
-  - "if not %DEPLOY_TO_PYPI% == 1 exit /B 0"
-  - "cd dist"
-  - "%PYTHON%\\python.exe -m pip install twine"
-  - "twine upload -u %pypi_user% -p %pypi_password%"
+  - "echo %DEPLOY_TO_PYPI%"
+  - "if %DEPLOY_TO_PYPI% cd dist"
+  - "dir"
+  - "if %DEPLOY_TO_PYPI% %PYTHON%\\python.exe -m pip install twine"
+  - "if %DEPLOY_TO_PYPI% %PYTHON%\\python.exe -m twine upload -u %pypi_user% -p %pypi_password%"
