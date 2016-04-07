@@ -16,7 +16,7 @@ environment:
     secure: nmmwU7UgFbrGUJwIr0Vo6cHzCuxlvW4vjg9TjkwrjmE=
 
 install:
-  - "%PYTHON%\\python.exe -m pip install -U setuptools wheel pip mock"
+  - "%PYTHON%\\python.exe -m pip install -U setuptools wheel pip mock gitpython"
 
   # todo write a script to set this
 
