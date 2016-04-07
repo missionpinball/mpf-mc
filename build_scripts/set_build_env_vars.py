@@ -43,3 +43,6 @@ with open('set_env.bat', 'w') as f:
     f.write('set DEPLOY_TO_PYPI={}\n'.format(deploy))
     f.write('cd \\projects\\mpf\n')
     f.write('git checkout {}\n'.format(mpf_branch))
+
+import sysconfig
+print(sysconfig.get_config_vars())
