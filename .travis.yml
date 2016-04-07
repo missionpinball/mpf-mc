@@ -4,14 +4,11 @@ language:
 matrix:
   fast_finish: true
   include:
-  - language: python
-    python: 3.4
+  - python: "3.4"
     os: linux
-  - language: python
-    python: 3.4
+  - python: "3.4"
     os: osx
-  - language: python
-    python: 3.5
+  - python: "3.5"
     os: osx
 
 install:
