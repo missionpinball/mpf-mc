@@ -1,6 +1,4 @@
-language:
-  python
-
+language: python
 matrix:
   fast_finish: true
   include:
