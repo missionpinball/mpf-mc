@@ -1,11 +1,15 @@
 matrix:
   fast_finish: true
   include:
-   - language: python
-     python: 3.4
-     os: linux
+#   - language: python
+#     python: 3.4
+#     os: linux
    - language: generic
      os: osx
+
+env:
+  pypi_pass:
+    secure: uOKQJ3KxdWyhdhbwI3s5pAW6jKVMIRS5dWrMW7Rvsld7U6JedtHGDvmszFxqek2l+ImHYAUjCob9BGdVb7zHCu0qamp+v+GJKyovS7mC/s+JqeOyb9qi+F/qoUGD41IxSna05Mhbgqsf9FbSiVaj/Wo50jzP95EqfYmO6Hw/YlPaCjFx2YoPyc+gS/LJpLD3Uhp3diibjCwXgbPb4s5lXQhjIiXyPKqa41y1ynDVlBEIbURDOhWT344BVqg1bJIkrHAicTABI37nH7jQkfe1IIuwoMaRuyQZ82P7yuMmwJ3m+lO6GQbLLM1By0S6agU874XsGtOLS+SgBLmfCSFDTAiuftM8vA3IuSWyKqsITge2W43F+P+eLUR5eaDFF9Cxn0dvBodfBZzth/qhrCKf/C+kB5QKveuatA6Nd3dpzmflW+KOPkUrdK1lfwg1wM5GpsTt1xRIe1dewPBhXETMdsaDj+WJCzaKhg4zbLO24BPFvJMhVUM1lD5XQP1hIG73VMZ6eB/EwFrOaUPSQ5xQEJn5/Xlcht7HvjJPYXn6UE2L+PyAZeOLIsbFfYcf26yBrc1ovVY/tEej2guj5ZP2TMRP/X9/QGnPtOle1UgB2zwttNN5hXihorqxftsTdIbYtZIQ4+8QAkuATzmSEi/M4jvnxkPKwUljQWAGyB4y+1U=
 
 install:
 
@@ -26,42 +30,13 @@ install:
    fi;
 
  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      curl -O -L https://github.com/tatsuhiro-t/aria2/releases/download/release-1.19.3/aria2-1.19.3-osx-darwin.dmg;
-      hdiutil attach aria2-1.19.3-osx-darwin.dmg;
-      sudo installer -package "/Volumes/aria2 1.19.3 Intel/aria2.pkg" -target /;
-
-      curl -O -L https://www.libsdl.org/release/SDL2-2.0.4.dmg;
-      curl -O -L https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.1.dmg;
-      curl -O -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.1.dmg;
-      curl -O -L https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-2.0.13.dmg;
-      /usr/local/aria2/bin/aria2c -x 10 http://gstreamer.freedesktop.org/data/pkg/osx/1.7.1/gstreamer-1.0-1.7.1-x86_64.pkg;
-      /usr/local/aria2/bin/aria2c -x 10 http://gstreamer.freedesktop.org/data/pkg/osx/1.7.1/gstreamer-1.0-devel-1.7.1-x86_64.pkg;
-      curl -O -L http://www.sveinbjorn.org/files/software/platypus.zip;
-      curl -O -L http://www.kekaosx.com/release/Keka-1.0.4-intel.dmg;
-      hdiutil attach Keka-1.0.4-intel.dmg;
-      hdiutil attach SDL2-2.0.4.dmg;
-      sudo cp -a /Volumes/SDL2/SDL2.framework /Library/Frameworks/;
-      hdiutil attach SDL2_image-2.0.1.dmg;
-      sudo cp -a /Volumes/SDL2_image/SDL2_image.framework /Library/Frameworks/;
-      hdiutil attach SDL2_ttf-2.0.13.dmg;
-      sudo cp -a /Volumes/SDL2_ttf/SDL2_ttf.framework /Library/Frameworks/;
-      hdiutil attach SDL2_mixer-2.0.1.dmg;
-      sudo cp -a /Volumes/SDL2_mixer/SDL2_mixer.framework /Library/Frameworks/;
-      sudo installer -package gstreamer-1.0-1.7.1-x86_64.pkg -target /;
-      sudo installer -package gstreamer-1.0-devel-1.7.1-x86_64.pkg -target /;
-      unzip platypus.zip;
-      mkdir -p /usr/local/bin;
-      mkdir -p /usr/local/share/platypus;
-      mkdir -p /usr/local/man/platypus;
-      cp Platypus-5.0/Platypus.app/Contents/Resources/platypus_clt /usr/local/bin/platypus;
-      cp Platypus-5.0/Platypus.app/Contents/Resources/ScriptExec /usr/local/share/platypus/ScriptExec;
-      cp Platypus-5.0/Platypus.app/Contents/Resources/MainMenu.nib /usr/local/share/platypus/MainMenu.nib;
-      chmod -R 755 /usr/local/share/platypus;
-      curl -O -L https://www.python.org/ftp/python/3.5.1/python-3.5.1-macosx10.6.pkg;
-      sudo installer -package python-3.5.1-macosx10.6.pkg -target /;
-      pip3 install --upgrade --user cython pillow nose mock wheel pip setuptools;
-
-      pip3 install https://github.com/missionpinball/mpf/zipball/dev;
+      xcode-select --install;
+      /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
+      Brew install python3;
+      pip3 install -I Cython==0.23;
+      USE_OSX_FRAMEWORKS=0 pip3 install kivy;
+      pip3 install wheel setuptools --upgrade;
+      USE_OSX_FRAMEWORKS=0 pip3 install .;
 
     fi;
 
@@ -85,9 +60,7 @@ script:
     fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      pip3 install .;
-      python3 -m unittest discover -s mpfmc/tests;
-      python3 setup.py bdist_wheel;
+      echo skipping tests
     fi;
 
 after_success:
@@ -97,4 +70,8 @@ after_success:
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       python3 setup.py bdist_wheel;
+      cd dist;
+      python3 ../build_scripts/rename_wheels.py;
+      pip3 install twine;
+      python3 -m twine upload -u brianmadden -p $pypi_pass --skip-existing *;
     fi;
