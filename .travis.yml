@@ -36,6 +36,7 @@ install:
       pip3 install -I Cython==0.23;
       USE_OSX_FRAMEWORKS=0 pip3 install kivy;
       pip3 install wheel setuptools --upgrade;
+      ls /usr/local/SDL2;
       USE_OSX_FRAMEWORKS=0 pip3 install .;
 
     fi;
