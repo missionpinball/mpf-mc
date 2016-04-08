@@ -31,12 +31,17 @@ install:
  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       xcode-select --install;
       /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
+      brew update;
       brew install python3;
-      brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
-      pip3 install -I Cython==0.23;
-      USE_OSX_FRAMEWORKS=0 pip3 install kivy;
-      pip3 install wheel setuptools --upgrade;
-      USE_OSX_FRAMEWORKS=0 pip3 install .;
+      python3 --version;
+      brew upgrade python3;
+      brew cleanup python3;
+      python3 --version;
+#      brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
+#      pip3 install -I Cython==0.23;
+#      USE_OSX_FRAMEWORKS=0 pip3 install kivy;
+#      pip3 install wheel setuptools --upgrade;
+#      USE_OSX_FRAMEWORKS=0 pip3 install .;
 
     fi;
 
@@ -69,13 +74,10 @@ after_success:
     fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      python3 setup.py bdist_wheel;
+#      python3 setup.py bdist_wheel;
       cd dist;
-      python3 ../build_scripts/rename_wheels.py;
-      pip3 install twine;
-      ls;
-      echo TEST WITH NO BRACES;
-      python3 -m twine upload -u brianmadden -p $PYPI_PASS --skip-existing *;
-      echo TEST WITH BRACES;
-      python3 -m twine upload -u brianmadden -p ${PYPI_PASS} --skip-existing *;
+#      python3 ../build_scripts/rename_wheels.py;
+#      pip3 install twine;
+#      ls;
+#      python3 -m twine upload -u brianmadden -p $PYPI_PASS --skip-existing *;
     fi;
