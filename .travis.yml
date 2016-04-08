@@ -35,7 +35,6 @@ install:
       pip3 install -I Cython==0.23;
       USE_OSX_FRAMEWORKS=0 pip3 install kivy;
       pip3 install wheel setuptools --upgrade;
-      ls /usr/local/include/SDL2;
       USE_OSX_FRAMEWORKS=0 pip3 install .;
 
     fi;
@@ -64,14 +63,17 @@ script:
     fi;
 
 after_success:
- - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-     coveralls;
-   fi;
+  - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
+      coveralls;
+    fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       python3 setup.py bdist_wheel;
       cd dist;
       python3 ../build_scripts/rename_wheels.py;
       pip3 install twine;
+      echo TEST WITH NO BRACES;
       python3 -m twine upload -u brianmadden -p $pypi_pass --skip-existing *;
+      echo TEST WITH BRACES;
+      python3 -m twine upload -u brianmadden -p ${pypi_pass} --skip-existing *;
     fi;
