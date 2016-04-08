@@ -6,10 +6,8 @@ matrix:
      os: linux
    - language: generic
      os: osx
-
-env:
-  pypi_pass:
-    secure: uOKQJ3KxdWyhdhbwI3s5pAW6jKVMIRS5dWrMW7Rvsld7U6JedtHGDvmszFxqek2l+ImHYAUjCob9BGdVb7zHCu0qamp+v+GJKyovS7mC/s+JqeOyb9qi+F/qoUGD41IxSna05Mhbgqsf9FbSiVaj/Wo50jzP95EqfYmO6Hw/YlPaCjFx2YoPyc+gS/LJpLD3Uhp3diibjCwXgbPb4s5lXQhjIiXyPKqa41y1ynDVlBEIbURDOhWT344BVqg1bJIkrHAicTABI37nH7jQkfe1IIuwoMaRuyQZ82P7yuMmwJ3m+lO6GQbLLM1By0S6agU874XsGtOLS+SgBLmfCSFDTAiuftM8vA3IuSWyKqsITge2W43F+P+eLUR5eaDFF9Cxn0dvBodfBZzth/qhrCKf/C+kB5QKveuatA6Nd3dpzmflW+KOPkUrdK1lfwg1wM5GpsTt1xRIe1dewPBhXETMdsaDj+WJCzaKhg4zbLO24BPFvJMhVUM1lD5XQP1hIG73VMZ6eB/EwFrOaUPSQ5xQEJn5/Xlcht7HvjJPYXn6UE2L+PyAZeOLIsbFfYcf26yBrc1ovVY/tEej2guj5ZP2TMRP/X9/QGnPtOle1UgB2zwttNN5hXihorqxftsTdIbYtZIQ4+8QAkuATzmSEi/M4jvnxkPKwUljQWAGyB4y+1U=
+     pypi_pass:
+       secure: uOKQJ3KxdWyhdhbwI3s5pAW6jKVMIRS5dWrMW7Rvsld7U6JedtHGDvmszFxqek2l+ImHYAUjCob9BGdVb7zHCu0qamp+v+GJKyovS7mC/s+JqeOyb9qi+F/qoUGD41IxSna05Mhbgqsf9FbSiVaj/Wo50jzP95EqfYmO6Hw/YlPaCjFx2YoPyc+gS/LJpLD3Uhp3diibjCwXgbPb4s5lXQhjIiXyPKqa41y1ynDVlBEIbURDOhWT344BVqg1bJIkrHAicTABI37nH7jQkfe1IIuwoMaRuyQZ82P7yuMmwJ3m+lO6GQbLLM1By0S6agU874XsGtOLS+SgBLmfCSFDTAiuftM8vA3IuSWyKqsITge2W43F+P+eLUR5eaDFF9Cxn0dvBodfBZzth/qhrCKf/C+kB5QKveuatA6Nd3dpzmflW+KOPkUrdK1lfwg1wM5GpsTt1xRIe1dewPBhXETMdsaDj+WJCzaKhg4zbLO24BPFvJMhVUM1lD5XQP1hIG73VMZ6eB/EwFrOaUPSQ5xQEJn5/Xlcht7HvjJPYXn6UE2L+PyAZeOLIsbFfYcf26yBrc1ovVY/tEej2guj5ZP2TMRP/X9/QGnPtOle1UgB2zwttNN5hXihorqxftsTdIbYtZIQ4+8QAkuATzmSEi/M4jvnxkPKwUljQWAGyB4y+1U=
 
 install:
 
@@ -32,7 +30,8 @@ install:
  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       xcode-select --install;
       /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)";
-      Brew install python3;
+      brew install python3;
+      brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
       pip3 install -I Cython==0.23;
       USE_OSX_FRAMEWORKS=0 pip3 install kivy;
       pip3 install wheel setuptools --upgrade;
@@ -66,7 +65,7 @@ script:
 
 after_success:
  - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-     coveralls
+     coveralls;
    fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
