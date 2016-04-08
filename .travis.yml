@@ -6,8 +6,7 @@ matrix:
      os: linux
    - language: generic
      os: osx
-     pypi_pass:
-       secure: uOKQJ3KxdWyhdhbwI3s5pAW6jKVMIRS5dWrMW7Rvsld7U6JedtHGDvmszFxqek2l+ImHYAUjCob9BGdVb7zHCu0qamp+v+GJKyovS7mC/s+JqeOyb9qi+F/qoUGD41IxSna05Mhbgqsf9FbSiVaj/Wo50jzP95EqfYmO6Hw/YlPaCjFx2YoPyc+gS/LJpLD3Uhp3diibjCwXgbPb4s5lXQhjIiXyPKqa41y1ynDVlBEIbURDOhWT344BVqg1bJIkrHAicTABI37nH7jQkfe1IIuwoMaRuyQZ82P7yuMmwJ3m+lO6GQbLLM1By0S6agU874XsGtOLS+SgBLmfCSFDTAiuftM8vA3IuSWyKqsITge2W43F+P+eLUR5eaDFF9Cxn0dvBodfBZzth/qhrCKf/C+kB5QKveuatA6Nd3dpzmflW+KOPkUrdK1lfwg1wM5GpsTt1xRIe1dewPBhXETMdsaDj+WJCzaKhg4zbLO24BPFvJMhVUM1lD5XQP1hIG73VMZ6eB/EwFrOaUPSQ5xQEJn5/Xlcht7HvjJPYXn6UE2L+PyAZeOLIsbFfYcf26yBrc1ovVY/tEej2guj5ZP2TMRP/X9/QGnPtOle1UgB2zwttNN5hXihorqxftsTdIbYtZIQ4+8QAkuATzmSEi/M4jvnxkPKwUljQWAGyB4y+1U=
+     secure: "WNvNRbHmintW6NlclAw3rbP4EzJ0Zt7gqVSha/+gC8Vo2pkbWphltgH5YwBGGM37ZRRbJ90Qm7aaLsFSpxOLnWlOlTw6/NBdKFEjvZISU8x7VcxlScNKTgDmeMYrDTsfbzoZJx7A6ZzxIm3fvRDcfhQcB0kI6wvLhcD1jHGqy0omfOHyFw51RfvRq07xsqavHN2Km9ObSqRCyMSuKNSCBHuIvGq7WnMfv+yU+iEV9pfQOEIo6JC7aySfIJ0gdgXK68RbWPLg1x4KwLsni9VDnOxXw9lPQbJfv9bpY1Fv3RWOQE763mHGojyorODrLCcYnKW+f177+h8PfBgIMMJdcF4CmanoGSrJG6QCp0GdauNzaqSXhGPFGIBToHPdFAW9XbHyVivFOP+rK8fo52euxX4rOgAF0oYuTxaz1SZn0x52u/BWG44Za9pQur8mZZHuZr9JpSzYF2u1FO3T4wj3noCBkXXe250WQp/zA1VrWgRPZgB9r6nxfguWsbzpia2dhcRDY+/jChJvc2mvHio8wlw3WhFhoUjUQkoGzmr/uio2j4SEo84wAClcQ5S6yzGY4IE8i8b4NZuJy9tsVS8+99TaR4TrUET1r+LqU7T4uN2Bp85zaw1ekmlj5xUD5/aJWagIM6kCv35nSD2camIQWVq0eiBqzOsu0npH9EhML0A="
 
 install:
 
@@ -73,7 +72,7 @@ after_success:
       python3 ../build_scripts/rename_wheels.py;
       pip3 install twine;
       echo TEST WITH NO BRACES;
-      python3 -m twine upload -u brianmadden -p $pypi_pass --skip-existing *;
+      python3 -m twine upload -u brianmadden -p PYPI_PASS --skip-existing *;
       echo TEST WITH BRACES;
-      python3 -m twine upload -u brianmadden -p ${pypi_pass} --skip-existing *;
+      python3 -m twine upload -u brianmadden -p ${PYPI_PASS} --skip-existing *;
     fi;
