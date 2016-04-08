@@ -1,9 +1,9 @@
 matrix:
   fast_finish: true
   include:
-#   - language: python
-#     python: 3.4
-#     os: linux
+   - language: python
+     python: 3.4
+     os: linux
    - language: generic
      os: osx
 
@@ -36,7 +36,7 @@ install:
       pip3 install -I Cython==0.23;
       USE_OSX_FRAMEWORKS=0 pip3 install kivy;
       pip3 install wheel setuptools --upgrade;
-      ls /usr/local/SDL2;
+      ls /usr/local/include/SDL2;
       USE_OSX_FRAMEWORKS=0 pip3 install .;
 
     fi;
