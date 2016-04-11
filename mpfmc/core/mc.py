@@ -297,10 +297,6 @@ class MpfMc(App):
                              player_num, len(self.player_list))
 
     def set_machine_var(self, name, value, change, prev_value):
-
-        if type(change) is not bool and change.lower() in ('false', '0'):
-            change = False
-
         self.machine_vars[name] = value
 
         if change:
