@@ -150,6 +150,16 @@ slides:
       text: TEST NUMBER GROUPING & DOUBLE ZEROS
       y: 200
 
+  mpfmc_font:
+    - type: text
+      text: MPF-MC FONT TEST
+      font_name: dmd7
+
+  machine_font:
+    - type: text
+      text: TEST FONT FROM MACHINE FOLDER
+      font_name: big_noodle_titling
+
 slide_player:
   static_text: static_text
   text_from_event_param1: text_from_event_param1
@@ -170,6 +180,8 @@ slide_player:
   text_string2: text_string2
   text_string3: text_string3
   text_string4: text_string4
+  mpfmc_font: mpfmc_font
+  machine_font: machine_font
 
 text_strings:
   greeting: HELLO

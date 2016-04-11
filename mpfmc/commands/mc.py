@@ -57,7 +57,7 @@ class Command(object):
                             default="mcconfig.yaml",
                             metavar='config_file',
                             help="The MPF framework default config file. Default is "
-                                 "mc/mcconfig.yaml")
+                                 "<mpf-mc install folder>/mcconfig.yaml")
 
         parser.add_argument("-b",
                             action="store_false", dest="bcp", default=True,

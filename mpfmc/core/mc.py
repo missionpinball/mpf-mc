@@ -11,6 +11,7 @@ import time
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.logger import Logger
+from kivy.resources import resource_add_path
 
 from mpfmc.assets.video import VideoAsset
 from mpfmc.core.bcp_processor import BcpProcessor
@@ -20,6 +21,7 @@ from mpfmc.uix.transitions import TransitionManager
 from mpfmc.core.config_collection import create_config_collections
 
 import mpf
+import mpfmc
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
@@ -85,6 +87,17 @@ class MpfMc(App):
 
         self.config_processor = ConfigProcessor(self)
         self.transition_manager = TransitionManager(self)
+
+        # Add local machine fonts path
+        if os.path.isdir(os.path.join(self.machine_path,
+                self.machine_config['mpf-mc']['paths']['fonts'])):
+
+            resource_add_path(os.path.join(self.machine_path,
+                self.machine_config['mpf-mc']['paths']['fonts']))
+
+        # Add mpfmc fonts path
+        resource_add_path(os.path.join(os.path.dirname(mpfmc.__file__),
+                                       'fonts'))
 
         # Initialize the sound system (must be done prior to creating the AssetManager).
         # If the sound system is not available, do not load any other sound-related modules.
