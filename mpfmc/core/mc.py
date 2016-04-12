@@ -247,9 +247,6 @@ class MpfMc(App):
         except ZeroDivisionError:
             pass
 
-    def stop(self):
-        self.on_stop()
-
     def reset(self, **kwargs):
         self.player = None
         self.player_list = list()
@@ -347,10 +344,11 @@ class MpfMc(App):
             crash = self.crash_queue.get(block=False)
         except queue.Empty:
             pass
-        else:
+        except:
             print("MPF Shutting down due to child thread crash")
             print("Crash details: %s", crash)
             self.stop()
+            raise
 
     def register_monitor(self, monitor_class, monitor):
         """Registers a monitor.

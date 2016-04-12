@@ -1,6 +1,8 @@
 """BCP Server interface for the MPF Media Controller"""
 
 import logging
+import queue
+import select
 import socket
 import sys
 import threading
@@ -59,6 +61,7 @@ class BCPServer(threading.Thread):
             raise
 
         self.socket.listen(1)
+        self.socket.settimeout(1)
 
     def run(self):
         """The socket thread's run loop."""
@@ -70,7 +73,17 @@ class BCPServer(threading.Thread):
                                     host=self.socket.getsockname()[0],
                                     port=self.socket.getsockname()[1])
                 self.mc.bcp_client_connected = False
-                self.connection, client_address = self.socket.accept()
+
+                while not self.connection:
+                    try:
+                        self.connection, client_address = self.socket.accept()
+                    except socket.timeout:
+                        if self.mc.thread_stopper.is_set():
+                            print("Stopping BCP listener thread")
+                            self.socket.shutdown(socket.SHUT_RDWR)
+                            self.socket.close()
+                            return
+
 
                 self.log.info("Received connection from: %s:%s",
                               client_address[0], client_address[1])
@@ -80,7 +93,7 @@ class BCPServer(threading.Thread):
                 self.mc.bcp_client_connected = True
 
                 # Receive the data in small chunks and retransmit it
-                while True:
+                while not self.mc.thread_stopper.is_set():
                     try:
                         socket_chars = self.connection.recv(4096).decode(
                             'utf-8')
@@ -92,6 +105,9 @@ class BCPServer(threading.Thread):
                         else:
                             # no more data
                             break
+
+                    except socket.timeout:
+                        pass
 
                     except:
                         if self.mc.machine_config['mpf-mc'][
@@ -124,7 +140,18 @@ class BCPServer(threading.Thread):
         """
         try:
             while not self.done:
-                msg = self.sending_queue.get()
+                try:
+                    msg = self.sending_queue.get(block=True, timeout=1)
+                except queue.Empty:
+                    if self.mc.thread_stopper.is_set():
+                        print("Stopping BCP sending thread")
+                        self.socket.shutdown(socket.SHUT_RDWR)
+                        self.socket.close()
+                        self.socket = None
+                        self.mc.socket_thread_stopped()
+                        return
+                    else:
+                        continue
 
                 if not msg.startswith('dmd_frame'):
                     self.log.debug('Sending "%s"', msg)
@@ -136,10 +163,10 @@ class BCPServer(threading.Thread):
                     # Do we just keep on trying, waiting until a new client
                     # connects?
 
-            self.socket.close()
-            self.socket = None
-
-            self.mc.socket_thread_stopped()
+            # self.socket.close()
+            # self.socket = None
+            #
+            # self.mc.socket_thread_stopped()
 
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()

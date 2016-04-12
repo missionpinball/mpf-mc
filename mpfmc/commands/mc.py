@@ -5,7 +5,9 @@ import logging
 import os
 import socket
 import sys
+import threading
 from datetime import datetime
+import time
 
 import errno
 
@@ -134,20 +136,33 @@ class Command(object):
 
         self.preprocess_config(mpf_config)
 
-        try:
-            MpfMc(options=vars(args), config=mpf_config,
-                  machine_path=machine_path).run()
-            logging.info("MC run loop ended.")
-        except Exception as e:
-            # Todo need to change back to a normal exception
-            logging.exception(str(e))
+        print("Loading MPF-MC controller")
+        MpfMc(options=vars(args), config=mpf_config,
+              machine_path=machine_path).run()
 
-        if args.pause:
-            input('Press ENTER to close this window...')
-        sys.exit()
+        # todo commented this out and replaced with above to see if this try:
+        # block was causing python.exe to hang on exit.
+
+        # try:
+        #     MpfMc(options=vars(args), config=mpf_config,
+        #           machine_path=machine_path).run()
+        #     logging.info("MC run loop ended.")
+        # except Exception as e:
+        #     logging.exception(str(e))
+        #
+        # if args.pause:
+        #     input('Press ENTER to close this window...')
+        # sys.exit()
+
+        print("Stopping child threads... ({} remaining)".format(
+            len(threading.enumerate()) - 1))
+
+        while len(threading.enumerate()) > 1:
+            time.sleep(.1)
+
+        print("All child threads stopped.")
 
     def preprocess_config(self, config):
-
         from kivy.config import Config
 
         kivy_config = config['kivy_config']
