@@ -40,11 +40,46 @@ class TestUtils(MpfMcTestCase):
                                     anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (50, 50))
 
+        # add adjustments
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 2, 0, 0, 0)
+        self.assertEqual((res_x, res_y), (50, 50))
+
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 0, 2, 0, 0)
+        self.assertEqual((res_x, res_y), (50, 50))
+
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 0, 0, 2, 0)
+
+        self.assertEqual((res_x, res_y), (50, 48))
+
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 0, 0, 0, 2)
+        self.assertEqual((res_x, res_y), (48, 50))
+
         anchor_x = 'middle'
         anchor_y = 'middle'
         res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
                                     anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (45, 45))
+
+        # add adjustments
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 2, 0, 0, 0)
+        self.assertEqual((res_x, res_y), (45, 46))
+
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 0, 2, 0, 0)
+        self.assertEqual((res_x, res_y), (46, 45))
+
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 0, 0, 2, 0)
+        self.assertEqual((res_x, res_y), (45, 44))
+
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 0, 0, 0, 2)
+        self.assertEqual((res_x, res_y), (44, 45))
 
         anchor_x = 'center'
         anchor_y = 'center'
@@ -56,6 +91,24 @@ class TestUtils(MpfMcTestCase):
         anchor_y = 'top'
         res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
                                     anchor_x, anchor_y)
+        self.assertEqual((res_x, res_y), (40, 40))
+
+        # add adjustments
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 2, 0, 0, 0)
+        self.assertEqual((res_x, res_y), (40, 42))
+
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 0, 2, 0, 0)
+        self.assertEqual((res_x, res_y), (42, 40))
+
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 0, 0, 2, 0)
+
+        self.assertEqual((res_x, res_y), (40, 40))
+
+        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
+                                    anchor_x, anchor_y, 0, 0, 0, 2)
         self.assertEqual((res_x, res_y), (40, 40))
 
         # test positive x, y numbers
