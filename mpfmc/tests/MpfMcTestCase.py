@@ -2,11 +2,13 @@ import os
 import sys
 import unittest
 
+os.environ['KIVY_NO_FILELOG'] = '1'
+os.environ['KIVY_NO_CONSOLELOG'] = '1'
+
 from kivy.base import EventLoop, stopTouchApp
 from kivy.clock import Clock
 from kivy.config import Config
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
-from kivy.logger import FileHandler
 
 import mpfmc
 from mpf.core.config_processor import ConfigProcessor
@@ -16,21 +18,11 @@ from mpfmc.core.utils import load_machine_config
 Config.set('kivy', 'log_enable', '0')
 Config.set('kivy', 'log_level', 'warning')
 
+
 from mpfmc.core.mc import MpfMc
 from time import time, sleep
 
-
-class TestMpfMc(MpfMc):
-    def __init__(self, options, config, machine_path, **kwargs):
-        super().__init__(options, config, machine_path, **kwargs)
-        sys.path.append(self.machine_path)
-
-        # Sometimes Kivy's log purging takes too long and the next test fails
-        # because it can't open the log file, so disable purging for tests.
-        FileHandler.purge_logs = self.null_purge
-
-    def null_purge(self, *args, **kwargs):
-        pass
+sys.stderr = sys.__stderr__
 
 
 class MpfMcTestCase(unittest.TestCase):
@@ -39,10 +31,6 @@ class MpfMcTestCase(unittest.TestCase):
         super().__init__(*args)
 
     def get_options(self):
-
-        # mpfconfig = os.path.abspath(os.path.join(
-        #     mpf.core.__path__[0], os.pardir, 'mpfconfig.yaml'))
-
         return dict(machine_path=self.get_machine_path(),
                     mcconfigfile='mpfmc/mcconfig.yaml',
                     configfile=Util.string_to_list(self.get_config_file()),
@@ -138,7 +126,6 @@ class MpfMcTestCase(unittest.TestCase):
     def run(self, name):
         self._test_name = self.id()
         self._test = name
-        print("Running", self._test_name)
         # This setup is done in run() because we need to give control to the
         # kivy event loop which we can only do by returning from the run()
         # that's called. So we override run() and setup mpf-mc and then call
@@ -168,9 +155,9 @@ class MpfMcTestCase(unittest.TestCase):
                 mpf_config['mpf-mc']['paths']['config'], mpf_config)
         self.preprocess_config(mpf_config)
 
-        self.mc = TestMpfMc(options=self.get_options(),
-                            config=mpf_config,
-                            machine_path=machine_path)
+        self.mc = MpfMc(options=self.get_options(),
+                        config=mpf_config,
+                        machine_path=machine_path)
 
         self.patch_bcp()
 

@@ -7,23 +7,32 @@ import socket
 import sys
 from datetime import datetime
 
+import errno
+
+
+
 
 class Command(object):
 
     def __init__(self, mpf_path, machine_path, args):
 
+        # undo all of Kivy's built-in logging so we can do it our way
+        os.environ['KIVY_NO_FILELOG'] = '1'
+        os.environ['KIVY_NO_CONSOLELOG'] = '1'
+        from kivy.logger import Logger
+        Logger.removeHandler(Logger.handlers[0])
+        sys.stderr = sys.__stderr__
+
         # Need to have these in here because we don't want them to load when
         # the module is loaded as an mpf.command
-
-        from kivy.logger import Logger
         import mpfmc
         from mpf.core.utility_functions import Util
         from mpfmc.core.config_processor import ConfigProcessor
         from mpfmc.core.mc import MpfMc
         from mpfmc.core.utils import set_machine_path, load_machine_config
 
-
         del mpf_path
+
         parser = argparse.ArgumentParser(description='Starts the MPF Media Controller')
 
         parser.add_argument("-l",
@@ -86,30 +95,31 @@ class Command(object):
         # Formatting options are documented here:
         # https://docs.python.org/2.7/library/logging.html#logrecord-attributes
 
-        # try:
-        #     os.makedirs('logs')
-        # except OSError as exception:
-        #     if exception.errno != errno.EEXIST:
-        #         raise
-        #
-        # logging.basicConfig(level=args.loglevel,
-        #                     format='%(asctime)s : %(levelname)s : %(name)s : %(
-        # message)s',
-        #                     filename=os.path.join(machine_path, args.logfile),
-        #                     filemode='w')
-        #
-        # # define a Handler which writes INFO messages or higher to the sys.stderr
-        # console = logging.StreamHandler()
-        # console.setLevel(args.consoleloglevel)
-        #
-        # # set a format which is simpler for console use
-        # formatter = logging.Formatter('%(levelname)s : %(name)s : %(message)s')
-        #
-        # # tell the handler to use this format
-        # console.setFormatter(formatter)
-        #
-        # # add the handler to the root logger
-        # logging.getLogger('').addHandler(console)
+        try:
+            os.makedirs(os.path.join(machine_path, 'logs'))
+        except OSError as exception:
+            if exception.errno != errno.EEXIST:
+                raise
+
+        logging.basicConfig(level=args.loglevel,
+                            format='%(asctime)s : %(levelname)s : %(name)s : '
+                                   '%(message)s',
+                            filename=os.path.join(machine_path, args.logfile),
+                            filemode='w')
+
+        # define a Handler which writes INFO messages or higher to the
+        # sys.stderr
+        console = logging.StreamHandler()
+        console.setLevel(args.consoleloglevel)
+
+        # set a format which is simpler for console use
+        formatter = logging.Formatter('%(levelname)s : %(name)s : %(message)s')
+
+        # tell the handler to use this format
+        console.setFormatter(formatter)
+
+        # add the handler to the root logger
+        logging.getLogger('').addHandler(console)
 
         mpf_config = ConfigProcessor.load_config_file(os.path.join(
             mpfmc.__path__[0], args.mcconfigfile))
@@ -127,7 +137,7 @@ class Command(object):
         try:
             MpfMc(options=vars(args), config=mpf_config,
                   machine_path=machine_path).run()
-            Logger.info("MC run loop ended.")
+            logging.info("MC run loop ended.")
         except Exception as e:
             # Todo need to change back to a normal exception
             logging.exception(str(e))

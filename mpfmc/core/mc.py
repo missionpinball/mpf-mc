@@ -7,10 +7,10 @@ import os
 import queue
 import threading
 import time
+import logging
 
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.logger import Logger
 from kivy.resources import resource_add_path
 
 from mpfmc.assets.video import VideoAsset
@@ -22,6 +22,7 @@ from mpfmc.core.config_collection import create_config_collections
 
 import mpf
 import mpfmc
+from mpfmc._version import __version__
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
@@ -35,7 +36,8 @@ try:
 except ImportError:
     SoundSystem = None
     SoundAsset = None
-    Logger.warning("mpfmc.core.audio library could not be loaded - audio features will not be available")
+    logging.warning("mpfmc.core.audio library could not be loaded. Audio "
+                    "features will not be available")
 
 
 class MpfMc(App):
@@ -48,6 +50,9 @@ class MpfMc(App):
         self.clock = Clock
         self._boot_holds = set()
         self.mpf_path = os.path.dirname(mpf.__file__)
+        self.log = logging.getLogger('mpf-mc')
+        self.log.info("Mission Pinball Framework Media Controller v%s",
+                      __version__)
 
         self.modes = CaseInsensitiveDict()
         self.player_list = list()
@@ -232,13 +237,13 @@ class MpfMc(App):
         self.clock.schedule_interval(self.tick, 0)
 
     def on_stop(self):
-        print("Stopping ...")
+        self.log.info("Stopping ...")
         app = App.get_running_app()
         app.thread_stopper.set()
 
         try:
-            print("Loop rate {}Hz".format(
-                    round(self.ticks / (time.time() - self.start_time), 2)))
+            self.log.info("Loop rate {}Hz".format(round(
+                self.ticks / (time.time() - self.start_time), 2)))
         except ZeroDivisionError:
             pass
 
@@ -292,9 +297,9 @@ class MpfMc(App):
             try:
                 self.player = self.player_list[int(player_num) - 1]
             except IndexError:
-                Logger.error('Received player turn start for player %s, but '
-                             'only %s player(s) exist',
-                             player_num, len(self.player_list))
+                self.log.error('Received player turn start for player %s, but '
+                               'only %s player(s) exist',
+                               player_num, len(self.player_list))
 
     def set_machine_var(self, name, value, change, prev_value):
 
@@ -304,9 +309,9 @@ class MpfMc(App):
         self.machine_vars[name] = value
 
         if change:
-            Logger.debug("Setting machine_var '%s' to: %s, (prior: %s, "
-                         "change: %s)", name, value, prev_value,
-                         change)
+            self.log.debug("Setting machine_var '%s' to: %s, (prior: %s, "
+                           "change: %s)", name, value, prev_value,
+                           change)
             self.events.post('machine_var_' + name,
                              value=value,
                              prev_value=prev_value,
