@@ -76,7 +76,7 @@ class BcpProcessor(object):
     def receive_bcp_message(self, msg):
         """Receives an incoming BCP message to be processed.
 
-        Note this message is intended for testing. Usually BCP messages are
+        Note this method is intended for testing. Usually BCP messages are
         handled by the BCP Server thread, but for test purposes it's possible
         to run mpf-mc without the BCP Server, so in that case you can use this
         method to send BCP messages into the mpf-mc.
