@@ -115,9 +115,12 @@ cdef class AudioInterface:
             Logger.error('Mix_OpenAudio: %s' % SDL_GetError())
             raise AudioException('Unable to open audio for output (Mix_OpenAudio failed: %s)' % SDL_GetError())
 
-        Logger.info("AudioInterface: Initialized AudioInterface {}".format(AudioInterface.get_version()))
-        Logger.info("AudioInterface: Loaded {}".format(AudioInterface.get_sdl_version()))
-        Logger.info("AudioInterface: Loaded {}".format(AudioInterface.get_sdl_mixer_version()))
+        Logger.info("Initialized AudioInterface {}".format(
+            AudioInterface.get_version()))
+        Logger.debug("AudioInterface: Loaded {}".format(
+            AudioInterface.get_sdl_version()))
+        Logger.debug("AudioInterface: Loaded {}".format(
+            AudioInterface.get_sdl_mixer_version()))
 
         # Lock SDL from calling the audio callback functions
         SDL_LockAudio()
@@ -125,10 +128,11 @@ cdef class AudioInterface:
         # Determine the actual audio format in use by the opened audio device.  This may or may not match
         # the parameters used to initialize the audio interface.
         self.buffer_samples = buffer_samples
-        Logger.info('AudioInterface: requested {} {} {}'.format(rate, channels, buffer_samples))
+        Logger.debug('AudioInterface: requested rate:{} channels:{} buffer:{}'
+            .format(rate, channels, buffer_samples))
         Mix_QuerySpec(&self.sample_rate, NULL, &self.audio_channels)
-        Logger.info('AudioInterface: received {} {} {}'
-                    .format(self.sample_rate, self.audio_channels, self.buffer_samples))
+        Logger.debug('Audio Settings: rate:{} channels:{} buffer:{}'.format(
+            self.sample_rate, self.audio_channels, self.buffer_samples))
 
         # Set the size of the track audio buffers (samples * channels * size of 16-bit int) for 16-bit audio
         self.buffer_size = self.buffer_samples * self.audio_channels * sizeof(Uint16*)
@@ -169,7 +173,8 @@ cdef class AudioInterface:
 
     def __del__(self):
 
-        Logger.info("AudioInterface: Shutting down and cleaning up allocated memory...")
+        Logger.debug("AudioInterface: Shutting down and cleaning up allocated "
+                 "memory...")
 
         # Stop audio processing (will stop all SDL callbacks)
         self.disable()
@@ -419,7 +424,7 @@ cdef class AudioInterface:
         """
         cdef int fade_ms = 0
 
-        Logger.info("AudioInterface: Enabling audio playback")
+        Logger.debug("AudioInterface: Enabling audio playback")
 
         SDL_LockAudio()
         if fade_sec > 0:
@@ -438,7 +443,7 @@ cdef class AudioInterface:
         """
         cdef int fade_ms = 0
 
-        Logger.info("AudioInterface: Disabling audio playback")
+        Logger.debug("AudioInterface: Disabling audio playback")
 
         SDL_LockAudio()
         if fade_sec > 0:
@@ -528,7 +533,8 @@ cdef class AudioInterface:
         # Allow audio callback function to be called again
         SDL_UnlockAudio()
 
-        Logger.info("AudioInterface: The '{}' track has successfully been created.".format(name))
+        Logger.debug("AudioInterface: The '{}' track has successfully been "
+            "created.".format(name))
 
         return new_track
 
@@ -1314,7 +1320,8 @@ cdef class Track:
         self.attributes.max_simultaneous_sounds = max_simultaneous_sounds
         self.attributes.buffer = PyMem_Malloc(buffer_size)
         self.attributes.buffer_size = buffer_size
-        Logger.info("Track {}: allocated track audio buffer ({} bytes)".format(name, buffer_size))
+        Logger.debug("Track {}: allocated track audio buffer ({} "
+                     "bytes)".format(name, buffer_size))
         self.volume = volume
         self._name = name
 
