@@ -8,8 +8,8 @@ from mpf.core.utility_functions import Util
 
 # pylint: disable-msg=too-many-arguments
 def set_position(parent_w, parent_h, w, h, x=None, y=None,
-                 anchor_x=None, anchor_y=None, adjust_top=0, adjust_right=0,
-                 adjust_bottom=0, adjust_left=0):
+                 anchor_x=None, anchor_y=None, adjust_top=None,
+                 adjust_right=None, adjust_bottom=None, adjust_left=None):
     """Returns the x,y position for the lower-left corner of a widget
     within a larger parent frame based on several positioning parameters.
 
@@ -78,6 +78,14 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None,
         y = 'middle'
     if not anchor_y:
         anchor_y = 'middle'
+    if not adjust_top:
+        adjust_top = 0
+    if not adjust_right:
+        adjust_right = 0
+    if not adjust_bottom:
+        adjust_bottom = 0
+    if not adjust_left:
+        adjust_left = 0
 
     # ----------------------
     # X / width / horizontal

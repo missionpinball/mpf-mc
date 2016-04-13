@@ -18,7 +18,6 @@ class Text(MpfWidget, Label):
 
         super().__init__(mc=mc, mode=mode, slide=slide, config=config)
 
-        self._apply_style()
         self.original_text = self._get_text_string(config.get('text', ''),
                                                    mode=mode)
 
@@ -37,52 +36,6 @@ class Text(MpfWidget, Label):
         self.event_replacements.update(kwargs)
 
         self._process_text(self.original_text)
-
-    def _apply_style(self, force_default=False):
-        if not self.config['style'] or force_default:
-            style = 'default'
-        else:
-            style = self.config['style']
-            # todo enhance with defaults per mode, or slide, or target, or??
-
-        found = False
-
-        try:
-            # This looks crazy but it's not too bad... The list comprehension
-            # builds a list of attributes (settings) that are in the style
-            # definition but that were not manually set in the widget.
-
-            # Then it sets the attributes directly since the config was already
-            # processed.
-
-            # First it applies machine-wide style settings, then mode styles on
-            # top of those
-
-            for attr in [x for x in
-                         self.mc.machine_config['text_styles'][style] if
-                           x not in self.config['_default_settings']]:
-
-                setattr(self, attr,
-                        self.mc.machine_config['text_styles'][style][attr])
-
-            found = True
-
-        except (AttributeError, KeyError):
-            pass
-
-        try:
-            for attr in [x for x in self.mode.config['text_styles'][style] if
-                            x not in self.config['_default_settings']]:
-                setattr(self, attr,
-                        self.mode.config['text_styles'][style][attr])
-
-            found = True
-
-        except (AttributeError, KeyError):
-            pass
-
-        if not found and not force_default:
-            self._apply_style(force_default=True)
 
     def _get_text_string(self, text, mode=None):
         if not '$' in text:

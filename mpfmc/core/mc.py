@@ -237,13 +237,12 @@ class MpfMc(App):
         self.clock.schedule_interval(self.tick, 0)
 
     def on_stop(self):
-        self.log.info("Stopping ...")
-        app = App.get_running_app()
-        app.thread_stopper.set()
+        print("Stopping...")
+        self.thread_stopper.set()
 
         try:
-            self.log.info("Loop rate {}Hz".format(round(
-                self.ticks / (time.time() - self.start_time), 2)))
+            print("Loop rate {}Hz".format(round(
+                  self.ticks / (time.time() - self.start_time), 2)))
         except ZeroDivisionError:
             pass
 

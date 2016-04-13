@@ -40,7 +40,11 @@ class Dmd(MpfWidget, Widget):
                                           self.config['x'],
                                           self.config['y'],
                                           self.config['anchor_x'],
-                                          self.config['anchor_y'])
+                                          self.config['anchor_y'],
+                                          self.config['adjust_top'],
+                                          self.config['adjust_right'],
+                                          self.config['adjust_bottom'],
+                                          self.config['adjust_left'])
 
     def __repr__(self):  # pragma: no cover
         try:

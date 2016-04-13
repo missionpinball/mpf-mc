@@ -8,9 +8,10 @@ displays:
     width: 400
     height: 300
 
-text_styles:
-  default:
+widget_styles:
+  text_default:
     font_size: 21
+    color: red
   big:
     font_size: 100
     halign: left
@@ -24,6 +25,16 @@ slides:
     - type: text
       text: Default Style
       y: 100
+  slide3:
+    - type: text
+      font_size: 30
+      text: COLOR FROM DEFAULT STYLE
+  slide4:
+    - type: text
+      text: TESTING INVALID STYLE
+      style: bogus
 
 slide_player:
   slide1: slide1
+  slide3: slide3
+  slide4: slide4

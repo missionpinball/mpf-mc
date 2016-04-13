@@ -10,7 +10,7 @@ from mpf.core.utility_functions import Util
 class ConfigCollection(CaseInsensitiveDict):
     """ A lightweight collection of validated configs from the machine or
     mode config. Used to hold configs for things like slides, widgets,
-    animations, text_styles, etc.
+    animations, widget_styles, etc.
 
     Getter attributes and methods automatically return a deepcopied version of
     the config dict.

@@ -62,7 +62,8 @@ class Display(Scatter, RelativeLayout):
             Clock.schedule_once(self._display_created, 0)
             return
 
-        config = dict(width=self.native_size[0], height=self.native_size[1])
+        config = dict(width=self.native_size[0], height=self.native_size[1],
+                      style=None)
 
         self.slide_frame = SlideFrame(mc=self.mc, name=self.name,
                                       config=config)

@@ -120,7 +120,11 @@ class Slide(Screen):
                                           widget['x'],
                                           widget['y'],
                                           widget['anchor_x'],
-                                          widget['anchor_y'])
+                                          widget['anchor_y'],
+                                          widget['adjust_top'],
+                                          widget['adjust_right'],
+                                          widget['adjust_bottom'],
+                                          widget['adjust_left'])
             widgets_added.append(widget_obj)
 
         return widgets_added
@@ -156,7 +160,11 @@ class Slide(Screen):
                                   widget.config['x'],
                                   widget.config['y'],
                                   widget.config['anchor_x'],
-                                  widget.config['anchor_y'])
+                                  widget.config['anchor_y'],
+                                  widget.config['adjust_top'],
+                                  widget.config['adjust_right'],
+                                  widget.config['adjust_bottom'],
+                                  widget.config['adjust_left'])
 
     def remove_widgets_by_mode(self, mode):
         for widget in [x for x in self.stencil.children if x.mode == mode]:

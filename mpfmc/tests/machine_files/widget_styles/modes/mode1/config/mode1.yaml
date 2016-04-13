@@ -3,8 +3,8 @@
 mode:
   priority: 100
 
-text_styles:
-  default:
+widget_styles:
+  text_default:
     font_size: 50
 
 slides:
@@ -16,9 +16,6 @@ slides:
       style: big
       text: BIG FROM BASE
       y: 225
-    - type: text
-      text: TESTING INVALID STYLE
-      style: bogus
 
 slide_player:
   slide2: slide2

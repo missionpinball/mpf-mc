@@ -21,7 +21,11 @@ class Rectangle(MpfWidget, Widget):
                            self.config['x'],
                            self.config['y'],
                            self.config['anchor_x'],
-                           self.config['anchor_y'])
+                           self.config['anchor_y'],
+                           self.config['adjust_top'],
+                           self.config['adjust_right'],
+                           self.config['adjust_bottom'],
+                           self.config['adjust_left'])
 
         with self.canvas:
             Color(*self.config['color'])

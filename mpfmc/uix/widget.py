@@ -32,6 +32,7 @@ class MpfWidget(object):
         self.mc = mc
         self.animation = None
         self._animation_event_keys = set()
+        self._default_style = None
 
         # some attributes can be expressed in percentages. This dict holds
         # those, key is attribute name, val is max value
@@ -44,6 +45,9 @@ class MpfWidget(object):
                                             line_height=1)
         except AttributeError:
             self._percent_prop_dicts = dict()
+
+        self._set_default_style()
+        self._apply_style()
 
         if 'color' in self.config and not isinstance(self.config['color'],
                                                      RGBColor):
@@ -68,11 +72,56 @@ class MpfWidget(object):
     def __lt__(self, other):
         return abs(self.config['z']) < abs(other.config['z'])
 
+    # todo change to classmethod
+    def _set_default_style(self):
+        if ('{}_default'.format(self.widget_type_name.lower()) in
+                self.mc.machine_config['widget_styles']):
+            self._default_style = self.mc.machine_config['widget_styles'][
+                '{}_default'.format(self.widget_type_name.lower())]
+
     def merge_asset_config(self, asset):
         for setting in [x for x in self.merge_settings if (
                         x not in self.config['_default_settings'] and
                         x in asset.config)]:
             self.config[setting] = asset.config[setting]
+
+    def _apply_style(self, force_default=False):
+        if not self.config['style'] or force_default:
+            if self._default_style:
+                style = self._default_style
+            else:
+                return
+        else:
+            try:
+                style = self.mc.machine_config['widget_styles'][self.config['style']]
+            except KeyError:
+                raise ValueError("{} has an invalid style name: {}".format(
+                    self, self.config['style']))
+        # todo enhance with defaults per mode, or slide, or target, or??
+
+        found = False
+
+        try:
+            # This looks crazy but it's not too bad... The list comprehension
+            # builds a list of attributes (settings) that are in the style
+            # definition but that were not manually set in the widget.
+
+            # Then it sets the attributes directly since the config was already
+            # processed.
+
+            # First it applies machine-wide style settings, then mode styles on
+            # top of those
+            for attr in [x for x in style if
+                         x not in self.config['_default_settings']]:
+                self.config[attr] = style[attr]
+
+            found = True
+
+        except (AttributeError, KeyError):
+            pass
+
+        if not found and not force_default:
+            self._apply_style(force_default=True)
 
     def on_size(self, *args):
         try:
@@ -82,7 +131,11 @@ class MpfWidget(object):
                                     self.config['x'],
                                     self.config['y'],
                                     self.config['anchor_x'],
-                                    self.config['anchor_y'])
+                                    self.config['anchor_y'],
+                                    self.config['adjust_top'],
+                                    self.config['adjust_right'],
+                                    self.config['adjust_bottom'],
+                                    self.config['adjust_left'])
 
         except AttributeError:
             pass

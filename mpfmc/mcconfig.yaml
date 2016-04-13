@@ -10,7 +10,7 @@ mpf-mc:
         slide: mpfmc.config_collections.slide
         widget: mpfmc.config_collections.widget
         animation: mpfmc.config_collections.animation
-        text_styles: mpfmc.config_collections.text_styles
+        widget_styles: mpfmc.config_collections.widget_styles
 
     mpf_transition_modules:
         - push
@@ -106,6 +106,6 @@ kivy_config:
     minimum_width: 100
     minimum_height: 100
 
-text_styles:
-  default:
+widget_styles:
+  text_default:
     font_size: 20
