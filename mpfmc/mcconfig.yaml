@@ -33,6 +33,7 @@ mpf-mc:
         scriptlets: scriptlets
 
     allow_invalid_config_sections: true
+    fps: auto
 
 modes:
     - attract
@@ -95,7 +96,7 @@ kivy_config:
     fullscreen: false
     height: 600
 #    left: 0
-    maxfps: 60
+#    maxfps: 60
     multisamples: 2
     position: auto  # auto, custom
     show_cursor: true

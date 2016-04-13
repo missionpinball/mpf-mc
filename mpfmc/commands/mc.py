@@ -190,6 +190,13 @@ class Command(object):
         except KeyError:
             pass
 
+        try:
+            fps = int(config['mpf-mc']['fps'])
+        except ValueError:
+            fps = 30
+        Config.set('graphics', 'maxfps', fps)
+        Config.write()
+
 
 def get_command():
     return 'mc', Command

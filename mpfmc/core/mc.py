@@ -42,18 +42,20 @@ except ImportError:
 
 class MpfMc(App):
     def __init__(self, options, config, machine_path, **kwargs):
+
+        self.log = logging.getLogger('')
+        self.log.info("Mission Pinball Framework Media Controller v%s",
+                      __version__)
         super().__init__(**kwargs)
 
         self.options = options
         self.machine_config = config
+        self.log.info("Machine path: %s", machine_path)
         self.machine_path = machine_path
         self.clock = Clock
+        self.log.info("Starting clock at %sHz", Clock._max_fps)
         self._boot_holds = set()
         self.mpf_path = os.path.dirname(mpf.__file__)
-        self.log = logging.getLogger('mpf-mc')
-        self.log.info("Mission Pinball Framework Media Controller v%s",
-                      __version__)
-
         self.modes = CaseInsensitiveDict()
         self.player_list = list()
         self.player = None
