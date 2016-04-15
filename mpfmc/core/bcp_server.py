@@ -84,7 +84,6 @@ class BCPServer(threading.Thread):
                             self.socket.close()
                             return
 
-
                 self.log.info("Received connection from: %s:%s",
                               client_address[0], client_address[1])
                 self.mc.events.post('client_connected',
@@ -127,7 +126,7 @@ class BCPServer(threading.Thread):
         """ Stops and shuts down the BCP server."""
         if not self.done:
             self.log.info("Socket thread stopping.")
-            self.sending_queue.put('goodbye')
+            self.sending_queue.put('goodbye', None)
             time.sleep(1)  # give it a chance to send goodbye before quitting
             self.done = True
             self.mc.done = True
@@ -141,7 +140,9 @@ class BCPServer(threading.Thread):
         try:
             while not self.done:
                 try:
-                    msg = self.sending_queue.get(block=True, timeout=1)
+                    msg, rawbytes = self.sending_queue.get(block=True,
+                                                           timeout=1)
+
                 except queue.Empty:
                     if self.mc.thread_stopper.is_set():
                         print("Stopping BCP sending thread")
@@ -150,23 +151,17 @@ class BCPServer(threading.Thread):
                         self.socket = None
                         self.mc.socket_thread_stopped()
                         return
+
                     else:
                         continue
 
-                if not msg.startswith('dmd_frame'):
-                    self.log.debug('Sending "%s"', msg)
+                if not rawbytes:
+                    self.connection.sendall(('{}\n'.format(msg)).encode('utf-8'))
 
-                try:
-                    self.connection.sendall((msg + '\n').encode('utf-8'))
-                except (AttributeError, socket.error):
-                    pass
-                    # Do we just keep on trying, waiting until a new client
-                    # connects?
-
-            # self.socket.close()
-            # self.socket = None
-            #
-            # self.mc.socket_thread_stopped()
+                else:
+                    self.connection.sendall('{}&bytes={}\n'.format(
+                        msg, len(rawbytes)).encode('utf-8'))
+                    self.connection.sendall(rawbytes)
 
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -174,6 +169,8 @@ class BCPServer(threading.Thread):
                                                exc_traceback)
             msg = ''.join(line for line in lines)
             self.mc.crash_queue.put(msg)
+
+            # todo this does not crash mpf-mc
 
     def process_received_message(self, message):
         """Puts a received BCP message into the receiving queue.
@@ -183,8 +180,5 @@ class BCPServer(threading.Thread):
 
         """
         self.log.debug('Received "%s"', message)
-        # print('received', message)
-
         cmd, kwargs = bcp.decode_command_string(message)
-
         self.receive_queue.put((cmd, kwargs))

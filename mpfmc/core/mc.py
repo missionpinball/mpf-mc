@@ -78,6 +78,8 @@ class MpfMc(App):
         """
 
         self.keyboard = None
+        self.physical_dmd = None
+        self.physical_rgb_dmd = None
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
@@ -120,13 +122,14 @@ class MpfMc(App):
         ImageAsset.initialize(self)
         VideoAsset.initialize(self)
 
-        # Only initialize sound assets if the sound system is loaded and enabled
+        # Only initialize sound assets if sound system is loaded and enabled
         if self.sound_system is not None and self.sound_system.enabled:
-            SoundAsset.extensions = tuple(self.sound_system.audio_interface.supported_extensions())
+            SoundAsset.extensions = tuple(
+                self.sound_system.audio_interface.supported_extensions())
             SoundAsset.initialize(self)
         else:
-            # If the sound system is not loaded or enabled, remove the sound_player
-            # from the list of config_player modules to setup
+            # If the sound system is not loaded or enabled, remove the
+            # sound_player from the list of config_player modules to setup
             del self.machine_config['mpf-mc']['config_players']['sound']
 
         self.clock.schedule_interval(self._check_crash_queue, 1)
@@ -142,7 +145,7 @@ class MpfMc(App):
             self.config[section] = dict()
 
         self.machine_config[section] = self.config_validator.validate_config(
-                section, self.machine_config[section], section)
+            section, self.machine_config[section], section)
 
     def get_config(self):
         return self.machine_config
@@ -190,6 +193,19 @@ class MpfMc(App):
         '''
         self.events.process_event_queue()
         self._init()
+
+    def create_physical_dmd(self, fps):
+        if 'physical_dmd' in self.machine_config and not self.physical_dmd:
+            from mpfmc.core.physical_dmd import PhysicalDmd
+            self.physical_dmd = PhysicalDmd(
+                self, self.machine_config['physical_dmd'], fps)
+
+    def create_physical_rgb_dmd(self, fps):
+        if ('physical_rgb_dmd' in self.machine_config and
+                not self.physical_rgb_dmd):
+            from mpfmc.core.physical_dmd import PhysicalRgbDmd
+            self.physical_rgb_dmd = PhysicalRgbDmd(
+                self, self.machine_config['physical_rgb_dmd'], fps)
 
     def _init(self):
         # Since the window is so critical in Kivy, we can't continue the

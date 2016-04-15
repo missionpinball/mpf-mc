@@ -20,12 +20,12 @@ class BcpProcessor(object):
             self._start_socket_thread()
             self.enabled = True
         else:
-            # print('Will NOT setup BCP server')
             self.enabled = False
 
         self.bcp_commands = {'ball_start': self._bcp_ball_start,
                              'ball_end': self._bcp_ball_end,
                              'config': self._bcp_config,
+                             'dmd_start': self._bcp_dmd_start,
                              'error': self._bcp_error,
                              'get': self._bcp_get,
                              'goodbye': self._bcp_goodbye,
@@ -38,10 +38,9 @@ class BcpProcessor(object):
                              'player_turn_start': self._bcp_player_turn_start,
                              'player_variable': self._bcp_player_variable,
                              'reset': self._bcp_reset,
+                             'rgb_dmd_start': self._bcp_rgb_dmd_start,
                              'set': self._bcp_set,
-                             'shot': self._bcp_shot,
                              'switch': self._bcp_switch,
-                             'timer': self._bcp_timer,
                              'trigger': self._bcp_trigger,
                              }
 
@@ -53,7 +52,7 @@ class BcpProcessor(object):
         self.socket_thread.daemon = True
         self.socket_thread.start()
 
-    def send(self, bcp_command, callback=None, **kwargs):
+    def send(self, bcp_command, callback=None, rawbytes=None, **kwargs):
         """Sends a BCP command to the connected pinball controller.
 
         Note that if the BCP server is not running, this method will just throw
@@ -68,8 +67,10 @@ class BcpProcessor(object):
 
         """
         if self.enabled and self.mc.bcp_client_connected:
-            self.sending_queue.put(bcp.encode_command_string(bcp_command,
-                                                             **kwargs))
+
+            self.sending_queue.put(
+                (bcp.encode_command_string(bcp_command, **kwargs), rawbytes))
+
         if callback:
             callback()
 
@@ -103,8 +104,8 @@ class BcpProcessor(object):
         if bcp_command in self.bcp_commands:
             self.bcp_commands[bcp_command](**kwargs)
         else:
-            Logger.warning("Received invalid BCP command: %s", bcp_command)
-            self.send('error', message='invalid command', command=bcp_command)
+            Logger.warning("Received invalid BCP command: %s", bcp_command[:9])
+            # self.send('error',message='invalid command', command=bcp_command)
 
     def _bcp_hello(self, **kwargs):
         """Processes an incoming BCP 'hello' command."""
@@ -223,11 +224,6 @@ class BcpProcessor(object):
         for k, v in kwargs.items():
             self.mc.events.post('bcp_set_{}'.format(k), value=v)
 
-    def _bcp_shot(self, name, profile, state):
-        """The MPF media controller uses triggers instead of shots for its
-        display events, so we don't need to pay attention here."""
-        pass
-
     def _bcp_config(self, **kwargs):
         """Processes an incoming BCP 'config' command."""
         # for k, v in kwargs.iteritems():
@@ -235,10 +231,6 @@ class BcpProcessor(object):
         #         self.bcp_set_volume(track=k.split('volume_')[1], value=v)
 
         pass  # todo
-
-    def _bcp_timer(self, name, action, **kwargs):
-        """Processes an incoming BCP 'timer' command."""
-        pass
 
     def _bcp_set_volume(self, track, value):
         """Sets the volume based on an incoming BCP 'config' command.
@@ -264,3 +256,9 @@ class BcpProcessor(object):
 
         # temp todo
         self.send('reset_complete')
+
+    def _bcp_dmd_start(self, fps):
+        self.mc.create_phyiscal_dmd(fps)
+
+    def _bcp_rgb_dmd_start(self, fps):
+        self.mc.create_physical_rgb_dmd(fps)

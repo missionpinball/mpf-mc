@@ -112,7 +112,6 @@ class DmdSource(MpfWidget, Scatter, Widget):
             self.source.parent = None
             effect.add_widget(self.source)
 
-
         effect.size = (self.config['width'], self.config['height'])
 
         effect.texture.mag_filter = 'nearest'

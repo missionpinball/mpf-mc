@@ -5,7 +5,6 @@ mpf-mc.
 from kivy.clock import Clock
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.scatter import Scatter
-
 from mpfmc.uix.slide_frame import SlideFrame
 
 
@@ -23,11 +22,11 @@ class Display(Scatter, RelativeLayout):
         Display.displays_to_initialize += 1
 
         self.slide_frame = None
-        self.native_size = ((self.config['width'], self.config['height']))
+        self.native_size = (self.config['width'], self.config['height'])
 
         self.size_hint = (None, None)
-        super().__init__()
 
+        super().__init__()
         Clock.schedule_once(self._display_created, 0)
 
     def __repr__(self):
@@ -57,7 +56,7 @@ class Display(Scatter, RelativeLayout):
         # Easiest way to do that is to check to see if the display is the right
         # size, and when it is, we move on.
         if (self.size[0] != self.native_size[0] or
-                    self.size[1] != self.native_size[1]):
+                self.size[1] != self.native_size[1]):
             self.size = self.native_size
             Clock.schedule_once(self._display_created, 0)
             return
@@ -98,23 +97,15 @@ class Display(Scatter, RelativeLayout):
             self.mc.targets['default'] = \
                 [x for x in self.mc.displays.values()][0].slide_frame
 
-        # elif not self.mc.displays:
-        #     Display.create_default_display(self.mc)
-        #     return
-
-        elif not 'default' in self.mc.targets:
-            # print('WARNING: You have more than one display, but no default
-            #  set')
+        elif 'default' not in self.mc.targets:
             for target in ('window', 'dmd'):
                 if target in self.mc.targets:
                     self.mc.targets['default'] = self.mc.targets[target]
                     break
 
-            if not 'default' in self.mc.targets:
+            if 'default' not in self.mc.targets:
                 self.mc.targets['default'] = self.mc.displays[
                     (sorted(self.mc.displays.keys()))[0]].slide_frame
-
-        # print('Setting default display to', self.mc.targets['default'].name)
 
         self.mc.displays_initialized()
 
