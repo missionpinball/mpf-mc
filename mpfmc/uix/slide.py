@@ -33,7 +33,7 @@ class Slide(Screen):
         self.pending_widgets = set()
 
         if not config:
-            config=dict()
+            config = dict()
 
         if priority is None:
             try:
@@ -51,7 +51,7 @@ class Slide(Screen):
         else:
             self.mode = None
 
-        self.transistion_out = config.get('transition_out', None)
+        self.transition_out = config.get('transition_out', None)
         self.expire = config.get('expire', None)
 
         target = mc.targets[target]
@@ -198,7 +198,12 @@ class Slide(Screen):
 
     def remove(self, dt):
         del dt
-        self.parent.remove_slide(self, self.transistion_out)
+
+        try:
+            self.parent.remove_slide(slide=self,
+                                     transition_config=self.transition_out)
+        except AttributeError:  # no parent
+            pass
 
     def prepare_for_removal(self):
         self.mc.clock.unschedule(self.remove)

@@ -327,3 +327,107 @@ class TestSlidePlayer(MpfMcTestCase):
         # Should still be slide 1
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_1')
+
+    def test_slide_removal(self):
+        # show a base slide
+        self.mc.events.post('show_slide_1')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        # show another slide
+        self.mc.events.post('show_slide_4')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_4')
+
+        # make sure base slide comes back
+        self.mc.events.post('remove_slide_4')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+    def test_slide_removal_new_transition(self):
+        # show a base slide
+        self.mc.events.post('show_slide_1')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        # show a slide with not transition out
+        self.assertIsNone(self.mc.slides['machine_slide_4']['transition_out'])
+        self.mc.events.post('show_slide_4')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_4')
+
+        # remove that slide with a transition
+        self.mc.events.post('remove_slide_4_with_transition')
+        self.advance_time(.1)
+
+        # make sure the transition is taking effect
+        self.assertTrue(isinstance(self.mc.targets['display1'].transition,
+                                   WipeTransition))
+
+        # original slide is back
+        self.advance_time(1)
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+    def test_slide_removal_existing_transition(self):
+        # show a base slide
+        self.mc.events.post('show_slide_1')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        # show a slide which has a transition out
+        self.assertEqual(
+            self.mc.slides['machine_slide_8']['transition_out']['type'],
+            'wipe')
+        self.mc.events.post('show_slide_8')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_8')
+
+        # post an event which does not have a transition
+        self.mc.events.post('remove_slide_8')
+        self.advance_time(.1)
+
+        # make sure the transition is taking effect
+        self.assertTrue(isinstance(self.mc.targets['display1'].transition,
+                                   WipeTransition))
+
+        # original slide is back
+        self.advance_time(1)
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+    def test_slide_removal_override_transition(self):
+        # show a base slide
+        self.mc.events.post('show_slide_1')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        # show a slide which has a wipe transition
+        self.assertEqual(
+            self.mc.slides['machine_slide_8']['transition_out']['type'],
+            'wipe')
+        self.mc.events.post('show_slide_8')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_8')
+
+        # remove slide with a fade transition
+        self.mc.events.post('remove_slide_8_fade')
+        self.advance_time(.1)
+
+        # make sure it uses the fade transition from the slide player
+        self.assertTrue(isinstance(self.mc.targets['display1'].transition,
+                                   FadeTransition))
+
+        # original slide should be back
+        self.advance_time(1)
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')

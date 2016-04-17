@@ -229,6 +229,8 @@ class SlideFrame(MpfWidget, ScreenManager):
         # Note that you can't remove the last slide, but if you try it will
         # change the priority so it gets removed by whatever comes next
 
+        # slide can be slide name or slide obj
+
         # todo
         # Warning, if you just created a slide, you have to wait at least on
         # tick before removing it. Can we prevent that? What if someone tilts
@@ -250,8 +252,16 @@ class SlideFrame(MpfWidget, ScreenManager):
         # priority one to show instead.
         if self.current_screen == slide:
             new_slide = self.get_next_highest_slide(slide)
-            self.transition = self.mc.transition_manager.get_transition(
-                transition_config)
+
+            if transition_config:
+                self.transition = self.mc.transition_manager.get_transition(
+                    transition_config)
+            elif self.current_screen.transition_out:
+                self.transition = self.mc.transition_manager.get_transition(
+                    self.current_screen.transition_out)
+            else:
+                self.transition = NoTransition()
+
             self._set_current_slide(new_slide)
 
         try:

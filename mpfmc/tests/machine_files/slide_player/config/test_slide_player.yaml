@@ -165,5 +165,19 @@ slide_player:
     machine_slide_9:
       transition: fade
   slide_2_dont_show:
-      machine_slide_2:
-        show: no
+    machine_slide_2:
+      show: no
+  remove_slide_4:
+    machine_slide_4:
+      action: remove
+  remove_slide_4_with_transition:
+    machine_slide_4:
+      action: remove
+      transition: wipe
+  remove_slide_8:
+    machine_slide_8:
+      action: remove
+  remove_slide_8_fade:
+    machine_slide_8:
+      action: remove
+      transition: fade

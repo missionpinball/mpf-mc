@@ -160,13 +160,18 @@ class McSlidePlayer(McConfigPlayer):
                 else:
                     target = self.machine.targets['default']
 
-            # is this a named slide, or a new slide?
-            if 'widgets' in s:
-                target.add_and_show_slide(mode=mode, slide_name=slide,
-                                          **s)
-            else:
-                target.show_slide(slide_name=slide, mode=mode,
-                                  **s)
+            if s['action'] == 'add':
+                # is this a named slide, or a new slide?
+                if 'widgets' in s:
+                    target.add_and_show_slide(mode=mode, slide_name=slide,
+                                              **s)
+                else:
+                    target.show_slide(slide_name=slide, mode=mode,
+                                      **s)
+
+            elif s['action'] == 'remove':
+                target.remove_slide(slide=slide,
+                                    transition_config=s['transition'])
 
     def get_express_config(self, value):
         # express config for slides can either be a string (slide name) or a
