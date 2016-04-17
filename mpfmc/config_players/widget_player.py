@@ -58,6 +58,11 @@ class McWidgetPlayer(McConfigPlayer):
 
             slide = None
 
+            if s['key']:
+                key = s['key']
+            else:
+                key = widget
+
             if s['target']:
                 try:
                     slide = self.machine.targets[s['target']].current_slide
@@ -72,19 +77,19 @@ class McWidgetPlayer(McConfigPlayer):
 
             if s['action'] == 'remove':
                 if slide:
-                    slide.remove_widgets_by_key(widget)
+                    slide.remove_widgets_by_key(key)
                 else:
                     for target in self.machine.targets.values():
                         for w in target.slide_frame_parent.walk():
                             try:
-                                if w.key == widget:
+                                if w.key == key:
                                     w.parent.remove_widget(w)
                             except AttributeError:
                                 pass
                         for x in target.screens:
                             for y in x.walk():
                                 try:
-                                    if y.key == widget:
+                                    if y.key == key:
                                         x.remove_widget(y)
                                 except AttributeError:
                                     pass

@@ -118,3 +118,16 @@ widget_player:
   add_widget8_expire:
       widget8:
         expire: 1s
+
+slide_player:
+  show_slide_1:
+    slide_1:
+    - type: text
+      text: WIDGET WITH KEY
+      key: widget1
+      color: red
+      y: 33%
+    - type: text
+      text: WIDGET NO KEY
+      color: red
+      y: 66%

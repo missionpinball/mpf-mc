@@ -32,7 +32,8 @@ class MpfWidget(object):
         self.slide = slide
         self.config = config.copy()  # make optional? TODO
         self.mc = mc
-        self.key = key
+
+
         self.animation = None
         self._animation_event_keys = set()
         self._default_style = None
@@ -59,6 +60,9 @@ class MpfWidget(object):
         for k, v in self.config.items():
             if k not in self._dont_send_to_kivy and hasattr(self, k):
                 setattr(self, k, v)
+
+        # Has to be after we set the attributes since it could be in the config
+        self.key = key
 
         # This is a weird way to do this, but I don't want to wrap the whole
         # thing in a try block since I don't want to swallow other exceptions.
