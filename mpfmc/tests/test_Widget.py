@@ -384,6 +384,26 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('WIDGET NO KEY', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
+    def test_widget_expire_from_slide_player(self):
+        # tests that we can remove a widget by key that was shown via the
+        # slide player instead of the widget player
+        self.mc.events.post('show_slide_1_with_expire')
+        self.advance_time()
+
+        # make sure the two widgets are there
+        self.assertIn('WIDGET EXPIRE 1s', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertIn('WIDGET NO EXPIRE', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        self.advance_time(1)
+
+        # make sure the one with key is gone but the other is there
+        self.assertNotIn('WIDGET EXPIRE 1s', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertIn('WIDGET NO EXPIRE', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
     def test_widget_player_errors(self):
         pass
 

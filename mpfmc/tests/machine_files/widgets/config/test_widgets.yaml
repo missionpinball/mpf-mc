@@ -131,3 +131,14 @@ slide_player:
       text: WIDGET NO KEY
       color: red
       y: 66%
+  show_slide_1_with_expire:
+    slide_1:
+    - type: text
+      text: WIDGET EXPIRE 1s
+      expire: 1s
+      color: red
+      y: 33%
+    - type: text
+      text: WIDGET NO EXPIRE
+      color: red
+      y: 66%

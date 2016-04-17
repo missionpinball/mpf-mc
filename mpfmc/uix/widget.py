@@ -33,7 +33,6 @@ class MpfWidget(object):
         self.config = config.copy()  # make optional? TODO
         self.mc = mc
 
-
         self.animation = None
         self._animation_event_keys = set()
         self._default_style = None

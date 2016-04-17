@@ -72,8 +72,7 @@ class Widget(ConfigCollection):
                 config['_default_settings'].append(default_setting_name)
 
         self.mc.config_validator.validate_config('widgets:{}'.format(
-            config['type']).lower(),
-                             config, base_spec='widgets:common')
+            config['type']).lower(), config, base_spec='widgets:common')
 
         if not mode:
             priority = 0
@@ -86,7 +85,8 @@ class Widget(ConfigCollection):
             config['priority'] = priority
 
         if 'animations' in config:
-            config['animations'] = self.process_animations(config['animations'])
+            config['animations'] = (
+                self.process_animations(config['animations']))
 
         else:
             config['animations'] = None
