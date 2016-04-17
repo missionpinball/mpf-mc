@@ -164,3 +164,6 @@ slide_player:
   show_slide_9_with_transition:
     machine_slide_9:
       transition: fade
+  slide_2_dont_show:
+      machine_slide_2:
+        show: no

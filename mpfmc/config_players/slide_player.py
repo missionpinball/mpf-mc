@@ -291,6 +291,8 @@ class MpfSlidePlayer(PluginPlayer):
             if dict_is_widgets:
                 device_settings = dict(widgets=[device_settings])
 
+        # todo make transition manager validation static and use that here too
+
         if 'transition' in device_settings:
             if not isinstance(device_settings['transition'], dict):
                 device_settings['transition'] = dict(

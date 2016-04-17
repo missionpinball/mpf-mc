@@ -309,3 +309,21 @@ class TestSlidePlayer(MpfMcTestCase):
         # make sure the transition from the slide player is happening
         self.assertTrue(isinstance(self.mc.targets['display1'].transition,
                                    FadeTransition))
+
+    def test_slide_show(self):
+        # tests the 'show' feature of a slide. This is not a slide show, but
+        # rather a setting which controls whether a slide is show right away
+        # or not
+
+        # show a base slide
+        self.mc.events.post('show_slide_1')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        # post new slide, but with show=False, so it should not show
+        self.mc.events.post('slide_2_dont_show')
+        self.advance_time()
+        # Should still be slide 1
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')

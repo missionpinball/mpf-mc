@@ -157,8 +157,6 @@ class SlideFrame(MpfWidget, ScreenManager):
                    priority=None, show=True, expire=None, play_kwargs=None,
                    **kwargs):
 
-        # todo implement 'show' kwarg
-
         if not play_kwargs:
             play_kwargs = kwargs
         else:
@@ -193,7 +191,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         elif slide.expire:
             slide.schedule_removal(slide.expire)
 
-        if slide.priority >= self.current_slide.priority or force:
+        if (slide.priority >= self.current_slide.priority and show) or force:
             # We need to show this slide
 
             # Have to set a transition even if there's not one because we have
