@@ -88,6 +88,18 @@ widgets:
     z: -100
     color: 774303
     font_size: 100
+  widget7:
+    type: text
+    text: EXPIRES 1S
+    color: orange
+    font_size: 100
+    expire: 1s
+  widget8:
+    type: text
+    text: WIDGET 8
+    color: orange
+    font_size: 100
+    expire: 1s
 
 widget_player:
   add_widget1_to_current: widget1
@@ -102,3 +114,7 @@ widget_player:
   remove_widget1:
     widget1:
       action: remove
+  add_widget7: widget7
+  add_widget8_expire:
+      widget8:
+        expire: 1s

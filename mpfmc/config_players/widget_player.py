@@ -1,3 +1,4 @@
+from copy import deepcopy
 from mpf.config_players.plugin_player import PluginPlayer
 from mpfmc.core.mc_config_player import McConfigPlayer
 
@@ -35,14 +36,20 @@ class McWidgetPlayer(McConfigPlayer):
     def play(self, settings, mode=None, caller=None, play_kwargs=None,
              priority=0, **kwargs):
 
-        # todo add play_kwargs and kwargs, use McSlidePlayer as example
+        settings = deepcopy(settings)
 
-        # super().play(settings, mode, caller, play_kwargs)
+        if 'play_kwargs' in settings:
+            play_kwargs = settings.pop('play_kwargs')
 
         if 'widgets' in settings:
             settings = settings['widgets']
 
         for widget, s in settings.items():
+
+            if play_kwargs:
+                s.update(play_kwargs)
+
+            s.update(kwargs)
 
             try:
                 s['priority'] += priority
@@ -91,7 +98,7 @@ class McWidgetPlayer(McConfigPlayer):
                 raise ValueError("Cannot add widget. No current slide")
 
             if s['action'] == 'add':
-                slide.add_widgets_from_library(name=widget, mode=mode)
+                slide.add_widgets_from_library(name=widget, mode=mode, **s)
 
     def get_express_config(self, value):
         return dict(widget=value)

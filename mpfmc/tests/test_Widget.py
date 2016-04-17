@@ -319,6 +319,50 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
+    def test_widget_expire(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('add_widget1_to_current')
+        self.mc.events.post('add_widget7')
+        self.advance_time()
+
+        self.assertIn('widget1', [x.key for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertIn('widget7', [x.key for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        self.advance_time(1)
+
+        self.assertIn('widget1', [x.key for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('widget7', [x.key for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+    def test_widget_player_expire(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('add_widget1_to_current')
+        self.mc.events.post('add_widget8_expire')
+        self.advance_time()
+
+        self.assertIn('widget1', [x.key for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertIn('widget8', [x.key for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        self.advance_time(1)
+
+        self.assertIn('widget1', [x.key for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('widget8', [x.key for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
     def test_widget_player_errors(self):
         pass
 

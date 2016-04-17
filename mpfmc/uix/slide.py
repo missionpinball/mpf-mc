@@ -86,12 +86,15 @@ class Slide(Screen):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
             self.priority, self.creation_order)
 
-    def add_widgets_from_library(self, name, mode=None):
+    def add_widgets_from_library(self, name, mode=None, key=None, **kwargs):
         if name not in self.mc.widgets:
             raise ValueError("Widget %s not found", name)
 
+        if not key:
+            key = name
+
         return self.add_widgets_from_config(config=self.mc.widgets[name],
-                                            mode=mode, key=name)
+                                            mode=mode, key=key)
 
     def add_widgets_from_config(self, config, mode=None, key=None,
                                 play_kwargs=None):

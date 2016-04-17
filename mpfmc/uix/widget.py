@@ -69,6 +69,11 @@ class MpfWidget(object):
                 else:
                     self._register_animation_events(k)
 
+        self.expire = config.get('expire', None)
+
+        if self.expire:
+            self.schedule_removal(self.expire)
+
     def __repr__(self):  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
@@ -212,17 +217,25 @@ class MpfWidget(object):
             pass
 
     def prepare_for_removal(self, widget):
+        self.mc.clock.unschedule(self.remove)
         self._remove_animation_events()
+
+    def schedule_removal(self, secs):
+        self.mc.clock.schedule_once(self.remove, secs)
+
+    def remove(self, dt):
+        del dt
+        self.parent.remove_widget(self)
 
     def _register_animation_events(self, event_name):
         self._animation_event_keys.add(self.mc.events.add_handler(
-                event=event_name, handler=self.start_animation_from_event,
-                event_name=event_name))
+            event=event_name, handler=self.start_animation_from_event,
+            event_name=event_name))
 
     def start_animation_from_event(self, event_name, **kwargs):
         self.stop_animation()
         self.animation = self.build_animation_from_config(
-                self.config['animations'][event_name])
+            self.config['animations'][event_name])
         self.animation.start(self)
 
     def _remove_animation_events(self):
