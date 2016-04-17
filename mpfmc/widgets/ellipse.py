@@ -10,9 +10,10 @@ class Ellipse(MpfWidget, Widget):
 
     widget_type_name = 'Rectangle'
 
-    def __init__(self, mc, config, slide, mode=None, priority=None, **kwargs):
-        super().__init__(mc=mc, mode=mode, priority=priority, slide=slide,
-                         config=config)
+    def __init__(self, mc, config, slide, mode=None, priority=None, key=None,
+                 **kwargs):
+        super().__init__(mc=mc, mode=mode, slide=slide, config=config,
+                         priority=priority, key=key)
 
         pos = set_position(slide.width,
                            slide.height,
@@ -32,5 +33,3 @@ class Ellipse(MpfWidget, Widget):
                         segments=self.config['segments'],
                         angle_start=self.config['angle_start'],
                         angle_end=self.config['angle_end'])
-
-

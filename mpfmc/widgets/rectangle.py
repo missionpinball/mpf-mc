@@ -11,9 +11,10 @@ class Rectangle(MpfWidget, Widget):
 
     widget_type_name = 'Rectangle'
 
-    def __init__(self, mc, config, slide, mode=None, priority=None, **kwargs):
-        super().__init__(mc=mc, mode=mode, priority=priority, slide=slide,
-                         config=config)
+    def __init__(self, mc, config, slide, mode=None, priority=None, key=None,
+                 **kwargs):
+        super().__init__(mc=mc, mode=mode, slide=slide, config=config,
+                         priority=priority, key=key)
 
         pos = set_position(slide.width,
                            slide.height,

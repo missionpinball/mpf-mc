@@ -70,7 +70,8 @@ class SlideFrameParent(MpfWidget, FloatLayout):
 
 
 class SlideFrame(MpfWidget, ScreenManager):
-    def __init__(self, mc, name=None, config=None, slide=None, mode=None):
+    def __init__(self, mc, name=None, config=None, slide=None, mode=None,
+                 key=None):
 
         self.name = name  # needs to be set before super()
         # If this is a the main SlideFrame of a display, it will get its size
@@ -81,7 +82,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         except (KeyError, TypeError):
             self.native_size = self.slide.native_size
 
-        super().__init__(mc=mc, mode=mode, slide=slide, config=config)
+        super().__init__(mc=mc, mode=mode, slide=slide, config=config, key=key)
         self.slide_frame_parent = None
 
         # minimal config needed if this is a widget

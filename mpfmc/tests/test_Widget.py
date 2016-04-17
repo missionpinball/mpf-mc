@@ -87,9 +87,8 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('add_widget1_to_current')
         self.advance_time()
 
-        # A widget with text that reads 'widget1' should be on the default
-        # slide
-        self.assertIn('widget1', [x.text for x in self.mc.targets[
+        # widget1 should be on the default slide
+        self.assertIn('widget1', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
     def test_widget_player_add_to_named_slide(self):
@@ -282,7 +281,7 @@ class TestWidget(MpfMcTestCase):
         self.assertEqual('widget6', self.mc.targets[
             'default'].parent.children[-1].text)
         self.assertTrue(isinstance(self.mc.targets[
-                                       'default'].parent.children[-1], Text))
+            'default'].parent.children[-1], Text))
 
         # stop the mode
         self.mc.modes['mode1'].stop()
@@ -294,14 +293,38 @@ class TestWidget(MpfMcTestCase):
 
         # verify widget6 is gone
         self.assertFalse(isinstance(self.mc.targets[
-                                        'default'].parent.children[-1], Text))
+            'default'].parent.children[-1], Text))
+
+    def test_removing_widget(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        # post the event to add widget1 to the default target, default slide
+        self.mc.events.post('add_widget1_to_current')
+        self.mc.events.post('add_widget2_to_current')
+        self.advance_time()
+
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        self.mc.events.post('remove_widget1')
+        self.advance_time()
+
+        self.assertNotIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
 
     def test_widget_player_errors(self):
         pass
 
         # no slide
         # bad target
-        #
+        # todo
 
 
-        # test non named widgets?
+    # todo test non named widgets?

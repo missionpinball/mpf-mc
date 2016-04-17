@@ -63,14 +63,35 @@ class McWidgetPlayer(McConfigPlayer):
                 except KeyError:  # pragma: no cover
                     pass
 
+            if s['action'] == 'remove':
+                if slide:
+                    slide.remove_widgets_by_key(widget)
+                else:
+                    for target in self.machine.targets.values():
+                        for w in target.slide_frame_parent.walk():
+                            try:
+                                if w.key == widget:
+                                    w.parent.remove_widget(w)
+                            except AttributeError:
+                                pass
+                        for x in target.screens:
+                            for y in x.walk():
+                                try:
+                                    if y.key == widget:
+                                        x.remove_widget(y)
+                                except AttributeError:
+                                    pass
+
+                continue
+
             if not slide:
                 slide = self.machine.targets['default'].current_slide
 
-            if not slide:
-                continue  # pragma: no cover
+            if not slide:  # pragma: no cover
+                raise ValueError("Cannot add widget. No current slide")
 
-            slide.add_widgets_from_library(name=widget, mode=mode)
-
+            if s['action'] == 'add':
+                slide.add_widgets_from_library(name=widget, mode=mode)
 
     def get_express_config(self, value):
         return dict(widget=value)
@@ -78,6 +99,7 @@ class McWidgetPlayer(McConfigPlayer):
 
 player_cls = MpfWidgetPlayer
 mc_player_cls = McWidgetPlayer
+
 
 def register_with_mpf(machine):
     return 'widget', MpfWidgetPlayer(machine)

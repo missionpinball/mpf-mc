@@ -10,9 +10,10 @@ from kivy.uix.stencilview import StencilView
 class Dmd(MpfWidget, Widget):
     widget_type_name = 'DMD'
 
-    def __init__(self, mc, config, slide, mode=None, priority=None, **kwargs):
-        super().__init__(mc=mc, mode=mode, priority=priority, slide=slide,
-                         config=config)
+    def __init__(self, mc, config, slide, mode=None, priority=None,  key=None,
+                 **kwargs):
+        super().__init__(mc=mc, mode=mode, slide=slide, config=config,
+                         priority=priority, key=key)
 
         self.source = self.mc.displays[self.config['source_display']]
 

@@ -68,11 +68,13 @@ class Slide(Screen):
         super().add_widget(self.stencil)
 
         if 'widgets' in config:  # don't want try, swallows too much
-            self.add_widgets_from_config(config['widgets'], self.mode,
-                                         play_kwargs)
+            self.add_widgets_from_config(config=config['widgets'],
+                                         mode=self.mode,
+                                         play_kwargs=play_kwargs)
 
         self.mc.active_slides[name] = self
         target.add_widget(self)
+        mc.slides[name] = config
 
         # Make the slide not transparent. (Widgets are drawn in reverse order,
         # so the before method draws it on the bottom.)
@@ -86,11 +88,14 @@ class Slide(Screen):
 
     def add_widgets_from_library(self, name, mode=None):
         if name not in self.mc.widgets:
-            return
+            raise ValueError("Widget %s not found", name)
 
-        return self.add_widgets_from_config(self.mc.widgets[name], mode)
+        return self.add_widgets_from_config(config=self.mc.widgets[name],
+                                            mode=mode, key=name)
 
-    def add_widgets_from_config(self, config, mode=None, play_kwargs=None):
+    def add_widgets_from_config(self, config, mode=None, key=None,
+                                play_kwargs=None):
+
         if type(config) is not list:
             config = [config]
         widgets_added = list()
@@ -102,10 +107,11 @@ class Slide(Screen):
             if '_widget_cls' in widget:  # don't want try, swallows too much
                 widget_obj = widget['_widget_cls'](mc=self.mc, config=widget,
                                                    slide=self, mode=mode,
-                                                   **play_kwargs)
+                                                   key=key, **play_kwargs)
             else:
                 widget_obj = self.mc.widgets.type_map[widget['type']](
-                    mc=self.mc, config=widget, slide=self, mode=mode, **play_kwargs)
+                    mc=self.mc, config=widget, slide=self, mode=mode,
+                    key=key, **play_kwargs)
 
             top_widget = widget_obj
 
@@ -174,6 +180,10 @@ class Slide(Screen):
         for widget in [x for x in self.stencil.children if x.mode == mode]:
             self.stencil.remove_widget(widget)
 
+    def remove_widgets_by_key(self, key):
+        for widget in [x for x in self.stencil.children if x.key == key]:
+            self.stencil.remove_widget(widget)
+
     def add_widget_to_parent_frame(self, widget):
         """Adds this widget to this slide's parent frame instead of to this
         slide.
@@ -198,6 +208,8 @@ class Slide(Screen):
 
     def remove(self, dt):
         del dt
+
+        del self.mc.active_slides[self.name]
 
         try:
             self.parent.remove_slide(slide=self,

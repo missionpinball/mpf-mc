@@ -22,14 +22,17 @@ class MpfWidget(object):
 
     merge_settings = tuple()
 
-    def __init__(self, mc, mode, slide=None, config=None, **kwargs):
+    def __init__(self, mc, mode=None, slide=None, config=None, key=None,
+                 **kwargs):
         self.size_hint = (None, None)
+
         super().__init__()
 
         self.mode = mode
         self.slide = slide
         self.config = config.copy()  # make optional? TODO
         self.mc = mc
+        self.key = key
         self.animation = None
         self._animation_event_keys = set()
         self._default_style = None
