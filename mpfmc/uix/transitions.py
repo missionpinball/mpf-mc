@@ -44,6 +44,44 @@ class TransitionManager(object):
         self.register_transition('rise_in', RiseInTransition)
         self.register_transition('none', NoTransition)
 
+    def validate_transitions(self, config):
+
+        if 'transition' in config:
+            if not isinstance(config['transition'], dict):
+                config['transition'] = dict(type=config['transition'])
+
+            try:
+                config['transition'] = (
+                    self.mc.config_validator.validate_config(
+                        'transitions:{}'.format(
+                            config['transition']['type']),
+                            config['transition']))
+
+            except KeyError:
+                raise ValueError('transition: section of config requires a'
+                                 ' "type:" setting')
+        else:
+            config['transition'] = None
+
+        if 'transition_out' in config:
+            if not isinstance(config['transition_out'], dict):
+                config['transition_out'] = dict(type=config['transition_out'])
+
+            try:
+                config['transition_out'] = (
+                    self.mc.config_validator.validate_config(
+                        'transitions:{}'.format(
+                            config['transition_out']['type']),
+                        config['transition_out']))
+
+            except KeyError:
+                raise ValueError('transition_out: section of config '
+                                 'requires a "type:" setting')
+        else:
+            config['transition_out'] = None
+
+        return config
+
 
 class MpfTransition(TransitionBase):
     """Base class for slide transitions in MPF. Use this when writing your

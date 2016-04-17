@@ -34,6 +34,7 @@ class ConfigCollection(CaseInsensitiveDict):
         return super().__getitem__(deepcopy(self.__class__.lower(key)))
 
     def __init__(self, mc):
+        super().__init__()
         self.mc = mc
         self.log = logging.getLogger(self.class_label)
 
@@ -60,6 +61,7 @@ class ConfigCollection(CaseInsensitiveDict):
 
     def process_config(self, config):
         raise NotImplementedError
+
 
 def create_config_collections(mc, collections):
 

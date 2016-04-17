@@ -28,27 +28,8 @@ class Slide(ConfigCollection):
             # since dict is mutable it updates in place
             config['widgets'][i] = self.mc.widgets.process_widget(widget)
 
-        if 'transition' in config:
-            config['transition'] = self.process_transition(
-                config['transition'])
-        else:
-            config['transition'] = None
-
-        return config
-        # return SlideDevice(**config)
-
-    def process_transition(self, config):
-        # config is localized to the 'transition' section
-
-        if not isinstance(config, dict):
-            config = dict(type=config)
-
-        try:
-            config = self.mc.config_validator.validate_config(
-                    'transitions:{}'.format(config['type']), config)
-        except KeyError:
-            raise ValueError('transition: section of config requires a '
-                             '"type:" setting')
+        config = self.mc.config_validator.validate_config('slides', config)
+        config = self.mc.transition_manager.validate_transitions(config)
 
         return config
 

@@ -55,7 +55,7 @@ class SlideFrameParent(MpfWidget, FloatLayout):
     # def __lt__(self, other):
     #     return self.stencil.config['z'] < other.stencil.config['z']
 
-    def add_widget(self, widget):
+    def add_widget(self, widget, **kwargs):
         widget.config['z'] = abs(widget.config['z'])
 
         widget.pos = set_position(self.width, self.height,
@@ -100,19 +100,15 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         self.transition = NoTransition()
 
-        # Not implemented yet. Maybe some day?
-        # self.default_transition = NoTransition()
-
         self.slide_frame_parent = SlideFrameParent(mc, name, self.config, self)
         self.slide_frame_parent.config = self.config
 
         self.mc.targets[self.name] = self
 
     def __repr__(self):
-        return '<SlideFrame {}{}, current slide={}, total slides={' \
-               '}>'.format(
-                self.name, self.size, self.current_slide_name,
-                len(self.screens))
+        return '<SlideFrame {}{}, current slide={}, total slides={}>'.format(
+            self.name, self.size, self.current_slide_name,
+            len(self.screens))
 
     @property
     def current_slide(self):
@@ -158,9 +154,10 @@ class SlideFrame(MpfWidget, ScreenManager):
                          play_kwargs=play_kwargs)
 
     def show_slide(self, slide_name, transition=None, mode=None, force=False,
-                   priority=None, show=True, play_kwargs=None, **kwargs):
+                   priority=None, show=True, expire=None, play_kwargs=None,
+                   **kwargs):
 
-        # todo implement show= kwarg
+        # todo implement 'show' kwarg
 
         if not play_kwargs:
             play_kwargs = kwargs
@@ -190,6 +187,12 @@ class SlideFrame(MpfWidget, ScreenManager):
             except KeyError:
                 pass
 
+        # If there's an exprire kwarg, that takes priority over slide's expire
+        if expire:
+            slide.schedule_removal(expire)
+        elif slide.expire:
+            slide.schedule_removal(slide.expire)
+
         if slide.priority >= self.current_slide.priority or force:
             # We need to show this slide
 
@@ -206,7 +209,8 @@ class SlideFrame(MpfWidget, ScreenManager):
 
     def add_and_show_slide(self, widgets=None, slide_name=None,
                            transition=None, priority=None, mode=None,
-                           force=False, play_kwargs=None, **kwargs):
+                           force=False, expire=None, play_kwargs=None,
+                           **kwargs):
         # create the slide. If a slide with this name already exists, it will
         # be replaced
 
@@ -221,14 +225,14 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         self.show_slide(slide_name=slide_obj.name, transition=transition,
                         priority=priority, mode=mode, force=force,
-                        play_kwargs=play_kwargs)
-
+                        expire=expire, play_kwargs=play_kwargs)
 
     def remove_slide(self, slide, transition_config=None):
         # Note that you can't remove the last slide, but if you try it will
         # change the priority so it gets removed by whatever comes next
 
-        # warning, if you just created a slide, you have to wait at least on
+        # todo
+        # Warning, if you just created a slide, you have to wait at least on
         # tick before removing it. Can we prevent that? What if someone tilts
         # at the exact perfect instant when a mode was starting or something?
 
@@ -240,8 +244,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             if not isinstance(slide, Slide):
                 return
 
-        for widget in self.children:
-            widget.prepare_for_removal()
+        slide.prepare_for_removal()
 
         self.mc.active_slides.pop(slide.name, None)
 

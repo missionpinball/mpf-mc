@@ -2,6 +2,7 @@ from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from mpfmc.transitions.push import PushTransition
 from kivy.uix.screenmanager import WipeTransition, NoTransition
 
+
 class TestTransitions(MpfMcTestCase):
     def get_machine_path(self):
         return 'tests/machine_files/transitions'
@@ -19,10 +20,6 @@ class TestTransitions(MpfMcTestCase):
         self.assertIn('wipe', self.mc.transition_manager.transitions)
         self.assertEqual(self.mc.transition_manager.transitions['wipe'],
                          WipeTransition)
-
-    def test_slide_player_transition_loading(self):
-        pass
-
 
     def test_mpf_transition(self):
         self.mc.events.post('show_slide1')

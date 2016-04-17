@@ -51,6 +51,9 @@ class Slide(Screen):
         else:
             self.mode = None
 
+        self.transistion_out = config.get('transition_out', None)
+        self.expire = config.get('expire', None)
+
         target = mc.targets[target]
 
         self.size_hint = (None, None)
@@ -75,7 +78,7 @@ class Slide(Screen):
         # so the before method draws it on the bottom.)
         with self.canvas.before:
             Color(0, 0, 0, 1)
-            Rectangle(size=self.size, pos=(0,0))
+            Rectangle(size=self.size, pos=(0, 0))
 
     def __repr__(self):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
@@ -129,7 +132,7 @@ class Slide(Screen):
 
         return widgets_added
 
-    def add_widget(self, widget):
+    def add_widget(self, widget, **kwargs):
         """Adds a widget to this slide.
 
         Args:
@@ -146,6 +149,7 @@ class Slide(Screen):
         priority.
 
         """
+        del kwargs
 
         if widget.config['z'] < 0:
             self.add_widget_to_parent_frame(widget)
@@ -189,8 +193,18 @@ class Slide(Screen):
         """
         self.parent.parent.parent.add_widget(widget)
 
-    def prepare_for_removal(self, widget=None):
-        pass
+    def schedule_removal(self, secs):
+        self.mc.clock.schedule_once(self.remove, secs)
 
-        # TODO what do we have to do here? I assume something? Remove from
-        # active slide list?
+    def remove(self, dt):
+        del dt
+        self.parent.remove_slide(self, self.transistion_out)
+
+    def prepare_for_removal(self):
+        self.mc.clock.unschedule(self.remove)
+
+        for widget in self.children:
+            try:
+                widget.prepare_for_removal()
+            except AttributeError:
+                pass

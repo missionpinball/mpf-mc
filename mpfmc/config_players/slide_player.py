@@ -212,21 +212,34 @@ class McSlidePlayer(McConfigPlayer):
 
                 # if settings is list, it's widgets
                 if isinstance(slide_settings, list):
+                    # convert it to a dict by moving this list of settings into
+                    # a dict key called "widgets"
                     slide_settings = dict(widgets=slide_settings)
 
-                # Now check to see if all the settings are valid
-                # slide settings. If not, assume it's a single widget settings.
-                if isinstance(slide_settings, dict):
-                    for key in slide_settings.keys():
-                        if key not in ConfigValidator.config_spec['slide_player']:
-                            dict_is_widgets = True
-                            break
+                # Now we have a dict, but is this a dict of settings for a
+                # single slide, or a dict of settings for the slide player
+                # itself?
 
-                    if dict_is_widgets:
-                        slide_settings = dict(widgets=[slide_settings])
+                # So let's check the keys and see if they're all valid keys
+                # for a slide_player. If so, it's slide_player keys. If not,
+                # we assume they're widgets for a slide.
 
-                    validated_config[event]['slides'].update(
-                        self.validate_show_config(slide, slide_settings))
+                if isinstance(slide_settings, str):
+                    # slide_settings could be a string 'slide: slide_name',
+                    # so we rename the key to the slide name with an empty dict
+                    slide = slide_settings
+                    slide_settings = dict()
+
+                for key in slide_settings.keys():
+                    if key not in ConfigValidator.config_spec['slide_player']:
+                        dict_is_widgets = True
+                        break
+
+                if dict_is_widgets:
+                    slide_settings = dict(widgets=[slide_settings])
+
+                validated_config[event]['slides'].update(
+                    self.validate_show_config(slide, slide_settings))
 
         return validated_config
 
@@ -236,24 +249,11 @@ class McSlidePlayer(McConfigPlayer):
         # device is slide name
 
         for v in validated_dict.values():
-
-            if 'transition' in v:
-                if not isinstance(v['transition'], dict):
-                    v['transition'] = dict(type=v['transition'])
-
-                try:
-                    v['transition'] = (
-                        self.machine.config_validator.validate_config(
-                            'transitions:{}'.format(
-                                v['transition']['type']), v['transition']))
-
-                except KeyError:
-                    raise ValueError('transition: section of config requires a'
-                                     ' "type:" setting')
-
             if 'widgets' in v:
                 v['widgets'] = self.machine.widgets.process_config(
                     v['widgets'], serializable=serializable)
+
+            self.machine.transition_manager.validate_transitions(v)
 
         return validated_dict
 

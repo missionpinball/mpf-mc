@@ -1,8 +1,11 @@
 import json
 
+from kivy.uix.screenmanager import WipeTransition, FadeTransition
+
 from mpf.core.bcp import decode_command_string
 from mpf.core.config_player import ConfigPlayer
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc.transitions.move_in import MoveInTransition
 
 
 class TestSlidePlayer(MpfMcTestCase):
@@ -169,3 +172,140 @@ class TestSlidePlayer(MpfMcTestCase):
 
         self.mc.events.post('anon_slide_widgets')
         self.advance_time()
+
+    def test_expire_in_slide(self):
+        # tests that slide expire time works when configured in a slide
+        self.mc.events.post('base_slide_no_expire')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_6')
+
+        self.mc.events.post('show_slide_7')  # expire 1s
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_7')
+
+        self.advance_time(1)
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_6')
+
+    def test_expire_in_slide_player(self):
+        # tests that expire time works when configured in the slide player
+        self.mc.events.post('base_slide_no_expire')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_6')
+
+        self.mc.events.post('new_slide_expire')  # expire 1s
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        self.advance_time(1)
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_6')
+
+    def test_expire_with_transition_out_in_slide(self):
+        # Tests a slide expiring where the expiring slide has a transition
+        self.mc.events.post('base_slide_no_expire')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_6')
+
+        # show a slide which expires in 1 sec, and has a transition out set
+        self.mc.events.post('show_slide_8')
+        self.advance_time(.1)
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_8')
+
+        # advance to after this slide_8 expired, transition should be in effect
+        self.advance_time(1)
+        self.assertTrue(isinstance(self.mc.targets['display1'].transition,
+                                   WipeTransition))
+
+        # advance to transition done, should be back to the original slide
+        self.advance_time(1)
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_6')
+
+    def test_current_slide_transition_out(self):
+        # Tests a new slide with no transition, but the current slide has one,
+        # so it uses that
+
+        # show a slide, no expire, but with transition out
+        self.mc.events.post('show_slide_9')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_9')
+
+        # show a new slide with no transition
+        self.assertIsNone(self.mc.slides['machine_slide_6']['transition'])
+        self.mc.events.post('machine_slide_6')
+        self.advance_time()
+
+        # transition from first slide should be happening
+        self.assertTrue(isinstance(self.mc.targets['display1'].transition,
+                                   MoveInTransition))
+
+    def test_both_slides_transitions(self):
+        # current slide has transition out, and new slide has transition, so
+        # transition of new slide takes precendence
+
+        # show a slide, no expire, but with transition out
+        self.assertEqual(
+            self.mc.slides['machine_slide_8']['transition_out']['type'],
+            'wipe')
+        self.mc.events.post('show_slide_8')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_8')
+
+        # show a new slide with a different transition in
+        self.assertEqual(
+            self.mc.slides['machine_slide_9']['transition']['type'], 'move_in')
+        self.mc.events.post('show_slide_9')
+        self.advance_time()
+
+        # transition from second slide should be happening
+        self.assertTrue(isinstance(self.mc.targets['display1'].transition,
+                                   MoveInTransition))
+
+    def test_transition_in_slide_player(self):
+        # transition is specified in slide player for slide that does not have
+        # transition
+
+        # show a base slide with no transition
+        self.assertIsNone(self.mc.slides['machine_slide_4']['transition'])
+        self.mc.events.post('machine_slide_4')
+        self.advance_time()
+
+        # show a second slide where the slide has no transition, but the
+        # slide player does have a transition
+        self.assertIsNone(self.mc.slides['machine_slide_5']['transition'])
+        self.mc.events.post('show_slide_5_with_transition')
+        self.advance_time()
+
+        # make sure the transition is happening
+        self.assertTrue(isinstance(self.mc.targets['display1'].transition,
+                                   FadeTransition))
+
+    def test_transition_in_slide_player_override(self):
+        # transition in slide player for slide that already has a transition.
+        # the slide player transition should override the slide one
+
+        # show a base slide with no transition
+        self.assertIsNone(self.mc.slides['machine_slide_4']['transition'])
+        self.mc.events.post('machine_slide_4')
+        self.advance_time()
+
+        # show a second slide where the slide has a transition, but the
+        # slide player has a different transition, so the slide player
+        # should take precedence
+        self.assertEqual(
+            self.mc.slides['machine_slide_9']['transition']['type'], 'move_in')
+        self.mc.events.post('show_slide_5_with_transition')
+        self.advance_time()
+
+        # make sure the transition from the slide player is happening
+        self.assertTrue(isinstance(self.mc.targets['display1'].transition,
+                                   FadeTransition))
