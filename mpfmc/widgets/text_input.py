@@ -43,7 +43,10 @@ class MpfTextInput(Text):
         Clock.schedule_once(self.find_linked_text_widget, .1)
 
     def __repr__(self):
-        return '<TextInput Widget key={}>'.format(self.key)
+        try:
+            return '<TextInput Widget key={}>'.format(self.key)
+        except AttributeError:
+            return '<TextInput Widget>'
 
     def find_linked_text_widget(self, dt):
         del dt
