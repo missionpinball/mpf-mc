@@ -108,7 +108,7 @@ class Slide(Screen):
 
         for widget in config:
 
-            if 'key' in widget and widget['key']:
+            if widget['key']:
                 this_key = widget['key']
             else:
                 this_key = key
