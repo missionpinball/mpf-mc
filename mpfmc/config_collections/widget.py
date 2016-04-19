@@ -13,8 +13,7 @@ from mpfmc.widgets.ellipse import Ellipse
 from mpfmc.widgets.bezier import Bezier
 from mpfmc.widgets.point import Point
 from mpfmc.widgets.dmd import Dmd, ColorDmd
-from mpfmc.widgets.character_picker import CharacterPicker
-from mpfmc.widgets.entered_chars import EnteredChars
+from mpfmc.widgets.text_input import MpfTextInput
 
 
 class Widget(ConfigCollection):
@@ -28,7 +27,6 @@ class Widget(ConfigCollection):
                                    video=VideoWidget,
                                    slide_frame=SlideFrame,
                                    bezier=Bezier,
-                                   # imageborder=Shape,
                                    ellipse=Ellipse,
                                    line=Line,
                                    point=Point,
@@ -38,8 +36,7 @@ class Widget(ConfigCollection):
                                    triangle=Triangle,
                                    dmd=Dmd,
                                    color_dmd=ColorDmd,
-                                   character_picker=CharacterPicker,
-                                   entered_chars=EnteredChars)
+                                   text_input=MpfTextInput)
 
     def process_config(self, config, serializable=True):
         # config is localized to a specific widget section

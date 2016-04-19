@@ -75,12 +75,6 @@ class Text(MpfWidget, Label):
 
         self.update_vars_in_text(text)
 
-    def _get_font(self, font_name):
-        # returns a string to a font file, either the full path in the machine
-        # fonts folder if the font is there, or the string name of the font if
-        # it's an installed system font.
-        pass
-
     def update_vars_in_text(self, text):
         for var_string in self._get_text_vars(text):
             if var_string.startswith('machine|'):

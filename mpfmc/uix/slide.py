@@ -193,6 +193,9 @@ class Slide(Screen):
         for widget in [x for x in self.stencil.children if x.key == key]:
             self.stencil.remove_widget(widget)
 
+    def remove_widget(self, widget):
+            self.stencil.remove_widget(widget)
+
     def add_widget_to_parent_frame(self, widget):
         """Adds this widget to this slide's parent frame instead of to this
         slide.
