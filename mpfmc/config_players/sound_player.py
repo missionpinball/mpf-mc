@@ -164,8 +164,7 @@ Here are several various examples:
 
         return validated_config
 
-    def validate_show_config(self, device, device_settings, serializable=True):
-        del serializable
+    def validate_show_config(self, device, device_settings):
         validated_dict = super().validate_show_config(device, device_settings)
         # device is sound name
         return validated_dict
@@ -184,7 +183,7 @@ class MpfSoundPlayer(PluginPlayer):
     config_file_section = 'sound_player'
     show_section = 'sounds'
 
-    def validate_show_config(self, device, device_settings, serializable=True):
+    def validate_show_config(self, device, device_settings):
         # device is sound name, device_settings
 
         device_settings = self.machine.config_validator.validate_config("sound_player", device_settings)

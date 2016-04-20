@@ -114,14 +114,9 @@ class Slide(Screen):
             else:
                 this_key = key
 
-            if '_widget_cls' in widget:  # don't want try, swallows too much
-                widget_obj = widget['_widget_cls'](mc=self.mc, config=widget,
-                                                   slide=self, mode=mode,
-                                                   key=this_key, **play_kwargs)
-            else:
-                widget_obj = self.mc.widgets.type_map[widget['type']](
-                    mc=self.mc, config=widget, slide=self, mode=mode,
-                    key=this_key, **play_kwargs)
+            widget_obj = self.mc.widgets.type_map[widget['type']](
+                mc=self.mc, config=widget, slide=self, mode=mode,
+                key=this_key, **play_kwargs)
 
             top_widget = widget_obj
 

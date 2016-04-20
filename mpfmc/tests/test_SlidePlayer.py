@@ -152,7 +152,7 @@ class TestSlidePlayer(MpfMcTestCase):
             type='text', text='TEST FROM SHOW'))
 
         show_slide_section = ConfigPlayer.show_players[
-            'slides'].validate_show_config('slide1', show_slide_section, False)
+            'slides'].validate_show_config('slide1', show_slide_section)
 
         bcp_string = encode_command_string('trigger', name='slides_play',
                                            **show_slide_section)

@@ -248,7 +248,7 @@ class McSlidePlayer(McConfigPlayer):
 
         return validated_config
 
-    def validate_show_config(self, device, device_settings, serializable=True):
+    def validate_show_config(self, device, device_settings):
         validated_dict = super().validate_show_config(device, device_settings)
 
         # device is slide name
@@ -256,7 +256,7 @@ class McSlidePlayer(McConfigPlayer):
         for v in validated_dict.values():
             if 'widgets' in v:
                 v['widgets'] = self.machine.widgets.process_config(
-                    v['widgets'], serializable=serializable)
+                    v['widgets'])
 
             self.machine.transition_manager.validate_transitions(v)
 
@@ -276,7 +276,7 @@ class MpfSlidePlayer(PluginPlayer):
     config_file_section = 'slide_player'
     show_section = 'slides'
 
-    def validate_show_config(self, device, device_settings, serializable=True):
+    def validate_show_config(self, device, device_settings):
         # device is slide name, device_settings
         dict_is_widgets = False
 
@@ -347,7 +347,7 @@ class MpfSlidePlayer(PluginPlayer):
 
         return widget_list
 
-    def process_widget(self, config, serializable=True):
+    def process_widget(self, config):
         # config is localized widget settings
 
         self.machine.config_validator.validate_config('widgets:{}'.format(
