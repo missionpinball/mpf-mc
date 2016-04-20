@@ -160,7 +160,7 @@ class McSlidePlayer(McConfigPlayer):
                 else:
                     target = self.machine.targets['default']
 
-            if s['action'] == 'add':
+            if s['action'] == 'play':
                 # is this a named slide, or a new slide?
                 if 'widgets' in s:
                     target.add_and_show_slide(mode=mode, slide_name=slide,
