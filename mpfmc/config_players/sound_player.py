@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+from kivy.logger import Logger
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer

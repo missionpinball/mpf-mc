@@ -51,6 +51,7 @@ class Display(Scatter, RelativeLayout):
         self.slide_frame.current_slide_name = value
 
     def _display_created(self, *args):
+        del args
         # There's a race condition since mpf-mc will continue while the display
         # gets setup. So we need to wait to know that the display is done.
         # Easiest way to do that is to check to see if the display is the right
@@ -70,6 +71,7 @@ class Display(Scatter, RelativeLayout):
         self.slide_frame_created()
 
     def slide_frame_created(self, *args):
+        del args
         self.add_widget(self.slide_frame.slide_frame_parent)
         self.mc.displays[self.name] = self
         self._set_default_target()
@@ -84,6 +86,7 @@ class Display(Scatter, RelativeLayout):
             pass
 
     def _init_done(self, *args):
+        del args
         self.mc.events.post('display_{}_initialized'.format(self.name))
 
         Display.displays_to_initialize -= 1
@@ -92,6 +95,7 @@ class Display(Scatter, RelativeLayout):
             Clock.schedule_once(self._displays_initialized)
 
     def _displays_initialized(self, *args):
+        del args
 
         if len(self.mc.displays) == 1:
             self.mc.targets['default'] = \
@@ -113,9 +117,12 @@ class Display(Scatter, RelativeLayout):
         pass
 
     def on_window_resize(self, window, size):
+        del window
+        del size
         self.fit_to_window()
 
     def fit_to_window(self, *args):
+        del args
         from kivy.core.window import Window
 
         self.scale = min(Window.width / self.native_size[0],

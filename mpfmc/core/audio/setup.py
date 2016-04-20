@@ -11,7 +11,7 @@ from distutils.core import setup
 from distutils.extension import Extension
 from Cython.Build import cythonize
 from os import environ
-from os.path import join, dirname, sep, exists, basename, isdir, abspath
+from os.path import join, dirname, exists, isdir
 import sys
 
 platform = sys.platform

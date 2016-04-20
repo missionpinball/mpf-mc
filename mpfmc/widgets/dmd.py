@@ -24,7 +24,6 @@ class Dmd(MpfWidget, Widget):
                 DmdLook(width=self.width,
                         height=self.height,
                         dmd_width=self.source.width,
-                        dmd_height=self.source.height,
                         blur=self.config['blur'],
                         pixel_size=self.config['pixel_size'],
                         bg_color=self.config['bg_color'])]
@@ -273,7 +272,7 @@ class DmdLook(EffectBase):
     Mac OS X Native.
 
     """
-    def __init__(self, width, height, dmd_width, dmd_height, blur=0.1,
+    def __init__(self, width, height, dmd_width, blur=0.1,
                  pixel_size=0.6, bg_color=(0.1, 0.1, 0.1, 1.0)):
         super().__init__()
 

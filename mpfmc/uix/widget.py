@@ -24,6 +24,7 @@ class MpfWidget(object):
 
     def __init__(self, mc, mode=None, slide=None, config=None, key=None,
                  **kwargs):
+        del kwargs
         self.size_hint = (None, None)
 
         super().__init__()
@@ -135,6 +136,8 @@ class MpfWidget(object):
             self._apply_style(force_default=True)
 
     def on_size(self, *args):
+        del args
+
         try:
             self.pos = set_position(self.parent.width,
                                     self.parent.height,
@@ -220,6 +223,7 @@ class MpfWidget(object):
             pass
 
     def prepare_for_removal(self, widget):
+        del widget
         self.mc.clock.unschedule(self.remove)
         self._remove_animation_events()
 
@@ -236,6 +240,7 @@ class MpfWidget(object):
             event_name=event_name))
 
     def start_animation_from_event(self, event_name, **kwargs):
+        del kwargs
         self.stop_animation()
         self.animation = self.build_animation_from_config(
             self.config['animations'][event_name])

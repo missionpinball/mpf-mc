@@ -178,6 +178,7 @@ class SoundSystem(object):
     def sound_loaded_callback(self):
         pass
 
-    def _tick(self, delta_time):
+    def _tick(self, dt):
+        del dt
         # TODO: Implement tick function (trigger the processing of internal audio events and track queues)
         self.audio_interface.process()

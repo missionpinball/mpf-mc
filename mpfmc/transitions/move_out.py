@@ -22,6 +22,8 @@ class MoveOutTransition(MpfTransition):
 
         s_in, s_out, width, height, progress = self.get_vars(progression)
 
+        del s_in
+
         direction = self.direction
 
         if direction == 'left':

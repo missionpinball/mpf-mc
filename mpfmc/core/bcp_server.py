@@ -2,7 +2,6 @@
 
 import logging
 import queue
-import select
 import socket
 import sys
 import threading
@@ -108,7 +107,7 @@ class BCPServer(threading.Thread):
                     except socket.timeout:
                         pass
 
-                    except:
+                    except OSError:
                         if self.mc.machine_config['mpf-mc'][
                                 'exit_on_disconnect']:
                             self.mc.stop()

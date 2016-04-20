@@ -87,6 +87,7 @@ class Slide(Screen):
             self.priority, self.creation_order)
 
     def add_widgets_from_library(self, name, mode=None, key=None, **kwargs):
+        del kwargs
         if name not in self.mc.widgets:
             raise ValueError("Widget %s not found", name)
 
@@ -194,7 +195,7 @@ class Slide(Screen):
             self.stencil.remove_widget(widget)
 
     def remove_widget(self, widget):
-            self.stencil.remove_widget(widget)
+        self.stencil.remove_widget(widget)
 
     def add_widget_to_parent_frame(self, widget):
         """Adds this widget to this slide's parent frame instead of to this

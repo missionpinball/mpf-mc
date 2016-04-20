@@ -110,6 +110,12 @@ class Mode(object):
         mode_start method which will be called automatically.
 
         """
+
+        # todo might want to use this
+        del callback
+
+        del kwargs
+
         if type(priority) is int:
             self.priority = priority
         else:
@@ -141,6 +147,12 @@ class Mode(object):
         mode_stop method which will be called automatically.
 
         """
+
+        # todo might want to use this?
+        del callback
+
+        del kwargs
+
         self.log.debug('Mode Stop.')
 
         self.priority = 0

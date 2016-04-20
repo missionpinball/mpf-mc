@@ -307,8 +307,8 @@ class MpfSlidePlayer(PluginPlayer):
                 device_settings['transition'] = (
                     self.machine.config_validator.validate_config(
                         'transitions:{}'.format(
-                            device_settings['transition']['type']),
-                            device_settings['transition']))
+                        device_settings['transition']['type']),
+                        device_settings['transition']))
 
             except KeyError:
                 raise ValueError('transition: section of config requires a'

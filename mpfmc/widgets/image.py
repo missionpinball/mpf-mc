@@ -42,6 +42,7 @@ class ImageWidget(MpfWidget, Image):
                                                                   self.pos)
 
     def _image_loaded(self, *args):
+        del args
         self.texture = self.image.image.texture
         self.size = self.texture_size  # will re-position automatically
 
@@ -59,6 +60,8 @@ class ImageWidget(MpfWidget, Image):
     def texture_update(self, *largs):
         # overrides base method to pull the texture from our ImageClass instead
         # of from a file
+        del largs
+
         if not self.image.image:
             return
 
@@ -110,6 +113,10 @@ class ImageWidget(MpfWidget, Image):
         self._coreimage.anim_loop = value
 
     def play(self, start_frame=None):
+
+        if start_frame:
+            self._set_current_frame(start_frame)
+
         self._coreimage.anim_reset(True)
 
     def stop(self):

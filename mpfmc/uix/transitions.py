@@ -54,8 +54,8 @@ class TransitionManager(object):
                 config['transition'] = (
                     self.mc.config_validator.validate_config(
                         'transitions:{}'.format(
-                            config['transition']['type']),
-                            config['transition']))
+                        config['transition']['type']),
+                        config['transition']))
 
             except KeyError:
                 raise ValueError('transition: section of config requires a'

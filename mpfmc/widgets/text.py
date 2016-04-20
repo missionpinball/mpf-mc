@@ -13,8 +13,8 @@ class Text(MpfWidget, Label):
                       'max_lines', 'strip', 'shorten_from', 'split_str',
                       'unicode_errors', 'color')
 
-    def __init__(self, mc, config, slide, text_variables=None, mode=None, key=None,
-                 priority=0, **kwargs):
+    def __init__(self, mc, config, slide, mode=None, key=None, priority=0,
+                 **kwargs):
 
         super().__init__(mc=mc, mode=mode, slide=slide, config=config,
                          priority=priority, key=key)
@@ -39,7 +39,7 @@ class Text(MpfWidget, Label):
         self._process_text(self.original_text)
 
     def _get_text_string(self, text, mode=None):
-        if not '$' in text:
+        if '$' not in text:
             return text
 
         for text_string in Text.string_finder.findall(text):
@@ -64,6 +64,8 @@ class Text(MpfWidget, Label):
         return Text.var_finder.findall(text)
 
     def _process_text(self, text, mode=None):
+        del mode
+
         for var_string in self._get_text_vars(text):
             if var_string in self.event_replacements:
                 text = text.replace('({})'.format(var_string),
@@ -135,9 +137,12 @@ class Text(MpfWidget, Label):
         self.texture_update()
 
     def _player_var_change(self, **kwargs):
+        del kwargs
+
         self.update_vars_in_text(self.original_text)
 
     def _machine_var_change(self, **kwargs):
+        del kwargs
         self.update_vars_in_text(self.original_text)
 
     def _setup_variable_monitors(self, text):

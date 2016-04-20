@@ -42,7 +42,7 @@ class Keyboard(Widget):
             if switch_name:  # We're processing a key entry for a switch
                 if invert:
                     self.inverted_keys.append(switch_name)
-                self.add_key_map(key, mods, switch_name, toggle_key, invert)
+                self.add_key_map(key, mods, switch_name, toggle_key)
 
             elif event:  # we're processing an entry for an event
                 event_dict = {'event': event, 'params': params}
@@ -61,7 +61,7 @@ class Keyboard(Widget):
         return '{}-{}'.format(key, '-'.join(mods))
 
     def add_key_map(self, key, mods, switch_name=None, toggle_key=False,
-                    invert=False, event_dict=None):
+                    event_dict=None):
         """Adds an entry to the key_map which is used to see what to do when
         key events are received.
 
@@ -72,12 +72,8 @@ class Keyboard(Widget):
                 to.
             toggle_key: Boolean as to whether this key should be a toggle key.
                 (i.e. push on / push off).
-            invert: Boolean as to whether this key combination should be
-                inverted. (Key down = switch inactive, key up = switch active.)
-                Default is False.
             event_dict: Dictionary of events with parameters that will be
-            posted
-                when this key combination is pressed. Default is None.
+            posted when this key combination is pressed. Default is None.
 
         """
         key_string = self.get_key_string(key, mods)
@@ -91,11 +87,14 @@ class Keyboard(Widget):
             self.toggle_keys.add(key_string)
 
     def _on_keyboard_up(self, keyboard, keycode):
+        del keyboard
         key = keycode[1]
         self.process_key_release(key)
         return True
 
     def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        del keyboard
+        del text
         key = keycode[1]
 
         if key in self.active_keys:

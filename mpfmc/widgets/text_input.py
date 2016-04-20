@@ -123,7 +123,7 @@ class MpfTextInput(Text):
         # way.
         counts_remaining = len(self.char_list)
         while self.char_list[0] != char:
-            self.char_list.rotate()
+            self.char_list.rotate(1)
             counts_remaining -= 1
 
             if not counts_remaining:

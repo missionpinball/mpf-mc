@@ -170,6 +170,7 @@ class MpfMc(App):
                     imported_module.mc_player_cls(self))
 
     def displays_initialized(self, *args):
+        del args
         from mpfmc.uix.window import Window
         Window.initialize(self)
         self.events.post('displays_initialized')
@@ -265,6 +266,7 @@ class MpfMc(App):
             pass
 
     def reset(self, **kwargs):
+        del kwargs
         self.player = None
         self.player_list = list()
 
@@ -334,6 +336,7 @@ class MpfMc(App):
                          prev_value=prev_value, change=change)
 
     def tick(self, time):
+        del time
         self.ticks += 1
         self.events.process_event_queue()
 
@@ -344,24 +347,24 @@ class MpfMc(App):
 
             for scriptlet in self.machine_config['mc_scriptlets']:
                 i = __import__(
-                    self.machine_config['mpf-mc']['paths']['scriptlets']
-                    + '.'
-                    + scriptlet.split('.')[0], fromlist=[''])
+                    self.machine_config['mpf-mc']['paths']['scriptlets'] +
+                    '.' + scriptlet.split('.')[0], fromlist=[''])
 
                 self.scriptlets.append(getattr(i, scriptlet.split('.')[1])
                                        (mc=self,
                                         name=scriptlet.split('.')[1]))
 
     def _check_crash_queue(self, time):
+        del time
         try:
             crash = self.crash_queue.get(block=False)
         except queue.Empty:
             pass
-        except:
-            print("MPF Shutting down due to child thread crash")
+        else:
+            print("Shutting down due to child thread crash")
             print("Crash details: %s", crash)
             self.stop()
-            raise
+
 
     def register_monitor(self, monitor_class, monitor):
         """Registers a monitor.

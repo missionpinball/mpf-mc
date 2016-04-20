@@ -23,7 +23,7 @@ transition_map = dict(none=NoTransition,
 
 
 class SlideFrameParent(MpfWidget, FloatLayout):
-    def __init__(self, mc, name, config, slide_frame):
+    def __init__(self, mc, config, slide_frame):
         self.mc = mc
         self.name = slide_frame.name
         self.config = config
@@ -56,6 +56,7 @@ class SlideFrameParent(MpfWidget, FloatLayout):
     #     return self.stencil.config['z'] < other.stencil.config['z']
 
     def add_widget(self, widget, **kwargs):
+        del kwargs
         widget.config['z'] = abs(widget.config['z'])
 
         widget.pos = set_position(self.width, self.height,
@@ -101,7 +102,7 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         self.transition = NoTransition()
 
-        self.slide_frame_parent = SlideFrameParent(mc, name, self.config, self)
+        self.slide_frame_parent = SlideFrameParent(mc, self.config, self)
         self.slide_frame_parent.config = self.config
 
         self.mc.targets[self.name] = self

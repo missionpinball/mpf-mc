@@ -10,7 +10,6 @@ class McConfigPlayer(ConfigPlayer):
     config_file_players = dict()
 
     def __init__(self, machine):
-        from kivy.logger import Logger
         super().__init__(machine)
 
     def __repr__(self):

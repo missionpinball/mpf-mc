@@ -92,6 +92,8 @@ class BcpProcessor(object):
 
     def _get_from_queue(self, dt):
         """Gets and processes all queued up incoming BCP commands."""
+        del dt
+
         while not self.receive_queue.empty():
             cmd, kwargs = self.receive_queue.get(False)
             self._process_command(cmd, **kwargs)
@@ -129,6 +131,8 @@ class BcpProcessor(object):
 
     def _bcp_mode_start(self, name=None, priority=0, **kwargs):
         """Processes an incoming BCP 'mode_start' command."""
+        del kwargs
+
         if not name:
             return
             # todo raise error
@@ -139,10 +143,9 @@ class BcpProcessor(object):
         if name in self.mc.modes:
             self.mc.modes[name].start(priority=int(priority))
 
-        pass  # todo
-
     def _bcp_mode_stop(self, name, **kwargs):
         """Processes an incoming BCP 'mode_stop' command."""
+        del kwargs
         if not name:
             return
             # todo raise error
@@ -155,6 +158,7 @@ class BcpProcessor(object):
 
     def _bcp_error(self, **kwargs):
         """Processes an incoming BCP 'error' command."""
+        del kwargs
         Logger.warning('Received error command from client')
 
     def _bcp_ball_start(self, **kwargs):
@@ -169,25 +173,34 @@ class BcpProcessor(object):
 
     def _bcp_player_add(self, player_num, **kwargs):
         """Processes an incoming BCP 'player_add' command."""
+        del kwargs
         self.mc.add_player(int(player_num))
 
     def _bcp_player_variable(self, name, value, prev_value, change, player_num,
                              **kwargs):
         """Processes an incoming BCP 'player_variable' command."""
+        del prev_value
+        del change
+        del kwargs
         self.mc.update_player_var(name, value, int(player_num))
 
     def _bcp_machine_variable(self, name, value, change=True, prev_value=None,
                               **kwargs):
         """Processes an incoming BCP 'machine_variable' command."""
+        del kwargs
         self.mc.set_machine_var(name, value, change, prev_value)
 
     def _bcp_player_score(self, value, prev_value, change, player_num,
                           **kwargs):
         """Processes an incoming BCP 'player_score' command."""
+        del change
+        del prev_value
+        del kwargs
         self.mc.update_player_var('score', value, int(player_num))
 
     def _bcp_player_turn_start(self, player_num, **kwargs):
         """Processes an incoming BCP 'player_turn_start' command."""
+        del kwargs
         self.mc.player_start_turn(int(player_num))
 
     def _bcp_trigger(self, name, **kwargs):
@@ -196,6 +209,7 @@ class BcpProcessor(object):
 
     def _bcp_switch(self, name, state, **kwargs):
         """Processes an incoming BCP 'switch' command."""
+        del kwargs
         if int(state):
             self.mc.events.post('switch_' + name + '_active')
         else:
@@ -252,6 +266,7 @@ class BcpProcessor(object):
             # todo add per-track volume support to sound system
 
     def _bcp_reset(self, **kwargs):
+        del kwargs
         self.mc.reset()
 
         # temp todo

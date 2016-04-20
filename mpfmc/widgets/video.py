@@ -44,9 +44,17 @@ class VideoWidget(MpfWidget, Video):
         # copied and pasted from there, with the change that this method pulls
         # the video object from the MPF asset versus loading from a file and
         # it has the extra bit at the end to set the size and position
+
+        del largs
+
         if CoreVideo is None:
             raise TypeError("Could not find a video provider to play back "
                             "the video '{}'".format(self.video.file))
+
+        # pylint: disable=E0203
+        # Disable the error about accessing an attribute before its defined.
+        # self._video is defined in the base class, but not in a direct way, so
+        # pylint doesn't see it.
         if self._video:
             self._video.stop()
         elif self.video.video:
@@ -55,6 +63,8 @@ class VideoWidget(MpfWidget, Video):
             self._video.bind(on_load=self._on_load,
                              on_frame=self._on_video_frame,
                              on_eos=self._on_eos)
+            # This is also flagged as an error by pylint, but it's okay because
+            # self.state is defined in the base class.
             if self.state == 'play' or self.play:
                 self._video.play()
             self.duration = 1.
@@ -65,6 +75,8 @@ class VideoWidget(MpfWidget, Video):
     def on_texture(self, instance, value):
         # Overrides the base method to put the size into self.size instead of
         # self.texture_size
+        del instance
+
         if value is not None:
             if self.config['width'] and self.config['height']:
                 self.size = (self.config['width'], self.config['height'])

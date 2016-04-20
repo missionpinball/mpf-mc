@@ -1,10 +1,8 @@
-from collections import OrderedDict
 from copy import deepcopy
 from importlib import import_module
 import logging
 
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
-from mpf.core.utility_functions import Util
 
 
 class ConfigCollection(CaseInsensitiveDict):
@@ -65,7 +63,7 @@ class ConfigCollection(CaseInsensitiveDict):
 
 def create_config_collections(mc, collections):
 
-    for name, module in collections.items():
+    for module in collections.values():
         imported_module = import_module(module)
         setattr(mc, imported_module.collection_cls.collection,
                 imported_module.collection_cls(mc))
