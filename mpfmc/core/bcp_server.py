@@ -92,8 +92,15 @@ class BCPServer(threading.Thread):
 
                 # Receive the data in small chunks and retransmit it
                 while not self.mc.thread_stopper.is_set():
+
+                    # todo Better large message handling
+                    # if a json message comes in that's larger than 8192, it
+                    # won't be processed properly. So if we end up sticking
+                    # with BCP, we should probably change this to be smarter
+                    # and to check for complete messages before processing them
+
                     try:
-                        socket_chars = self.connection.recv(4096).decode(
+                        socket_chars = self.connection.recv(8192).decode(
                             'utf-8')
                         if socket_chars:
                             commands = socket_chars.split("\n")
