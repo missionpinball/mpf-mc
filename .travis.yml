@@ -21,10 +21,10 @@ install:
       sudo apt-get update;
       sudo apt-get -y install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev;
       sudo apt-get -y install libgstreamer1.0-dev gstreamer1.0-alsa gstreamer1.0-plugins-base gstreamer1.0-plugins-good;
-      sudo apt-get -y install python-dev libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff4-dev libX11-dev libmtdev-dev;
-      sudo apt-get -y install python-setuptools build-essential libgl1-mesa-dev libgles2-mesa-dev;
+      sudo apt-get -y install libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff4-dev libX11-dev libmtdev-dev;
+      sudo apt-get -y install build-essential libgl1-mesa-dev libgles2-mesa-dev;
       sudo apt-get -y install xvfb pulseaudio;
-      pip install --upgrade cython pillow coveralls;
+      pip install --upgrade cython pillow coveralls setuptools;
       pip install kivy;
       pip install https://github.com/missionpinball/mpf/zipball/${TRAVIS_BRANCH};
       python setup.py install;
