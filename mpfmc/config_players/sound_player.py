@@ -7,6 +7,7 @@ from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
 
+
 class McSoundPlayer(McConfigPlayer):
     """Base class for the Sound Player that runs on the mpf-mc side of things.
     It receives all of its instructions via BCP from a MpfSoundPlayer instance
@@ -55,6 +56,7 @@ Here are several various examples:
     show_section = 'sounds'
     machine_collection_name = 'sounds'
 
+    # pylint: disable-msg=too-many-arguments
     def play(self, settings, mode=None, caller=None,
              priority=0, play_kwargs=None, **kwargs):
         """Plays a validated sounds: section from a sound_player: section of a
@@ -67,6 +69,7 @@ Here are several various examples:
 
         <settings> can be:
 
+        action:
         priority:
         track:
         volume:
@@ -97,8 +100,6 @@ Here are several various examples:
             except (KeyError, TypeError):
                 s['priority'] = priority
 
-            # figure out track first since we need that to play a sound
-
             # Retrieve sound asset by name
             try:
                 sound = self.machine.sounds[sound_name]
@@ -119,7 +120,12 @@ Here are several various examples:
             except KeyError:
                 track = sound.track
 
-            track.play_sound(sound=sound, **s)
+            # Determine action to perform
+            if s['action'].lower() == 'play':
+                track.play_sound(sound=sound, **s)
+
+            elif s['action'].lower() == 'stop':
+                track.stop_sound(sound)
 
     def get_express_config(self, value):
         # express config for sounds is simply a string (sound name)
