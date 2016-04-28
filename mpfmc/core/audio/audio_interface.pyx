@@ -807,6 +807,11 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                 # Advance the output buffer pointer to the next sample (2 bytes)
                 index += 2
 
+                # Check if we are at the end of the source sample buffer (loop if applicable)
+                sound_processing_continue_check(cython.address(track.sound_players[player]))
+                if track.sound_players[player].status is player_finished:
+                    break
+
                 # Set volume for next loop
                 volume = <int> (
                     (1.0 - in_out_quad(index / fade_out_duration)) * track.sound_players[player].current.volume)
@@ -852,6 +857,11 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
 
                 # Advance the output buffer pointer to the next sample (2 bytes)
                 index += 2
+
+                # Check if we are at the end of the source sample buffer (loop if applicable)
+                sound_processing_continue_check(cython.address(track.sound_players[player]))
+                if track.sound_players[player].status is player_finished:
+                    break
 
                 # Set volume for next loop
                 volume = <int> (
@@ -950,20 +960,9 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                 index += 2
 
                 # Check if we are at the end of the source sample buffer (loop if applicable)
-                if track.sound_players[player].current.sample_pos > track.sound_players[player].current.chunk.alen:
-                    if track.sound_players[player].current.loops_remaining > 0:
-                        # At the end and still loops remaining, loop back to the beginning
-                        track.sound_players[player].current.loops_remaining -= 1
-                        track.sound_players[player].current.sample_pos = 0
-                        track.sound_players[player].current.current_loop += 1
-                    elif track.sound_players[player].current.loops_remaining == 0:
-                        # At the end and not looping, the sample has finished playing
-                        track.sound_players[player].status = player_finished
-                        break
-                    else:
-                        # Looping infinitely, loop back to the beginning
-                        track.sound_players[player].current.sample_pos = 0
-                        track.sound_players[player].current.current_loop += 1
+                sound_processing_continue_check(cython.address(track.sound_players[player]))
+                if track.sound_players[player].status is player_finished:
+                    break
 
         # Check if the sound has finished
         if track.sound_players[player].status is player_finished:
@@ -972,6 +971,33 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                                      callback_data.events,
                                      sdl_ticks)
             track.sound_players[player].status = player_idle
+
+cdef inline void sound_processing_continue_check(SoundPlayer* player) nogil:
+    """
+    Checks if the sound player pointer/sample position is at the end of
+    the source sample buffer.  If so, looping is handled according to
+    the current settings.
+    Args:
+        player: SoundPlayer pointer
+
+    Returns:
+        Bool flag indicating whether the current sound player processing loop
+        should continue (True) or be stopped (False)
+    """
+    # Check if we are at the end of the source sample buffer (loop if applicable)
+    if player.current.sample_pos > player.current.chunk.alen:
+        if player.current.loops_remaining > 0:
+            # At the end and still loops remaining, loop back to the beginning
+            player.current.loops_remaining -= 1
+            player.current.sample_pos = 0
+            player.current.current_loop += 1
+        elif player.current.loops_remaining == 0:
+            # At the end and not looping, the sample has finished playing
+            player.status = player_finished
+        else:
+            # Looping infinitely, loop back to the beginning
+            player.current.sample_pos = 0
+            player.current.current_loop += 1
 
 cdef void send_sound_stopped_event(int track_num, int player, int sound_id,
                                    AudioEventContainer **events, Uint32 sdl_ticks) nogil:
@@ -1716,7 +1742,7 @@ cdef class Track:
                 else:
                     audio_event.event = event_sound_play
 
-                audio_event.sound_id = self.attributes.sound_players[player].current.sound_id
+                audio_event.sound_id = sound.id
                 audio_event.track = self.number
                 audio_event.player = player
                 audio_event.time = SDL_GetTicks()
