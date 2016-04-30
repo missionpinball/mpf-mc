@@ -190,6 +190,9 @@ class MpfTextInput(Text):
 
     def complete(self):
         self.done()
+        self.mc.bcp_processor.send(bcp_command='trigger',
+            name='text_input_{}_complete'.format(self.key),
+            text=self.linked_text_widget.text)
         self.mc.events.post('text_input_{}_complete'.format(self.key),
                             text=self.linked_text_widget.text)
         """event: text_input_(key)_complete
