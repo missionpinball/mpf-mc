@@ -103,7 +103,13 @@ class TestAudio(MpfMcTestCase):
         self.mc.events.post('play_sound_synthping')
         self.advance_time(3)
         self.mc.events.post('play_sound_synthping')
-        self.advance_time(10)
+        self.advance_time(6)
+        self.mc.events.post('stop_sound_music')
+        self.advance_time(1)
+        self.mc.events.post('play_sound_synthping')
+        self.advance_time(2)
+
+        # TODO: Develop tests than can be evaluated by the test system and not the human ear
 
         """
         # Add another track with the same name (should not be allowed)
@@ -117,11 +123,13 @@ class TestAudio(MpfMcTestCase):
         # TODO: Tests to write:
         # Load sounds (wav, ogg, flac, unsupported format)
         # Play a sound
-        # Play two sounds on track with max_simultaneous_sounds = 1 (test sound queue, time expiration, priority scenarios)
+        # Play two sounds on track with max_simultaneous_sounds = 1 (test sound queue,
+        time expiration, priority scenarios)
         # Play a sound on each track simultaneously
         # Stop all sounds on track
         # Stop all sounds on all tracks
         # Ducking
-        # Configuration file tests (audio interface, tracks, sounds, sound player, sound trigger events, etc.)
+        # Configuration file tests (audio interface, tracks, sounds, sound player, sound
+        # trigger events, etc.)
         #
         """

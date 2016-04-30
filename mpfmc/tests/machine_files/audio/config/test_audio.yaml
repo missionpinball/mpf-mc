@@ -58,12 +58,15 @@ sound_player:
     play_sound_synthping: 210871_synthping
     play_sound_text:
         264828_text:
-          loops: 3
-          priority: 100
+            loops: 3
+            priority: 100
     play_sound_moron_test: 104457_moron_test
     play_sound_test:
         113690_test:
-          volume: 0.25
+            volume: 0.25
     play_sound_music:
         263774_music:
-          volume: 0.5
+            volume: 0.5
+    stop_sound_music:
+        263774_music:
+            action: stop
