@@ -208,6 +208,6 @@ def load_machine_config(config_file_list, machine_path,
                                        config_file)
 
         machine_config = Util.dict_merge(machine_config,
-            ConfigProcessor.load_config_file(config_file))
+            ConfigProcessor.load_config_file(config_file, 'machine'))
 
     return machine_config

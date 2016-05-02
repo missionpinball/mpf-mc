@@ -124,7 +124,7 @@ class Command(object):
         logging.getLogger('').addHandler(console)
 
         mpf_config = ConfigProcessor.load_config_file(os.path.join(
-            mpfmc.__path__[0], args.mcconfigfile))
+            mpfmc.__path__[0], args.mcconfigfile), 'machine')
 
         machine_path = set_machine_path(machine_path,
                                         mpf_config['mpf-mc']['paths'][

@@ -144,7 +144,7 @@ class MpfMcTestCase(unittest.TestCase):
 
         mpf_config = ConfigProcessor.load_config_file(os.path.abspath(
             os.path.join(mpfmc.__path__[0], os.pardir,
-                         self.get_options()['mcconfigfile'])))
+                         self.get_options()['mcconfigfile'])), 'machine')
 
         machine_path = os.path.abspath(os.path.join(
             mpfmc.__path__[0], os.pardir, 'mpfmc', self.get_machine_path()))

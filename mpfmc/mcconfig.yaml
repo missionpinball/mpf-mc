@@ -39,10 +39,6 @@ modes:
     - attract
     - game
 
-textstrings:
-    volume_zero: OFF
-    volume_max: MAX
-
 assets:
     images:
         default:
