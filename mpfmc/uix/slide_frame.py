@@ -285,9 +285,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         # re-adds the screen.
 
         if not slide:
-            self.current_slide.priority = 0
-            self.current_slide.creation_order = 0
-            return
+            slide = self.add_slide(name='blank', priority=0, mode=None)
 
         try:
             self.current = slide.name

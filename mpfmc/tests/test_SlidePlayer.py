@@ -431,3 +431,17 @@ class TestSlidePlayer(MpfMcTestCase):
         self.advance_time(1)
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_1')
+
+    def test_removing_last_slide(self):
+
+        self.mc.events.post('show_slide_1')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'machine_slide_1')
+        self.advance_time()
+        self.mc.targets['default'].remove_slide('machine_slide_1')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'blank')
+        self.assertEqual(1, len(self.mc.targets['default'].screens))
+
