@@ -96,7 +96,6 @@ class TestSlides(MpfMcTestCase):
         self.assertEqual(widget_tree[3].text, 'SLIDE TEST 1-1')
 
     def test_slides_from_config(self):
-
         self.assertIn('slide1', self.mc.slides)
         self.assertIn('slide2', self.mc.slides)
         self.assertIn('slide3', self.mc.slides)
