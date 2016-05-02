@@ -165,26 +165,3 @@ class Mode(object):
                 pass
 
         self.stop_methods = list()
-
-        self.remove_slides()
-        self.remove_widgets()
-
-    def remove_slides(self):
-        """Removes all the slides from this mode from the active targets."""
-
-        target_list = set(self.mc.targets.values())
-        for target in target_list:
-            for screen in [x for x in target.screens if x.mode == self]:
-                target.remove_slide(screen)
-
-    def remove_widgets(self):
-        # remove widgets from slides
-        for slide in self.mc.active_slides.values():
-            slide.remove_widgets_by_mode(self)
-
-        # remove widgets from slide frame parents
-        target_list = set(self.mc.targets.values())
-        for target in target_list:
-            for widget in [x for x in target.parent.children if
-                           x.mode == self]:
-                target.parent.remove_widget(widget)

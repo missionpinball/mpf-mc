@@ -108,6 +108,21 @@ class McWidgetPlayer(McConfigPlayer):
     def get_express_config(self, value):
         return dict(widget=value)
 
+    def clear(self, caller, priority):
+        self.remove_widgets(mode=caller)
+
+    def remove_widgets(self, mode):
+        # remove widgets from slides
+        for slide in self.machine.active_slides.values():
+            slide.remove_widgets_by_mode(mode)
+
+        # remove widgets from slide frame parents
+        target_list = set(self.machine.targets.values())
+        for target in target_list:
+            for widget in [x for x in target.parent.children if
+                           x.mode == mode]:
+                target.parent.remove_widget(widget)
+
 
 player_cls = MpfWidgetPlayer
 mc_player_cls = McWidgetPlayer

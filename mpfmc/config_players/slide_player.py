@@ -262,6 +262,17 @@ class McSlidePlayer(McConfigPlayer):
 
         return validated_dict
 
+    def clear(self, caller, priority):
+        self.remove_slides(mode=caller)
+
+    def remove_slides(self, mode):
+        """Removes all the slides from this mode from the active targets."""
+
+        target_list = set(self.machine.targets.values())
+        for target in target_list:
+            for screen in [x for x in target.screens if x.mode == mode]:
+                target.remove_slide(screen)
+
 
 class MpfSlidePlayer(PluginPlayer):
     """Base class for part of the slide player which runs as part of MPF.
