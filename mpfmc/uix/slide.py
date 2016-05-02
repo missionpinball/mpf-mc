@@ -76,6 +76,7 @@ class Slide(Screen):
         target.add_widget(self)
         mc.slides[name] = config
 
+        # todo make transparency an option?
         # Make the slide not transparent. (Widgets are drawn in reverse order,
         # so the before method draws it on the bottom.)
         with self.canvas.before:
@@ -209,7 +210,7 @@ class Slide(Screen):
         of a -50 widget.
 
         """
-        self.parent.parent.parent.add_widget(widget)
+        self.manager.parent.parent.add_widget(widget)
 
     def schedule_removal(self, secs):
         self.mc.clock.schedule_once(self.remove, secs)
@@ -217,15 +218,8 @@ class Slide(Screen):
     def remove(self, dt):
         del dt
 
-        # if there's a slide_frame, we want to remove this slide from there
-
-        try:
-            self.parent.remove_slide(slide=self,
-                                     transition_config=self.transition_out)
-
-        except AttributeError:  # no parent
-            self.prepare_for_removal()
-            self.mc.active_slides.pop(self.name, None)
+        self.manager.remove_slide(slide=self,
+                                  transition_config=self.transition_out)
 
     def prepare_for_removal(self):
         self.mc.clock.unschedule(self.remove)

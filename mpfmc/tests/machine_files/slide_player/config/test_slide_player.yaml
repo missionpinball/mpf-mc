@@ -181,3 +181,9 @@ slide_player:
     machine_slide_8:
       action: remove
       transition: fade
+  slide1_expire_1s:
+    machine_slide_1:
+      expire: 1s
+  slide2_expire_1s:
+    machine_slide_2:
+      expire: 1s

@@ -187,7 +187,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             except KeyError:
                 pass
 
-        # If there's an exprire kwarg, that takes priority over slide's expire
+        # If there's an expire kwarg, that takes priority over slide's expire
         if expire:
             slide.schedule_removal(expire)
         elif slide.expire:
@@ -228,8 +228,9 @@ class SlideFrame(MpfWidget, ScreenManager):
                         expire=expire, play_kwargs=play_kwargs)
 
     def remove_slide(self, slide, transition_config=None):
-        # Note that you can't remove the last slide, but if you try it will
-        # change the priority so it gets removed by whatever comes next
+        # Note that you can't remove the last slide, so if you try it will
+        # create a new slide called "blank" which is a blank slide and priority
+        # 0 and show that instead
 
         # slide can be slide name or slide obj
 
@@ -250,7 +251,7 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         self.mc.active_slides.pop(slide.name, None)
 
-        # If the current screen is the active one, find the next highest
+        # If the current slide is the active one, find the next highest
         # priority one to show instead.
         if self.current_screen == slide:
             new_slide = self.get_next_highest_slide(slide)
@@ -273,8 +274,8 @@ class SlideFrame(MpfWidget, ScreenManager):
 
     def _set_current_slide(self, slide):
         # slide frame requires at least one slide, so if you try to set current
-        # to None, it will just mark the current slide as the lowest priority
-        # so it can be overwritten by anything
+        # to None, it will create a new slide called 'blank' at priority 0 and
+        # show that one
 
         # I think there's a bug in Kivy 1.9.1. According to the docs, you
         # should be able to set self.current to a screen name. But if that
