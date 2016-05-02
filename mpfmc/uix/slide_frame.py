@@ -224,7 +224,7 @@ class SlideFrame(MpfWidget, ScreenManager):
                                    priority=priority, mode=mode)
 
         self.show_slide(slide_name=slide_obj.name, transition=transition,
-                        priority=priority, mode=mode, force=force,
+                        priority=priority, force=force,
                         expire=expire, play_kwargs=play_kwargs)
 
     def remove_slide(self, slide, transition_config=None):
