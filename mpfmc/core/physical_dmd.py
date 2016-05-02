@@ -30,6 +30,8 @@ class PhysicalDmdBase(object):
         effect_list.append(Gain(gain=0.3))
         self.effect_widget.effects = effect_list
 
+        self.fbo.add(self.effect_widget.canvas)
+
         self._set_dmd_fps(fps)
 
     def _set_dmd_fps(self, fps):
@@ -76,12 +78,6 @@ class PhysicalDmdBase(object):
             parent.remove_widget(widget)
 
         self.effect_widget.add_widget(widget)
-
-        fbo.add(self.effect_widget.canvas)
-
-        # todo something is slow here. Quick tests show it might be binding and
-        # releasing the FBO. Maybe move this to its own thread? Need to
-        # experiment more.
 
         # clear the fbo background
         fbo.bind()
