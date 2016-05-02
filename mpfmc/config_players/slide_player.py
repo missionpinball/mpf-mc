@@ -298,6 +298,9 @@ class MpfSlidePlayer(PluginPlayer):
 
         # todo make transition manager validation static and use that here too
 
+        device_settings = self.machine.config_validator.validate_config(
+            'slide_player', device_settings)
+
         if 'transition' in device_settings:
             if not isinstance(device_settings['transition'], dict):
                 device_settings['transition'] = dict(
