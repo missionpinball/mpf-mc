@@ -217,13 +217,15 @@ class Slide(Screen):
     def remove(self, dt):
         del dt
 
-        del self.mc.active_slides[self.name]
+        # if there's a slide_frame, we want to remove this slide from there
 
         try:
             self.parent.remove_slide(slide=self,
                                      transition_config=self.transition_out)
+
         except AttributeError:  # no parent
-            pass
+            self.prepare_for_removal()
+            self.mc.active_slides.pop(self.name, None)
 
     def prepare_for_removal(self):
         self.mc.clock.unschedule(self.remove)
