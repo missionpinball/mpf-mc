@@ -76,3 +76,7 @@ class TestSlideFrame(MpfMcTestCase):
         self.assertEqual(
             frame1_frame.current_slide.children[0].children[0].text,
             'TEXT IN FRAME')
+
+    def test_remove_non_existent_slide(self):
+        self.assertFalse(self.mc.targets['default'].remove_slide('hello'))
+        self.advance_time()

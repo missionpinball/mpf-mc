@@ -215,11 +215,19 @@ class Slide(Screen):
     def schedule_removal(self, secs):
         self.mc.clock.schedule_once(self.remove, secs)
 
-    def remove(self, dt):
+    def remove(self, dt=None):
         del dt
 
-        self.manager.remove_slide(slide=self,
-                                  transition_config=self.transition_out)
+        try:
+            self.manager.remove_slide(slide=self,
+                                      transition_config=self.transition_out)
+
+        except AttributeError:
+            # looks like slide was already removed, but let's clean it up just
+            # in case
+
+            self.prepare_for_removal()
+            self.mc.active_slides.pop(self.name, None)
 
     def prepare_for_removal(self):
         self.mc.clock.unschedule(self.remove)

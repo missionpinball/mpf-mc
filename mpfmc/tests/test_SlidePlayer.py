@@ -456,13 +456,30 @@ class TestSlidePlayer(MpfMcTestCase):
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'machine_slide_2')
 
-        print(self.mc.targets['default'].screens)
-
         self.advance_time(1)
-
-
 
         # should be back to blank, because slide1 expired while slide 2 was up
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'blank')
         self.assertEqual(1, len(self.mc.targets['default'].screens))
+
+    def test_remove_already_removed_slide(self):
+        self.mc.events.post('slide1_expire_1s')
+        self.advance_time(.1)
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'machine_slide_1')
+
+        # grab a reference to this slide
+        slide1 = self.mc.targets['default'].current_slide
+
+        self.advance_time(1)
+
+        # should be blank, because slide1 expired
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'blank')
+        self.assertEqual(1, len(self.mc.targets['default'].screens))
+
+        # now try to call the now-gone slide's remove
+
+        slide1.remove()
+        self.advance_time()
