@@ -14,8 +14,8 @@ class PhysicalDmdBase(object):
 
     def __init__(self, mc, config, fps):
         self.mc = mc
-        self.config = (self.mc.config_validator.validate_config('physical_dmd',
-                                                                config))
+
+        self.config = self._get_validated_config(config)
 
         self.source = self.mc.displays[self.config['source_display']]
         self.prev_data = None
@@ -28,12 +28,22 @@ class PhysicalDmdBase(object):
 
         effect_list = list()
         effect_list.append(FlipVertical())
-        effect_list.append(Gain(gain=0.3))
+
+        if self.config['brightness'] != 1.0:
+            if not 0.0 <= self.config['brightness'] <= 1.0:
+                raise ValueError("DMD brightness value should be between 0.0 "
+                    "and 1.0. Yours is {}".format(self.config['brightness']))
+
+            effect_list.append(Gain(gain=self.config['brightness']))
+
         self.effect_widget.effects = effect_list
 
         self.fbo.add(self.effect_widget.canvas)
 
         self._set_dmd_fps(fps)
+
+    def _get_validated_config(self, config):
+        raise NotImplementedError
 
     def _set_dmd_fps(self, fps):
         # fps is the rate that the connected client requested. We'll use the
@@ -107,6 +117,9 @@ class PhysicalDmdBase(object):
 
 class PhysicalDmd(PhysicalDmdBase):
 
+    def _get_validated_config(self, config):
+        return self.mc.config_validator.validate_config('physical_dmd', config)
+
     def _convert_to_single_bytes(self, data):
 
         new_data = bytearray()
@@ -133,6 +146,10 @@ class PhysicalDmd(PhysicalDmdBase):
 class PhysicalRgbDmd(PhysicalDmdBase):
 
     dmd_name_string = 'Physical RGB DMD'
+
+    def _get_validated_config(self, config):
+        return self.mc.config_validator.validate_config('physical_rgb_dmd',
+                                                        config)
 
     def send(self, data):
         self.mc.bcp_processor.send('rgb_dmd_frame', rawbytes=data)

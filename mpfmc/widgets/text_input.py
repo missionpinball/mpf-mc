@@ -226,4 +226,3 @@ class MpfTextInput(Text):
     def prepare_for_removal(self, widget):
         self.done()
         super().prepare_for_removal(widget)
-
