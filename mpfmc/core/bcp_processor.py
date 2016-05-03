@@ -273,7 +273,7 @@ class BcpProcessor(object):
         self.send('reset_complete')
 
     def _bcp_dmd_start(self, fps):
-        self.mc.create_phyiscal_dmd(fps)
+        self.mc.create_physical_dmd(fps)
 
     def _bcp_rgb_dmd_start(self, fps):
         self.mc.create_physical_rgb_dmd(fps)

@@ -1,4 +1,5 @@
 """Physical DMD"""
+import struct
 from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
@@ -106,7 +107,26 @@ class PhysicalDmdBase(object):
 
 class PhysicalDmd(PhysicalDmdBase):
 
+    def _convert_to_single_bytes(self, data):
+
+        new_data = bytearray()
+        loops = 0
+
+        for r, g, b in struct.iter_unpack('BBB', data):
+            loops += 1
+            try:
+                pixel_weight = ((r * .299) + (g * .587) + (b * .114)) / 255.
+                new_data.append(int(round(pixel_weight * 15)))
+
+            except ValueError:
+                raise ValueError(loops, r, g, b)
+
+        return bytes(new_data)
+
     def send(self, data):
+
+        data = self._convert_to_single_bytes(data)
+
         self.mc.bcp_processor.send('dmd_frame', rawbytes=data)
 
 
