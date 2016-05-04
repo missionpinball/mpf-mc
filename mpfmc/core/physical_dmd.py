@@ -37,6 +37,7 @@ class PhysicalDmdBase(object):
             effect_list.append(Gain(gain=self.config['brightness']))
 
         self.effect_widget.effects = effect_list
+        self.effect_widget.size = self.source.size
 
         self.fbo.add(self.effect_widget.canvas)
 
@@ -170,6 +171,6 @@ class FlipVertical(EffectBase):
         vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
 
         {{
-        return texture2D(texture, vec2(tex_coords.x, .32 - tex_coords.y));
+        return texture2D(texture, vec2(tex_coords.x, 1.0 - tex_coords.y));
         }}
         '''
