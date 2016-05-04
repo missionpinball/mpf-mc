@@ -176,16 +176,16 @@ cdef enum SoundPlayerStatus:
 ctypedef struct DuckingSettings:
     int track
     int envelope_num
-    int attack_start_pos
-    int attack_duration
+    Uint32 attack_start_pos
+    Uint32 attack_duration
     Uint8 attenuation_volume
-    int release_start_pos
-    int release_duration
+    Uint32 release_start_pos
+    Uint32 release_duration
 
 ctypedef struct DuckingEnvelope:
     DuckingEnvelopeStage stage
-    int stage_pos
-    int stage_duration
+    Uint32 stage_pos
+    Uint32 stage_duration
     Uint8 stage_initial_volume
     Uint8 stage_target_volume
     Uint8 current_volume
@@ -205,7 +205,7 @@ ctypedef struct SoundSettings:
     int current_loop
     Uint32 start_time
     Uint32 samples_elapsed
-    int sample_pos
+    Uint32 sample_pos
     int sound_id
     int sound_priority
     int sound_has_ducking
