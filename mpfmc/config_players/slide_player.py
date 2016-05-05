@@ -364,10 +364,10 @@ class MpfSlidePlayer(PluginPlayer):
     def process_widget(self, config):
         # config is localized widget settings
 
+        config['_default_settings'] = list(config.keys())
+
         self.machine.config_validator.validate_config('widgets:{}'.format(
             config['type']).lower(), config, base_spec='widgets:common')
-
-        config['_default_settings'] = list()
 
         if 'animations' in config:
             config['animations'] = self.process_animations(
