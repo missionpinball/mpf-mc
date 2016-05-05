@@ -41,6 +41,12 @@ class TestWidgetStyles(MpfMcTestCase):
         with self.assertRaises(ValueError):
             self.advance_time()
 
+    def test_local_setting_overrides_style(self):
+        self.mc.events.post('slide5')
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().font_size, 50)
+
     # todo some future release
 
     # def test_mode_style(self):

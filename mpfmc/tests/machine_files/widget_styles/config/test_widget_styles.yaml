@@ -33,8 +33,14 @@ slides:
     - type: text
       text: TESTING INVALID STYLE
       style: bogus
+  slide5:
+    - type: text
+      text: HELLO
+      style: big
+      font_size: 50
 
 slide_player:
   slide1: slide1
   slide3: slide3
   slide4: slide4
+  slide5: slide5
