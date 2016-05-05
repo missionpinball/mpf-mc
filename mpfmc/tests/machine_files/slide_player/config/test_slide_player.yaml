@@ -98,6 +98,19 @@ slides:
       height: 300
       color: lime
     transition: move_in
+  machine_slide_10:
+    widgets:
+    - type: text
+      text: WIDGET 1
+      animations:
+        flash_widget_1:
+        - property: opacity
+          value: 1
+          duration: .25s
+        - property: opacity
+          value: 0
+          duration: .25s
+          repeat: yes
 
 slide_player:
   show_slide_1: machine_slide_1
@@ -187,3 +200,17 @@ slide_player:
   slide2_expire_1s:
     machine_slide_2:
       expire: 1s
+  show_slide_with_animations:
+    my_slide:
+      widgets:
+      - type: text
+        text: WIDGET 1
+        animations:
+          flash_widget_2:
+          - property: opacity
+            value: 1
+            duration: .25s
+          - property: opacity
+            value: 0
+            duration: .25s
+            repeat: yes

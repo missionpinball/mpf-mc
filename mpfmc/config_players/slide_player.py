@@ -399,10 +399,6 @@ class MpfSlidePlayer(PluginPlayer):
 
             config[event_name] = new_list
 
-            # make sure the event_name is registered as a trigger event so MPF
-            # will send those events as triggers via BCP
-            self.machine.bcp.add_registered_trigger_event(event_name)
-
         return config
 
     def process_animation(self, config, mode=None):

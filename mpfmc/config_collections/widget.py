@@ -94,6 +94,12 @@ class Widget(ConfigCollection):
 
         for event_name, event_settings in config.items():
 
+            # make sure the event_name is registered as a trigger event so MPF
+            # will send those events as triggers via BCP
+            if event_name != 'entrance':
+                self.mc.bcp_processor.send(bcp_command='register_trigger',
+                                           event=event_name)
+
             # str means it's a list of named animations
             if type(event_settings) is str:
                 event_settings = Util.string_to_list(event_settings)

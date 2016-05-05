@@ -1,11 +1,12 @@
-import json
-
 from kivy.uix.screenmanager import WipeTransition, FadeTransition
 
-from mpf.core.bcp import decode_command_string
 from mpf.core.config_player import ConfigPlayer
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from mpfmc.transitions.move_in import MoveInTransition
+from mpf.tests.MpfTestCase import MpfTestCase
+
+import mpfmc.core
+import os
 
 
 class TestSlidePlayer(MpfMcTestCase):
@@ -483,3 +484,37 @@ class TestSlidePlayer(MpfMcTestCase):
 
         slide1.remove()
         self.advance_time()
+
+    def test_animation_triggers(self):
+        bcp_command = ('register_trigger', None, {'event': 'flash_widget_1'})
+        self.assertIn(bcp_command, self.sent_bcp_commands)
+
+        bcp_command = ('register_trigger', None, {'event': 'flash_widget_2'})
+        self.assertIn(bcp_command, self.sent_bcp_commands)
+
+
+class TestMpfSlidePlayer(MpfTestCase):
+
+    # runs the MPF tests (and not the MPF-MC ones) to test the MPF side of the
+    # slide player plugin
+
+    def __init__(self, methodName):
+        super().__init__(methodName)
+        # remove config patch which disables bcp
+        del self.machine_config_patches['bcp']
+
+    def getAbsoluteMachinePath(self):
+        # override the base to we set the patch based on the mpfmc location
+        return os.path.abspath(os.path.join(
+            mpfmc.core.__path__[0], os.pardir, self.getMachinePath()))
+
+    def get_enable_plugins(self):
+        return True
+
+    def getConfigFile(self):
+        return 'test_slide_player.yaml'
+
+    def getMachinePath(self):
+        return 'tests/machine_files/slide_player/'
+
+    # todo add tests

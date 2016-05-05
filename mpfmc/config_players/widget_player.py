@@ -11,6 +11,7 @@ class MpfWidgetPlayer(PluginPlayer):
 
     """
     config_file_section = 'widget_player'
+    show_section = 'widgets'
 
     def play(self, settings, mode=None, play_kwargs=None, **kwargs):
 
