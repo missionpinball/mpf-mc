@@ -33,7 +33,7 @@ mpf-mc:
         scriptlets: scriptlets
 
     allow_invalid_config_sections: true
-    fps: auto
+    fps: 30
 
 modes:
     - attract

@@ -11,7 +11,9 @@ import time
 
 import errno
 
-
+# Note, other imports are done deeper in this file, which we need to do there
+# since Kivy does so much with singletons and we don't want MPF to import
+# them when it reads this command
 
 
 class Command(object):
@@ -30,7 +32,6 @@ class Command(object):
         import mpfmc
         from mpf.core.utility_functions import Util
         from mpfmc.core.config_processor import ConfigProcessor
-        from mpfmc.core.mc import MpfMc
         from mpfmc.core.utils import set_machine_path, load_machine_config
 
         del mpf_path
@@ -136,6 +137,8 @@ class Command(object):
 
         self.preprocess_config(mpf_config)
 
+        from mpfmc.core.mc import MpfMc
+
         print("Loading MPF-MC controller")
         MpfMc(options=vars(args), config=mpf_config,
               machine_path=machine_path).run()
@@ -190,12 +193,7 @@ class Command(object):
         except KeyError:
             pass
 
-        try:
-            fps = int(config['mpf-mc']['fps'])
-        except ValueError:
-            fps = 30
-        Config.set('graphics', 'maxfps', fps)
-        Config.write()
+        Config.set('graphics', 'maxfps', int(config['mpf-mc']['fps']))
 
 
 def get_command():

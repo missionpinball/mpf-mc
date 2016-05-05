@@ -5,7 +5,10 @@ controller.
 
 from kivy.logger import Logger
 from mpf.core.config_processor import ConfigProcessor as ConfigProcessorBase
-from mpfmc.uix.display import Display
+
+# from mpfmc.uix.display import Display is imported deeper in this file
+# we need it there because if we do a standard import, the Clock is created
+# before we have a chance to read the config and set the maxfps
 
 
 class ConfigProcessor(ConfigProcessorBase):
@@ -32,6 +35,7 @@ class ConfigProcessor(ConfigProcessorBase):
             pass
 
         if not self.mc.displays:
+            from mpfmc.uix.display import Display
             Display.create_default_display(self.mc)
 
     def _init(self):
@@ -45,6 +49,7 @@ class ConfigProcessor(ConfigProcessorBase):
 
     def create_display(self, name, config):
         # config is localized display settings
+        from mpfmc.uix.display import Display
         return Display(self.mc, name,
             **self.machine.config_validator.validate_config('displays',
                                                             config))
