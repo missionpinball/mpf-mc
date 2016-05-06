@@ -138,12 +138,11 @@ class TestAudio(MpfMcTestCase):
         self.mc.events.post('play_sound_synthping')
         self.advance_time(1)
 
-        # Test playing sound pool
-        self.mc.events.post('play_sound_drum_group')
-        self.advance_time(0.1)
-        self.mc.events.post('play_sound_drum_group')
-        self.advance_time(0.1)
-        self.mc.events.post('play_sound_drum_group')
+        # Test playing sound pool (many times)
+        for x in range(16):
+            self.mc.events.post('play_sound_drum_group')
+            self.advance_time(0.1)
+
         self.advance_time(1)
 
         # Test sound events
