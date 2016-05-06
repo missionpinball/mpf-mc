@@ -2,3 +2,6 @@
 
 mode:
   priority: 500
+
+sound_player:
+    play_sound_synthping_in_mode: 210871_synthping

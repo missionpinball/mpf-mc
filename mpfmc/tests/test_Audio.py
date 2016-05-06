@@ -82,6 +82,11 @@ class TestAudio(MpfMcTestCase):
         # Allow some time for sound assets to load
         self.advance_time(2)
 
+        # Start mode
+        self.send(bcp_command='mode_start', name='mode1', priority=500)
+        self.assertTrue(self.mc.modes['mode1'].active)
+        self.assertEqual(self.mc.modes['mode1'].priority, 500)
+
         # /sounds/sfx
         self.assertIn('198361_sfx-028', self.mc.sounds)     # .wav
         self.assertIn('210871_synthping', self.mc.sounds)   # .wav
@@ -134,6 +139,7 @@ class TestAudio(MpfMcTestCase):
         self.mc.events.post('play_sound_synthping')
         self.advance_time(6)
         self.mc.events.post('stop_sound_music')
+        self.mc.events.post('play_sound_synthping_in_mode')
         self.advance_time(1)
         self.mc.events.post('play_sound_synthping')
         self.advance_time(1)
