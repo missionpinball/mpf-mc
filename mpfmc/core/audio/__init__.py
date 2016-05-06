@@ -77,7 +77,8 @@ class SoundSystem(object):
 
         # Initialize audio interface library (get audio output)
         try:
-            self.audio_interface = AudioInterface.initialize(rate=self.config['frequency'],
+            self.audio_interface = AudioInterface.initialize(mc=self.mc,
+                                                             rate=self.config['frequency'],
                                                              channels=self.config['channels'],
                                                              buffer_samples=self.config['buffer'])
         except AudioException:

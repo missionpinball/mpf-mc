@@ -1,3 +1,5 @@
+"""Contains the sound config player class"""
+
 from copy import deepcopy
 
 # WARNING: Do not import kivy's logger here since that will trigger Kivy to
@@ -56,7 +58,7 @@ Here are several various examples:
     show_section = 'sounds'
     machine_collection_name = 'sounds'
 
-    # pylint: disable-msg=too-many-arguments
+    # pylint: disable=too-many-arguments
     def play(self, settings, mode=None, caller=None,
              priority=0, play_kwargs=None, **kwargs):
         """Plays a validated sounds: section from a sound_player: section of a
@@ -71,7 +73,6 @@ Here are several various examples:
 
         action:
         priority:
-        track:
         volume:
         loops:
         max_queue_time:
@@ -81,7 +82,8 @@ Here are several various examples:
             must be specified in the sounds section of a config file.
 
         """
-        # super().play(settings, mode, caller, priority, play_kwargs)
+        del caller
+        del mode
 
         # todo figure out where the settings are coming from and see if we can
         # move the deepcopy there?
@@ -114,21 +116,15 @@ Here are several various examples:
 
             s.update(kwargs)
 
-            # Get track by name. If track was not provided, use the default track name from the sound.
-            try:
-                track = self.machine.sound_system.tracks[s.pop('track')]
-            except KeyError:
-                track = sound.track
-
             # Determine action to perform
             if s['action'].lower() == 'play':
-                track.play_sound(sound=sound, **s)
+                sound.play(s)
 
             elif s['action'].lower() == 'stop':
-                track.stop_sound(sound)
+                sound.stop()
 
     def get_express_config(self, value):
-        # express config for sounds is simply a string (sound name)
+        """ express config for sounds is simply a string (sound name)"""
         return dict(sound=value)
 
     def validate_config(self, config):
@@ -174,6 +170,7 @@ Here are several various examples:
         return validated_config
 
     def validate_show_config(self, device, device_settings):
+        """Validates the config when in a show"""
         validated_dict = super().validate_show_config(device, device_settings)
         # device is sound name
         return validated_dict
@@ -193,9 +190,11 @@ class MpfSoundPlayer(PluginPlayer):
     show_section = 'sounds'
 
     def validate_show_config(self, device, device_settings):
+        """Validates the config in a show"""
         # device is sound name, device_settings
 
-        device_settings = self.machine.config_validator.validate_config("sound_player", device_settings)
+        device_settings = self.machine.config_validator.validate_config("sound_player",
+                                                                        device_settings)
 
         return_dict = dict()
         return_dict[device] = device_settings
@@ -208,4 +207,5 @@ mc_player_cls = McSoundPlayer
 
 
 def register_with_mpf(machine):
+    """Registers the sound player plug-in with MPF"""
     return 'sound', MpfSoundPlayer(machine)

@@ -38,14 +38,17 @@ sounds:
     264828_text:
         loops: 7
     104457_moron_test:
+        events_when_played: moron_test_played
+        events_when_stopped: moron_test_stopped
         ducking:
             target: music
             delay: 0
-            attack: 0.4sec
-            attenuation: -9db
-            release_point: 1sec
-            release: 1.25sec
+            attack: 1.0sec
+            attenuation: -18db
+            release_point: 3sec
+            release: 2.25sec
     210871_synthping:
+        events_when_played: synthping_played
         ducking:
             target: music
             delay: 0
@@ -53,6 +56,15 @@ sounds:
             attenuation: -9db
             release_point: 0.5sec
             release: 0.6sec
+
+sound_pools:
+    drum_group:
+        load: preload
+        type: sequence
+        sounds:
+            4832__zajo__drum07
+            84480__zgump__drum-fx-4
+            100184__menegass__rick-drum-bd-hard
 
 sound_player:
     play_sound_synthping: 210871_synthping
@@ -70,3 +82,4 @@ sound_player:
     stop_sound_music:
         263774_music:
             action: stop
+    play_sound_drum_group: drum_group

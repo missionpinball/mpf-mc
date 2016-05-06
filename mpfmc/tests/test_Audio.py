@@ -1,5 +1,6 @@
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from kivy.logger import Logger
+from mock import MagicMock
 
 
 class TestAudio(MpfMcTestCase):
@@ -73,13 +74,26 @@ class TestAudio(MpfMcTestCase):
         self.assertAlmostEqual(track_music.volume, 0.5)
         self.assertEqual(track_music.max_simultaneous_sounds, 1)
 
+        self.assertTrue(self.mc, 'sounds')
+
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+
         # Allow some time for sound assets to load
         self.advance_time(2)
+
+        # Start mode
+        self.send(bcp_command='mode_start', name='mode1', priority=500)
+        self.assertTrue(self.mc.modes['mode1'].active)
+        self.assertEqual(self.mc.modes['mode1'].priority, 500)
 
         # /sounds/sfx
         self.assertIn('198361_sfx-028', self.mc.sounds)     # .wav
         self.assertIn('210871_synthping', self.mc.sounds)   # .wav
         self.assertIn('264828_text', self.mc.sounds)        # .ogg
+        self.assertIn('4832__zajo__drum07', self.mc.sounds)   # .wav
+        self.assertIn('84480__zgump__drum-fx-4', self.mc.sounds)   # .wav
+        self.assertIn('100184__menegass__rick-drum-bd-hard', self.mc.sounds)   # .wav
 
         # /sounds/voice
         self.assertIn('104457_moron_test', self.mc.sounds)  # .wav
@@ -87,6 +101,16 @@ class TestAudio(MpfMcTestCase):
 
         # /sounds/music
         self.assertIn('263774_music', self.mc.sounds)       # .wav
+
+        # Sound groups
+        self.assertIn('drum_group', self.mc.sounds)
+
+        # Check if sounds are in special sounds_by_id list
+        self.assertIn(self.mc.sounds['104457_moron_test'].id, self.mc.sounds_by_id)
+        self.assertIn(self.mc.sounds['210871_synthping'].id, self.mc.sounds_by_id)
+
+        # Test baseline internal audio event count
+        self.assertEqual(interface.get_in_use_sound_event_count(), 0)
 
         # Test sound_player
         self.mc.events.post('play_sound_text')
@@ -96,20 +120,45 @@ class TestAudio(MpfMcTestCase):
         # Test two sounds at the same time on the voice track (only
         # 1 sound at a time max).  Second sound should be queued and
         # play immediately after the first one ends.
+        self.assertEqual(track_voice.get_sound_queue_count(), 0)
         self.mc.events.post('play_sound_test')
-        self.advance_time(2)
+        self.advance_time()
+
+        # Make sure first sound is playing on the voice track
+        self.assertEqual(track_voice.get_status()[0]['sound_id'], self.mc.sounds['113690_test'].id)
         self.mc.events.post('play_sound_moron_test')
-        self.advance_time(3)
+        self.advance_time()
+
+        # Make sure first sound is still playing and the second one has been queued
+        self.assertEqual(track_voice.get_status()[0]['sound_id'], self.mc.sounds['113690_test'].id)
+        self.assertEqual(track_voice.get_sound_queue_count(), 1)
+
+        self.advance_time(5)
         self.mc.events.post('play_sound_synthping')
         self.advance_time(3)
         self.mc.events.post('play_sound_synthping')
         self.advance_time(6)
         self.mc.events.post('stop_sound_music')
+        self.mc.events.post('play_sound_synthping_in_mode')
         self.advance_time(1)
         self.mc.events.post('play_sound_synthping')
-        self.advance_time(2)
+        self.advance_time(1)
 
-        # TODO: Develop tests than can be evaluated by the test system and not the human ear
+        # Test playing sound pool (many times)
+        for x in range(16):
+            self.mc.events.post('play_sound_drum_group')
+            self.advance_time(0.1)
+
+        self.advance_time(1)
+
+        # Test sound events
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_stopped')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='synthping_played')
+
+        # Check for internal sound event processing leaks (are there any internal sound
+        # events that get generated, but never processed and cleared from the queue?)
+        self.assertEqual(interface.get_in_use_sound_event_count(), 0)
 
         """
         # Add another track with the same name (should not be allowed)
