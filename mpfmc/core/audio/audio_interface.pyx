@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '30', '0-dev10')
+__version_info__ = ('0', '30', '0-dev11')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -36,7 +36,7 @@ DEF MAX_TRACKS = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
 DEF MAX_TRACK_DUCKING_ENVELOPES = 32
-DEF MAX_AUDIO_EVENTS = 32
+DEF MAX_AUDIO_EVENTS = 64
 DEF QUICK_FADE_DURATION_SECS = 0.05
 
 DEF MAX_AUDIO_VALUE_S16 = ((1 << (16 - 1)) - 1)
@@ -67,6 +67,7 @@ cdef class AudioInterface:
     cdef int supported_formats
     cdef int mixer_channel
     cdef list tracks
+    cdef object mc
 
     # In order to get the SDL_Mixer library to work with the desired features needed for the
     # media controller, a sound must be played at all times on a mixer channel.  A sound
@@ -86,7 +87,7 @@ cdef class AudioInterface:
         self.raw_chunk_silence = NULL
         self.audio_callback_data = NULL
 
-    def __init__(self, rate=44100, channels=2, buffer_samples=4096):
+    def __init__(self, mc, rate=44100, channels=2, buffer_samples=4096):
         """
         Initializes the AudioInterface.
         Args:
@@ -94,6 +95,7 @@ cdef class AudioInterface:
             channels: The number of channels to use (1=mono, 2=stereo)
             buffer_samples: The audio buffer size to use (in number of samples, must be power of two)
         """
+        self.mc = mc
 
         # Initialize threading in the extension library and acquire the Python global interpreter lock
         PyEval_InitThreads()
@@ -267,6 +269,7 @@ cdef class AudioInterface:
         return max(min(float(gain_string), 1.0), 0.0)
 
     def convert_seconds_to_samples(self, int seconds):
+        """Converts the specified number of seconds into samples (based on current sample rate)"""
         return self.sample_rate * seconds
 
     @staticmethod
@@ -604,6 +607,48 @@ cdef class AudioInterface:
         for track in self.tracks:
             track.process()
 
+        # Process any internal notification events that may cause other events to be generated
+        SDL_LockMutex(self.audio_callback_data.mutex)
+        for i in range(MAX_AUDIO_EVENTS):
+            if self.audio_callback_data.events[i].event == event_sound_started:
+                sound = self.mc.sounds_by_id[self.audio_callback_data.events[i].sound_id]
+                if sound.config['events_when_played'] is not None:
+                    for event in sound.config['events_when_played']:
+                        self.mc.bcp_processor.send('trigger', name=event)
+
+                # Event has been processed, reset it so it may be used again
+                self.audio_callback_data.events[i].event = event_none
+
+            elif self.audio_callback_data.events[i].event == event_sound_stopped:
+                sound = self.mc.sounds_by_id[self.audio_callback_data.events[i].sound_id]
+                if sound.config['events_when_stopped'] is not None:
+                    for event in sound.config['events_when_stopped']:
+                        self.mc.bcp_processor.send('trigger', name=event)
+
+                # Event has been processed, reset it so it may be used again
+                self.audio_callback_data.events[i].event = event_none
+
+            elif self.audio_callback_data.events[i].event == event_sound_marker:
+                # TODO: Process sound marker event
+
+                # Event has been processed, reset it so it may be used again
+                self.audio_callback_data.events[i].event = event_none
+
+        SDL_UnlockMutex(self.audio_callback_data.mutex)
+
+    def get_in_use_sound_event_count(self):
+        """
+        Returns the number of sound events currently in use.  Used for debugging and testing.
+        """
+        in_use_event_count = 0
+        SDL_LockMutex(self.audio_callback_data.mutex)
+        for i in range(MAX_AUDIO_EVENTS):
+            if self.audio_callback_data.events[i].event != event_none:
+                in_use_event_count += 1
+
+        SDL_UnlockMutex(self.audio_callback_data.mutex)
+        return in_use_event_count
+
     @staticmethod
     cdef void audio_callback(int channel, void *output_buffer, int length, void *data) nogil:
         """
@@ -899,15 +944,15 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                 callback_data.events[event_index].event = event_sound_started
                 callback_data.events[event_index].track = track.number
                 callback_data.events[event_index].player = player
-                callback_data.events[event_index].sound_id = track.sound_players[player].current.sound_id
+                callback_data.events[event_index].sound_id = \
+                    track.sound_players[player].current.sound_id
                 callback_data.events[event_index].time = sdl_ticks
-
-            # TODO: Log error if events are full
 
             track.sound_players[player].status = player_playing
 
         # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
-        if track.sound_players[player].status is player_playing and track.sound_players[player].current.volume > 0 and \
+        if track.sound_players[player].status is player_playing and \
+                        track.sound_players[player].current.volume > 0 and \
                         track.sound_players[player].current.chunk != NULL:
 
             # Get source sound buffer (read one byte at a time, bytes will be combined into a
@@ -999,7 +1044,7 @@ cdef inline void sound_processing_continue_check(SoundPlayer* player) nogil:
             player.current.sample_pos = 0
             player.current.current_loop += 1
 
-cdef void send_sound_stopped_event(int track_num, int player, int sound_id,
+cdef inline void send_sound_stopped_event(int track_num, int player, int sound_id,
                                    AudioEventContainer **events, Uint32 sdl_ticks) nogil:
     """
     Sends a sound stopped audio event
@@ -1017,8 +1062,6 @@ cdef void send_sound_stopped_event(int track_num, int player, int sound_id,
         events[event_index].player = player
         events[event_index].sound_id = sound_id
         events[event_index].time = sdl_ticks
-
-    # TODO: Log error if events are full
 
 cdef void apply_volume_to_buffer(Uint8 *buffer, int buffer_length, Uint8 volume) nogil:
     """
@@ -1192,6 +1235,7 @@ cdef void apply_track_ducking_envelopes(TrackAttributes* track, int buffer_size,
                 track.ducking_envelopes[envelope_num].current_volume = volume
                 track.ducking_envelopes[envelope_num].stage_pos += buffer_step_size
 
+                # Check if attack stage has completed
                 if track.ducking_envelopes[envelope_num].stage_pos >= track.ducking_envelopes[
                     envelope_num].stage_duration:
                     track.ducking_envelopes[envelope_num].stage = envelope_stage_sustain
@@ -1287,6 +1331,7 @@ cdef int get_available_audio_event(AudioEventContainer ** events) nogil:
             return i
 
     return -1
+
 
 # ---------------------------------------------------------------------------
 #    Track class
@@ -1583,8 +1628,6 @@ cdef class Track:
             Logger.debug("play_sound: Sound was not loaded and therefore was queued for playback.")
             return
 
-        self.get_status()
-
         # If the sound can be played right away (available player) then play it.
         # Is there an available sound player?
         sound_player = self._get_sound_player_with_lowest_priority()
@@ -1664,6 +1707,11 @@ cdef class Track:
                     audio_event.track = self.number
                     audio_event.player = i
                     audio_event.time = SDL_GetTicks()
+                else:
+                    Logger.warning(
+                        "Track: All internal audio events are currently in use, "
+                        "could not stop sound {}".format(sound.name))
+
 
         SDL_UnlockMutex(self.mutex)
 
@@ -1737,9 +1785,11 @@ cdef class Track:
             # Set play sound event
             audio_event = self._get_available_audio_event()
             if audio_event != NULL:
-                if self.attributes.sound_players[player].status == player_idle and force:
+                if self.attributes.sound_players[player].status != player_idle and force:
                     audio_event.event = event_sound_replace
                 else:
+                    # Reserve the sound player for this sound (it is no longer idle)
+                    self.attributes.sound_players[player].status = player_pending
                     audio_event.event = event_sound_play
 
                 audio_event.sound_id = sound.id
@@ -1750,8 +1800,6 @@ cdef class Track:
                 audio_event.data.play.volume = volume
                 audio_event.data.play.loops = loops
 
-                # Reserve the sound player for this sound (it is no longer idle)
-                self.attributes.sound_players[player].status = player_pending
             else:
                 Logger.warning(
                     "Track: All internal audio events are currently in use, "
@@ -1835,7 +1883,7 @@ cdef class Track:
 
     def set_ducking_envelope_stage(self, int envelope_num, int stage):
         """
-        Returns a pointer to the specified ducking envelope
+        Sets the current stage for the specified ducking envelope
         Args:
             envelope_num: The ducking envelope number
             stage: The new envelope stage value
@@ -1848,16 +1896,101 @@ cdef class Track:
             SDL_UnlockMutex(self.mutex)
 
     def get_status(self):
+        """
+        Get the current track status (status of all sound players on the track).
+        Used for debugging and testing.
+        Returns:
+            A list of status dictionaries containing the current settings for each
+            sound player.
+        """
         SDL_LockMutex(self.mutex)
         Logger.debug("Track.{}.{} Status: ".format(self.number, self.name))
+        status = []
         for player in range(self.max_simultaneous_sounds):
+            status.append({
+                "player": player,
+                "status": Track.player_status_to_text(self.attributes.sound_players[player].status),
+                "volume": self.attributes.sound_players[player].current.volume,
+                "sound_id": self.attributes.sound_players[player].current.sound_id,
+                "priority": self.attributes.sound_players[player].current.sound_priority,
+                "loops": self.attributes.sound_players[player].current.loops_remaining,
+                "start_time": self.attributes.sound_players[player].current.start_time,
+                "has_ducking": self.attributes.sound_players[player].current.sound_has_ducking,
+            })
+
             Logger.debug("    Player {}: Status={}, Sound={}, Priority={}, Loops={}"
                          .format(player,
-                                 self.attributes.sound_players[player].status,
+                                 Track.player_status_to_text(
+                                     self.attributes.sound_players[player].status),
                                  self.attributes.sound_players[player].current.sound_id,
                                  self.attributes.sound_players[player].current.sound_priority,
                                  self.attributes.sound_players[player].current.loops_remaining))
         SDL_UnlockMutex(self.mutex)
+
+        return status
+
+    def get_sound_queue_count(self):
+        """
+        Gets the number of sounds currently in the track sound queue.
+        Returns:
+            Integer number of sounds currently in the track sound queue.
+        """
+        return self._sound_queue.qsize()
+
+    def get_available_audio_event_count(self):
+        """
+        Gets the current count of available internal audio events.  Used for debugging
+        and testing.
+        Returns:
+            Integer number of internal audio events available to be used.
+        """
+        available_event_count = 0
+        SDL_LockMutex(self.mutex)
+        for i in range(MAX_AUDIO_EVENTS):
+            if self._audio_callback_data.events[i].event == event_none:
+                available_event_count += 1
+        SDL_UnlockMutex(self.mutex)
+        return available_event_count
+
+    def get_sound_players_in_use_count(self):
+        """
+        Gets the current count of sound players in use on the track.  Used for
+        debugging and testing.
+        Returns:
+            Integer number of sound players currently in use on the track.
+        """
+        players_in_use_count = 0
+        SDL_LockMutex(self.mutex)
+        for i in range(self.max_simultaneous_sounds):
+            if self.attributes.sound_players[i].status != player_idle:
+                players_in_use_count += 1
+        SDL_UnlockMutex(self.mutex)
+        return players_in_use_count
+
+    @staticmethod
+    def player_status_to_text(int status):
+        """
+        Converts a sound player status value into an equivalent text string
+        Args:
+            status: Integer sound player status value
+
+        Returns:
+            string containing the equivalent status text
+        """
+        status_values = {
+            player_idle: "idle",
+            player_pending: "pending",
+            player_replacing: "replacing",
+            player_playing: "playing",
+            player_finished: "finished",
+            player_stopping: "stopping",
+        }
+
+        try:
+            return status_values.get(status)
+        except KeyError:
+            return "unknown"
+
 
 # ---------------------------------------------------------------------------
 #    MixChunkContainer class

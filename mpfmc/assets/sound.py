@@ -1,6 +1,7 @@
 """Contains sound-related asset classes used by the audio system"""
 
 from mpf.core.assets import Asset, AssetPool
+from mpf.core.utility_functions import Util
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException
 import logging
 Logger = logging.getLogger('AudioInterface')
@@ -105,6 +106,22 @@ class SoundAsset(Asset):
         else:
             self.config['loops'] = DEFAULT_LOOPS
 
+        if 'events_when_played' in self.config:
+            # str means it's a list of events
+            if isinstance(self.config['events_when_played'], str):
+                self.config['events_when_played'] = Util.string_to_list(
+                    self.config['events_when_played'])
+        else:
+            self.config['events_when_played'] = None
+
+        if 'events_when_stopped' in self.config:
+            # str means it's a list of events
+            if isinstance(self.config['events_when_stopped'], str):
+                self.config['events_when_stopped'] = Util.string_to_list(
+                    self.config['events_when_stopped'])
+        else:
+            self.config['events_when_stopped'] = None
+
         if 'ducking' in self.config:
             self._ducking = DuckingSettings(self.machine, self.config['ducking'])
 
@@ -113,6 +130,11 @@ class SoundAsset(Asset):
             # sound when attenuation is 1.0.
             if self._ducking.attenuation == 1.0:
                 self._ducking = None
+
+        if not hasattr(self.machine, 'sounds_by_id'):
+            setattr(self.machine, 'sounds_by_id', dict())
+
+        self.machine.sounds_by_id[self.id] = self
 
     def __repr__(self):
         """String that's returned if someone prints this object"""

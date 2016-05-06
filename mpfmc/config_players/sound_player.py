@@ -73,7 +73,6 @@ Here are several various examples:
 
         action:
         priority:
-        track:
         volume:
         loops:
         max_queue_time:
@@ -83,7 +82,6 @@ Here are several various examples:
             must be specified in the sounds section of a config file.
 
         """
-        # super().play(settings, mode, caller, priority, play_kwargs)
         del caller
         del mode
 
