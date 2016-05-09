@@ -109,6 +109,9 @@ class TestAudio(MpfMcTestCase):
         self.assertIn(self.mc.sounds['104457_moron_test'].id, self.mc.sounds_by_id)
         self.assertIn(self.mc.sounds['210871_synthping'].id, self.mc.sounds_by_id)
 
+        # Make sure sound has ducking (since it was specified in the config files)
+        self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
+
         # Test baseline internal audio event count
         self.assertEqual(interface.get_in_use_sound_event_count(), 0)
 

@@ -98,7 +98,7 @@ class SoundSystem(object):
         self.master_volume = self.config['master_volume']
 
         # Establish machine tick function callback (will process internal audio events)
-        Clock.schedule_interval(self._tick, 0)
+        Clock.schedule_interval(self.tick, 0)
 
         # Establish event callback functions
         # Setup event triggers (sound events trigger BCP triggers)
@@ -179,7 +179,6 @@ class SoundSystem(object):
     def sound_loaded_callback(self):
         pass
 
-    def _tick(self, dt):
+    def tick(self, dt):
         del dt
-        # TODO: Implement tick function (trigger the processing of internal audio events and track queues)
         self.audio_interface.process()
