@@ -256,12 +256,12 @@ class MpfMc(App):
         self.clock.schedule_interval(self.tick, 0)
 
     def on_stop(self):
-        print("Stopping...")
+        self.log.info("Stopping...")
         self.thread_stopper.set()
 
         try:
-            print("Loop rate {}Hz".format(round(
-                  self.ticks / (time.time() - self.start_time), 2)))
+            self.log.info("Loop rate {}Hz".format(round(
+                          self.ticks / (time.time() - self.start_time), 2)))
         except ZeroDivisionError:
             pass
 
@@ -361,8 +361,8 @@ class MpfMc(App):
         except queue.Empty:
             pass
         else:
-            print("Shutting down due to child thread crash")
-            print("Crash details: %s", crash)
+            self.log.info("Shutting down due to child thread crash")
+            self.log.info("Crash details: %s", crash)
             self.stop()
 
 

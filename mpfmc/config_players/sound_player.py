@@ -1,7 +1,5 @@
 """Contains the sound config player class"""
 
-from copy import deepcopy
-
 # WARNING: Do not import kivy's logger here since that will trigger Kivy to
 # load in the mpf process when MPF processes the MpfSoundPlayer
 # from kivy.logger import Logger
@@ -58,9 +56,7 @@ Here are several various examples:
     show_section = 'sounds'
     machine_collection_name = 'sounds'
 
-    # pylint: disable=too-many-arguments
-    def play(self, settings, mode=None, caller=None,
-             priority=0, play_kwargs=None, **kwargs):
+    def play(self, settings, key=None, priority=0, **kwargs):
         """Plays a validated sounds: section from a sound_player: section of a
         config file or the sounds: section of a show.
 
@@ -82,15 +78,6 @@ Here are several various examples:
             must be specified in the sounds section of a config file.
 
         """
-        del caller
-        del mode
-
-        # todo figure out where the settings are coming from and see if we can
-        # move the deepcopy there?
-        settings = deepcopy(settings)
-
-        if 'play_kwargs' in settings:
-            play_kwargs = settings.pop('play_kwargs')
 
         if 'sounds' in settings:
             settings = settings['sounds']
@@ -110,9 +97,6 @@ Here are several various examples:
                                          "does not exist ('{}') - sound could "
                                          "not be played.".format(sound_name))
                 return
-
-            if play_kwargs:
-                s.update(play_kwargs)
 
             s.update(kwargs)
 

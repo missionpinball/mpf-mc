@@ -255,16 +255,3 @@ class ModeController(object):
 
         # sort the active mode list by priority
         self.active_modes.sort(key=lambda x: x.priority, reverse=True)
-
-        self.dump()
-
-    def dump(self):
-        """Dumps the current status of the running modes to the log file."""
-
-        self.log.info('================== ACTIVE MODES ======================')
-
-        for mode in self.active_modes:
-            if mode.active:
-                self.log.info('%s : %s', mode.name, mode.priority)
-
-        self.log.info('======================================================')

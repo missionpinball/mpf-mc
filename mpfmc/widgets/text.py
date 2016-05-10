@@ -13,18 +13,14 @@ class Text(MpfWidget, Label):
                       'max_lines', 'strip', 'shorten_from', 'split_str',
                       'unicode_errors', 'color')
 
-    def __init__(self, mc, config, slide, mode=None, key=None, priority=0,
-                 **kwargs):
+    def __init__(self, mc, config, slide, key=None, **kwargs):
+        super().__init__(mc=mc, slide=slide, config=config, key=key)
 
-        super().__init__(mc=mc, mode=mode, slide=slide, config=config,
-                         priority=priority, key=key)
-
-        self.original_text = self._get_text_string(config.get('text', ''),
-                                                   mode=mode)
+        self.original_text = self._get_text_string(config.get('text', ''))
 
         self.text_variables = dict()
         self.event_replacements = kwargs
-        self._process_text(self.original_text, mode=mode)
+        self._process_text(self.original_text)
 
     def __repr__(self):
         return '<Text Widget text={}>'.format(self.text)
@@ -38,22 +34,17 @@ class Text(MpfWidget, Label):
 
         self._process_text(self.original_text)
 
-    def _get_text_string(self, text, mode=None):
+    def _get_text_string(self, text):
         if '$' not in text:
             return text
 
         for text_string in Text.string_finder.findall(text):
             text = text.replace('${}'.format(text_string),
-                                self._do_get_text_string(text_string, mode))
+                                self._do_get_text_string(text_string))
 
         return text
 
-    def _do_get_text_string(self, text_string, mode):
-        try:
-            return str(mode.config['text_strings'][text_string])
-        except (AttributeError, KeyError):
-            pass
-
+    def _do_get_text_string(self, text_string):
         try:
             return str(self.mc.machine_config['text_strings'][text_string])
         except (KeyError):
@@ -63,9 +54,7 @@ class Text(MpfWidget, Label):
     def _get_text_vars(self, text):
         return Text.var_finder.findall(text)
 
-    def _process_text(self, text, mode=None):
-        del mode
-
+    def _process_text(self, text):
         for var_string in self._get_text_vars(text):
             if var_string in self.event_replacements:
                 text = text.replace('({})'.format(var_string),

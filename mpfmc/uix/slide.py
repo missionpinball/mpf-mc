@@ -5,7 +5,6 @@ from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
 
-from mpfmc.core.mode import Mode
 from mpfmc.core.utils import set_position
 
 
@@ -17,8 +16,8 @@ class Slide(Screen):
         Slide.next_id += 1
         return Slide.next_id
 
-    def __init__(self, mc, name, config=None, target='default', mode=None,
-                 priority=None, play_kwargs=None):
+    def __init__(self, mc, name, config=None, target='default', key=None,
+                 priority=0, play_kwargs=None):
 
         # config is a dict. widgets will be in a key
 
@@ -29,27 +28,12 @@ class Slide(Screen):
 
         self.mc = mc
         self.name = name
-        self.priority = None
+        self.priority = priority
         self.pending_widgets = set()
+        self.key = key
 
         if not config:
             config = dict()
-
-        if priority is None:
-            try:
-                self.priority = mode.priority
-            except AttributeError:
-                self.priority = 0
-        else:
-            self.priority = int(priority)
-
-        if mode:
-            if isinstance(mode, Mode):
-                self.mode = mode
-            else:
-                self.mode = self.mc.modes[mode]
-        else:
-            self.mode = None
 
         self.transition_out = config.get('transition_out', None)
         self.expire = config.get('expire', None)
@@ -69,7 +53,7 @@ class Slide(Screen):
 
         if 'widgets' in config:  # don't want try, swallows too much
             self.add_widgets_from_config(config=config['widgets'],
-                                         mode=self.mode,
+                                         key=self.key,
                                          play_kwargs=play_kwargs)
 
         self.mc.active_slides[name] = self
@@ -87,7 +71,7 @@ class Slide(Screen):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
             self.priority, self.creation_order)
 
-    def add_widgets_from_library(self, name, mode=None, key=None, **kwargs):
+    def add_widgets_from_library(self, name, key=None, **kwargs):
         del kwargs
         if name not in self.mc.widgets:
             raise ValueError("Widget %s not found", name)
@@ -96,10 +80,9 @@ class Slide(Screen):
             key = name
 
         return self.add_widgets_from_config(config=self.mc.widgets[name],
-                                            mode=mode, key=key)
+                                            key=key)
 
-    def add_widgets_from_config(self, config, mode=None, key=None,
-                                play_kwargs=None):
+    def add_widgets_from_config(self, config, key=None, play_kwargs=None):
 
         if type(config) is not list:
             config = [config]
@@ -116,8 +99,8 @@ class Slide(Screen):
                 this_key = key
 
             widget_obj = self.mc.widgets.type_map[widget['type']](
-                mc=self.mc, config=widget, slide=self, mode=mode,
-                key=this_key, **play_kwargs)
+                mc=self.mc, config=widget, slide=self, key=this_key,
+                **play_kwargs)
 
             top_widget = widget_obj
 
@@ -149,7 +132,7 @@ class Slide(Screen):
 
         Args:
             widget: An MPF-enhanced widget (which will include details like z
-                order and what mode created it.
+                order and removal keys.)
 
         This method respects the z-order of the widget it's adding and inserts
         it into the proper position in the widget tree. Higher numbered z order
@@ -181,10 +164,6 @@ class Slide(Screen):
                                   widget.config['adjust_right'],
                                   widget.config['adjust_bottom'],
                                   widget.config['adjust_left'])
-
-    def remove_widgets_by_mode(self, mode):
-        for widget in [x for x in self.stencil.children if x.mode == mode]:
-            self.stencil.remove_widget(widget)
 
     def remove_widgets_by_key(self, key):
         for widget in [x for x in self.stencil.children if x.key == key]:

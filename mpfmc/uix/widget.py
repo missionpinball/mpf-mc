@@ -22,14 +22,12 @@ class MpfWidget(object):
 
     merge_settings = tuple()
 
-    def __init__(self, mc, mode=None, slide=None, config=None, key=None,
-                 **kwargs):
+    def __init__(self, mc, slide=None, config=None, key=None, **kwargs):
         del kwargs
         self.size_hint = (None, None)
 
         super().__init__()
 
-        self.mode = mode
         self.slide = slide
         self.config = config.copy()  # make optional? TODO
         self.mc = mc
@@ -109,7 +107,6 @@ class MpfWidget(object):
             except KeyError:
                 raise ValueError("{} has an invalid style name: {}".format(
                     self, self.config['style']))
-        # todo enhance with defaults per mode, or slide, or target, or??
 
         found = False
 
@@ -120,9 +117,6 @@ class MpfWidget(object):
 
             # Then it sets the attributes directly since the config was already
             # processed.
-
-            # First it applies machine-wide style settings, then mode styles on
-            # top of those
             for attr in [x for x in style if
                          x not in self.config['_default_settings']]:
                 self.config[attr] = style[attr]

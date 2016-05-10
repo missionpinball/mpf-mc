@@ -30,7 +30,7 @@ class SlideFrameParent(MpfWidget, FloatLayout):
 
         self.ready = False
         self.size_hint = (None, None)
-        super().__init__(mc=mc, mode=None, config=config)
+        super().__init__(mc=mc, key=None, config=config)
         self.size = slide_frame.native_size
 
         self.stencil = StencilView(size_hint=(None, None),
@@ -71,8 +71,7 @@ class SlideFrameParent(MpfWidget, FloatLayout):
 
 
 class SlideFrame(MpfWidget, ScreenManager):
-    def __init__(self, mc, name=None, config=None, slide=None, mode=None,
-                 key=None):
+    def __init__(self, mc, name=None, config=None, slide=None, key=None):
 
         self.name = name  # needs to be set before super()
         # If this is a the main SlideFrame of a display, it will get its size
@@ -83,7 +82,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         except (KeyError, TypeError):
             self.native_size = self.slide.native_size
 
-        super().__init__(mc=mc, mode=mode, slide=slide, config=config, key=key)
+        super().__init__(mc=mc, slide=slide, config=config, key=key)
         self.slide_frame_parent = None
 
         # minimal config needed if this is a widget
@@ -143,7 +142,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         frame."""
         return self.screens
 
-    def add_slide(self, name, config=None, priority=None, mode=None,
+    def add_slide(self, name, config=None, priority=0, key=None,
                   play_kwargs=None):
         # Note this method just adds it. It doesn't show it.
 
@@ -152,11 +151,11 @@ class SlideFrame(MpfWidget, ScreenManager):
         except ScreenManagerException:
             # Slide() created also adds it to this screen manager
             return Slide(mc=self.mc, name=name, target=self.name,
-                         config=config, mode=mode, priority=priority,
+                         config=config, key=key, priority=priority,
                          play_kwargs=play_kwargs)
 
-    def show_slide(self, slide_name, transition=None, mode=None, force=False,
-                   priority=None, show=True, expire=None, play_kwargs=None,
+    def show_slide(self, slide_name, transition=None, key=None, force=False,
+                   priority=0, show=True, expire=None, play_kwargs=None,
                    **kwargs):
 
         if not play_kwargs:
@@ -170,7 +169,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             slide = self.add_slide(name=slide_name,
                                    config=self.mc.slides[slide_name],
                                    priority=priority,
-                                   mode=mode,
+                                   key=key,
                                    play_kwargs=play_kwargs)
 
         # update the widgets with whatever kwargs came through here
@@ -208,7 +207,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             return False
 
     def add_and_show_slide(self, widgets=None, slide_name=None,
-                           transition=None, priority=None, mode=None,
+                           transition=None, priority=0, key=None,
                            force=False, expire=None, play_kwargs=None,
                            **kwargs):
         # create the slide. If a slide with this name already exists, it will
@@ -221,7 +220,7 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         slide_obj = self.add_slide(name=slide_name,
                                    config=dict(widgets=widgets),
-                                   priority=priority, mode=mode)
+                                   priority=priority, key=key)
 
         self.show_slide(slide_name=slide_obj.name, transition=transition,
                         priority=priority, force=force,
@@ -286,7 +285,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         # re-adds the screen.
 
         if not slide:
-            slide = self.add_slide(name='blank', priority=0, mode=None)
+            slide = self.add_slide(name='blank', priority=0, key=None)
 
         try:
             self.current = slide.name

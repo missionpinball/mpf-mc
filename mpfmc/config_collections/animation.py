@@ -25,7 +25,7 @@ class Animation(ConfigCollection):
 
         return new_list
 
-    def process_animation(self, config, mode=None):
+    def process_animation(self, config):
         # config is localized to a single animation's settings within a list
 
         # str means it's a named animation

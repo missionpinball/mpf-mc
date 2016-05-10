@@ -23,67 +23,29 @@ class TestSlides(MpfMcTestCase):
         self.assertIn('slide4', self.mc.machine_config['slides'])
         self.assertIn('slide5', self.mc.machine_config['slides'])
 
-    def test_mode_by_name(self):
-
+    def test_key_by_name(self):
         slide = Slide(mc=self.mc,
                       name='slide1',
                       config=self.mc.slides['slide1'],
-                      mode='mode1',
+                      key='mode1',
                       priority=0)
 
-        self.assertIs(slide.mode, self.mc.modes['mode1'])
-
-    def test_mode_by_object(self):
-        slide = Slide(mc=self.mc,
-                      name='slide1',
-                      config=self.mc.slides['slide1'],
-                      mode=self.mc.modes['mode1'],
-                      priority=0)
-
-        self.assertIs(slide.mode, self.mc.modes['mode1'])
+        self.assertEqual(slide.key, 'mode1')
 
     def test_priority_passed(self):
         slide = Slide(mc=self.mc,
                       name='slide1',
                       config=self.mc.slides['slide1'],
-                      mode=self.mc.modes['mode1'],
+                      key='mode1',
                       priority=123)
 
         self.assertEqual(slide.priority, 123)
-
-    def test_priority_from_mode(self):
-        slide = Slide(mc=self.mc,
-                      name='slide1',
-                      config=self.mc.slides['slide1'],
-                      mode=self.mc.modes['mode1'])
-
-        self.assertEqual(slide.priority, self.mc.modes['mode1'].priority)
-
-    def test_priority_merged_with_mode(self):
-        self.mc.modes['mode1'].start()
-
-        slide = Slide(mc=self.mc,
-                      name='slide1',
-                      config=self.mc.slides['slide1'],
-                      mode=self.mc.modes['mode1'],
-                      priority=123)
-
-        self.assertEqual(self.mc.modes['mode1'].priority, 500)
-
-        self.assertEqual(slide.priority, 123)
-
-    def test_no_priority_no_mode(self):
-        slide = Slide(mc=self.mc,
-                      name='slide1',
-                      config=self.mc.slides['slide1'])
-
-        self.assertIs(slide.priority, 0)
 
     def test_widgets_from_config(self):
         slide = Slide(mc=self.mc,
                       name='slide1',
                       config=self.mc.slides['slide1'],
-                      mode='mode1',
+                      key='mode1',
                       priority=0)
 
         widget_tree = list()
@@ -118,8 +80,8 @@ class TestSlides(MpfMcTestCase):
 
         # start a mode and add a slide from that mode
         self.mc.modes['mode1'].start()
-        self.mc.targets['display1'].add_slide(name='slide2',
-                                              mode=self.mc.modes['mode1'])
+        self.mc.targets['display1'].add_slide(name='slide2', key='mode1',
+                                              priority=500)
         self.mc.targets['display1'].show_slide('slide2')
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'slide2')
@@ -132,6 +94,8 @@ class TestSlides(MpfMcTestCase):
         # stop the mode and its slide should be removed
         num_slides = len(self.mc.targets['display1'].slides)
         self.mc.modes['mode1'].stop()
+        self.mc.events.post('clear', key='mode1')
+        self.advance_time()
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'slide1')
         self.assertEqual(self.mc.targets['display1'].current_slide.priority,
