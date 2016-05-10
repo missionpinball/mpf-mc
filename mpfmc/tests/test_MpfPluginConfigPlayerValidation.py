@@ -42,6 +42,8 @@ class TestMpfPluginConfigPlayerValidation(MpfTestCase):
         machine_path = os.path.abspath(os.path.join(
             mpfmc.__path__[0], os.pardir, 'mpfmc', self.getMachinePath()))
 
+        self._mock_data_manager()
+
         try:
             # Note the 'True' for enabling plugins, change from base
             self.machine = TestMachineController(
