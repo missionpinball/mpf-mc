@@ -249,21 +249,6 @@ class TestText(MpfMcTestCase):
 
         self.assertEqual(self.get_widget().text, '$100')
 
-    def test_mode1_text_string1(self):
-        self.mc.modes['mode1'].start()
-        self.advance_time()
-
-        self.mc.events.post('text_string1_mode1')
-        self.advance_time()
-
-        self.assertEqual(self.get_widget().text, 'HELLO FROM MODE 1')
-        self.mc.modes['mode1'].stop()
-        self.advance_time()
-
-        self.mc.events.post('text_string1')
-        self.advance_time()
-        self.assertEqual(self.get_widget().text, 'HELLO')
-
     def test_custom_fonts(self):
         self.mc.events.post('mpfmc_font')
         self.advance_time()

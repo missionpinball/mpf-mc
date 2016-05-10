@@ -31,7 +31,7 @@ class TestTransitions(MpfMcTestCase):
         # transition is 2 secs, so we can check the progress here
         slide = self.mc.targets['default'].current_slide
 
-        self.assertAlmostEqual(slide.transition_progress, 0.5, 1)
+        self.assertAlmostEqual(slide.transition_progress, 0.5, delta=.1)
         self.assertEqual(slide.transition_state,'in')
 
         transition = self.mc.targets['default'].transition

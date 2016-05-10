@@ -15,8 +15,8 @@ from mpfmc.widgets.text import Text
 class MpfTextInput(Text):
     widget_type_name = 'text_input'
 
-    def __init__(self, mc, config, slide, mode=None, key=None, priority=0,
-                 **kwargs):
+    def __init__(self, mc, config, slide, key=None, **kwargs):
+        super().__init__(mc=mc, slide=slide, config=config, key=key)
         """
 
         Note that this class is called *MpfTextInput* instead of *TextInput*
@@ -25,9 +25,6 @@ class MpfTextInput(Text):
         """
 
         del kwargs
-
-        super().__init__(mc=mc, mode=mode, slide=slide, config=config,
-                         priority=priority, key=key)
 
         self.linked_text_widget = None
         self.linked_text_widget_right_edge = None

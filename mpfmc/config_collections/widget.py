@@ -52,7 +52,7 @@ class Widget(ConfigCollection):
 
         return widget_list
 
-    def process_widget(self, config, mode=None):
+    def process_widget(self, config):
         # config is localized widget settings
 
         try:
@@ -69,16 +69,6 @@ class Widget(ConfigCollection):
 
         self.mc.config_validator.validate_config('widgets:{}'.format(
             config['type']).lower(), config, base_spec='widgets:common')
-
-        if not mode:
-            priority = 0
-        else:
-            priority = mode.priority
-
-        try:
-            config['priority'] += priority
-        except (KeyError, TypeError):
-            config['priority'] = priority
 
         if 'animations' in config:
             config['animations'] = (

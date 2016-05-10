@@ -1,4 +1,3 @@
-from copy import deepcopy
 from mpf.config_players.plugin_player import PluginPlayer
 from mpfmc.core.mc_config_player import McConfigPlayer
 
@@ -13,15 +12,6 @@ class MpfWidgetPlayer(PluginPlayer):
     config_file_section = 'widget_player'
     show_section = 'widgets'
 
-    def play(self, settings, mode=None, play_kwargs=None, **kwargs):
-
-        if not play_kwargs:
-            play_kwargs = kwargs
-        else:
-            play_kwargs.update(kwargs)
-
-        super().play(settings, mode, play_kwargs)
-
 
 class McWidgetPlayer(McConfigPlayer):
     """Base class for the Widget Player that runs on the mpf-mc side of things.
@@ -34,22 +24,14 @@ class McWidgetPlayer(McConfigPlayer):
     show_section = 'widgets'
     machine_collection_name = 'widgets'
 
-    def play(self, settings, mode=None, caller=None, play_kwargs=None,
-             priority=0, **kwargs):
+    def play(self, settings, key=None, priority=0, **kwargs):
 
-        settings = deepcopy(settings)
-
-        if 'play_kwargs' in settings:
-            play_kwargs = settings.pop('play_kwargs')
+        settings = settings.copy()
 
         if 'widgets' in settings:
             settings = settings['widgets']
 
         for widget, s in settings.items():
-
-            if play_kwargs:
-                s.update(play_kwargs)
-
             s.update(kwargs)
 
             try:
@@ -59,10 +41,8 @@ class McWidgetPlayer(McConfigPlayer):
 
             slide = None
 
-            if s['key']:
-                key = s['key']
-            else:
-                key = widget
+            if not s['key']:
+                s['key'] = key
 
             if s['target']:
                 try:
@@ -77,6 +57,12 @@ class McWidgetPlayer(McConfigPlayer):
                     pass
 
             if s['action'] == 'remove':
+
+                if s['key']:
+                    key = s['key']
+                else:
+                    key = widget
+
                 if slide:
                     slide.remove_widgets_by_key(key)
                 else:
@@ -104,24 +90,24 @@ class McWidgetPlayer(McConfigPlayer):
                 raise ValueError("Cannot add widget. No current slide")
 
             if s['action'] == 'add':
-                slide.add_widgets_from_library(name=widget, mode=mode, **s)
+                slide.add_widgets_from_library(name=widget, **s)
 
     def get_express_config(self, value):
         return dict(widget=value)
 
-    def clear(self, caller, priority):
-        self.remove_widgets(mode=caller)
+    def clear(self, key):
+        self.remove_widgets(key)
 
-    def remove_widgets(self, mode):
+    def remove_widgets(self, key):
         # remove widgets from slides
         for slide in self.machine.active_slides.values():
-            slide.remove_widgets_by_mode(mode)
+            slide.remove_widgets_by_key(key)
 
         # remove widgets from slide frame parents
         target_list = set(self.machine.targets.values())
         for target in target_list:
             for widget in [x for x in target.parent.children if
-                           x.mode == mode]:
+                           x.key == key]:
                 target.parent.remove_widget(widget)
 
 

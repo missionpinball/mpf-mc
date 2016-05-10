@@ -271,7 +271,7 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('mode1_add_widget6')
         self.advance_time()
 
-        # make sure the new widget is not there, but the old one is
+        # make sure the new widget is not in the slide, but the old one is
         self.assertIn('widget1', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
         self.assertNotIn('widget6', [x.text for x in self.mc.targets[
@@ -294,6 +294,7 @@ class TestWidget(MpfMcTestCase):
         # verify widget6 is gone
         self.assertFalse(isinstance(self.mc.targets[
             'default'].parent.children[-1], Text))
+
 
     def test_removing_widget(self):
         self.mc.targets['default'].add_slide(name='slide1')
