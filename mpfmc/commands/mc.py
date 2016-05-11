@@ -76,7 +76,7 @@ class Command(object):
                             help="Do not set up the BCP server threads")
 
         parser.add_argument("-p",
-                            action="store_true", dest="pause", default=True,
+                            action="store_true", dest="pause", default=False,
                             help="Pause the terminal window on exit. Useful "
                             "when launching in a separate window so you can "
                             "see any errors before the window closes.")
@@ -139,31 +139,27 @@ class Command(object):
 
         from mpfmc.core.mc import MpfMc
 
-        print("Loading MPF-MC controller")
-        MpfMc(options=vars(args), config=mpf_config,
-              machine_path=machine_path).run()
+        logging.info("Loading MPF-MC controller")
 
-        # todo commented this out and replaced with above to see if this try:
-        # block was causing python.exe to hang on exit.
+        try:
+            MpfMc(options=vars(args), config=mpf_config,
+                  machine_path=machine_path).run()
+            logging.info("MC run loop ended.")
+        except Exception as e:
+            logging.exception(str(e))
 
-        # try:
-        #     MpfMc(options=vars(args), config=mpf_config,
-        #           machine_path=machine_path).run()
-        #     logging.info("MC run loop ended.")
-        # except Exception as e:
-        #     logging.exception(str(e))
-        #
-        # if args.pause:
-        #     input('Press ENTER to close this window...')
-        # sys.exit()
-
-        print("Stopping child threads... ({} remaining)".format(
-            len(threading.enumerate()) - 1))
+        logging.info("Stopping child threads... ({} remaining)".format(
+                     len(threading.enumerate()) - 1))
 
         while len(threading.enumerate()) > 1:
             time.sleep(.1)
 
-        print("All child threads stopped.")
+        logging.info("All child threads stopped.")
+
+        if args.pause:
+            input('Press ENTER to continue...')
+
+        sys.exit()
 
     def preprocess_config(self, config):
         from kivy.config import Config
