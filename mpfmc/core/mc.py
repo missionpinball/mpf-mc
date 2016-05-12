@@ -271,13 +271,22 @@ class MpfMc(App):
         self.player_list = list()
 
         self.events.post('mc_reset_phase_1')
-        # no events docstring as this event is also in mpf
+        '''event: mc_reset_phase_1
+        desc: Posted on the MPF-MC only (e.g. not in MPF). This event is used
+        internally as part of the MPF-MC reset process.
+        '''
         self.events.process_event_queue()
         self.events.post('mc_reset_phase_2')
-        # no events docstring as this event is also in mpf
+        '''event: mc_reset_phase_2
+        desc: Posted on the MPF-MC only (e.g. not in MPF). This event is used
+        internally as part of the MPF-MC reset process.
+        '''
         self.events.process_event_queue()
         self.events.post('mc_reset_phase_3')
-        # no events docstring as this event is also in mpf
+        '''event: mc_reset_phase_3
+        desc: Posted on the MPF-MC only (e.g. not in MPF). This event is used
+        internally as part of the MPF-MC reset process.
+        '''
         self.events.process_event_queue()
 
     def game_start(self, **kargs):

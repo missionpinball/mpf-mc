@@ -71,6 +71,20 @@ class BCPServer(threading.Thread):
                 self.mc.events.post('client_disconnected',
                                     host=self.socket.getsockname()[0],
                                     port=self.socket.getsockname()[1])
+                '''event: client_disconnected
+                desc: Posted on the MPF-MC only (e.g. not in MPF) when the BCP
+                client disconnects. This event is also posted when the MPF-MC
+                starts before a client is connected.
+
+                This is useful for triggering a slide notifying of the
+                disconnect.
+
+                args:
+                host: The hostname or IP address that the socket is listening
+                on.
+                port: The port that the socket is listening on.
+
+                '''
                 self.mc.bcp_client_connected = False
 
                 while not self.connection:
@@ -88,6 +102,15 @@ class BCPServer(threading.Thread):
                 self.mc.events.post('client_connected',
                                     address=client_address[0],
                                     port=client_address[1])
+                '''event: client_connected
+                desc: Posted on the MPF-MC only when a BCP client has
+                connected.
+
+                args:
+                address: The IP address of the client that connected.
+                port: The port the client connected on.
+                '''
+
                 self.mc.bcp_client_connected = True
 
                 # Receive the data in small chunks and retransmit it

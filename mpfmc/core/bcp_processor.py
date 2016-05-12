@@ -166,10 +166,12 @@ class BcpProcessor(object):
         kwargs['player'] = kwargs.pop('player_num')
 
         self.mc.events.post('ball_started', **kwargs)
+        # event docstring covered in MPF
 
     def _bcp_ball_end(self, **kwargs):
         """Processes an incoming BCP 'ball_end' command."""
         self.mc.events.post('ball_ended', **kwargs)
+        # event docstring covered in MPF
 
     def _bcp_player_add(self, player_num, **kwargs):
         """Processes an incoming BCP 'player_add' command."""
@@ -212,8 +214,22 @@ class BcpProcessor(object):
         del kwargs
         if int(state):
             self.mc.events.post('switch_' + name + '_active')
+            '''event: switch_(name)_active
+            desc: Posted on MPF-MC only (e.g. not in MPF) when the MC receives
+            a BCP "switch" active command. Useful for video modes and graphical
+            menu navigation. Note that this is not posted for every switch all
+            the time, rather, only for switches that have been configured to
+            send events to BCP.
+            '''
         else:
             self.mc.events.post('switch_' + name + '_inactive')
+            '''event: switch_(name)_inactive
+            desc: Posted on MPF-MC only (e.g. not in MPF) when the MC receives
+            a BCP "switch" inactive command. Useful for video modes and graphical
+            menu navigation. Note that this is not posted for every switch all
+            the time, rather, only for switches that have been configured to
+            send events to BCP.
+            '''
 
     def _bcp_get(self, **kwargs):
         """Processes an incoming BCP 'get' command by posting an event
@@ -237,6 +253,7 @@ class BcpProcessor(object):
         """
         for k, v in kwargs.items():
             self.mc.events.post('bcp_set_{}'.format(k), value=v)
+            # docstring covered in MPF
 
     def _bcp_config(self, **kwargs):
         """Processes an incoming BCP 'config' command."""
