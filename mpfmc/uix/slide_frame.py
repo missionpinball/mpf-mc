@@ -198,7 +198,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             # Have to set a transition even if there's not one because we have
             # to remove whatever transition was last used
             self.transition = self.mc.transition_manager.get_transition(
-                    transition)
+                transition)
 
             self._set_current_slide(slide)
             return True

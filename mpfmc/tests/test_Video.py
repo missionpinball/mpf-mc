@@ -1,4 +1,3 @@
-
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
@@ -18,16 +17,20 @@ class TestVideo(MpfMcTestCase):
         self.mc.events.post('show_slide1')
         self.advance_time()
 
-        # This works locally but not on travis. I need to figure out the right
-        # library & format that can run on travis.
+        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
 
-        # video_widget = self.mc.targets['default'].current_slide.children[0]
-        #
-        # self.assertEqual(video_widget.state, 'play')
-        # self.assertTrue(video_widget.loaded)
-        # self.assertAlmostEqual(video_widget.position, .8, delta=.3)
-        # self.assertAlmostEqual(video_widget.duration, 7.79, delta=.1)
-        # self.assertEqual(video_widget.volume, 1.0)
-        # self.assertEqual(video_widget.size, [400, 258])
-        #
-        # self.advance_time(5)
+        self.assertEqual(video_widget.state, 'play')
+        self.assertTrue(video_widget.video.loaded)
+
+        self.assertAlmostEqual(video_widget.position, 0.0, delta=.3)
+        self.assertAlmostEqual(video_widget.video.video.duration, 7.96, delta=.1)
+        self.assertEqual(video_widget.video.video.volume, 1.0)
+
+        self.advance_time(1)
+        # now that 1 sec has passed, make sure the video is advancing
+        self.assertAlmostEqual(video_widget.position, 1.0, delta=.3)
+        # also check the size. The size isn't set until the video actually
+        # starts playing, which is why we don't check it until now.
+        self.assertEqual(video_widget.size, [100, 70])
+
+        self.advance_time(4)

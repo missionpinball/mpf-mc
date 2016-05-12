@@ -19,9 +19,9 @@ class VideoWidget(MpfWidget, Video):
 
         self.merge_asset_config(self.video)
 
-        # Set it to (0,0) while it's loading so we don't see a white
+        # Set it to (0, 0) while it's loading so we don't see a white
         # box on the slide
-        self.size = (0,0)
+        self.size = (0, 0)
 
         if not self.video.video:
             self.video.load(callback=self._do_video_load)
