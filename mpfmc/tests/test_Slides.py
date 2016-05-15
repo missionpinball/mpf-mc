@@ -115,3 +115,11 @@ class TestSlides(MpfMcTestCase):
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
         self.mc.targets['default'].remove_slide('slide1')
+
+    def test_background_color_and_opacity(self):
+        slide = Slide(mc=self.mc,
+                      name='slide6',
+                      config=self.mc.slides['slide6'])
+        self.advance_time()
+
+        self.assertEqual(0.5, slide.canvas.opacity)

@@ -427,5 +427,20 @@ class TestWidget(MpfMcTestCase):
         # bad target
         # todo
 
+    def test_opacity(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('add_widget8_opacity_50')
+        self.advance_time()
+
+        w8 = [x for x in self.mc.targets[
+              'default'].current_slide.children[0].children
+              if x.key == 'widget8'][0]
+
+        self.assertEqual(.5, w8.opacity)
+
 
     # todo test non named widgets?

@@ -56,3 +56,9 @@ slides:
     transition:
       type: move_in
       direction: right
+  slide6:
+    background_color: ff0000ff
+    opacity: 0.5
+    widgets:
+      type: text
+      text: TEST BACKGROUND COLOR & OPACITY

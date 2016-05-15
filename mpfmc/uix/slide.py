@@ -20,6 +20,7 @@ class Slide(Screen):
                  priority=0, play_kwargs=None):
 
         # config is a dict. widgets will be in a key
+        # assumes config, if present, is validated.
 
         self.creation_order = Slide.get_id()
 
@@ -60,12 +61,12 @@ class Slide(Screen):
         target.add_widget(self)
         mc.slides[name] = config
 
-        # todo make transparency an option?
-        # Make the slide not transparent. (Widgets are drawn in reverse order,
-        # so the before method draws it on the bottom.)
-        with self.canvas.before:
-            Color(0, 0, 0, 1)
-            Rectangle(size=self.size, pos=(0, 0))
+        if config['background_color'] != [0.0, 0.0, 0.0, 0.0]:
+            with self.canvas.before:
+                Color(*config['background_color'])
+                Rectangle(size=self.size, pos=(0, 0))
+
+        self.opacity = config['opacity']
 
     def __repr__(self):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,

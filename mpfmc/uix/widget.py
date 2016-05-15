@@ -29,7 +29,9 @@ class MpfWidget(object):
         super().__init__()
 
         self.slide = slide
+
         self.config = config.copy()  # make optional? TODO
+
         self.mc = mc
 
         self.animation = None
@@ -61,6 +63,8 @@ class MpfWidget(object):
 
         # Has to be after we set the attributes since it could be in the config
         self.key = key
+
+        self.opacity = self.config.get('opacity', 1.0)
 
         # This is a weird way to do this, but I don't want to wrap the whole
         # thing in a try block since I don't want to swallow other exceptions.

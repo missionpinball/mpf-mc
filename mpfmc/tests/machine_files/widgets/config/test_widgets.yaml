@@ -123,6 +123,14 @@ widget_player:
         widget_settings:
           color: red
           font_size: 70
+  add_widget8_opacity_50:
+      widget8:
+        widget_settings:
+          opacity: .5
+          text: 50% OPACITY
+          font_size: 50
+      widget1:
+        action: add
 
 slide_player:
   show_slide_1:
