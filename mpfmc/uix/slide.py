@@ -34,7 +34,7 @@ class Slide(Screen):
         self.key = key
 
         if not config:
-            config = dict()
+            config = self.mc.config_validator.validate_config('slides', dict())
 
         self.transition_out = config.get('transition_out', None)
         self.expire = config.get('expire', None)
@@ -61,12 +61,13 @@ class Slide(Screen):
         target.add_widget(self)
         mc.slides[name] = config
 
-        if config['background_color'] != [0.0, 0.0, 0.0, 0.0]:
+        bg = config.get('background_color', [0.0, 0.0, 0.0, 1.0])
+        if bg != [0.0, 0.0, 0.0, 0.0]:
             with self.canvas.before:
-                Color(*config['background_color'])
+                Color(*bg)
                 Rectangle(size=self.size, pos=(0, 0))
 
-        self.opacity = config['opacity']
+        self.opacity = config.get('opacity', 1.0)
 
     def __repr__(self):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
