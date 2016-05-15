@@ -108,21 +108,21 @@ class TestWidget(MpfMcTestCase):
         self.advance_time()
 
         # widget1 should be in slide1, not slide2, not current slide
-        self.assertIn('widget1',
+        self.assertIn('widget2',
                       [x.text for x in
                        self.mc.active_slides['slide1'].children[0].children])
-        self.assertNotIn('widget1',
+        self.assertNotIn('widget2',
                          [x.text for x in
                           self.mc.active_slides['slide2'].children[
                               0].children])
-        self.assertNotIn('widget1', [x.text for x in self.mc.targets[
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
         # show slide1 and make sure the widget is there
         self.mc.targets['default'].current_slide = 'slide1'
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
-        self.assertIn('widget1', [x.text for x in self.mc.targets[
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
     def test_widget_player_add_to_target(self):
@@ -295,7 +295,6 @@ class TestWidget(MpfMcTestCase):
         self.assertFalse(isinstance(self.mc.targets[
             'default'].parent.children[-1], Text))
 
-
     def test_removing_widget(self):
         self.mc.targets['default'].add_slide(name='slide1')
         self.mc.targets['default'].show_slide('slide1')
@@ -363,6 +362,22 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.children[0].children])
         self.assertNotIn('widget8', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
+
+    def test_widget_player_custom_widget_settings(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('add_widget8_custom_settings')
+        self.advance_time()
+
+        w8 = [x for x in self.mc.targets[
+              'default'].current_slide.children[0].children
+              if x.key == 'widget8'][0]
+
+        self.assertEqual([1, 0, 0, 1], w8.color)
+        self.assertEqual(70, w8.font_size)
 
     def test_widget_removal_from_slide_player(self):
         # tests that we can remove a widget by key that was shown via the

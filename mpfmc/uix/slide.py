@@ -71,7 +71,8 @@ class Slide(Screen):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
             self.priority, self.creation_order)
 
-    def add_widgets_from_library(self, name, key=None, **kwargs):
+    def add_widgets_from_library(self, name, key=None, widget_settings=None,
+                                 **kwargs):
         del kwargs
         if name not in self.mc.widgets:
             raise ValueError("Widget %s not found", name)
@@ -80,9 +81,11 @@ class Slide(Screen):
             key = name
 
         return self.add_widgets_from_config(config=self.mc.widgets[name],
-                                            key=key)
+                                            key=key,
+                                            widget_settings=widget_settings)
 
-    def add_widgets_from_config(self, config, key=None, play_kwargs=None):
+    def add_widgets_from_config(self, config, key=None, play_kwargs=None,
+                                widget_settings=None):
 
         if type(config) is not list:
             config = [config]
@@ -93,14 +96,20 @@ class Slide(Screen):
 
         for widget in config:
 
+            if widget_settings:
+                widget_settings = self.mc.config_validator.validate_config(
+                    'widgets:{}'.format(widget['type']), widget_settings,
+                    base_spec='widgets:common', add_missing_keys=False)
+
+                widget.update(widget_settings)
+
             if widget['key']:
                 this_key = widget['key']
             else:
                 this_key = key
 
             widget_obj = self.mc.widgets.type_map[widget['type']](
-                mc=self.mc, config=widget, slide=self, key=this_key,
-                **play_kwargs)
+                mc=self.mc, config=widget, slide=self, key=this_key)
 
             top_widget = widget_obj
 

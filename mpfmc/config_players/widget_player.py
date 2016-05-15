@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from mpf.config_players.plugin_player import PluginPlayer
 from mpfmc.core.mc_config_player import McConfigPlayer
 
@@ -25,39 +27,35 @@ class McWidgetPlayer(McConfigPlayer):
     machine_collection_name = 'widgets'
 
     def play(self, settings, key=None, priority=0, **kwargs):
+        # **kwargs since this is an event callback
+        del priority
+        del kwargs
 
-        settings = settings.copy()
+        settings = deepcopy(settings)
 
         if 'widgets' in settings:
             settings = settings['widgets']
 
         for widget, s in settings.items():
-            s.update(kwargs)
-
-            try:
-                s['priority'] += priority
-            except (KeyError, TypeError):
-                s['priority'] = priority
-
+            s.pop('priority', None)
             slide = None
-
-            if not s['key']:
-                s['key'] = key
+            action = s.pop('action')
+            assert action in ('add', 'remove')
 
             if s['target']:
                 try:
-                    slide = self.machine.targets[s['target']].current_slide
+                    slide = self.machine.targets[s.pop('target')].current_slide
                 except KeyError:  # pragma: no cover
                     pass
 
             if s['slide']:
+                slide_name = s.pop('slide')
                 try:
-                    slide = self.machine.active_slides[s['slide']]
+                    slide = self.machine.active_slides[slide_name]
                 except KeyError:  # pragma: no cover
                     pass
 
-            if s['action'] == 'remove':
-
+            if action == 'remove':
                 if s['key']:
                     key = s['key']
                 else:
@@ -89,7 +87,14 @@ class McWidgetPlayer(McConfigPlayer):
             if not slide:  # pragma: no cover
                 raise ValueError("Cannot add widget. No current slide")
 
-            if s['action'] == 'add':
+            if action == 'add':
+
+                if not s['key']:
+                    try:
+                        s['key'] = s['widget_settings'].pop('key')
+                    except (KeyError, AttributeError):
+                        s['key'] = key
+
                 slide.add_widgets_from_library(name=widget, **s)
 
     def get_express_config(self, value):
