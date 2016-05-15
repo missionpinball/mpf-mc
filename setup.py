@@ -6,7 +6,6 @@ import re
 from os import environ
 from os.path import join, dirname, exists, isdir
 from distutils.version import LooseVersion
-from time import sleep
 from setuptools import setup, Extension
 
 platform = sys.platform
