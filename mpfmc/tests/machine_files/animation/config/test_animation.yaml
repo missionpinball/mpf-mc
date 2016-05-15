@@ -78,10 +78,37 @@ slides:
         value: 400
         duration: 500ms
 
+  slide8:
+    type: text
+    text: TEST ANIMATION FROM OFF SCREEN
+    y: 75%
+
 slide_player:
   show_slide7: slide7
   show_slide2: slide2
   show_slide3: slide3
+  show_slide8: slide8
+
+widgets:
+  widget1:
+     type: text
+     text: WIDGET 1
+     color: red
+     x: -100
+     animations:
+       entrance:
+        - property: x
+          value: 100
+          duration: 500ms
+          timing: after_previous
+        - property: x
+          value: -100
+          duration: 500ms
+          timing: after_previous
+     expire: 2s
+
+widget_player:
+  show_widget1: widget1
 
 animations:
   fade_in:

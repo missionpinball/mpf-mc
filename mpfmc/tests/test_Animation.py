@@ -164,3 +164,27 @@ class TestAnimation(MpfMcTestCase):
         # post the event to animate it
         self.mc.events.post('entrance3')
         self.advance_time()
+
+    def test_entrance_from_offscreen(self):
+        self.mc.events.post('show_slide8')
+        self.advance_time()
+
+        self.mc.events.post('show_widget1')
+        self.advance_time(.1)
+
+        widget = self.mc.targets['default'].current_slide.children[0].children[1]
+
+        # make sure we got the right widget
+        self.assertEqual('WIDGET 1', widget.text)
+
+        # widget starts at -100, but thta's the center, so it's real x start
+        # is somewhere less than -100
+        self.assertLess(widget.pos[0], -100)
+
+        # right most position now should be somewhere around 80
+        self.advance_time(.4)
+        self.assertGreater(widget.pos[0], 70)
+
+        # animation should be done, make sure it's back to -100
+        self.advance_time(.6)
+        self.assertEqual(widget.pos[0], -100)

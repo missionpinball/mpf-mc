@@ -1,5 +1,6 @@
 from kivy.animation import Animation
 from mpf.core.rgb_color import RGBColor
+from kivy.clock import Clock
 
 from mpfmc.core.utils import set_position, percent_to_float
 
@@ -71,7 +72,9 @@ class MpfWidget(object):
         if 'animations' in config and config['animations']:
             for k, v in config['animations'].items():
                 if k == 'entrance':
-                    self.start_animation_from_event('entrance')
+                    # needed because the initial properties of the widget
+                    # aren't set yet
+                    Clock.schedule_once(self._start_entrance_animations, -1)
                 else:
                     self._register_animation_events(k)
 
@@ -236,6 +239,10 @@ class MpfWidget(object):
         self._animation_event_keys.add(self.mc.events.add_handler(
             event=event_name, handler=self.start_animation_from_event,
             event_name=event_name))
+
+    def _start_entrance_animations(self, dt):
+        del dt
+        self.start_animation_from_event('entrance')
 
     def start_animation_from_event(self, event_name, **kwargs):
         del kwargs
