@@ -8,6 +8,8 @@ import threading
 import time
 import traceback
 
+import select
+
 import mpf.core.bcp as bcp
 
 
@@ -66,7 +68,7 @@ class BCPServer(threading.Thread):
         """The socket thread's run loop."""
 
         try:
-            while True:
+            while not self.mc.thread_stopper.is_set():
                 self.log.info("Waiting for a connection...")
                 self.mc.events.post('client_disconnected',
                                     host=self.socket.getsockname()[0],
@@ -92,7 +94,7 @@ class BCPServer(threading.Thread):
                         self.connection, client_address = self.socket.accept()
                     except socket.timeout:
                         if self.mc.thread_stopper.is_set():
-                            print("Stopping BCP listener thread")
+                            self.log.info("Stopping BCP listener thread")
                             self.socket.shutdown(socket.SHUT_RDWR)
                             self.socket.close()
                             return
@@ -123,16 +125,18 @@ class BCPServer(threading.Thread):
                     # and to check for complete messages before processing them
 
                     try:
-                        socket_chars = self.connection.recv(8192).decode(
-                            'utf-8')
-                        if socket_chars:
-                            commands = socket_chars.split("\n")
-                            for cmd in commands:
-                                if cmd:
-                                    self.process_received_message(cmd)
-                        else:
-                            # no more data
-                            break
+                        ready = select.select([self.connection], [], [], 1)
+                        if ready[0]:
+                            socket_chars = self.connection.recv(8192).decode(
+                                'utf-8')
+                            if socket_chars:
+                                commands = socket_chars.split("\n")
+                                for cmd in commands:
+                                    if cmd:
+                                        self.process_received_message(cmd)
+                            else:
+                                # no more data
+                                break
 
                     except socket.timeout:
                         pass
@@ -174,7 +178,7 @@ class BCPServer(threading.Thread):
 
                 except queue.Empty:
                     if self.mc.thread_stopper.is_set():
-                        print("Stopping BCP sending thread")
+                        self.log.info("Stopping BCP sending thread")
                         self.socket.shutdown(socket.SHUT_RDWR)
                         self.socket.close()
                         self.socket = None
