@@ -127,7 +127,7 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None,
         x -= adjust_left
 
     # --------------------
-    # Y / height / verical
+    # Y / height / vertical
     # --------------------
 
     # Set position
