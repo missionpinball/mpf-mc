@@ -40,20 +40,6 @@ modes:
     - game
 
 assets:
-    images:
-        default:
-            load: preload
-        slide:
-            target: slide
-        dmd:
-            target: dmd
-    animations:
-        default:
-            load: preload
-            target: dmd
-        slide:
-            load: preload
-            target: slide
     sounds:
         default:
             track: sfx
@@ -67,12 +53,24 @@ assets:
         music:
             track: music
             load: preload
-    shows:
+    videos:
         default:
             load: preload
-    movies:
+        preload:
+            load: preload
+        on_demand:
+            load: on_demand
+        mode_start:
+            load: mode_start
+    images:
         default:
             load: preload
+        preload:
+            load: preload
+        on_demand:
+            load: on_demand
+        mode_start:
+            load: mode_start
 
 mpf:
   allow_invalid_config_sections: false
