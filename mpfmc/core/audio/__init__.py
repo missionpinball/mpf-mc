@@ -43,8 +43,7 @@ class SoundSystem(object):
 
         # Load configuration for sound system
         if 'sound_system' not in self.mc.machine_config:
-            Logger.warning("SoundSystem: Could not locate the 'sound_system' configuration section. "
-                           "Default audio settings will be used.")
+            Logger.info("SoundSystem: Using default 'sound_system' settings")
             self.config = {}
         else:
             self.config = self.mc.machine_config['sound_system']
@@ -55,15 +54,16 @@ class SoundSystem(object):
 
         # If the sound system has been disabled, abort initialization
         if not self.config['enabled']:
-            Logger.warning("SoundSystem: The sound system has been disabled in the configuration file (enabled: False)."
-                           "  No audio features will be available.")
+            Logger.debug("SoundSystem: The sound system has been disabled in "
+                         "the configuration file (enabled: False). No audio "
+                         "features will be available.")
             return
 
         if 'buffer' not in self.config or self.config['buffer'] == 'auto':
             self.config['buffer'] = DEFAULT_AUDIO_BUFFER_SAMPLE_SIZE
         elif not AudioInterface.power_of_two(self.config['buffer']):
-            Logger.warning("SoundSystem: The buffer setting is not a power of two. "
-                           "Default buffer size will be used.")
+            Logger.warning("SoundSystem: The buffer setting is not a power of "
+                           "two. Default buffer size will be used.")
             self.config['buffer'] = DEFAULT_AUDIO_BUFFER_SAMPLE_SIZE
 
         if 'frequency' not in self.config or self.config['frequency'] == 'auto':
@@ -77,10 +77,11 @@ class SoundSystem(object):
 
         # Initialize audio interface library (get audio output)
         try:
-            self.audio_interface = AudioInterface.initialize(mc=self.mc,
-                                                             rate=self.config['frequency'],
-                                                             channels=self.config['channels'],
-                                                             buffer_samples=self.config['buffer'])
+            self.audio_interface = AudioInterface.initialize(
+                mc=self.mc,
+                rate=self.config['frequency'],
+                channels=self.config['channels'],
+                buffer_samples=self.config['buffer'])
         except AudioException:
             Logger.error("SoundController: Could not initialize the audio interface. "
                          "Audio features will not be available.")
