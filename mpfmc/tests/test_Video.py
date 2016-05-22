@@ -42,14 +42,14 @@ class TestVideo(MpfMcTestCase):
         # --------------------------------
 
 
-        # self.assertAlmostEqual(video_widget.video.video.duration, 7.96, delta=.1)
-        # self.assertEqual(video_widget.video.video.volume, 1.0)
-        #
-        # self.advance_time(1)
-        # # now that 1 sec has passed, make sure the video is advancing
-        # self.assertAlmostEqual(video_widget.position, 1.0, delta=.3)
-        # # also check the size. The size isn't set until the video actually
-        # # starts playing, which is why we don't check it until now.
-        # self.assertEqual(video_widget.size, [100, 70])
-        #
-        # self.advance_time(4)
+        self.assertAlmostEqual(video_widget.video.video.duration, 7.96, delta=.1)
+        self.assertEqual(video_widget.video.video.volume, 1.0)
+
+        self.advance_time(1)
+        # now that 1 sec has passed, make sure the video is advancing
+        self.assertAlmostEqual(video_widget.position, 1.0, delta=.3)
+        # also check the size. The size isn't set until the video actually
+        # starts playing, which is why we don't check it until now.
+        self.assertEqual(video_widget.size, [100, 70])
+
+        self.advance_time(4)
