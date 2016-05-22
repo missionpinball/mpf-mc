@@ -17,6 +17,8 @@ class VideoWidget(MpfWidget, Video):
             raise ValueError("Cannot add Video widget. Video '{}' is not a "
                              "valid video name.".format(self.config['video']))
 
+        self._control_events = list()
+
         self.merge_asset_config(self.video)
 
         # Set it to (0, 0) while it's loading so we don't see a white
@@ -36,6 +38,60 @@ class VideoWidget(MpfWidget, Video):
         except AttributeError:
             return '<Video (loading...), size={}, pos={}>'.format(self.size,
                                                                   self.pos)
+
+    def _register_control_events(self):
+        # todo should this be moved to the base widget class?
+
+        for event in self.config['play_events']:
+            self._control_events.append(
+                self.machine.events.add_handler(event, self.play))
+
+        for event in self.config['pause_events']:
+            self._control_events.append(
+                self.machine.events.add_handler(event, self.pause))
+
+        for event in self.config['stop_events']:
+            self._control_events.append(
+                self.machine.events.add_handler(event, self.stop))
+
+        for percent, event in self.config['seek_events'].items():
+            self._control_events.append(
+                self.machine.events.add_handler(event, self.seek,
+                                                percent=percent))
+
+        for volume, event in self.config['volume_events'].items():
+            self._control_events.append(
+                self.machine.events.add_handler(event, self.set_volume,
+                                                volume=volume))
+
+        for position, event in self.config['position_events'].items():
+            self._control_events.append(
+                self.machine.events.add_handler(event, self.set_position,
+                                                position=position))
+
+    def play(self, **kwargs):
+        del kwargs
+        self.video.play()
+
+    def pause(self, **kwargs):
+        del kwargs
+        self.video.pause()
+
+    def stop(self, **kwargs):
+        del kwargs
+        self.video.stop()
+
+    def seek(self, percent, **kwargs):
+        del kwargs
+        super().seek(percent)
+
+    def set_volume(self, volume, **kwargs):
+        del kwargs
+        self.volume = volume
+
+    def set_position(self, position, **kwargs):
+        del kwargs
+        super().seek(position / self.duration)
 
     def _do_video_load(self, *largs):
         # Overrides a method in the base Kivy Video widget. It's basically
@@ -80,3 +136,10 @@ class VideoWidget(MpfWidget, Video):
                 self.size = (self.config['width'], self.config['height'])
             else:
                 self.size = list(value.size)
+
+    def prepare_for_removal(self, widget):
+        super().prepare_for_removal(widget)
+        del widget
+
+        self.mc.events.remove_handler_by_keys(self._control_events)
+        self._control_events = list()

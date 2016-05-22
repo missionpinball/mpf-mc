@@ -9,36 +9,15 @@ slides:
   video_test:
     - type: video
       video: mpf_video_small_test
-#      width: 200
-#      height: 150
     - type: text
       text: Video Test
-
+      y: bottom+20%
+    - type: text
+      text: ""
+      y: bottom+10%
 
 slide_player:
   show_slide1: video_test
-
-assets:
-    images:
-        default:
-            load: preload
-        preload:
-            load: preload
-            test_key: test_value
-        on_demand:
-            load: on_demand
-        mode_start:
-            load: mode_start
-    videos:
-        default:
-            load: preload
-        preload:
-            load: preload
-            test_key: test_value
-        on_demand:
-            load: on_demand
-        mode_start:
-            load: mode_start
 
 videos:
   mpf_video_small_test:
