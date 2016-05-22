@@ -125,7 +125,6 @@ if platform == 'win32':
                          'kivy.deps.sdl2',
                          'kivy.deps.sdl2_dev',
                          'kivy.deps.glew',
-                         'kivy.deps.gstreamer_dev',
                          'kivy',
                          ]
 
