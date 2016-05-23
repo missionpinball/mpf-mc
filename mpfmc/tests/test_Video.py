@@ -40,7 +40,7 @@ class TestVideo(MpfMcTestCase):
         # E: Couldn't find any package by regex 'gstreamer1.0-plugins-ugly'
         # --------------------------------
 
-        self.assertAlmostEqual(video_widget.video.duration, 7.96, delta=.1)
+        self.assertAlmostEqual(video_widget.video.duration, 7.96, delta=.5)
         self.assertEqual(video_widget.video.volume, 1.0)
 
         text.text = 'PLAY'
