@@ -55,8 +55,6 @@ class TestMpfPluginConfigPlayerValidation(MpfTestCase):
             self.testTime = self.realTime()
             self.machine.clock.time = MagicMock(return_value=self.testTime)
 
-            self.machine.default_platform.timer_initialize()
-
             while not self.machine.test_init_complete:
                 self.advance_time_and_run(0.01)
 
