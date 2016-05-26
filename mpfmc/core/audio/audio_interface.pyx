@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '30', '0-dev12')
+__version_info__ = ('0', '30', '0-dev13')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -1343,6 +1343,7 @@ cdef class Track:
     # The name of the track
     cdef str _name
     cdef object _sound_queue
+    cdef dict _sound_queue_items
     cdef float _volume
     cdef AudioCallbackData *_audio_callback_data
     cdef SDL_mutex *mutex
@@ -1375,6 +1376,7 @@ cdef class Track:
         SDL_LockMutex(self.mutex)
 
         self._sound_queue = PriorityQueue()
+        self._sound_queue_items = {}
 
         # Make sure the number of simultaneous sounds is within the allowable range
         if max_simultaneous_sounds > MAX_SIMULTANEOUS_SOUNDS_LIMIT:
@@ -1549,11 +1551,12 @@ cdef class Track:
         If the next sound in the queue has expired, it is discarded and the
         next sound that has not expired is returned.
         """
-        while True:
-            try:
-                next_sound = self._sound_queue.get_nowait()
-            except Empty:
-                return None
+        # We don't want to go through the entire sound queue more than once
+        # in this method so keep track of the number of items we are
+        # retrieving from the queue and exit when we have gone through
+        # all items once.
+        count = self._sound_queue.qsize()
+        while count > 0:
 
             # Each item in the queue is a list containing the following items:
             #    0 (priority): The priority of the returned sound
@@ -1561,17 +1564,49 @@ cdef class Track:
             #    2 (sound): The Sound object ready for playback
             #    3 (settings): A dictionary of any additional settings for this sound's playback (ducking, etc.)
 
+            try:
+                next_sound = self._sound_queue.get_nowait()
+                count -= 1
+                if next_sound[2] is None:
+                    continue
+            except Empty:
+                return None
+
             # If the sound is still loading and not expired, put it back in the queue
             if not next_sound[2].loaded and next_sound[2].loading and \
                     (next_sound[1] is None or next_sound[1] > time.time()):
                 self._sound_queue.put(next_sound)
                 Logger.debug("Re-queueing sound: {}".format(next_sound))
-
-            # Return the next sound from the priority queue if it has not expired
-            if not next_sound[1] or next_sound[1] > time.time():
-                return next_sound[2], -next_sound[0], next_sound[3]
             else:
-                Logger.debug("Discarding expired sound from queue: {}".format(next_sound))
+                # Remove the queue entry from the list of sounds in the queue
+                if next_sound in self._sound_queue_items[next_sound[2]]:
+                    self._sound_queue_items[next_sound[2]].remove(next_sound)
+                    if len(self._sound_queue_items[next_sound[2]]) == 0:
+                        del self._sound_queue_items[next_sound[2]]
+
+                # Return the next sound from the priority queue if it has not expired
+                if not next_sound[1] or next_sound[1] > time.time():
+                    return next_sound[2], -next_sound[0], next_sound[3]
+                else:
+                    Logger.debug("Discarding expired sound from queue: {}".format(next_sound))
+
+        return None
+
+    def _remove_sound_from_queue(self, sound):
+        """
+        Removes a sound from the priority sound queue.
+        Args:
+            sound: The sound object to remove
+        """
+
+        # The sounds will not actually be removed from the priority queue because that
+        # could corrupt the queue heap structure, but are simply set to None so they
+        # will not be played.  After marking queue entry as None, the dictionary keeping
+        # track of sounds in the queue is updated.
+        if sound in self._sound_queue_items:
+            for entry in self._sound_queue_items[sound]:
+                entry[2] = None
+            del self._sound_queue_items[sound]
 
     def play_sound(self, sound not None, **kwargs):
         """
@@ -1684,8 +1719,17 @@ cdef class Track:
         # Note the negative operator in front of priority since this queue
         # retrieves the lowest values first, and MPF uses higher values for
         # higher priorities.
-        self._sound_queue.put([-priority, exp_time, sound, settings])
-        Logger.debug("Queueing sound: {}".format([-priority, exp_time, sound, settings]))
+        entry = [-priority, exp_time, sound, settings]
+        self._sound_queue.put(entry)
+
+        # Save the new entry in a dictionary of entries keyed by sound.  This
+        # dictionary is used to remove pending sounds from the priority queue.
+        if sound in self._sound_queue_items:
+            self._sound_queue_items[sound].append(entry)
+        else:
+            self._sound_queue_items[sound] = [entry]
+
+        Logger.debug("Queueing sound on {} track: {}".format(self.name, entry))
 
     def stop_sound(self, sound not None):
         """
@@ -1712,6 +1756,8 @@ cdef class Track:
                         "Track: All internal audio messages are currently in use, "
                         "could not stop sound {}".format(sound.name))
 
+        # Remove any instances of the specified sound that are pending in the sound queue.
+        self._remove_sound_from_queue(sound)
 
         SDL_UnlockMutex(self.mutex)
 
@@ -1966,6 +2012,10 @@ cdef class Track:
                 players_in_use_count += 1
         SDL_UnlockMutex(self.mutex)
         return players_in_use_count
+
+    def sound_is_in_queue(self, sound):
+        """Returns whether or not the specified sound is currently in the queue"""
+        return sound in self._sound_queue_items
 
     @staticmethod
     def player_status_to_text(int status):

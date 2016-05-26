@@ -133,6 +133,16 @@ class SoundAsset(Asset):
         """String that's returned if someone prints this object"""
         return '<Sound: {}({}), Loaded={}>'.format(self.name, self.id, self.loaded)
 
+    def __lt__(self, other):
+        """Less than comparison operator"""
+        # Note this is "backwards" (It's the __lt__ method but the formula uses
+        # greater than because the PriorityQueue puts lowest first.)
+        if other is None:
+            return False
+        else:
+            return ("%s, %s" % (self.priority, self._id) >
+                    "%s, %s" % (other.priority, other.get_id()))
+
     @property
     def id(self):
         """

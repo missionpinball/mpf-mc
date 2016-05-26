@@ -66,6 +66,9 @@ sound_player:
             loops: 3
             priority: 100
     play_sound_moron_test: 104457_moron_test
+    stop_sound_moron_test:
+        104457_moron_test:
+            action: stop
     play_sound_test:
         113690_test:
             volume: 0.25
