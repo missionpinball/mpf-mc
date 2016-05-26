@@ -12,8 +12,6 @@ class McConfigPlayer(ConfigPlayer):
     def __init__(self, machine):
         super().__init__(machine)
 
-        self.machine.mode_controller.register_stop_method(self.mode_stop)
-
     def __repr__(self):
         return 'McConfigPlayer.{}'.format(self.show_section)
 
@@ -48,6 +46,3 @@ class McConfigPlayer(ConfigPlayer):
 
     def play_from_trigger(self, **kwargs):
         self.play(settings=kwargs)
-
-    def mode_stop(self, mode):
-        self.clear(mode, mode.priority)

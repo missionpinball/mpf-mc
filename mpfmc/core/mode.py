@@ -67,23 +67,6 @@ class Mode(object):
         if not ('priority' in config and type(config['priority']) is int):
             config['priority'] = 0
 
-        if 'start_events' in config:
-            config['start_events'] = Util.string_to_list(
-                    config['start_events'])
-        else:
-            config['start_events'] = list()
-
-        if 'stop_events' in config:
-            config['stop_events'] = Util.string_to_list(
-                    config['stop_events'])
-        else:
-            config['stop_events'] = list()
-
-        # register mode start events
-        if 'start_events' in config:
-            for event in config['start_events']:
-                self.mc.events.add_handler(event, self.start)
-
         try:
             self.target = self.mc.targets[config['target']]
         except KeyError:
@@ -113,7 +96,6 @@ class Mode(object):
 
         # todo might want to use this
         del callback
-
         del kwargs
 
         if type(priority) is int:
@@ -121,7 +103,7 @@ class Mode(object):
         else:
             self.priority = self.config['mode']['priority']
 
-        self.log.info('Mode Start. Priority: %s', self.priority)
+        self.log.debug('Mode Start. Priority: %s', self.priority)
 
         self.active = True
 

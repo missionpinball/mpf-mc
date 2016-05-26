@@ -20,6 +20,3 @@ class TestModes(MpfMcTestCase):
         # stop the mode
         self.send(bcp_command='mode_stop', name='mode1')
         self.assertFalse(self.mc.modes['mode1'].active)
-
-        # also make sure this method doesn't explode
-        self.mc.mode_controller.dump()

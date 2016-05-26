@@ -24,7 +24,6 @@ if sys.platform == 'darwin':
     else:
         osx_arch = 'i386'
 
-
 # Get the version number of mpf-mc and the required version of MPF by reading
 # the file directly. We can't import it because that would import mpf and
 # break the setup. Details here:

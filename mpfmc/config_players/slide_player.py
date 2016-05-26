@@ -101,50 +101,13 @@ class McSlidePlayer(McConfigPlayer):
     show_section = 'slides'
     machine_collection_name = 'slides'
 
-    def play(self, settings, mode=None, caller=None,
-             priority=0, play_kwargs=None, **kwargs):
-        """Plays a validated slides: section from a slide_player: section of a
-        config file or the slides: section of a show.
-
-        The config must be validated. Validated config looks like this:
-
-        <slide_name>:
-            <settings>: ...
-
-        <settings> can be:
-
-        priority:
-        show:
-        force:
-        target:
-        widgets:
-        transition:
-
-        If widgets: is in the settings, a new slide will be created with the
-        widgets from the settings. Otherwise it will assume the <slide_name> is
-        the slide to show.
-
-        """
-
-        # **kwargs here are things that would have been passed as event
-        # params to the slide_player section
-
-        # todo figure out where the settings are coming from and see if we can
-        # move the deepcopy there?
+    def play(self, settings, key=None, priority=0, **kwargs):
         settings = deepcopy(settings)
-
-        if 'play_kwargs' in settings:
-            play_kwargs = settings.pop('play_kwargs')
 
         if 'slides' in settings:
             settings = settings['slides']
 
         for slide, s in settings.items():
-            # figure out target first since we need that to make a slide
-
-            if play_kwargs:
-                s.update(play_kwargs)
-
             s.update(kwargs)
 
             try:
@@ -155,19 +118,14 @@ class McSlidePlayer(McConfigPlayer):
             try:
                 target = self.machine.targets[s.pop('target')]
             except KeyError:
-                if mode and mode.target:
-                    target = mode.target
-                else:
-                    target = self.machine.targets['default']
+                target = self.machine.targets['default']
 
             if s['action'] == 'play':
                 # is this a named slide, or a new slide?
                 if 'widgets' in s:
-                    target.add_and_show_slide(mode=mode, slide_name=slide,
-                                              **s)
+                    target.add_and_show_slide(key=key, slide_name=slide, **s)
                 else:
-                    target.show_slide(slide_name=slide, mode=mode,
-                                      **s)
+                    target.show_slide(slide_name=slide, key=key, **s)
 
             elif s['action'] == 'remove':
                 target.remove_slide(slide=slide,
@@ -262,15 +220,15 @@ class McSlidePlayer(McConfigPlayer):
 
         return validated_dict
 
-    def clear(self, caller, priority):
-        self.remove_slides(mode=caller)
+    def clear(self, key):
+        self.remove_slides(key)
 
-    def remove_slides(self, mode):
+    def remove_slides(self, key):
         """Removes all the slides from this mode from the active targets."""
 
         target_list = set(self.machine.targets.values())
         for target in target_list:
-            for screen in [x for x in target.screens if x.mode == mode]:
+            for screen in [x for x in target.screens if x.key == key]:
                 target.remove_slide(screen)
 
 
@@ -401,7 +359,7 @@ class MpfSlidePlayer(PluginPlayer):
 
         return config
 
-    def process_animation(self, config, mode=None):
+    def process_animation(self, config):
         # config is localized to a single animation's settings within a list
 
         # str means it's a named animation

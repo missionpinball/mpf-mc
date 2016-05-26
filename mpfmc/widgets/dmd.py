@@ -10,10 +10,8 @@ from kivy.uix.stencilview import StencilView
 class Dmd(MpfWidget, Widget):
     widget_type_name = 'DMD'
 
-    def __init__(self, mc, config, slide, mode=None, priority=None,  key=None,
-                 **kwargs):
-        super().__init__(mc=mc, mode=mode, slide=slide, config=config,
-                         priority=priority, key=key)
+    def __init__(self, mc, config, slide, key=None, **kwargs):
+        super().__init__(mc=mc, slide=slide, config=config, key=key)
 
         self.source = self.mc.displays[self.config['source_display']]
 
@@ -30,7 +28,7 @@ class Dmd(MpfWidget, Widget):
 
         self.add_widget(self.dmd_frame)
 
-        self.dmd_frame.add_widget(DmdSource(mc, config, slide, mode, priority))
+        self.dmd_frame.add_widget(DmdSource(mc, config, slide, key))
 
         self.dmd_frame.size = self.size
 
@@ -70,9 +68,8 @@ class ColorDmd(Dmd):
 class DmdSource(MpfWidget, Scatter, Widget):
     widget_type_name = 'DMD Source'
 
-    def __init__(self, mc, config, slide, mode=None, priority=None, **kwargs):
-        super().__init__(mc=mc, mode=mode, priority=priority, slide=slide,
-                         config=config)
+    def __init__(self, mc, config, slide, key=None, **kwargs):
+        super().__init__(mc=mc, slide=slide, config=config, key=key)
 
         self.source = self.mc.displays[self.config['source_display']]
 
