@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '30', '0-dev13')
+__version_info__ = ('0', '30', '0-dev14')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -26,6 +26,7 @@ from math import pow
 import time
 import logging
 Logger = logging.getLogger('AudioInterface')
+
 
 include "audio_interface.pxi"
 
@@ -393,7 +394,7 @@ cdef class AudioInterface:
 
     def set_master_volume(self, float volume):
         SDL_LockMutex(self.audio_callback_data.mutex)
-        self.audio_callback_data.master_volume = min(max(int(volume * MIX_MAX_VOLUME), 0), MIX_MAX_VOLUME)
+        self.audio_callback_data.master_volume = <Uint8>min(max(volume * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
         SDL_UnlockMutex(self.audio_callback_data.mutex)
 
     def get_settings(self):
@@ -668,9 +669,12 @@ cdef class AudioInterface:
             library only uses a single SDL_Mixer channel for all output.  Individual track buffers
             are maintained in each Track object and are processed during this callback.
         """
+        cdef Uint32 buffer_length
 
         if data == NULL:
             return
+
+        buffer_length = <Uint32>length
 
         # SDL_Mixer channel should already be playing 'silence', a silent sample generated in memory.
         # This is so SDL_Mixer thinks the channel is active and will call the channel callback
@@ -687,27 +691,28 @@ cdef class AudioInterface:
         # Loop over tracks, mixing the playing sounds into the track's audio buffer
         for track_num in range(callback_data.track_count):
             # Zero out track buffer (start with silence)
-            memset(callback_data.tracks[track_num].buffer, 0, length)
+            memset(callback_data.tracks[track_num].buffer, 0, buffer_length)
 
             # Mix any playing sounds into the track buffer
             mix_sounds_to_track(callback_data.tracks[track_num],
-                                length,
+                                buffer_length,
                                 callback_data)
 
         # Loop over tracks again, mixing down tracks to the master output buffer
         for track_num in range(callback_data.track_count):
 
             # Apply ducking envelopes to track audio buffer
-            apply_track_ducking_envelopes(callback_data.tracks[track_num], length, callback_data.audio_channels)
+            apply_track_ducking_envelopes(callback_data.tracks[track_num], buffer_length,
+                                          callback_data.audio_channels, callback_data)
 
             # Apply track volume and mix to output buffer
             mix_track_to_output(<Uint8*> callback_data.tracks[track_num].buffer,
                                 callback_data.tracks[track_num].volume,
                                 <Uint8*> output_buffer,
-                                length)
+                                buffer_length)
 
         # Apply master volume to output buffer
-        apply_volume_to_buffer(<Uint8*> output_buffer, length, callback_data.master_volume)
+        apply_volume_to_buffer(<Uint8*> output_buffer, buffer_length, callback_data.master_volume)
 
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockMutex(callback_data.mutex)
@@ -775,7 +780,7 @@ cdef void process_sound_messages(AudioCallbackData *callback_data) nogil:
             # Clear event since it has been processed
             callback_data.messages[i].message = message_not_in_use
 
-cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCallbackData *callback_data) nogil:
+cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioCallbackData *callback_data) nogil:
     """
     Mixes any sounds that are playing on the specified track into the specified audio buffer.
     Args:
@@ -796,9 +801,9 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
     cdef Uint8 *output_buffer = <Uint8*> track.buffer
 
     cdef int event_index
-    cdef int index
-    cdef int fade_out_duration
-    cdef int sound_samples_remaining
+    cdef Uint32 index
+    cdef Uint32 fade_out_duration
+    cdef Uint32 sound_samples_remaining
     cdef Uint8 volume
     cdef DuckingSettings *ducking_settings
     cdef TrackAttributes *target_track
@@ -822,7 +827,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
             sound_samples_remaining = track.sound_players[player].current.chunk.alen - track.sound_players[
                 player].current.sample_pos
             fade_out_duration = min(buffer_size,
-                                    <int>(callback_data.sample_rate * callback_data.audio_channels *
+                                    <Uint32>(callback_data.sample_rate * callback_data.audio_channels *
                                           QUICK_FADE_DURATION_SECS),
                                     sound_samples_remaining)
             volume = track.sound_players[player].current.volume
@@ -833,7 +838,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                 target_track = callback_data.tracks[ducking_settings.track]
                 envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
                 envelope.stage = envelope_stage_release
-                envelope.stage_duration = <int>(callback_data.sample_rate * callback_data.audio_channels *
+                envelope.stage_duration = <Sint32>(callback_data.sample_rate * callback_data.audio_channels *
                                                 QUICK_FADE_DURATION_SECS)
                 envelope.stage_initial_volume = envelope.current_volume
                 envelope.stage_target_volume = MIX_MAX_VOLUME
@@ -860,7 +865,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                         break
 
                 # Set volume for next loop
-                volume = <int> (
+                volume = <Uint8> (
                     (1.0 - in_out_quad(index / fade_out_duration)) * track.sound_players[player].current.volume)
 
             # Update sound player status to finished
@@ -875,7 +880,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
             sound_samples_remaining = track.sound_players[player].current.chunk.alen - track.sound_players[
                 player].current.sample_pos
             fade_out_duration = min(buffer_size,
-                                    <int>(callback_data.sample_rate * callback_data.audio_channels *
+                                    <Uint32>(callback_data.sample_rate * callback_data.audio_channels *
                                           QUICK_FADE_DURATION_SECS),
                                     sound_samples_remaining)
             volume = track.sound_players[player].current.volume
@@ -886,7 +891,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                 target_track = callback_data.tracks[ducking_settings.track]
                 envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
                 envelope.stage = envelope_stage_release
-                envelope.stage_duration = callback_data.sample_rate * callback_data.audio_channels // 100
+                envelope.stage_duration = <Sint32>callback_data.sample_rate * callback_data.audio_channels // 100
                 envelope.stage_initial_volume = envelope.current_volume
                 envelope.stage_target_volume = MIX_MAX_VOLUME
                 envelope.stage_pos = 0
@@ -964,9 +969,9 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
 
             if track.sound_players[player].current.sound_has_ducking:
                 ducking_settings = cython.address(track.sound_players[player].current.ducking_settings)
-                if track.sound_players[player].current.current_loop == 0 and track.sound_players[
-                    player].current.sample_pos <= ducking_settings.attack_start_pos < track.sound_players[
-                    player].current.sample_pos + buffer_size:
+                if track.sound_players[player].current.current_loop == 0 and <Sint32>track.sound_players[
+                    player].current.sample_pos <= ducking_settings.attack_start_pos < <Sint32>(track.sound_players[
+                    player].current.sample_pos + buffer_size):
 
                     # Ducking attack starts in this callback frame, set ducking envelope settings
                     target_track = callback_data.tracks[ducking_settings.track]
@@ -975,12 +980,12 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                     envelope.stage_duration = ducking_settings.attack_duration
                     envelope.stage_initial_volume = envelope.current_volume
                     envelope.stage_target_volume = ducking_settings.attenuation_volume
-                    envelope.stage_pos = track.sound_players[
+                    envelope.stage_pos = <Sint32>track.sound_players[
                                              player].current.sample_pos - ducking_settings.attack_start_pos
 
-                if track.sound_players[player].current.loops_remaining == 0 and track.sound_players[
-                    player].current.sample_pos <= ducking_settings.release_start_pos < track.sound_players[
-                    player].current.sample_pos + buffer_size:
+                if track.sound_players[player].current.loops_remaining == 0 and <Sint32>track.sound_players[
+                    player].current.sample_pos <= ducking_settings.release_start_pos < <Sint32>(track.sound_players[
+                    player].current.sample_pos + buffer_size):
 
                     # Ducking release starts in this callback frame, set ducking envelope settings
                     target_track = callback_data.tracks[ducking_settings.track]
@@ -989,7 +994,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, int buffer_size, AudioCall
                     envelope.stage_duration = ducking_settings.release_duration
                     envelope.stage_initial_volume = envelope.current_volume
                     envelope.stage_target_volume = MIX_MAX_VOLUME
-                    envelope.stage_pos = track.sound_players[
+                    envelope.stage_pos = <Sint32>track.sound_players[
                                              player].current.sample_pos - ducking_settings.release_start_pos
 
             # Loop over destination buffer, mixing in the source sample
@@ -1096,7 +1101,7 @@ cdef void apply_volume_to_buffer(Uint8 *buffer, int buffer_length, Uint8 volume)
 
         buffer_pos += BYTES_PER_SAMPLE
 
-cdef inline void apply_volume_to_buffer_sample(Uint8 *buffer, int buffer_pos, Uint8 volume, int sample_count=1) nogil:
+cdef inline void apply_volume_to_buffer_sample(Uint8 *buffer, Uint32 buffer_pos, Uint8 volume, Uint32 sample_count=1) nogil:
     """
     Applies the specified volume to one or more samples in an audio buffer
     at the specified buffer position.
@@ -1107,7 +1112,7 @@ cdef inline void apply_volume_to_buffer_sample(Uint8 *buffer, int buffer_pos, Ui
         sample_count: The number of samples to apply the volume level to
     """
     cdef Sample16Bit buffer_sample
-    cdef int sample = 0
+    cdef Uint32 sample = 0
 
     while sample < sample_count:
         buffer_sample.bytes.byte0 = buffer[buffer_pos + BYTES_PER_SAMPLE * sample]
@@ -1117,8 +1122,8 @@ cdef inline void apply_volume_to_buffer_sample(Uint8 *buffer, int buffer_pos, Ui
         buffer[buffer_pos + BYTES_PER_SAMPLE * sample + 1] = buffer_sample.bytes.byte1
         sample += 1
 
-cdef inline void mix_sound_sample_to_buffer(Uint8 *sound_buffer, int sample_pos, Uint8 sound_volume,
-                                            Uint8 *output_buffer, int buffer_pos) nogil:
+cdef inline void mix_sound_sample_to_buffer(Uint8 *sound_buffer, Uint32 sample_pos, Uint8 sound_volume,
+                                            Uint8 *output_buffer, Uint32 buffer_pos) nogil:
     """
     Mixes a single sample into a buffer at the specified volume
     Args:
@@ -1189,7 +1194,8 @@ cdef inline float in_out_quad(float progress) nogil:
     p -= 1.0
     return -0.5 * (p * (p - 2.0) - 1.0)
 
-cdef void apply_track_ducking_envelopes(TrackAttributes* track, int buffer_size, int audio_channels) nogil:
+cdef void apply_track_ducking_envelopes(TrackAttributes* track, Uint32 buffer_size, int audio_channels,
+                                        AudioCallbackData* callback_data) nogil:
     """
     Processes all active ducking envelopes for the specified track.
     Args:
@@ -1207,7 +1213,7 @@ cdef void apply_track_ducking_envelopes(TrackAttributes* track, int buffer_size,
     cdef Uint8 ducking_volume
     cdef Uint8 volume
     cdef int envelope_num
-    cdef int buffer_pos = 0
+    cdef Uint32 buffer_pos = 0
     cdef int buffer_step_size = BYTES_PER_SAMPLE * audio_channels
 
     # Loop over track buffers, one sample at a time
@@ -1268,7 +1274,7 @@ cdef void apply_track_ducking_envelopes(TrackAttributes* track, int buffer_size,
 
         buffer_pos += buffer_step_size
 
-cdef void mix_track_to_output(Uint8 *track_buffer, int track_volume, Uint8 *output_buffer, int buffer_size) nogil:
+cdef void mix_track_to_output(Uint8 *track_buffer, Uint8 track_volume, Uint8 *output_buffer, Uint32 buffer_size) nogil:
     """
     Mixes a track buffer into the master audio output buffer.
     Args:
@@ -1283,7 +1289,7 @@ cdef void mix_track_to_output(Uint8 *track_buffer, int track_volume, Uint8 *outp
     cdef Sample16Bit output_sample
 
     cdef int temp_sample
-    cdef int index
+    cdef Uint32 index
 
     index = 0
     while index < buffer_size:
@@ -1408,8 +1414,6 @@ cdef class Track:
             self.attributes.sound_players[i].current.chunk = NULL
             self.attributes.sound_players[i].current.loops_remaining = 0
             self.attributes.sound_players[i].current.current_loop = 0
-            self.attributes.sound_players[i].current.start_time = 0
-            self.attributes.sound_players[i].current.samples_elapsed = 0
             self.attributes.sound_players[i].current.volume = 0
             self.attributes.sound_players[i].current.sample_pos = 0
             self.attributes.sound_players[i].current.sound_id = 0
@@ -1418,8 +1422,6 @@ cdef class Track:
             self.attributes.sound_players[i].next.chunk = NULL
             self.attributes.sound_players[i].next.loops_remaining = 0
             self.attributes.sound_players[i].next.current_loop = 0
-            self.attributes.sound_players[i].next.start_time = 0
-            self.attributes.sound_players[i].next.samples_elapsed = 0
             self.attributes.sound_players[i].next.volume = 0
             self.attributes.sound_players[i].next.sample_pos = 0
             self.attributes.sound_players[i].next.sound_id = 0
@@ -1642,7 +1644,7 @@ cdef class Track:
 
         # Volume is passed as a float 0.0 to 1.0, the audio library requires volume to be
         # an 8-bit unsigned int from 0 to MIX_MAX_VOLUME.
-        settings['volume'] = min(max(int(settings['volume'] * MIX_MAX_VOLUME), 0), MIX_MAX_VOLUME)
+        settings['volume'] = <Uint8>min(max(settings['volume'] * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
 
         if settings['max_queue_time'] is None:
             exp_time = None
@@ -1800,7 +1802,7 @@ cdef class Track:
         SDL_UnlockMutex(self.mutex)
         return i, lowest_priority
 
-    cdef bint _play_sound_on_sound_player(self, sound, int player, int loops=0, int volume=MIX_MAX_VOLUME,
+    cdef bint _play_sound_on_sound_player(self, sound, int player, int loops=0, Uint8 volume=MIX_MAX_VOLUME,
                                           int priority=0, bint force=False):
         """
         Plays a sound using the specified sound player
@@ -1875,7 +1877,7 @@ cdef class Track:
                     ducking_settings.envelope_num = envelope
                     ducking_settings.attack_start_pos = sound.ducking.delay * samples_to_bytes_factor
                     ducking_settings.attack_duration = sound.ducking.attack * samples_to_bytes_factor
-                    ducking_settings.attenuation_volume = int(sound.ducking.attenuation * MIX_MAX_VOLUME)
+                    ducking_settings.attenuation_volume = <Uint8>(sound.ducking.attenuation * MIX_MAX_VOLUME)
                     ducking_settings.release_start_pos = mc.chunk.alen - (
                         sound.ducking.release_point * samples_to_bytes_factor)
                     ducking_settings.release_duration = sound.ducking.release * samples_to_bytes_factor
@@ -1960,7 +1962,6 @@ cdef class Track:
                 "sound_id": self.attributes.sound_players[player].current.sound_id,
                 "priority": self.attributes.sound_players[player].current.sound_priority,
                 "loops": self.attributes.sound_players[player].current.loops_remaining,
-                "start_time": self.attributes.sound_players[player].current.start_time,
                 "has_ducking": self.attributes.sound_players[player].current.sound_has_ducking,
             })
 

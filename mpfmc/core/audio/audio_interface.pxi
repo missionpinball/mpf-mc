@@ -158,7 +158,7 @@ cdef union Sample16Bit:
 ctypedef struct TrackAttributes:
     int number
     int max_simultaneous_sounds
-    int volume
+    Uint8 volume
     void *buffer
     int buffer_size
     SoundPlayer *sound_players
@@ -176,16 +176,16 @@ cdef enum SoundPlayerStatus:
 ctypedef struct DuckingSettings:
     int track
     int envelope_num
-    Uint32 attack_start_pos
-    Uint32 attack_duration
+    Sint32 attack_start_pos
+    Sint32 attack_duration
     Uint8 attenuation_volume
-    Uint32 release_start_pos
-    Uint32 release_duration
+    Sint32 release_start_pos
+    Sint32 release_duration
 
 ctypedef struct DuckingEnvelope:
     DuckingEnvelopeStage stage
-    Uint32 stage_pos
-    Uint32 stage_duration
+    Sint32 stage_pos
+    Sint32 stage_duration
     Uint8 stage_initial_volume
     Uint8 stage_target_volume
     Uint8 current_volume
@@ -200,11 +200,9 @@ cdef enum DuckingEnvelopeStage:
 
 ctypedef struct SoundSettings:
     Mix_Chunk *chunk
-    int volume
+    Uint8 volume
     int loops_remaining
     int current_loop
-    Uint32 start_time
-    Uint32 samples_elapsed
     Uint32 sample_pos
     long sound_id
     int sound_priority
@@ -222,7 +220,7 @@ ctypedef struct SoundPlayer:
 ctypedef struct AudioCallbackData:
     int sample_rate
     int audio_channels
-    int master_volume
+    Uint8 master_volume
     int track_count
     TrackAttributes **tracks
     AudioMessageContainer **messages
@@ -241,7 +239,7 @@ cdef enum AudioMessage:
 
 ctypedef struct AudioMessageDataPlaySound:
     Mix_Chunk *chunk
-    int volume
+    Uint8 volume
     int loops
 
 ctypedef struct AudioMessageDataStopSound:
