@@ -94,7 +94,7 @@ class Slide(Screen):
         widgets_added = list()
 
         if not play_kwargs:
-            play_kwargs = dict()
+            play_kwargs = dict()  # todo
 
         for widget in config:
 
@@ -177,8 +177,11 @@ class Slide(Screen):
                                   widget.config['adjust_left'])
 
     def remove_widgets_by_key(self, key):
-        for widget in [x for x in self.stencil.children if x.key == key]:
+        for widget in self.get_widgets_by_key(key):
             self.stencil.remove_widget(widget)
+
+    def get_widgets_by_key(self, key):
+        return [x for x in self.stencil.children if x.key == key]
 
     def remove_widget(self, widget):
         self.stencil.remove_widget(widget)
