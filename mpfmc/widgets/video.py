@@ -18,12 +18,23 @@ class VideoWidget(MpfWidget, Video):
                              "valid video name.".format(self.config['video']))
 
         self._control_events = list()
+        self._magic_events = ('add_to_slide', 'remove_from_slide',
+                              'pre_show_slide', 'show_slide',
+                              'pre_slide_leave', 'slide_leave',
+                              'video_end')
+
+        self._registered_magic_events = dict()
+        for event in self._magic_events:
+            self._registered_magic_events[event] = list()
 
         self.merge_asset_config(self.video)
 
         # Set it to (0, 0) while it's loading so we don't see a white
         # box on the slide
         self.size = (0, 0)
+
+        if self.config['control_events']:
+            self._setup_control_events(self.config['control_events'])
 
         if not self.video.video:
             self.video.load(callback=self._do_video_load)
@@ -39,35 +50,100 @@ class VideoWidget(MpfWidget, Video):
             return '<Video (loading...), size={}, pos={}>'.format(self.size,
                                                                   self.pos)
 
-    def _register_control_events(self):
-        # todo should this be moved to the base widget class?
+    def _setup_control_events(self, event_list):
+        kwargs = dict()
 
-        for event in self.config['play_events']:
-            self._control_events.append(
-                self.machine.events.add_handler(event, self.play))
+        for entry in event_list:
 
-        for event in self.config['pause_events']:
-            self._control_events.append(
-                self.machine.events.add_handler(event, self.pause))
+            if entry['action'] == 'play':
+                handler = self.play
 
-        for event in self.config['stop_events']:
-            self._control_events.append(
-                self.machine.events.add_handler(event, self.stop))
+            elif entry['action'] == 'pause':
+                handler = self.pause
 
-        for percent, event in self.config['seek_events'].items():
-            self._control_events.append(
-                self.machine.events.add_handler(event, self.seek,
-                                                percent=percent))
+            elif entry['action'] == 'stop':
+                handler = self.stop
 
-        for volume, event in self.config['volume_events'].items():
-            self._control_events.append(
-                self.machine.events.add_handler(event, self.set_volume,
-                                                volume=volume))
+            elif entry['action'] == 'seek':
+                handler = self.seek
+                kwargs = {'percent': entry['value']}
 
-        for position, event in self.config['position_events'].items():
-            self._control_events.append(
-                self.machine.events.add_handler(event, self.set_position,
-                                                position=position))
+            elif entry['action'] == 'volume':
+                handler = self.set_volume
+                kwargs = {'volume': entry['value']}
+
+            elif entry['action'] == 'position':
+                handler = self.set_position
+                kwargs = {'position': entry['value']}
+
+            else:
+                raise AssertionError("Invalid control_event action {} in "
+                                     "video".format(entry['action']), self)
+
+            if entry['event'] in self._magic_events:
+                self._registered_magic_events[entry['event']] = (
+                    (handler, kwargs))
+
+            else:
+                self._control_events.append(
+                    self.mc.events.add_handler(entry['event'], handler,
+                                               **kwargs))
+
+    def on_add_to_slide(self, dt):
+        super().on_add_to_slide(dt)
+
+        try:
+            for handler, kwargs in self._registered_magic_events['add_to_slide']:
+                handler(**kwargs)
+        except TypeError:
+            pass
+
+    def on_remove_from_slide(self):
+        super().on_remove_from_slide()
+
+        try:
+            for handler, kwargs in self._registered_magic_events[
+                    'remove_from_slide']:
+                handler(**kwargs)
+        except TypeError:
+            pass
+
+    def on_pre_show_slide(self):
+        super().on_pre_show_slide()
+
+        try:
+            for handler, kwargs in self._registered_magic_events['pre_show_slide']:
+                handler(**kwargs)
+        except TypeError:
+            pass
+
+    def on_show_slide(self):
+        super().on_show_slide()
+
+        try:
+            for handler, kwargs in self._registered_magic_events['show_slide']:
+                handler(**kwargs)
+        except TypeError:
+            pass
+
+    def on_pre_slide_leave(self):
+        super().on_pre_slide_leave()
+
+        try:
+            for handler, kwargs in self._registered_magic_events[
+                    'pre_slide_leave']:
+                handler(**kwargs)
+        except TypeError:
+            pass
+
+    def on_slide_leave(self):
+        super().on_slide_leave()
+
+        try:
+            for handler, kwargs in self._registered_magic_events['slide_leave']:
+                handler(**kwargs)
+        except TypeError:
+            pass
 
     def play(self, **kwargs):
         del kwargs
@@ -105,6 +181,13 @@ class VideoWidget(MpfWidget, Video):
             raise TypeError("Could not find a video provider to play back "
                             "the video '{}'".format(self.video.file))
 
+
+        self.volume = self.config['volume']
+        if self.config['auto_play']:
+            self.state = 'play'
+        else:
+            self.state = 'stop'
+
         # pylint: disable=E0203
         # Disable the error about accessing an attribute before its defined.
         # self._video is defined in the base class, but not in a direct way, so
@@ -119,12 +202,10 @@ class VideoWidget(MpfWidget, Video):
                              on_eos=self._on_eos)
             # This is also flagged as an error by pylint, but it's okay because
             # self.state is defined in the base class.
-            if self.state == 'play' or self.play:
+
+            if self.state == 'play':
                 self._video.play()
             self.duration = 1.
-            self.position = 0.
-
-            self.state = 'play'
 
     def on_texture(self, instance, value):
         # Overrides the base method to put the size into self.size instead of
@@ -137,9 +218,7 @@ class VideoWidget(MpfWidget, Video):
             else:
                 self.size = list(value.size)
 
-    def prepare_for_removal(self, widget):
-        super().prepare_for_removal(widget)
-        del widget
-
-        self.mc.events.remove_handler_by_keys(self._control_events)
+    def prepare_for_removal(self):
+        super().prepare_for_removal()
+        self.mc.events.remove_handlers_by_keys(self._control_events)
         self._control_events = list()
