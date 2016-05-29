@@ -37,7 +37,15 @@ class MpfWidget(object):
 
         self.animation = None
         self._animation_event_keys = set()
+        # MPF event keys for event handlers that have been registered for
+        # animation events. Used to remove the handlers when this widget is
+        # removed.
+
         self._default_style = None
+        self._magic_events = ('add_to_slide', 'remove_from_slide',
+                              'pre_show_slide', 'show_slide',
+                              'pre_slide_leave', 'slide_leave',
+                              'entrance')
 
         # some attributes can be expressed in percentages. This dict holds
         # those, key is attribute name, val is max value
@@ -69,14 +77,26 @@ class MpfWidget(object):
 
         # This is a weird way to do this, but I don't want to wrap the whole
         # thing in a try block since I don't want to swallow other exceptions.
-        if 'animations' in config and config['animations']:
-            for k, v in config['animations'].items():
-                if k == 'entrance':
+        if 'animations' in self.config and self.config['animations']:
+            for k, v in self.config['animations'].items():
+                if k == 'add_to_slide':
                     # needed because the initial properties of the widget
                     # aren't set yet
-                    Clock.schedule_once(self._start_entrance_animations, -1)
-                else:
+                    Clock.schedule_once(self.on_add_to_slide, -1)
+
+                elif k == 'entrance':
+                    Clock.schedule_once(self.on_add_to_slide, -1)
+                    self.mc.log.warning(
+                        "DEPRECATION WARNING: The 'entrance' animation event "
+                        "name has been changed to 'add_to_slide', "
+                        "'pre_show_slide', and/or 'show_slide' to give more "
+                        "flexibility. See the docs for more details. "
+                        "'entrance' will be removed in 0.31.")
+
+                elif k not in self._magic_events:
                     self._register_animation_events(k)
+        else:
+            self.config['animations'] = dict()
 
         self.expire = config.get('expire', None)
 
@@ -165,11 +185,9 @@ class MpfWidget(object):
 
         for entry in config_list:
             if 'named_animation' in entry:
-
                 for named_anim_settings in (
                         self.mc.animations[entry['named_animation']]):
                     animation_list.append(named_anim_settings)
-
             else:
                 animation_list.append(entry)
 
@@ -234,18 +252,19 @@ class MpfWidget(object):
     def remove(self, dt):
         del dt
         self.parent.remove_widget(self)
+        self.on_remove_from_slide()
 
     def _register_animation_events(self, event_name):
         self._animation_event_keys.add(self.mc.events.add_handler(
             event=event_name, handler=self.start_animation_from_event,
             event_name=event_name))
 
-    def _start_entrance_animations(self, dt):
-        del dt
-        self.start_animation_from_event('entrance')
-
     def start_animation_from_event(self, event_name, **kwargs):
         del kwargs
+
+        if event_name not in self.config['animations']:
+            return
+
         self.stop_animation()
         self.animation = self.build_animation_from_config(
             self.config['animations'][event_name])
@@ -257,3 +276,67 @@ class MpfWidget(object):
 
     def update_kwargs(self, **kwargs):
         pass
+
+    def on_add_to_slide(self, dt):
+        """Automatically called when this widget is added to a slide.
+
+        If you subclass this method, be sure to call super(), as it's needed
+        for widget animations.
+        """
+        del dt
+        self.start_animation_from_event('entrance')
+        self.start_animation_from_event('add_to_slide')
+
+    def on_remove_from_slide(self):
+        """Automatically called when this widget is removed from a slide.
+
+        If you subclass this method, be sure to call super(), as it's needed
+        for widget animations.
+        """
+        pass
+
+    def on_pre_show_slide(self):
+        """Automatically called when the slide this widget is part of is about
+        to be shown. If there's an entrance transition, this method is called
+        before the transition starts.
+
+        If you subclass this method, be sure to call super(), as it's needed
+        for widget animations.
+        """
+        if 'pre_show_slide' in self.config['animations']:
+            self.start_animation_from_event('pre_show_slide')
+
+    def on_show_slide(self):
+        """Automatically called when the slide this widget is part of has been
+        shown. If there's an entrance transition, this method is called
+        after the transition is complete.
+
+        If you subclass this method, be sure to call super(), as it's needed
+        for widget animations.
+        """
+        if 'show_slide' in self.config['animations']:
+            self.start_animation_from_event('show_slide')
+
+    def on_pre_slide_leave(self):
+        """Automatically called when the slide this widget is part of is about
+        to leave (e.g. when another slide is going to replace it). If
+        there's an exit transition, this method is called before the
+        transition starts.
+
+        If you subclass this method, be sure to call super(), as it's needed
+        for widget animations.
+        """
+        if 'pre_slide_leave' in self.config['animations']:
+            self.start_animation_from_event('pre_slide_leave')
+
+    def on_slide_leave(self):
+        """Automatically called when the slide this widget is part of is about
+        to leave (e.g. when another slide is going to replace it). If there's
+        an exit transition, this method is called after the transition is
+        complete.
+
+        If you subclass this method, be sure to call super(), as it's needed
+        for widget animations.
+        """
+        if 'slide_leave' in self.config['animations']:
+            self.start_animation_from_event('slide_leave')

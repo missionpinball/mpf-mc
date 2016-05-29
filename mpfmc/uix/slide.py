@@ -230,3 +230,23 @@ class Slide(Screen):
                 widget.prepare_for_removal()
             except AttributeError:
                 pass
+
+    def on_pre_enter(self, *args):
+        del args
+        for widget in self.stencil.children:
+            widget.on_pre_show_slide()
+
+    def on_enter(self, *args):
+        del args
+        for widget in self.stencil.children:
+            widget.on_show_slide()
+
+    def on_pre_leave(self, *args):
+        del args
+        for widget in self.stencil.children:
+            widget.on_pre_slide_leave()
+
+    def on_leave(self, *args):
+        del args
+        for widget in self.stencil.children:
+            widget.on_slide_leave()

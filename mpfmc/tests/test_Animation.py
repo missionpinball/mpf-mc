@@ -100,7 +100,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(self.mc.animations['multi'][1]['easing'],
                          'linear')
 
-    def test_animation_entrance(self):
+    def test_animation_show_slide(self):
         self.mc.events.post('show_slide7')
         self.advance_time()
         self.assertEqual(self.mc.targets['default'].current_slide_name,
@@ -108,7 +108,7 @@ class TestAnimation(MpfMcTestCase):
 
         # grab this widget
         widget = self.mc.targets['default'].current_slide.children[0].children[0]
-        self.assertTrue(widget.text == 'slide7')
+        self.assertTrue(widget.text == 'TEST ANIMATION ON show_slide')
 
         # make sure it's animating as we expect
         self.assertTrue(widget.animation)
@@ -119,6 +119,81 @@ class TestAnimation(MpfMcTestCase):
         # wait for it to finish and make sure it stopped
         self.advance_time(.5)
         self.assertIsNone(widget.animation.have_properties_to_animate(widget))
+
+    def test_animation_show_slide_with_transition(self):
+        self.mc.events.post('show_base_slide')
+        self.advance_time()
+
+        self.mc.events.post('show_slide10')
+        self.advance_time()
+
+        # transition is 1 sec, so animation should not start until that's done
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        self.assertTrue(widget.text == 'ANIMATION show_slide')
+        self.assertFalse(widget.animation)
+
+        self.advance_time(1)
+        # slide should be fully transitioned in, so animation should be started
+
+        self.assertTrue(widget.animation)
+        self.assertEqual(widget.animation.duration, 0.5)
+        self.assertTrue(widget.animation.have_properties_to_animate(widget))
+        self.assertEqual(widget.animation.animated_properties, {'x': 400})
+
+    def test_animation_pre_show_slide(self):
+        self.mc.events.post('show_base_slide')
+        self.advance_time()
+
+        self.mc.events.post('show_slide9')
+        self.advance_time()
+
+        # transition is 1 sec, but animation should run at the same time
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        self.assertTrue(widget.text == 'ANIMATION pre_show_slide')
+
+        self.assertTrue(widget.animation)
+        self.assertEqual(widget.animation.duration, 0.5)
+        self.assertTrue(widget.animation.have_properties_to_animate(widget))
+        self.assertEqual(widget.animation.animated_properties, {'x': 400})
+
+    def test_animation_pre_slide_leave(self):
+        self.mc.events.post('show_slide11')
+        self.advance_time()
+
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        self.assertTrue(widget.text == 'ANIMATION pre_slide_leave')
+
+        self.mc.events.post('show_base_slide_with_transition')
+        self.advance_time()
+
+        # transition is 1 sec, but leave animation should run at the same time
+        self.assertTrue(widget.animation)
+        self.assertEqual(widget.animation.duration, 0.5)
+        self.assertTrue(widget.animation.have_properties_to_animate(widget))
+        self.assertEqual(widget.animation.animated_properties, {'x': -400})
+
+        # todo this test passes and the events fire, but visually it doesn't
+        # seem to work. Bug in kivy? Or maybe it's by design?
+
+    def test_animation_slide_leave(self):
+        self.mc.events.post('show_slide12')
+        self.advance_time()
+
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        self.assertTrue(widget.text == 'ANIMATION slide_leave')
+        self.assertFalse(widget.animation)
+
+        self.mc.events.post('show_base_slide_with_transition')
+        self.advance_time()
+
+        self.advance_time(1)
+        # slide should be fully transitioned out, so animation should be
+        # started
+
+        self.assertTrue(widget.animation)
+        self.assertEqual(widget.animation.duration, 0.5)
+        self.assertTrue(widget.animation.have_properties_to_animate(widget))
+        self.assertEqual(widget.animation.animated_properties, {'x': 0})
 
     def test_animation_from_event(self):
         # This will also test multiple animated properties on the same entry
@@ -165,7 +240,7 @@ class TestAnimation(MpfMcTestCase):
         self.mc.events.post('entrance3')
         self.advance_time()
 
-    def test_entrance_from_offscreen(self):
+    def test_add_to_slide_from_offscreen(self):
         self.mc.events.post('show_slide8')
         self.advance_time()
 

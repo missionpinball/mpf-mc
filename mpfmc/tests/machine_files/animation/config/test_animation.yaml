@@ -68,12 +68,12 @@ slides:
 
   slide7:
     type: text
-    text: slide7
+    text: TEST ANIMATION ON show_slide
     x: 0
     color: ffaa00
-    font_size: 200
+    font_size: 50
     animations:
-      entrance:
+      show_slide:
         property: x
         value: 400
         duration: 500ms
@@ -83,11 +83,81 @@ slides:
     text: TEST ANIMATION FROM OFF SCREEN
     y: 75%
 
+  base_slide:
+    background_color: blue
+    widgets:
+      type: text
+      text: WIDGET ANIMATION TESTS
+
+  slide9:
+    type: text
+    text: ANIMATION pre_show_slide
+    x: 0
+    color: ffaa00
+    font_size: 50
+    animations:
+      pre_show_slide:
+        property: x
+        value: 400
+        duration: 500ms
+
+  slide10:
+    type: text
+    text: ANIMATION show_slide
+    x: 0
+    color: ffaa00
+    font_size: 50
+    animations:
+      show_slide:
+        property: x
+        value: 400
+        duration: 500ms
+
+  slide11:
+    type: text
+    text: ANIMATION pre_slide_leave
+    color: ffaa00
+    font_size: 50
+    animations:
+      pre_slide_leave:
+        property: x
+        value: -400
+        duration: 500ms
+
+  slide12:
+    type: text
+    text: ANIMATION slide_leave
+    color: ffaa00
+    font_size: 50
+    animations:
+      slide_leave:
+        property: x
+        value: 0
+        duration: 500ms
+
 slide_player:
   show_slide7: slide7
   show_slide2: slide2
   show_slide3: slide3
   show_slide8: slide8
+  show_slide9:
+    slide9:
+      transition:
+        type: fade
+        duration: 1s
+  show_slide10:
+    slide10:
+      transition:
+        type: fade
+        duration: 1s
+  show_slide11: slide11
+  show_slide12: slide12
+  show_base_slide: base_slide
+  show_base_slide_with_transition:
+    base_slide:
+      transition:
+        type: fade
+        duration: 1s
 
 widgets:
   widget1:
@@ -96,7 +166,7 @@ widgets:
      color: red
      x: -100
      animations:
-       entrance:
+       add_to_slide:
         - property: x
           value: 100
           duration: 500ms
