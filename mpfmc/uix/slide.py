@@ -225,11 +225,9 @@ class Slide(Screen):
     def prepare_for_removal(self):
         self.mc.clock.unschedule(self.remove)
 
-        for widget in self.children:
-            try:
+        for widget in self.stencil.children:
+            if hasattr(widget, 'prepare_for_removal'):  # try swallows too much
                 widget.prepare_for_removal()
-            except AttributeError:
-                pass
 
     def on_pre_enter(self, *args):
         del args
