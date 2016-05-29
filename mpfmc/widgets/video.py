@@ -20,8 +20,7 @@ class VideoWidget(MpfWidget, Video):
         self._control_events = list()
         self._magic_events = ('add_to_slide', 'remove_from_slide',
                               'pre_show_slide', 'show_slide',
-                              'pre_slide_leave', 'slide_leave',
-                              'video_end')
+                              'pre_slide_leave', 'slide_leave')
 
         self._registered_magic_events = dict()
         for event in self._magic_events:
@@ -51,9 +50,11 @@ class VideoWidget(MpfWidget, Video):
                                                                   self.pos)
 
     def _setup_control_events(self, event_list):
-        kwargs = dict()
+
 
         for entry in event_list:
+
+            kwargs = dict()
 
             if entry['action'] == 'play':
                 handler = self.play
@@ -81,7 +82,7 @@ class VideoWidget(MpfWidget, Video):
                                      "video".format(entry['action']), self)
 
             if entry['event'] in self._magic_events:
-                self._registered_magic_events[entry['event']] = (
+                self._registered_magic_events[entry['event']].append(
                     (handler, kwargs))
 
             else:
@@ -92,58 +93,40 @@ class VideoWidget(MpfWidget, Video):
     def on_add_to_slide(self, dt):
         super().on_add_to_slide(dt)
 
-        try:
-            for handler, kwargs in self._registered_magic_events['add_to_slide']:
-                handler(**kwargs)
-        except TypeError:
-            pass
+        for handler, kwargs in self._registered_magic_events['add_to_slide']:
+            handler(**kwargs)
 
     def on_remove_from_slide(self):
         super().on_remove_from_slide()
 
-        try:
-            for handler, kwargs in self._registered_magic_events[
-                    'remove_from_slide']:
-                handler(**kwargs)
-        except TypeError:
-            pass
+        for handler, kwargs in self._registered_magic_events[
+                'remove_from_slide']:
+            handler(**kwargs)
 
     def on_pre_show_slide(self):
         super().on_pre_show_slide()
 
-        try:
-            for handler, kwargs in self._registered_magic_events['pre_show_slide']:
-                handler(**kwargs)
-        except TypeError:
-            pass
+        for handler, kwargs in self._registered_magic_events['pre_show_slide']:
+            handler(**kwargs)
 
     def on_show_slide(self):
         super().on_show_slide()
 
-        try:
-            for handler, kwargs in self._registered_magic_events['show_slide']:
-                handler(**kwargs)
-        except TypeError:
-            pass
+        for handler, kwargs in self._registered_magic_events['show_slide']:
+            handler(**kwargs)
 
     def on_pre_slide_leave(self):
         super().on_pre_slide_leave()
 
-        try:
-            for handler, kwargs in self._registered_magic_events[
-                    'pre_slide_leave']:
-                handler(**kwargs)
-        except TypeError:
-            pass
+        for handler, kwargs in self._registered_magic_events[
+                'pre_slide_leave']:
+            handler(**kwargs)
 
     def on_slide_leave(self):
         super().on_slide_leave()
 
-        try:
-            for handler, kwargs in self._registered_magic_events['slide_leave']:
-                handler(**kwargs)
-        except TypeError:
-            pass
+        for handler, kwargs in self._registered_magic_events['slide_leave']:
+            handler(**kwargs)
 
     def play(self, **kwargs):
         del kwargs
