@@ -109,6 +109,9 @@ class TestAudio(MpfMcTestCase):
         self.assertIn(self.mc.sounds['104457_moron_test'].id, self.mc.sounds_by_id)
         self.assertIn(self.mc.sounds['210871_synthping'].id, self.mc.sounds_by_id)
 
+        # Make sure sound has ducking (since it was specified in the config files)
+        self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
+
         # Test baseline internal audio event count
         self.assertEqual(interface.get_in_use_sound_event_count(), 0)
 
@@ -132,8 +135,20 @@ class TestAudio(MpfMcTestCase):
         # Make sure first sound is still playing and the second one has been queued
         self.assertEqual(track_voice.get_status()[0]['sound_id'], self.mc.sounds['113690_test'].id)
         self.assertEqual(track_voice.get_sound_queue_count(), 1)
+        self.assertTrue(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
+        self.advance_time(0.1)
 
-        self.advance_time(5)
+        # Now stop sound that is not yet playing but is queued (should be removed from queue)
+        self.mc.events.post('stop_sound_moron_test')
+        self.advance_time(0.25)
+        self.assertFalse(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
+
+        # Play moron test sound again (should be added to queue)
+        self.mc.events.post('play_sound_moron_test')
+        self.advance_time(0.1)
+        self.assertTrue(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
+
+        self.advance_time(4.7)
         self.mc.events.post('play_sound_synthping')
         self.advance_time(3)
         self.mc.events.post('play_sound_synthping')

@@ -49,13 +49,6 @@ sounds:
             release: 2.25sec
     210871_synthping:
         events_when_played: synthping_played
-        ducking:
-            target: music
-            delay: 0
-            attack: 0.2sec
-            attenuation: -9db
-            release_point: 0.5sec
-            release: 0.6sec
 
 sound_pools:
     drum_group:
@@ -73,6 +66,9 @@ sound_player:
             loops: 3
             priority: 100
     play_sound_moron_test: 104457_moron_test
+    stop_sound_moron_test:
+        104457_moron_test:
+            action: stop
     play_sound_test:
         113690_test:
             volume: 0.25

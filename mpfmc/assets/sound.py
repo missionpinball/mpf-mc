@@ -1,9 +1,11 @@
 """Contains sound-related asset classes used by the audio system"""
 
+import logging
+
 from mpf.core.assets import Asset, AssetPool
 from mpf.core.utility_functions import Util
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException
-import logging
+
 Logger = logging.getLogger('AudioInterface')
 
 
@@ -71,6 +73,13 @@ class SoundAsset(Asset):
         """ Constructor"""
         super().__init__(mc, name, file, config)
 
+        self._track = None
+        self._volume = DEFAULT_VOLUME
+        self.priority = DEFAULT_PRIORITY
+        self._max_queue_time = DEFAULT_MAX_QUEUE_TIME
+        self._loops = DEFAULT_LOOPS
+        self._events_when_played = None
+        self._events_when_stopped = None
         self._container = None  # holds the actual sound samples in memory
         self._ducking = None
 
@@ -82,45 +91,28 @@ class SoundAsset(Asset):
             raise AudioException("Sound must have a valid track name. "
                                  "Could not create sound '{}' asset".format(name))
 
-        self.track = track
+        self._track = track
 
         # Validate sound attributes and provide default values
         if 'volume' in self.config:
-            self.config['volume'] = min(max(float(self.config['volume']), 0.0), 1.0)
-        else:
-            self.config['volume'] = DEFAULT_VOLUME
+            self._volume = min(max(float(self.config['volume']), 0.0), 1.0)
 
         if 'priority' in self.config:
-            self.config['priority'] = int(self.config['priority'])
-        else:
-            self.config['priority'] = DEFAULT_PRIORITY
+            self.priority = int(self.config['priority'])
 
-        if 'max_queue_time' not in self.config or self.config['max_queue_time'] is None:
-            self.config['max_queue_time'] = DEFAULT_MAX_QUEUE_TIME
-        else:
-            self.config['max_queue_time'] = AudioInterface.string_to_secs(
-                self.config['max_queue_time'])
+        if 'max_queue_time' in self.config and self.config['max_queue_time'] is not None:
+            self._max_queue_time = AudioInterface.string_to_secs(self.config['max_queue_time'])
 
         if 'loops' in self.config:
-            self.config['loops'] = int(self.config['loops'])
-        else:
-            self.config['loops'] = DEFAULT_LOOPS
+            self._loops = int(self.config['loops'])
 
-        if 'events_when_played' in self.config:
-            # str means it's a list of events
-            if isinstance(self.config['events_when_played'], str):
-                self.config['events_when_played'] = Util.string_to_list(
-                    self.config['events_when_played'])
-        else:
-            self.config['events_when_played'] = None
+        if 'events_when_played' in self.config and isinstance(
+                self.config['events_when_played'], str):
+            self._events_when_played = Util.string_to_list(self.config['events_when_played'])
 
-        if 'events_when_stopped' in self.config:
-            # str means it's a list of events
-            if isinstance(self.config['events_when_stopped'], str):
-                self.config['events_when_stopped'] = Util.string_to_list(
-                    self.config['events_when_stopped'])
-        else:
-            self.config['events_when_stopped'] = None
+        if 'events_when_stopped' in self.config and isinstance(
+                self.config['events_when_stopped'], str):
+            self._events_when_stopped = Util.string_to_list(self.config['events_when_stopped'])
 
         if 'ducking' in self.config:
             self._ducking = DuckingSettings(self.machine, self.config['ducking'])
@@ -131,6 +123,7 @@ class SoundAsset(Asset):
             if self._ducking.attenuation == 1.0:
                 self._ducking = None
 
+        # Add sound to a dictionary of sound objects keyed by sound id
         if not hasattr(self.machine, 'sounds_by_id'):
             setattr(self.machine, 'sounds_by_id', dict())
 
@@ -139,6 +132,16 @@ class SoundAsset(Asset):
     def __repr__(self):
         """String that's returned if someone prints this object"""
         return '<Sound: {}({}), Loaded={}>'.format(self.name, self.id, self.loaded)
+
+    def __lt__(self, other):
+        """Less than comparison operator"""
+        # Note this is "backwards" (It's the __lt__ method but the formula uses
+        # greater than because the PriorityQueue puts lowest first.)
+        if other is None:
+            return False
+        else:
+            return ("%s, %s" % (self.priority, self._id) >
+                    "%s, %s" % (other.priority, other.get_id()))
 
     @property
     def id(self):
@@ -152,6 +155,39 @@ class SoundAsset(Asset):
         return id(self)
 
     @property
+    def track(self):
+        """The track object on which to play the sound"""
+        return self._track
+
+    @property
+    def volume(self):
+        """Returns the volume of the sound (float 0.0 to 1.0)"""
+        return self._volume
+
+    @property
+    def max_queue_time(self):
+        """Returns the maximum time a sound may be queued before
+        playing or being discarded"""
+        return self._max_queue_time
+
+    @property
+    def loops(self):
+        """Returns the looping setting for the sound.
+        0 - do not loop, -1 loop infinitely, >= 1 the number of
+        times to loop."""
+        return self._loops
+
+    @property
+    def events_when_played(self):
+        """Returns the list of events that are posted when the sound is played"""
+        return self._events_when_played
+
+    @property
+    def events_when_stopped(self):
+        """Returns the list of events that are posted when the sound is stopped"""
+        return self._events_when_stopped
+
+    @property
     def container(self):
         """The container object wrapping the SDL structure containing the actual sound data"""
         return self._container
@@ -161,13 +197,25 @@ class SoundAsset(Asset):
         """A DuckingSettings object containing the ducking settings for this sound (optional)"""
         return self._ducking
 
+    @property
+    def has_ducking(self):
+        """Returns whether or not this sound has ducking"""
+        return self._ducking is not None
+
     def do_load(self):
         """Loads the sound asset from disk."""
 
         # Load the sound file into memory
         self._container = AudioInterface.load_sound(self.file)
 
-        # Save the sound
+        # Validate ducking now that the sound has been loaded
+        if self._ducking is not None:
+            try:
+                self._ducking.validate(self._container.length)
+            except AudioException as exception:
+                Logger.error("SoundAsset: Ducking settings for sound %s are not valid: %s",
+                             self.name, str(exception))
+                raise
 
     def _do_unload(self):
         """Unloads the asset from memory"""
@@ -186,13 +234,11 @@ class SoundAsset(Asset):
         Args:
             settings: Optional dictionary of settings to override the default values.
         """
-        self.track.play_sound(self, **settings)
+        self._track.play_sound(self, **settings)
 
     def stop(self):
-        """
-        Stops all instances of the sound playing on the sound's default track.
-        """
-        self.track.stop_sound(self)
+        """Stops all instances of the sound playing on the sound's default track."""
+        self._track.stop_sound(self)
 
 
 class DuckingSettings(object):
@@ -227,16 +273,17 @@ class DuckingSettings(object):
                                  "release_point, and release")
 
         if 'target' not in config:
-            raise AudioException("'ducking.target' must contain a valid audio track name")
+            raise AudioException("'ducking.target' must contain at least one "
+                                 "valid audio track name")
 
-        track = mc.sound_system.audio_interface.get_track_by_name(config['target'])
-        if track is None:
+        self._track = mc.sound_system.audio_interface.get_track_by_name(config['target'])
+        if self._track is None:
             raise AudioException("'ducking.target' must contain a valid audio track name")
-        self._track = track
 
         # Delay is optional (defaults to 0, must be >= 0)
         if 'delay' in config:
-            self._delay = max(mc.sound_system.audio_interface.string_to_samples(config['delay']), 0)
+            self._delay = max(mc.sound_system.audio_interface.string_to_samples(
+                config['delay']), 0)
         else:
             self._delay = 0
 
@@ -300,3 +347,30 @@ class DuckingSettings(object):
     def release(self):
         """The duration (in samples) of the release stage of the ducking process."""
         return self._release
+
+    def validate(self, sound_length):
+        """
+        Validates the ducking settings against the length of the sound to ensure all
+        settings are valid.
+        Args:
+            sound_length: The length of the sound in samples
+
+        Returns:
+            True if all settings are valid, otherwise an exception will be thrown
+        """
+        if sound_length is None or sound_length == 0:
+            raise AudioException("ducking may not be applied to an empty/zero length sound")
+
+        if self._attack > sound_length:
+            raise AudioException("'ducking.attack' value may not be longer than the "
+                                 "length of the sound")
+
+        if self._release_point >= sound_length:
+            raise AudioException("'ducking.release_point' value may not occur before the "
+                                 "beginning of the sound")
+
+        if self._release_point + self._attack >= sound_length:
+            raise AudioException("'ducking.release_point' value may not occur before "
+                                 "the ducking attack segment has completed")
+
+        return True
