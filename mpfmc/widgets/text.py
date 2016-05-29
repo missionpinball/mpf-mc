@@ -165,7 +165,7 @@ class Text(MpfWidget, Label):
                                    self._machine_var_change,
                                    var_name=name)
 
-    def prepare_for_removal(self, widget):
+    def prepare_for_removal(self):
         self.mc.events.remove_handler(self._player_var_change)
         self.mc.events.remove_handler(self._machine_var_change)
 

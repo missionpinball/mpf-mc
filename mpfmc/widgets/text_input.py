@@ -220,6 +220,6 @@ class MpfTextInput(Text):
         self.text = ''
         self.slide.remove_widget(self)
 
-    def prepare_for_removal(self, widget):
+    def prepare_for_removal(self):
         self.done()
-        super().prepare_for_removal(widget)
+        super().prepare_for_removal()

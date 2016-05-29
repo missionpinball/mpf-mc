@@ -241,8 +241,7 @@ class MpfWidget(object):
         except AttributeError:
             pass
 
-    def prepare_for_removal(self, widget):
-        del widget
+    def prepare_for_removal(self):
         self.mc.clock.unschedule(self.remove)
         self._remove_animation_events()
 
