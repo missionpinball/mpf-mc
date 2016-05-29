@@ -23,22 +23,9 @@ class TestVideo(MpfMcTestCase):
         self.assertEqual(video_widget.state, 'play')
         self.assertTrue(video_widget.video.loaded)
 
-        self.assertAlmostEqual(video_widget.position, 0.0, delta=.3)
-
-        # from the travis log:
-        # --------------------------------
-        # E: Unable to locate package libgstreamer1.0-dev E: Couldn't find any package by regex 'libgstreamer1.0-dev'
-        # E: Unable to locate package gstreamer1.0-alsa
-        # E: Couldn't find any package by regex 'gstreamer1.0-alsa'
-        # E: Unable to locate package gstreamer1.0-plugins-bad
-        # E: Couldn't find any package by regex 'gstreamer1.0-plugins-bad'
-        # E: Unable to locate package gstreamer1.0-plugins-base
-        # E: Couldn't find any package by regex 'gstreamer1.0-plugins-base'
-        # E: Unable to locate package gstreamer1.0-plugins-good
-        # E: Couldn't find any package by regex 'gstreamer1.0-plugins-good'
-        # E: Unable to locate package gstreamer1.0-plugins-ugly
-        # E: Couldn't find any package by regex 'gstreamer1.0-plugins-ugly'
-        # --------------------------------
+        # removed since this is a race condition, pos = -1 if the video hasn't
+        # actually started playing yet.
+        # self.assertAlmostEqual(video_widget.position, 0.0, delta=.3)
 
         self.assertAlmostEqual(video_widget.video.duration, 7.96, delta=.5)
         self.assertEqual(video_widget.video.volume, 1.0)
