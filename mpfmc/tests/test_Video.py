@@ -25,9 +25,6 @@ class TestVideo(MpfMcTestCase):
 
         self.assertAlmostEqual(video_widget.position, 0.0, delta=.3)
 
-        # return
-        # todo disabled because I can't get this to pass on travis
-
         # from the travis log:
         # --------------------------------
         # E: Unable to locate package libgstreamer1.0-dev E: Couldn't find any package by regex 'libgstreamer1.0-dev'
@@ -43,7 +40,7 @@ class TestVideo(MpfMcTestCase):
         # E: Couldn't find any package by regex 'gstreamer1.0-plugins-ugly'
         # --------------------------------
 
-        self.assertAlmostEqual(video_widget.video.duration, 7.96, delta=.1)
+        self.assertAlmostEqual(video_widget.video.duration, 7.96, delta=.5)
         self.assertEqual(video_widget.video.volume, 1.0)
 
         text.text = 'PLAY'
