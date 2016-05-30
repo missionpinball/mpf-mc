@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from kivy.animation import Animation
 from mpf.core.rgb_color import RGBColor
 from kivy.clock import Clock
@@ -31,7 +33,8 @@ class MpfWidget(object):
 
         self.slide = slide
 
-        self.config = config.copy()  # make optional? TODO
+        self.config = deepcopy(config)
+        # needs to be deepcopy since configs can have nested dicts
 
         self.mc = mc
 
