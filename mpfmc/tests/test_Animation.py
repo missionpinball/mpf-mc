@@ -16,12 +16,12 @@ class TestAnimation(MpfMcTestCase):
         # slide def, list of animations
         s1w0 = self.mc.slides['slide1']['widgets'][0]['animations']
 
-        self.assertIs(type(s1w0['entrance']), list)
-        self.assertEqual(len(s1w0['entrance']), 2)
-        self.assertIs(type(s1w0['entrance'][0]), dict)
-        self.assertIs(type(s1w0['entrance'][1]), dict)
-        self.assertEqual(s1w0['entrance'][0]['value'], ['101'])
-        self.assertEqual(s1w0['entrance'][1]['value'], ['100'])
+        self.assertIs(type(s1w0['show_slide']), list)
+        self.assertEqual(len(s1w0['show_slide']), 2)
+        self.assertIs(type(s1w0['show_slide'][0]), dict)
+        self.assertIs(type(s1w0['show_slide'][1]), dict)
+        self.assertEqual(s1w0['show_slide'][0]['value'], ['101'])
+        self.assertEqual(s1w0['show_slide'][1]['value'], ['100'])
 
         # slide def, single dict animation
         s2w0 = self.mc.slides['slide2']['widgets'][0]['animations']
@@ -99,6 +99,41 @@ class TestAnimation(MpfMcTestCase):
                          ['width'])
         self.assertEqual(self.mc.animations['multi'][1]['easing'],
                          'linear')
+
+    def test_reset_animations(self):
+        self.mc.events.post('show_slide1')
+        self.advance_time(.1)
+
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+
+        self.assertAlmostEqual(-11, widget.x, delta=5)
+        self.advance_time(.5)
+        self.assertAlmostEqual(48, widget.x, delta=5)
+        self.advance_time(.5)
+        self.assertEqual(100.0, widget.x)
+
+        self.mc.events.post('show_base_slide')
+        self.advance_time()
+
+        # animations should going again
+        self.mc.events.post('show_slide1')
+        self.advance_time(.1)
+        self.assertAlmostEqual(-11, widget.x, delta=5)
+        self.advance_time(.5)
+        self.assertAlmostEqual(48, widget.x, delta=5)
+        self.advance_time(.5)
+        self.assertEqual(100.0, widget.x)
+
+        self.mc.events.post('show_base_slide')
+        self.advance_time()
+        self.mc.events.post('show_slide1')
+        self.advance_time(.1)
+        self.assertAlmostEqual(-11, widget.x, delta=5)
+        self.advance_time(.5)
+        self.assertAlmostEqual(48, widget.x, delta=5)
+        self.advance_time(.5)
+        self.assertEqual(100.0, widget.x)
+
 
     def test_animation_show_slide(self):
         self.mc.events.post('show_slide7')

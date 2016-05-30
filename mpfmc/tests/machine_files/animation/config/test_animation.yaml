@@ -11,7 +11,7 @@ slides:
     text: text
     x: 0
     animations:
-      entrance:
+      show_slide:
         - property: x  # x, y, height, width, opacity, rotation?
           value: 101
           duration: 1s
@@ -21,6 +21,7 @@ slides:
           duration: 1s
           timing: with_previous  # or after prev
           repeat: True
+    reset_animations_events: pre_show_slide
 
   slide2:
     type: text
@@ -136,6 +137,7 @@ slides:
         duration: 500ms
 
 slide_player:
+  show_slide1: slide1
   show_slide7: slide7
   show_slide2: slide2
   show_slide3: slide3

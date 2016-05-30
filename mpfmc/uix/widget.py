@@ -44,6 +44,10 @@ class MpfWidget(object):
         # animation events. Used to remove the handlers when this widget is
         # removed.
 
+        self._pre_animated_settings = dict()
+        # dict of original values of settings that were animated so we can
+        # restore them later
+
         self._default_style = None
         self._magic_events = ('add_to_slide', 'remove_from_slide',
                               'pre_show_slide', 'show_slide',
@@ -213,6 +217,9 @@ class MpfWidget(object):
 
                 prop_dict[prop] = val
 
+                if prop not in self._pre_animated_settings:
+                    self._pre_animated_settings[prop] = getattr(self, prop)
+
             anim = Animation(duration=settings['duration'],
                              transition=settings['easing'],
                              **prop_dict)
@@ -243,6 +250,11 @@ class MpfWidget(object):
             self.animation.play(self)
         except AttributeError:
             pass
+
+    def reset_animations(self, **kwargs):
+        del kwargs
+        for k, v in self._pre_animated_settings.items():
+            setattr(self, k, v)
 
     def prepare_for_removal(self):
         self.mc.clock.unschedule(self.remove)
@@ -286,6 +298,10 @@ class MpfWidget(object):
         for widget animations.
         """
         del dt
+
+        if 'add_to_slide' in self.config['reset_animations_events']:
+            self.reset_animations()
+
         self.start_animation_from_event('entrance')
         self.start_animation_from_event('add_to_slide')
 
@@ -295,7 +311,8 @@ class MpfWidget(object):
         If you subclass this method, be sure to call super(), as it's needed
         for widget animations.
         """
-        pass
+        if 'remove_from_slide' in self.config['reset_animations_events']:
+            self.reset_animations()
 
     def on_pre_show_slide(self):
         """Automatically called when the slide this widget is part of is about
@@ -305,6 +322,9 @@ class MpfWidget(object):
         If you subclass this method, be sure to call super(), as it's needed
         for widget animations.
         """
+        if 'pre_show_slide' in self.config['reset_animations_events']:
+            self.reset_animations()
+
         if 'pre_show_slide' in self.config['animations']:
             self.start_animation_from_event('pre_show_slide')
 
@@ -316,6 +336,9 @@ class MpfWidget(object):
         If you subclass this method, be sure to call super(), as it's needed
         for widget animations.
         """
+        if 'show_slide' in self.config['reset_animations_events']:
+            self.reset_animations()
+
         if 'show_slide' in self.config['animations']:
             self.start_animation_from_event('show_slide')
 
@@ -328,6 +351,9 @@ class MpfWidget(object):
         If you subclass this method, be sure to call super(), as it's needed
         for widget animations.
         """
+        if 'pre_slide_leave' in self.config['reset_animations_events']:
+            self.reset_animations()
+
         if 'pre_slide_leave' in self.config['animations']:
             self.start_animation_from_event('pre_slide_leave')
 
@@ -340,5 +366,8 @@ class MpfWidget(object):
         If you subclass this method, be sure to call super(), as it's needed
         for widget animations.
         """
+        if 'slide_leave' in self.config['reset_animations_events']:
+            self.reset_animations()
+
         if 'slide_leave' in self.config['animations']:
             self.start_animation_from_event('slide_leave')
