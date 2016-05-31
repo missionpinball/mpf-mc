@@ -148,6 +148,22 @@ class TestAnimation(MpfMcTestCase):
         self.advance_time(.5)
         self.assertEqual(100.0, widget.x)
 
+    def test_reset_animations_standard_event(self):
+        self.mc.events.post('show_slide15')
+        self.advance_time(.1)
+
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+
+        self.assertAlmostEqual(-132, widget.x, delta=20)
+        self.advance_time(.5)
+        self.assertAlmostEqual(-8, widget.x, delta=20)
+        self.advance_time(.5)
+        self.assertEqual(100.0, widget.x)
+
+        self.mc.events.post('event1')
+        self.advance_time()
+        self.assertAlmostEqual(-132, widget.x, delta=20)
+
     def test_animation_show_slide(self):
         self.mc.events.post('show_slide7')
         self.advance_time()

@@ -158,6 +158,17 @@ slides:
           duration: 1s
     reset_animations_events: slide_play
 
+  slide15:
+    type: text
+    text: RESET POSITION standard event
+    x: 0
+    animations:
+      show_slide:
+        - property: x
+          value: 100
+          duration: 1s
+    reset_animations_events: event1
+
 slide_player:
   show_slide1: slide1
   show_slide7: slide7
@@ -184,6 +195,7 @@ slide_player:
         duration: 1s
   show_slide13: slide13
   show_slide14: slide14
+  show_slide15: slide15
 
 widgets:
   widget1:

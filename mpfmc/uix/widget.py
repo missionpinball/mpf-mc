@@ -105,6 +105,13 @@ class MpfWidget(object):
         else:
             self.config['animations'] = dict()
 
+        # why is this needed? Why is it not config validated by here?
+        if 'reset_animations_events' in self.config:
+            for event in [x for x in self.config['reset_animations_events']
+                    if x not in self._magic_events]:
+                self._animation_event_keys.add(self.mc.events.add_handler(
+                    event=event, handler=self.reset_animations))
+
         self.expire = config.get('expire', None)
 
         if self.expire:
