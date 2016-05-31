@@ -272,7 +272,12 @@ class MpfWidget(object):
 
     def remove(self, dt):
         del dt
-        self.parent.remove_widget(self)
+
+        try:
+            self.parent.remove_widget(self)
+        except AttributeError:
+            pass
+
         self.on_remove_from_slide()
 
     def _register_animation_events(self, event_name):
