@@ -420,13 +420,6 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('WIDGET NO EXPIRE', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
-    def test_widget_player_errors(self):
-        pass
-
-        # no slide
-        # bad target
-        # todo
-
     def test_opacity(self):
         self.mc.targets['default'].add_slide(name='slide1')
         self.mc.targets['default'].show_slide('slide1')
@@ -441,6 +434,41 @@ class TestWidget(MpfMcTestCase):
               if x.key == 'widget8'][0]
 
         self.assertEqual(.5, w8.opacity)
+
+    def test_updating_widget_settings(self):
+        self.mc.events.post('show_slide_2')
+        self.advance_time()
+
+        self.mc.events.post('event_a')
+        self.advance_time()
+
+        widget = self.mc.targets['default'].current_slide.get_widgets_by_key(
+            'widget1')[0]
+        self.assertEqual(widget.text, 'A')
+        self.assertEqual(widget.color, [1.0, 0.0, 0.0, 1.0])
+
+        self.mc.events.post('event_s')
+        self.advance_time()
+
+        widget = self.mc.targets['default'].current_slide.get_widgets_by_key(
+            'widget1')[0]
+        self.assertEqual(widget.text, 'S')
+        self.assertEqual(widget.color, [0.0, 1.0, 0.0, 1.0])
+
+        self.mc.events.post('event_d')
+        self.advance_time()
+
+        widget = self.mc.targets['default'].current_slide.get_widgets_by_key(
+            'widget1')[0]
+        self.assertEqual(widget.text, 'D')
+        self.assertEqual(widget.color, [0.0, 0.0, 1.0, 1.0])
+
+    def test_widget_player_errors(self):
+        pass
+
+        # no slide
+        # bad target
+        # todo
 
 
     # todo test non named widgets?

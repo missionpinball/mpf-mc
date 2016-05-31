@@ -131,6 +131,21 @@ widget_player:
           font_size: 50
       widget1:
         action: add
+  event_a:
+    widget1:
+      widget_settings:
+        text: A
+        color: red
+  event_s:
+    widget1:
+      widget_settings:
+        text: S
+        color: lime
+  event_d:
+    widget1:
+      widget_settings:
+        text: D
+        color: blue
 
 slide_player:
   show_slide_1:
@@ -155,3 +170,10 @@ slide_player:
       text: WIDGET NO EXPIRE
       color: red
       y: 66%
+  show_slide_2:
+    slide_2:
+      widgets:
+        type: text
+        text: TEST UPDATING EXISTING WIDGET SETTINGS
+        y: bottom
+        anchor_y: bottom

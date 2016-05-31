@@ -88,13 +88,16 @@ class McWidgetPlayer(McConfigPlayer):
                 raise ValueError("Cannot add widget. No current slide")
 
             if action == 'add':
-
                 if not s['key']:
                     try:
                         s['key'] = s['widget_settings'].pop('key')
                     except (KeyError, AttributeError):
-                        s['key'] = key
+                        if key:
+                            s['key'] = key
+                        else:
+                            s['key'] = widget
 
+                slide.remove_widgets_by_key(s['key'])
                 slide.add_widgets_from_library(name=widget, **s)
 
     def get_express_config(self, value):
