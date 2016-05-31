@@ -88,7 +88,7 @@ class TestVideo(MpfMcTestCase):
         video_widget.set_position(.5)
         text.text = 'SET POSITION TO 0.5s'
         self.advance_time(.1)
-        self.assertAlmostEqual(video_widget.video.position, 0.6, delta=.1)
+        self.assertAlmostEqual(video_widget.video.position, 0.6, delta=.5)
 
         # jump to the 90% point
         video_widget.seek(.9)
@@ -104,7 +104,7 @@ class TestVideo(MpfMcTestCase):
         video_widget.video.set_end_behavior('pause')
         text.text = 'JUMP TO 90%, PAUSE AT END'
         self.advance_time(2)
-        self.assertAlmostEqual(video_widget.video.position, 7.9, delta=.1)
+        self.assertAlmostEqual(video_widget.video.position, 7.9, delta=.5)
 
         # jump to the 90% point
         video_widget.seek(.9)
@@ -112,7 +112,7 @@ class TestVideo(MpfMcTestCase):
         video_widget.video.set_end_behavior('loop')
         text.text = 'JUMP TO 90%, LOOP AT END'
         self.advance_time(2)
-        self.assertAlmostEqual(video_widget.video.position, 1, delta=.1)
+        self.assertAlmostEqual(video_widget.video.position, 1, delta=.5)
 
     def test_control_events(self):
         self.mc.events.post('show_slide2')

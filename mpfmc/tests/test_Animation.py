@@ -106,9 +106,9 @@ class TestAnimation(MpfMcTestCase):
 
         widget = self.mc.targets['default'].current_slide.children[0].children[0]
 
-        self.assertAlmostEqual(-11, widget.x, delta=5)
+        self.assertAlmostEqual(-11, widget.x, delta=6)
         self.advance_time(.5)
-        self.assertAlmostEqual(48, widget.x, delta=5)
+        self.assertAlmostEqual(48, widget.x, delta=6)
         self.advance_time(.5)
         self.assertEqual(100.0, widget.x)
 
@@ -118,9 +118,9 @@ class TestAnimation(MpfMcTestCase):
         # animations should going again
         self.mc.events.post('show_slide1')
         self.advance_time(.1)
-        self.assertAlmostEqual(-11, widget.x, delta=5)
+        self.assertAlmostEqual(-11, widget.x, delta=6)
         self.advance_time(.5)
-        self.assertAlmostEqual(48, widget.x, delta=5)
+        self.assertAlmostEqual(48, widget.x, delta=6)
         self.advance_time(.5)
         self.assertEqual(100.0, widget.x)
 
@@ -128,9 +128,9 @@ class TestAnimation(MpfMcTestCase):
         self.advance_time()
         self.mc.events.post('show_slide1')
         self.advance_time(.1)
-        self.assertAlmostEqual(-11, widget.x, delta=5)
+        self.assertAlmostEqual(-11, widget.x, delta=6)
         self.advance_time(.5)
-        self.assertAlmostEqual(48, widget.x, delta=5)
+        self.assertAlmostEqual(48, widget.x, delta=6)
         self.advance_time(.5)
         self.assertEqual(100.0, widget.x)
 
