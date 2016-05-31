@@ -136,6 +136,28 @@ slides:
         value: 0
         duration: 500ms
 
+  slide13:
+    type: text
+    text: RESET POSITION pre_show_slide
+    x: 0
+    animations:
+      show_slide:
+        - property: x
+          value: 100
+          duration: 1s
+    reset_animations_events: pre_show_slide
+
+  slide14:
+    type: text
+    text: RESET POSITION slide_play
+    x: 0
+    animations:
+      show_slide:
+        - property: x
+          value: 100
+          duration: 1s
+    reset_animations_events: slide_play
+
 slide_player:
   show_slide1: slide1
   show_slide7: slide7
@@ -160,6 +182,8 @@ slide_player:
       transition:
         type: fade
         duration: 1s
+  show_slide13: slide13
+  show_slide14: slide14
 
 widgets:
   widget1:

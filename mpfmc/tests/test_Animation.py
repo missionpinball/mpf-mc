@@ -100,40 +100,53 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(self.mc.animations['multi'][1]['easing'],
                          'linear')
 
-    def test_reset_animations(self):
-        self.mc.events.post('show_slide1')
+    def test_reset_animations_pre_show_slide(self):
+        self.mc.events.post('show_slide13')
         self.advance_time(.1)
 
         widget = self.mc.targets['default'].current_slide.children[0].children[0]
 
-        self.assertAlmostEqual(-11, widget.x, delta=6)
+        self.assertAlmostEqual(-130, widget.x, delta=20)
         self.advance_time(.5)
-        self.assertAlmostEqual(48, widget.x, delta=6)
+        self.assertAlmostEqual(-8, widget.x, delta=20)
+        self.advance_time(.5)
+        self.assertEqual(100.0, widget.x)
+
+        self.mc.events.post('show_base_slide')
+        self.advance_time()
+
+        # animations should start from orig position
+        self.mc.events.post('show_slide13')
+        self.advance_time(.1)
+        self.assertAlmostEqual(-130, widget.x, delta=20)
+        self.advance_time(.5)
+        self.assertAlmostEqual(-8, widget.x, delta=20)
+        self.advance_time(.5)
+        self.assertEqual(100.0, widget.x)
+
+    def test_reset_animations_slide_play(self):
+        self.mc.events.post('show_slide14')
+        self.advance_time(.1)
+
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+
+        self.assertAlmostEqual(-108, widget.x, delta=20)
+        self.advance_time(.5)
+        self.assertAlmostEqual(-8, widget.x, delta=20)
         self.advance_time(.5)
         self.assertEqual(100.0, widget.x)
 
         self.mc.events.post('show_base_slide')
         self.advance_time()
 
-        # animations should going again
-        self.mc.events.post('show_slide1')
+        # animations should start from orig position
+        self.mc.events.post('show_slide14')
         self.advance_time(.1)
-        self.assertAlmostEqual(-11, widget.x, delta=6)
+        self.assertAlmostEqual(-108, widget.x, delta=20)
         self.advance_time(.5)
-        self.assertAlmostEqual(48, widget.x, delta=6)
+        self.assertAlmostEqual(-8, widget.x, delta=20)
         self.advance_time(.5)
         self.assertEqual(100.0, widget.x)
-
-        self.mc.events.post('show_base_slide')
-        self.advance_time()
-        self.mc.events.post('show_slide1')
-        self.advance_time(.1)
-        self.assertAlmostEqual(-11, widget.x, delta=6)
-        self.advance_time(.5)
-        self.assertAlmostEqual(48, widget.x, delta=6)
-        self.advance_time(.5)
-        self.assertEqual(100.0, widget.x)
-
 
     def test_animation_show_slide(self):
         self.mc.events.post('show_slide7')

@@ -52,7 +52,7 @@ class MpfWidget(object):
         self._magic_events = ('add_to_slide', 'remove_from_slide',
                               'pre_show_slide', 'show_slide',
                               'pre_slide_leave', 'slide_leave',
-                              'entrance')
+                              'slide_play', 'entrance')
 
         # some attributes can be expressed in percentages. This dict holds
         # those, key is attribute name, val is max value
@@ -371,3 +371,17 @@ class MpfWidget(object):
 
         if 'slide_leave' in self.config['animations']:
             self.start_animation_from_event('slide_leave')
+
+    def on_slide_play(self):
+        """Automatically called when the slide this widget is part of is played
+        as part of a slide_player play command (either via a standalone slide
+        player or as a show step).
+
+        If you subclass this method, be sure to call super(), as it's needed
+        for widget animations.
+        """
+        if 'slide_play' in self.config['reset_animations_events']:
+            self.reset_animations()
+
+        if 'slide_play' in self.config['animations']:
+            self.start_animation_from_event('slide_play')

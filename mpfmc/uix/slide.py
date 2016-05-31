@@ -248,3 +248,7 @@ class Slide(Screen):
         del args
         for widget in self.stencil.children:
             widget.on_slide_leave()
+
+    def on_slide_play(self):
+        for widget in self.stencil.children:
+            widget.on_slide_play()

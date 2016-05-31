@@ -127,6 +127,8 @@ class McSlidePlayer(McConfigPlayer):
                 else:
                     target.show_slide(slide_name=slide, key=key, **s)
 
+                target.get_screen(slide).on_slide_play()
+
             elif s['action'] == 'remove':
                 target.remove_slide(slide=slide,
                                     transition_config=s['transition'])

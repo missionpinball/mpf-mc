@@ -20,7 +20,7 @@ class VideoWidget(MpfWidget, Video):
         self._control_events = list()
         self._magic_events = ('add_to_slide', 'remove_from_slide',
                               'pre_show_slide', 'show_slide',
-                              'pre_slide_leave', 'slide_leave')
+                              'pre_slide_leave', 'slide_leave', 'slide_play')
 
         self._registered_magic_events = dict()
         for event in self._magic_events:
@@ -50,8 +50,6 @@ class VideoWidget(MpfWidget, Video):
                                                                   self.pos)
 
     def _setup_control_events(self, event_list):
-
-
         for entry in event_list:
 
             kwargs = dict()
@@ -92,40 +90,39 @@ class VideoWidget(MpfWidget, Video):
 
     def on_add_to_slide(self, dt):
         super().on_add_to_slide(dt)
-
         for handler, kwargs in self._registered_magic_events['add_to_slide']:
             handler(**kwargs)
 
     def on_remove_from_slide(self):
         super().on_remove_from_slide()
-
         for handler, kwargs in self._registered_magic_events[
                 'remove_from_slide']:
             handler(**kwargs)
 
     def on_pre_show_slide(self):
         super().on_pre_show_slide()
-
         for handler, kwargs in self._registered_magic_events['pre_show_slide']:
             handler(**kwargs)
 
     def on_show_slide(self):
         super().on_show_slide()
-
         for handler, kwargs in self._registered_magic_events['show_slide']:
             handler(**kwargs)
 
     def on_pre_slide_leave(self):
         super().on_pre_slide_leave()
-
         for handler, kwargs in self._registered_magic_events[
                 'pre_slide_leave']:
             handler(**kwargs)
 
     def on_slide_leave(self):
         super().on_slide_leave()
-
         for handler, kwargs in self._registered_magic_events['slide_leave']:
+            handler(**kwargs)
+
+    def on_slide_play(self):
+        super().on_slide_play()
+        for handler, kwargs in self._registered_magic_events['slide_play']:
             handler(**kwargs)
 
     def play(self, **kwargs):
