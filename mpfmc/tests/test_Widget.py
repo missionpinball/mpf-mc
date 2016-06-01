@@ -463,12 +463,20 @@ class TestWidget(MpfMcTestCase):
         self.assertEqual(widget.text, 'D')
         self.assertEqual(widget.color, [0.0, 0.0, 1.0, 1.0])
 
+    def test_widget_updating(self):
+        self.mc.events.post('show_slide_3')
+        self.advance_time(1)
+
+        self.mc.events.post('widget_4up')
+        self.advance_time(1)
+
+        self.mc.events.post('widget_4up_red')
+        self.advance_time(1)
+
     def test_widget_player_errors(self):
         pass
-
         # no slide
         # bad target
         # todo
-
 
     # todo test non named widgets?

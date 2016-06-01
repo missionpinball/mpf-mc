@@ -30,7 +30,6 @@ class McWidgetPlayer(McConfigPlayer):
         # **kwargs since this is an event callback
         del priority
         del kwargs
-
         settings = deepcopy(settings)
 
         if 'widgets' in settings:
@@ -40,7 +39,7 @@ class McWidgetPlayer(McConfigPlayer):
             s.pop('priority', None)
             slide = None
             action = s.pop('action')
-            assert action in ('add', 'remove')
+            assert action in ('add', 'remove', 'update')
 
             if s['target']:
                 try:
@@ -87,18 +86,19 @@ class McWidgetPlayer(McConfigPlayer):
             if not slide:  # pragma: no cover
                 raise ValueError("Cannot add widget. No current slide")
 
-            if action == 'add':
-                if not s['key']:
-                    try:
-                        s['key'] = s['widget_settings'].pop('key')
-                    except (KeyError, AttributeError):
-                        if key:
-                            s['key'] = key
-                        else:
-                            s['key'] = widget
+            if not s['key']:
+                try:
+                    s['key'] = s['widget_settings'].pop('key')
+                except (KeyError, AttributeError):
+                    if key:
+                        s['key'] = key
+                    else:
+                        s['key'] = widget
 
+            if action == 'update':
                 slide.remove_widgets_by_key(s['key'])
-                slide.add_widgets_from_library(name=widget, **s)
+
+            slide.add_widgets_from_library(name=widget, **s)
 
     def get_express_config(self, value):
         return dict(widget=value)

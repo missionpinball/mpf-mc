@@ -99,6 +99,18 @@ widgets:
     text: WIDGET 8
     color: orange
     font_size: 100
+  box11:
+     - type: text
+       text: box11
+  box12:
+     - type: text
+       text: box12
+  box13:
+     - type: text
+       text: box13
+  box14:
+     - type: text
+       text: box14
 
 widget_player:
   add_widget1_to_current: widget1
@@ -133,19 +145,52 @@ widget_player:
         action: add
   event_a:
     widget1:
+      action: update
       widget_settings:
         text: A
         color: red
   event_s:
     widget1:
+      action: update
       widget_settings:
         text: S
         color: lime
   event_d:
     widget1:
+      action: update
       widget_settings:
         text: D
         color: blue
+  widget_4up:
+    box14:
+      widget_settings:
+        x: 25
+        expire: 6s
+    box13:
+      widget_settings:
+        x: 105
+        expire: 6s
+    box12:
+      widget_settings:
+        x: 185
+        expire: 6s
+    box11:
+      widget_settings:
+        x: 265
+        expire: 6s
+  widget_4up_red:
+    box14:
+      widget_settings:
+        color: red
+    box13:
+      widget_settings:
+        color: red
+    box12:
+      widget_settings:
+        color: red
+    box11:
+      widget_settings:
+        color: red
 
 slide_player:
   show_slide_1:
@@ -172,8 +217,29 @@ slide_player:
       y: 66%
   show_slide_2:
     slide_2:
+    - type: text
+      text: TEST UPDATING EXISTING WIDGET SETTINGS
+      y: bottom
+      anchor_y: bottom
+  show_slide_3:
+    slide_3:
       widgets:
-        type: text
-        text: TEST UPDATING EXISTING WIDGET SETTINGS
-        y: bottom
-        anchor_y: bottom
+      - type: text
+        text: WIDGET REPLACEMENT
+        y: 25%
+#      - key: box11
+#        type: text
+#        text: box11
+#        x: 260
+#      - key: box12
+#        type: text
+#        text: box12
+#        x: 180
+#      - key: box13
+#        type: text
+#        text: box13
+#        x: 100
+#      - key: box14
+#        type: text
+#        text: box14
+#        x: 20
