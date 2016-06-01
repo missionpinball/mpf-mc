@@ -73,13 +73,9 @@ class VideoAsset(Asset):
         return self._video.state
 
     def do_load(self):
-        self._video = Video(filename=self.file)
-
-        if self.video.duration <= 0:
-            raise ValueError(
-                "Video file {} was loaded, but seems to have no content. Check"
-                "to make sure you have the proper Gstreamer plugins for the "
-                "codec this video needs".format(self.file))
+        # For videos, we need them to load in the main thread, so we do not
+        # load them here and load them via is_loaded() below.
+        pass
 
     def _do_unload(self):
         if self._video:
@@ -103,3 +99,16 @@ class VideoAsset(Asset):
         assert eos in ('loop', 'pause', 'stop')
         self._video.eos = eos
 
+    def is_loaded(self):
+        self.loading = False
+        self.loaded = True
+        self.unloading = False
+        self._video = Video(filename=self.file)
+
+        if self._video.duration <= 0:
+            raise ValueError(
+                "Video file {} was loaded, but seems to have no content. Check"
+                "to make sure you have the proper Gstreamer plugins for the "
+                "codec this video needs".format(self.file))
+
+        self._call_callbacks()
