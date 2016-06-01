@@ -24,7 +24,7 @@ class ImageAsset(Asset):
     attribute = 'images'  # attribute in MC, e.g. self.mc.images
     path_string = 'images'  # entry from mpf-mc:paths: for asset folder name
     config_section = 'images'  # section in the config files for this asset
-    extensions = ('png', 'jpg', 'jpeg', 'gif', 'zip')  # obvious. No dots.
+    extensions = ('png', 'jpg', 'jpeg', 'gif', 'zip', 'bmp')  # obvious. No dots.
     class_priority = 100  # Order asset classes are loaded. Higher is first.
     pool_config_section = 'image_pools'  # Will setup groups if present
     asset_group_class = ImagePool  # Class or None to not use pools
@@ -54,7 +54,6 @@ class ImageAsset(Asset):
         # the various load status attributes will be updated automatically,
         # and anything that was waiting for it to load will be called. So
         # all you have to do here is load and return.
-
         self._image = Image(self.config['file'],
                             keep_data=False,
                             scale=1.0,
