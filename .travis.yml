@@ -25,7 +25,7 @@ install:
       sudo apt-get -y install xvfb pulseaudio;
       pip install --upgrade cython pillow coveralls setuptools;
       pip install kivy;
-      pip install https://github.com/missionpinball/mpf/zipball/${TRAVIS_BRANCH};
+      pip install https://github.com/missionpinball/mpf/zipball/${TRAVIS_BRANCH} || pip install https://github.com/missionpinball/mpf/zipball/dev;
       python setup.py install;
    fi;
 
@@ -34,7 +34,7 @@ install:
       brew install python3;
       brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
       pip3 install -I Cython==0.23;
-      pip install https://github.com/missionpinball/mpf/zipball/${TRAVIS_BRANCH};
+      pip install https://github.com/missionpinball/mpf/zipball/${TRAVIS_BRANCH} || pip install https://github.com/missionpinball/mpf/zipball/dev;
       USE_OSX_FRAMEWORKS=0 pip3 install kivy;
       pip3 install wheel setuptools --upgrade;
       USE_OSX_FRAMEWORKS=0 pip3 install .;
