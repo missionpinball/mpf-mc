@@ -75,7 +75,7 @@ class VideoAsset(Asset):
     def do_load(self):
         self._video = Video(filename=self.file)
 
-        if not self.video.duration:
+        if self.video.duration <= 0:
             raise ValueError(
                 "Video file {} was loaded, but seems to have no content. Check"
                 "to make sure you have the proper Gstreamer plugins for the "
