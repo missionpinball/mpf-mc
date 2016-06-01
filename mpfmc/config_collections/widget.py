@@ -54,12 +54,14 @@ class Widget(ConfigCollection):
 
     def process_widget(self, config):
         # config is localized widget settings
-
         try:
             widget_cls = Widget.type_map[config['type']]
         except KeyError:
-            raise ValueError('"{}" is not a valid MPF display widget type'
-                             .format(config['type']))
+            try:
+                raise ValueError('"{}" is not a valid MPF display widget type'
+                                 .format(config['type']))
+            except KeyError:
+                raise ValueError("Invalid widget config: {}".format(config))
 
         config['_default_settings'] = list()
 
