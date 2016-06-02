@@ -108,7 +108,7 @@ class VideoAsset(Asset):
         if self._video.duration <= 0:
             raise ValueError(
                 "Video file {} was loaded, but seems to have no content. Check"
-                "to make sure you have the proper Gstreamer plugins for the "
+                " to make sure you have the proper Gstreamer plugins for the "
                 "codec this video needs".format(self.file))
 
         self._call_callbacks()
