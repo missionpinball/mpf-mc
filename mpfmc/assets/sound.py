@@ -240,6 +240,10 @@ class SoundAsset(Asset):
         """Stops all instances of the sound playing on the sound's default track."""
         self._track.stop_sound(self)
 
+    def stop_looping(self):
+        """Stops looping on all instances of the sound playing (and awaiting playback)."""
+        self._track.stop_sound_looping(self)
+
 
 class DuckingSettings(object):
     """ DuckingSettings contains the parameters needed to control audio ducking
