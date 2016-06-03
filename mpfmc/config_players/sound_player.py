@@ -107,6 +107,9 @@ Here are several various examples:
             elif s['action'].lower() == 'stop':
                 sound.stop()
 
+            elif s['action'].lower() == 'stop_looping':
+                sound.stop_looping()
+
     def get_express_config(self, value):
         """ express config for sounds is simply a string (sound name)"""
         return dict(sound=value)

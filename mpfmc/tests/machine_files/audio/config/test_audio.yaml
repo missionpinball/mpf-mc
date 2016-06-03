@@ -63,8 +63,11 @@ sound_player:
     play_sound_synthping: 210871_synthping
     play_sound_text:
         264828_text:
-            loops: 3
+            loops: -1
             priority: 100
+    stop_sound_looping_text:
+        264828_text:
+            action: stop_looping
     play_sound_moron_test: 104457_moron_test
     stop_sound_moron_test:
         104457_moron_test:

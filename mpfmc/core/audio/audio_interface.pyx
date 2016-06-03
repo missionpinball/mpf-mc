@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '30', '0-dev14')
+__version_info__ = ('0', '30', '0-dev15')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -220,6 +220,10 @@ cdef class AudioInterface:
         channels = Mix_AllocateChannels(1)
         Logger.debug("SDL_Mixer: Allocated {} channel(s)".format(channels))
         self.mixer_channel = 0
+
+        # Ensure channel volume is at maximum (should be the default, but we'll set it manually
+        # in case the default ever changes)
+        Mix_Volume(self.mixer_channel, MIX_MAX_VOLUME)
 
         # Setup callback function for mixer channel depending upon the audio format used
         cdef Mix_EffectFunc_t audio_callback_fn = AudioInterface.audio_callback
@@ -1735,7 +1739,8 @@ cdef class Track:
 
     def stop_sound(self, sound not None):
         """
-        Stops all instances of the specified sound immediately on the track.
+        Stops all instances of the specified sound immediately on the track. Any queued instances
+        will be removed from the queue.
         Args:
             sound: The Sound to stop
         """
@@ -1757,6 +1762,27 @@ cdef class Track:
                     Logger.warning(
                         "Track: All internal audio messages are currently in use, "
                         "could not stop sound {}".format(sound.name))
+
+        # Remove any instances of the specified sound that are pending in the sound queue.
+        self._remove_sound_from_queue(sound)
+
+        SDL_UnlockMutex(self.mutex)
+
+    def stop_sound_looping(self, sound not None):
+        """
+        Stops all instances of the specified sound on the track after they finish the current loop.
+        Any queued instances of the sound will be removed.
+        Args:
+            sound: The Sound to stop
+        """
+
+        SDL_LockMutex(self.mutex)
+
+        for i in range(self.max_simultaneous_sounds):
+            if self.attributes.sound_players[i].status != player_idle and self.attributes.sound_players[
+                i].current.sound_id == sound.id:
+                # Set sound's loops_remaining variable to zero
+                self.attributes.sound_players[i].current.loops_remaining = 0
 
         # Remove any instances of the specified sound that are pending in the sound queue.
         self._remove_sound_from_queue(sound)
@@ -2013,6 +2039,18 @@ cdef class Track:
                 players_in_use_count += 1
         SDL_UnlockMutex(self.mutex)
         return players_in_use_count
+
+    def sound_is_playing(self, sound):
+        """Returns whether or not the specified sound is currently playing on the track"""
+        SDL_LockMutex(self.mutex)
+        for i in range(self.max_simultaneous_sounds):
+            if self.attributes.sound_players[i].status != player_idle and \
+                            self.attributes.sound_players[i].current.sound_id == sound.id:
+                SDL_UnlockMutex(self.mutex)
+                return True
+
+        SDL_UnlockMutex(self.mutex)
+        return False
 
     def sound_is_in_queue(self, sound):
         """Returns whether or not the specified sound is currently in the queue"""

@@ -115,10 +115,13 @@ class TestAudio(MpfMcTestCase):
         # Test baseline internal audio event count
         self.assertEqual(interface.get_in_use_sound_event_count(), 0)
 
+
         # Test sound_player
+        self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
         self.mc.events.post('play_sound_text')
         self.mc.events.post('play_sound_music')
         self.advance_time(1)
+        self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
 
         # Test two sounds at the same time on the voice track (only
         # 1 sound at a time max).  Second sound should be queued and
@@ -148,7 +151,17 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(0.1)
         self.assertTrue(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
 
-        self.advance_time(4.7)
+        # Make sure text sound is still playing (looping)
+        self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
+
+        # Send an event to stop the text sound looping
+        self.mc.events.post('stop_sound_looping_text')
+        self.advance_time(2)
+
+        # Text sound should no longer be playing
+        self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
+
+        self.advance_time(2.7)
         self.mc.events.post('play_sound_synthping')
         self.advance_time(3)
         self.mc.events.post('play_sound_synthping')
