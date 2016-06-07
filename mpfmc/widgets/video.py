@@ -187,6 +187,8 @@ class VideoWidget(MpfWidget, Video):
                 self._video.play()
             self.duration = 1.
 
+        self.video.set_end_behavior(self.config['end_behavior'])
+
     def on_texture(self, instance, value):
         # Overrides the base method to put the size into self.size instead of
         # self.texture_size

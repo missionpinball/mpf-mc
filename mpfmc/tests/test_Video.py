@@ -175,20 +175,41 @@ class TestVideo(MpfMcTestCase):
         self.advance_time(1)
         video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
 
+        # make sure it's playing
         self.assertEqual('playing', video_widget.video.state)
         self.assertEqual(0.2, video_widget.video.volume)
+        last_pos = video_widget.video.position
+        self.advance_time(1)
+
+        # make sure the current position is about 1 sec later than last
+        self.assertAlmostEqual(1, video_widget.video.position - last_pos, delta=.2)
+
+        # jump to 90%
         self.mc.events.post('seek1')
         self.advance_time()
+        self.assertGreater(video_widget.video.position, 7)
 
         # wait for the video to end and make sure it loops
         self.advance_time(2)
-        self.assertLess(video_widget.video.position, 2.0)
+        last_pos = video_widget.video.position
+        self.advance_time(1)
+
+        # should still be playing, make sure the current position is about 1
+        # sec later than last
+        self.assertAlmostEqual(1, video_widget.video.position - last_pos, delta=.2)
+
+        # stop and reset the video since it's the same asset used in the next
+        # slide
+        video_widget.stop()
+        self.advance_time(.1)
 
         self.mc.events.post('show_slide8')
         self.advance_time(1)
         video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
 
-        # self.assertEqual('stopped', video_widget.video.state)
+        self.assertEqual('', video_widget.video.state)
+        # stopped state is empty string
+
         self.assertEqual(video_widget.video.position, 0.0)
         self.advance_time()
         self.assertEqual(video_widget.video.position, 0.0)
@@ -204,7 +225,6 @@ class TestVideo(MpfMcTestCase):
 
         self.advance_time(1)
         self.assertAlmostEqual(video_widget.video.position, 7.1, delta=.3)
-
 
     def test_pre_show_slide(self):
         self.mc.events.post('show_slide3')
