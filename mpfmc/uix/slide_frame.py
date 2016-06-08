@@ -1,4 +1,4 @@
-from bisect import bisect
+from bisect import bisect_left
 
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
@@ -57,17 +57,12 @@ class SlideFrameParent(MpfWidget, FloatLayout):
 
     def add_widget(self, widget, **kwargs):
         del kwargs
-        widget.config['z'] = abs(widget.config['z'])
 
         widget.pos = set_position(self.width, self.height,
                                   widget.width, widget.height)
 
-        self.stencil.add_widget(widget, bisect(self.stencil.children, widget))
-
-    # def on_size(self, *args):
-    #     for widget in self.children:
-    #         widget.pos = set_position(self.width, self.height,
-    #                                   widget.width, widget.height)
+        self.stencil.add_widget(widget, bisect_left(
+            self.stencil.children, widget))
 
 
 class SlideFrame(MpfWidget, ScreenManager):

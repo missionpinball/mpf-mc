@@ -191,6 +191,15 @@ widget_player:
     box11:
       widget_settings:
         color: red
+  widget_to_parent:
+    box11:
+      widget_settings:
+        z: -1
+    box12:
+      widget_settings:
+        z: -2
+        color: red
+        y: middle+2
 
 slide_player:
   show_slide_1:

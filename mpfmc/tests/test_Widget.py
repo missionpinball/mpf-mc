@@ -217,6 +217,7 @@ class TestWidget(MpfMcTestCase):
         self.assertNotIn('widget6', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
+        # add widget 6, z: -100, so it should go to parent frame
         self.mc.events.post('add_widget6')
         self.advance_time()
 
@@ -229,7 +230,7 @@ class TestWidget(MpfMcTestCase):
         # verify widget6 is the highest priority in the parent frame
         # (highest priority is the last element in the list)
         self.assertEqual('widget6', self.mc.targets[
-            'default'].parent.children[-1].text)
+            'default'].parent.children[0].text)
 
         # now switch the slide
         self.mc.targets['default'].add_slide(name='slide2')
@@ -245,7 +246,46 @@ class TestWidget(MpfMcTestCase):
 
         # make sure widget6 is still in the SlideFrameParent
         self.assertEqual('widget6', self.mc.targets[
-            'default'].parent.children[-1].text)
+            'default'].parent.children[0].text)
+
+    def test_widget_to_parent_via_widget_settings(self):
+        # create a slide and add some base widgets
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('add_widget1_to_current')
+        self.advance_time()
+
+        # verify widget 1 is there but not box11
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('box11', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('box12', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # add boxx11, z: -1, so it should go to parent frame
+        self.mc.events.post('widget_to_parent')
+        self.advance_time()
+
+        # verify widget1 is in the slide but not box11
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('box11', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('box12', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # verify widget6 is the highest priority in the parent frame
+        # (highest priority is the last element in the list)
+        self.assertEqual('box12', self.mc.targets[
+            'default'].parent.children[-3].text)
+        self.assertEqual('box11', self.mc.targets[
+            'default'].parent.children[-2].text)
+
+        self.advance_time(2)
 
     def test_removing_mode_widget_from_parent_frame_on_mode_stop(self):
         # create a slide and add some base widgets
@@ -279,9 +319,9 @@ class TestWidget(MpfMcTestCase):
 
         # verify widget6 is the highest priority in the parent frame
         self.assertEqual('widget6', self.mc.targets[
-            'default'].parent.children[-1].text)
+            'default'].parent.children[0].text)
         self.assertTrue(isinstance(self.mc.targets[
-            'default'].parent.children[-1], Text))
+            'default'].parent.children[0], Text))
 
         # stop the mode
         self.mc.modes['mode1'].stop()
