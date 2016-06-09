@@ -51,6 +51,11 @@ class SoundPool(AssetPool):
         for sound in self.assets:
             sound.stop()
 
+    def stop_looping(self):
+        """Stops looping on all instances of all sounds contained in the sound pool."""
+        for sound in self.assets:
+            sound.stop_looping(self)
+
 
 class SoundAsset(Asset):
     """
@@ -80,6 +85,7 @@ class SoundAsset(Asset):
         self._loops = DEFAULT_LOOPS
         self._events_when_played = None
         self._events_when_stopped = None
+        self._events_when_looping = None
         self._container = None  # holds the actual sound samples in memory
         self._ducking = None
 
@@ -113,6 +119,10 @@ class SoundAsset(Asset):
         if 'events_when_stopped' in self.config and isinstance(
                 self.config['events_when_stopped'], str):
             self._events_when_stopped = Util.string_to_list(self.config['events_when_stopped'])
+
+        if 'events_when_looping' in self.config and isinstance(
+                self.config['events_when_looping'], str):
+            self._events_when_looping = Util.string_to_list(self.config['events_when_looping'])
 
         if 'ducking' in self.config:
             self._ducking = DuckingSettings(self.machine, self.config['ducking'])
@@ -186,6 +196,11 @@ class SoundAsset(Asset):
     def events_when_stopped(self):
         """Returns the list of events that are posted when the sound is stopped"""
         return self._events_when_stopped
+
+    @property
+    def events_when_looping(self):
+        """Returns the list of events that are posted when the sound begins a new loop"""
+        return self._events_when_looping
 
     @property
     def container(self):
