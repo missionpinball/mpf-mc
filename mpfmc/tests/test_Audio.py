@@ -154,6 +154,9 @@ class TestAudio(MpfMcTestCase):
         # Make sure text sound is still playing (looping)
         self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
 
+        # Ensure sound.events_when_looping is working properly (send event when a sound loops)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_looping')
+
         # Send an event to stop the text sound looping
         self.mc.events.post('stop_sound_looping_text')
         self.advance_time(2)
