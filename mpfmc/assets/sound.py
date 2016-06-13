@@ -6,8 +6,6 @@ from mpf.core.assets import Asset, AssetPool
 from mpf.core.utility_functions import Util
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException
 
-Logger = logging.getLogger('SoundAsset')
-
 
 # ---------------------------------------------------------------------------
 #    Default sound asset configuration parameter values
@@ -82,12 +80,14 @@ class SoundAsset(Asset):
         self._events_when_stopped = None
         self._container = None  # holds the actual sound samples in memory
         self._ducking = None
+        self.log = logging.getLogger('SoundAsset')
+
 
         # Make sure a legal track name has been specified.  If not, throw an exception
         track = self.machine.sound_system.audio_interface.get_track_by_name(self.config['track'])
         if 'track' not in self.config or track is None:
-            Logger.error("SoundAsset: sound must have a valid track name. "
-                         "Could not create sound '%s' asset.", name)
+            self.log.error("sound must have a valid track name. "
+                           "Could not create sound '%s' asset.", name)
             raise AudioException("Sound must have a valid track name. "
                                  "Could not create sound '{}' asset".format(name))
 
@@ -213,8 +213,8 @@ class SoundAsset(Asset):
             try:
                 self._ducking.validate(self._container.length)
             except AudioException as exception:
-                Logger.error("SoundAsset: Ducking settings for sound %s are not valid: %s",
-                             self.name, str(exception))
+                self.log.error("Ducking settings for sound %s are not valid: %s",
+                               self.name, str(exception))
                 raise
 
     def _do_unload(self):
@@ -226,7 +226,7 @@ class SoundAsset(Asset):
     def is_loaded(self):
         """Called when the asset has finished loading"""
         super().is_loaded()
-        Logger.debug("SoundAsset: Loaded %s (Track %s)", self.name, self.track)
+        self.log.debug("Loaded %s (Track %s)", self.name, self.track)
 
     def play(self, settings=None):
         """
@@ -234,17 +234,17 @@ class SoundAsset(Asset):
         Args:
             settings: Optional dictionary of settings to override the default values.
         """
-        Logger.debug("SoundAsset: Play sound %s %s", self.name, self.track)
+        self.log.debug("Play sound %s %s", self.name, self.track)
         self._track.play_sound(self, **settings)
 
     def stop(self):
         """Stops all instances of the sound playing on the sound's default track."""
-        Logger.debug("SoundAsset: Stop sound %s %s", self.name, self.track)
+        self.log.debug("Stop sound %s %s", self.name, self.track)
         self._track.stop_sound(self)
 
     def stop_looping(self):
         """Stops looping on all instances of the sound playing (and awaiting playback)."""
-        Logger.debug("SoundAsset: Stop looping sound %s %s", self.name, self.track)
+        self.log.debug("Stop looping sound %s %s", self.name, self.track)
         self._track.stop_sound_looping(self)
 
 
