@@ -6,7 +6,7 @@ from mpf.core.assets import Asset, AssetPool
 from mpf.core.utility_functions import Util
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException
 
-Logger = logging.getLogger('AudioInterface')
+Logger = logging.getLogger('SoundAsset')
 
 
 # ---------------------------------------------------------------------------
@@ -234,14 +234,17 @@ class SoundAsset(Asset):
         Args:
             settings: Optional dictionary of settings to override the default values.
         """
+        Logger.debug("SoundAsset: Play sound %s %s", self.name, self.track)
         self._track.play_sound(self, **settings)
 
     def stop(self):
         """Stops all instances of the sound playing on the sound's default track."""
+        Logger.debug("SoundAsset: Stop sound %s %s", self.name, self.track)
         self._track.stop_sound(self)
 
     def stop_looping(self):
         """Stops looping on all instances of the sound playing (and awaiting playback)."""
+        Logger.debug("SoundAsset: Stop looping sound %s %s", self.name, self.track)
         self._track.stop_sound_looping(self)
 
 

@@ -2,7 +2,6 @@
 
 # WARNING: Do not import kivy's logger here since that will trigger Kivy to
 # load in the mpf process when MPF processes the MpfSoundPlayer
-# from kivy.logger import Logger
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer

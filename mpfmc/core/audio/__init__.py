@@ -2,9 +2,9 @@
 Audio module provides all the audio features (playing of sounds) for the media controller.
 """
 
-from kivy.logger import Logger
 from kivy.clock import Clock
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException, Track
+import logging
 
 __all__ = ('SoundSystem',
            'AudioInterface',
@@ -33,17 +33,18 @@ class SoundSystem(object):
 
     def __init__(self, mc):
         self.mc = mc
+        self.log = logging.getLogger('SoundSystem')
         self._initialized = False
         self.audio_interface = None
         self.config = {}
         self.tracks = {}
         self.sound_events = {}
 
-        Logger.debug("Loading the Sound System")
+        self.log.debug("Loading the Sound System")
 
         # Load configuration for sound system
         if 'sound_system' not in self.mc.machine_config:
-            Logger.info("SoundSystem: Using default 'sound_system' settings")
+            self.log.info("SoundSystem: Using default 'sound_system' settings")
             self.config = {}
         else:
             self.config = self.mc.machine_config['sound_system']
@@ -54,16 +55,16 @@ class SoundSystem(object):
 
         # If the sound system has been disabled, abort initialization
         if not self.config['enabled']:
-            Logger.debug("SoundSystem: The sound system has been disabled in "
-                         "the configuration file (enabled: False). No audio "
-                         "features will be available.")
+            self.log.debug("SoundSystem: The sound system has been disabled in "
+                           "the configuration file (enabled: False). No audio "
+                           "features will be available.")
             return
 
         if 'buffer' not in self.config or self.config['buffer'] == 'auto':
             self.config['buffer'] = DEFAULT_AUDIO_BUFFER_SAMPLE_SIZE
         elif not AudioInterface.power_of_two(self.config['buffer']):
-            Logger.warning("SoundSystem: The buffer setting is not a power of "
-                           "two. Default buffer size will be used.")
+            self.log.warning("SoundSystem: The buffer setting is not a power of "
+                             "two. Default buffer size will be used.")
             self.config['buffer'] = DEFAULT_AUDIO_BUFFER_SAMPLE_SIZE
 
         if 'frequency' not in self.config or self.config['frequency'] == 'auto':
@@ -83,8 +84,8 @@ class SoundSystem(object):
                 channels=self.config['channels'],
                 buffer_samples=self.config['buffer'])
         except AudioException:
-            Logger.error("SoundController: Could not initialize the audio interface. "
-                         "Audio features will not be available.")
+            self.log.error("SoundController: Could not initialize the audio interface. "
+                           "Audio features will not be available.")
             self.audio_interface = None
             return
 
@@ -148,14 +149,14 @@ class SoundSystem(object):
             True if the track was successfully created, False otherwise
         """
         if self.audio_interface is None:
-            Logger.error("SoundSystem: Could not create '{}' track - the audio interface has not been initialized"
-                         .format(name))
+            self.log.error("SoundSystem: Could not create '{}' track - the audio interface has "
+                           "not been initialized".format(name))
             return False
 
         # Validate track config parameters
         if name in self.tracks:
-            Logger.error("SoundSystem: Could not create '{}' track - a track with that name already exists"
-                         .format(name))
+            self.log.error("SoundSystem: Could not create '{}' track - a track with that name "
+                           "already exists".format(name))
             return False
 
         if config is None:
