@@ -1,5 +1,5 @@
+import logging
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from kivy.logger import Logger
 from mock import MagicMock
 
 
@@ -9,7 +9,6 @@ class TestAudio(MpfMcTestCase):
     custom extension library written in Cython that interfaces with the SDL2 and
     SDL_Mixer libraries.
     """
-
     def get_machine_path(self):
         return 'tests/machine_files/audio'
 
@@ -23,7 +22,8 @@ class TestAudio(MpfMcTestCase):
         """ Tests the sound system and audio interface with typical settings """
 
         if self.mc.sound_system is None:
-            Logger.warning("Sound system is not enabled - unable to run audio tests")
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - unable to run audio tests")
             return
 
         self.assertIsNotNone(self.mc.sound_system)
