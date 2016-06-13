@@ -101,7 +101,9 @@ class McSlidePlayer(McConfigPlayer):
     show_section = 'slides'
     machine_collection_name = 'slides'
 
-    def play(self, settings, key=None, priority=0, **kwargs):
+    def play(self, settings, context, priority=0, **kwargs):
+        instance_dict = self._get_instance_dict(context)
+        full_context = self._get_full_context(context)
         settings = deepcopy(settings)
 
         if 'slides' in settings:
@@ -120,18 +122,26 @@ class McSlidePlayer(McConfigPlayer):
             except KeyError:
                 target = self.machine.targets['default']
 
+            if target not in instance_dict:
+                instance_dict[target] = list()
+
             if s['action'] == 'play':
                 # is this a named slide, or a new slide?
                 if 'widgets' in s:
-                    target.add_and_show_slide(key=key, slide_name=slide, **s)
+                    target.add_and_show_slide(key=full_context, slide_name=slide, **s)
                 else:
-                    target.show_slide(slide_name=slide, key=key, **s)
+                    target.show_slide(slide_name=slide, key=full_context, **s)
 
                 target.get_screen(slide).on_slide_play()
 
+                if slide not in instance_dict[target]:
+                    instance_dict[target].append(slide)
+
             elif s['action'] == 'remove':
-                target.remove_slide(slide=slide,
-                                    transition_config=s['transition'])
+                if slide in instance_dict[target]:
+                    instance_dict[target].remove(slide)
+                    target.remove_slide(slide=slide,
+                                        transition_config=s['transition'])
 
     def get_express_config(self, value):
         # express config for slides can either be a string (slide name) or a
@@ -222,16 +232,14 @@ class McSlidePlayer(McConfigPlayer):
 
         return validated_dict
 
-    def clear(self, key):
-        self.remove_slides(key)
+    def clear_context(self, context):
+        """Remove all slides from this player context."""
+        instance_dict = self._get_instance_dict(context)
+        for target, slides in instance_dict.items():
+            for slide in slides:
+                target.remove_slide(slide)
 
-    def remove_slides(self, key):
-        """Removes all the slides from this mode from the active targets."""
-
-        target_list = set(self.machine.targets.values())
-        for target in target_list:
-            for screen in [x for x in target.screens if x.key == key]:
-                target.remove_slide(screen)
+        self._reset_instance_dict(context)
 
 
 class MpfSlidePlayer(PluginPlayer):
