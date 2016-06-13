@@ -69,44 +69,6 @@ class TestSlides(MpfMcTestCase):
         # make sure it also works by attribute
         self.assertIsNotNone(self.mc.slides.slide1)
 
-    def test_slides_from_modes(self):
-        self.assertIn('mode1_slide1', self.mc.slides)
-
-        # set a current slide
-        self.mc.targets['display1'].add_slide(name='slide1')
-        self.mc.targets['display1'].show_slide('slide1')
-        self.assertEqual(self.mc.targets['display1'].current_slide_name,
-                         'slide1')
-
-        # start a mode and add a slide from that mode
-        self.mc.modes['mode1'].start()
-        self.mc.targets['display1'].add_slide(name='slide2', key='mode1',
-                                              priority=500)
-        self.mc.targets['display1'].show_slide('slide2')
-        self.assertEqual(self.mc.targets['display1'].current_slide_name,
-                         'slide2')
-        self.assertEqual(self.mc.targets['display1'].current_slide.priority,
-                         500)
-
-        # save how many slides are active
-        active_slides = len(self.mc.active_slides)
-
-        # stop the mode and its slide should be removed
-        num_slides = len(self.mc.targets['display1'].slides)
-        self.mc.modes['mode1'].stop()
-        self.mc.events.post('clear', key='mode1')
-        self.advance_time()
-        self.assertEqual(self.mc.targets['display1'].current_slide_name,
-                         'slide1')
-        self.assertEqual(self.mc.targets['display1'].current_slide.priority,
-                         0)
-        self.assertEqual(len(self.mc.targets['display1'].slides),
-                         num_slides - 1)
-
-        # Make sure we have one less active slide
-        self.assertEqual(len(self.mc.active_slides), active_slides - 1)
-        self.advance_time(0.01)
-
     def test_quick_actions(self):
         # There was a bug where immediately adding and then removing a slide
         # would crash because the kivy event loop didn't get a chance to run.
