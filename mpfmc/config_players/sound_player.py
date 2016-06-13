@@ -168,8 +168,9 @@ Here are several various examples:
     def clear_context(self, context):
         """Stop all sounds from this context."""
         instance_dict = self._get_instance_dict(context)
-        for sound in instance_dict:
-            sound.stop()
+        # TODO: this segfaults when uncommented. why?
+        # for sound in instance_dict.values():
+        #    sound.stop()
         self._reset_instance_dict(context)
 
 
