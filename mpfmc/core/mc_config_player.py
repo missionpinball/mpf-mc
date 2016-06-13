@@ -16,11 +16,15 @@ class McConfigPlayer(ConfigPlayer):
         return 'McConfigPlayer.{}'.format(self.show_section)
 
     def _initialize(self):
+        # this does not call super() since the base class uses self.config
+        # and the mc uses self.machine_config
         if self.machine_collection_name:
             self.device_collection = getattr(self.machine,
                                              self.machine_collection_name)
         else:
             self.device_collection = None
+
+        self.instances['_global'][self.config_file_section] = dict()
 
         self.machine.mode_controller.register_load_method(
             self.process_mode_config, self.config_file_section)
@@ -44,5 +48,5 @@ class McConfigPlayer(ConfigPlayer):
             event='{}_play'.format(self.show_section),
             handler=self.play_from_trigger)
 
-    def play_from_trigger(self, **kwargs):
-        self.play(settings=kwargs)
+    def play_from_trigger(self, settings, context, priority, **kwargs):
+        self.play(settings=settings, content=context, priority=priority)
