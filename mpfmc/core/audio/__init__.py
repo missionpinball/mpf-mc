@@ -150,13 +150,13 @@ class SoundSystem(object):
         """
         if self.audio_interface is None:
             self.log.error("Could not create '%s' track - the audio interface has "
-                           "not been initialized" % name)
+                           "not been initialized", name)
             return False
 
         # Validate track config parameters
         if name in self.tracks:
             self.log.error("Could not create '%s' track - a track with that name "
-                           "already exists" % name)
+                           "already exists", name)
             return False
 
         if config is None:
