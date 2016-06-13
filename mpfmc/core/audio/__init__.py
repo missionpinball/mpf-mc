@@ -84,7 +84,7 @@ class SoundSystem(object):
                 channels=self.config['channels'],
                 buffer_samples=self.config['buffer'])
         except AudioException:
-            self.log.error("SoundController: Could not initialize the audio interface. "
+            self.log.error("Could not initialize the audio interface. "
                            "Audio features will not be available.")
             self.audio_interface = None
             return
@@ -149,14 +149,14 @@ class SoundSystem(object):
             True if the track was successfully created, False otherwise
         """
         if self.audio_interface is None:
-            self.log.error("SoundSystem: Could not create '{}' track - the audio interface has "
-                           "not been initialized".format(name))
+            self.log.error("Could not create '%s' track - the audio interface has "
+                           "not been initialized" % name)
             return False
 
         # Validate track config parameters
         if name in self.tracks:
-            self.log.error("SoundSystem: Could not create '{}' track - a track with that name "
-                           "already exists".format(name))
+            self.log.error("Could not create '%s' track - a track with that name "
+                           "already exists" % name)
             return False
 
         if config is None:
