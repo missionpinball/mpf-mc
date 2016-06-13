@@ -1,7 +1,11 @@
+"""Base class for remote config players."""
 from mpf.core.config_player import ConfigPlayer
 
 
 class McConfigPlayer(ConfigPlayer):
+
+    """Remote config player which is triggered via BCP."""
+
     config_file_section = None
     show_section = None
     machine_collection_name = None
@@ -48,5 +52,20 @@ class McConfigPlayer(ConfigPlayer):
             event='{}_play'.format(self.show_section),
             handler=self.play_from_trigger)
 
+        self.machine.events.add_handler(
+            event='{}_clear'.format(self.show_section),
+            handler=self.clear_from_trigger)
+
     def play_from_trigger(self, settings, context, priority, **kwargs):
-        self.play(settings=settings, content=context, priority=priority)
+        """Call play from BCP trigger."""
+        if context not in self.instances:
+            self.instances[context] = dict()
+        if self.config_file_section not in self.instances[context]:
+            self.instances[context][self.config_file_section] = dict()
+
+        self.play(settings=settings, context=context, priority=priority, **kwargs)
+
+    def clear_from_trigger(self, context, **kwargs):
+        """Call clear_context from BCP trigger."""
+        del kwargs
+        self.clear_context(context=context)
