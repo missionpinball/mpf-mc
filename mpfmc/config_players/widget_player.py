@@ -26,11 +26,13 @@ class McWidgetPlayer(McConfigPlayer):
     show_section = 'widgets'
     machine_collection_name = 'widgets'
 
-    def play(self, settings, key=None, priority=0, **kwargs):
+    def play(self, settings, context, priority=0, **kwargs):
         # **kwargs since this is an event callback
         del priority
         del kwargs
         settings = deepcopy(settings)
+        instance_dict = self._get_instance_dict(context)
+        full_context = self._get_full_context(context)
 
         if 'widgets' in settings:
             settings = settings['widgets']
@@ -90,34 +92,25 @@ class McWidgetPlayer(McConfigPlayer):
                 try:
                     s['key'] = s['widget_settings'].pop('key')
                 except (KeyError, AttributeError):
-                    if key:
-                        s['key'] = key
-                    else:
-                        s['key'] = widget
+                    s['key'] = widget
 
             if action == 'update':
                 slide.remove_widgets_by_key(s['key'])
+                if s['key'] in instance_dict:
+                    del instance_dict[s['key']]
 
             slide.add_widgets_from_library(name=widget, **s)
+            instance_dict[s['key']] = slide
 
     def get_express_config(self, value):
         return dict(widget=value)
 
-    def clear(self, key):
-        self.remove_widgets(key)
-
-    def remove_widgets(self, key):
-        # remove widgets from slides
-        for slide in self.machine.active_slides.values():
+    def clear_context(self, context):
+        instance_dict = self._get_instance_dict(context)
+        for key, slide in instance_dict.items():
             slide.remove_widgets_by_key(key)
 
-        # remove widgets from slide frame parents
-        target_list = set(self.machine.targets.values())
-        for target in target_list:
-            for widget in [x for x in target.parent.children if
-                           x.key == key]:
-                target.parent.remove_widget(widget)
-
+        self._reset_instance_dict(context)
 
 player_cls = MpfWidgetPlayer
 mc_player_cls = McWidgetPlayer
