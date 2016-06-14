@@ -1708,13 +1708,13 @@ cdef class Track:
                                                         force=True)
             else:
                 # Add the requested sound to the priority queue
+                self.log.debug("play_sound - Sound priority ({}) is less than or equal to the "
+                               "lowest sound currently playing ({}). Sound will be queued "
+                               "for playback.".format(priority, lowest_priority))
                 self.queue_sound(sound=sound,
                                  priority=priority,
                                  exp_time=exp_time,
                                  settings=settings)
-                self.log.debug("play_sound - Sound priority ({}) is less than or equal to the "
-                               "lowest sound currently playing ({}). Sound will be queued "
-                               "for playback.".format(priority, lowest_priority))
 
     def queue_sound(self, sound, priority, exp_time=None, settings=None):
         """Adds a sound to the queue to be played when a sound player becomes available.
