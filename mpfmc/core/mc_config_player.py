@@ -1,7 +1,11 @@
+"""Base class for remote config players."""
 from mpf.core.config_player import ConfigPlayer
 
 
 class McConfigPlayer(ConfigPlayer):
+
+    """Remote config player which is triggered via BCP."""
+
     config_file_section = None
     show_section = None
     machine_collection_name = None
@@ -16,11 +20,15 @@ class McConfigPlayer(ConfigPlayer):
         return 'McConfigPlayer.{}'.format(self.show_section)
 
     def _initialize(self):
+        # this does not call super() since the base class uses self.config
+        # and the mc uses self.machine_config
         if self.machine_collection_name:
             self.device_collection = getattr(self.machine,
                                              self.machine_collection_name)
         else:
             self.device_collection = None
+
+        self.instances['_global'][self.config_file_section] = dict()
 
         self.machine.mode_controller.register_load_method(
             self.process_mode_config, self.config_file_section)
@@ -44,5 +52,20 @@ class McConfigPlayer(ConfigPlayer):
             event='{}_play'.format(self.show_section),
             handler=self.play_from_trigger)
 
-    def play_from_trigger(self, **kwargs):
-        self.play(settings=kwargs)
+        self.machine.events.add_handler(
+            event='{}_clear'.format(self.show_section),
+            handler=self.clear_from_trigger)
+
+    def play_from_trigger(self, settings, context, priority, **kwargs):
+        """Call play from BCP trigger."""
+        if context not in self.instances:
+            self.instances[context] = dict()
+        if self.config_file_section not in self.instances[context]:
+            self.instances[context][self.config_file_section] = dict()
+
+        self.play(settings=settings, context=context, priority=priority, **kwargs)
+
+    def clear_from_trigger(self, context, **kwargs):
+        """Call clear_context from BCP trigger."""
+        del kwargs
+        self.clear_context(context=context)

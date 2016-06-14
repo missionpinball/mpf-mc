@@ -56,7 +56,7 @@ Here are several various examples:
     show_section = 'sounds'
     machine_collection_name = 'sounds'
 
-    def play(self, settings, key=None, priority=0, **kwargs):
+    def play(self, settings, context, priority=0, **kwargs):
         """Plays a validated sounds: section from a sound_player: section of a
         config file or the sounds: section of a show.
 
@@ -78,9 +78,7 @@ Here are several various examples:
             must be specified in the sounds section of a config file.
 
         """
-
-        del key  # unused in this method
-
+        instance_dict = self._get_instance_dict(context)
         if 'sounds' in settings:
             settings = settings['sounds']
 
@@ -104,9 +102,12 @@ Here are several various examples:
             # Determine action to perform
             if s['action'].lower() == 'play':
                 sound.play(s)
+                instance_dict[sound_name] = sound
 
             elif s['action'].lower() == 'stop':
                 sound.stop()
+                if sound_name in instance_dict:
+                    del instance_dict[sound_name]
 
             elif s['action'].lower() == 'stop_looping':
                 sound.stop_looping()
@@ -166,6 +167,13 @@ Here are several various examples:
         validated_dict = super().validate_show_config(device, device_settings)
         # device is sound name
         return validated_dict
+
+    def clear_context(self, context):
+        """Stop all sounds from this context."""
+        instance_dict = self._get_instance_dict(context)
+        for sound in instance_dict.values():
+            sound.stop()
+        self._reset_instance_dict(context)
 
 
 class MpfSoundPlayer(PluginPlayer):
