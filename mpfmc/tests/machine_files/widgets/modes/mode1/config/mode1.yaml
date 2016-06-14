@@ -1,0 +1,8 @@
+# config_version=4
+
+mode:
+  priority: 500
+
+widget_player:
+  mode1_add_widgets: widget2
+  mode1_add_widget6: widget6

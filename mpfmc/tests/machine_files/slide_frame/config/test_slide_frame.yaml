@@ -1,0 +1,38 @@
+#config_version=4
+
+displays:
+  default:
+    width: 400
+    height: 300
+
+slides:
+  slide1:
+  - type: slide_frame
+    width: 200
+    height: 100
+    name: frame1
+    y: 100%
+    anchor_y: top
+    x: 100%
+    anchor_x: right
+  - type: text
+    text: SLIDE FRAME BASE
+    font_size: 100
+  frame1_text:
+  - type: text
+    text: TEXT IN FRAME
+    color: 00ff00
+    font_size: 200
+  frame1_text2:
+  - type: text
+    text: MORE TEXT
+    color: 00ffff
+    font_size: 100
+
+slide_player:
+  show_frame_text:
+    frame1_text:
+      target: frame1
+  show_frame_text2:
+    frame1_text2:
+      target: frame1

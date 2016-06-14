@@ -1,0 +1,106 @@
+# config_version=4
+
+mpf-mc:
+    config_players:
+        slide: mpfmc.config_players.slide_player
+        widget: mpfmc.config_players.widget_player
+        sound: mpfmc.config_players.sound_player
+
+    config_collections:
+        slide: mpfmc.config_collections.slide
+        widget: mpfmc.config_collections.widget
+        animation: mpfmc.config_collections.animation
+        widget_styles: mpfmc.config_collections.widget_styles
+
+    mpf_transition_modules:
+        - push
+        - move_in
+        - move_out
+
+    port: 5050
+    exit_on_disconnect: yes
+
+    paths:
+        shows: shows
+        sounds: sounds
+        machine_files: examples
+        config: config
+        fonts: fonts
+        images: images
+        animations: animations
+        movies: movies
+        modes: modes
+        scriptlets: scriptlets
+
+    allow_invalid_config_sections: true
+    fps: 30
+
+modes:
+    - attract
+    - game
+
+assets:
+    sounds:
+        default:
+            track: sfx
+            load: preload
+        voice:
+            track: voice
+            load: preload
+        sfx:
+            track: sfx
+            load: preload
+        music:
+            track: music
+            load: preload
+    videos:
+        default:
+            load: preload
+        preload:
+            load: preload
+        on_demand:
+            load: on_demand
+        mode_start:
+            load: mode_start
+    images:
+        default:
+            load: preload
+        preload:
+            load: preload
+        on_demand:
+            load: on_demand
+        mode_start:
+            load: mode_start
+
+mpf:
+  allow_invalid_config_sections: false
+  config_versions_file: tools/config_versions.yaml
+
+kivy_config:
+  kivy:
+    desktop: 1
+    exit_on_escape: true
+    pause_on_minimize: 0
+    log_dir:
+    window_icon:
+  graphics:
+    borderless: false
+    window_state: visible  # visible, hidden, maximized, minimized
+    fbo: hardware  # hardware, software, force-hardware
+    fullscreen: false
+    height: 600
+#    left: 0
+#    maxfps: 60
+    multisamples: 2
+    position: auto  # auto, custom
+    show_cursor: true
+#    top: 0
+    resizable: true
+    rotation: 0
+    width: 800
+    minimum_width: 100
+    minimum_height: 100
+
+widget_styles:
+  text_default:
+    font_size: 20
