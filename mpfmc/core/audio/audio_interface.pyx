@@ -1814,10 +1814,8 @@ cdef class Track:
                     audio_message.track = self.number
                     audio_message.player = i
                     audio_message.time = SDL_GetTicks()
-                    Logger.debug(
-                        "Track: Stopping sound {} on track {}".format(sound.name, self.name))
                 else:
-                    self.log.warning(
+                    self.log.error(
                         "All internal audio messages are currently "
                         "in use, could not stop sound %s", sound.name)
 
