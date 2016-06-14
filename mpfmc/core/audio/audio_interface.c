@@ -17974,75 +17974,22 @@ static PyObject *__pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface
     /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1711
  *             else:
  *                 # Add the requested sound to the priority queue
- *                 self.queue_sound(sound=sound,             # <<<<<<<<<<<<<<
- *                                  priority=priority,
- *                                  exp_time=exp_time,
- */
-    /*else*/ {
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_queue_sound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1711, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1711, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_1);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_sound, __pyx_v_sound) < 0) __PYX_ERR(0, 1711, __pyx_L1_error)
-
-      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1712
- *                 # Add the requested sound to the priority queue
- *                 self.queue_sound(sound=sound,
- *                                  priority=priority,             # <<<<<<<<<<<<<<
- *                                  exp_time=exp_time,
- *                                  settings=settings)
- */
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_priority, __pyx_v_priority) < 0) __PYX_ERR(0, 1711, __pyx_L1_error)
-
-      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1713
- *                 self.queue_sound(sound=sound,
- *                                  priority=priority,
- *                                  exp_time=exp_time,             # <<<<<<<<<<<<<<
- *                                  settings=settings)
- *                 self.log.debug("play_sound - Sound priority ({}) is less than or equal to the "
- */
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_exp_time, __pyx_v_exp_time) < 0) __PYX_ERR(0, 1711, __pyx_L1_error)
-
-      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1714
- *                                  priority=priority,
- *                                  exp_time=exp_time,
- *                                  settings=settings)             # <<<<<<<<<<<<<<
- *                 self.log.debug("play_sound - Sound priority ({}) is less than or equal to the "
- *                                "lowest sound currently playing ({}). Sound will be queued "
- */
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_settings, __pyx_v_settings) < 0) __PYX_ERR(0, 1711, __pyx_L1_error)
-
-      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1711
- *             else:
- *                 # Add the requested sound to the priority queue
- *                 self.queue_sound(sound=sound,             # <<<<<<<<<<<<<<
- *                                  priority=priority,
- *                                  exp_time=exp_time,
- */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1711, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1715
- *                                  exp_time=exp_time,
- *                                  settings=settings)
  *                 self.log.debug("play_sound - Sound priority ({}) is less than or equal to the "             # <<<<<<<<<<<<<<
  *                                "lowest sound currently playing ({}). Sound will be queued "
  *                                "for playback.".format(priority, lowest_priority))
  */
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1715, __pyx_L1_error)
+    /*else*/ {
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1711, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
 
-      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1717
+      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1713
  *                 self.log.debug("play_sound - Sound priority ({}) is less than or equal to the "
  *                                "lowest sound currently playing ({}). Sound will be queued "
  *                                "for playback.".format(priority, lowest_priority))             # <<<<<<<<<<<<<<
- * 
- *     def queue_sound(self, sound, priority, exp_time=None, settings=None):
+ *                 self.queue_sound(sound=sound,
+ *                                  priority=priority,
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_play_sound_Sound_priority_is_les, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1717, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_play_sound_Sound_priority_is_les, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1713, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_5 = NULL;
       __pyx_t_7 = 0;
@@ -18056,7 +18003,7 @@ static PyObject *__pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface
           __pyx_t_7 = 1;
         }
       }
-      __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1717, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1713, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       if (__pyx_t_5) {
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -18067,8 +18014,8 @@ static PyObject *__pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface
       __Pyx_INCREF(__pyx_v_lowest_priority);
       __Pyx_GIVEREF(__pyx_v_lowest_priority);
       PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_v_lowest_priority);
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1717, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1713, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __pyx_t_4 = NULL;
@@ -18082,22 +18029,75 @@ static PyObject *__pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface
         }
       }
       if (!__pyx_t_4) {
-        __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1715, __pyx_L1_error)
-        __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-        __Pyx_GOTREF(__pyx_t_3);
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1711, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_GOTREF(__pyx_t_2);
       } else {
-        __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1715, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1711, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_4); __pyx_t_4 = NULL;
-        __Pyx_GIVEREF(__pyx_t_2);
-        PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_t_2);
-        __pyx_t_2 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 1715, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_3);
+        __Pyx_GIVEREF(__pyx_t_3);
+        PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_t_3);
+        __pyx_t_3 = 0;
+        __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1711, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       }
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1714
+ *                                "lowest sound currently playing ({}). Sound will be queued "
+ *                                "for playback.".format(priority, lowest_priority))
+ *                 self.queue_sound(sound=sound,             # <<<<<<<<<<<<<<
+ *                                  priority=priority,
+ *                                  exp_time=exp_time,
+ */
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_queue_sound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1714, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1714, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_sound, __pyx_v_sound) < 0) __PYX_ERR(0, 1714, __pyx_L1_error)
+
+      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1715
+ *                                "for playback.".format(priority, lowest_priority))
+ *                 self.queue_sound(sound=sound,
+ *                                  priority=priority,             # <<<<<<<<<<<<<<
+ *                                  exp_time=exp_time,
+ *                                  settings=settings)
+ */
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_priority, __pyx_v_priority) < 0) __PYX_ERR(0, 1714, __pyx_L1_error)
+
+      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1716
+ *                 self.queue_sound(sound=sound,
+ *                                  priority=priority,
+ *                                  exp_time=exp_time,             # <<<<<<<<<<<<<<
+ *                                  settings=settings)
+ * 
+ */
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_exp_time, __pyx_v_exp_time) < 0) __PYX_ERR(0, 1714, __pyx_L1_error)
+
+      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1717
+ *                                  priority=priority,
+ *                                  exp_time=exp_time,
+ *                                  settings=settings)             # <<<<<<<<<<<<<<
+ * 
+ *     def queue_sound(self, sound, priority, exp_time=None, settings=None):
+ */
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_settings, __pyx_v_settings) < 0) __PYX_ERR(0, 1714, __pyx_L1_error)
+
+      /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1714
+ *                                "lowest sound currently playing ({}). Sound will be queued "
+ *                                "for playback.".format(priority, lowest_priority))
+ *                 self.queue_sound(sound=sound,             # <<<<<<<<<<<<<<
+ *                                  priority=priority,
+ *                                  exp_time=exp_time,
+ */
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_empty_tuple, __pyx_t_1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 1714, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_8);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
   }
 
@@ -18135,7 +18135,7 @@ static PyObject *__pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface
 }
 
 /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1719
- *                                "for playback.".format(priority, lowest_priority))
+ *                                  settings=settings)
  * 
  *     def queue_sound(self, sound, priority, exp_time=None, settings=None):             # <<<<<<<<<<<<<<
  *         """Adds a sound to the queue to be played when a sound player becomes available.
@@ -18428,7 +18428,7 @@ static PyObject *__pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1719
- *                                "for playback.".format(priority, lowest_priority))
+ *                                  settings=settings)
  * 
  *     def queue_sound(self, sound, priority, exp_time=None, settings=None):             # <<<<<<<<<<<<<<
  *         """Adds a sound to the queue to be played when a sound player becomes available.
