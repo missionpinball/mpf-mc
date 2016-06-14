@@ -244,6 +244,7 @@ ctypedef struct AudioMessageDataPlaySound:
     Mix_Chunk *chunk
     Uint8 volume
     int loops
+    int priority
 
 ctypedef struct AudioMessageDataStopSound:
     int track

@@ -25,7 +25,6 @@ from queue import PriorityQueue, Empty
 from math import pow
 import time
 import logging
-Logger = logging.getLogger('AudioInterface')
 
 
 include "audio_interface.pxi"
@@ -69,6 +68,7 @@ cdef class AudioInterface:
     cdef int mixer_channel
     cdef list tracks
     cdef object mc
+    cdef object log
 
     # In order to get the SDL_Mixer library to work with the desired features needed for the
     # media controller, a sound must be played at all times on a mixer channel.  A sound
@@ -97,33 +97,31 @@ cdef class AudioInterface:
             buffer_samples: The audio buffer size to use (in number of samples, must be power of two)
         """
         self.mc = mc
+        self.log = logging.getLogger("AudioInterface")
 
         # Initialize threading in the extension library and acquire the Python global interpreter lock
         PyEval_InitThreads()
 
         # Make sure buffer samples is a power of two (required by SDL2)
         if not AudioInterface.power_of_two(buffer_samples):
-            Logger.error('AudioInterface: Buffer samples is required to be a power of two')
+            self.log.error('Buffer samples is required to be a power of two')
             raise AudioException("Unable to initialize Audio Interface: "
                                  "Buffer samples is required to be a power of two")
 
         # Initialize the SDL audio system
         if SDL_Init(SDL_INIT_AUDIO) < 0:
-            Logger.error('SDL_Init: %s' % SDL_GetError())
+            self.log.error('SDL_Init error - %s' % SDL_GetError())
             raise AudioException('Unable to initialize SDL (SDL_Init call failed: %s)' % SDL_GetError())
 
         # Initialize the SDL_Mixer library to establish the output audio format and encoding
         # (sample rate, bit depth, buffer size)
         if Mix_OpenAudio(rate, AUDIO_S16SYS, channels, buffer_samples):
-            Logger.error('Mix_OpenAudio: %s' % SDL_GetError())
+            self.log.error('Mix_OpenAudio error - %s' % SDL_GetError())
             raise AudioException('Unable to open audio for output (Mix_OpenAudio failed: %s)' % SDL_GetError())
 
-        Logger.info("Initialized AudioInterface {}".format(
-            AudioInterface.get_version()))
-        Logger.debug("AudioInterface: Loaded {}".format(
-            AudioInterface.get_sdl_version()))
-        Logger.debug("AudioInterface: Loaded {}".format(
-            AudioInterface.get_sdl_mixer_version()))
+        self.log.info("Initialized %s", AudioInterface.get_version())
+        self.log.debug("Loaded %s", AudioInterface.get_sdl_version())
+        self.log.debug("Loaded %s", AudioInterface.get_sdl_mixer_version())
 
         # Lock SDL from calling the audio callback functions
         SDL_LockAudio()
@@ -131,14 +129,14 @@ cdef class AudioInterface:
         # Determine the actual audio format in use by the opened audio device.  This may or may not match
         # the parameters used to initialize the audio interface.
         self.buffer_samples = buffer_samples
-        Logger.debug('AudioInterface: requested rate:{} channels:{} buffer:{}'
-            .format(rate, channels, buffer_samples))
+        self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
+                       rate, channels, buffer_samples)
         Mix_QuerySpec(&self.sample_rate, NULL, &self.audio_channels)
-        Logger.debug('Audio Settings: rate:{} channels:{} buffer:{}'.format(
-            self.sample_rate, self.audio_channels, self.buffer_samples))
+        self.log.debug('Settings in use - rate: %d, channels: %d, buffer: %d samples',
+                       self.sample_rate, self.audio_channels, self.buffer_samples)
 
         # Set the size of the track audio buffers (samples * channels * size of 16-bit int) for 16-bit audio
-        self.buffer_size = self.buffer_samples * self.audio_channels * sizeof(Uint16*)
+        self.buffer_size = self.buffer_samples * self.audio_channels * sizeof(Uint16)
 
         # Allocate memory for the audio callback data structure
         self.audio_callback_data = <AudioCallbackData*> PyMem_Malloc(sizeof(AudioCallbackData))
@@ -176,8 +174,7 @@ cdef class AudioInterface:
 
     def __del__(self):
 
-        Logger.debug("AudioInterface: Shutting down and cleaning up allocated "
-                 "memory...")
+        self.log.debug("Shutting down and cleaning up allocated memory...")
 
         # Stop audio processing (will stop all SDL callbacks)
         self.disable()
@@ -213,12 +210,15 @@ cdef class AudioInterface:
         self.raw_chunk_silence = Mix_QuickLoad_RAW(silence, length)
         if self.raw_chunk_silence == NULL:
             raise AudioException('Unable to load generated silence sample required for playback')
+        else:
+            self.log.debug("Silence audio chunk initialized (required for SDL_Mixer callback)")
+
 
     def _initialize_audio_callback(self):
         # Set the number of channels to mix (will cause existing channels to be stopped and restarted if playing)
         # This is an SDL_Mixer library function call.
         channels = Mix_AllocateChannels(1)
-        Logger.debug("SDL_Mixer: Allocated {} channel(s)".format(channels))
+        self.log.debug("SDL_Mixer - Allocated %d channel for final audio output", channels)
         self.mixer_channel = 0
 
         # Ensure channel volume is at maximum (should be the default, but we'll set it manually
@@ -433,7 +433,7 @@ cdef class AudioInterface:
         """
         cdef int fade_ms = 0
 
-        Logger.debug("AudioInterface: Enabling audio playback")
+        self.log.debug("Enabling audio playback")
 
         SDL_LockAudio()
         if fade_sec > 0:
@@ -452,7 +452,7 @@ cdef class AudioInterface:
         """
         cdef int fade_ms = 0
 
-        Logger.debug("AudioInterface: Disabling audio playback")
+        self.log.debug("Disabling audio playback")
 
         SDL_LockAudio()
         if fade_sec > 0:
@@ -511,16 +511,15 @@ cdef class AudioInterface:
         """
         cdef int track_num = len(self.tracks)
         if track_num == MAX_TRACKS:
-            Logger.error("AudioInterface: Add track failed - "
-                         "the maximum number of tracks ({}) has been reached.".format(MAX_TRACKS))
+            self.log.error("Add track failed - the maximum number of tracks "
+                           "(%d) has been reached.", MAX_TRACKS)
             return None
 
         # Make sure track name does not already exist (no duplicates allowed)
         name = name.lower()
         for track in self.tracks:
             if name == track.name:
-                Logger.error("AudioInterface: Add track failed - "
-                             "the track name '{}' already exists.".format(name))
+                self.log.error("Add track failed - the track name '%s' already exists.", name)
                 return None
 
         # Make sure audio callback function cannot be called while we are changing the track data
@@ -542,8 +541,7 @@ cdef class AudioInterface:
         # Allow audio callback function to be called again
         SDL_UnlockAudio()
 
-        Logger.debug("AudioInterface: The '{}' track has successfully been "
-            "created.".format(name))
+        self.log.debug("The '%s' track has successfully been created.", name)
 
         return new_track
 
@@ -565,14 +563,13 @@ cdef class AudioInterface:
         # 2) convert the python byte string to a C char* (can just do an assign)
         # 3) the C char* string is now ready for use in calls to the C library
         py_byte_file_name = file_name.encode('UTF-8')
-        cdef char*c_file_name = py_byte_file_name
+        cdef char *c_file_name = py_byte_file_name
 
         # Attempt to load the file
         cdef Mix_Chunk *chunk = Mix_LoadWAV(c_file_name)
         if chunk == NULL:
-            Logger.error("AudioInterface: Unable to load sound from source file '{}' - {}"
-                         .format(file_name, SDL_GetError()))
-            return None
+            raise AudioException("Unable to load sound from source file '{}' - {}"
+                                 .format(file_name, SDL_GetError()))
 
         # Create a Python container object to wrap the Mix_Chunk C pointer
         cdef MixChunkContainer mc = MixChunkContainer()
@@ -765,6 +762,7 @@ cdef void process_sound_messages(AudioCallbackData *callback_data) nogil:
             callback_data.tracks[track].sound_players[player].current.chunk = callback_data.messages[i].data.play.chunk
             callback_data.tracks[track].sound_players[player].current.volume = callback_data.messages[i].data.play.volume
             callback_data.tracks[track].sound_players[player].current.loops_remaining = callback_data.messages[i].data.play.loops
+            callback_data.tracks[track].sound_players[player].current.sound_priority = callback_data.messages[i].data.play.priority
 
             # Clear event since it has been processed
             callback_data.messages[i].message = message_not_in_use
@@ -789,6 +787,7 @@ cdef void process_sound_messages(AudioCallbackData *callback_data) nogil:
             callback_data.tracks[track].sound_players[player].next.chunk = callback_data.messages[i].data.play.chunk
             callback_data.tracks[track].sound_players[player].next.volume = callback_data.messages[i].data.play.volume
             callback_data.tracks[track].sound_players[player].next.loops_remaining = callback_data.messages[i].data.play.loops
+            callback_data.tracks[track].sound_players[player].next.sound_priority = callback_data.messages[i].data.play.priority
 
             # Clear event since it has been processed
             callback_data.messages[i].message = message_not_in_use
@@ -958,6 +957,8 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
                 callback_data.tracks[track.number].sound_players[player].next.volume
             callback_data.tracks[track.number].sound_players[player].current.loops_remaining = \
                 callback_data.tracks[track.number].sound_players[player].next.loops_remaining
+            callback_data.tracks[track.number].sound_players[player].current.sound_priority = \
+                callback_data.tracks[track.number].sound_players[player].next.sound_priority
 
         # Check if player has a sound pending playback (ready to start)
         if track.sound_players[player].status is player_pending:
@@ -1398,6 +1399,7 @@ cdef class Track:
     cdef float _volume
     cdef AudioCallbackData *_audio_callback_data
     cdef SDL_mutex *mutex
+    cdef object log
 
     # Track attributes need to be stored in a C struct in order for them to be accessible in
     # the SDL callback functions without the GIL (for performance reasons).  The TrackAttributes
@@ -1421,6 +1423,7 @@ cdef class Track:
         # The easiest way to pass a C pointer in a constructor is to wrap it in a PyCapsule
         # (see https://docs.python.org/3.4/c-api/capsule.html).  This basically wraps the
         # pointer in a Python object. It can be extracted using PyCapsule_GetPointer.
+        self.log = logging.getLogger('AudioInterface.Track.' + str(track_num) + '.' + name)
         self._audio_callback_data = <AudioCallbackData*>pycapsule.PyCapsule_GetPointer(audio_callback_data, NULL)
         self.mutex = self._audio_callback_data.mutex
 
@@ -1431,11 +1434,11 @@ cdef class Track:
 
         # Make sure the number of simultaneous sounds is within the allowable range
         if max_simultaneous_sounds > MAX_SIMULTANEOUS_SOUNDS_LIMIT:
-            Logger.warning("AudioInterface: The maximum number of simultaneous sounds per track is {}"
-                           .format(MAX_SIMULTANEOUS_SOUNDS_LIMIT))
+            self.log.warning("The maximum number of simultaneous sounds per track is %d",
+                             MAX_SIMULTANEOUS_SOUNDS_LIMIT)
             max_simultaneous_sounds = MAX_SIMULTANEOUS_SOUNDS_LIMIT
         elif max_simultaneous_sounds < 1:
-            Logger.warning("AudioInterface: The minimum number of simultaneous sounds per track is 1")
+            self.log.warning("The minimum number of simultaneous sounds per track is 1")
             max_simultaneous_sounds = 1
 
         # Allocate memory for the track attributes
@@ -1444,8 +1447,7 @@ cdef class Track:
         self.attributes.max_simultaneous_sounds = max_simultaneous_sounds
         self.attributes.buffer = PyMem_Malloc(buffer_size)
         self.attributes.buffer_size = buffer_size
-        Logger.debug("Track {}: allocated track audio buffer ({} "
-                     "bytes)".format(name, buffer_size))
+        self.log.debug("Allocated track audio buffer (%d bytes)", buffer_size)
         self.volume = volume
         self._name = name
 
@@ -1578,7 +1580,7 @@ cdef class Track:
             next_sound = self._get_next_sound()
 
             if next_sound is not None:
-                Logger.debug("Getting sound from queue: {}".format(next_sound))
+                self.log.debug("Getting sound from queue %s", next_sound)
                 self._play_sound_on_sound_player(sound=next_sound[0],
                                                  player=idle_sound_player,
                                                  loops=next_sound[2]['loops'],
@@ -1625,7 +1627,9 @@ cdef class Track:
             if not next_sound[2].loaded and next_sound[2].loading and \
                     (next_sound[1] is None or next_sound[1] > time.time()):
                 self._sound_queue.put(next_sound)
-                Logger.debug("Re-queueing sound: {}".format(next_sound))
+                self.log.debug("Next pending sound in queue is still loading, "
+                               "re-queueing sound %s",
+                               next_sound)
             else:
                 # Remove the queue entry from the list of sounds in the queue
                 if next_sound in self._sound_queue_items[next_sound[2]]:
@@ -1635,9 +1639,10 @@ cdef class Track:
 
                 # Return the next sound from the priority queue if it has not expired
                 if not next_sound[1] or next_sound[1] > time.time():
+                    self.log.debug("Retrieving next pending sound from queue %s", next_sound)
                     return next_sound[2], -next_sound[0], next_sound[3]
                 else:
-                    Logger.debug("Discarding expired sound from queue: {}".format(next_sound))
+                    self.log.debug("Discarding expired sound from queue %s", next_sound)
 
         return None
 
@@ -1655,6 +1660,7 @@ cdef class Track:
         if sound in self._sound_queue_items:
             for entry in self._sound_queue_items[sound]:
                 entry[2] = None
+                self.log.debug("Removing pending sound from queue %s", sound)
             del self._sound_queue_items[sound]
 
     def play_sound(self, sound not None, **kwargs):
@@ -1664,7 +1670,7 @@ cdef class Track:
             sound: The Sound object to play
             **kwargs: Optional additional arguments for overriding sound defaults
         """
-        Logger.debug("play_sound: Processing sound '{}' for playback ({}).".format(sound.name, kwargs))
+        self.log.debug("play_sound - Processing sound '%s' for playback (%s).", sound.name, kwargs)
 
         settings = {}
 
@@ -1709,7 +1715,8 @@ cdef class Track:
                              priority=priority,
                              exp_time=exp_time,
                              settings=settings)
-            Logger.debug("play_sound: Sound was not loaded and therefore was queued for playback.")
+            self.log.debug("play_sound - Sound %s was not loaded and therefore has been "
+                           "queued for playback.", sound.name)
             return
 
         # If the sound can be played right away (available player) then play it.
@@ -1719,7 +1726,8 @@ cdef class Track:
         lowest_priority = sound_player[1]
 
         if lowest_priority is None:
-            Logger.debug("play_sound: Sound player {} is available for playback".format(player))
+            self.log.debug("play_sound - Sound player %d is available "
+                           "for playback", player)
             # Play the sound using the available player
             return self._play_sound_on_sound_player(sound=sound,
                                                     player=player,
@@ -1728,13 +1736,16 @@ cdef class Track:
                                                     priority=priority)
         else:
             # All sound players are currently busy:
-            Logger.debug("play_sound: No idle sound player is available.")
+            self.log.debug("play_sound - No idle sound player is available.")
+            self.log.debug("play_sound - Sound player %d is currently playing the sound with "
+                           "the lowest priority (%d).", player, lowest_priority)
 
             # If the lowest priority of all the sounds currently playing is lower than
             # the requested sound, kill the lowest priority sound and replace it.
             if priority > lowest_priority:
-                Logger.debug("play_sound: Sound priority is higher than the lowest "
-                             "sound currently playing. Forcing playback.")
+                self.log.debug("play_sound - Sound priority (%d) is higher than the "
+                               "lowest sound currently playing (%d). Forcing playback "
+                               "on sound player %d.", priority, lowest_priority, player)
                 return self._play_sound_on_sound_player(sound=sound,
                                                         player=player,
                                                         loops=settings['loops'],
@@ -1743,11 +1754,13 @@ cdef class Track:
                                                         force=True)
             else:
                 # Add the requested sound to the priority queue
+                self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
+                               "lowest sound currently playing (%d). Sound will be queued "
+                               "for playback.", priority, lowest_priority)
                 self.queue_sound(sound=sound,
                                  priority=priority,
                                  exp_time=exp_time,
                                  settings=settings)
-                Logger.debug("play_sound: Sound was queued for playback.")
 
     def queue_sound(self, sound, priority, exp_time=None, settings=None):
         """Adds a sound to the queue to be played when a sound player becomes available.
@@ -1778,7 +1791,7 @@ cdef class Track:
         else:
             self._sound_queue_items[sound] = [entry]
 
-        Logger.debug("Queueing sound on {} track: {}".format(self.name, entry))
+        self.log.debug("Queueing sound %s", entry)
 
     def stop_sound(self, sound not None):
         """
@@ -1804,12 +1817,14 @@ cdef class Track:
                     Logger.debug(
                         "Track: Stopping sound {} on track {}".format(sound.name, self.name))
                 else:
-                    Logger.warning(
-                        "Track: All internal audio messages are currently in use, "
-                        "could not stop sound {}".format(sound.name))
+                    self.log.warning(
+                        "All internal audio messages are currently "
+                        "in use, could not stop sound %s", sound.name)
 
         # Remove any instances of the specified sound that are pending in the sound queue.
         self._remove_sound_from_queue(sound)
+
+        self.log.debug("Stopping sound %s and removing any pending instances from queue", sound.name)
 
         SDL_UnlockMutex(self.mutex)
 
@@ -1887,8 +1902,8 @@ cdef class Track:
         cdef DuckingSettings *ducking_settings
 
         if not sound.loaded:
-            Logger.debug(
-                "Track: Specified sound is not loaded, could not play sound {}".format(sound.name))
+            self.log.debug("Specified sound is not loaded, could not "
+                           "play sound %s", sound.name)
             return False
 
         # Make sure the player in range
@@ -1896,8 +1911,8 @@ cdef class Track:
             SDL_LockMutex(self.mutex)
             # If the specified sound player is not idle do not play the sound if force is not set
             if self.attributes.sound_players[player].status != player_idle and not force:
-                Logger.debug(
-                    "Track: All sound players are currently in use, could not play sound {}".format(sound.name))
+                self.log.debug("All sound players are currently in use, "
+                               "could not play sound %s", sound.name)
                 SDL_UnlockMutex(self.mutex)
                 return False
 
@@ -1918,11 +1933,12 @@ cdef class Track:
                 audio_message.data.play.chunk = mc.chunk
                 audio_message.data.play.volume = volume
                 audio_message.data.play.loops = loops
+                audio_message.data.play.priority = priority
 
             else:
-                Logger.warning(
-                    "Track: All internal audio messages are currently in use, "
-                    "could not play sound {}".format(sound.name))
+                self.log.warning("All internal audio messages are "
+                               "currently in use, could not play sound %s"
+                               , sound.name)
 
             # If the sound has a ducking envelope, apply it to the target track
             if sound.ducking is not None and sound.ducking.track is not None:
@@ -1935,8 +1951,9 @@ cdef class Track:
                 envelope = sound.ducking.track.get_available_ducking_envelope()
                 if envelope == -1:
                     self.attributes.sound_players[player].current.sound_has_ducking = 0
-                    Logger.warning("Track: All ducking envelopes are currently in use in the target track, "
-                                   "could not apply ducking for sound {}".format(sound.name))
+                    self.log.warning("All ducking envelopes are "
+                                     "currently in use in the target track, "
+                                     "could not apply ducking for sound %s", sound.name)
                 else:
                     # Reserve the envelope
                     sound.ducking.track.set_ducking_envelope_stage(envelope, envelope_stage_delay)
@@ -1953,14 +1970,14 @@ cdef class Track:
                         sound.ducking.release_point * samples_to_bytes_factor)
                     ducking_settings.release_duration = sound.ducking.release * samples_to_bytes_factor
 
-                    Logger.debug("Track: Adding ducking settings to sound {}".format(sound.name))
+                    self.log.debug("Adding ducking settings to sound %s", sound.name)
             else:
                 self.attributes.sound_players[player].current.sound_has_ducking = 0
 
             SDL_UnlockMutex(self.mutex)
 
-            Logger.debug(
-                "Track: Sound {} is set to begin playback (loops={})".format(sound.name, loops))
+            self.log.debug("Sound %s is set to begin playback on player %d (loops=%d)",
+                           sound.name, player, loops)
 
             return True
 
@@ -2023,7 +2040,6 @@ cdef class Track:
             sound player.
         """
         SDL_LockMutex(self.mutex)
-        Logger.debug("Track.{}.{} Status: ".format(self.number, self.name))
         status = []
         for player in range(self.max_simultaneous_sounds):
             status.append({
@@ -2036,13 +2052,15 @@ cdef class Track:
                 "has_ducking": self.attributes.sound_players[player].current.sound_has_ducking,
             })
 
-            Logger.debug("    Player {}: Status={}, Sound={}, Priority={}, Loops={}"
-                         .format(player,
-                                 Track.player_status_to_text(
-                                     self.attributes.sound_players[player].status),
-                                 self.attributes.sound_players[player].current.sound_id,
-                                 self.attributes.sound_players[player].current.sound_priority,
-                                 self.attributes.sound_players[player].current.loops_remaining))
+            self.log.debug("Status - Player %d: Status=%s, Sound=%s, "
+                           "Priority=%d, Loops=%d",
+                           player,
+                           Track.player_status_to_text(
+                               self.attributes.sound_players[player].status),
+                           self.attributes.sound_players[player].current.sound_id,
+                           self.attributes.sound_players[player].current.sound_priority,
+                           self.attributes.sound_players[player].current.loops_remaining)
+
         SDL_UnlockMutex(self.mutex)
 
         return status
