@@ -206,7 +206,11 @@ class SoundAsset(Asset):
         """Loads the sound asset from disk."""
 
         # Load the sound file into memory
-        self._container = AudioInterface.load_sound(self.file)
+        try:
+            self._container = AudioInterface.load_sound(self.file)
+        except AudioException as exception:
+            self.log.error("Load sound %s failed due to an exception - %s", self.name, str(exception))
+            raise
 
         # Validate ducking now that the sound has been loaded
         if self._ducking is not None:

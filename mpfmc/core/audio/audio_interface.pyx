@@ -564,15 +564,13 @@ cdef class AudioInterface:
         # 2) convert the python byte string to a C char* (can just do an assign)
         # 3) the C char* string is now ready for use in calls to the C library
         py_byte_file_name = file_name.encode('UTF-8')
-        cdef char*c_file_name = py_byte_file_name
+        cdef char *c_file_name = py_byte_file_name
 
         # Attempt to load the file
         cdef Mix_Chunk *chunk = Mix_LoadWAV(c_file_name)
         if chunk == NULL:
-            log = logging.getLogger('AudioInterface')
-            log.error("Unable to load sound from source file '{}' - {}"
-                      .format(file_name, SDL_GetError()))
-            return None
+            raise AudioException("Unable to load sound from source file '{}' - {}"
+                                 .format(file_name, SDL_GetError()))
 
         # Create a Python container object to wrap the Mix_Chunk C pointer
         cdef MixChunkContainer mc = MixChunkContainer()
