@@ -79,6 +79,8 @@ Here are several various examples:
 
         """
 
+        del key  # unused in this method
+
         if 'sounds' in settings:
             settings = settings['sounds']
 
@@ -93,9 +95,8 @@ Here are several various examples:
             try:
                 sound = self.machine.sounds[sound_name]
             except KeyError:
-                self.machine.log.warning("SoundPlayer: The specified sound "
-                                         "does not exist ('{}') - sound could "
-                                         "not be played.".format(sound_name))
+                self.machine.log.error("SoundPlayer: The specified sound "
+                                       "does not exist ('{}').".format(sound_name))
                 return
 
             s.update(kwargs)
@@ -109,6 +110,10 @@ Here are several various examples:
 
             elif s['action'].lower() == 'stop_looping':
                 sound.stop_looping()
+
+            else:
+                self.machine.log.error("SoundPlayer: The specified action "
+                                       "is not valid ('{}').".format(s['action']))
 
     def get_express_config(self, value):
         """ express config for sounds is simply a string (sound name)"""

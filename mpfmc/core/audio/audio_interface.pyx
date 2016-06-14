@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '30', '0-dev15')
+__version_info__ = ('0', '30', '0-dev16')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -634,6 +634,15 @@ cdef class AudioInterface:
                 # Event has been processed, reset it so it may be used again
                 self.audio_callback_data.messages[i].message = message_not_in_use
 
+            elif self.audio_callback_data.messages[i].message == message_sound_looping:
+                sound = self.mc.sounds_by_id[self.audio_callback_data.messages[i].sound_id]
+                if sound.events_when_looping is not None:
+                    for event in sound.events_when_looping:
+                        self.mc.bcp_processor.send('trigger', name=event)
+
+                # Event has been processed, reset it so it may be used again
+                self.audio_callback_data.messages[i].message = message_not_in_use
+
             elif self.audio_callback_data.messages[i].message == message_sound_marker:
                 # TODO: Process sound marker event
 
@@ -864,7 +873,8 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
 
                 # Check if we are at the end of the source sample buffer
                 if track.sound_players[player].current.sample_pos >= track.sound_players[player].current.chunk.alen:
-                    end_of_sound_processing(cython.address(track.sound_players[player]))
+                    end_of_sound_processing(cython.address(track.sound_players[player]),
+                                            callback_data.messages, sdl_ticks)
                     if track.sound_players[player].status is player_finished:
                         break
 
@@ -916,7 +926,8 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
 
                 # Check if we are at the end of the source sample buffer (loop if applicable)
                 if track.sound_players[player].current.sample_pos >= track.sound_players[player].current.chunk.alen:
-                    end_of_sound_processing(cython.address(track.sound_players[player]))
+                    end_of_sound_processing(cython.address(track.sound_players[player]),
+                                            callback_data.messages, sdl_ticks)
                     if track.sound_players[player].status is player_finished:
                         break
 
@@ -1018,7 +1029,8 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
 
                 # Check if we are at the end of the source sample buffer (loop if applicable)
                 if track.sound_players[player].current.sample_pos >= track.sound_players[player].current.chunk.alen:
-                    end_of_sound_processing(cython.address(track.sound_players[player]))
+                    end_of_sound_processing(cython.address(track.sound_players[player]),
+                                            callback_data.messages, sdl_ticks)
                     if track.sound_players[player].status is player_finished:
                         break
 
@@ -1030,13 +1042,17 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
                                      sdl_ticks)
             track.sound_players[player].status = player_idle
 
-cdef inline void end_of_sound_processing(SoundPlayer* player) nogil:
+cdef inline void end_of_sound_processing(SoundPlayer* player,
+                                         AudioMessageContainer **messages,
+                                         Uint32 sdl_ticks) nogil:
     """
     Determines the action to take at the end of the sound (loop or stop) based on
     the current settings.  This function should be called when a sound processing
     loop has reached the end of the source buffer.
     Args:
         player: SoundPlayer pointer
+        messages: The AudioMessageContainer object containing all audio messages
+        sdl_ticks: The current SDL timestamp (in ticks)
     """
     # Check if we are at the end of the source sample buffer (loop if applicable)
     if player.current.loops_remaining > 0:
@@ -1044,13 +1060,19 @@ cdef inline void end_of_sound_processing(SoundPlayer* player) nogil:
         player.current.loops_remaining -= 1
         player.current.sample_pos = 0
         player.current.current_loop += 1
+        send_sound_looping_event(player.track_num, player.player, player.current.sound_id,
+                                 messages, sdl_ticks)
+
     elif player.current.loops_remaining == 0:
         # At the end and not looping, the sample has finished playing
         player.status = player_finished
+
     else:
         # Looping infinitely, loop back to the beginning
         player.current.sample_pos = 0
         player.current.current_loop += 1
+        send_sound_looping_event(player.track_num, player.player, player.current.sound_id,
+                                 messages, sdl_ticks)
 
 cdef inline void send_sound_stopped_event(int track_num, int player, long sound_id,
                                           AudioMessageContainer **messages, Uint32 sdl_ticks) nogil:
@@ -1066,6 +1088,25 @@ cdef inline void send_sound_stopped_event(int track_num, int player, long sound_
     event_index = get_available_audio_message(messages)
     if event_index != -1:
         messages[event_index].message = message_sound_stopped
+        messages[event_index].track = track_num
+        messages[event_index].player = player
+        messages[event_index].sound_id = sound_id
+        messages[event_index].time = sdl_ticks
+
+cdef inline void send_sound_looping_event(int track_num, int player, long sound_id,
+                                          AudioMessageContainer **messages, Uint32 sdl_ticks) nogil:
+    """
+    Sends a sound looping audio event
+    Args:
+        track_num: The track number on which the event occurred
+        player: The sound player number on which the event occurred
+        sound_id: The sound id
+        messages: A pointer to the audio messages structures
+        sdl_ticks: The current SDL tick time
+    """
+    event_index = get_available_audio_message(messages)
+    if event_index != -1:
+        messages[event_index].message = message_sound_looping
         messages[event_index].track = track_num
         messages[event_index].player = player
         messages[event_index].sound_id = sound_id
@@ -1415,6 +1456,8 @@ cdef class Track:
         # Initialize sound player attributes
         for i in range(self.max_simultaneous_sounds):
             self.attributes.sound_players[i].status = player_idle
+            self.attributes.sound_players[i].track_num = self.number
+            self.attributes.sound_players[i].player = i
             self.attributes.sound_players[i].current.chunk = NULL
             self.attributes.sound_players[i].current.loops_remaining = 0
             self.attributes.sound_players[i].current.current_loop = 0
@@ -1758,6 +1801,8 @@ cdef class Track:
                     audio_message.track = self.number
                     audio_message.player = i
                     audio_message.time = SDL_GetTicks()
+                    Logger.debug(
+                        "Track: Stopping sound {} on track {}".format(sound.name, self.name))
                 else:
                     Logger.warning(
                         "Track: All internal audio messages are currently in use, "

@@ -36,6 +36,7 @@ assets:
 
 sounds:
     264828_text:
+        events_when_looping: text_sound_looping
         loops: 7
     104457_moron_test:
         events_when_played: moron_test_played
