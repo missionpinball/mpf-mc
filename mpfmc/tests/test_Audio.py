@@ -1,7 +1,6 @@
 import logging
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from mock import MagicMock
-from mpfmc.core.audio.audio_interface import AudioException
 
 
 class TestAudio(MpfMcTestCase):
@@ -98,7 +97,7 @@ class TestAudio(MpfMcTestCase):
 
         # Test bad sound file
         self.assertIn('bad_sound_file', self.mc.sounds)
-        with self.assertRaises(AudioException):
+        with self.assertRaises(Exception):
             self.mc.sounds['bad_sound_file'].do_load()
         self.assertFalse(self.mc.sounds['bad_sound_file'].loaded)
 
