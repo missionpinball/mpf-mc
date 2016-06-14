@@ -22,9 +22,7 @@ class BcpProcessor(object):
         else:
             self.enabled = False
 
-        self.bcp_commands = {'ball_start': self._bcp_ball_start,
-                             'ball_end': self._bcp_ball_end,
-                             'config': self._bcp_config,
+        self.bcp_commands = {'config': self._bcp_config,
                              'dmd_start': self._bcp_dmd_start,
                              'error': self._bcp_error,
                              'get': self._bcp_get,
@@ -160,18 +158,6 @@ class BcpProcessor(object):
         """Processes an incoming BCP 'error' command."""
         del kwargs
         Logger.warning('Received error command from client')
-
-    def _bcp_ball_start(self, **kwargs):
-        """Processes an incoming BCP 'ball_start' command."""
-        kwargs['player'] = kwargs.pop('player_num')
-
-        self.mc.events.post('ball_started', **kwargs)
-        # event docstring covered in MPF
-
-    def _bcp_ball_end(self, **kwargs):
-        """Processes an incoming BCP 'ball_end' command."""
-        self.mc.events.post('ball_ended', **kwargs)
-        # event docstring covered in MPF
 
     def _bcp_player_add(self, player_num, **kwargs):
         """Processes an incoming BCP 'player_add' command."""
