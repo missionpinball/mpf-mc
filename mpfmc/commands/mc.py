@@ -24,7 +24,9 @@ class Command(object):
         os.environ['KIVY_NO_FILELOG'] = '1'
         os.environ['KIVY_NO_CONSOLELOG'] = '1'
         from kivy.logger import Logger
-        Logger.removeHandler(Logger.handlers[0])
+
+        for handler in Logger.handlers:
+            Logger.removeHandler(handler)
         sys.stderr = sys.__stderr__
 
         # Need to have these in here because we don't want them to load when
@@ -92,6 +94,7 @@ class Command(object):
                             const='smart_virtual', help=argparse.SUPPRESS)
 
         args = parser.parse_args(args)
+
         args.configfile = Util.string_to_list(args.configfile)
 
         # Configure logging. Creates a logfile and logs to the console.

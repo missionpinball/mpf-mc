@@ -1,5 +1,5 @@
+import logging
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from kivy.logger import Logger
 
 
 class TestAudioDisabled(MpfMcTestCase):
@@ -18,7 +18,8 @@ class TestAudioDisabled(MpfMcTestCase):
         disable the sound system. """
 
         if self.mc.sound_system is None:
-            Logger.warning("Sound system is not enabled - unable to run audio tests")
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - unable to run audio tests")
             return
 
         self.assertIsNotNone(self.mc.sound_system)

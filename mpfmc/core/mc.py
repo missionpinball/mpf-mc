@@ -12,6 +12,10 @@ import logging
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.resources import resource_add_path
+from kivy.logger import Logger
+
+# The following line is needed to allow mpfmc modules to use the getLogger(name) method
+logging.Logger.manager.root = Logger
 
 from mpfmc.assets.video import VideoAsset
 from mpfmc.core.bcp_processor import BcpProcessor
@@ -43,9 +47,8 @@ except ImportError:
 class MpfMc(App):
     def __init__(self, options, config, machine_path, **kwargs):
 
-        self.log = logging.getLogger('')
-        self.log.info("Mission Pinball Framework Media Controller v%s",
-                      __version__)
+        self.log = logging.getLogger('mpfmc')
+        self.log.info("Mission Pinball Framework Media Controller v%s", __version__)
         super().__init__(**kwargs)
 
         self.options = options
