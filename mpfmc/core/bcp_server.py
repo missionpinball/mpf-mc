@@ -61,7 +61,7 @@ class BCPServer(threading.Thread):
             self.log.critical('Socket bind IOError')
             raise
 
-        self.socket.listen(1)
+        self.socket.listen(5)
         self.socket.settimeout(1)
 
     def run(self):
@@ -135,7 +135,7 @@ class BCPServer(threading.Thread):
                                     if cmd:
                                         self.process_received_message(cmd)
                             else:
-                                # no more data
+                                # no bytes -> socket closed
                                 break
 
                     except socket.timeout:
@@ -147,6 +147,10 @@ class BCPServer(threading.Thread):
                             self.mc.stop()
                         else:
                             break
+
+                # close connection. while loop will not exit if this is not intended.
+                self.connection.close()
+                self.connection = None
 
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()

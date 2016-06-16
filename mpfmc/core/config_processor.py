@@ -3,7 +3,7 @@ controller.
 
 """
 
-from kivy.logger import Logger
+import logging
 from mpf.core.config_processor import ConfigProcessor as ConfigProcessorBase
 
 # from mpfmc.uix.display import Display is imported deeper in this file
@@ -16,7 +16,7 @@ class ConfigProcessor(ConfigProcessorBase):
         self.mc = machine
         self.machine = machine
         self.system_config = self.mc.machine_config['mpf-mc']
-        self.log = Logger
+        self.log = logging.getLogger('ConfigProcessor')
         self.machine_sections = None
         self.mode_sections = None
 
