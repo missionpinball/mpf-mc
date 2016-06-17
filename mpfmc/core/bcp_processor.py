@@ -18,7 +18,7 @@ class BcpProcessor(object):
         self.sending_queue = queue.Queue()
 
         if self.mc.options['bcp']:
-            self._start_socket_thread()
+            self.mc.events.add_handler('init_done', self._start_socket_thread)
             self.enabled = True
         else:
             self.enabled = False

@@ -119,7 +119,7 @@ class MpfMc(App):
             self.sound_system = SoundSystem(self)
 
         self.asset_manager = AssetManager(self)
-        self.bcp_processor = None  # setup after init_done
+        self.bcp_processor = BcpProcessor(self)
 
         # Asset classes
         ImageAsset.initialize(self)
@@ -250,8 +250,11 @@ class MpfMc(App):
 
     def init_done(self):
         self.is_init_done = True
-        self.bcp_processor = BcpProcessor(self)
         ConfigValidator.unload_config_spec()
+        self.events.post("init_done")
+        # no events docstring as this event is also in mpf
+        self.events.process_event_queue()
+
         self.reset()
 
     def build(self):
