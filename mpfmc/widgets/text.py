@@ -142,14 +142,13 @@ class Text(MpfWidget, Label):
                 source, variable_name = var_string.split('|')
                 if source.lower().startswith('player'):
 
-                    if source.lstrip('player'):
+                    if source.lstrip('player'):  # we have player num
                         self.add_player_var_handler(name=variable_name,
                                                     player=source.lstrip(
                                                             'player'))
-                    else:
+                    else:  # no player num
                         self.add_player_var_handler(name=var_string,
-                                                    player=self.mc.player[
-                                                        'number'])
+                                                    player=None)
 
                 elif source.lower() == 'machine':
                     self.add_machine_var_handler(name=variable_name)
