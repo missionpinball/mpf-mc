@@ -137,32 +137,31 @@ class Text(MpfWidget, Label):
     def _setup_variable_monitors(self, text):
         for var_string in self._get_text_vars(text):
             if '|' not in var_string:
-                self.add_player_var_handler(name=var_string, player=None)
+                self.add_player_var_handler(name=var_string)
+                self.add_current_player_handler()
             else:
                 source, variable_name = var_string.split('|')
                 if source.lower().startswith('player'):
 
                     if source.lstrip('player'):  # we have player num
-                        self.add_player_var_handler(name=variable_name,
-                                                    player=source.lstrip(
-                                                            'player'))
+                        self.add_player_var_handler(name=variable_name)
                     else:  # no player num
-                        self.add_player_var_handler(name=var_string,
-                                                    player=None)
-
+                        self.add_player_var_handler(name=var_string)
+                        self.add_current_player_handler()
                 elif source.lower() == 'machine':
                     self.add_machine_var_handler(name=variable_name)
 
-    def add_player_var_handler(self, name, player):
-        self.mc.events.add_handler('player_' + name,
-                                   self._player_var_change,
-                                   target_player=player,
-                                   var_name=name)
+    def add_player_var_handler(self, name):
+        self.mc.events.add_handler('player_{}'.format(name),
+                                   self._player_var_change)
+
+    def add_current_player_handler(self):
+        self.mc.events.add_handler('player_turn_start',
+                                   self._player_var_change)
 
     def add_machine_var_handler(self, name):
-        self.mc.events.add_handler('machine_var_' + name,
-                                   self._machine_var_change,
-                                   var_name=name)
+        self.mc.events.add_handler('machine_var_{}'.format(name),
+                                   self._machine_var_change)
 
     def prepare_for_removal(self):
         self.mc.events.remove_handler(self._player_var_change)

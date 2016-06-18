@@ -328,6 +328,8 @@ class MpfMc(App):
 
             try:
                 self.player = self.player_list[int(player_num) - 1]
+                self.events.post('player_turn_start', number=player_num,
+                                 player=self.player)
             except IndexError:
                 self.log.error('Received player turn start for player %s, but '
                                'only %s player(s) exist',

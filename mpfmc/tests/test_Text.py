@@ -178,9 +178,78 @@ class TestText(MpfMcTestCase):
 
         # Add player 2 & set the value. Widget should update
         self.mc.add_player(2)
-        self.mc.player_list[1].test_var = 0
+        self.mc.player_list[1].test_var = 'Player 2 test variable'
         self.advance_time()
-        self.assertEqual(self.get_widget().text, '0')
+        self.assertEqual(self.get_widget().text, 'Player 2 test variable')
+
+    def test_current_player(self):
+        # verifies that current player text update when current player changes
+        self.mc.game_start()
+        self.advance_time()
+        self.mc.add_player(1)  # Player 1
+        self.advance_time()
+        self.mc.add_player(2)  # Player 2
+        self.advance_time()
+        self.mc.add_player(3)  # Player 3
+        self.advance_time()
+
+        # Test text: (test_var)
+
+        # Player 1
+        self.mc.player_start_turn(1)
+        self.advance_time()
+
+        self.assertEqual(0, self.mc.player.index)
+        self.assertEqual(1, self.mc.player.number)
+
+        self.mc.player.test_var = 'Player 1 test var'
+        self.mc.events.post('text_with_player_var1')
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, 'Player 1 test var')
+
+        # Player 2
+        self.mc.player_start_turn(2)
+        self.advance_time()
+
+        self.assertEqual(1, self.mc.player.index)
+        self.assertEqual(2, self.mc.player.number)
+
+        self.mc.player.test_var = 'Player 2 test var'
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, 'Player 2 test var')
+
+        # Player 3
+        self.mc.player_start_turn(3)
+        self.advance_time()
+
+        self.assertEqual(2, self.mc.player.index)
+        self.assertEqual(3, self.mc.player.number)
+
+        self.mc.player.test_var = 'Player 3 test var'
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, 'Player 3 test var')
+
+        # Back to player 1, make sure it's still there
+        self.mc.player_start_turn(1)
+        self.advance_time()
+
+        self.assertEqual(self.get_widget().text, 'Player 1 test var')
+
+        # Test text: (player|test_var)
+        self.mc.events.post('text_with_player_var2')
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'Player 1 test var')
+
+        self.mc.player_start_turn(2)
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'Player 2 test var')
+
+        self.mc.player_start_turn(3)
+        self.advance_time()
+        self.assertEqual(self.get_widget().text, 'Player 3 test var')
 
     def test_mix_player_var_and_event_param(self):
         self.mc.game_start()
