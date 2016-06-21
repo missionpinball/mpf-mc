@@ -89,7 +89,8 @@ class BCPServer(threading.Thread):
                 '''
                 self.mc.bcp_client_connected = False
 
-                while not self.connection:
+                while (not self.connection and
+                           not self.mc.thread_stopper.is_set()):
                     try:
                         self.connection, client_address = self.socket.accept()
                     except socket.timeout:
@@ -175,7 +176,7 @@ class BCPServer(threading.Thread):
         This method is run as a thread.
         """
         try:
-            while not self.done:
+            while not self.done and not self.mc.thread_stopper.is_set():
                 try:
                     msg, rawbytes = self.sending_queue.get(block=True,
                                                            timeout=1)

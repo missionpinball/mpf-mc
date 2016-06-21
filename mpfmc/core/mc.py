@@ -45,7 +45,8 @@ except ImportError:
 
 
 class MpfMc(App):
-    def __init__(self, options, config, machine_path, **kwargs):
+    def __init__(self, options, config, machine_path,
+                 thread_stopper=None, **kwargs):
 
         self.log = logging.getLogger('mpfmc')
         self.log.info("Mission Pinball Framework Media Controller v%s", __version__)
@@ -87,7 +88,11 @@ class MpfMc(App):
         self.ticks = 0
         self.start_time = 0
         self.is_init_done = False
-        self.thread_stopper = threading.Event()
+
+        if thread_stopper:
+            self.thread_stopper = thread_stopper
+        else:
+            self.thread_stopper = threading.Event()
 
         # Core components
         self.config_validator = ConfigValidator(self)
