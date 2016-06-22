@@ -187,7 +187,6 @@ class BCPServer(threading.Thread):
                         self.socket.shutdown(socket.SHUT_RDWR)
                         self.socket.close()
                         self.socket = None
-                        self.mc.socket_thread_stopped()
                         return
 
                     else:
@@ -218,5 +217,10 @@ class BCPServer(threading.Thread):
 
         """
         self.log.debug('Received "%s"', message)
-        cmd, kwargs = bcp.decode_command_string(message)
-        self.receive_queue.put((cmd, kwargs))
+
+        try:
+            cmd, kwargs = bcp.decode_command_string(message)
+            self.receive_queue.put((cmd, kwargs))
+        except ValueError:
+            self.log.error("DECODE BCP ERROR. Message: %s", message)
+            raise
