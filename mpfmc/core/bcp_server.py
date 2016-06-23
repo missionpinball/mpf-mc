@@ -29,7 +29,7 @@ class BCPServer(threading.Thread):
 
         threading.Thread.__init__(self)
         self.mc = mc
-        self.log = logging.getLogger('BCP')
+        self.log = logging.getLogger('MPF-MC BCP Server')
         self.receive_queue = receiving_queue
         self.sending_queue = sending_queue
         self.connection = None
@@ -90,7 +90,7 @@ class BCPServer(threading.Thread):
                 self.mc.bcp_client_connected = False
 
                 while (not self.connection and
-                           not self.mc.thread_stopper.is_set()):
+                        not self.mc.thread_stopper.is_set()):
                     try:
                         self.connection, client_address = self.socket.accept()
                     except socket.timeout:
@@ -118,7 +118,6 @@ class BCPServer(threading.Thread):
 
                 # Receive the data in small chunks and retransmit it
                 while not self.mc.thread_stopper.is_set():
-
                     # todo Better large message handling
                     # if a json message comes in that's larger than 8192, it
                     # won't be processed properly. So if we end up sticking
