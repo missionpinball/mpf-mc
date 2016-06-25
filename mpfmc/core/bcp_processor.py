@@ -4,7 +4,7 @@ from distutils.version import LooseVersion
 
 from kivy.clock import Clock
 
-import mpf.core.bcp as bcp
+import mpf.core.bcp.bcp_socket_client as bcp
 from mpfmc._version import __bcp_version__
 from mpfmc.core.bcp_server import BCPServer
 
@@ -43,7 +43,13 @@ class BcpProcessor(object):
                              'trigger': self._bcp_trigger,
                              }
 
+        self.mc.events.add_handler('client_connected', self._client_connected)
+
         Clock.schedule_interval(self._get_from_queue, 0)
+
+    def _client_connected(self, **kwargs):
+        del kwargs
+        self.send("get_machine_vars")
 
     def _start_socket_thread(self):
         self.socket_thread = BCPServer(self.mc, self.receive_queue,
