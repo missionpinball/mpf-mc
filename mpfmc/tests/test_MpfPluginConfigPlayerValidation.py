@@ -70,7 +70,11 @@ class TestMpfPluginConfigPlayerValidation(MpfTestCase):
                 pass
             raise e
 
-        self.patch_bcp()  # change from base
+        # remove config patches
+        self.machine_config_patches = dict()
+        # use bcp mock
+        self.machine_config_patches['bcp'] = \
+            {"connections": {"local_display": {"type": "mpf.tests.MpfTestCase.MockBcpClient"}}}
 
     def getConfigFile(self):
         return 'mpf_plugin_validation.yaml'
