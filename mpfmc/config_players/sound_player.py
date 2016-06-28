@@ -171,7 +171,7 @@ Here are several various examples:
         """Stop all sounds from this context."""
         instance_dict = self._get_instance_dict(context)
         for sound in instance_dict.values():
-            sound.stop()
+            sound.stop_looping()
         self._reset_instance_dict(context)
 
 
