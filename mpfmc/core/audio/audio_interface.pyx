@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '30', '0-dev16')
+__version_info__ = ('0', '30', '0')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
