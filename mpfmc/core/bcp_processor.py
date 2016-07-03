@@ -50,6 +50,9 @@ class BcpProcessor(object):
     def _client_connected(self, **kwargs):
         del kwargs
         self.send("get_machine_vars")
+        self.send("register_trigger", event="ball_started")
+        self.send("register_trigger", event="ball_ended")
+        self.send("register_trigger", event="player_add_success")
 
     def _start_socket_thread(self):
         self.socket_thread = BCPServer(self.mc, self.receive_queue,
