@@ -216,6 +216,8 @@ ctypedef struct SoundPlayer:
     SoundPlayerStatus status
     SoundSettings current
     SoundSettings next
+    int track_num
+    int player
 
 ctypedef struct AudioCallbackData:
     int sample_rate
@@ -233,6 +235,7 @@ cdef enum AudioMessage:
     message_sound_stop,               # Request to stop a sound that is playing
     message_sound_started,            # Notification that a sound has started playing
     message_sound_stopped,            # Notification that a sound has stopped
+    message_sound_looping,            # Notification that a sound is looping back to the beginning
     message_sound_marker,             # Notification that a sound marker has been reached
     message_track_ducking_start,      # Request to start ducking on a track (fade down)
     message_track_ducking_stop,       # Request to stop ducking on a track (fade up)
@@ -241,6 +244,7 @@ ctypedef struct AudioMessageDataPlaySound:
     Mix_Chunk *chunk
     Uint8 volume
     int loops
+    int priority
 
 ctypedef struct AudioMessageDataStopSound:
     int track

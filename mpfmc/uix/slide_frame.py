@@ -67,7 +67,6 @@ class SlideFrameParent(MpfWidget, FloatLayout):
 
 class SlideFrame(MpfWidget, ScreenManager):
     def __init__(self, mc, name=None, config=None, slide=None, key=None):
-
         self.name = name  # needs to be set before super()
         # If this is a the main SlideFrame of a display, it will get its size
         # from its parent. If this is a widget, it will get its size from
@@ -100,6 +99,24 @@ class SlideFrame(MpfWidget, ScreenManager):
         self.slide_frame_parent.config = self.config
 
         self.mc.targets[self.name] = self
+
+        self.mc.events.post('display_{}_ready'.format(self.name))
+        '''event: display_(name)_ready
+        desc: The display target called (name) is now ready and available to
+        show slides.
+
+        This event is useful with slide_frame widgets where you want to add
+        a slide_frame to an existing slide which shows some content, but you
+        need to make sure the slide_frame exists before showing a slide.
+
+        So if you have a slide_frame called "overlay", then you can add it to
+        a slide however you want, and when it's added, the event
+        "display_overlay_ready" will be posted, and then you can use that event
+        in your slide_player to trigger the first slide you want to show.
+
+        Note that this event is posted by MPF-MC and will not exist on the MPF
+        side. So you can use this event for slide_player, widget_player, etc.,
+        but not to start shows or other things controlled by MPF.'''
 
     def __repr__(self):
         return '<SlideFrame {}{}, current slide={}, total slides={}>'.format(

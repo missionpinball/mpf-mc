@@ -24,7 +24,9 @@ class Command(object):
         os.environ['KIVY_NO_FILELOG'] = '1'
         os.environ['KIVY_NO_CONSOLELOG'] = '1'
         from kivy.logger import Logger
-        Logger.removeHandler(Logger.handlers[0])
+
+        for handler in Logger.handlers:
+            Logger.removeHandler(handler)
         sys.stderr = sys.__stderr__
 
         # Need to have these in here because we don't want them to load when
@@ -92,6 +94,7 @@ class Command(object):
                             const='smart_virtual', help=argparse.SUPPRESS)
 
         args = parser.parse_args(args)
+
         args.configfile = Util.string_to_list(args.configfile)
 
         # Configure logging. Creates a logfile and logs to the console.
@@ -141,15 +144,20 @@ class Command(object):
 
         logging.info("Loading MPF-MC controller")
 
+        thread_stopper = threading.Event()
+
         try:
             MpfMc(options=vars(args), config=mpf_config,
-                  machine_path=machine_path).run()
+                  machine_path=machine_path,
+                  thread_stopper=thread_stopper).run()
             logging.info("MC run loop ended.")
         except Exception as e:
             logging.exception(str(e))
 
         logging.info("Stopping child threads... ({} remaining)".format(
                      len(threading.enumerate()) - 1))
+
+        thread_stopper.set()
 
         while len(threading.enumerate()) > 1:
             time.sleep(.1)

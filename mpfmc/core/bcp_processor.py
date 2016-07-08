@@ -1,8 +1,8 @@
 import queue
+import logging
 from distutils.version import LooseVersion
 
 from kivy.clock import Clock
-from kivy.logger import Logger
 
 import mpf.core.bcp as bcp
 from mpfmc._version import __bcp_version__
@@ -12,19 +12,18 @@ from mpfmc.core.bcp_server import BCPServer
 class BcpProcessor(object):
     def __init__(self, mc):
         self.mc = mc
+        self.log = logging.getLogger('BcpProcessor')
 
         self.receive_queue = queue.Queue()
         self.sending_queue = queue.Queue()
 
         if self.mc.options['bcp']:
-            self._start_socket_thread()
+            self.mc.events.add_handler('init_done', self._start_socket_thread)
             self.enabled = True
         else:
             self.enabled = False
 
-        self.bcp_commands = {'ball_start': self._bcp_ball_start,
-                             'ball_end': self._bcp_ball_end,
-                             'config': self._bcp_config,
+        self.bcp_commands = {'config': self._bcp_config,
                              'dmd_start': self._bcp_dmd_start,
                              'error': self._bcp_error,
                              'get': self._bcp_get,
@@ -99,14 +98,14 @@ class BcpProcessor(object):
             self._process_command(cmd, **kwargs)
 
     def _process_command(self, bcp_command, **kwargs):
-        Logger.debug("Processing command: %s %s", bcp_command, kwargs)
+        self.log.debug("Processing command: %s %s", bcp_command, kwargs)
 
         # Can't use try/except KeyError here becasue there could be a KeyError
         # in the callback which we don't want it to swallow.
         if bcp_command in self.bcp_commands:
             self.bcp_commands[bcp_command](**kwargs)
         else:
-            Logger.warning("Received invalid BCP command: %s", bcp_command[:9])
+            self.log.warning("Received invalid BCP command: %s", bcp_command[:9])
             # self.send('error',message='invalid command', command=bcp_command)
 
     def _bcp_hello(self, **kwargs):
@@ -118,8 +117,7 @@ class BcpProcessor(object):
             else:
                 self.send('hello', version='unknown protocol version')
         except KeyError:
-            Logger.warning("Received invalid 'version' parameter with "
-                           "'hello'")
+            self.log.warning("Received invalid 'version' parameter with 'hello'")
 
     def _bcp_goodbye(self, **kwargs):
         """Processes an incoming BCP 'goodbye' command."""
@@ -159,19 +157,7 @@ class BcpProcessor(object):
     def _bcp_error(self, **kwargs):
         """Processes an incoming BCP 'error' command."""
         del kwargs
-        Logger.warning('Received error command from client')
-
-    def _bcp_ball_start(self, **kwargs):
-        """Processes an incoming BCP 'ball_start' command."""
-        kwargs['player'] = kwargs.pop('player_num')
-
-        self.mc.events.post('ball_started', **kwargs)
-        # event docstring covered in MPF
-
-    def _bcp_ball_end(self, **kwargs):
-        """Processes an incoming BCP 'ball_end' command."""
-        self.mc.events.post('ball_ended', **kwargs)
-        # event docstring covered in MPF
+        self.log.warning('Received error command from client')
 
     def _bcp_player_add(self, player_num, **kwargs):
         """Processes an incoming BCP 'player_add' command."""

@@ -2,7 +2,6 @@
 
 # WARNING: Do not import kivy's logger here since that will trigger Kivy to
 # load in the mpf process when MPF processes the MpfSoundPlayer
-# from kivy.logger import Logger
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
@@ -93,9 +92,8 @@ Here are several various examples:
             try:
                 sound = self.machine.sounds[sound_name]
             except KeyError:
-                self.machine.log.warning("SoundPlayer: The specified sound "
-                                         "does not exist ('{}') - sound could "
-                                         "not be played.".format(sound_name))
+                self.machine.log.error("SoundPlayer: The specified sound "
+                                       "does not exist ('{}').".format(sound_name))
                 return
 
             s.update(kwargs)
@@ -112,6 +110,10 @@ Here are several various examples:
 
             elif s['action'].lower() == 'stop_looping':
                 sound.stop_looping()
+
+            else:
+                self.machine.log.error("SoundPlayer: The specified action "
+                                       "is not valid ('{}').".format(s['action']))
 
     def get_express_config(self, value):
         """ express config for sounds is simply a string (sound name)"""
@@ -169,7 +171,7 @@ Here are several various examples:
         """Stop all sounds from this context."""
         instance_dict = self._get_instance_dict(context)
         for sound in instance_dict.values():
-            sound.stop()
+            sound.stop_looping()
         self._reset_instance_dict(context)
 
 

@@ -12,6 +12,10 @@ import logging
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.resources import resource_add_path
+from kivy.logger import Logger
+
+# The following line is needed to allow mpfmc modules to use the getLogger(name) method
+logging.Logger.manager.root = Logger
 
 from mpfmc.assets.video import VideoAsset
 from mpfmc.core.bcp_processor import BcpProcessor
@@ -41,11 +45,11 @@ except ImportError:
 
 
 class MpfMc(App):
-    def __init__(self, options, config, machine_path, **kwargs):
+    def __init__(self, options, config, machine_path,
+                 thread_stopper=None, **kwargs):
 
-        self.log = logging.getLogger('')
-        self.log.info("Mission Pinball Framework Media Controller v%s",
-                      __version__)
+        self.log = logging.getLogger('mpfmc')
+        self.log.info("Mission Pinball Framework Media Controller v%s", __version__)
         super().__init__(**kwargs)
 
         self.options = options
@@ -84,7 +88,11 @@ class MpfMc(App):
         self.ticks = 0
         self.start_time = 0
         self.is_init_done = False
-        self.thread_stopper = threading.Event()
+
+        if thread_stopper:
+            self.thread_stopper = thread_stopper
+        else:
+            self.thread_stopper = threading.Event()
 
         # Core components
         self.config_validator = ConfigValidator(self)
@@ -248,6 +256,10 @@ class MpfMc(App):
     def init_done(self):
         self.is_init_done = True
         ConfigValidator.unload_config_spec()
+        self.events.post("init_done")
+        # no events docstring as this event is also in mpf
+        self.events.process_event_queue()
+
         self.reset()
 
     def build(self):
@@ -321,6 +333,8 @@ class MpfMc(App):
 
             try:
                 self.player = self.player_list[int(player_num) - 1]
+                self.events.post('player_turn_start', number=player_num,
+                                 player=self.player)
             except IndexError:
                 self.log.error('Received player turn start for player %s, but '
                                'only %s player(s) exist',

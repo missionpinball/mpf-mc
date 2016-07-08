@@ -6,8 +6,6 @@ from mpf.core.assets import Asset, AssetPool
 from mpf.core.utility_functions import Util
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException
 
-Logger = logging.getLogger('AudioInterface')
-
 
 # ---------------------------------------------------------------------------
 #    Default sound asset configuration parameter values
@@ -49,7 +47,14 @@ class SoundPool(AssetPool):
         Stops all instances of all sounds contained in the sound pool.
         """
         for sound in self.assets:
-            sound.stop()
+            # Assets contain a list of tuples (sound, number)
+            sound[0].stop()
+
+    def stop_looping(self):
+        """Stops looping on all instances of all sounds contained in the sound pool."""
+        for sound in self.assets:
+            # Assets contain a list of tuples (sound, number)
+            sound[0].stop_looping()
 
 
 class SoundAsset(Asset):
@@ -80,14 +85,17 @@ class SoundAsset(Asset):
         self._loops = DEFAULT_LOOPS
         self._events_when_played = None
         self._events_when_stopped = None
+        self._events_when_looping = None
         self._container = None  # holds the actual sound samples in memory
         self._ducking = None
+        self.log = logging.getLogger('SoundAsset')
+
 
         # Make sure a legal track name has been specified.  If not, throw an exception
         track = self.machine.sound_system.audio_interface.get_track_by_name(self.config['track'])
         if 'track' not in self.config or track is None:
-            Logger.error("SoundAsset: sound must have a valid track name. "
-                         "Could not create sound '%s' asset.", name)
+            self.log.error("sound must have a valid track name. "
+                           "Could not create sound '%s' asset.", name)
             raise AudioException("Sound must have a valid track name. "
                                  "Could not create sound '{}' asset".format(name))
 
@@ -113,6 +121,10 @@ class SoundAsset(Asset):
         if 'events_when_stopped' in self.config and isinstance(
                 self.config['events_when_stopped'], str):
             self._events_when_stopped = Util.string_to_list(self.config['events_when_stopped'])
+
+        if 'events_when_looping' in self.config and isinstance(
+                self.config['events_when_looping'], str):
+            self._events_when_looping = Util.string_to_list(self.config['events_when_looping'])
 
         if 'ducking' in self.config:
             self._ducking = DuckingSettings(self.machine, self.config['ducking'])
@@ -188,6 +200,11 @@ class SoundAsset(Asset):
         return self._events_when_stopped
 
     @property
+    def events_when_looping(self):
+        """Returns the list of events that are posted when the sound begins a new loop"""
+        return self._events_when_looping
+
+    @property
     def container(self):
         """The container object wrapping the SDL structure containing the actual sound data"""
         return self._container
@@ -206,15 +223,19 @@ class SoundAsset(Asset):
         """Loads the sound asset from disk."""
 
         # Load the sound file into memory
-        self._container = AudioInterface.load_sound(self.file)
+        try:
+            self._container = AudioInterface.load_sound(self.file)
+        except AudioException as exception:
+            self.log.error("Load sound %s failed due to an exception - %s", self.name, str(exception))
+            raise
 
         # Validate ducking now that the sound has been loaded
         if self._ducking is not None:
             try:
                 self._ducking.validate(self._container.length)
             except AudioException as exception:
-                Logger.error("SoundAsset: Ducking settings for sound %s are not valid: %s",
-                             self.name, str(exception))
+                self.log.error("Ducking settings for sound %s are not valid: %s",
+                               self.name, str(exception))
                 raise
 
     def _do_unload(self):
@@ -226,7 +247,7 @@ class SoundAsset(Asset):
     def is_loaded(self):
         """Called when the asset has finished loading"""
         super().is_loaded()
-        Logger.debug("SoundAsset: Loaded %s (Track %s)", self.name, self.track)
+        self.log.debug("Loaded %s (Track %s)", self.name, self.track)
 
     def play(self, settings=None):
         """
@@ -234,14 +255,17 @@ class SoundAsset(Asset):
         Args:
             settings: Optional dictionary of settings to override the default values.
         """
+        self.log.debug("Play sound %s %s", self.name, self.track)
         self._track.play_sound(self, **settings)
 
     def stop(self):
         """Stops all instances of the sound playing on the sound's default track."""
+        self.log.debug("Stop sound %s %s", self.name, self.track)
         self._track.stop_sound(self)
 
     def stop_looping(self):
         """Stops looping on all instances of the sound playing (and awaiting playback)."""
+        self.log.debug("Stop looping sound %s %s", self.name, self.track)
         self._track.stop_sound_looping(self)
 
 

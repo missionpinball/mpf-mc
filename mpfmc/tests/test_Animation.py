@@ -132,7 +132,7 @@ class TestAnimation(MpfMcTestCase):
 
         self.assertAlmostEqual(-108, widget.x, delta=20)
         self.advance_time(.5)
-        self.assertAlmostEqual(-8, widget.x, delta=20)
+        self.assertAlmostEqual(-8, widget.x, delta=30)
         self.advance_time(.5)
         self.assertEqual(100.0, widget.x)
 

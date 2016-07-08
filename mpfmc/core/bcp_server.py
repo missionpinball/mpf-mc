@@ -29,7 +29,7 @@ class BCPServer(threading.Thread):
 
         threading.Thread.__init__(self)
         self.mc = mc
-        self.log = logging.getLogger('BCP')
+        self.log = logging.getLogger('MPF-MC BCP Server')
         self.receive_queue = receiving_queue
         self.sending_queue = sending_queue
         self.connection = None
@@ -61,7 +61,7 @@ class BCPServer(threading.Thread):
             self.log.critical('Socket bind IOError')
             raise
 
-        self.socket.listen(1)
+        self.socket.listen(5)
         self.socket.settimeout(1)
 
     def run(self):
@@ -89,7 +89,8 @@ class BCPServer(threading.Thread):
                 '''
                 self.mc.bcp_client_connected = False
 
-                while not self.connection:
+                while (not self.connection and
+                        not self.mc.thread_stopper.is_set()):
                     try:
                         self.connection, client_address = self.socket.accept()
                     except socket.timeout:
@@ -117,7 +118,6 @@ class BCPServer(threading.Thread):
 
                 # Receive the data in small chunks and retransmit it
                 while not self.mc.thread_stopper.is_set():
-
                     # todo Better large message handling
                     # if a json message comes in that's larger than 8192, it
                     # won't be processed properly. So if we end up sticking
@@ -135,7 +135,7 @@ class BCPServer(threading.Thread):
                                     if cmd:
                                         self.process_received_message(cmd)
                             else:
-                                # no more data
+                                # no bytes -> socket closed
                                 break
 
                     except socket.timeout:
@@ -147,6 +147,10 @@ class BCPServer(threading.Thread):
                             self.mc.stop()
                         else:
                             break
+
+                # close connection. while loop will not exit if this is not intended.
+                self.connection.close()
+                self.connection = None
 
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -171,7 +175,7 @@ class BCPServer(threading.Thread):
         This method is run as a thread.
         """
         try:
-            while not self.done:
+            while not self.done and not self.mc.thread_stopper.is_set():
                 try:
                     msg, rawbytes = self.sending_queue.get(block=True,
                                                            timeout=1)
@@ -182,7 +186,6 @@ class BCPServer(threading.Thread):
                         self.socket.shutdown(socket.SHUT_RDWR)
                         self.socket.close()
                         self.socket = None
-                        self.mc.socket_thread_stopped()
                         return
 
                     else:
@@ -213,5 +216,10 @@ class BCPServer(threading.Thread):
 
         """
         self.log.debug('Received "%s"', message)
-        cmd, kwargs = bcp.decode_command_string(message)
-        self.receive_queue.put((cmd, kwargs))
+
+        try:
+            cmd, kwargs = bcp.decode_command_string(message)
+            self.receive_queue.put((cmd, kwargs))
+        except ValueError:
+            self.log.error("DECODE BCP ERROR. Message: %s", message)
+            raise

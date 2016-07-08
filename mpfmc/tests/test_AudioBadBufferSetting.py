@@ -1,5 +1,5 @@
+import logging
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from kivy.logger import Logger
 
 
 class TestAudioBadBufferSetting(MpfMcTestCase):
@@ -17,10 +17,12 @@ class TestAudioBadBufferSetting(MpfMcTestCase):
         """ Tests the sound system and audio interface with default settings """
 
         if self.mc.sound_system is None:
-            Logger.warning("Sound system is not enabled - unable to run audio tests")
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - unable to run audio tests")
+            self.skipTest("Sound system is not enabled - unable to run audio tests")
             return
 
-        Logger.setLevel(10)
+        logging.getLogger('TestAudio').setLevel(10)
 
         self.assertIsNotNone(self.mc.sound_system)
         self.assertIsNotNone(self.mc.sound_system.audio_interface)

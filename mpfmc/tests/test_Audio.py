@@ -1,5 +1,5 @@
+import logging
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from kivy.logger import Logger
 from mock import MagicMock
 
 
@@ -9,7 +9,6 @@ class TestAudio(MpfMcTestCase):
     custom extension library written in Cython that interfaces with the SDL2 and
     SDL_Mixer libraries.
     """
-
     def get_machine_path(self):
         return 'tests/machine_files/audio'
 
@@ -23,7 +22,8 @@ class TestAudio(MpfMcTestCase):
         """ Tests the sound system and audio interface with typical settings """
 
         if self.mc.sound_system is None:
-            Logger.warning("Sound system is not enabled - unable to run audio tests")
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - unable to run audio tests")
             return
 
         self.assertIsNotNone(self.mc.sound_system)
@@ -95,6 +95,12 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('84480__zgump__drum-fx-4', self.mc.sounds)   # .wav
         self.assertIn('100184__menegass__rick-drum-bd-hard', self.mc.sounds)   # .wav
 
+        # Test bad sound file
+        self.assertIn('bad_sound_file', self.mc.sounds)
+        with self.assertRaises(Exception):
+            self.mc.sounds['bad_sound_file'].do_load()
+        self.assertFalse(self.mc.sounds['bad_sound_file'].loaded)
+
         # /sounds/voice
         self.assertIn('104457_moron_test', self.mc.sounds)  # .wav
         self.assertIn('113690_test', self.mc.sounds)        # .wav
@@ -154,6 +160,9 @@ class TestAudio(MpfMcTestCase):
         # Make sure text sound is still playing (looping)
         self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
 
+        # Ensure sound.events_when_looping is working properly (send event when a sound loops)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_looping')
+
         # Send an event to stop the text sound looping
         self.mc.events.post('stop_sound_looping_text')
         self.advance_time(2)
@@ -177,7 +186,13 @@ class TestAudio(MpfMcTestCase):
             self.mc.events.post('play_sound_drum_group')
             self.advance_time(0.1)
 
+        self.mc.events.post('play_sound_drum_group_in_mode')
+
         self.advance_time(1)
+
+        # Test stopping the mode
+        self.send(bcp_command='mode_stop', name='mode1')
+        self.advance_time()
 
         # Test sound events
         self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_played')
