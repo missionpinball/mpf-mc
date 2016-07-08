@@ -47,12 +47,14 @@ class SoundPool(AssetPool):
         Stops all instances of all sounds contained in the sound pool.
         """
         for sound in self.assets:
-            sound.stop()
+            # Assets contain a list of tuples (sound, number)
+            sound[0].stop()
 
     def stop_looping(self):
         """Stops looping on all instances of all sounds contained in the sound pool."""
         for sound in self.assets:
-            sound.stop_looping(self)
+            # Assets contain a list of tuples (sound, number)
+            sound[0].stop_looping()
 
 
 class SoundAsset(Asset):
