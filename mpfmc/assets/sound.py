@@ -84,6 +84,7 @@ class SoundAsset(Asset):
         self._events_when_played = None
         self._events_when_stopped = None
         self._events_when_looping = None
+        self._markers = []
         self._container = None  # holds the actual sound samples in memory
         self._ducking = None
         self.log = logging.getLogger('SoundAsset')
@@ -123,6 +124,9 @@ class SoundAsset(Asset):
         if 'events_when_looping' in self.config and isinstance(
                 self.config['events_when_looping'], str):
             self._events_when_looping = Util.string_to_list(self.config['events_when_looping'])
+
+        if 'markers' in self.config:
+            self._markers = self._validate_markers(self.machine, self.config['markers'])
 
         if 'ducking' in self.config:
             self._ducking = DuckingSettings(self.machine, self.config['ducking'])
@@ -265,6 +269,21 @@ class SoundAsset(Asset):
         """Stops looping on all instances of the sound playing (and awaiting playback)."""
         self.log.debug("Stop looping sound %s %s", self.name, self.track)
         self._track.stop_sound_looping(self)
+
+    def _validate_markers(self, mc, config):
+        """Validates the markers config section"""
+
+        markers = []
+
+        if isinstance(config, dict):
+            markers = list(config)
+        elif isinstance(config, list):
+            markers = config
+        else:
+            raise AudioException("Sound %s has an invalid markers section", self.name)
+
+
+
 
 
 class DuckingSettings(object):
