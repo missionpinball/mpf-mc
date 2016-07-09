@@ -48,6 +48,12 @@ sounds:
             attenuation: -18db
             release_point: 3sec
             release: 2.25sec
+        markers:
+            - time: 2.5sec
+              events: moron_marker
+            - time: 3.5sec
+              name: verse_1
+              events: moron_marker, last_marker
     210871_synthping:
         events_when_played: synthping_played
     bad_sound_file:
