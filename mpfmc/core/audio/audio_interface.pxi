@@ -225,44 +225,78 @@ ctypedef struct AudioCallbackData:
     Uint8 master_volume
     int track_count
     TrackAttributes **tracks
-    AudioMessageContainer **messages
+    RequestMessageContainer **request_messages
+    NotificationMessageContainer **notification_messages
     SDL_mutex *mutex
+    
+cdef enum RequestMessage:
+    request_not_in_use,               # Message is not in use and is available
+    request_sound_play,               # Request to play a sound
+    request_sound_replace,            # Request to play a sound that replaces a sound in progress
+    request_sound_stop,               # Request to stop a sound that is playing
+    request_sound_stop_looping,       # Request to stop looping a sound that is playing
+    request_track_ducking_start,      # Request to start ducking on a track (fade down)
+    request_track_ducking_stop,       # Request to stop ducking on a track (fade up)
 
-cdef enum AudioMessage:
-    message_not_in_use,               # Message is not in use and is available
-    message_sound_play,               # Request to play a sound
-    message_sound_replace,            # Request to play a sound that replaces a sound in progress
-    message_sound_stop,               # Request to stop a sound that is playing
-    message_sound_started,            # Notification that a sound has started playing
-    message_sound_stopped,            # Notification that a sound has stopped
-    message_sound_looping,            # Notification that a sound is looping back to the beginning
-    message_sound_marker,             # Notification that a sound marker has been reached
-    message_track_ducking_start,      # Request to start ducking on a track (fade down)
-    message_track_ducking_stop,       # Request to stop ducking on a track (fade up)
-
-ctypedef struct AudioMessageDataPlaySound:
+ctypedef struct RequestMessageDataPlaySound:
     Mix_Chunk *chunk
     Uint8 volume
     int loops
     int priority
+    Uint32 fade_in
+    int marker_count
 
-ctypedef struct AudioMessageDataStopSound:
-    int track
-    int player
+ctypedef struct RequestMessageDataStopSound:
+    Uint32 fade_out
 
-ctypedef struct AudioMessageDataMarker:
-    int id
+ctypedef struct RequestMessageDataDuckingStart:
+    int from_track
+    int from_player
+    Uint32 attack_duration
+    float attenuation
 
-ctypedef union AudioMessageData:
-    AudioMessageDataPlaySound play
-    AudioMessageDataStopSound stop
-    AudioMessageDataMarker marker
+ctypedef struct RequestMessageDataDuckingStop:
+    int from_track
+    int from_player
+    Uint32 release_duration
 
-ctypedef struct AudioMessageContainer:
-    AudioMessage message
+ctypedef union RequestMessageData:
+    RequestMessageDataPlaySound play
+    RequestMessageDataStopSound stop
+    RequestMessageDataDuckingStart ducking_start
+    RequestMessageDataDuckingStop ducking_stop
+
+ctypedef struct RequestMessageContainer:
+    RequestMessage message
     long sound_id
     int track
     int player
     Uint32 time
-    AudioMessageData data
+    RequestMessageData data
 
+cdef enum NotificationMessage:
+    notification_not_in_use,               # Message is not in use and is available
+    notification_sound_started,            # Notification that a sound has started playing
+    notification_sound_stopped,            # Notification that a sound has stopped
+    notification_sound_looping,            # Notification that a sound is looping back to the beginning
+    notification_sound_marker,             # Notification that a sound marker has been reached
+    notification_player_idle,              # Notification that a player is now idle and ready to play another sound
+
+ctypedef struct NotificationMessageDataLooping:
+    int loop_count
+    int loops_remaining
+
+ctypedef struct NotificationMessageDataMarker:
+    int id
+
+ctypedef union NotificationMessageData:
+    NotificationMessageDataLooping looping
+    NotificationMessageDataMarker marker
+
+ctypedef struct NotificationMessageContainer:
+    NotificationMessage message
+    long sound_id
+    int track
+    int player
+    Uint32 time
+    NotificationMessageData data
