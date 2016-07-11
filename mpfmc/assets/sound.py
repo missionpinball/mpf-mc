@@ -87,6 +87,7 @@ class SoundAsset(Asset):
         self._max_queue_time = DEFAULT_MAX_QUEUE_TIME
         self._loops = DEFAULT_LOOPS
         self._fade_in = 0
+        self._streaming = False
         self._events_when_played = None
         self._events_when_stopped = None
         self._events_when_looping = None
@@ -207,6 +208,11 @@ class SoundAsset(Asset):
     def fade_in(self):
         """Return the fade in time for the sound (in seconds)"""
         return self._fade_in
+
+    @property
+    def streaming(self):
+        """Return whether or not this sound is streaming (True) or loaded in memory (False)"""
+        return self._streaming
 
     @property
     def events_when_played(self):
@@ -393,9 +399,20 @@ class DuckingSettings(object):
             raise AudioException("'ducking.target' must contain at least one "
                                  "valid audio track name")
 
-        self._track = mc.sound_system.audio_interface.get_track_by_name(config['target'])
-        if self._track is None:
-            raise AudioException("'ducking.target' must contain a valid audio track name")
+        # Target can contain a list of track names - convert string to list and validate
+        self._targets = Util.string_to_list(config['target'])
+        if len(self._targets) == 0:
+            raise AudioException("'ducking.target' must contain at least one "
+                                 "valid audio track name")
+
+        # Create a bit mask of target tracks based on their track number (will be used to pass
+        # the target data to the audio library).
+        self._track_bit_mask = 0
+        for target in self._targets:
+            track = mc.sound_system.audio_interface.get_track_by_name(target)
+            if track is None:
+                raise AudioException("'ducking.target' contains an invalid track name '%s'", target)
+            self._track_bit_mask += (1 << track.number)
 
         # Delay is optional (defaults to 0, must be >= 0)
         if 'delay' in config:
@@ -432,9 +449,14 @@ class DuckingSettings(object):
                                 MINIMUM_DUCKING_DURATION))
 
     @property
-    def track(self):
-        """ The track object to apply the ducking envelope"""
-        return self._track
+    def targets(self):
+        """Return the list of target track names"""
+        return self._targets
+
+    @property
+    def track_bit_mask(self):
+        """ A bit mask of target tracks (each bit represents a track)"""
+        return self._track_bit_mask
 
     @property
     def delay(self):
@@ -578,8 +600,8 @@ class SoundInstance(object):
 
     def __repr__(self):
         """String that's returned if someone prints this object"""
-        return '<SoundInstance: {}({}), Loaded={}>'.format(
-            self.sound.name, self.id, self.sound.loaded)
+        return '<SoundInstance: {}({}), Volume={}, Loops={}, Loaded={}>'.format(
+            self.sound.name, self.id, self.volume, self.loops, self.sound.loaded)
 
     def __lt__(self, other):
         """Less than comparison operator"""
