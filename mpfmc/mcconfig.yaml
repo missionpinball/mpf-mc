@@ -42,16 +42,6 @@ modes:
 assets:
     sounds:
         default:
-            track: sfx
-            load: preload
-        voice:
-            track: voice
-            load: preload
-        sfx:
-            track: sfx
-            load: preload
-        music:
-            track: music
             load: preload
     videos:
         default:
