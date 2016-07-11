@@ -186,7 +186,13 @@ class TestAudio(MpfMcTestCase):
             self.mc.events.post('play_sound_drum_group')
             self.advance_time(0.1)
 
+        self.mc.events.post('play_sound_drum_group_in_mode')
+
         self.advance_time(1)
+
+        # Test stopping the mode
+        self.send(bcp_command='mode_stop', name='mode1')
+        self.advance_time()
 
         # Test sound events
         self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_played')
