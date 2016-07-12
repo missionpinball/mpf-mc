@@ -169,9 +169,9 @@ class SoundSystem(object):
             config['volume'] = DEFAULT_TRACK_VOLUME
 
         # Create the track
-        track = self.audio_interface.create_standard_track(name,
-                                                           config['simultaneous_sounds'],
-                                                           config['volume'])
+        track = self.audio_interface.create_track(name,
+                                                  config['simultaneous_sounds'],
+                                                  config['volume'])
         if track is None:
             return False
 

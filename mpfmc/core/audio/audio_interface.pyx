@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev01')
+__version_info__ = ('0', '30', '0')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -36,8 +36,7 @@ DEF MAX_TRACKS = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
 DEF MAX_TRACK_DUCKING_ENVELOPES = 32
-DEF MAX_REQUEST_MESSAGES = 64
-DEF MAX_NOTIFICATION_MESSAGES = 64
+DEF MAX_AUDIO_MESSAGES = 64
 DEF QUICK_FADE_DURATION_SECS = 0.05
 DEF BYTES_PER_SAMPLE = 2
 
@@ -147,34 +146,19 @@ cdef class AudioInterface:
         self.audio_callback_data.audio_channels = self.audio_channels
         self.audio_callback_data.master_volume = MIX_MAX_VOLUME // 2
         self.audio_callback_data.track_count = 0
-        self.audio_callback_data.tracks = <TrackState**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
+        self.audio_callback_data.tracks = <TrackAttributes**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackAttributes*))
+        self.audio_callback_data.messages = <AudioMessageContainer**> PyMem_Malloc(
+            MAX_AUDIO_MESSAGES * sizeof(AudioMessageContainer*))
 
-        # Initialize request messages
-        self.audio_callback_data.request_messages = <RequestMessageContainer**> PyMem_Malloc(
-            MAX_REQUEST_MESSAGES * sizeof(RequestMessageContainer*))
+        # Initialize audio messages
+        for i in range(MAX_AUDIO_MESSAGES):
+            self.audio_callback_data.messages[i] = <AudioMessageContainer*> PyMem_Malloc(sizeof(AudioMessageContainer))
+            self.audio_callback_data.messages[i].message = message_not_in_use
+            self.audio_callback_data.messages[i].sound_id = 0
+            self.audio_callback_data.messages[i].track = 0
+            self.audio_callback_data.messages[i].player = 0
+            self.audio_callback_data.messages[i].time = 0
 
-        for i in range(MAX_REQUEST_MESSAGES):
-            self.audio_callback_data.request_messages[i] = <RequestMessageContainer*> PyMem_Malloc(sizeof(RequestMessageContainer))
-            self.audio_callback_data.request_messages[i].message = request_not_in_use
-            self.audio_callback_data.request_messages[i].sound_id = 0
-            self.audio_callback_data.request_messages[i].track = 0
-            self.audio_callback_data.request_messages[i].player = 0
-            self.audio_callback_data.request_messages[i].time = 0
-
-        # Initialize notification messages
-        self.audio_callback_data.notification_messages = <NotificationMessageContainer**> PyMem_Malloc(
-            MAX_NOTIFICATION_MESSAGES * sizeof(NotificationMessageContainer*))
-
-        for i in range(MAX_REQUEST_MESSAGES):
-            self.audio_callback_data.notification_messages[i] = <NotificationMessageContainer*> PyMem_Malloc(sizeof(NotificationMessageContainer))
-            self.audio_callback_data.notification_messages[i].message = notification_not_in_use
-            self.audio_callback_data.notification_messages[i].sound_id = 0
-            self.audio_callback_data.notification_messages[i].track = 0
-            self.audio_callback_data.notification_messages[i].player = 0
-            self.audio_callback_data.notification_messages[i].time = 0
-
-        # Create the mutex used for thread protection for shared data (Python thread
-        # and C audio callback thread)
         self.audio_callback_data.mutex = SDL_CreateMutex()
 
         # Initialize the supported SDL_Mixer library formats
@@ -186,7 +170,7 @@ cdef class AudioInterface:
         # Unlock the SDL audio callback functions
         SDL_UnlockAudio()
 
-        self.tracks = list()
+        self.tracks = []
 
     def __del__(self):
 
@@ -199,19 +183,13 @@ cdef class AudioInterface:
         self.tracks.clear()
 
         # Free all allocated memory
-        for i in range(MAX_REQUEST_MESSAGES):
-            PyMem_Free(self.audio_callback_data.request_messages[i])
-        for i in range(MAX_NOTIFICATION_MESSAGES):
-            PyMem_Free(self.audio_callback_data.notification_messages[i])
+        for i in range(MAX_AUDIO_MESSAGES):
+            PyMem_Free(self.audio_callback_data.messages[i])
 
-        PyMem_Free(self.audio_callback_data.request_messages)
-        PyMem_Free(self.audio_callback_data.notification_messages)
+        PyMem_Free(self.audio_callback_data.messages)
         PyMem_Free(self.audio_callback_data.tracks)
         SDL_DestroyMutex(self.audio_callback_data.mutex)
         PyMem_Free(self.audio_callback_data)
-
-        # Free silence chunk
-        Mix_FreeChunk(self.raw_chunk_silence)
 
         # SDL_Mixer and SDL no longer needed
         Mix_Quit()
@@ -226,14 +204,10 @@ cdef class AudioInterface:
         # Create the audio buffer containing silence
         cdef Uint8 *silence = NULL
         cdef Uint32 length = self.buffer_size
-        silence = <Uint8 *> PyMem_Malloc(length)
-        memset(silence, 0, length)
+        silence = <Uint8 *> calloc(1, length)
 
         # Instruct SDL_Mixer to load the silence into a chunk
         self.raw_chunk_silence = Mix_QuickLoad_RAW(silence, length)
-
-        PyMem_Free(silence)
-
         if self.raw_chunk_silence == NULL:
             raise AudioException('Unable to load generated silence sample required for playback')
         else:
@@ -244,7 +218,7 @@ cdef class AudioInterface:
         # Set the number of channels to mix (will cause existing channels to be stopped and restarted if playing)
         # This is an SDL_Mixer library function call.
         channels = Mix_AllocateChannels(1)
-        self.log.debug("SDL_Mixer - Allocated %d channel for master audio output", channels)
+        self.log.debug("SDL_Mixer - Allocated %d channel for final audio output", channels)
         self.mixer_channel = 0
 
         # Ensure channel volume is at maximum (should be the default, but we'll set it manually
@@ -522,9 +496,9 @@ cdef class AudioInterface:
 
         return None
 
-    def create_standard_track(self, str name not None,
-                              int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
-                              float volume=1.0):
+    def create_track(self, str name not None,
+                     int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
+                     float volume=1.0):
         """
         Creates a new track in the audio interface
         Args:
@@ -552,7 +526,7 @@ cdef class AudioInterface:
         SDL_LockAudio()
 
         # Create the new track
-        new_track = TrackStandard(pycapsule.PyCapsule_New(self.audio_callback_data, NULL, NULL),
+        new_track = Track(pycapsule.PyCapsule_New(self.audio_callback_data, NULL, NULL),
                           name,
                           track_num,
                           self.buffer_size,
@@ -562,7 +536,7 @@ cdef class AudioInterface:
 
         # Update audio callback data with new track
         self.audio_callback_data.track_count = len(self.tracks)
-        self.audio_callback_data.tracks[track_num] = new_track.state
+        self.audio_callback_data.tracks[track_num] = new_track.attributes
 
         # Allow audio callback function to be called again
         SDL_UnlockAudio()
@@ -638,64 +612,54 @@ cdef class AudioInterface:
 
         # Process any internal notification messages that may cause other messages to be generated
         SDL_LockMutex(self.audio_callback_data.mutex)
-        for i in range(MAX_NOTIFICATION_MESSAGES):
-            if self.audio_callback_data.notification_messages[i].message == notification_sound_started:
-                # TODO: Process event
+        for i in range(MAX_AUDIO_MESSAGES):
+            if self.audio_callback_data.messages[i].message == message_sound_started:
+                sound = self.mc.sounds_by_id[self.audio_callback_data.messages[i].sound_id]
+                if sound.events_when_played is not None:
+                    for event in sound.events_when_played:
+                        self.mc.bcp_processor.send('trigger', name=event)
 
                 # Event has been processed, reset it so it may be used again
-                self.audio_callback_data.notification_messages[i].message = notification_not_in_use
+                self.audio_callback_data.messages[i].message = message_not_in_use
 
-            elif self.audio_callback_data.notification_messages[i].message == notification_sound_stopped:
-                # TODO: Process event
-
-                # Event has been processed, reset it so it may be used again
-                self.audio_callback_data.notification_messages[i].message = notification_not_in_use
-
-            elif self.audio_callback_data.notification_messages[i].message == notification_sound_looping:
-                # TODO: Process event
+            elif self.audio_callback_data.messages[i].message == message_sound_stopped:
+                sound = self.mc.sounds_by_id[self.audio_callback_data.messages[i].sound_id]
+                if sound.events_when_stopped is not None:
+                    for event in sound.events_when_stopped:
+                        self.mc.bcp_processor.send('trigger', name=event)
 
                 # Event has been processed, reset it so it may be used again
-                self.audio_callback_data.notification_messages[i].message = notification_not_in_use
+                self.audio_callback_data.messages[i].message = message_not_in_use
 
-            elif self.audio_callback_data.notification_messages[i].message == notification_sound_marker:
-                # TODO: Process event
-
-                # Event has been processed, reset it so it may be used again
-                self.audio_callback_data.notification_messages[i].message = notification_not_in_use
-
-            elif self.audio_callback_data.notification_messages[i].message == notification_player_idle:
-                # TODO: Process event
+            elif self.audio_callback_data.messages[i].message == message_sound_looping:
+                sound = self.mc.sounds_by_id[self.audio_callback_data.messages[i].sound_id]
+                if sound.events_when_looping is not None:
+                    for event in sound.events_when_looping:
+                        self.mc.bcp_processor.send('trigger', name=event)
 
                 # Event has been processed, reset it so it may be used again
-                self.audio_callback_data.notification_messages[i].message = notification_not_in_use
+                self.audio_callback_data.messages[i].message = message_not_in_use
+
+            elif self.audio_callback_data.messages[i].message == message_sound_marker:
+                # TODO: Process sound marker event
+
+                # Event has been processed, reset it so it may be used again
+                self.audio_callback_data.messages[i].message = message_not_in_use
 
         SDL_UnlockMutex(self.audio_callback_data.mutex)
 
-    def get_in_use_request_message_count(self):
+    def get_in_use_sound_event_count(self):
         """
-        Returns the number of request messages currently in use.  Used for debugging and testing.
+        Returns the number of sound messages currently in use.  Used for debugging and testing.
         """
-        in_use_message_count = 0
+        in_use_event_count = 0
         SDL_LockMutex(self.audio_callback_data.mutex)
-        for i in range(MAX_REQUEST_MESSAGES):
-            if self.audio_callback_data.request_messages[i].message != request_not_in_use:
-                in_use_message_count += 1
+        for i in range(MAX_AUDIO_MESSAGES):
+            if self.audio_callback_data.messages[i].message != message_not_in_use:
+                in_use_event_count += 1
 
         SDL_UnlockMutex(self.audio_callback_data.mutex)
-        return in_use_message_count
-
-    def get_in_use_notification_message_count(self):
-        """
-        Returns the number of notification messages currently in use.  Used for debugging and testing.
-        """
-        in_use_message_count = 0
-        SDL_LockMutex(self.audio_callback_data.mutex)
-        for i in range(MAX_NOTIFICATION_MESSAGES):
-            if self.audio_callback_data.notification_messages[i].message != notification_not_in_use:
-                in_use_message_count += 1
-
-        SDL_UnlockMutex(self.audio_callback_data.mutex)
-        return in_use_message_count
+        return in_use_event_count
 
     @staticmethod
     cdef void audio_callback(int channel, void *output_buffer, int length, void *data) nogil:
@@ -716,8 +680,6 @@ cdef class AudioInterface:
             are maintained in each Track object and are processed during this callback.
         """
         cdef Uint32 buffer_length
-        cdef TrackState *track
-        cdef int index
 
         if data == NULL:
             return
@@ -733,35 +695,25 @@ cdef class AudioInterface:
         # (multi-threaded protection)
         SDL_LockMutex(callback_data.mutex)
 
-        # Process any internal request messages that may affect sound playback (play and stop messages)
-        process_request_messages(callback_data)
+        # Process any internal sound messages that may affect sound playback (play and stop messages)
+        process_sound_messages(callback_data)
 
         # Loop over tracks, mixing the playing sounds into the track's audio buffer
         for track_num in range(callback_data.track_count):
-            track = callback_data.tracks[track_num]
-
             # Zero out track buffer (start with silence)
-            memset(track.buffer, 0, buffer_length)
+            memset(callback_data.tracks[track_num].buffer, 0, buffer_length)
 
-            # Reset ducking for the track (will be calculated/enabled in the mix function)
-            track.ducking_is_active = 0
-
-            # Mix any playing sounds into the track buffer (call the track's mix function)
-            if track.type == track_type_standard:
-                standard_track_mix_playing_sounds(track, callback_data)
-            elif track.type == track_type_playlist:
-                # TODO: Implement track mix function call
-                pass
-            elif track.type == track_type_live_loop:
-                # TODO: Implement track mix function call
-                pass
+            # Mix any playing sounds into the track buffer
+            mix_sounds_to_track(callback_data.tracks[track_num],
+                                buffer_length,
+                                callback_data)
 
         # Loop over tracks again, mixing down tracks to the master output buffer
         for track_num in range(callback_data.track_count):
-            track = callback_data.tracks[track_num]
 
-            # Apply ducking to track audio buffer (if applicable)
-            apply_track_ducking(track, buffer_length, callback_data)
+            # Apply ducking envelopes to track audio buffer
+            apply_track_ducking_envelopes(callback_data.tracks[track_num], buffer_length,
+                                          callback_data.audio_channels, callback_data)
 
             # Apply track volume and mix to output buffer
             mix_track_to_output(<Uint8*> callback_data.tracks[track_num].buffer,
@@ -785,38 +737,314 @@ cdef class AudioInterface:
 #    callback function.
 # ---------------------------------------------------------------------------
 
-cdef void process_request_messages(AudioCallbackData *callback_data) nogil:
+cdef void process_sound_messages(AudioCallbackData *callback_data) nogil:
     """
-    Processes any new request messages that should be processed prior to the main
+    Processes any new sound messages that should be processed prior to the main
     audio callback processing (such as sound play and sound stop messages).
     Args:
         callback_data: The audio callback data structure
     """
     cdef int i
-    cdef int track_num
+    cdef int track
     cdef int player
-    cdef TrackState *track
 
     # Loop over messages
-    for i in range(MAX_REQUEST_MESSAGES):
+    for i in range(MAX_AUDIO_MESSAGES):
 
-        # Dispatch messages to track's request message processing function
-        if callback_data.request_messages[i].message != request_not_in_use:
-            track_num = callback_data.request_messages[i].track
-            track = callback_data.tracks[track_num]
-            if track.type == track_type_standard:
-                standard_track_request_message(callback_data.request_messages[i],
-                                               track)
-            elif track.type == track_type_playlist:
-                # TODO: Implement track request message function call
-                pass
-            elif track.type == track_type_live_loop:
-                # TODO: Implement track request message function call
-                pass
+        if callback_data.messages[i].message == message_sound_play:
+            # Update player to start playing new sound
+            track = callback_data.messages[i].track
+            player = callback_data.messages[i].player
+            callback_data.tracks[track].sound_players[player].status = player_pending
+            callback_data.tracks[track].sound_players[player].current.sample_pos = 0
+            callback_data.tracks[track].sound_players[player].current.current_loop = 0
+            callback_data.tracks[track].sound_players[player].current.sound_id = callback_data.messages[i].sound_id
+            callback_data.tracks[track].sound_players[player].current.chunk = callback_data.messages[i].data.play.chunk
+            callback_data.tracks[track].sound_players[player].current.volume = callback_data.messages[i].data.play.volume
+            callback_data.tracks[track].sound_players[player].current.loops_remaining = callback_data.messages[i].data.play.loops
+            callback_data.tracks[track].sound_players[player].current.sound_priority = callback_data.messages[i].data.play.priority
 
+            # Clear event since it has been processed
+            callback_data.messages[i].message = message_not_in_use
+
+        elif callback_data.messages[i].message == message_sound_stop:
+            # Update player to stop playing sound
+            track = callback_data.messages[i].track
+            player = callback_data.messages[i].player
+            callback_data.tracks[track].sound_players[player].status = player_stopping
+
+            # Clear event since it has been processed
+            callback_data.messages[i].message = message_not_in_use
+
+        elif callback_data.messages[i].message == message_sound_replace:
+            # Update player to stop playing current sound and start playing new sound
+            track = callback_data.messages[i].track
+            player = callback_data.messages[i].player
+            callback_data.tracks[track].sound_players[player].status = player_replacing
+            callback_data.tracks[track].sound_players[player].next.sample_pos = 0
+            callback_data.tracks[track].sound_players[player].next.current_loop = 0
+            callback_data.tracks[track].sound_players[player].next.sound_id = callback_data.messages[i].sound_id
+            callback_data.tracks[track].sound_players[player].next.chunk = callback_data.messages[i].data.play.chunk
+            callback_data.tracks[track].sound_players[player].next.volume = callback_data.messages[i].data.play.volume
+            callback_data.tracks[track].sound_players[player].next.loops_remaining = callback_data.messages[i].data.play.loops
+            callback_data.tracks[track].sound_players[player].next.sound_priority = callback_data.messages[i].data.play.priority
+
+            # Clear event since it has been processed
+            callback_data.messages[i].message = message_not_in_use
+
+cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioCallbackData *callback_data) nogil:
+    """
+    Mixes any sounds that are playing on the specified track into the specified audio buffer.
+    Args:
+        track: A pointer to the TrackAttributes data structure for the track
+        buffer_size: The length of the destination audio buffer (bytes)
+        callback_data: The audio callback data structure
+    Notes:
+        Audio messages are generated.
+    """
+    if track == NULL:
+        return
+
+    # Get the current clock from SDL (it is used for the audio timing master)
+    cdef Uint32 sdl_ticks = SDL_GetTicks()
+
+    # Setup source (sound) and destination (track) buffer pointers/values
+    cdef Uint8 *sound_buffer
+    cdef Uint8 *output_buffer = <Uint8*> track.buffer
+
+    cdef int event_index
+    cdef Uint32 index
+    cdef Uint32 fade_out_duration
+    cdef Uint32 sound_samples_remaining
+    cdef Uint8 volume
+    cdef DuckingSettings *ducking_settings
+    cdef TrackAttributes *target_track
+    cdef DuckingEnvelope *envelope
+
+    # Loop over track sound players
+    for player in range(track.max_simultaneous_sounds):
+
+        # If the player is idle, there is nothing to do so move on to the next player
+        if track.sound_players[player].status is player_idle:
+            continue
+
+        index = 0
+
+        # Check if player has been requested to stop a sound
+        if track.sound_players[player].status is player_stopping:
+            # Get source sound buffer (read one byte at a time, bytes will be combined into a
+            # 16-bit sample value before being mixed)
+            sound_buffer = <Uint8*> track.sound_players[player].current.chunk.abuf
+
+            sound_samples_remaining = track.sound_players[player].current.chunk.alen - track.sound_players[
+                player].current.sample_pos
+            fade_out_duration = min(buffer_size,
+                                    <Uint32>(callback_data.sample_rate * callback_data.audio_channels *
+                                          QUICK_FADE_DURATION_SECS),
+                                    sound_samples_remaining)
+            volume = track.sound_players[player].current.volume
+
+            if track.sound_players[player].current.sound_has_ducking:
+                # Initiate a fast ducking release (10 ms)
+                ducking_settings = cython.address(track.sound_players[player].current.ducking_settings)
+                target_track = callback_data.tracks[ducking_settings.track]
+                envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
+                envelope.stage = envelope_stage_release
+                envelope.stage_duration = <Sint32>(callback_data.sample_rate * callback_data.audio_channels *
+                                                QUICK_FADE_DURATION_SECS)
+                envelope.stage_initial_volume = envelope.current_volume
+                envelope.stage_target_volume = MIX_MAX_VOLUME
+                envelope.stage_pos = 0
+
+            # Loop over destination buffer, mixing in the source sample
+            while index < fade_out_duration:
+                mix_sound_sample_to_buffer(sound_buffer,
+                                           track.sound_players[player].current.sample_pos,
+                                           volume,
+                                           output_buffer,
+                                           index)
+
+                # Advance the source sample pointer to the next sample (2 bytes)
+                track.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
+
+                # Advance the output buffer pointer to the next sample (2 bytes)
+                index += BYTES_PER_SAMPLE
+
+                # Check if we are at the end of the source sample buffer
+                if track.sound_players[player].current.sample_pos >= track.sound_players[player].current.chunk.alen:
+                    end_of_sound_processing(cython.address(track.sound_players[player]),
+                                            callback_data.messages, sdl_ticks)
+                    if track.sound_players[player].status is player_finished:
+                        break
+
+                # Set volume for next loop
+                volume = <Uint8> (
+                    (1.0 - in_out_quad(index / fade_out_duration)) * track.sound_players[player].current.volume)
+
+            # Update sound player status to finished
+            track.sound_players[player].status = player_finished
+
+        # Check if player has been requested to stop a sound and immediately replace it with another sound
+        if track.sound_players[player].status is player_replacing:
+            # Get source sound buffer (read one byte at a time, bytes will be combined into a
+            # 16-bit sample value before being mixed)
+            sound_buffer = <Uint8*> track.sound_players[player].current.chunk.abuf
+
+            sound_samples_remaining = track.sound_players[player].current.chunk.alen - track.sound_players[
+                player].current.sample_pos
+            fade_out_duration = min(buffer_size,
+                                    <Uint32>(callback_data.sample_rate * callback_data.audio_channels *
+                                          QUICK_FADE_DURATION_SECS),
+                                    sound_samples_remaining)
+            volume = track.sound_players[player].current.volume
+
+            if track.sound_players[player].current.sound_has_ducking:
+                # Initiate a fast ducking release (10 ms)
+                ducking_settings = cython.address(track.sound_players[player].current.ducking_settings)
+                target_track = callback_data.tracks[ducking_settings.track]
+                envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
+                envelope.stage = envelope_stage_release
+                envelope.stage_duration = <Sint32>callback_data.sample_rate * callback_data.audio_channels // 100
+                envelope.stage_initial_volume = envelope.current_volume
+                envelope.stage_target_volume = MIX_MAX_VOLUME
+                envelope.stage_pos = 0
+
+            # Loop over destination buffer, mixing in the source sample
+            while index < fade_out_duration:
+                mix_sound_sample_to_buffer(sound_buffer,
+                                           track.sound_players[player].current.sample_pos,
+                                           volume,
+                                           output_buffer,
+                                           index)
+
+                # Advance the source sample pointer to the next sample (2 bytes)
+                track.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
+
+                # Advance the output buffer pointer to the next sample (2 bytes)
+                index += BYTES_PER_SAMPLE
+
+                # Check if we are at the end of the source sample buffer (loop if applicable)
+                if track.sound_players[player].current.sample_pos >= track.sound_players[player].current.chunk.alen:
+                    end_of_sound_processing(cython.address(track.sound_players[player]),
+                                            callback_data.messages, sdl_ticks)
+                    if track.sound_players[player].status is player_finished:
+                        break
+
+                # Set volume for next loop
+                volume = <int> (
+                    (1.0 - in_out_quad(index / fade_out_duration)) * track.sound_players[player].current.volume)
+
+            # Send audio event that the sound has stopped
+            send_sound_stopped_event(track.number, player,
+                                     track.sound_players[player].current.sound_id,
+                                     callback_data.messages,
+                                     sdl_ticks)
+
+            # Update sound player status to finished
+            track.sound_players[player].status = player_pending
+
+            # Copy sound player settings from next sound to current
+            callback_data.tracks[track.number].sound_players[player].status = player_pending
+            callback_data.tracks[track.number].sound_players[player].current.sample_pos = \
+                callback_data.tracks[track.number].sound_players[player].next.sample_pos
+            callback_data.tracks[track.number].sound_players[player].current.current_loop = \
+                callback_data.tracks[track.number].sound_players[player].next.current_loop
+            callback_data.tracks[track.number].sound_players[player].current.sound_id = \
+                callback_data.tracks[track.number].sound_players[player].next.sound_id
+            callback_data.tracks[track.number].sound_players[player].current.chunk = \
+                callback_data.tracks[track.number].sound_players[player].next.chunk
+            callback_data.tracks[track.number].sound_players[player].current.volume = \
+                callback_data.tracks[track.number].sound_players[player].next.volume
+            callback_data.tracks[track.number].sound_players[player].current.loops_remaining = \
+                callback_data.tracks[track.number].sound_players[player].next.loops_remaining
+            callback_data.tracks[track.number].sound_players[player].current.sound_priority = \
+                callback_data.tracks[track.number].sound_players[player].next.sound_priority
+
+        # Check if player has a sound pending playback (ready to start)
+        if track.sound_players[player].status is player_pending:
+            # Sound ready to start playback, send event notification and set status to playing
+            event_index = get_available_audio_message(callback_data.messages)
+            if event_index != -1:
+                callback_data.messages[event_index].message = message_sound_started
+                callback_data.messages[event_index].track = track.number
+                callback_data.messages[event_index].player = player
+                callback_data.messages[event_index].sound_id = \
+                    track.sound_players[player].current.sound_id
+                callback_data.messages[event_index].time = sdl_ticks
+
+            track.sound_players[player].status = player_playing
+
+        # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
+        if track.sound_players[player].status is player_playing and \
+                        track.sound_players[player].current.volume > 0 and \
+                        track.sound_players[player].current.chunk != NULL:
+
+            # Get source sound buffer (read one byte at a time, bytes will be combined into a
+            # 16-bit sample value before being mixed)
+            sound_buffer = <Uint8*> track.sound_players[player].current.chunk.abuf
+
+            if track.sound_players[player].current.sound_has_ducking:
+                ducking_settings = cython.address(track.sound_players[player].current.ducking_settings)
+                if track.sound_players[player].current.current_loop == 0 and <Sint32>track.sound_players[
+                    player].current.sample_pos <= ducking_settings.attack_start_pos < <Sint32>(track.sound_players[
+                    player].current.sample_pos + buffer_size):
+
+                    # Ducking attack starts in this callback frame, set ducking envelope settings
+                    target_track = callback_data.tracks[ducking_settings.track]
+                    envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
+                    envelope.stage = envelope_stage_attack
+                    envelope.stage_duration = ducking_settings.attack_duration
+                    envelope.stage_initial_volume = envelope.current_volume
+                    envelope.stage_target_volume = ducking_settings.attenuation_volume
+                    envelope.stage_pos = <Sint32>track.sound_players[
+                                             player].current.sample_pos - ducking_settings.attack_start_pos
+
+                if track.sound_players[player].current.loops_remaining == 0 and <Sint32>track.sound_players[
+                    player].current.sample_pos <= ducking_settings.release_start_pos < <Sint32>(track.sound_players[
+                    player].current.sample_pos + buffer_size):
+
+                    # Ducking release starts in this callback frame, set ducking envelope settings
+                    target_track = callback_data.tracks[ducking_settings.track]
+                    envelope = target_track.ducking_envelopes[ducking_settings.envelope_num]
+                    envelope.stage = envelope_stage_release
+                    envelope.stage_duration = ducking_settings.release_duration
+                    envelope.stage_initial_volume = envelope.current_volume
+                    envelope.stage_target_volume = MIX_MAX_VOLUME
+                    envelope.stage_pos = <Sint32>track.sound_players[
+                                             player].current.sample_pos - ducking_settings.release_start_pos
+
+            # Loop over destination buffer, mixing in the source sample
+            while index < buffer_size:
+
+                mix_sound_sample_to_buffer(sound_buffer,
+                                           track.sound_players[player].current.sample_pos,
+                                           track.sound_players[player].current.volume,
+                                           output_buffer,
+                                           index)
+
+                # Advance the source sample pointer to the next sample (2 bytes)
+                track.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
+
+                # Advance the output buffer pointer to the next sample (2 bytes)
+                index += BYTES_PER_SAMPLE
+
+                # Check if we are at the end of the source sample buffer (loop if applicable)
+                if track.sound_players[player].current.sample_pos >= track.sound_players[player].current.chunk.alen:
+                    end_of_sound_processing(cython.address(track.sound_players[player]),
+                                            callback_data.messages, sdl_ticks)
+                    if track.sound_players[player].status is player_finished:
+                        break
+
+        # Check if the sound has finished
+        if track.sound_players[player].status is player_finished:
+            send_sound_stopped_event(track.number, player,
+                                     track.sound_players[player].current.sound_id,
+                                     callback_data.messages,
+                                     sdl_ticks)
+            track.sound_players[player].status = player_idle
 
 cdef inline void end_of_sound_processing(SoundPlayer* player,
-                                         NotificationMessageContainer **messages,
+                                         AudioMessageContainer **messages,
                                          Uint32 sdl_ticks) nogil:
     """
     Determines the action to take at the end of the sound (loop or stop) based on
@@ -824,7 +1052,7 @@ cdef inline void end_of_sound_processing(SoundPlayer* player,
     loop has reached the end of the source buffer.
     Args:
         player: SoundPlayer pointer
-        messages: The NotificationMessageContainer object containing all audio messages
+        messages: The AudioMessageContainer object containing all audio messages
         sdl_ticks: The current SDL timestamp (in ticks)
     """
     # Check if we are at the end of the source sample buffer (loop if applicable)
@@ -848,38 +1076,38 @@ cdef inline void end_of_sound_processing(SoundPlayer* player,
                                  messages, sdl_ticks)
 
 cdef inline void send_sound_stopped_event(int track_num, int player, long sound_id,
-                                          NotificationMessageContainer **messages, Uint32 sdl_ticks) nogil:
+                                          AudioMessageContainer **messages, Uint32 sdl_ticks) nogil:
     """
     Sends a sound stopped audio event
     Args:
         track_num: The track number on which the event occurred
         player: The sound player number on which the event occurred
         sound_id: The sound id
-        messages: A pointer to the notification messages structures
+        messages: A pointer to the audio messages structures
         sdl_ticks: The current SDL tick time
     """
-    event_index = get_available_notification_message(messages)
+    event_index = get_available_audio_message(messages)
     if event_index != -1:
-        messages[event_index].message = notification_sound_stopped
+        messages[event_index].message = message_sound_stopped
         messages[event_index].track = track_num
         messages[event_index].player = player
         messages[event_index].sound_id = sound_id
         messages[event_index].time = sdl_ticks
 
 cdef inline void send_sound_looping_event(int track_num, int player, long sound_id,
-                                          NotificationMessageContainer **messages, Uint32 sdl_ticks) nogil:
+                                          AudioMessageContainer **messages, Uint32 sdl_ticks) nogil:
     """
     Sends a sound looping audio event
     Args:
         track_num: The track number on which the event occurred
         player: The sound player number on which the event occurred
         sound_id: The sound id
-        messages: A pointer to the notification messages structures
+        messages: A pointer to the audio messages structures
         sdl_ticks: The current SDL tick time
     """
-    event_index = get_available_notification_message(messages)
+    event_index = get_available_audio_message(messages)
     if event_index != -1:
-        messages[event_index].message = notification_sound_looping
+        messages[event_index].message = message_sound_looping
         messages[event_index].track = track_num
         messages[event_index].player = player
         messages[event_index].sound_id = sound_id
@@ -1012,33 +1240,85 @@ cdef inline float in_out_quad(float progress) nogil:
     p -= 1.0
     return -0.5 * (p * (p - 2.0) - 1.0)
 
-cdef void apply_track_ducking(TrackState* track, Uint32 buffer_size, AudioCallbackData* callback_data) nogil:
+cdef void apply_track_ducking_envelopes(TrackAttributes* track, Uint32 buffer_size, int audio_channels,
+                                        AudioCallbackData* callback_data) nogil:
     """
     Processes all active ducking envelopes for the specified track.
     Args:
-        track: A pointer to the TrackState struct for the track
+        track: A pointer to the TrackAttributes struct for the track
         buffer_size: The size of the current output audio buffer
-        callback_data: The AudioCallbackData struct
+        audio_channels: The number of audio channels
+
+    Notes:
+        If multiple ducking envelopes are active simultaneously on the track, the minimum
+        volume level across all active ducking envelopes for each sample is used.
     """
     if track == NULL:
         return
 
+    cdef Uint8 ducking_volume
+    cdef Uint8 volume
     cdef int envelope_num
     cdef Uint32 buffer_pos = 0
-    cdef Uint32 samples_per_control_point = buffer_size // (CONTROL_POINTS_PER_BUFFER * BYTES_PER_SAMPLE * callback_data.audio_channels)
+    cdef int buffer_step_size = BYTES_PER_SAMPLE * audio_channels
 
-    # No need to do anything if ducking is not active on this track
-    if track.ducking_is_active != 1:
-        return
+    # Loop over track buffers, one sample at a time
+    while buffer_pos < buffer_size:
+        ducking_volume = MIX_MAX_VOLUME
+        for envelope_num in range(MAX_TRACK_DUCKING_ENVELOPES):
+            volume = MIX_MAX_VOLUME
+            if track.ducking_envelopes[envelope_num].stage == envelope_stage_idle:
+                continue
 
-    # Loop over track buffer
-    for index in range(CONTROL_POINTS_PER_BUFFER):
-        ducking_volume = track.ducking_control_points[index]
+            elif track.ducking_envelopes[envelope_num].stage == envelope_stage_sustain:
+                volume = track.ducking_envelopes[envelope_num].stage_initial_volume
+                track.ducking_envelopes[envelope_num].current_volume = volume
+
+            elif track.ducking_envelopes[envelope_num].stage == envelope_stage_attack:
+                if track.ducking_envelopes[envelope_num].stage_pos < 0:
+                    volume = track.ducking_envelopes[envelope_num].stage_initial_volume
+                else:
+                    volume = lerpU8(in_out_quad(
+                        track.ducking_envelopes[envelope_num].stage_pos / track.ducking_envelopes[
+                            envelope_num].stage_duration), track.ducking_envelopes[envelope_num].stage_initial_volume,
+                                    track.ducking_envelopes[envelope_num].stage_target_volume)
+
+                track.ducking_envelopes[envelope_num].current_volume = volume
+                track.ducking_envelopes[envelope_num].stage_pos += buffer_step_size
+
+                # Check if attack stage has completed
+                if track.ducking_envelopes[envelope_num].stage_pos >= track.ducking_envelopes[
+                    envelope_num].stage_duration:
+                    track.ducking_envelopes[envelope_num].stage = envelope_stage_sustain
+                    track.ducking_envelopes[envelope_num].stage_initial_volume = track.ducking_envelopes[
+                        envelope_num].stage_target_volume
+
+            elif track.ducking_envelopes[envelope_num].stage == envelope_stage_release:
+                if track.ducking_envelopes[envelope_num].stage_pos < 0:
+                    volume = track.ducking_envelopes[envelope_num].stage_initial_volume
+                else:
+                    volume = lerpU8(in_out_quad(
+                        track.ducking_envelopes[envelope_num].stage_pos / track.ducking_envelopes[
+                            envelope_num].stage_duration), track.ducking_envelopes[envelope_num].stage_initial_volume,
+                                    track.ducking_envelopes[envelope_num].stage_target_volume)
+
+                track.ducking_envelopes[envelope_num].current_volume = volume
+                track.ducking_envelopes[envelope_num].stage_pos += buffer_step_size
+
+                if track.ducking_envelopes[envelope_num].stage_pos >= track.ducking_envelopes[
+                    envelope_num].stage_duration:
+                    track.ducking_envelopes[envelope_num].stage = envelope_stage_idle
+                    track.ducking_envelopes[envelope_num].current_volume = MIX_MAX_VOLUME
+
+            # Use the minimum volume level of all track ducking envelopes
+            if volume < ducking_volume:
+                ducking_volume = volume
+
         if ducking_volume < MIX_MAX_VOLUME:
             apply_volume_to_buffer_sample(<Uint8*> track.buffer, buffer_pos, ducking_volume,
-                                          samples_per_control_point)
+                                          buffer_step_size // BYTES_PER_SAMPLE)
 
-        buffer_pos += samples_per_control_point * BYTES_PER_SAMPLE
+        buffer_pos += buffer_step_size
 
 cdef void mix_track_to_output(Uint8 *track_buffer, Uint8 track_volume, Uint8 *output_buffer, Uint32 buffer_size) nogil:
     """
@@ -1088,85 +1368,150 @@ cdef void mix_track_to_output(Uint8 *track_buffer, Uint8 track_volume, Uint8 *ou
 
         index += BYTES_PER_SAMPLE
 
-cdef int get_available_notification_message(NotificationMessageContainer ** messages) nogil:
+cdef int get_available_audio_message(AudioMessageContainer ** messages) nogil:
     """
-    Returns the index of the first available notification message. If all notification messages
-    are currently in use, -1 is returned.
+    Returns the index of the first available audio message on the supplied track.
+    If all audio messages are currently in use, -1 is returned.
     :param messages: The pool of audio messages
-    :return: The index of the first available notification message.  -1 if all are in use.
+    :return: The index of the first available audio message.  -1 if all are in use.
     """
     if messages == NULL:
         return -1
 
-    for i in range(MAX_NOTIFICATION_MESSAGES):
-        if messages[i].message == notification_not_in_use:
+    for i in range(MAX_AUDIO_MESSAGES):
+        if messages[i].message == message_not_in_use:
             return i
 
     return -1
 
 
 # ---------------------------------------------------------------------------
-#    Track base class
+#    Track class
 # ---------------------------------------------------------------------------
 cdef class Track:
     """
-    Track base class
+    Track class
     """
     # The name of the track
     cdef str _name
-    cdef int _number
+    cdef object _sound_queue
+    cdef dict _sound_queue_items
     cdef float _volume
     cdef AudioCallbackData *_audio_callback_data
     cdef SDL_mutex *mutex
     cdef object log
 
     # Track attributes need to be stored in a C struct in order for them to be accessible in
-    # the SDL callback functions without the GIL (for performance reasons).  The TrackState
+    # the SDL callback functions without the GIL (for performance reasons).  The TrackAttributes
     # struct is allocated during construction and freed during destruction.
-    cdef TrackState *state
-
-    def __cinit__(self, *args, **kw):
-        """C constructor"""
-        self.state = NULL
-        self._volume = 1.0
-        self._audio_callback_data = NULL
-        self.mutex = NULL
+    cdef TrackAttributes *attributes
 
     def __init__(self, object audio_callback_data, str name, int track_num, int buffer_size,
+                 int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
                  float volume=1.0):
         """
         Constructor
         Args:
-            audio_callback_data: The AudioCallbackData pointer wrapped in a PyCapsule object
             name: The track name
             track_num: The track number (corresponds to the SDL_Mixer channel number)
+            mutex: An SDL_mutex pointer wrapped in a PyCapsule.
             buffer_size: The length of the track audio buffer in bytes
+            max_simultaneous_sounds: The maximum number of sounds that can be played simultaneously
+                on the track
             volume: The track volume (0.0 to 1.0)
         """
-        self.log = logging.getLogger("Track")
-        self._name = name
-        self._number = track_num
-
         # The easiest way to pass a C pointer in a constructor is to wrap it in a PyCapsule
         # (see https://docs.python.org/3.4/c-api/capsule.html).  This basically wraps the
         # pointer in a Python object. It can be extracted using PyCapsule_GetPointer.
+        self.log = logging.getLogger('AudioInterface.Track.' + str(track_num) + '.' + name)
         self._audio_callback_data = <AudioCallbackData*>pycapsule.PyCapsule_GetPointer(audio_callback_data, NULL)
         self.mutex = self._audio_callback_data.mutex
 
-        # Allocate memory for the track state (common among all track types)
-        self.state = <TrackState*> PyMem_Malloc(sizeof(TrackState))
-        self.state.type = track_type_none
-        self.state.type_state = NULL
-        self.state.number = track_num
-        self.state.buffer = <void *>PyMem_Malloc(buffer_size)
-        self.state.buffer_size = buffer_size
+        SDL_LockMutex(self.mutex)
+
+        self._sound_queue = PriorityQueue()
+        self._sound_queue_items = {}
+
+        # Make sure the number of simultaneous sounds is within the allowable range
+        if max_simultaneous_sounds > MAX_SIMULTANEOUS_SOUNDS_LIMIT:
+            self.log.warning("The maximum number of simultaneous sounds per track is %d",
+                             MAX_SIMULTANEOUS_SOUNDS_LIMIT)
+            max_simultaneous_sounds = MAX_SIMULTANEOUS_SOUNDS_LIMIT
+        elif max_simultaneous_sounds < 1:
+            self.log.warning("The minimum number of simultaneous sounds per track is 1")
+            max_simultaneous_sounds = 1
+
+        # Allocate memory for the track attributes
+        self.attributes = <TrackAttributes*> PyMem_Malloc(sizeof(TrackAttributes))
+        self.attributes.number = track_num
+        self.attributes.max_simultaneous_sounds = max_simultaneous_sounds
+        self.attributes.buffer = PyMem_Malloc(buffer_size)
+        self.attributes.buffer_size = buffer_size
         self.log.debug("Allocated track audio buffer (%d bytes)", buffer_size)
+        self.volume = volume
+        self._name = name
+
+        # Allocate memory for the sound player structs needed for the desired number of
+        # simultaneous sounds that can be played on the track.
+        self.attributes.sound_players = <SoundPlayer*> PyMem_Malloc(self.max_simultaneous_sounds * sizeof(SoundPlayer))
+
+        # Initialize sound player attributes
+        for i in range(self.max_simultaneous_sounds):
+            self.attributes.sound_players[i].status = player_idle
+            self.attributes.sound_players[i].track_num = self.number
+            self.attributes.sound_players[i].player = i
+            self.attributes.sound_players[i].current.chunk = NULL
+            self.attributes.sound_players[i].current.loops_remaining = 0
+            self.attributes.sound_players[i].current.current_loop = 0
+            self.attributes.sound_players[i].current.volume = 0
+            self.attributes.sound_players[i].current.sample_pos = 0
+            self.attributes.sound_players[i].current.sound_id = 0
+            self.attributes.sound_players[i].current.sound_priority = 0
+            self.attributes.sound_players[i].current.sound_has_ducking = 0
+            self.attributes.sound_players[i].next.chunk = NULL
+            self.attributes.sound_players[i].next.loops_remaining = 0
+            self.attributes.sound_players[i].next.current_loop = 0
+            self.attributes.sound_players[i].next.volume = 0
+            self.attributes.sound_players[i].next.sample_pos = 0
+            self.attributes.sound_players[i].next.sound_id = 0
+            self.attributes.sound_players[i].next.sound_priority = 0
+            self.attributes.sound_players[i].next.sound_has_ducking = 0
+
+        self.attributes.ducking_envelopes = <DuckingEnvelope**> PyMem_Malloc(
+            MAX_TRACK_DUCKING_ENVELOPES * sizeof(DuckingEnvelope*))
+
+        # Initialize ducking envelope attributes
+        for i in range(MAX_TRACK_DUCKING_ENVELOPES):
+            self.attributes.ducking_envelopes[i] = <DuckingEnvelope*> PyMem_Malloc(sizeof(DuckingEnvelope))
+            self.attributes.ducking_envelopes[i].stage = envelope_stage_idle
+            self.attributes.ducking_envelopes[i].stage_pos = 0
+            self.attributes.ducking_envelopes[i].stage_duration = 0
+            self.attributes.ducking_envelopes[i].stage_initial_volume = MIX_MAX_VOLUME
+            self.attributes.ducking_envelopes[i].stage_target_volume = MIX_MAX_VOLUME
+            self.attributes.ducking_envelopes[i].current_volume = MIX_MAX_VOLUME
+
+        SDL_UnlockMutex(self.mutex)
+
+    def __dealloc__(self):
+
+        SDL_LockMutex(self.mutex)
+
+        # Free the attributes and other allocated memory
+        if self.attributes != NULL:
+            PyMem_Free(self.attributes.buffer)
+            PyMem_Free(self.attributes.sound_players)
+
+            for i in range(MAX_TRACK_DUCKING_ENVELOPES):
+                PyMem_Free(self.attributes.ducking_envelopes[i])
+
+            PyMem_Free(self.attributes.ducking_envelopes)
+            PyMem_Free(self.attributes)
+            self.attributes = NULL
+
+        SDL_UnlockMutex(self.mutex)
 
     def __repr__(self):
         return '<Track.{}.{}>'.format(self.number, self.name)
-
-    cdef TrackState *get_state(self):
-        return self.state
 
     property name:
         def __get__(self):
@@ -1177,157 +1522,34 @@ cdef class Track:
             return self._volume
 
         def __set__(self, float value):
-            if self.state != NULL:
+            if self.attributes != NULL:
                 value = min(max(value, 0.0), 1.0)
                 self._volume = value
 
                 SDL_LockMutex(self.mutex)
 
                 # Volume used in SDL_Mixer is an integer between 0 and MIX_MAX_VOLUME (0 to 128)
-                self.state.volume = int(self._volume * MIX_MAX_VOLUME)
+                self.attributes.volume = int(self._volume * MIX_MAX_VOLUME)
 
                 SDL_UnlockMutex(self.mutex)
 
     @property
     def number(self):
         cdef int number = -1
-        if self.state != NULL:
+        if self.attributes != NULL:
             SDL_LockMutex(self.mutex)
-            number = self.state.number
+            number = self.attributes.number
             SDL_UnlockMutex(self.mutex)
         return number
 
     @property
-    def accepts_in_memory_sounds(self):
-        """Return whether or not track accepts in-memory sounds"""
-        raise NotImplementedError('Must be overridden in derived class')
-
-    @property
-    def accepts_streaming_sounds(self):
-        """Return whether or not track accepts streaming sounds"""
-        raise NotImplementedError('Must be overridden in derived class')
-
-
-
-# ---------------------------------------------------------------------------
-#    TrackStandard class
-# ---------------------------------------------------------------------------
-cdef class TrackStandard(Track):
-    """
-    TrackStandard class
-    """
-    cdef object _sound_queue
-    cdef dict _sound_queue_items
-    cdef int _max_simultaneous_sounds
-    cdef TrackStandardState *type_state
-
-    def __cinit__(self, *args, **kw):
-        """C constructor"""
-        self._max_simultaneous_sounds = MAX_SIMULTANEOUS_SOUNDS_DEFAULT
-        self.type_state = NULL
-
-    def __init__(self, object audio_callback_data, str name, int track_num, int buffer_size,
-                 int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
-                 float volume=1.0):
-        """
-        Constructor
-        Args:
-            name: The track name
-            track_num: The track number (corresponds to the SDL_Mixer channel number)
-            buffer_size: The length of the track audio buffer in bytes
-            max_simultaneous_sounds: The maximum number of sounds that can be played simultaneously
-                on the track
-            volume: The track volume (0.0 to 1.0)
-        """
-        # IMPORTANT: Call super class init function to allocate track state memory!
-        super().__init__(audio_callback_data, name, track_num, buffer_size, volume)
-
-        self.log = logging.getLogger("Track.TrackStandard")
-
-        SDL_LockMutex(self.mutex)
-
-        self._sound_queue = PriorityQueue()
-        self._sound_queue_items = dict()
-
-        # Set track type specific settings
-        self.state.type = track_type_standard
-
-        # Allocate memory for the specific track type state struct (TrackStandardState)
-        self.type_state = <TrackStandardState*> PyMem_Malloc(sizeof(TrackStandardState))
-        self.state.type_state = <void*>self.type_state
-
-        # Make sure the number of simultaneous sounds is within the allowable range
-        if max_simultaneous_sounds > MAX_SIMULTANEOUS_SOUNDS_LIMIT:
-            self.log.warning("The maximum number of simultaneous sounds per track is %d",
-                             MAX_SIMULTANEOUS_SOUNDS_LIMIT)
-            max_simultaneous_sounds = MAX_SIMULTANEOUS_SOUNDS_LIMIT
-        elif max_simultaneous_sounds < 1:
-            self.log.warning("The minimum number of simultaneous sounds per track is 1")
-            max_simultaneous_sounds = 1
-        self._max_simultaneous_sounds = max_simultaneous_sounds
-        self.type_state.sound_player_count = max_simultaneous_sounds
-
-        # Allocate memory for the sound player structs needed for the desired number of
-        # simultaneous sounds that can be played on the track.
-        self.type_state.sound_players = <SoundPlayer*> PyMem_Malloc(self.type_state.sound_player_count * sizeof(SoundPlayer))
-
-        # Initialize sound player attributes
-        for i in range(self.type_state.sound_player_count):
-            self.type_state.sound_players[i].status = player_idle
-            self.type_state.sound_players[i].track_num = self.number
-            self.type_state.sound_players[i].player = i
-            self.type_state.sound_players[i].current.type = sound_type_chunk
-            self.type_state.sound_players[i].current.data.chunk = NULL
-            self.type_state.sound_players[i].current.loops_remaining = 0
-            self.type_state.sound_players[i].current.current_loop = 0
-            self.type_state.sound_players[i].current.volume = 0
-            self.type_state.sound_players[i].current.sample_pos = 0
-            self.type_state.sound_players[i].current.sound_id = 0
-            self.type_state.sound_players[i].current.sound_priority = 0
-            self.type_state.sound_players[i].current.sound_has_ducking = 0
-            self.type_state.sound_players[i].next.type = sound_type_chunk
-            self.type_state.sound_players[i].next.data.chunk = NULL
-            self.type_state.sound_players[i].next.loops_remaining = 0
-            self.type_state.sound_players[i].next.current_loop = 0
-            self.type_state.sound_players[i].next.volume = 0
-            self.type_state.sound_players[i].next.sample_pos = 0
-            self.type_state.sound_players[i].next.sound_id = 0
-            self.type_state.sound_players[i].next.sound_priority = 0
-            self.type_state.sound_players[i].next.sound_has_ducking = 0
-
-        SDL_UnlockMutex(self.mutex)
-
-    def __dealloc__(self):
-        SDL_LockMutex(self.mutex)
-
-        # TODO: Only delete track type attributes here, delete common ones in Track.__dealloc__
-
-        # Free the attributes and other allocated memory
-        if self.state != NULL:
-            PyMem_Free(self.state.buffer)
-            PyMem_Free(self.type_state.sound_players)
-            PyMem_Free(self.state)
-            self.state = NULL
-
-        SDL_UnlockMutex(self.mutex)
-
-    def __repr__(self):
-        return '<Track.{}.Standard.{}>'.format(self.number, self.name)
-
-    @property
-    def accepts_in_memory_sounds(self):
-        """Return whether or not track accepts in-memory sounds"""
-        return True
-
-    @property
-    def accepts_streaming_sounds(self):
-        """Return whether or not track accepts streaming sounds"""
-        return False
-
-    @property
     def max_simultaneous_sounds(self):
-        """Return the number of sounds that can be played simultaneously on this track"""
-        return self._max_simultaneous_sounds
+        cdef int max_simultaneous_sounds = 0
+        if self.attributes != NULL:
+            SDL_LockMutex(self.mutex)
+            max_simultaneous_sounds = self.attributes.max_simultaneous_sounds
+            SDL_UnlockMutex(self.mutex)
+        return max_simultaneous_sounds
 
     cdef int _get_idle_sound_player(self):
         """
@@ -1335,8 +1557,8 @@ cdef class TrackStandard(Track):
         players are currently busy playing, -1 is returned.
         """
         SDL_LockMutex(self.mutex)
-        for index in range(self._max_simultaneous_sounds):
-            if self.type_state.sound_players[index].status == player_idle:
+        for index in range(self.max_simultaneous_sounds):
+            if self.attributes.sound_players[index].status == player_idle:
                 SDL_UnlockMutex(self.mutex)
                 return index
 
@@ -1355,25 +1577,30 @@ cdef class TrackStandard(Track):
         if idle_sound_player >= 0:
             # Found an idle player, check if there are any sounds queued for playback
             # Sound is returned as a tuple (sound, priority, settings)
-            sound_instance = self._get_next_sound()
+            next_sound = self._get_next_sound()
 
-            if sound_instance is not None:
-                self.log.debug("Getting sound from queue %s", sound_instance)
-                self._play_sound_on_sound_player(sound_instance=sound_instance,
-                                                 player=idle_sound_player)
+            if next_sound is not None:
+                self.log.debug("Getting sound from queue %s", next_sound)
+                self._play_sound_on_sound_player(sound=next_sound[0],
+                                                 player=idle_sound_player,
+                                                 loops=next_sound[2]['loops'],
+                                                 volume=next_sound[2]['volume'],
+                                                 priority=next_sound[1])
 
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockMutex(self.mutex)
 
     def _get_next_sound(self):
         """
-        Returns the next sound instance in the priority queue ready for playback.
+        Returns the next sound in the priority queue ready for playback.
 
-        Returns: A SoundInstance object.  If the queue is empty, None is returned.
+        Returns: A tuple of the Sound object, the priority, and dictionary of
+            additional settings for playing the sound.  If the queue is empty,
+            None is returned.
 
-        This method ensures that the sound instance that is returned has not expired.
-        If the next sound in the queue has expired, it is discarded and the next sound
-        that has not expired is returned.
+        This method ensures that the sound that is returned has not expired.
+        If the next sound in the queue has expired, it is discarded and the
+        next sound that has not expired is returned.
         """
         # We don't want to go through the entire sound queue more than once
         # in this method so keep track of the number of items we are
@@ -1385,7 +1612,8 @@ cdef class TrackStandard(Track):
             # Each item in the queue is a list containing the following items:
             #    0 (priority): The priority of the returned sound
             #    1 (exp_time): The time (in ticks) after which the sound expires and should not be played
-            #    2 (sound_instance): The SoundInstance object ready for playback
+            #    2 (sound): The Sound object ready for playback
+            #    3 (settings): A dictionary of any additional settings for this sound's playback (ducking, etc.)
 
             try:
                 next_sound = self._sound_queue.get_nowait()
@@ -1395,73 +1623,100 @@ cdef class TrackStandard(Track):
             except Empty:
                 return None
 
-            sound_instance = next_sound[2]
-            exp_time = next_sound[1]
-
             # If the sound is still loading and not expired, put it back in the queue
-            if not sound_instance.sound.loaded and sound_instance.sound.loading and \
-                    (exp_time is None or exp_time > time.time()):
+            if not next_sound[2].loaded and next_sound[2].loading and \
+                    (next_sound[1] is None or next_sound[1] > time.time()):
                 self._sound_queue.put(next_sound)
                 self.log.debug("Next pending sound in queue is still loading, "
                                "re-queueing sound %s",
                                next_sound)
             else:
                 # Remove the queue entry from the list of sounds in the queue
-                if sound_instance.id in self._sound_queue_items:
-                    del self._sound_queue_items[sound_instance.id]
+                if next_sound in self._sound_queue_items[next_sound[2]]:
+                    self._sound_queue_items[next_sound[2]].remove(next_sound)
+                    if len(self._sound_queue_items[next_sound[2]]) == 0:
+                        del self._sound_queue_items[next_sound[2]]
 
                 # Return the next sound from the priority queue if it has not expired
-                if not exp_time or exp_time > time.time():
+                if not next_sound[1] or next_sound[1] > time.time():
                     self.log.debug("Retrieving next pending sound from queue %s", next_sound)
-                    sound_instance.notify_pending()
-                    return sound_instance
+                    return next_sound[2], -next_sound[0], next_sound[3]
                 else:
-                    # Expired - discard the sound
                     self.log.debug("Discarding expired sound from queue %s", next_sound)
-                    sound_instance.notify_expired()
 
         return None
 
-    def _remove_sound_from_queue(self, sound_instance):
+    def _remove_sound_from_queue(self, sound):
         """
         Removes a sound from the priority sound queue.
         Args:
-            sound_instance: The sound instance object to remove
+            sound: The sound object to remove
         """
 
-        # The sound instances will not actually be removed from the priority queue because that
+        # The sounds will not actually be removed from the priority queue because that
         # could corrupt the queue heap structure, but are simply set to None so they
         # will not be played.  After marking queue entry as None, the dictionary keeping
         # track of sounds in the queue is updated.
-        if sound_instance.id in self._sound_queue_items:
-            entry = self._sound_queue_items[sound_instance.id]
-            entry[2] = None
-            self.log.debug("Removing pending sound from queue %s", sound_instance)
-            del self._sound_queue_items[sound_instance.id]
+        if sound in self._sound_queue_items:
+            for entry in self._sound_queue_items[sound]:
+                entry[2] = None
+                self.log.debug("Removing pending sound from queue %s", sound)
+            del self._sound_queue_items[sound]
 
-    def play_sound(self, sound_instance not None):
+    def play_sound(self, sound not None, **kwargs):
         """
         Plays a sound on the current track.
         Args:
-            sound_instance: The SoundInstance object to play
+            sound: The Sound object to play
+            **kwargs: Optional additional arguments for overriding sound defaults
         """
-        self.log.debug("play_sound - Processing sound '%s' for playback.", sound_instance.name)
+        self.log.debug("play_sound - Processing sound '%s' for playback (%s).", sound.name, kwargs)
 
-        if sound_instance.max_queue_time is None:
+        settings = {}
+
+        # Validate settings that can be overridden
+        if 'priority' in kwargs and kwargs['priority'] is not None:
+            priority = kwargs['priority']
+        else:
+            priority = sound.priority
+
+        if 'loops' in kwargs and kwargs['loops'] is not None:
+            settings['loops'] = kwargs['loops']
+        else:
+            settings['loops'] = sound.loops
+
+        if 'max_queue_time' in kwargs:
+            settings['max_queue_time'] = kwargs['max_queue_time']
+        else:
+            settings['max_queue_time'] = sound.max_queue_time
+
+        if 'volume' in kwargs and kwargs['volume'] is not None:
+            settings['volume'] = kwargs['volume']
+        else:
+            settings['volume'] = sound.volume
+
+        # Volume is passed as a float 0.0 to 1.0, the audio library requires volume to be
+        # an 8-bit unsigned int from 0 to MIX_MAX_VOLUME.
+        settings['volume'] = <Uint8>min(max(settings['volume'] * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
+
+        if settings['max_queue_time'] is None:
             exp_time = None
         else:
-            exp_time = time.time() + sound_instance.max_queue_time
+            exp_time = time.time() + settings['max_queue_time']
 
         # Make sure sound is loaded.  If not, we assume the sound is being loaded and we
         # add it to the queue so it will be picked up on the next loop.
-        if not sound_instance.sound.loaded:
+        if not sound.loaded:
             # If the sound is not already loading, load it now
-            if not sound_instance.sound.loading:
-                sound_instance.sound.load()
+            if not sound.loading:
+                sound.load()
 
-            self.queue_sound(sound_instance=sound_instance, exp_time=exp_time)
+            self.queue_sound(sound=sound,
+                             priority=priority,
+                             exp_time=exp_time,
+                             settings=settings)
             self.log.debug("play_sound - Sound %s was not loaded and therefore has been "
-                           "queued for playback.", sound_instance.name)
+                           "queued for playback.", sound.name)
             return
 
         # If the sound can be played right away (available player) then play it.
@@ -1474,8 +1729,11 @@ cdef class TrackStandard(Track):
             self.log.debug("play_sound - Sound player %d is available "
                            "for playback", player)
             # Play the sound using the available player
-            return self._play_sound_on_sound_player(sound_instance=sound_instance,
-                                                    player=player)
+            return self._play_sound_on_sound_player(sound=sound,
+                                                    player=player,
+                                                    loops=settings['loops'],
+                                                    volume=settings['volume'],
+                                                    priority=priority)
         else:
             # All sound players are currently busy:
             self.log.debug("play_sound - No idle sound player is available.")
@@ -1484,76 +1742,87 @@ cdef class TrackStandard(Track):
 
             # If the lowest priority of all the sounds currently playing is lower than
             # the requested sound, kill the lowest priority sound and replace it.
-            if sound_instance.priority > lowest_priority:
-                self.log.debug("play_sound - Sound instance priority (%d) is higher than the "
+            if priority > lowest_priority:
+                self.log.debug("play_sound - Sound priority (%d) is higher than the "
                                "lowest sound currently playing (%d). Forcing playback "
-                               "on sound player %d.",
-                               sound_instance.priority, lowest_priority, player)
-                return self._play_sound_on_sound_player(sound_instance=sound_instance,
+                               "on sound player %d.", priority, lowest_priority, player)
+                return self._play_sound_on_sound_player(sound=sound,
                                                         player=player,
+                                                        loops=settings['loops'],
+                                                        volume=settings['volume'],
+                                                        priority=priority,
                                                         force=True)
             else:
                 # Add the requested sound to the priority queue
                 self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
                                "lowest sound currently playing (%d). Sound will be queued "
-                               "for playback.", sound_instance.priority, lowest_priority)
-                self.queue_sound(sound_instance=sound_instance, exp_time=exp_time)
+                               "for playback.", priority, lowest_priority)
+                self.queue_sound(sound=sound,
+                                 priority=priority,
+                                 exp_time=exp_time,
+                                 settings=settings)
 
-    def queue_sound(self, sound_instance, exp_time=None):
-        """Adds a sound instance to the queue to be played when a sound player becomes available.
+    def queue_sound(self, sound, priority, exp_time=None, settings=None):
+        """Adds a sound to the queue to be played when a sound player becomes available.
 
         Args:
-            sound_instance: The SoundInstance object to add to the queue.
+            sound: The Sound object to play.
+            priority: The priority of the sound to be queued.
             exp_time: Real world time of when this sound will expire.  It will not play
                 if the queue is freed up after it expires.  None indicates the sound
                 never expires and will eventually be played.
+            settings: Additional settings for the sound's playback.
 
-        Note that this method will insert this sound instance into a position in the
-        queue based on its priority, so highest-priority sounds are played first.
+        Note that this method will insert this sound into a position in the
+        queue based on its priority, so highest-priority sounds are played
+        first.
         """
 
-        # Note the negative operator in front of priority since this queue retrieves the
-        # lowest values first, and MPF uses higher values for higher priorities.
-        entry = [-sound_instance.priority, exp_time, sound_instance]
+        # Note the negative operator in front of priority since this queue
+        # retrieves the lowest values first, and MPF uses higher values for
+        # higher priorities.
+        entry = [-priority, exp_time, sound, settings]
         self._sound_queue.put(entry)
 
-        # Save the new entry in a dictionary of entries keyed by sound instance id.  This
+        # Save the new entry in a dictionary of entries keyed by sound.  This
         # dictionary is used to remove pending sounds from the priority queue.
-        if sound_instance.id not in self._sound_queue_items:
-            self._sound_queue_items[sound_instance.id] = entry
+        if sound in self._sound_queue_items:
+            self._sound_queue_items[sound].append(entry)
+        else:
+            self._sound_queue_items[sound] = [entry]
 
         self.log.debug("Queueing sound %s", entry)
 
-    def stop_sound(self, sound_instance not None):
+    def stop_sound(self, sound not None):
         """
         Stops all instances of the specified sound immediately on the track. Any queued instances
         will be removed from the queue.
         Args:
-            sound_instance: The Sound to stop
+            sound: The Sound to stop
         """
 
         SDL_LockMutex(self.mutex)
 
         for i in range(self.max_simultaneous_sounds):
-            if self.type_state.sound_players[i].status != player_idle and self.type_state.sound_players[
-                i].current.sound_id == sound_instance.id:
+            if self.attributes.sound_players[i].status != player_idle and self.attributes.sound_players[
+                i].current.sound_id == sound.id:
                 # Set stop sound event
-                request_message = self._get_available_request_message()
-                if request_message != NULL:
-                    request_message.message = request_sound_stop
-                    request_message.sound_id = self.type_state.sound_players[i].current.sound_id
-                    request_message.track = self.number
-                    request_message.player = i
-                    request_message.time = SDL_GetTicks()
+                audio_message = self._get_available_audio_message()
+                if audio_message != NULL:
+                    audio_message.message = message_sound_stop
+                    audio_message.sound_id = self.attributes.sound_players[i].current.sound_id
+                    audio_message.track = self.number
+                    audio_message.player = i
+                    audio_message.time = SDL_GetTicks()
                 else:
                     self.log.error(
-                        "All internal request messages are currently "
-                        "in use, could not stop sound %s", sound_instance.name)
+                        "All internal audio messages are currently "
+                        "in use, could not stop sound %s", sound.name)
 
         # Remove any instances of the specified sound that are pending in the sound queue.
-        self._remove_sound_from_queue(sound_instance)
+        self._remove_sound_from_queue(sound)
 
-        self.log.debug("Stopping sound %s and removing any pending instances from queue", sound_instance.name)
+        self.log.debug("Stopping sound %s and removing any pending instances from queue", sound.name)
 
         SDL_UnlockMutex(self.mutex)
 
@@ -1568,10 +1837,10 @@ cdef class TrackStandard(Track):
         SDL_LockMutex(self.mutex)
 
         for i in range(self.max_simultaneous_sounds):
-            if self.type_state.sound_players[i].status != player_idle and self.type_state.sound_players[
+            if self.attributes.sound_players[i].status != player_idle and self.attributes.sound_players[
                 i].current.sound_id == sound.id:
                 # Set sound's loops_remaining variable to zero
-                self.type_state.sound_players[i].current.loops_remaining = 0
+                self.attributes.sound_players[i].current.loops_remaining = 0
 
         # Remove any instances of the specified sound that are pending in the sound queue.
         self._remove_sound_from_queue(sound)
@@ -1585,7 +1854,7 @@ cdef class TrackStandard(Track):
         SDL_LockMutex(self.mutex)
 
         for i in range(self.max_simultaneous_sounds):
-            if self.type_state.sound_players[i].status == player_idle:
+            if self.attributes.sound_players[i].status == player_idle:
                 SDL_UnlockMutex(self.mutex)
                 return i
 
@@ -1607,105 +1876,158 @@ cdef class TrackStandard(Track):
         SDL_LockMutex(self.mutex)
 
         for i in range(self.max_simultaneous_sounds):
-            if self.type_state.sound_players[i].status == player_idle:
+            if self.attributes.sound_players[i].status == player_idle:
                 SDL_UnlockMutex(self.mutex)
                 return i, None
-            elif self.type_state.sound_players[i].current.sound_priority < lowest_priority:
-                lowest_priority = self.type_state.sound_players[i].current.sound_priority
+            elif self.attributes.sound_players[i].current.sound_priority < lowest_priority:
+                lowest_priority = self.attributes.sound_players[i].current.sound_priority
                 sound_player = i
 
         SDL_UnlockMutex(self.mutex)
         return i, lowest_priority
 
-    cdef bint _play_sound_on_sound_player(self, sound_instance, int player, bint force=False):
+    cdef bint _play_sound_on_sound_player(self, sound, int player, int loops=0, Uint8 volume=MIX_MAX_VOLUME,
+                                          int priority=0, bint force=False):
         """
         Plays a sound using the specified sound player
-        Args:
-            sound_instance: The sound instance object to play
-            player: The player number to use to play the sound
-            force: Flag whether or not to force this sound instance to play, even if the
-                specified player is currently busy.
-
-        Returns:
-            Boolean flag indicating whether or not the sound instance was played
         """
         # Get the sound sample buffer container
-        cdef MixChunkContainer mc = sound_instance.container
+        cdef MixChunkContainer mc = sound.container
         cdef int event_index
         cdef int envelope
-        cdef RequestMessageContainer *request_message
+        cdef AudioMessageContainer *audio_message
+        cdef DuckingEnvelope *ducking_envelope
+        cdef DuckingSettings *ducking_settings
 
-        if not sound_instance.sound.loaded:
+        if not sound.loaded:
             self.log.debug("Specified sound is not loaded, could not "
-                           "play sound %s on player %d", sound_instance.name, player)
+                           "play sound %s", sound.name)
             return False
 
         # Make sure the player in range
         if player in range(self.max_simultaneous_sounds):
             SDL_LockMutex(self.mutex)
             # If the specified sound player is not idle do not play the sound if force is not set
-            if self.type_state.sound_players[player].status != player_idle and not force:
+            if self.attributes.sound_players[player].status != player_idle and not force:
                 self.log.debug("All sound players are currently in use, "
-                               "could not play sound %s", sound_instance.name)
+                               "could not play sound %s", sound.name)
                 SDL_UnlockMutex(self.mutex)
                 return False
 
             # Set play sound event
-            request_message = self._get_available_request_message()
-            if request_message != NULL:
-                if self.type_state.sound_players[player].status != player_idle:
-                    request_message.message = request_sound_replace
+            audio_message = self._get_available_audio_message()
+            if audio_message != NULL:
+                if self.attributes.sound_players[player].status != player_idle:
+                    audio_message.message = message_sound_replace
                 else:
                     # Reserve the sound player for this sound (it is no longer idle)
-                    self.type_state.sound_players[player].status = player_pending
-                    request_message.message = request_sound_play
+                    self.attributes.sound_players[player].status = player_pending
+                    audio_message.message = message_sound_play
 
-                request_message.sound_id = sound_instance.id
-                request_message.track = self.number
-                request_message.player = player
-                request_message.time = SDL_GetTicks()
-                request_message.data.play.chunk = mc.chunk
-                request_message.data.play.loops = sound_instance.loops
-                request_message.data.play.priority = sound_instance.priority
-
-                # Volume is passed as a float 0.0 to 1.0, the audio library requires volume to be
-                # an 8-bit unsigned int from 0 to MIX_MAX_VOLUME.
-                request_message.data.play.volume = <Uint8>(sound_instance.volume * MIX_MAX_VOLUME)
+                audio_message.sound_id = sound.id
+                audio_message.track = self.number
+                audio_message.player = player
+                audio_message.time = SDL_GetTicks()
+                audio_message.data.play.chunk = mc.chunk
+                audio_message.data.play.volume = volume
+                audio_message.data.play.loops = loops
+                audio_message.data.play.priority = priority
 
             else:
                 self.log.warning("All internal audio messages are "
                                "currently in use, could not play sound %s"
-                               , sound_instance.name)
+                               , sound.name)
 
-            # TODO: Insert ducking code here
-            self.type_state.sound_players[player].current.sound_has_ducking = 0
+            # If the sound has a ducking envelope, apply it to the target track
+            if sound.ducking is not None and sound.ducking.track is not None:
+                # To convert between the number of samples and a buffer position (bytes), we need to
+                # account for both the number of audio channels and number of bytes per sample (all
+                # samples are 16 bits)
+                samples_to_bytes_factor = self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
+
+                # First get an available ducking envelope from the target track
+                envelope = sound.ducking.track.get_available_ducking_envelope()
+                if envelope == -1:
+                    self.attributes.sound_players[player].current.sound_has_ducking = 0
+                    self.log.warning("All ducking envelopes are "
+                                     "currently in use in the target track, "
+                                     "could not apply ducking for sound %s", sound.name)
+                else:
+                    # Reserve the envelope
+                    sound.ducking.track.set_ducking_envelope_stage(envelope, envelope_stage_delay)
+
+                    # Set the ducking envelope settings for the sound player
+                    self.attributes.sound_players[player].current.sound_has_ducking = 1
+                    ducking_settings = cython.address(self.attributes.sound_players[player].current.ducking_settings)
+                    ducking_settings.track = sound.ducking.track.number
+                    ducking_settings.envelope_num = envelope
+                    ducking_settings.attack_start_pos = sound.ducking.delay * samples_to_bytes_factor
+                    ducking_settings.attack_duration = sound.ducking.attack * samples_to_bytes_factor
+                    ducking_settings.attenuation_volume = <Uint8>(sound.ducking.attenuation * MIX_MAX_VOLUME)
+                    ducking_settings.release_start_pos = mc.chunk.alen - (
+                        sound.ducking.release_point * samples_to_bytes_factor)
+                    ducking_settings.release_duration = sound.ducking.release * samples_to_bytes_factor
+
+                    self.log.debug("Adding ducking settings to sound %s", sound.name)
+            else:
+                self.attributes.sound_players[player].current.sound_has_ducking = 0
 
             SDL_UnlockMutex(self.mutex)
 
             self.log.debug("Sound %s is set to begin playback on player %d (loops=%d)",
-                           sound_instance.name, player, sound_instance.loops)
+                           sound.name, player, loops)
 
             return True
 
         return False
 
-    cdef RequestMessageContainer* _get_available_request_message(self):
+    cdef AudioMessageContainer* _get_available_audio_message(self):
         """
-        Returns a pointer to the first available request message.
-        If all request messages are currently in use, NULL is returned.
+        Returns a pointer to the first available audio event.
+        If all audio messages are currently in use, NULL is returned.
         :return: The index of the first available audio event.  -1 if all
             are in use.
         """
-        cdef RequestMessageContainer *message
+        cdef AudioMessageContainer *event
         SDL_LockMutex(self.mutex)
-        for i in range(MAX_REQUEST_MESSAGES):
-            if self._audio_callback_data.request_messages[i].message == request_not_in_use:
-                message = <RequestMessageContainer*> self._audio_callback_data.request_messages[i]
+        for i in range(MAX_AUDIO_MESSAGES):
+            if self._audio_callback_data.messages[i].message == message_not_in_use:
+                event = <AudioMessageContainer*> self._audio_callback_data.messages[i]
                 SDL_UnlockMutex(self.mutex)
-                return message
+                return event
 
         SDL_UnlockMutex(self.mutex)
         return NULL
+
+    def get_available_ducking_envelope(self):
+        """
+        Returns the index of the first available (idle) ducking envelope.
+        If all ducking envelopes are currently in use, -1 is returned.
+        :return: The index of the first available ducking envelope.  -1 if all
+            are in use.
+        """
+        SDL_LockMutex(self.mutex)
+        for i in range(MAX_TRACK_DUCKING_ENVELOPES):
+            if self.attributes.ducking_envelopes[i].stage == envelope_stage_idle:
+                SDL_UnlockMutex(self.mutex)
+                return i
+
+        SDL_UnlockMutex(self.mutex)
+        return -1
+
+    def set_ducking_envelope_stage(self, int envelope_num, int stage):
+        """
+        Sets the current stage for the specified ducking envelope
+        Args:
+            envelope_num: The ducking envelope number
+            stage: The new envelope stage value
+        Returns:
+            A pointer to the specified ducking envelope
+        """
+        if envelope_num in range(MAX_TRACK_DUCKING_ENVELOPES):
+            SDL_LockMutex(self.mutex)
+            self.attributes.ducking_envelopes[envelope_num].stage = <DuckingEnvelopeStage>stage
+            SDL_UnlockMutex(self.mutex)
 
     def get_status(self):
         """
@@ -1720,22 +2042,22 @@ cdef class TrackStandard(Track):
         for player in range(self.max_simultaneous_sounds):
             status.append({
                 "player": player,
-                "status": Track.player_status_to_text(self.type_state.sound_players[player].status),
-                "volume": self.type_state.sound_players[player].current.volume,
-                "sound_id": self.type_state.sound_players[player].current.sound_id,
-                "priority": self.type_state.sound_players[player].current.sound_priority,
-                "loops": self.type_state.sound_players[player].current.loops_remaining,
-                "has_ducking": self.type_state.sound_players[player].current.sound_has_ducking,
+                "status": Track.player_status_to_text(self.attributes.sound_players[player].status),
+                "volume": self.attributes.sound_players[player].current.volume,
+                "sound_id": self.attributes.sound_players[player].current.sound_id,
+                "priority": self.attributes.sound_players[player].current.sound_priority,
+                "loops": self.attributes.sound_players[player].current.loops_remaining,
+                "has_ducking": self.attributes.sound_players[player].current.sound_has_ducking,
             })
 
             self.log.debug("Status - Player %d: Status=%s, Sound=%s, "
                            "Priority=%d, Loops=%d",
                            player,
                            Track.player_status_to_text(
-                               self.type_state.sound_players[player].status),
-                           self.type_state.sound_players[player].current.sound_id,
-                           self.type_state.sound_players[player].current.sound_priority,
-                           self.type_state.sound_players[player].current.loops_remaining)
+                               self.attributes.sound_players[player].status),
+                           self.attributes.sound_players[player].current.sound_id,
+                           self.attributes.sound_players[player].current.sound_priority,
+                           self.attributes.sound_players[player].current.loops_remaining)
 
         SDL_UnlockMutex(self.mutex)
 
@@ -1749,20 +2071,20 @@ cdef class TrackStandard(Track):
         """
         return self._sound_queue.qsize()
 
-    def get_available_request_message_count(self):
+    def get_available_audio_message_count(self):
         """
-        Gets the current count of available internal request messages.  Used for debugging
+        Gets the current count of available internal audio messages.  Used for debugging
         and testing.
         Returns:
-            Integer number of internal request messages available to be used.
+            Integer number of internal audio messages available to be used.
         """
-        available_message_count = 0
+        available_event_count = 0
         SDL_LockMutex(self.mutex)
-        for i in range(MAX_REQUEST_MESSAGES):
-            if self._audio_callback_data.request_messages[i].message == request_not_in_use:
-                available_message_count += 1
+        for i in range(MAX_AUDIO_MESSAGES):
+            if self._audio_callback_data.messages[i].message == message_not_in_use:
+                available_event_count += 1
         SDL_UnlockMutex(self.mutex)
-        return available_message_count
+        return available_event_count
 
     def get_sound_players_in_use_count(self):
         """
@@ -1774,7 +2096,7 @@ cdef class TrackStandard(Track):
         players_in_use_count = 0
         SDL_LockMutex(self.mutex)
         for i in range(self.max_simultaneous_sounds):
-            if self.type_state.sound_players[i].status != player_idle:
+            if self.attributes.sound_players[i].status != player_idle:
                 players_in_use_count += 1
         SDL_UnlockMutex(self.mutex)
         return players_in_use_count
@@ -1783,8 +2105,8 @@ cdef class TrackStandard(Track):
         """Returns whether or not the specified sound is currently playing on the track"""
         SDL_LockMutex(self.mutex)
         for i in range(self.max_simultaneous_sounds):
-            if self.type_state.sound_players[i].status != player_idle and \
-                            self.type_state.sound_players[i].current.sound_id == sound.id:
+            if self.attributes.sound_players[i].status != player_idle and \
+                            self.attributes.sound_players[i].current.sound_id == sound.id:
                 SDL_UnlockMutex(self.mutex)
                 return True
 
@@ -1818,285 +2140,6 @@ cdef class TrackStandard(Track):
             return status_values.get(status)
         except KeyError:
             return "unknown"
-
-
-# ---------------------------------------------------------------------------
-#    Global track-related c functions (called from audio thread)
-#
-#    Note: Because these functions are only called from the audio callback
-#    function, we do not need to lock and unlock the mutex in these functions
-#    (locking/unlocking of the mutex is already performed in the audio
-#    callback function.
-# ---------------------------------------------------------------------------
-
-cdef void standard_track_request_message(RequestMessageContainer *request_message, TrackState *track) nogil:
-    """
-    Processes any new standard track request messages that should be processed prior to the
-    main audio callback processing (such as sound play and sound stop messages).
-    Args:
-        request_message: The request message to process
-        track: The TrackState struct for this track
-    """
-    cdef int player = request_message.player
-    cdef TrackStandardState *type_state
-
-    if track.type != track_type_standard:
-        return
-
-    type_state = <TrackStandardState*>track.type_state
-
-    if request_message.message == request_sound_play:
-        # Update player to start playing new sound
-        type_state.sound_players[player].status = player_pending
-        type_state.sound_players[player].current.sample_pos = 0
-        type_state.sound_players[player].current.current_loop = 0
-        type_state.sound_players[player].current.sound_id = request_message.sound_id
-        type_state.sound_players[player].current.data.chunk = request_message.data.play.chunk
-        type_state.sound_players[player].current.volume = request_message.data.play.volume
-        type_state.sound_players[player].current.loops_remaining = request_message.data.play.loops
-        type_state.sound_players[player].current.sound_priority = request_message.data.play.priority
-
-        # Clear event since it has been processed
-        request_message.message = request_not_in_use
-
-    elif request_message.message == request_sound_stop:
-        # Update player to stop playing sound
-        type_state.sound_players[player].status = player_stopping
-
-        # Clear event since it has been processed
-        request_message.message = request_not_in_use
-
-    elif request_message.message == request_sound_replace:
-        # Update player to stop playing current sound and start playing new sound
-        type_state.sound_players[player].status = player_replacing
-        type_state.sound_players[player].next.sample_pos = 0
-        type_state.sound_players[player].next.current_loop = 0
-        type_state.sound_players[player].next.sound_id = request_message.sound_id
-        type_state.sound_players[player].next.data.chunk = request_message.data.play.chunk
-        type_state.sound_players[player].next.volume = request_message.data.play.volume
-        type_state.sound_players[player].next.loops_remaining = request_message.data.play.loops
-        type_state.sound_players[player].next.sound_priority = request_message.data.play.priority
-
-        # Clear event since it has been processed
-        request_message.message = request_not_in_use
-
-
-
-cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData *callback_data) nogil:
-    """
-    Mixes any sounds that are playing on the specified standard track into the track audio buffer.
-    Args:
-        track: A pointer to the TrackState data structure for the track
-        callback_data: The audio callback data structure
-    Notes:
-        This function is called from the C audio callback thread and therefore the
-        function must not hold the GIL (use nogil). Notification messages are generated.
-    """
-    cdef Uint32 buffer_size
-    cdef TrackStandardState *type_state
-
-    if track == NULL or track.type != track_type_standard:
-        return
-
-    type_state = <TrackStandardState*>track.type_state
-
-    # Get the current clock from SDL (it is used for the audio timing master)
-    cdef Uint32 sdl_ticks = SDL_GetTicks()
-
-    # Setup source (sound) and destination (track) buffer pointers/values
-    cdef Uint8 *sound_buffer
-    cdef Uint8 *output_buffer = <Uint8*> track.buffer
-
-    cdef int event_index
-    cdef int player
-    cdef Uint32 index
-    cdef Uint32 fade_out_duration
-    cdef Uint32 sound_samples_remaining
-    cdef Uint8 volume
-
-    buffer_size = <Uint32>track.buffer_size
-
-    # Loop over track sound players
-    for player in range(type_state.sound_player_count):
-
-        # If the player is idle, there is nothing to do so move on to the next player
-        if type_state.sound_players[player].status is player_idle:
-            continue
-
-        index = 0
-
-        # Check if player has been requested to stop a sound
-        if type_state.sound_players[player].status is player_stopping:
-            # Get source sound buffer (read one byte at a time, bytes will be combined into a
-            # 16-bit sample value before being mixed)
-            sound_buffer = <Uint8*> type_state.sound_players[player].current.data.chunk.abuf
-
-            sound_samples_remaining = type_state.sound_players[player].current.data.chunk.alen - type_state.sound_players[
-                player].current.sample_pos
-            fade_out_duration = min(buffer_size,
-                                    <Uint32>(callback_data.sample_rate * callback_data.audio_channels *
-                                          QUICK_FADE_DURATION_SECS),
-                                    sound_samples_remaining)
-            volume = type_state.sound_players[player].current.volume
-
-            if type_state.sound_players[player].current.sound_has_ducking:
-                # TODO: Handle fast ducking release here
-                pass
-
-            # Loop over destination buffer, mixing in the source sample
-            while index < fade_out_duration:
-                mix_sound_sample_to_buffer(sound_buffer,
-                                           type_state.sound_players[player].current.sample_pos,
-                                           volume,
-                                           output_buffer,
-                                           index)
-
-                # Advance the source sample pointer to the next sample (2 bytes)
-                type_state.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
-
-                # Advance the output buffer pointer to the next sample (2 bytes)
-                index += BYTES_PER_SAMPLE
-
-                # Check if we are at the end of the source sample buffer
-                if type_state.sound_players[player].current.sample_pos >= type_state.sound_players[player].current.data.chunk.alen:
-                    end_of_sound_processing(cython.address(type_state.sound_players[player]),
-                                            callback_data.notification_messages, sdl_ticks)
-                    if type_state.sound_players[player].status is player_finished:
-                        break
-
-                # Set volume for next loop
-                volume = <Uint8> (
-                    (1.0 - in_out_quad(index / fade_out_duration)) * type_state.sound_players[player].current.volume)
-
-            # Update sound player status to finished
-            type_state.sound_players[player].status = player_finished
-
-        # Check if player has been requested to stop a sound and immediately replace it with another sound
-        if type_state.sound_players[player].status is player_replacing:
-            # Get source sound buffer (read one byte at a time, bytes will be combined into a
-            # 16-bit sample value before being mixed)
-            sound_buffer = <Uint8*> type_state.sound_players[player].current.data.chunk.abuf
-
-            sound_samples_remaining = type_state.sound_players[player].current.data.chunk.alen - type_state.sound_players[
-                player].current.sample_pos
-            fade_out_duration = min(buffer_size,
-                                    <Uint32>(callback_data.sample_rate * callback_data.audio_channels *
-                                          QUICK_FADE_DURATION_SECS),
-                                    sound_samples_remaining)
-            volume = type_state.sound_players[player].current.volume
-
-            if type_state.sound_players[player].current.sound_has_ducking:
-                # TODO: Handle fast ducking release (10 ms) here
-                pass
-
-            # Loop over destination buffer, mixing in the source sample
-            while index < fade_out_duration:
-                mix_sound_sample_to_buffer(sound_buffer,
-                                           type_state.sound_players[player].current.sample_pos,
-                                           volume,
-                                           output_buffer,
-                                           index)
-
-                # Advance the source sample pointer to the next sample (2 bytes)
-                type_state.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
-
-                # Advance the output buffer pointer to the next sample (2 bytes)
-                index += BYTES_PER_SAMPLE
-
-                # Check if we are at the end of the source sample buffer (loop if applicable)
-                if type_state.sound_players[player].current.sample_pos >= type_state.sound_players[player].current.data.chunk.alen:
-                    end_of_sound_processing(cython.address(type_state.sound_players[player]),
-                                            callback_data.notification_messages, sdl_ticks)
-                    if type_state.sound_players[player].status is player_finished:
-                        break
-
-                # Set volume for next loop
-                volume = <int> (
-                    (1.0 - in_out_quad(index / fade_out_duration)) * type_state.sound_players[player].current.volume)
-
-            # Send audio event that the sound has stopped
-            send_sound_stopped_event(track.number, player,
-                                     type_state.sound_players[player].current.sound_id,
-                                     callback_data.notification_messages,
-                                     sdl_ticks)
-
-            # Update sound player status to finished
-            type_state.sound_players[player].status = player_pending
-
-            # Copy sound player settings from next sound to current
-            type_state.sound_players[player].status = player_pending
-            type_state.sound_players[player].current.sample_pos = \
-                type_state.sound_players[player].next.sample_pos
-            type_state.sound_players[player].current.current_loop = \
-                type_state.sound_players[player].next.current_loop
-            type_state.sound_players[player].current.sound_id = \
-                type_state.sound_players[player].next.sound_id
-            type_state.sound_players[player].current.data.chunk = \
-                type_state.sound_players[player].next.data.chunk
-            type_state.sound_players[player].current.volume = \
-                type_state.sound_players[player].next.volume
-            type_state.sound_players[player].current.loops_remaining = \
-                type_state.sound_players[player].next.loops_remaining
-            type_state.sound_players[player].current.sound_priority = \
-                type_state.sound_players[player].next.sound_priority
-
-        # Check if player has a sound pending playback (ready to start)
-        if type_state.sound_players[player].status is player_pending:
-            # Sound ready to start playback, send event notification and set status to playing
-            event_index = get_available_notification_message(callback_data.notification_messages)
-            if event_index != -1:
-                callback_data.notification_messages[event_index].message = notification_sound_started
-                callback_data.notification_messages[event_index].track = track.number
-                callback_data.notification_messages[event_index].player = player
-                callback_data.notification_messages[event_index].sound_id = \
-                    type_state.sound_players[player].current.sound_id
-                callback_data.notification_messages[event_index].time = sdl_ticks
-
-            type_state.sound_players[player].status = player_playing
-
-        # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
-        if type_state.sound_players[player].status is player_playing and \
-                        type_state.sound_players[player].current.volume > 0 and \
-                        type_state.sound_players[player].current.data.chunk != NULL:
-
-            # Get source sound buffer (read one byte at a time, bytes will be combined into a
-            # 16-bit sample value before being mixed)
-            sound_buffer = <Uint8*> type_state.sound_players[player].current.data.chunk.abuf
-
-            if type_state.sound_players[player].current.sound_has_ducking:
-                # TODO: Calculate ducking here
-                pass
-
-            # Loop over destination buffer, mixing in the source sample
-            while index < buffer_size:
-
-                mix_sound_sample_to_buffer(sound_buffer,
-                                           type_state.sound_players[player].current.sample_pos,
-                                           type_state.sound_players[player].current.volume,
-                                           output_buffer,
-                                           index)
-
-                # Advance the source sample pointer to the next sample (2 bytes)
-                type_state.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
-
-                # Advance the output buffer pointer to the next sample (2 bytes)
-                index += BYTES_PER_SAMPLE
-
-                # Check if we are at the end of the source sample buffer (loop if applicable)
-                if type_state.sound_players[player].current.sample_pos >= type_state.sound_players[player].current.data.chunk.alen:
-                    end_of_sound_processing(cython.address(type_state.sound_players[player]),
-                                            callback_data.notification_messages, sdl_ticks)
-                    if type_state.sound_players[player].status is player_finished:
-                        break
-
-        # Check if the sound has finished
-        if type_state.sound_players[player].status is player_finished:
-            send_sound_stopped_event(track.number, player,
-                                     type_state.sound_players[player].current.sound_id,
-                                     callback_data.notification_messages,
-                                     sdl_ticks)
-            type_state.sound_players[player].status = player_idle
-
 
 
 # ---------------------------------------------------------------------------
