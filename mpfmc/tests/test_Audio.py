@@ -187,13 +187,20 @@ class TestAudio(MpfMcTestCase):
             self.advance_time(0.1)
 
         self.mc.events.post('play_sound_drum_group_in_mode')
-
-        self.advance_time(5)
+        self.advance_time(1)
 
         # Test stopping the mode
         self.send(bcp_command='mode_stop', name='mode1')
+        self.advance_time(1)
 
         # Test sound events
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_stopped')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='synthping_played')
+
+        # Check for internal sound event processing leaks (are there any internal sound
+        # events that get generated, but never processed and cleared from the queue?)
+        self.assertEqual(interface.get_in_use_sound_event_count(), 0)
 
         """
         # Add another track with the same name (should not be allowed)
