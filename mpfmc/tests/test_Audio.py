@@ -114,9 +114,9 @@ class TestAudio(MpfMcTestCase):
         # Make sure sound has ducking (since it was specified in the config files)
         self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
 
-        # Test baseline internal audio event count
-        self.assertEqual(interface.get_in_use_sound_event_count(), 0)
-
+        # Test baseline internal audio message count
+        self.assertEqual(interface.get_in_use_request_message_count(), 0)
+        self.assertEqual(interface.get_in_use_notification_message_count(), 0)
 
         # Test sound_player
         self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
@@ -194,9 +194,10 @@ class TestAudio(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_stopped')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='synthping_played')
 
-        # Check for internal sound event processing leaks (are there any internal sound
+        # Check for internal sound message processing leaks (are there any internal sound
         # events that get generated, but never processed and cleared from the queue?)
-        self.assertEqual(interface.get_in_use_sound_event_count(), 0)
+        self.assertEqual(interface.get_in_use_request_message_count(), 0)
+        self.assertEqual(interface.get_in_use_notification_message_count(), 0)
 
         """
         # Add another track with the same name (should not be allowed)
