@@ -205,6 +205,7 @@ ctypedef struct SoundSettings:
     int current_loop
     Uint32 sample_pos
     long sound_id
+    long sound_instance_id
     int sound_priority
     int sound_has_ducking
     DuckingSettings ducking_settings
@@ -270,6 +271,7 @@ ctypedef union AudioMessageData:
 ctypedef struct AudioMessageContainer:
     AudioMessage message
     long sound_id
+    long sound_instance_id
     int track
     int player
     Uint32 time

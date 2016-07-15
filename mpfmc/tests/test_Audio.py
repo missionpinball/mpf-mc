@@ -127,7 +127,7 @@ class TestAudio(MpfMcTestCase):
         self.mc.events.post('play_sound_text')
         self.mc.events.post('play_sound_music')
         self.advance_time(1)
-        # self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
+        self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
 
         # Test two sounds at the same time on the voice track (only
         # 1 sound at a time max).  Second sound should be queued and
@@ -137,28 +137,28 @@ class TestAudio(MpfMcTestCase):
         self.advance_time()
 
         # Make sure first sound is playing on the voice track
-        # self.assertEqual(track_voice.get_status()[0]['sound_id'], self.mc.sounds['113690_test'].id)
+        self.assertEqual(track_voice.get_status()[0]['sound_id'], self.mc.sounds['113690_test'].id)
         self.mc.events.post('play_sound_moron_test')
         self.advance_time()
 
         # Make sure first sound is still playing and the second one has been queued
         # self.assertEqual(track_voice.get_status()[0]['sound_id'], self.mc.sounds['113690_test'].id)
         self.assertEqual(track_voice.get_sound_queue_count(), 1)
-        # self.assertTrue(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
+        self.assertTrue(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
         self.advance_time(0.1)
 
         # Now stop sound that is not yet playing but is queued (should be removed from queue)
         self.mc.events.post('stop_sound_moron_test')
         self.advance_time(0.25)
-        # self.assertFalse(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
+        self.assertFalse(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
 
         # Play moron test sound again (should be added to queue)
         self.mc.events.post('play_sound_moron_test')
         self.advance_time(0.1)
-        # self.assertTrue(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
+        self.assertTrue(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
 
         # Make sure text sound is still playing (looping)
-        # self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
+        self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
 
         # Ensure sound.events_when_looping is working properly (send event when a sound loops)
         #self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_looping')
@@ -168,7 +168,7 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(2)
 
         # Text sound should no longer be playing
-        #self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
+        self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
 
         self.advance_time(2.7)
         self.mc.events.post('play_sound_synthping')
