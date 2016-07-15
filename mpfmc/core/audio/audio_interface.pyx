@@ -108,6 +108,11 @@ cdef class AudioInterface:
             raise AudioException("Unable to initialize Audio Interface: "
                                  "Buffer samples is required to be a power of two")
 
+        # Warn if a small buffer is used
+        if buffer_samples <= 1024:
+            self.log.warning('NOTE: You may experience noise and other undesirable sound artifacts '
+                             'when you set your buffer at 1024 or smaller.')
+
         # Initialize the SDL audio system
         if SDL_Init(SDL_INIT_AUDIO) < 0:
             self.log.error('SDL_Init error - %s' % SDL_GetError())
@@ -216,7 +221,6 @@ cdef class AudioInterface:
             raise AudioException('Unable to load generated silence sample required for playback')
         else:
             self.log.debug("Silence audio chunk initialized (required for SDL_Mixer callback)")
-
 
     def _initialize_audio_callback(self):
         # Set the number of channels to mix (will cause existing channels to be stopped and restarted if playing)
