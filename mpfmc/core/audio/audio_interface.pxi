@@ -219,7 +219,15 @@ ctypedef struct SoundPlayer:
     int track_num
     int player
 
+
+# ---------------------------------------------------------------------------
+#    Audio Callback Data type
+# ---------------------------------------------------------------------------
+
 ctypedef struct AudioCallbackData:
+    # A pointer to this struct is passed to the main audio callback function and
+    # is the only way data is made available to the main audio thread.  Must not
+    # contain any Python objects.
     int sample_rate
     int audio_channels
     Uint8 master_volume
@@ -227,6 +235,7 @@ ctypedef struct AudioCallbackData:
     TrackAttributes **tracks
     AudioMessageContainer **messages
     SDL_mutex *mutex
+
 
 cdef enum AudioMessage:
     message_not_in_use,               # Message is not in use and is available

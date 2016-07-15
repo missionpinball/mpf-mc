@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '30', '0')
+__version_info__ = ('0', '31', '0', 'dev00')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -98,6 +98,7 @@ cdef class AudioInterface:
         """
         self.mc = mc
         self.log = logging.getLogger("AudioInterface")
+        print("AudioInterface: Object creation")
 
         # Initialize threading in the extension library and acquire the Python global interpreter lock
         PyEval_InitThreads()
@@ -170,6 +171,8 @@ cdef class AudioInterface:
         # Unlock the SDL audio callback functions
         SDL_UnlockAudio()
 
+        print("AudioInterface: Initialization complete")
+
         self.tracks = []
 
     def __del__(self):
@@ -204,10 +207,13 @@ cdef class AudioInterface:
         # Create the audio buffer containing silence
         cdef Uint8 *silence = NULL
         cdef Uint32 length = self.buffer_size
-        silence = <Uint8 *> calloc(1, length)
+        silence = <Uint8 *>PyMem_Malloc(length)
+        memset(silence, 0, length)
 
         # Instruct SDL_Mixer to load the silence into a chunk
         self.raw_chunk_silence = Mix_QuickLoad_RAW(silence, length)
+        PyMem_Free(silence)
+
         if self.raw_chunk_silence == NULL:
             raise AudioException('Unable to load generated silence sample required for playback')
         else:
@@ -434,6 +440,7 @@ cdef class AudioInterface:
         cdef int fade_ms = 0
 
         self.log.debug("Enabling audio playback")
+        print("AudioInterface: Enabling audio playback")
 
         SDL_LockAudio()
         if fade_sec > 0:
@@ -453,6 +460,7 @@ cdef class AudioInterface:
         cdef int fade_ms = 0
 
         self.log.debug("Disabling audio playback")
+        print("AudioInterface: Disabling audio playback")
 
         SDL_LockAudio()
         if fade_sec > 0:
@@ -542,6 +550,7 @@ cdef class AudioInterface:
         SDL_UnlockAudio()
 
         self.log.debug("The '%s' track has successfully been created.", name)
+        print("AudioInterface: Created track - ", new_track)
 
         return new_track
 
@@ -571,6 +580,8 @@ cdef class AudioInterface:
             raise AudioException("Unable to load sound from source file '{}' - {}"
                                  .format(file_name, SDL_GetError()))
 
+        print("AudioInterface: Loaded sound - ", file_name)
+
         # Create a Python container object to wrap the Mix_Chunk C pointer
         cdef MixChunkContainer mc = MixChunkContainer()
         mc.chunk = chunk
@@ -594,14 +605,14 @@ cdef class AudioInterface:
             SDL_UnlockAudio()
             mc.chunk = NULL
 
-    def stop_sound(self, sound not None):
+    def stop_sound(self, sound_instance not None):
         """
         Stops all instances of the specified sound immediately on all tracks.
         Args:
-            sound: The Sound to stop
+            sound_instance: The SoundInstance to stop
         """
         for track in self.tracks:
-            track.stop_sound(sound)
+            track.stop_sound(sound_instance)
 
     def process(self):
         """Process tick function for the audio interface."""
@@ -614,34 +625,25 @@ cdef class AudioInterface:
         SDL_LockMutex(self.audio_callback_data.mutex)
         for i in range(MAX_AUDIO_MESSAGES):
             if self.audio_callback_data.messages[i].message == message_sound_started:
-                sound = self.mc.sounds_by_id[self.audio_callback_data.messages[i].sound_id]
-                if sound.events_when_played is not None:
-                    for event in sound.events_when_played:
-                        self.mc.bcp_processor.send('trigger', name=event)
+                # TODO: Process message
 
                 # Event has been processed, reset it so it may be used again
                 self.audio_callback_data.messages[i].message = message_not_in_use
 
             elif self.audio_callback_data.messages[i].message == message_sound_stopped:
-                sound = self.mc.sounds_by_id[self.audio_callback_data.messages[i].sound_id]
-                if sound.events_when_stopped is not None:
-                    for event in sound.events_when_stopped:
-                        self.mc.bcp_processor.send('trigger', name=event)
+                # TODO: Process message
 
                 # Event has been processed, reset it so it may be used again
                 self.audio_callback_data.messages[i].message = message_not_in_use
 
             elif self.audio_callback_data.messages[i].message == message_sound_looping:
-                sound = self.mc.sounds_by_id[self.audio_callback_data.messages[i].sound_id]
-                if sound.events_when_looping is not None:
-                    for event in sound.events_when_looping:
-                        self.mc.bcp_processor.send('trigger', name=event)
+                # TODO: Process message
 
                 # Event has been processed, reset it so it may be used again
                 self.audio_callback_data.messages[i].message = message_not_in_use
 
             elif self.audio_callback_data.messages[i].message == message_sound_marker:
-                # TODO: Process sound marker event
+                # TODO: Process message
 
                 # Event has been processed, reset it so it may be used again
                 self.audio_callback_data.messages[i].message = message_not_in_use
@@ -755,6 +757,7 @@ cdef void process_sound_messages(AudioCallbackData *callback_data) nogil:
             # Update player to start playing new sound
             track = callback_data.messages[i].track
             player = callback_data.messages[i].player
+
             callback_data.tracks[track].sound_players[player].status = player_pending
             callback_data.tracks[track].sound_players[player].current.sample_pos = 0
             callback_data.tracks[track].sound_players[player].current.current_loop = 0
@@ -1430,7 +1433,7 @@ cdef class Track:
         SDL_LockMutex(self.mutex)
 
         self._sound_queue = PriorityQueue()
-        self._sound_queue_items = {}
+        self._sound_queue_items = dict()
 
         # Make sure the number of simultaneous sounds is within the allowable range
         if max_simultaneous_sounds > MAX_SIMULTANEOUS_SOUNDS_LIMIT:
@@ -1576,16 +1579,11 @@ cdef class Track:
         cdef int idle_sound_player = self._get_idle_sound_player()
         if idle_sound_player >= 0:
             # Found an idle player, check if there are any sounds queued for playback
-            # Sound is returned as a tuple (sound, priority, settings)
-            next_sound = self._get_next_sound()
+            sound_instance = self._get_next_sound()
 
-            if next_sound is not None:
-                self.log.debug("Getting sound from queue %s", next_sound)
-                self._play_sound_on_sound_player(sound=next_sound[0],
-                                                 player=idle_sound_player,
-                                                 loops=next_sound[2]['loops'],
-                                                 volume=next_sound[2]['volume'],
-                                                 priority=next_sound[1])
+            if sound_instance is not None:
+                self.log.debug("Getting sound from queue %s", sound_instance)
+                self._play_sound_on_sound_player(sound_instance=sound_instance, player=idle_sound_player)
 
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockMutex(self.mutex)
@@ -1594,9 +1592,7 @@ cdef class Track:
         """
         Returns the next sound in the priority queue ready for playback.
 
-        Returns: A tuple of the Sound object, the priority, and dictionary of
-            additional settings for playing the sound.  If the queue is empty,
-            None is returned.
+        Returns: A SoundInstance object. If the queue is empty, None is returned.
 
         This method ensures that the sound that is returned has not expired.
         If the next sound in the queue has expired, it is discarded and the
@@ -1613,110 +1609,80 @@ cdef class Track:
             #    0 (priority): The priority of the returned sound
             #    1 (exp_time): The time (in ticks) after which the sound expires and should not be played
             #    2 (sound): The Sound object ready for playback
-            #    3 (settings): A dictionary of any additional settings for this sound's playback (ducking, etc.)
 
             try:
-                next_sound = self._sound_queue.get_nowait()
+                queue_entry = self._sound_queue.get_nowait()
                 count -= 1
-                if next_sound[2] is None:
+                if queue_entry[2] is None:
                     continue
             except Empty:
                 return None
 
             # If the sound is still loading and not expired, put it back in the queue
-            if not next_sound[2].loaded and next_sound[2].loading and \
-                    (next_sound[1] is None or next_sound[1] > time.time()):
-                self._sound_queue.put(next_sound)
+            sound_instance = queue_entry[2]
+            exp_time = queue_entry[1]
+            if not sound_instance.sound.loaded and sound_instance.sound.loading and \
+                    (exp_time is None or exp_time > time.time()):
+                self._sound_queue.put(queue_entry)
                 self.log.debug("Next pending sound in queue is still loading, "
                                "re-queueing sound %s",
-                               next_sound)
+                               queue_entry)
             else:
                 # Remove the queue entry from the list of sounds in the queue
-                if next_sound in self._sound_queue_items[next_sound[2]]:
-                    self._sound_queue_items[next_sound[2]].remove(next_sound)
-                    if len(self._sound_queue_items[next_sound[2]]) == 0:
-                        del self._sound_queue_items[next_sound[2]]
+                if sound_instance in self._sound_queue_items:
+                    del self._sound_queue_items[sound_instance]
 
                 # Return the next sound from the priority queue if it has not expired
-                if not next_sound[1] or next_sound[1] > time.time():
-                    self.log.debug("Retrieving next pending sound from queue %s", next_sound)
-                    return next_sound[2], -next_sound[0], next_sound[3]
+                if not exp_time or exp_time > time.time():
+                    self.log.debug("Retrieving next pending sound from queue %s", queue_entry)
+                    # TODO: Notify sound instance it is no longer queued
+                    return sound_instance
                 else:
-                    self.log.debug("Discarding expired sound from queue %s", next_sound)
+                    self.log.debug("Discarding expired sound from queue %s", queue_entry)
+                    # TODO: Notify sound instance it has expired
 
         return None
 
-    def _remove_sound_from_queue(self, sound):
+    def _remove_sound_from_queue(self, sound_instance not None):
         """
         Removes a sound from the priority sound queue.
         Args:
-            sound: The sound object to remove
+            sound_instance: The sound object to remove
         """
 
         # The sounds will not actually be removed from the priority queue because that
         # could corrupt the queue heap structure, but are simply set to None so they
         # will not be played.  After marking queue entry as None, the dictionary keeping
         # track of sounds in the queue is updated.
-        if sound in self._sound_queue_items:
-            for entry in self._sound_queue_items[sound]:
-                entry[2] = None
-                self.log.debug("Removing pending sound from queue %s", sound)
-            del self._sound_queue_items[sound]
+        if sound_instance in self._sound_queue_items:
+            entry = self._sound_queue_items[sound_instance]
+            entry[2] = None
+            self.log.debug("Removing pending sound from queue %s", sound_instance)
+            del self._sound_queue_items[sound_instance]
 
-    def play_sound(self, sound not None, **kwargs):
+    def play_sound(self, sound_instance not None):
         """
         Plays a sound on the current track.
         Args:
-            sound: The Sound object to play
-            **kwargs: Optional additional arguments for overriding sound defaults
+            sound_instance: The SoundInstance object to play
         """
-        self.log.debug("play_sound - Processing sound '%s' for playback (%s).", sound.name, kwargs)
+        self.log.debug("play_sound - Processing sound '%s' for playback (%s).", sound_instance.name)
 
-        settings = {}
-
-        # Validate settings that can be overridden
-        if 'priority' in kwargs and kwargs['priority'] is not None:
-            priority = kwargs['priority']
-        else:
-            priority = sound.priority
-
-        if 'loops' in kwargs and kwargs['loops'] is not None:
-            settings['loops'] = kwargs['loops']
-        else:
-            settings['loops'] = sound.loops
-
-        if 'max_queue_time' in kwargs:
-            settings['max_queue_time'] = kwargs['max_queue_time']
-        else:
-            settings['max_queue_time'] = sound.max_queue_time
-
-        if 'volume' in kwargs and kwargs['volume'] is not None:
-            settings['volume'] = kwargs['volume']
-        else:
-            settings['volume'] = sound.volume
-
-        # Volume is passed as a float 0.0 to 1.0, the audio library requires volume to be
-        # an 8-bit unsigned int from 0 to MIX_MAX_VOLUME.
-        settings['volume'] = <Uint8>min(max(settings['volume'] * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
-
-        if settings['max_queue_time'] is None:
+        if sound_instance.max_queue_time is None:
             exp_time = None
         else:
-            exp_time = time.time() + settings['max_queue_time']
+            exp_time = time.time() + sound_instance.max_queue_time
 
         # Make sure sound is loaded.  If not, we assume the sound is being loaded and we
         # add it to the queue so it will be picked up on the next loop.
-        if not sound.loaded:
+        if not sound_instance.sound.loaded:
             # If the sound is not already loading, load it now
-            if not sound.loading:
-                sound.load()
+            if not sound_instance.sound.loading:
+                sound_instance.sound.load()
 
-            self.queue_sound(sound=sound,
-                             priority=priority,
-                             exp_time=exp_time,
-                             settings=settings)
+            self.queue_sound(sound_instance=sound_instance, exp_time=exp_time)
             self.log.debug("play_sound - Sound %s was not loaded and therefore has been "
-                           "queued for playback.", sound.name)
+                           "queued for playback.", sound_instance.name)
             return
 
         # If the sound can be played right away (available player) then play it.
@@ -1729,11 +1695,7 @@ cdef class Track:
             self.log.debug("play_sound - Sound player %d is available "
                            "for playback", player)
             # Play the sound using the available player
-            return self._play_sound_on_sound_player(sound=sound,
-                                                    player=player,
-                                                    loops=settings['loops'],
-                                                    volume=settings['volume'],
-                                                    priority=priority)
+            return self._play_sound_on_sound_player(sound_instance=sound_instance, player=player)
         else:
             # All sound players are currently busy:
             self.log.debug("play_sound - No idle sound player is available.")
@@ -1742,36 +1704,28 @@ cdef class Track:
 
             # If the lowest priority of all the sounds currently playing is lower than
             # the requested sound, kill the lowest priority sound and replace it.
-            if priority > lowest_priority:
+            if sound_instance.priority > lowest_priority:
                 self.log.debug("play_sound - Sound priority (%d) is higher than the "
                                "lowest sound currently playing (%d). Forcing playback "
-                               "on sound player %d.", priority, lowest_priority, player)
-                return self._play_sound_on_sound_player(sound=sound,
+                               "on sound player %d.", sound_instance.priority, lowest_priority, player)
+                return self._play_sound_on_sound_player(sound_instance=sound_instance,
                                                         player=player,
-                                                        loops=settings['loops'],
-                                                        volume=settings['volume'],
-                                                        priority=priority,
                                                         force=True)
             else:
                 # Add the requested sound to the priority queue
                 self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
                                "lowest sound currently playing (%d). Sound will be queued "
-                               "for playback.", priority, lowest_priority)
-                self.queue_sound(sound=sound,
-                                 priority=priority,
-                                 exp_time=exp_time,
-                                 settings=settings)
+                               "for playback.", sound_instance.priority, lowest_priority)
+                self.queue_sound(sound_instance=sound_instance, exp_time=exp_time)
 
-    def queue_sound(self, sound, priority, exp_time=None, settings=None):
+    def queue_sound(self, sound_instance, exp_time=None):
         """Adds a sound to the queue to be played when a sound player becomes available.
 
         Args:
-            sound: The Sound object to play.
-            priority: The priority of the sound to be queued.
+            sound_instance: The SoundInstance object to play.
             exp_time: Real world time of when this sound will expire.  It will not play
                 if the queue is freed up after it expires.  None indicates the sound
                 never expires and will eventually be played.
-            settings: Additional settings for the sound's playback.
 
         Note that this method will insert this sound into a position in the
         queue based on its priority, so highest-priority sounds are played
@@ -1781,31 +1735,30 @@ cdef class Track:
         # Note the negative operator in front of priority since this queue
         # retrieves the lowest values first, and MPF uses higher values for
         # higher priorities.
-        entry = [-priority, exp_time, sound, settings]
+        entry = [-sound_instance.priority, exp_time, sound_instance]
         self._sound_queue.put(entry)
+
+        # TODO: Notify sound instance it has been queued
 
         # Save the new entry in a dictionary of entries keyed by sound.  This
         # dictionary is used to remove pending sounds from the priority queue.
-        if sound in self._sound_queue_items:
-            self._sound_queue_items[sound].append(entry)
-        else:
-            self._sound_queue_items[sound] = [entry]
+        self._sound_queue_items[sound_instance] = entry
 
         self.log.debug("Queueing sound %s", entry)
 
-    def stop_sound(self, sound not None):
+    def stop_sound(self, sound_instance not None):
         """
         Stops all instances of the specified sound immediately on the track. Any queued instances
         will be removed from the queue.
         Args:
-            sound: The Sound to stop
+            sound_instance: The SoundInstance to stop
         """
 
         SDL_LockMutex(self.mutex)
 
         for i in range(self.max_simultaneous_sounds):
             if self.attributes.sound_players[i].status != player_idle and self.attributes.sound_players[
-                i].current.sound_id == sound.id:
+                i].current.sound_id == sound_instance.id:
                 # Set stop sound event
                 audio_message = self._get_available_audio_message()
                 if audio_message != NULL:
@@ -1817,33 +1770,33 @@ cdef class Track:
                 else:
                     self.log.error(
                         "All internal audio messages are currently "
-                        "in use, could not stop sound %s", sound.name)
+                        "in use, could not stop sound %s", sound_instance.name)
 
         # Remove any instances of the specified sound that are pending in the sound queue.
-        self._remove_sound_from_queue(sound)
+        self._remove_sound_from_queue(sound_instance)
 
-        self.log.debug("Stopping sound %s and removing any pending instances from queue", sound.name)
+        self.log.debug("Stopping sound %s and removing any pending instances from queue", sound_instance.name)
 
         SDL_UnlockMutex(self.mutex)
 
-    def stop_sound_looping(self, sound not None):
+    def stop_sound_looping(self, sound_instance not None):
         """
         Stops all instances of the specified sound on the track after they finish the current loop.
         Any queued instances of the sound will be removed.
         Args:
-            sound: The Sound to stop
+            sound_instance: The Sound to stop
         """
 
         SDL_LockMutex(self.mutex)
 
         for i in range(self.max_simultaneous_sounds):
             if self.attributes.sound_players[i].status != player_idle and self.attributes.sound_players[
-                i].current.sound_id == sound.id:
+                i].current.sound_id == sound_instance.id:
                 # Set sound's loops_remaining variable to zero
                 self.attributes.sound_players[i].current.loops_remaining = 0
 
         # Remove any instances of the specified sound that are pending in the sound queue.
-        self._remove_sound_from_queue(sound)
+        self._remove_sound_from_queue(sound_instance)
 
         SDL_UnlockMutex(self.mutex)
 
@@ -1886,22 +1839,30 @@ cdef class Track:
         SDL_UnlockMutex(self.mutex)
         return i, lowest_priority
 
-    cdef bint _play_sound_on_sound_player(self, sound, int player, int loops=0, Uint8 volume=MIX_MAX_VOLUME,
-                                          int priority=0, bint force=False):
+    cdef bint _play_sound_on_sound_player(self, sound_instance, int player, bint force=False):
         """
         Plays a sound using the specified sound player
+
+        Args:
+            sound_instance: The SoundInstance object to play
+            player: The player number to use to play the sound
+            force: Flag indicating whether or not the sound should be forced to play if
+                the player is already busy playing another sound.
+
+        Returns:
+
         """
         # Get the sound sample buffer container
-        cdef MixChunkContainer mc = sound.container
+        cdef MixChunkContainer chunk_container = sound_instance.container
         cdef int event_index
         cdef int envelope
         cdef AudioMessageContainer *audio_message
         cdef DuckingEnvelope *ducking_envelope
         cdef DuckingSettings *ducking_settings
 
-        if not sound.loaded:
+        if not sound_instance.sound.loaded:
             self.log.debug("Specified sound is not loaded, could not "
-                           "play sound %s", sound.name)
+                           "play sound %s", sound_instance.name)
             return False
 
         # Make sure the player in range
@@ -1910,7 +1871,7 @@ cdef class Track:
             # If the specified sound player is not idle do not play the sound if force is not set
             if self.attributes.sound_players[player].status != player_idle and not force:
                 self.log.debug("All sound players are currently in use, "
-                               "could not play sound %s", sound.name)
+                               "could not play sound %s", sound_instance.name)
                 SDL_UnlockMutex(self.mutex)
                 return False
 
@@ -1924,58 +1885,63 @@ cdef class Track:
                     self.attributes.sound_players[player].status = player_pending
                     audio_message.message = message_sound_play
 
-                audio_message.sound_id = sound.id
+                audio_message.sound_id = sound_instance.id
                 audio_message.track = self.number
                 audio_message.player = player
                 audio_message.time = SDL_GetTicks()
-                audio_message.data.play.chunk = mc.chunk
-                audio_message.data.play.volume = volume
-                audio_message.data.play.loops = loops
-                audio_message.data.play.priority = priority
+                audio_message.data.play.loops = sound_instance.loops
+                audio_message.data.play.priority = sound_instance.priority
+                audio_message.data.play.chunk = chunk_container.chunk
+
+                # Volume must be converted from a float (0.0 to 1.0) to an 8-bit integer (0..MIX_MAX_VOLUME)
+                audio_message.data.play.volume = <Uint8>(sound_instance.volume * MIX_MAX_VOLUME)
 
             else:
                 self.log.warning("All internal audio messages are "
                                "currently in use, could not play sound %s"
-                               , sound.name)
+                               , sound_instance.name)
 
+            """
             # If the sound has a ducking envelope, apply it to the target track
-            if sound.ducking is not None and sound.ducking.track is not None:
+            if sound_instance.ducking is not None and sound_instance.ducking.track is not None:
                 # To convert between the number of samples and a buffer position (bytes), we need to
                 # account for both the number of audio channels and number of bytes per sample (all
                 # samples are 16 bits)
                 samples_to_bytes_factor = self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
 
                 # First get an available ducking envelope from the target track
-                envelope = sound.ducking.track.get_available_ducking_envelope()
+                envelope = sound_instance.ducking.track.get_available_ducking_envelope()
                 if envelope == -1:
                     self.attributes.sound_players[player].current.sound_has_ducking = 0
                     self.log.warning("All ducking envelopes are "
                                      "currently in use in the target track, "
-                                     "could not apply ducking for sound %s", sound.name)
+                                     "could not apply ducking for sound %s", sound_instance.name)
                 else:
                     # Reserve the envelope
-                    sound.ducking.track.set_ducking_envelope_stage(envelope, envelope_stage_delay)
+                    sound_instance.ducking.track.set_ducking_envelope_stage(envelope, envelope_stage_delay)
 
                     # Set the ducking envelope settings for the sound player
                     self.attributes.sound_players[player].current.sound_has_ducking = 1
                     ducking_settings = cython.address(self.attributes.sound_players[player].current.ducking_settings)
-                    ducking_settings.track = sound.ducking.track.number
+                    ducking_settings.track = sound_instance.ducking.track.number
                     ducking_settings.envelope_num = envelope
-                    ducking_settings.attack_start_pos = sound.ducking.delay * samples_to_bytes_factor
-                    ducking_settings.attack_duration = sound.ducking.attack * samples_to_bytes_factor
-                    ducking_settings.attenuation_volume = <Uint8>(sound.ducking.attenuation * MIX_MAX_VOLUME)
-                    ducking_settings.release_start_pos = mc.chunk.alen - (
-                        sound.ducking.release_point * samples_to_bytes_factor)
-                    ducking_settings.release_duration = sound.ducking.release * samples_to_bytes_factor
+                    ducking_settings.attack_start_pos = sound_instance.ducking.delay * samples_to_bytes_factor
+                    ducking_settings.attack_duration = sound_instance.ducking.attack * samples_to_bytes_factor
+                    ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * MIX_MAX_VOLUME)
+                    ducking_settings.release_start_pos = chunk_container.chunk.alen - (
+                        sound_instance.ducking.release_point * samples_to_bytes_factor)
+                    ducking_settings.release_duration = sound_instance.ducking.release * samples_to_bytes_factor
 
-                    self.log.debug("Adding ducking settings to sound %s", sound.name)
+                    self.log.debug("Adding ducking settings to sound %s", sound_instance.name)
             else:
                 self.attributes.sound_players[player].current.sound_has_ducking = 0
+            """
+            self.attributes.sound_players[player].current.sound_has_ducking = 0
 
             SDL_UnlockMutex(self.mutex)
 
             self.log.debug("Sound %s is set to begin playback on player %d (loops=%d)",
-                           sound.name, player, loops)
+                           sound_instance.name, player, sound_instance.loops)
 
             return True
 
@@ -2113,9 +2079,9 @@ cdef class Track:
         SDL_UnlockMutex(self.mutex)
         return False
 
-    def sound_is_in_queue(self, sound):
-        """Returns whether or not the specified sound is currently in the queue"""
-        return sound in self._sound_queue_items
+    def sound_is_in_queue(self, sound_instance not None):
+        """Returns whether or not the specified sound instance is currently in the queue"""
+        return sound_instance in self._sound_queue_items
 
     @staticmethod
     def player_status_to_text(int status):
