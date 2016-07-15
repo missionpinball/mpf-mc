@@ -621,29 +621,11 @@ cdef class AudioInterface:
         # Process any internal notification messages that may cause other messages to be generated
         SDL_LockMutex(self.audio_callback_data.mutex)
         for i in range(MAX_AUDIO_MESSAGES):
-            if self.audio_callback_data.messages[i].message == message_sound_started:
-                # TODO: Process message
-
-                # Event has been processed, reset it so it may be used again
-                self.audio_callback_data.messages[i].message = message_not_in_use
-
-            elif self.audio_callback_data.messages[i].message == message_sound_stopped:
-                # TODO: Process message
-
-                # Event has been processed, reset it so it may be used again
-                self.audio_callback_data.messages[i].message = message_not_in_use
-
-            elif self.audio_callback_data.messages[i].message == message_sound_looping:
-                # TODO: Process message
-
-                # Event has been processed, reset it so it may be used again
-                self.audio_callback_data.messages[i].message = message_not_in_use
-
-            elif self.audio_callback_data.messages[i].message == message_sound_marker:
-                # TODO: Process message
-
-                # Event has been processed, reset it so it may be used again
-                self.audio_callback_data.messages[i].message = message_not_in_use
+            if self.audio_callback_data.messages[i].message != message_not_in_use:
+                # Dispatch message processing to target track
+                track = self.get_track(self.audio_callback_data.messages[i].track)
+                if track is not None:
+                    track.process_notification_message(i)
 
         SDL_UnlockMutex(self.audio_callback_data.mutex)
 
@@ -1412,6 +1394,7 @@ cdef class Track:
     cdef str _name
     cdef object _sound_queue
     cdef dict _sound_queue_items
+    cdef dict _active_sound_instances
     cdef float _volume
     cdef AudioCallbackData *_audio_callback_data
     cdef SDL_mutex *mutex
@@ -1447,6 +1430,7 @@ cdef class Track:
 
         self._sound_queue = PriorityQueue()
         self._sound_queue_items = dict()
+        self._active_sound_instances = dict()
 
         # Make sure the number of simultaneous sounds is within the allowable range
         if max_simultaneous_sounds > MAX_SIMULTANEOUS_SOUNDS_LIMIT:
@@ -1603,6 +1587,43 @@ cdef class Track:
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockMutex(self.mutex)
 
+    def process_notification_message(self, int message_num):
+        """Process a notification message to this track"""
+        cdef AudioMessageContainer *message_container = self._audio_callback_data.messages[message_num]
+
+        if message_container == NULL:
+            return
+
+        elif message_container.message == message_sound_started:
+            sound_instance = self._active_sound_instances[message_container.sound_instance_id]
+            if sound_instance is not None:
+                sound_instance.set_playing()
+
+            # Event has been processed, reset it so it may be used again
+            message_container.message = message_not_in_use
+
+        elif message_container.message == message_sound_stopped:
+            sound_instance = self._active_sound_instances[message_container.sound_instance_id]
+            if sound_instance is not None:
+                sound_instance.set_stopped()
+
+            # Event has been processed, reset it so it may be used again
+            message_container.message = message_not_in_use
+
+        elif message_container.message == message_sound_looping:
+            sound_instance = self._active_sound_instances[message_container.sound_instance_id]
+            if sound_instance is not None:
+                sound_instance.set_looping()
+
+            # Event has been processed, reset it so it may be used again
+            message_container.message = message_not_in_use
+
+        elif message_container.message == message_sound_marker:
+            # TODO: Process message
+
+            # Event has been processed, reset it so it may be used again
+            message_container.message = message_not_in_use
+
     def _get_next_sound(self):
         """
         Returns the next sound in the priority queue ready for playback.
@@ -1650,11 +1671,11 @@ cdef class Track:
                 # Return the next sound from the priority queue if it has not expired
                 if not exp_time or exp_time > time.time():
                     self.log.debug("Retrieving next pending sound from queue %s", queue_entry)
-                    # TODO: Notify sound instance it is no longer queued
+                    sound_instance.set_pending()  # Notify sound instance it is no longer queued
                     return sound_instance
                 else:
                     self.log.debug("Discarding expired sound from queue %s", queue_entry)
-                    # TODO: Notify sound instance it has expired
+                    sound_instance.set_expired()  # Notify sound instance it has expired
 
         return None
 
@@ -1673,6 +1694,7 @@ cdef class Track:
             entry = self._sound_queue_items[sound_instance]
             entry[2] = None
             self.log.debug("Removing pending sound from queue %s", sound_instance)
+            sound_instance.set_canceled()
             del self._sound_queue_items[sound_instance]
 
     def play_sound(self, sound_instance not None):
@@ -1753,7 +1775,8 @@ cdef class Track:
         entry = [-sound_instance.priority, exp_time, sound_instance]
         self._sound_queue.put(entry)
 
-        # TODO: Notify sound instance it has been queued
+        # Notify sound instance it has been queued
+        sound_instance.set_queued()
 
         # Save the new entry in a dictionary of entries keyed by sound.  This
         # dictionary is used to remove pending sounds from the priority queue.
@@ -1890,6 +1913,9 @@ cdef class Track:
                                "could not play sound %s", sound_instance.name)
                 SDL_UnlockMutex(self.mutex)
                 return False
+
+            # Save the sound instance in the track's list of active sound instances
+            self._active_sound_instances[sound_instance.id] = sound_instance
 
             # Set play sound event
             audio_message = self._get_available_audio_message()

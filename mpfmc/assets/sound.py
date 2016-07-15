@@ -671,7 +671,7 @@ class SoundInstance(object):
         # TODO: call any finished callback functions
 
         # Remove the instance from the list of active instances for the parent sound
-        del self.sound.instances[self.id]
+        # del self.sound.instances[self.id]
 
     @property
     def status(self):

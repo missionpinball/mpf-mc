@@ -111,10 +111,6 @@ class TestAudio(MpfMcTestCase):
         # Sound groups
         self.assertIn('drum_group', self.mc.sounds)
 
-        # Check if sounds are in special sounds_by_id list
-        #self.assertIn(self.mc.sounds['104457_moron_test'].id, self.mc.sounds_by_id)
-        #self.assertIn(self.mc.sounds['210871_synthping'].id, self.mc.sounds_by_id)
-
         # Make sure sound has ducking (since it was specified in the config files)
         self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
 
@@ -123,7 +119,7 @@ class TestAudio(MpfMcTestCase):
 
 
         # Test sound_player
-        # self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
+        self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
         self.mc.events.post('play_sound_text')
         self.mc.events.post('play_sound_music')
         self.advance_time(1)
@@ -142,7 +138,7 @@ class TestAudio(MpfMcTestCase):
         self.advance_time()
 
         # Make sure first sound is still playing and the second one has been queued
-        # self.assertEqual(track_voice.get_status()[0]['sound_id'], self.mc.sounds['113690_test'].id)
+        self.assertEqual(track_voice.get_status()[0]['sound_id'], self.mc.sounds['113690_test'].id)
         self.assertEqual(track_voice.get_sound_queue_count(), 1)
         self.assertTrue(track_voice.sound_is_in_queue(self.mc.sounds['104457_moron_test']))
         self.advance_time(0.1)
@@ -161,7 +157,7 @@ class TestAudio(MpfMcTestCase):
         self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
 
         # Ensure sound.events_when_looping is working properly (send event when a sound loops)
-        #self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_looping')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_looping')
 
         # Send an event to stop the text sound looping
         self.mc.events.post('stop_sound_looping_text')
@@ -194,9 +190,9 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(1)
 
         # Test sound events
-        #self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_played')
-        #self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_stopped')
-        #self.mc.bcp_processor.send.assert_any_call('trigger', name='synthping_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_stopped')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='synthping_played')
 
         # Check for internal sound event processing leaks (are there any internal sound
         # events that get generated, but never processed and cleared from the queue?)
