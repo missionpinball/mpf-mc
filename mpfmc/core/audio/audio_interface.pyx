@@ -550,7 +550,7 @@ cdef class AudioInterface:
         return new_track
 
     @staticmethod
-    def load_sound(str file_name):
+    def load_sound_chunk(str file_name):
         """
         Loads an audio file into a MixChunkContainer wrapper object for use in a Sound object.
         Used in asset loading for Sound objects.
@@ -581,7 +581,7 @@ cdef class AudioInterface:
         return mc
 
     @staticmethod
-    def unload_sound(container):
+    def unload_sound_chunk(container):
         """
         Unloads the source sample (Mix_Chunk) from the supplied container (used in Sound
         asset unloading).  The sound will no longer be in memory.

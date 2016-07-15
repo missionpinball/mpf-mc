@@ -293,7 +293,7 @@ class SoundAsset(Asset):
 
         # Load the sound file into memory
         try:
-            self._container = AudioInterface.load_sound(self.file)
+            self._container = AudioInterface.load_sound_chunk(self.file)
         except AudioException as exception:
             self.log.error("Load sound %s failed due to an exception - %s",
                            self.name, str(exception))
@@ -315,7 +315,7 @@ class SoundAsset(Asset):
     def _do_unload(self):
         """Unloads the asset from memory"""
 
-        AudioInterface.unload_sound(self._container)
+        AudioInterface.unload_sound_chunk(self._container)
         self._container = None
 
     def is_loaded(self):
