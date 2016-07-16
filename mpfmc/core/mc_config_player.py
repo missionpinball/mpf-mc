@@ -19,7 +19,7 @@ class McConfigPlayer(ConfigPlayer):
     def __repr__(self):
         return 'McConfigPlayer.{}'.format(self.show_section)
 
-    def _initialize(self):
+    def _initialise_system_wide(self):
         # this does not call super() since the base class uses self.config
         # and the mc uses self.machine_config
         if self.machine_collection_name:
@@ -27,14 +27,6 @@ class McConfigPlayer(ConfigPlayer):
                                              self.machine_collection_name)
         else:
             self.device_collection = None
-
-        self.instances['_global'][self.config_file_section] = dict()
-
-        self.machine.mode_controller.register_load_method(
-            self.process_mode_config, self.config_file_section)
-
-        self.machine.mode_controller.register_start_method(
-            self.mode_start, self.config_file_section)
 
         # Look through the machine config for config_player sections and
         # for shows to validate and process
