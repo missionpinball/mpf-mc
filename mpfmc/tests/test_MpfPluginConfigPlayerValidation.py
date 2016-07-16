@@ -5,7 +5,7 @@
 import logging
 import os
 import time
-from mock import *
+from unittest.mock import *
 
 import mpfmc
 from mpf.core.config_player import ConfigPlayer

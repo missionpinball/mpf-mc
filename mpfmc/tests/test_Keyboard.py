@@ -1,5 +1,5 @@
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 
 class TestKeyboard(MpfMcTestCase):
