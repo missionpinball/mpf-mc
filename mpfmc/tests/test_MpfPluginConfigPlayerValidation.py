@@ -7,6 +7,8 @@ import os
 import time
 from unittest.mock import *
 
+from mpf.tests.loop import TimeTravelLoop, TestClock
+
 import mpfmc
 from mpf.core.config_player import ConfigPlayer
 from mpf.tests.MpfTestCase import MpfTestCase, TestMachineController
@@ -45,15 +47,14 @@ class TestMpfPluginConfigPlayerValidation(MpfTestCase):
         self._mock_data_manager()
 
         try:
+            self.loop = TimeTravelLoop()
+            self.clock = TestClock(self.loop)
             # Note the 'True' for enabling plugins, change from base
             self.machine = TestMachineController(
                 os.path.abspath(os.path.join(
                     mpf.core.__path__[0], os.pardir)), machine_path,
                 self.getOptions(),
-                self.machine_config_patches, True)
-            self.realTime = self.machine.clock.time
-            self.testTime = self.realTime()
-            self.machine.clock.time = MagicMock(return_value=self.testTime)
+                self.machine_config_patches, self.clock, True)
 
             while not self.machine.test_init_complete:
                 self.advance_time_and_run(0.01)
