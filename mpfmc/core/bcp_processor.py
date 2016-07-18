@@ -4,7 +4,7 @@ from distutils.version import LooseVersion
 
 from kivy.clock import Clock
 
-import mpf.core.bcp as bcp
+import mpf.core.bcp.bcp_socket_client as bcp
 from mpfmc._version import __bcp_version__
 from mpfmc.core.bcp_server import BCPServer
 
@@ -26,7 +26,6 @@ class BcpProcessor(object):
         self.bcp_commands = {'config': self._bcp_config,
                              'dmd_start': self._bcp_dmd_start,
                              'error': self._bcp_error,
-                             'get': self._bcp_get,
                              'goodbye': self._bcp_goodbye,
                              'hello': self._bcp_hello,
                              'machine_variable': self._bcp_machine_variable,
@@ -38,12 +37,21 @@ class BcpProcessor(object):
                              'player_variable': self._bcp_player_variable,
                              'reset': self._bcp_reset,
                              'rgb_dmd_start': self._bcp_rgb_dmd_start,
-                             'set': self._bcp_set,
                              'switch': self._bcp_switch,
                              'trigger': self._bcp_trigger,
                              }
 
+        self.mc.events.add_handler('client_connected', self._client_connected)
+
         Clock.schedule_interval(self._get_from_queue, 0)
+
+    def _client_connected(self, **kwargs):
+        del kwargs
+        self.send("monitor_machine_vars")
+        self.send("monitor_player_vars")
+        self.send("register_trigger", event="ball_started")
+        self.send("register_trigger", event="ball_ended")
+        self.send("register_trigger", event="player_add_success")
 
     def _start_socket_thread(self):
         self.socket_thread = BCPServer(self.mc, self.receive_queue,
@@ -216,30 +224,6 @@ class BcpProcessor(object):
             the time, rather, only for switches that have been configured to
             send events to BCP.
             '''
-
-    def _bcp_get(self, **kwargs):
-        """Processes an incoming BCP 'get' command by posting an event
-        'bcp_get_<name>'. It's up to an event handler to register for that
-        event and to send the response BCP 'set' command.
-
-        """
-        # for name in Util.string_to_list(names):
-        #     self.mc.events.post('bcp_get_{}'.format(name))
-
-        pass  # todo
-
-    def _bcp_set(self, **kwargs):
-        """Processes an incoming BCP 'set' command by posting an event
-        'bcp_set_<name>' with a parameter value=<value>. It's up to an event
-        handler to register for that event and to do something with it.
-
-        Note that BCP set commands can contain multiple key/value pairs, and
-        this method will post one event for each pair.
-
-        """
-        for k, v in kwargs.items():
-            self.mc.events.post('bcp_set_{}'.format(k), value=v)
-            # docstring covered in MPF
 
     def _bcp_config(self, **kwargs):
         """Processes an incoming BCP 'config' command."""

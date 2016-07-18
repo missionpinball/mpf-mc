@@ -186,7 +186,7 @@ setup(
 
     install_requires=install_requires,
 
-    tests_require=['mock'],
+    tests_require=[],
 
     entry_points="""
     [mpf.config_player]

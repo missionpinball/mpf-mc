@@ -37,6 +37,7 @@ install:
       USE_OSX_FRAMEWORKS=0 pip3 install .;
 
     fi;
+ - pip3 install https://github.com/pyserial/pyserial-asyncio/archive/master.zip
 
 before_script:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then

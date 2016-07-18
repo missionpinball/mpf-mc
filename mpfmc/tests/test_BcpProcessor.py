@@ -1,4 +1,4 @@
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 from mpfmc._version import __version__
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
