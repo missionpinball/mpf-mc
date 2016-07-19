@@ -110,17 +110,27 @@ class SoundAsset(Asset):
         self._instances = list()
         self.log = logging.getLogger('SoundAsset')
 
-        # Make sure a legal track name has been specified.  If not, throw an exception
-        if 'track' in self.config:
-            track = self.machine.sound_system.audio_interface.get_track_by_name(self.config['track'])
+        # Make sure a legal track name has been specified (unless only one track exists)
+        if 'track' not in self.config:
+            # Track not specified, determine track count
+            if self.machine.sound_system.audio_interface.get_track_count() == 1:
+                # Only one track exists, assign default track
+                track = self.machine.sound_system.audio_interface.get_track(0)
+            else:
+                # More than one track exists, raise error
+                self.log.error("sound must have a valid track name. "
+                               "Could not create sound '%s' asset.", name)
+                raise AudioException("Sound must have a valid track name. "
+                                     "Could not create sound '{}' asset".format(name))
         else:
-            track = None
-
-        if 'track' not in self.config or track is None:
-            self.log.error("sound must have a valid track name. "
-                           "Could not create sound '%s' asset.", name)
-            raise AudioException("Sound must have a valid track name. "
-                                 "Could not create sound '{}' asset".format(name))
+            # Track specified in config, validate it
+            track = self.machine.sound_system.audio_interface.get_track_by_name(
+                self.config['track'])
+            if track is None:
+                self.log.error("'%s' is not a valid track name. "
+                               "Could not create sound '%s' asset.", self.config['track'], name)
+                raise AudioException("'{}' is not a valid track name. "
+                                     "Could not create sound '{}' asset".format(self.config['track'], name))
 
         self._track = track
 
