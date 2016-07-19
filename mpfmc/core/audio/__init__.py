@@ -102,9 +102,6 @@ class SoundSystem(object):
         # Establish machine tick function callback (will process internal audio events)
         Clock.schedule_interval(self.tick, 0)
 
-        # Establish event callback functions
-        # Setup event triggers (sound events trigger BCP triggers)
-
         # Start audio engine processing
         self.audio_interface.enable()
         self._initialized = True

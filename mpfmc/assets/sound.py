@@ -337,6 +337,7 @@ class SoundAsset(Asset):
         sound_instance = SoundInstance(self, settings)
         sound_instance.track.play_sound(sound_instance)
         self._instances.append(sound_instance)
+
         return sound_instance
 
     def stop(self):
@@ -477,8 +478,8 @@ class SoundInstance(object):
 
     def __repr__(self):
         """String that's returned if someone prints this object"""
-        return '<SoundInstance: {} ({}), Volume={}, Loops={}, Loaded={}>'.format(
-            self.sound.name, self.id, self.volume, self.loops, self.sound.loaded)
+        return '<SoundInstance: {} ({}), Volume={}, Loops={}, Loaded={}, Track={}>'.format(
+            self.sound.name, self.id, self.volume, self.loops, self.sound.loaded, self.track.name)
 
     def __lt__(self, other):
         """Less than comparison operator"""

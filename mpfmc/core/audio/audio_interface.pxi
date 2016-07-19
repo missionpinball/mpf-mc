@@ -155,6 +155,10 @@ cdef union Sample16Bit:
     Sint16 value
     Sample16Bytes bytes
 
+
+# The number of control points per audio buffer (sets control rate for ducking)
+DEF CONTROL_POINTS_PER_BUFFER = 16
+
 ctypedef struct TrackAttributes:
     int number
     int max_simultaneous_sounds
@@ -162,7 +166,8 @@ ctypedef struct TrackAttributes:
     void *buffer
     int buffer_size
     SoundPlayer *sound_players
-    DuckingEnvelope **ducking_envelopes
+    int ducking_is_active
+    Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
 
 cdef enum SoundPlayerStatus:
     # Enumeration of the possible AudioSamplePlayer status values.
