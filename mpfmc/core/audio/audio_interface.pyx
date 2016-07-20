@@ -1590,19 +1590,27 @@ cdef class Track:
     def process(self):
         """Processes the track queue each tick."""
 
+        cdef bint keep_checking = True
+        cdef int idle_sound_player
+
         # Lock the mutex to ensure no audio data is changed during the playback processing
         # (multi-threaded protection)
         SDL_LockMutex(self.mutex)
 
-        # See if there are now any idle sound players
-        cdef int idle_sound_player = self._get_idle_sound_player()
-        if idle_sound_player >= 0:
-            # Found an idle player, check if there are any sounds queued for playback
-            sound_instance = self._get_next_sound()
+        while keep_checking:
+            # See if there are now any idle sound players
+            idle_sound_player = self._get_idle_sound_player()
+            if idle_sound_player >= 0:
+                # Found an idle player, check if there are any sounds queued for playback
+                sound_instance = self._get_next_sound()
 
-            if sound_instance is not None:
-                self.log.debug("Getting sound from queue %s", sound_instance)
-                self._play_sound_on_sound_player(sound_instance=sound_instance, player=idle_sound_player)
+                if sound_instance is not None:
+                    self.log.debug("Getting sound from queue %s", sound_instance)
+                    self._play_sound_on_sound_player(sound_instance=sound_instance, player=idle_sound_player)
+                else:
+                    keep_checking = False
+            else:
+                keep_checking = False
 
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockMutex(self.mutex)
