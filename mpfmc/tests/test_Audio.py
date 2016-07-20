@@ -33,7 +33,7 @@ class TestAudio(MpfMcTestCase):
         # Check basic audio interface settings
         settings = interface.get_settings()
         self.assertIsNotNone(settings)
-        self.assertEqual(settings['buffer_samples'], 4096)
+        self.assertEqual(settings['buffer_samples'], 2048)
         self.assertEqual(settings['audio_channels'], 2)
         self.assertEqual(settings['sample_rate'], 44100)
 
