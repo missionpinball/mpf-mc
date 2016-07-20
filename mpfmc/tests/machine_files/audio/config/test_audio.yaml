@@ -1,8 +1,8 @@
 #config_version=4
 sound_system:
-  buffer: 2048
+  buffer: 4096
   frequency: 44100
-  channels: 2
+  channels: 1
   master_volume: 0.9
   tracks:
     music:
@@ -41,13 +41,6 @@ sounds:
     104457_moron_test:
         events_when_played: moron_test_played
         events_when_stopped: moron_test_stopped
-        ducking:
-            target: music
-            delay: 0
-            attack: 1.0sec
-            attenuation: -18db
-            release_point: 3sec
-            release: 2.25sec
         markers:
             - time: 2.5sec
               events: moron_marker
