@@ -5,17 +5,17 @@ sound_system:
   channels: 2
   master_volume: 0.9
   tracks:
-    voice:
-      volume: 0.6
+    music:
+      volume: 0.5
       simultaneous_sounds: 1
-      preload: yes
     sfx:
       volume: 0.4
       simultaneous_sounds: 8
       preload: yes
-    music:
-      volume: 0.5
+    voice:
+      volume: 0.6
       simultaneous_sounds: 1
+      preload: yes
 
 modes:
  - mode1
