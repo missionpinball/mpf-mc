@@ -160,6 +160,7 @@ cdef union Sample16Bit:
 DEF CONTROL_POINTS_PER_BUFFER = 16
 
 ctypedef struct TrackAttributes:
+    int active
     int number
     int max_simultaneous_sounds
     Uint8 volume
@@ -179,29 +180,20 @@ cdef enum SoundPlayerStatus:
     player_stopping,
 
 ctypedef struct DuckingSettings:
-    int track
-    int envelope_num
+    int track_bit_mask
     Sint32 attack_start_pos
     Sint32 attack_duration
     Uint8 attenuation_volume
     Sint32 release_start_pos
     Sint32 release_duration
 
-ctypedef struct DuckingEnvelope:
-    DuckingEnvelopeStage stage
-    Sint32 stage_pos
-    Sint32 stage_duration
-    Uint8 stage_initial_volume
-    Uint8 stage_target_volume
-    Uint8 current_volume
-
-cdef enum DuckingEnvelopeStage:
-    envelope_stage_idle,
-    envelope_stage_delay,
-    envelope_stage_attack,
-    envelope_stage_sustain,
-    envelope_stage_release,
-    envelope_stage_finished
+cdef enum DuckingStage:
+    ducking_stage_idle,
+    ducking_stage_delay,
+    ducking_stage_attack,
+    ducking_stage_hold,
+    ducking_stage_release,
+    ducking_stage_finished
 
 ctypedef struct SoundSettings:
     Mix_Chunk *chunk
@@ -214,6 +206,8 @@ ctypedef struct SoundSettings:
     int sound_priority
     int sound_has_ducking
     DuckingSettings ducking_settings
+    DuckingStage ducking_stage
+    Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
 
 ctypedef struct SoundPlayer:
     # The SoundPlayer keeps track of the current sample position in the source audio
@@ -242,6 +236,7 @@ ctypedef struct AudioCallbackData:
     RequestMessageContainer **request_messages
     NotificationMessageContainer **notification_messages
     SDL_mutex *mutex
+    FILE *c_log_file
 
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 """Contains sound-related asset classes used by the audio system"""
 
 import logging
+import sys
 from enum import Enum, unique
 
 from mpf.core.assets import Asset, AssetPool
@@ -181,7 +182,12 @@ class SoundAsset(Asset):
             self._markers = SoundAsset.load_markers(self.config['markers'], self.name)
 
         if 'ducking' in self.config:
-            self._ducking = DuckingSettings(self.machine, self.config['ducking'])
+            try:
+                self._ducking = DuckingSettings(self.machine, self.config['ducking'])
+            except AudioException:
+                raise AudioException("Error in ducking settings: {}. "
+                                     "Could not create sound '{}' asset"
+                                     .format(sys.exc_info()[1], self.name))
 
             # An attenuation value of exactly 1.0 does absolutely nothing so
             # there is no point in keeping the ducking settings for this
@@ -728,7 +734,7 @@ class DuckingSettings(object):
 
         Notes:
             The config section should contain the following attributes:
-                target: The track name to apply the ducking to when the sound is played.
+                target: A list of track names to apply the ducking to when the sound is played.
                 delay: The duration (in seconds) of the delay period (time before attack starts)
                 attack: The duration (in seconds) of the attack stage of the ducking envelope
                 attenuation: The attenuation (gain) (0.0 to 1.0) to apply to the target track while
@@ -748,9 +754,20 @@ class DuckingSettings(object):
             raise AudioException("'ducking.target' must contain at least one "
                                  "valid audio track name")
 
-        self._track = mc.sound_system.audio_interface.get_track_by_name(config['target'])
-        if self._track is None:
-            raise AudioException("'ducking.target' must contain a valid audio track name")
+        # Target can contain a list of track names - convert string to list and validate
+        self._targets = Util.string_to_list(config['target'])
+        if len(self._targets) == 0:
+            raise AudioException("'ducking.target' must contain at least one "
+                                 "valid audio track name")
+
+        # Create a bit mask of target tracks based on their track number (will be used to pass
+        # the target data to the audio library).
+        self._track_bit_mask = 0
+        for target in self._targets:
+            track = mc.sound_system.audio_interface.get_track_by_name(target)
+            if track is None:
+                raise AudioException("'ducking.target' contains an invalid track name '%s'", target)
+            self._track_bit_mask += (1 << track.number)
 
         # Delay is optional (defaults to 0, must be >= 0)
         if 'delay' in config:
@@ -787,9 +804,14 @@ class DuckingSettings(object):
                                 MINIMUM_DUCKING_DURATION))
 
     @property
-    def track(self):
-        """ The track object to apply the ducking envelope"""
-        return self._track
+    def targets(self):
+        """Return the list of target track names"""
+        return self._targets
+
+    @property
+    def track_bit_mask(self):
+        """ A bit mask of target tracks (each bit represents a track)"""
+        return self._track_bit_mask
 
     @property
     def delay(self):

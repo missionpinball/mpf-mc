@@ -12,9 +12,10 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev00')
+__version_info__ = ('0', '31', '0', 'dev01')
 __version__ = '.'.join(__version_info__)
 
+from libc.stdio cimport FILE, fopen, fprintf
 from libc.stdlib cimport malloc, free, calloc
 from libc.string cimport memset, memcpy
 from cpython.mem cimport PyMem_Malloc, PyMem_Free
@@ -153,6 +154,8 @@ cdef class AudioInterface:
         self.audio_callback_data.master_volume = MIX_MAX_VOLUME // 2
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackAttributes**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackAttributes*))
+        self.audio_callback_data.c_log_file = NULL
+        #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
 
         # Initialize request messages
         self.audio_callback_data.request_messages = <RequestMessageContainer**> PyMem_Malloc(
@@ -569,6 +572,7 @@ cdef class AudioInterface:
         SDL_UnlockAudio()
 
         self.log.debug("The '%s' track has successfully been created.", name)
+        print("Track created", new_track)
 
         return new_track
 
@@ -713,12 +717,6 @@ cdef class AudioInterface:
 
         # Loop over tracks, mixing the playing sounds into the track's audio buffer
         for track_num in range(callback_data.track_count):
-            # Zero out track buffer (start with silence)
-            memset(callback_data.tracks[track_num].buffer, 0, buffer_length)
-
-            # Reset ducking for the track (will be calculated/enabled in the mix function)
-            callback_data.tracks[track_num].ducking_is_active = 0
-
             # Mix any playing sounds into the track buffer
             mix_sounds_to_track(callback_data.tracks[track_num],
                                 buffer_length,
@@ -727,14 +725,17 @@ cdef class AudioInterface:
         # Loop over tracks again, mixing down tracks to the master output buffer
         for track_num in range(callback_data.track_count):
 
-            # Apply ducking to track audio buffer (when applicable)
-            apply_track_ducking(callback_data.tracks[track_num], buffer_length, callback_data)
+            # Only mix the track to the master output if it is active
+            if callback_data.tracks[track_num].active:
 
-            # Apply track volume and mix to output buffer
-            mix_track_to_output(<Uint8*> callback_data.tracks[track_num].buffer,
-                                callback_data.tracks[track_num].volume,
-                                <Uint8*> output_buffer,
-                                buffer_length)
+                # Apply ducking to track audio buffer (when applicable)
+                apply_track_ducking(callback_data.tracks[track_num], buffer_length, callback_data)
+
+                # Apply track volume and mix to output buffer
+                mix_track_to_output(<Uint8*> callback_data.tracks[track_num].buffer,
+                                    callback_data.tracks[track_num].volume,
+                                    <Uint8*> output_buffer,
+                                    buffer_length)
 
         # Apply master volume to output buffer
         apply_volume_to_buffer(<Uint8*> output_buffer, buffer_length, callback_data.master_volume)
@@ -835,9 +836,17 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
     cdef Uint32 fade_out_duration
     cdef Uint32 sound_samples_remaining
     cdef Uint8 volume
-    cdef DuckingSettings *ducking_settings
-    cdef TrackAttributes *target_track
-    cdef DuckingEnvelope *envelope
+
+    cdef Uint32 samples_per_control_point
+    cdef Uint32 control_point_pos
+    cdef int ducking_is_active
+    cdef float progress
+    cdef int track_num
+
+    # Reset track buffer and attributes
+    track.active = 0
+    track.ducking_is_active = 0
+    memset(track.buffer, 0, buffer_size)
 
     # Loop over track sound players
     for player in range(track.max_simultaneous_sounds):
@@ -847,6 +856,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
             continue
 
         index = 0
+        track.active = 1
 
         # Check if player has been requested to stop a sound
         if track.sound_players[player].status is player_stopping:
@@ -988,13 +998,66 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
             # 16-bit sample value before being mixed)
             sound_buffer = <Uint8*> track.sound_players[player].current.chunk.abuf
 
+            # Process sound ducking (if applicable)
             if track.sound_players[player].current.sound_has_ducking:
-                # TODO: implement ducking checks here
 
-                # Check if ducking attack starts in this frame
+                ducking_is_active = 0
+                samples_per_control_point = buffer_size // CONTROL_POINTS_PER_BUFFER
+                control_point_pos = track.sound_players[player].current.sample_pos
 
-                # Check if ducking release starts in this frame
-                pass
+                # Loop over control points in sound
+                for control_point in range(CONTROL_POINTS_PER_BUFFER):
+
+                    # Determine control point ducking stage and calculate control point
+                    if control_point_pos >= track.sound_players[player].current.ducking_settings.release_start_pos + track.sound_players[player].current.ducking_settings.release_duration:
+                        # Ducking finished
+                        track.sound_players[player].current.ducking_control_points[control_point] = MIX_MAX_VOLUME
+
+                    elif control_point_pos >= track.sound_players[player].current.ducking_settings.release_start_pos:
+                        # Ducking release stage
+                        ducking_is_active = 1
+                        progress = (control_point_pos - track.sound_players[player].current.ducking_settings.release_start_pos) / track.sound_players[player].current.ducking_settings.release_duration
+                        track.sound_players[player].current.ducking_control_points[control_point] = \
+                            lerpU8(in_out_quad(progress), track.sound_players[player].current.ducking_settings.attenuation_volume, MIX_MAX_VOLUME)
+
+                    elif control_point_pos >= track.sound_players[player].current.ducking_settings.attack_start_pos + track.sound_players[player].current.ducking_settings.attack_duration:
+                        # Ducking hold state
+                        ducking_is_active = 1
+                        track.sound_players[player].current.ducking_control_points[control_point] = track.sound_players[player].current.ducking_settings.attenuation_volume
+
+                    elif control_point_pos >= track.sound_players[player].current.ducking_settings.attack_start_pos:
+                        # Ducking attack stage
+                        ducking_is_active = 1
+                        progress = (control_point_pos - track.sound_players[player].current.ducking_settings.attack_start_pos) / track.sound_players[player].current.ducking_settings.attack_duration
+                        track.sound_players[player].current.ducking_control_points[control_point] = \
+                            lerpU8(in_out_quad(progress), MIX_MAX_VOLUME, track.sound_players[player].current.ducking_settings.attenuation_volume)
+
+                    else:
+                        # Ducking delay stage
+                        track.sound_players[player].current.ducking_control_points[control_point] = MIX_MAX_VOLUME
+
+                    # Move to next control point
+                    control_point_pos += samples_per_control_point
+
+                    # Loop back to beginning of sound (if looping)
+                    if control_point_pos >= track.sound_players[player].current.chunk.alen and track.sound_players[player].current.loops_remaining != 0:
+                        control_point_pos -= track.sound_players[player].current.chunk.alen
+
+                # Apply ducking to target track(s) (when applicable)
+                if ducking_is_active == 1:
+                    for track_num in range(callback_data.track_count):
+                        if (1 << track_num) & track.sound_players[player].current.ducking_settings.track_bit_mask:
+                            if callback_data.tracks[track_num].ducking_is_active == 1:
+                                # Ducking is already active on the track; take the minimum value at each control point
+                                for control_point in range(CONTROL_POINTS_PER_BUFFER):
+                                    callback_data.tracks[track_num].ducking_control_points[control_point] = min(
+                                        callback_data.tracks[track_num].ducking_control_points[control_point],
+                                        track.sound_players[player].current.ducking_control_points[control_point])
+                            else:
+                                # Ducking not active on track; set it to active and assign control points
+                                callback_data.tracks[track_num].ducking_is_active = 1
+                                for control_point in range(CONTROL_POINTS_PER_BUFFER):
+                                    callback_data.tracks[track_num].ducking_control_points[control_point] = track.sound_players[player].current.ducking_control_points[control_point]
 
             # Loop over destination buffer, mixing in the source sample
             while index < buffer_size:
@@ -1017,6 +1080,10 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
                                             callback_data.notification_messages, sdl_ticks)
                     if track.sound_players[player].status is player_finished:
                         break
+
+                # TODO: Hold sound processing until ducking has finished
+                # It is possible to have the ducking release finish after the sound has stopped.  In that
+                # case, silence should be generated until the ducking is done.
 
         # Check if the sound has finished
         if track.sound_players[player].status is player_finished:
@@ -1142,18 +1209,20 @@ cdef void apply_track_ducking(TrackAttributes* track, Uint32 buffer_size, AudioC
         return
 
     cdef Uint32 buffer_pos = 0
-    cdef Uint32 samples_per_control_point = buffer_size // (CONTROL_POINTS_PER_BUFFER * BYTES_PER_SAMPLE)
+    cdef Uint32 samples_per_control_point = buffer_size // CONTROL_POINTS_PER_BUFFER
+    cdef Uint8 ducking_volume
+    cdef int control_point
 
     # No need to do anything if ducking is not active on this track
     if track.ducking_is_active != 1:
         return
 
     # Loop over track buffer
-    for index in range(CONTROL_POINTS_PER_BUFFER):
-        ducking_volume = track.ducking_control_points[index]
+    for control_point in range(CONTROL_POINTS_PER_BUFFER):
+        ducking_volume = track.ducking_control_points[control_point]
         if ducking_volume < MIX_MAX_VOLUME:
-            apply_volume_to_buffer_sample(<Uint8*> track.buffer, buffer_pos, ducking_volume,
-                                          samples_per_control_point)
+            apply_volume_to_buffer_range(<Uint8*> track.buffer, buffer_pos, ducking_volume,
+                                           samples_per_control_point)
 
         buffer_pos += samples_per_control_point
 
@@ -1191,29 +1260,26 @@ cdef void apply_volume_to_buffer(Uint8 *buffer, int buffer_length, Uint8 volume)
 
         buffer_pos += BYTES_PER_SAMPLE
 
-cdef inline void apply_volume_to_buffer_sample(Uint8 *buffer, Uint32 buffer_pos, Uint8 volume, Uint32 sample_count=1) nogil:
+cdef inline void apply_volume_to_buffer_range(Uint8 *buffer, Uint32 start_pos, Uint8 volume, Uint32 length=2) nogil:
     """
-    Applies the specified volume to one or more samples in an audio buffer
-    at the specified buffer position.
+    Applies the specified volume to a range of samples in an audio buffer at the specified
+    buffer position.
     Args:
         buffer: The audio buffer
-        buffer_pos: The audio buffer position at which to apply the volume level
+        start_pos: The starting audio buffer position at which to apply the volume level
         volume: The volume level to apply (8-bit unsigned value 0 to MIX_MAX_VOLUME)
-        sample_count: The number of samples to apply the volume level to (not the number of bytes)
-    Notes:
-        This function does not consider the number of channels in the buffer, but does take into account
-        the number of bytes per sample.
+        length: The number of bytes to apply the volume to
     """
     cdef Sample16Bit buffer_sample
-    cdef Uint32 sample = 0
+    cdef Uint32 buffer_pos = start_pos
 
-    while sample < sample_count:
-        buffer_sample.bytes.byte0 = buffer[buffer_pos + BYTES_PER_SAMPLE * sample]
-        buffer_sample.bytes.byte1 = buffer[buffer_pos + BYTES_PER_SAMPLE * sample + 1]
+    while buffer_pos < start_pos + length:
+        buffer_sample.bytes.byte0 = buffer[buffer_pos]
+        buffer_sample.bytes.byte1 = buffer[buffer_pos + 1]
         buffer_sample.value = (buffer_sample.value * volume) // MIX_MAX_VOLUME
-        buffer[buffer_pos + BYTES_PER_SAMPLE * sample] = buffer_sample.bytes.byte0
-        buffer[buffer_pos + BYTES_PER_SAMPLE * sample + 1] = buffer_sample.bytes.byte1
-        sample += 1
+        buffer[buffer_pos] = buffer_sample.bytes.byte0
+        buffer[buffer_pos + 1] = buffer_sample.bytes.byte1
+        buffer_pos += BYTES_PER_SAMPLE
 
 cdef inline void mix_sound_sample_to_buffer(Uint8 *sound_buffer, Uint32 sample_pos, Uint8 sound_volume,
                                             Uint8 *output_buffer, Uint32 buffer_pos) nogil:
@@ -1439,6 +1505,7 @@ cdef class Track:
             self.attributes.sound_players[i].current.sound_instance_id = 0
             self.attributes.sound_players[i].current.sound_priority = 0
             self.attributes.sound_players[i].current.sound_has_ducking = 0
+            self.attributes.sound_players[i].current.ducking_stage = ducking_stage_idle
             self.attributes.sound_players[i].next.chunk = NULL
             self.attributes.sound_players[i].next.loops_remaining = 0
             self.attributes.sound_players[i].next.current_loop = 0
@@ -1448,6 +1515,7 @@ cdef class Track:
             self.attributes.sound_players[i].next.sound_instance_id = 0
             self.attributes.sound_players[i].next.sound_priority = 0
             self.attributes.sound_players[i].next.sound_has_ducking = 0
+            self.attributes.sound_players[i].next.ducking_stage = ducking_stage_idle
 
         SDL_UnlockMutex(self.mutex)
 
@@ -1913,15 +1981,21 @@ cdef class Track:
                                , sound_instance.name)
 
             # If the sound has ducking settings, apply them
-            if sound_instance.ducking is not None and sound_instance.ducking.track is not None:
-                # To convert between the number of samples and a buffer position (bytes), we need to
-                # account for both the number of audio channels and number of bytes per sample (all
-                # samples are 16 bits)
-                samples_to_bytes_factor = self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
+            if sound_instance.ducking is not None and sound_instance.ducking.track_bit_mask != 0:
+                # To convert between the number of seconds and a buffer position (bytes), we need to
+                # account for the sample rate (sampes per second), the number of audio channels, and the
+                # number of bytes per sample (all samples are 16 bits)
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
 
-                # TODO: Apply ducking settings to sound player here
+                self.attributes.sound_players[player].current.sound_has_ducking = 1
+                self.attributes.sound_players[player].current.ducking_settings.track_bit_mask = sound_instance.ducking.track_bit_mask
+                self.attributes.sound_players[player].current.ducking_settings.attack_start_pos = sound_instance.ducking.delay * seconds_to_bytes_factor
+                self.attributes.sound_players[player].current.ducking_settings.attack_duration = sound_instance.ducking.attack * seconds_to_bytes_factor
+                self.attributes.sound_players[player].current.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * MIX_MAX_VOLUME)
+                self.attributes.sound_players[player].current.ducking_settings.release_start_pos = sound_instance.ducking.release_point * seconds_to_bytes_factor
+                self.attributes.sound_players[player].current.ducking_settings.release_duration = sound_instance.ducking.release * seconds_to_bytes_factor
+                self.attributes.sound_players[player].current.ducking_stage = ducking_stage_delay
 
-                self.attributes.sound_players[player].current.sound_has_ducking = 0 # 1 !!!!!!!
                 self.log.debug("Adding ducking settings to sound %s", sound_instance.name)
             else:
                 self.attributes.sound_players[player].current.sound_has_ducking = 0
