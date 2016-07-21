@@ -71,12 +71,6 @@ cdef class AudioInterface:
     cdef object mc
     cdef object log
 
-    # In order to get the SDL_Mixer library to work with the desired features needed for the
-    # media controller, a sound must be played at all times on a mixer channel.  A sound
-    # containing silence is created and stored in the audio interface to be played by the
-    # SDL_Mixer channel.
-    cdef Mix_Chunk *raw_chunk_silence
-
     cdef AudioCallbackData *audio_callback_data
 
     def __cinit__(self, *args, **kw):
@@ -86,7 +80,6 @@ cdef class AudioInterface:
         self.buffer_size = 0
         self.supported_formats = 0
         self.mixer_channel = -1
-        self.raw_chunk_silence = NULL
         self.audio_callback_data = NULL
 
     def __init__(self, mc, rate=44100, channels=2, buffer_samples=4096):
@@ -187,9 +180,6 @@ cdef class AudioInterface:
         # Initialize the supported SDL_Mixer library formats
         self.supported_formats = Mix_Init(MIX_INIT_OGG)
 
-        self._initialize_silence()
-        self._initialize_audio_callback()
-
         # Unlock the SDL audio callback functions
         SDL_UnlockAudio()
 
@@ -221,47 +211,6 @@ cdef class AudioInterface:
         # SDL_Mixer and SDL no longer needed
         Mix_Quit()
         SDL_Quit()
-
-    def _initialize_silence(self):
-        """
-        Initializes and generates an audio chunk/sample containing silence (used to play on each
-        track since each track in SDL_Mixer must play something to call its effects callback
-        functions which are used in this library to perform the actual sound generation/mixing)
-        """
-        # Create the audio buffer containing silence
-        cdef Uint8 *silence = NULL
-        cdef Uint32 length = self.buffer_size
-        silence = <Uint8 *>PyMem_Malloc(length)
-        memset(silence, 0, length)
-
-        # Instruct SDL_Mixer to load the silence into a chunk
-        self.raw_chunk_silence = Mix_QuickLoad_RAW(silence, length)
-        PyMem_Free(silence)
-
-        if self.raw_chunk_silence == NULL:
-            raise AudioException('Unable to load generated silence sample required for playback')
-        else:
-            self.log.debug("Silence audio chunk initialized (required for SDL_Mixer callback)")
-
-    def _initialize_audio_callback(self):
-        # Set the number of channels to mix (will cause existing channels to be stopped and restarted if playing)
-        # This is an SDL_Mixer library function call.
-        channels = Mix_AllocateChannels(1)
-        self.log.debug("SDL_Mixer - Allocated %d channel for final audio output", channels)
-        self.mixer_channel = 0
-
-        # Ensure channel volume is at maximum (should be the default, but we'll set it manually
-        # in case the default ever changes)
-        Mix_Volume(self.mixer_channel, MIX_MAX_VOLUME)
-
-        # Setup callback function for mixer channel depending upon the audio format used
-        cdef Mix_EffectFunc_t audio_callback_fn = AudioInterface.audio_callback
-
-        # Register the audio callback function that will perform the actual mixing of sounds.
-        # A pointer to the audio callback data is passed to the callback function that contains
-        # all necessary data to perform the playback and mixing of sounds.
-        # This is an SDL_Mixer library function call.
-        Mix_RegisterEffect(self.mixer_channel, audio_callback_fn, NULL, <void *> self.audio_callback_data)
 
     @staticmethod
     def initialize(int rate=44100, int channels=2, int buffer_samples=4096, **kwargs):
@@ -446,48 +395,32 @@ cdef class AudioInterface:
 
     @property
     def enabled(self):
-        cdef int channel
+        cdef void *data
         SDL_LockAudio()
-        channel = Mix_Playing(self.mixer_channel) == 1
+        data = Mix_GetMusicHookData()
         SDL_UnlockAudio()
-        return channel
+        return data != NULL
 
-    def enable(self, int fade_sec=0):
+    def enable(self):
         """
-        Enables audio playback with a fade in (begins audio processing)
-        Args:
-            fade_sec:  The number of seconds over which to fade in the audio
+        Enables audio playback (begins audio processing)
         """
-        cdef int fade_ms = 0
-
         self.log.debug("Enabling audio playback")
 
         SDL_LockAudio()
-        if fade_sec > 0:
-            fade_ms = fade_sec // 1000
-            Mix_FadeInChannel(self.mixer_channel, self.raw_chunk_silence, -1, fade_ms)
-        else:
-            Mix_PlayChannel(self.mixer_channel, self.raw_chunk_silence, -1)
-
+        # Establish custom music hook/callback function
+        Mix_HookMusic(AudioInterface.audio_callback, <void*>self.audio_callback_data)
         SDL_UnlockAudio()
 
-    def disable(self, int fade_sec=0):
+    def disable(self):
         """
-        Disables audio playback after fading out (stops audio processing)
-        Args:
-            fade_sec:  The number of seconds over which to fade out the audio
+        Disables audio playback (stops audio processing)
         """
-        cdef int fade_ms = 0
-
         self.log.debug("Disabling audio playback")
 
         SDL_LockAudio()
-        if fade_sec > 0:
-            fade_ms = fade_sec // 1000
-            Mix_FadeOutChannel(self.mixer_channel, fade_ms)
-        else:
-            Mix_HaltChannel(self.mixer_channel)
-
+        # Remove custom music hook/callback function
+        Mix_HookMusic(NULL, NULL)
         SDL_UnlockAudio()
 
     @classmethod
@@ -676,22 +609,20 @@ cdef class AudioInterface:
         return in_use_message_count
 
     @staticmethod
-    cdef void audio_callback(int channel, void *output_buffer, int length, void *data) nogil:
+    cdef void audio_callback(void* data, Uint8 *output_buffer, int length) nogil:
         """
         Main audio callback function (called from SDL_Mixer).
         Args:
-            channel: The SDL_Mixer channel number (corresponds to the audio interface channel number)
-            output_buffer: The SDL_Mixer audio buffer for the mixer channel to process
-            length: The length (bytes) of the audio buffer
             data: A pointer to the AudioCallbackData class for the channel (contains all audio
                 processing-related settings and state, ex: interface settings, tracks, sound
                 players, ducking envelopes, etc.)
+            output_buffer: The music audio buffer for SDL_Mixer to process
+            length: The length (bytes) of the audio buffer
 
         Notes:
             This static function is responsible for filling the supplied audio buffer with sound.
-            samples. The function is called during an audio channel effect callback.  This audio
-            library only uses a single SDL_Mixer channel for all output.  Individual track buffers
-            are maintained in each Track object and are processed during this callback.
+            samples. The function is called during the custom music player callback. Individual
+            track buffers are maintained in each Track object and are processed during this callback.
         """
         cdef Uint32 buffer_length
 
@@ -704,6 +635,8 @@ cdef class AudioInterface:
         # This is so SDL_Mixer thinks the channel is active and will call the channel callback
         # function which is used to read and mix the actual source audio.
         cdef AudioCallbackData *callback_data = <AudioCallbackData*> data
+
+        memset(output_buffer, 0, buffer_length)
 
         # Lock the mutex to ensure no audio data is changed during the playback processing
         # (multi-threaded protection)
@@ -731,11 +664,11 @@ cdef class AudioInterface:
                 # Apply track volume and mix to output buffer
                 mix_track_to_output(<Uint8*> callback_data.tracks[track_num].buffer,
                                     callback_data.tracks[track_num].volume,
-                                    <Uint8*> output_buffer,
+                                    output_buffer,
                                     buffer_length)
 
         # Apply master volume to output buffer
-        apply_volume_to_buffer(<Uint8*> output_buffer, buffer_length, callback_data.master_volume)
+        apply_volume_to_buffer(output_buffer, buffer_length, callback_data.master_volume)
 
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockMutex(callback_data.mutex)

@@ -136,6 +136,12 @@ cdef extern from "SDL_mixer.h" nogil:
     int Mix_QuerySpec(int *frequency, Uint16 *format,int *channels)
     int Mix_Volume(int chan, int volume)
 
+    void Mix_HookMusic(void (*mix_func)(void *, Uint8 *, int), void *arg)
+    void * Mix_GetMusicHookData()
+
+# ---------------------------------------------------------------------------
+#    Helper structures
+# ---------------------------------------------------------------------------
 
 # The following declarations are not from SDL/SDL_Mixer, but are application-
 # specific data structures used in the MPF media controller audio library:
