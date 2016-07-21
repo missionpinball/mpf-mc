@@ -698,7 +698,7 @@ struct __pyx_t_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface_SoundSetti
   long sound_instance_id;
   int sound_priority;
   int marker_count;
-  long markers[8];
+  Uint32 markers[8];
   int sound_has_ducking;
   __pyx_t_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface_DuckingSettings ducking_settings;
   enum __pyx_t_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface_DuckingStage ducking_stage;
@@ -753,7 +753,7 @@ struct __pyx_t_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface_RequestMes
   int priority;
   Uint32 fade_in;
   int marker_count;
-  long markers[8];
+  Uint32 markers[8];
   int sound_has_ducking;
   __pyx_t_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface_DuckingSettings ducking_settings;
 };

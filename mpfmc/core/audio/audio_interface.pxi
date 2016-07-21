@@ -200,7 +200,7 @@ ctypedef struct SoundSettings:
     long sound_instance_id
     int sound_priority
     int marker_count
-    long markers[MAX_MARKERS]
+    Uint32 markers[MAX_MARKERS]
     bint sound_has_ducking
     DuckingSettings ducking_settings
     DuckingStage ducking_stage
@@ -257,7 +257,7 @@ ctypedef struct RequestMessageDataPlaySound:
     int priority
     Uint32 fade_in
     int marker_count
-    long markers[MAX_MARKERS]
+    Uint32 markers[MAX_MARKERS]
     bint sound_has_ducking
     DuckingSettings ducking_settings
 
