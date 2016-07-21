@@ -193,6 +193,9 @@ class TestAudio(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_played')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_stopped')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='synthping_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_marker')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_next_marker')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='last_marker')
 
         # Check for internal sound message processing leaks (are there any internal sound
         # events that get generated, but never processed and cleared from the queue?)

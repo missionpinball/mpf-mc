@@ -195,10 +195,6 @@ class SoundAsset(Asset):
             if self._ducking.attenuation == 1.0:
                 self._ducking = None
 
-        if 'markers' in self.config:
-            # TODO: Implement markers code here
-            pass
-
     def __repr__(self):
         """String that's returned if someone prints this object"""
         return '<Sound: {} ({}), Loaded={}>'.format(self.name, self.id, self.loaded)
@@ -413,6 +409,12 @@ class SoundAsset(Asset):
             else:
                 marker['name'] = None
 
+            if len(markers) == AudioInterface.get_max_markers():
+                raise AudioException("Cannot add marker - the limit of %d sound markers has been "
+                                     "reached for sound %s.",
+                                     AudioInterface.get_max_markers(),
+                                     sound_name)
+
             markers.append(marker)
 
         return markers
@@ -603,6 +605,11 @@ class SoundInstance(object):
         return self._markers
 
     @property
+    def marker_count(self):
+        """Return the number of markers specified for the sound"""
+        return len(self._markers)
+
+    @property
     def container(self):
         """The container object wrapping the SDL structure containing the actual sound data"""
         return self._sound.container
@@ -671,6 +678,20 @@ class SoundInstance(object):
         # Trigger any events
         if self.events_when_looping is not None:
             for event in self.events_when_looping:
+                self.mc.bcp_processor.send('trigger', name=event)
+
+    def set_marker(self, marker_id):
+        """Notifies the sound instance that the specified marker has just been reached
+        during playback and triggers any corresponding actions."""
+        try:
+            marker = self._markers[marker_id]
+        except ValueError:
+            self.log.warning("An invalid marker ID was received: %d", marker_id)
+            return
+
+        # Trigger any events
+        if marker['events'] is not None:
+            for event in marker['events']:
                 self.mc.bcp_processor.send('trigger', name=event)
 
     def set_expired(self):

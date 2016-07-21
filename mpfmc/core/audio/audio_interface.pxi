@@ -151,6 +151,9 @@ cdef union Sample16Bit:
 # The number of control points per audio buffer (sets control rate for ducking)
 DEF CONTROL_POINTS_PER_BUFFER = 8
 
+# The maximum number of markers that can be specified for a single sound
+DEF MAX_MARKERS = 8
+
 ctypedef struct TrackAttributes:
     bint active
     int number
@@ -196,7 +199,9 @@ ctypedef struct SoundSettings:
     long sound_id
     long sound_instance_id
     int sound_priority
-    int sound_has_ducking
+    int marker_count
+    long markers[MAX_MARKERS]
+    bint sound_has_ducking
     DuckingSettings ducking_settings
     DuckingStage ducking_stage
     Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
@@ -252,7 +257,8 @@ ctypedef struct RequestMessageDataPlaySound:
     int priority
     Uint32 fade_in
     int marker_count
-    int sound_has_ducking
+    long markers[MAX_MARKERS]
+    bint sound_has_ducking
     DuckingSettings ducking_settings
 
 ctypedef struct RequestMessageDataStopSound:
