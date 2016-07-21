@@ -2,15 +2,15 @@
 Audio module provides all the audio features (playing of sounds) for the media controller.
 """
 
+import logging
 from kivy.clock import Clock
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException, Track
-import logging
 
 __all__ = ('SoundSystem',
            'AudioInterface',
            'AudioException',
            'Track',
-           )
+          )
 
 # ---------------------------------------------------------------------------
 #    Default sound system and track values
@@ -24,6 +24,7 @@ DEFAULT_TRACK_MAX_SIMULTANEOUS_SOUNDS = 1
 DEFAULT_TRACK_VOLUME = 0.5
 
 
+# pylint: disable=too-many-instance-attributes
 class SoundSystem(object):
     """
     The SoundSystem class is used to read the sound system settings from the
@@ -31,7 +32,9 @@ class SoundSystem(object):
     specified tracks.
     """
 
+    # pylint: disable=invalid-name, too-many-branches
     def __init__(self, mc):
+        """ Constructor """
         self.mc = mc
         self.log = logging.getLogger('SoundSystem')
         self._initialized = False
@@ -108,27 +111,33 @@ class SoundSystem(object):
 
     @property
     def enabled(self):
+        """Return whether or not the sound system has been initialized"""
         return self._initialized
 
     @property
     def master_volume(self):
+        """Return the current master volume setting (0.0 to 1.0)"""
         return self.audio_interface.get_master_volume()
 
     @master_volume.setter
     def master_volume(self, value):
+        """Set the master volume (0.0 to 1.0)"""
         # Constrain volume to the range 0.0 to 1.0
         value = min(max(value, 0.0), 1.0)
         self.audio_interface.set_master_volume(value)
 
     @property
     def default_track(self):
+        """Return the default track"""
         return self.audio_interface.get_track(0)
 
     def master_volume_increase(self):
+        """Increase the master volume by one step"""
         # TODO: Implement me
         pass
 
     def master_volume_decrease(self):
+        """Decrease the master volume by one step"""
         # TODO: Implement me
         pass
 
@@ -175,9 +184,7 @@ class SoundSystem(object):
         self.tracks[name] = track
         return True
 
-    def sound_loaded_callback(self):
-        pass
-
     def tick(self, dt):
+        """Clock callback function"""
         del dt
         self.audio_interface.process()
