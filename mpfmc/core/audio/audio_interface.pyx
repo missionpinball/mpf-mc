@@ -502,7 +502,6 @@ cdef class AudioInterface:
         SDL_UnlockAudio()
 
         self.log.debug("The '%s' track has successfully been created.", name)
-        print("Track created", new_track)
 
         return new_track
 
@@ -647,6 +646,10 @@ cdef class AudioInterface:
 
         # Loop over tracks, mixing the playing sounds into the track's audio buffer
         for track_num in range(callback_data.track_count):
+            # Reset track status
+            callback_data.tracks[track_num].active = False
+            callback_data.tracks[track_num].ducking_is_active = False
+
             # Mix any playing sounds into the track buffer
             mix_sounds_to_track(callback_data.tracks[track_num],
                                 buffer_length,
@@ -769,13 +772,11 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
 
     cdef Uint32 samples_per_control_point
     cdef Uint32 control_point_pos
-    cdef int ducking_is_active
+    cdef bint ducking_is_active
     cdef float progress
     cdef int track_num
 
     # Reset track buffer and attributes
-    track.active = 0
-    track.ducking_is_active = 0
     memset(track.buffer, 0, buffer_size)
 
     # Loop over track sound players
@@ -786,7 +787,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
             continue
 
         index = 0
-        track.active = 1
+        track.active = True
 
         # Check if player has been requested to stop a sound
         if track.sound_players[player].status is player_stopping:
@@ -931,7 +932,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
             # Process sound ducking (if applicable)
             if track.sound_players[player].current.sound_has_ducking:
 
-                ducking_is_active = 0
+                ducking_is_active = False
                 samples_per_control_point = buffer_size // CONTROL_POINTS_PER_BUFFER
                 control_point_pos = track.sound_players[player].current.sample_pos
 
@@ -945,19 +946,19 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
 
                     elif control_point_pos >= track.sound_players[player].current.ducking_settings.release_start_pos:
                         # Ducking release stage
-                        ducking_is_active = 1
+                        ducking_is_active = True
                         progress = (control_point_pos - track.sound_players[player].current.ducking_settings.release_start_pos) / track.sound_players[player].current.ducking_settings.release_duration
                         track.sound_players[player].current.ducking_control_points[control_point] = \
                             lerpU8(in_out_quad(progress), track.sound_players[player].current.ducking_settings.attenuation_volume, MIX_MAX_VOLUME)
 
                     elif control_point_pos >= track.sound_players[player].current.ducking_settings.attack_start_pos + track.sound_players[player].current.ducking_settings.attack_duration:
                         # Ducking hold state
-                        ducking_is_active = 1
+                        ducking_is_active = True
                         track.sound_players[player].current.ducking_control_points[control_point] = track.sound_players[player].current.ducking_settings.attenuation_volume
 
                     elif control_point_pos >= track.sound_players[player].current.ducking_settings.attack_start_pos:
                         # Ducking attack stage
-                        ducking_is_active = 1
+                        ducking_is_active = True
                         progress = (control_point_pos - track.sound_players[player].current.ducking_settings.attack_start_pos) / track.sound_players[player].current.ducking_settings.attack_duration
                         track.sound_players[player].current.ducking_control_points[control_point] = \
                             lerpU8(in_out_quad(progress), MIX_MAX_VOLUME, track.sound_players[player].current.ducking_settings.attenuation_volume)
@@ -974,10 +975,10 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
                         control_point_pos -= track.sound_players[player].current.chunk.alen
 
                 # Apply ducking to target track(s) (when applicable)
-                if ducking_is_active == 1:
+                if ducking_is_active:
                     for track_num in range(callback_data.track_count):
                         if (1 << track_num) & track.sound_players[player].current.ducking_settings.track_bit_mask:
-                            if callback_data.tracks[track_num].ducking_is_active == 1:
+                            if callback_data.tracks[track_num].ducking_is_active:
                                 # Ducking is already active on the track; take the minimum value at each control point
                                 for control_point in range(CONTROL_POINTS_PER_BUFFER):
                                     callback_data.tracks[track_num].ducking_control_points[control_point] = min(
@@ -985,7 +986,7 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
                                         track.sound_players[player].current.ducking_control_points[control_point])
                             else:
                                 # Ducking not active on track; set it to active and assign control points
-                                callback_data.tracks[track_num].ducking_is_active = 1
+                                callback_data.tracks[track_num].ducking_is_active = True
                                 for control_point in range(CONTROL_POINTS_PER_BUFFER):
                                     callback_data.tracks[track_num].ducking_control_points[control_point] = track.sound_players[player].current.ducking_control_points[control_point]
 
@@ -1135,26 +1136,45 @@ cdef void apply_track_ducking(TrackAttributes* track, Uint32 buffer_size, AudioC
         buffer_size: The size of the current output audio buffer (in bytes)
         callback_data: The AudioCallbackData struct
     """
-    if track == NULL:
-        return
-
     cdef Uint32 buffer_pos = 0
     cdef Uint32 samples_per_control_point = buffer_size // CONTROL_POINTS_PER_BUFFER
     cdef Uint8 ducking_volume
     cdef int control_point
 
-    # No need to do anything if ducking is not active on this track
-    if track.ducking_is_active != 1:
+    if track == NULL:
         return
 
-    # Loop over track buffer
-    for control_point in range(CONTROL_POINTS_PER_BUFFER):
-        ducking_volume = track.ducking_control_points[control_point]
-        if ducking_volume < MIX_MAX_VOLUME:
-            apply_volume_to_buffer_range(<Uint8*> track.buffer, buffer_pos, ducking_volume,
-                                           samples_per_control_point)
+    # Only need to process when ducking is active
+    if track.ducking_is_active:
+        # Loop over track buffer
+        for control_point in range(CONTROL_POINTS_PER_BUFFER):
+            ducking_volume = track.ducking_control_points[control_point]
+            if ducking_volume < MIX_MAX_VOLUME:
+                apply_volume_to_buffer_range(<Uint8*> track.buffer, buffer_pos, ducking_volume,
+                                             samples_per_control_point)
 
-        buffer_pos += samples_per_control_point
+            buffer_pos += samples_per_control_point
+
+cdef inline void apply_volume_to_buffer_range(Uint8 *buffer, Uint32 start_pos, Uint8 volume, Uint32 length=2) nogil:
+    """
+    Applies the specified volume to a range of samples in an audio buffer at the specified
+    buffer position.
+    Args:
+        buffer: The audio buffer
+        start_pos: The starting audio buffer position at which to apply the volume level
+        volume: The volume level to apply (8-bit unsigned value 0 to MIX_MAX_VOLUME)
+        length: The number of bytes to apply the volume to
+    """
+    cdef Sample16Bit buffer_sample
+    cdef Uint32 buffer_pos = start_pos
+
+    while buffer_pos < start_pos + length:
+        buffer_sample.bytes.byte0 = buffer[buffer_pos]
+        buffer_sample.bytes.byte1 = buffer[buffer_pos + 1]
+        buffer_sample.value = (buffer_sample.value * volume) // MIX_MAX_VOLUME
+        buffer[buffer_pos] = buffer_sample.bytes.byte0
+        buffer[buffer_pos + 1] = buffer_sample.bytes.byte1
+        buffer_pos += BYTES_PER_SAMPLE
 
 cdef void apply_volume_to_buffer(Uint8 *buffer, int buffer_length, Uint8 volume) nogil:
     """
@@ -1181,27 +1201,6 @@ cdef void apply_volume_to_buffer(Uint8 *buffer, int buffer_length, Uint8 volume)
         buffer[buffer_pos] = sample.bytes.byte0
         buffer[buffer_pos + 1] = sample.bytes.byte1
 
-        buffer_pos += BYTES_PER_SAMPLE
-
-cdef inline void apply_volume_to_buffer_range(Uint8 *buffer, Uint32 start_pos, Uint8 volume, Uint32 length=2) nogil:
-    """
-    Applies the specified volume to a range of samples in an audio buffer at the specified
-    buffer position.
-    Args:
-        buffer: The audio buffer
-        start_pos: The starting audio buffer position at which to apply the volume level
-        volume: The volume level to apply (8-bit unsigned value 0 to MIX_MAX_VOLUME)
-        length: The number of bytes to apply the volume to
-    """
-    cdef Sample16Bit buffer_sample
-    cdef Uint32 buffer_pos = start_pos
-
-    while buffer_pos < start_pos + length:
-        buffer_sample.bytes.byte0 = buffer[buffer_pos]
-        buffer_sample.bytes.byte1 = buffer[buffer_pos + 1]
-        buffer_sample.value = (buffer_sample.value * volume) // MIX_MAX_VOLUME
-        buffer[buffer_pos] = buffer_sample.bytes.byte0
-        buffer[buffer_pos + 1] = buffer_sample.bytes.byte1
         buffer_pos += BYTES_PER_SAMPLE
 
 cdef inline void mix_sound_sample_to_buffer(Uint8 *sound_buffer, Uint32 sample_pos, Uint8 sound_volume,
@@ -1403,7 +1402,7 @@ cdef class Track:
         self.attributes = <TrackAttributes*> PyMem_Malloc(sizeof(TrackAttributes))
         self.attributes.number = track_num
         self.attributes.max_simultaneous_sounds = max_simultaneous_sounds
-        self.attributes.ducking_is_active = 0
+        self.attributes.ducking_is_active = False
         self.attributes.buffer = PyMem_Malloc(buffer_size)
         self.attributes.buffer_size = buffer_size
         self.log.debug("Allocated track audio buffer (%d bytes)", buffer_size)

@@ -113,31 +113,17 @@ cdef extern from "SDL_mixer.h" nogil:
     int Mix_Init(int)
     void Mix_Quit()
     int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
-    void Mix_Pause(int channel)
-    void Mix_Resume(int channel)
     void Mix_CloseAudio()
-    int Mix_Playing(int channel)
-    int Mix_Paused(int channel)
-    int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
-    int Mix_HaltChannel(int channel)
-    int Mix_FadeInChannel(int channel, Mix_Chunk *chunk, int loops, int ms)
-    int  Mix_FadeOutChannel(int channel, int ms)
     char *Mix_GetError()
     const SDL_version *Mix_Linked_Version()
-    ctypedef void (*Mix_EffectFunc_t)(int, void *, int, void *)
-    ctypedef void (*Mix_EffectDone_t)(int, void *)
-    int Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void * arg)
-    int Mix_UnregisterAllEffects(int chan)
-    int Mix_AllocateChannels(int numchans)
     Mix_Chunk *Mix_QuickLoad_RAW(Uint8 *mem, Uint32 l)
     Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
     Mix_Chunk *Mix_LoadWAV(char *file)
     void Mix_FreeChunk(Mix_Chunk *chunk)
     int Mix_QuerySpec(int *frequency, Uint16 *format,int *channels)
-    int Mix_Volume(int chan, int volume)
-
     void Mix_HookMusic(void (*mix_func)(void *, Uint8 *, int), void *arg)
-    void * Mix_GetMusicHookData()
+    void *Mix_GetMusicHookData()
+
 
 # ---------------------------------------------------------------------------
 #    Helper structures
@@ -163,21 +149,21 @@ cdef union Sample16Bit:
 
 
 # The number of control points per audio buffer (sets control rate for ducking)
-DEF CONTROL_POINTS_PER_BUFFER = 16
+DEF CONTROL_POINTS_PER_BUFFER = 8
 
 ctypedef struct TrackAttributes:
-    int active
+    bint active
     int number
     int max_simultaneous_sounds
     Uint8 volume
     void *buffer
     int buffer_size
-    SoundPlayer *sound_players
-    int ducking_is_active
+    bint ducking_is_active
     Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
+    SoundPlayer *sound_players
 
 cdef enum SoundPlayerStatus:
-    # Enumeration of the possible AudioSamplePlayer status values.
+    # Enumeration of the possible sound player status values.
     player_idle,
     player_pending,
     player_replacing,
