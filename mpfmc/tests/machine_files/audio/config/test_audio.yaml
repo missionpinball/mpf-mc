@@ -41,6 +41,7 @@ sounds:
     104457_moron_test:
         events_when_played: moron_test_played
         events_when_stopped: moron_test_stopped
+        volume: 0.6
         ducking:
             target: music
             delay: 0

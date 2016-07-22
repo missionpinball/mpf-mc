@@ -59,19 +59,19 @@ class TestAudio(MpfMcTestCase):
         track_voice = interface.get_track_by_name("voice")
         self.assertIsNotNone(track_voice)
         self.assertEqual(track_voice.name, "voice")
-        self.assertAlmostEqual(track_voice.volume, 0.6)
+        self.assertAlmostEqual(track_voice.volume, 0.6, 1)
         self.assertEqual(track_voice.max_simultaneous_sounds, 1)
 
         track_sfx = interface.get_track_by_name("sfx")
         self.assertIsNotNone(track_sfx)
         self.assertEqual(track_sfx.name, "sfx")
-        self.assertAlmostEqual(track_sfx.volume, 0.4)
+        self.assertAlmostEqual(track_sfx.volume, 0.4, 1)
         self.assertEqual(track_sfx.max_simultaneous_sounds, 8)
 
         track_music = interface.get_track_by_name("music")
         self.assertIsNotNone(track_music)
         self.assertEqual(track_music.name, "music")
-        self.assertAlmostEqual(track_music.volume, 0.5)
+        self.assertAlmostEqual(track_music.volume, 0.5, 1)
         self.assertEqual(track_music.max_simultaneous_sounds, 1)
 
         self.assertTrue(self.mc, 'sounds')
@@ -97,12 +97,13 @@ class TestAudio(MpfMcTestCase):
 
         # Test bad sound file
         self.assertIn('bad_sound_file', self.mc.sounds)
-        # with self.assertRaises(Exception):
-        #    self.mc.sounds['bad_sound_file'].do_load()
-        #self.assertFalse(self.mc.sounds['bad_sound_file'].loaded)
+        with self.assertRaises(Exception):
+            self.mc.sounds['bad_sound_file'].do_load()
+        self.assertFalse(self.mc.sounds['bad_sound_file'].loaded)
 
         # /sounds/voice
         self.assertIn('104457_moron_test', self.mc.sounds)  # .wav
+        self.assertEqual(self.mc.sounds['104457_moron_test'].volume, 0.6)
         self.assertIn('113690_test', self.mc.sounds)        # .wav
 
         # /sounds/music
@@ -112,7 +113,7 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('drum_group', self.mc.sounds)
 
         # Make sure sound has ducking (since it was specified in the config files)
-        #self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
+        self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
 
         # Test baseline internal audio message count
         self.assertEqual(interface.get_in_use_request_message_count(), 0)
@@ -169,6 +170,8 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(2.7)
         self.mc.events.post('play_sound_synthping')
         self.advance_time(3)
+        self.assertEqual(track_voice.get_status()[0]['sound_id'], self.mc.sounds['104457_moron_test'].id)
+        self.assertEqual(track_voice.get_status()[0]['volume'], 76)
         self.mc.events.post('play_sound_synthping')
         self.advance_time(6)
         self.mc.events.post('stop_sound_music')
