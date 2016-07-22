@@ -628,39 +628,39 @@ cdef class AudioInterface:
             samples. The function is called during the custom music player callback. Individual
             track buffers are maintained in each Track object and are processed during this callback.
         """
-        cdef Uint32 buffer_length
-
-        if data == NULL:
-            return
-
-        buffer_length = <Uint32>length
-
-        # SDL_Mixer channel should already be playing 'silence', a silent sample generated in memory.
-        # This is so SDL_Mixer thinks the channel is active and will call the channel callback
-        # function which is used to read and mix the actual source audio.
+        cdef Uint32 buffer_length = <Uint32> length
         cdef AudioCallbackData *callback_data = <AudioCallbackData*> data
 
+        if callback_data == NULL:
+            return
+
+        # Initialize master output buffer (silence)
         memset(output_buffer, 0, buffer_length)
 
         # Lock the mutex to ensure no audio data is changed during the playback processing
         # (multi-threaded protection)
         SDL_LockMutex(callback_data.mutex)
 
+        # Note: There are three separate loops over the tracks that must remain separate due
+        # to various track parameters than can be set for any track during each loop.  Difficult
+        # to debug logic errors will occur if these track loops are combined.
+
+        # Loop over tracks, initializing the track buffer and status.
+        for track_num in range(callback_data.track_count):
+            callback_data.tracks[track_num].active = False
+            callback_data.tracks[track_num].ducking_is_active = False
+            memset(callback_data.tracks[track_num].buffer, 0, buffer_length)
+
         # Process any internal sound messages that may affect sound playback (play and stop messages)
         process_request_messages(callback_data)
 
         # Loop over tracks, mixing the playing sounds into the track's audio buffer
         for track_num in range(callback_data.track_count):
-            # Reset track status
-            callback_data.tracks[track_num].active = False
-            callback_data.tracks[track_num].ducking_is_active = False
-
-            # Mix any playing sounds into the track buffer
             mix_sounds_to_track(callback_data.tracks[track_num],
                                 buffer_length,
                                 callback_data)
 
-        # Loop over tracks again, mixing down tracks to the master output buffer
+        # Loop over tracks again, applying ducking and mixing down tracks to the master output buffer
         for track_num in range(callback_data.track_count):
 
             # Only mix the track to the master output if it is active
@@ -816,9 +816,6 @@ cdef void mix_sounds_to_track(TrackAttributes *track, Uint32 buffer_size, AudioC
     cdef float progress
     cdef int track_num
     cdef int marker_id
-
-    # Reset track buffer and attributes
-    memset(track.buffer, 0, buffer_size)
 
     # Loop over track sound players
     for player in range(track.max_simultaneous_sounds):
