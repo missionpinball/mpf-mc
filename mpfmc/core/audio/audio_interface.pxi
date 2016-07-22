@@ -148,21 +148,43 @@ cdef union Sample16Bit:
     Sample16Bytes bytes
 
 
+# ---------------------------------------------------------------------------
+#    Settings
+# ---------------------------------------------------------------------------
+
 # The number of control points per audio buffer (sets control rate for ducking)
 DEF CONTROL_POINTS_PER_BUFFER = 8
 
 # The maximum number of markers that can be specified for a single sound
 DEF MAX_MARKERS = 8
 
-ctypedef struct TrackAttributes:
+
+# ---------------------------------------------------------------------------
+#    Track-related types
+# ---------------------------------------------------------------------------
+
+cdef enum TrackType:
+    # Enumeration of the possible track types
+    track_type_none,
+    track_type_standard,
+    track_type_playlist,
+    track_type_live_loop,
+
+ctypedef struct TrackState:
+    # Common track state variables (for all track types)
+    TrackType type
+    void* type_state
     bint active
     int number
-    int max_simultaneous_sounds
     Uint8 volume
-    void *buffer
     int buffer_size
+    void *buffer
     bint ducking_is_active
     Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
+
+ctypedef struct TrackStandardState:
+    # State variables for TrackStandard tracks
+    int sound_player_count
     SoundPlayer *sound_players
 
 cdef enum SoundPlayerStatus:
@@ -229,7 +251,7 @@ ctypedef struct AudioCallbackData:
     int audio_channels
     Uint8 master_volume
     int track_count
-    TrackAttributes **tracks
+    TrackState **tracks
     RequestMessageContainer **request_messages
     NotificationMessageContainer **notification_messages
     SDL_mutex *mutex

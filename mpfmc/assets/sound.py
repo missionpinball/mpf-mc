@@ -450,49 +450,43 @@ class SoundInstance(object):
         self._loop_count = 0
         self.log = logging.getLogger('SoundInstance')
 
+        # Assign default values from parent sound for parameters that can be overridden
+        self._loops = sound.loops
+        self._volume = sound.volume
+        self._priority = sound.priority
+        self._max_queue_time = sound.max_queue_time
+        self._events_when_played = sound.events_when_played
+        self._events_when_stopped = sound.events_when_stopped
+        self._events_when_looping = sound.events_when_looping
+        self._markers = sound.markers
+
         if settings is None:
             settings = dict()
 
-        # Validate settings that can be overridden when playing an instance of a sound
-        if 'priority' in settings and settings['priority'] is not None:
-            self._priority = settings['priority']
-        else:
-            self._priority = sound.priority
-
+        # Assign any overridden parameter values
         if 'loops' in settings and settings['loops'] is not None:
             self._loops = settings['loops']
-        else:
-            self._loops = sound.loops
-
-        if 'max_queue_time' in settings:
-            self._max_queue_time = settings['max_queue_time']
-        else:
-            self._max_queue_time = sound.max_queue_time
 
         if 'volume' in settings and settings['volume'] is not None:
             self._volume = settings['volume']
-        else:
-            self._volume = sound.volume
+
+        if 'priority' in settings and settings['priority'] is not None:
+            self._priority = settings['priority']
+
+        if 'max_queue_time' in settings:
+            self._max_queue_time = settings['max_queue_time']
 
         if 'events_when_played' in settings:
             self._events_when_played = settings['events_when_played']
-        else:
-            self._events_when_played = sound.events_when_played
 
         if 'events_when_stopped' in settings:
             self._events_when_stopped = settings['events_when_stopped']
-        else:
-            self._events_when_stopped = sound.events_when_stopped
 
         if 'events_when_looping' in settings:
             self._events_when_looping = settings['events_when_looping']
-        else:
-            self._events_when_looping = sound.events_when_looping
 
         if settings is not None and 'markers' in settings:
             self._markers = SoundAsset.load_markers(settings['markers'], self.name)
-        else:
-            self._markers = sound.markers
 
     def __repr__(self):
         """String that's returned if someone prints this object"""
