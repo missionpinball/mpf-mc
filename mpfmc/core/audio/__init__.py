@@ -98,6 +98,8 @@ class SoundSystem(object):
                 self._create_track(track_name, track_config)
         else:
             self._create_track('default')
+            self.log.warning("No audio tracks are specified in your machine config file. "
+                             "a track named 'default' has been created.")
 
         # Set initial master volume level
         self.master_volume = self.config['master_volume']
@@ -150,39 +152,50 @@ class SoundSystem(object):
                 "voice" or "sfx".
             config: A Python dictionary containing the configuration settings for
                 this track.
-
-        Returns:
-            True if the track was successfully created, False otherwise
         """
         if self.audio_interface is None:
-            self.log.error("Could not create '%s' track - the audio interface has "
-                           "not been initialized", name)
-            return False
+            raise AudioException("Could not create '{}' track - the sound_system has "
+                                 "not been initialized".format(name))
 
         # Validate track config parameters
         if name in self.tracks:
-            self.log.error("Could not create '%s' track - a track with that name "
-                           "already exists", name)
-            return False
+            raise AudioException("Could not create '{}' track - a track with that name "
+                                 "already exists".format(name))
 
         if config is None:
             config = {}
 
-        if 'simultaneous_sounds' not in config:
-            config['simultaneous_sounds'] = DEFAULT_TRACK_MAX_SIMULTANEOUS_SOUNDS
-
         if 'volume' not in config:
             config['volume'] = DEFAULT_TRACK_VOLUME
 
-        # Create the track
-        track = self.audio_interface.create_standard_track(name,
-                                                           config['simultaneous_sounds'],
-                                                           config['volume'])
+        if 'type' not in config:
+            config['type'] = 'standard'
+
+        if config['type'] not in ['standard', 'playlist', 'live_loop']:
+            raise AudioException("Could not create '{}' track - an illegal value for "
+                                 "'type' was found".format(name))
+
+        # Validate type-specific parameters and create the track
+        track = None
+        if config['type'] == 'standard':
+            if 'simultaneous_sounds' not in config:
+                config['simultaneous_sounds'] = DEFAULT_TRACK_MAX_SIMULTANEOUS_SOUNDS
+
+            track = self.audio_interface.create_standard_track(name,
+                                                               config['simultaneous_sounds'],
+                                                               config['volume'])
+        elif config['type'] == 'playlist':
+            # TODO: Implement playlist track create
+            pass
+
+        elif config['type'] == 'live_loop':
+            # TODO: Implement playlist track create
+            pass
+
         if track is None:
-            return False
+            raise AudioException("Could not create '{}' track due to an error".format(name))
 
         self.tracks[name] = track
-        return True
 
     def tick(self, dt):
         """Clock callback function"""
