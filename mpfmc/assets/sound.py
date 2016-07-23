@@ -2,6 +2,7 @@
 
 import logging
 import sys
+import uuid
 from enum import Enum, unique
 
 from mpf.core.assets import Asset, AssetPool
@@ -47,21 +48,29 @@ class SoundPool(AssetPool):
         """
         sound_instance = self.sound.play(settings)
         self._instances.append(sound_instance)
+        sound_instance.add_finished_handler(self.sound_instance_finished)
         return sound_instance
 
     def stop(self):
         """
         Stops all instances of all sounds contained in the sound pool.
         """
-        for sound in self.assets:
-            # Assets contain a list of tuples (sound, number)
-            sound[0].stop()
+        for sound_instance in self._instances:
+            sound_instance.stop()
 
     def stop_looping(self):
         """Stops looping on all instances of all sounds contained in the sound pool."""
-        for sound in self.assets:
+        for sound_instance in self._instances:
             # Assets contain a list of tuples (sound, number)
-            sound[0].stop_looping()
+            sound_instance.stop_looping()
+
+    def sound_instance_finished(self, sound_instance_id, **kwargs):
+        """Removes the specified sound instance from the list of current instances"""
+        del kwargs
+        for sound_instance in self._instances:
+            if sound_instance.id == sound_instance_id:
+                self._instances.remove(sound_instance)
+                return
 
 
 @unique
@@ -194,6 +203,20 @@ class SoundAsset(Asset):
             # sound when attenuation is 1.0.
             if self._ducking.attenuation == 1.0:
                 self._ducking = None
+
+        # Add sound to a dictionary of sound objects keyed by sound id
+        if not hasattr(self.machine, 'sounds_by_id'):
+            setattr(self.machine, 'sounds_by_id', dict())
+
+        self.machine.sounds_by_id[self.id] = self
+
+    def __del__(self):
+        """Destructor"""
+
+        self.stop()
+        self.unload()
+
+        del self.machine.sounds_by_id[self.id]
 
     def __repr__(self):
         """String that's returned if someone prints this object"""
@@ -342,15 +365,39 @@ class SoundAsset(Asset):
         Args:
             settings: Optional dictionary of settings to override the default values.
         """
-        self.log.debug("Play sound %s %s", self.name, self.track)
+        self.log.debug("Play sound %s on track %s", self.name, self.track)
 
-        # TODO: insert max instances code here (determine what action to take based on method)
+        # Determine if the maxmimum number of instances of this sound has been reached
+        if self.max_instances is not None and len(self._instances) == self.max_instances:
 
-        sound_instance = SoundInstance(self, settings)
-        sound_instance.track.play_sound(sound_instance)
-        self._instances.append(sound_instance)
+            # Perform action based on stealing method
+            if self.stealing_method == SoundStealingMethod.oldest:
+                oldest_instance = self._get_oldest_instance()
+                if oldest_instance is not None:
+                    sound_instance = SoundInstance(self, settings)
+                    sound_instance.track.replace_sound(oldest_instance, sound_instance)
+                    self.log.debug("Sound %s has reached the maximum number of instances. "
+                                   "Replacing oldest instance", self.name)
+                    return sound_instance
+            elif self.stealing_method == SoundStealingMethod.newest:
+                newest_instance = self._get_newest_instance()
+                if newest_instance is not None:
+                    sound_instance = SoundInstance(self, settings)
+                    sound_instance.track.replace_sound(newest_instance, sound_instance)
+                    self.log.debug("Sound %s has reached the maximum number of instances. "
+                                   "Replacing newest instance", self.name)
+                    return sound_instance
+            else:
+                # New instance will not be played; it will be skipped
+                self.log.info("Sound %s has reached the maximum number of instances. "
+                              "Sound will be skipped", self.name)
+        else:
+            sound_instance = SoundInstance(self, settings)
+            sound_instance.track.play_sound(sound_instance)
+            self._instances.append(sound_instance)
+            return sound_instance
 
-        return sound_instance
+        return None
 
     def stop(self):
         """Stops all instances of the sound playing or pending playback."""
@@ -363,6 +410,52 @@ class SoundAsset(Asset):
         self.log.debug("Stop looping sound %s", self.name)
         for sound_instance in self._instances:
             sound_instance.stop_looping()
+
+    def get_instance_by_id(self, sound_instance_id):
+        """
+        Return an active sound instance by id
+        Args:
+            sound_instance_id: The id of the sound instance to return
+
+        Returns:
+            SoundInstance if found, None otherwise
+        """
+        for sound_instance in self._instances:
+            if sound_instance.id == sound_instance_id:
+                return sound_instance
+
+        return None
+
+    def remove_instance(self, sound_instance):
+        """Remove the specified sound instance from the list of active sound instances"""
+        try:
+            self._instances.remove(sound_instance)
+        except ValueError:
+            pass
+
+    def _get_oldest_instance(self):
+        """Return the oldest sound instance currently playing"""
+        if len(self._instances) == 0:
+            return None
+
+        oldest_instance = self._instances[0]
+        for sound_instance in self._instances[1:]:
+            if sound_instance.timestamp < oldest_instance.timestamp:
+                oldest_instance = sound_instance
+
+        return oldest_instance
+
+    def _get_newest_instance(self):
+        """Return the newest sound instance currently playing"""
+        if len(self._instances) == 0:
+            return None
+
+        newest_instance = self._instances[0]
+        for sound_instance in self._instances[1:]:
+            if sound_instance.timestamp > newest_instance.timestamp:
+                newest_instance = sound_instance
+
+        return newest_instance
 
     @staticmethod
     def load_markers(config, sound_name):
@@ -442,12 +535,13 @@ class SoundInstance(object):
 
         # pylint: disable=invalid-name
         self.mc = sound.machine
-        self._time = self.mc.clock.get_time()
+        self._timestamp = self.mc.clock.get_time()
         self._sound = sound
         self._status = SoundInstanceStatus.pending
         self._played = False
         self._track = sound.track
         self._loop_count = 0
+        self._registered_finished_handlers = list()
         self.log = logging.getLogger('SoundInstance')
 
         # Assign default values from parent sound for parameters that can be overridden
@@ -515,6 +609,11 @@ class SoundInstance(object):
             An integer uniquely identifying the sound reference
         """
         return id(self)
+
+    @property
+    def timestamp(self):
+        """Return the time at which the sound instance was created"""
+        return self._timestamp
 
     @property
     def sound(self):
@@ -696,14 +795,68 @@ class SoundInstance(object):
         """Notifies the sound instance that is has been canceled and will not be played."""
         self._finished()
 
+    def add_finished_handler(self, handler, priority=1, **kwargs):
+        """
+        Register a handler to be called when the sound instance has finished.
+        Args:
+            handler: The method that will be called when the sound instance has finished
+            priority: An arbitrary integer value that defines what order the handlers will
+                be called in (highest to lowest).
+            **kwargs: Any additional keyword/arguments pairs
+
+        Returns:
+            A GUID reference to the handler which you can use to later remove the handler
+            via ``remove_finished_handler_by_key``.
+        """
+        if not callable(handler):
+            raise ValueError("Cannot add finished handler '{}' for sound '{}'".format(handler, self.name))
+
+        key = uuid.uuid4()
+
+        # A 'handler' in our case is a tuple with 4 elements:
+        # the handler method, priority, dict of kwargs, & uuid key
+
+        self._registered_finished_handlers.append((handler, priority, kwargs, key))
+        try:
+            self.log.debug("Registered %s as a finished handler for sound '%s', priority: %s, "
+                           "kwargs: %s",
+                           (str(handler).split(' '))[2], self.name, priority, kwargs)
+        except IndexError:
+            pass
+
+        # Sort the handlers for this event based on priority. We do it now
+        # so the list is pre-sorted so we don't have to do that with each
+        # event post.
+        self._registered_finished_handlers.sort(key=lambda x: x[1], reverse=True)
+
+        return key
+
+    def remove_finished_handler_by_key(self, key):
+        """Remove a registered finished handler by key.
+
+        Args:
+            key: The key of the handler you want to remove
+        """
+        for handler in self._registered_finished_handlers:
+            if handler[3] == key:
+                self._registered_finished_handlers.remove(handler)
+                self.log.debug("Removing finisehd handler method %s from sound %s",
+                               (str(handler[0]).split(' '))[2], self.name)
+
     def _finished(self):
         """Internal function to trigger finished state and related processing."""
         self._status = SoundInstanceStatus.finished
 
-        # TODO: call any finished callback functions
+        # Call any registered finished handlers
+        for handler in self._registered_finished_handlers:
+            merged_kwargs = dict(list(handler[2].items()))
+            merged_kwargs['sound_instance_id'] = self.id
+            merged_kwargs['sound_id'] = self.sound.id
+
+            result = handler[0](**merged_kwargs)
 
         # Remove the instance from the list of active instances for the parent sound
-        # del self.sound.instances[self.id]
+        self.sound.remove_instance(self)
 
     @property
     def status(self):

@@ -488,8 +488,9 @@ cdef class AudioInterface:
         # Make sure audio callback function cannot be called while we are changing the track data
         SDL_LockAudio()
 
-        # Create the new track
-        new_track = TrackStandard(pycapsule.PyCapsule_New(self.audio_callback_data, NULL, NULL),
+        # Create the new standard track
+        new_track = TrackStandard(self.mc,
+                                  pycapsule.PyCapsule_New(self.audio_callback_data, NULL, NULL),
                                   name,
                                   track_num,
                                   self.buffer_size,
@@ -504,7 +505,7 @@ cdef class AudioInterface:
         # Allow audio callback function to be called again
         SDL_UnlockAudio()
 
-        self.log.debug("The '%s' track has successfully been created.", name)
+        self.log.debug("The '%s' standard track has successfully been created.", name)
 
         return new_track
 
@@ -1465,7 +1466,7 @@ cdef class Track:
     """
     Track base class
     """
-    # The name of the track
+    cdef object mc
     cdef str _name
     cdef int _number
     cdef AudioCallbackData *_audio_callback_data
@@ -1483,10 +1484,11 @@ cdef class Track:
         self._audio_callback_data = NULL
         self.mutex = NULL
 
-    def __init__(self, object audio_callback_data, str name, int track_num, int buffer_size, float volume=1.0):
+    def __init__(self, object mc, object audio_callback_data, str name, int track_num, int buffer_size, float volume=1.0):
         """
         Constructor
         Args:
+            mc: The media controller
             audio_callback_data: The AudioCallbackData pointer wrapped in a PyCapsule object
             name: The track name
             track_num: The track number (corresponds to the SDL_Mixer channel number)
@@ -1494,6 +1496,7 @@ cdef class Track:
             volume: The track volume (0.0 to 1.0)
         """
         self.log = logging.getLogger("Track")
+        self.mc = mc
         self._name = name
         self._number = track_num
 
@@ -1566,7 +1569,6 @@ cdef class TrackStandard(Track):
     cdef object _sound_queue
     cdef dict _sound_queue_items
     cdef int _max_simultaneous_sounds
-    cdef dict _active_sound_instances
 
     # Track state needs to be stored in a C struct in order for them to be accessible in
     # the SDL callback functions without the GIL (for performance reasons).  
@@ -1574,22 +1576,23 @@ cdef class TrackStandard(Track):
     # destruction.
     cdef TrackStandardState *type_state
 
-    def __init__(self, object audio_callback_data, str name, int track_num, int buffer_size,
+    def __init__(self, object mc, object audio_callback_data, str name, int track_num, int buffer_size,
                  int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
                  float volume=1.0):
         """
         Constructor
         Args:
+            mc: The media controller object
+            audio_callback_data: The AudioCallbackData struct wrapped in a PyCapsule
             name: The track name
-            track_num: The track number (corresponds to the SDL_Mixer channel number)
-            mutex: An SDL_mutex pointer wrapped in a PyCapsule.
+            track_num: The track number
             buffer_size: The length of the track audio buffer in bytes
             max_simultaneous_sounds: The maximum number of sounds that can be played simultaneously
                 on the track
             volume: The track volume (0.0 to 1.0)
         """
         # IMPORTANT: Call super class init function to allocate track state memory!
-        super().__init__(audio_callback_data, name, track_num, buffer_size, volume)
+        super().__init__(mc, audio_callback_data, name, track_num, buffer_size, volume)
 
         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard")
 
@@ -1597,7 +1600,6 @@ cdef class TrackStandard(Track):
 
         self._sound_queue = PriorityQueue()
         self._sound_queue_items = dict()
-        self._active_sound_instances = dict()
 
         # Set track type specific settings
         self.state.type = track_type_standard
@@ -1747,37 +1749,47 @@ cdef class TrackStandard(Track):
         if notification_message == NULL:
             return
 
-        elif notification_message.message == notification_sound_started:
-            sound_instance = self._active_sound_instances[notification_message.sound_instance_id]
-            if sound_instance is not None:
-                sound_instance.set_playing()
+        if notification_message.message == notification_sound_started:
+            sound = self.mc.sounds_by_id[notification_message.sound_id]
+            if sound is not None:
+                sound_instance = sound.get_instance_by_id(notification_message.sound_instance_id)
+                if sound_instance is not None:
+                    sound_instance.set_playing()
 
             # Event has been processed, reset it so it may be used again
             notification_message.message = notification_not_in_use
 
         elif notification_message.message == notification_sound_stopped:
-            sound_instance = self._active_sound_instances[notification_message.sound_instance_id]
-            if sound_instance is not None:
-                sound_instance.set_stopped()
+            sound = self.mc.sounds_by_id[notification_message.sound_id]
+            if sound is not None:
+                sound_instance = sound.get_instance_by_id(notification_message.sound_instance_id)
+                if sound_instance is not None:
+                    sound_instance.set_stopped()
 
             # Event has been processed, reset it so it may be used again
             notification_message.message = notification_not_in_use
 
         elif notification_message.message == notification_sound_looping:
-            sound_instance = self._active_sound_instances[notification_message.sound_instance_id]
-            if sound_instance is not None:
-                sound_instance.set_looping()
+            sound = self.mc.sounds_by_id[notification_message.sound_id]
+            if sound is not None:
+                sound_instance = sound.get_instance_by_id(notification_message.sound_instance_id)
+                if sound_instance is not None:
+                    sound_instance.set_looping()
 
             # Event has been processed, reset it so it may be used again
             notification_message.message = notification_not_in_use
 
         elif notification_message.message == notification_sound_marker:
-            sound_instance = self._active_sound_instances[notification_message.sound_instance_id]
-            if sound_instance is not None:
-                sound_instance.set_marker(notification_message.data.marker.id)
+            sound = self.mc.sounds_by_id[notification_message.sound_id]
+            if sound is not None:
+                sound_instance = sound.get_instance_by_id(notification_message.sound_instance_id)
+                if sound_instance is not None:
+                    sound_instance.set_marker(notification_message.data.marker.id)
 
             # Event has been processed, reset it so it may be used again
             notification_message.message = notification_not_in_use
+        else:
+            raise AudioException("Unknown notification message received on Track %s", self.name)
 
     def _get_next_sound(self):
         """
@@ -1913,6 +1925,22 @@ cdef class TrackStandard(Track):
 
         SDL_UnlockMutex(self.mutex)
 
+    def replace_sound(self, old_instance not None, sound_instance not None):
+        """Replace a currently playing instance with another sound instance"""
+
+        self.log.debug("replace_sound - Preparing to replace existing sound with a new sound instance")
+
+        # Find which player is currently playing the specified sound instance to replace
+        SDL_LockMutex(self.mutex)
+        player = self._get_player_playing_sound_instance(old_instance)
+
+        if player >= 0:
+            self._play_sound_on_sound_player(sound_instance, player, force=True)
+        else:
+            self.log.debug("replace_sound - Could not locate specified sound to replace")
+            sound_instance.set_canceled()
+
+        SDL_UnlockMutex(self.mutex)
 
     def queue_sound(self, sound_instance, exp_time=None):
         """Adds a sound to the queue to be played when a sound player becomes available.
@@ -2055,9 +2083,6 @@ cdef class TrackStandard(Track):
                                "could not play sound %s", sound_instance.name)
                 return False
 
-            # Save the sound instance in the track's list of active sound instances
-            self._active_sound_instances[sound_instance.id] = sound_instance
-
             # Set play sound event
             request_message = self._get_available_request_message()
             if request_message != NULL:
@@ -2118,6 +2143,25 @@ cdef class TrackStandard(Track):
             return True
 
         return False
+
+    cdef int _get_player_playing_sound_instance(self, sound_instance):
+        """
+        Return the player currently playing the specified sound instance
+        Args:
+            sound_instance: The SoundInstance to find
+
+        Returns:
+            The sound player number currently playing the specified sound instance or -1 if the
+            sound instance is not currently playing.
+        """
+        # NOTE: The SDL Mutex must be held while calling this function
+
+        for i in range(self.type_state.sound_player_count):
+            if self.type_state.sound_players[i].status != player_idle and \
+                            self.type_state.sound_players[i].current.sound_instance_id == sound_instance.id:
+                return i
+
+        return -1
 
     def get_status(self):
         """
