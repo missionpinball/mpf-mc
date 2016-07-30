@@ -52,6 +52,7 @@ class BcpProcessor(object):
         self.send("register_trigger", event="ball_started")
         self.send("register_trigger", event="ball_ended")
         self.send("register_trigger", event="player_add_success")
+        self.send("register_trigger", event="player_turn_start")
 
     def _start_socket_thread(self):
         self.socket_thread = BCPServer(self.mc, self.receive_queue,
@@ -255,9 +256,6 @@ class BcpProcessor(object):
     def _bcp_reset(self, **kwargs):
         del kwargs
         self.mc.reset()
-
-        # temp todo
-        self.send('reset_complete')
 
     def _bcp_dmd_start(self, fps):
         self.mc.create_physical_dmd(fps)

@@ -142,6 +142,8 @@ class MpfMc(App):
 
         self.clock.schedule_interval(self._check_crash_queue, 1)
 
+        self.events.add_handler("player_turn_start", self.player_start_turn)
+
     def get_system_config(self):
         return self.machine_config['mpf-mc']
 
@@ -327,18 +329,19 @@ class MpfMc(App):
         except (IndexError, KeyError):
             pass
 
-    def player_start_turn(self, player_num):
-        if ((self.player and self.player.number != player_num) or
+    def player_start_turn(self, number, **kwargs):
+        del kwargs
+        if ((self.player and self.player.number != number) or
                 not self.player):
 
             try:
-                self.player = self.player_list[int(player_num) - 1]
-                self.events.post('player_turn_start', number=player_num,
+                self.player = self.player_list[int(number) - 1]
+                self.events.post('player_turn_start', number=number,
                                  player=self.player)
             except IndexError:
                 self.log.error('Received player turn start for player %s, but '
                                'only %s player(s) exist',
-                               player_num, len(self.player_list))
+                               number, len(self.player_list))
 
     def set_machine_var(self, name, value, change, prev_value):
         self.machine_vars[name] = value
