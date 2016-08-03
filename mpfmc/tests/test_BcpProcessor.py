@@ -25,11 +25,6 @@ class TestBcpProcessor(MpfMcTestCase):
         response = ('hello', None, {'version': '1.0'})
         self.assertIn(response, self.sent_bcp_commands)
 
-        self.send('reset')
-        self.advance_time()
-        response = ('reset_complete', None, {})
-        self.assertIn(response, self.sent_bcp_commands)
-
         self.send('mode_start',
                   name='tilt',
                   priority='10000')
