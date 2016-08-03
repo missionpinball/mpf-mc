@@ -24,7 +24,6 @@ class BcpProcessor(object):
             self.enabled = False
 
         self.bcp_commands = {'config': self._bcp_config,
-                             'dmd_start': self._bcp_dmd_start,
                              'error': self._bcp_error,
                              'goodbye': self._bcp_goodbye,
                              'hello': self._bcp_hello,
@@ -36,7 +35,6 @@ class BcpProcessor(object):
                              'player_turn_start': self._bcp_player_turn_start,
                              'player_variable': self._bcp_player_variable,
                              'reset': self._bcp_reset,
-                             'rgb_dmd_start': self._bcp_rgb_dmd_start,
                              'switch': self._bcp_switch,
                              'trigger': self._bcp_trigger,
                              }
@@ -256,9 +254,3 @@ class BcpProcessor(object):
     def _bcp_reset(self, **kwargs):
         del kwargs
         self.mc.reset()
-
-    def _bcp_dmd_start(self, fps):
-        self.mc.create_physical_dmd(fps)
-
-    def _bcp_rgb_dmd_start(self, fps):
-        self.mc.create_physical_rgb_dmd(fps)
