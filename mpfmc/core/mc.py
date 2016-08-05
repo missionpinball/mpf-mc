@@ -33,6 +33,7 @@ from mpf.core.events import EventManager
 from mpf.core.player import Player
 from mpf.core.assets import AssetManager
 from mpfmc.assets.image import ImageAsset
+from mpfmc.core.physical_dmd import PhysicalDmd, PhysicalRgbDmd
 
 try:
     from mpfmc.core.audio import SoundSystem
@@ -82,8 +83,8 @@ class MpfMc(App):
         """
 
         self.keyboard = None
-        self.physical_dmd = None
-        self.physical_rgb_dmd = None
+        self.physical_dmds = []
+        self.physical_rgb_dmds = []
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
@@ -129,6 +130,10 @@ class MpfMc(App):
         # Asset classes
         ImageAsset.initialize(self)
         VideoAsset.initialize(self)
+
+        # Create DMDs
+        self.create_physical_dmds()
+        self.create_physical_rgb_dmds()
 
         # Only initialize sound assets if sound system is loaded and enabled
         if self.sound_system is not None and self.sound_system.enabled:
@@ -205,18 +210,19 @@ class MpfMc(App):
         self.events.process_event_queue()
         self._init()
 
-    def create_physical_dmd(self, fps):
-        if 'physical_dmd' in self.machine_config and not self.physical_dmd:
-            from mpfmc.core.physical_dmd import PhysicalDmd
-            self.physical_dmd = PhysicalDmd(
-                self, self.machine_config['physical_dmd'], fps)
+    def create_physical_dmds(self):
+        """Create physical DMDs."""
+        if 'physical_dmds' in self.machine_config:
+            for name, config in self.machine_config['physical_dmds'].items():
+                dmd = PhysicalDmd(self, name, config)
+                self.physical_dmds.append(dmd)
 
-    def create_physical_rgb_dmd(self, fps):
-        if ('physical_rgb_dmd' in self.machine_config and
-                not self.physical_rgb_dmd):
-            from mpfmc.core.physical_dmd import PhysicalRgbDmd
-            self.physical_rgb_dmd = PhysicalRgbDmd(
-                self, self.machine_config['physical_rgb_dmd'], fps)
+    def create_physical_rgb_dmds(self):
+        """Create physical RBG DMDs."""
+        if 'physical_rgb_dmds' in self.machine_config:
+            for name, config in self.machine_config['physical_rgb_dmds'].items():
+                dmd = PhysicalRgbDmd(self, name, config)
+                self.physical_rgb_dmds.append(dmd)
 
     def _init(self):
         # Since the window is so critical in Kivy, we can't continue the
