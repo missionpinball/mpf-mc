@@ -31,7 +31,6 @@ class BcpProcessor(object):
                              'mode_start': self._bcp_mode_start,
                              'mode_stop': self._bcp_mode_stop,
                              'player_added': self._bcp_player_add,
-                             'player_score': self._bcp_player_score,
                              'player_turn_start': self._bcp_player_turn_start,
                              'player_variable': self._bcp_player_variable,
                              'reset': self._bcp_reset,
@@ -184,14 +183,6 @@ class BcpProcessor(object):
         """Processes an incoming BCP 'machine_variable' command."""
         del kwargs
         self.mc.set_machine_var(name, value, change, prev_value)
-
-    def _bcp_player_score(self, value, prev_value, change, player_num,
-                          **kwargs):
-        """Processes an incoming BCP 'player_score' command."""
-        del change
-        del prev_value
-        del kwargs
-        self.mc.update_player_var('score', value, int(player_num))
 
     def _bcp_player_turn_start(self, player_num, **kwargs):
         """Processes an incoming BCP 'player_turn_start' command."""
