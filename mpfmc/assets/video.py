@@ -104,11 +104,14 @@ class VideoAsset(Asset):
         self.loaded = True
         self.unloading = False
         self._video = Video(filename=self.file)
+        self._video.bind(on_load=self._check_duration)
 
+        self._call_callbacks()
+
+    def _check_duration(self, instance):
+        del instance
         if self._video.duration <= 0:
             raise ValueError(
                 "Video file {} was loaded, but seems to have no content. Check"
                 " to make sure you have the proper Gstreamer plugins for the "
                 "codec this video needs".format(self.file))
-
-        self._call_callbacks()
