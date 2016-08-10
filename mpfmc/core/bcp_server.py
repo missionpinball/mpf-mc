@@ -117,6 +117,7 @@ class BCPServer(threading.Thread):
                 '''
 
                 self.mc.bcp_client_connected = True
+                socket_chars = b''
 
                 # Receive the data in small chunks and retransmit it
                 while not self.mc.thread_stopper.is_set():
@@ -129,13 +130,18 @@ class BCPServer(threading.Thread):
                     try:
                         ready = select.select([self.connection], [], [], 1)
                         if ready[0]:
-                            socket_chars = self.connection.recv(8192).decode(
-                                'utf-8')
-                            if socket_chars:
-                                commands = socket_chars.split("\n")
+                            data_read = self.connection.recv(8192)
+                            if data_read:
+                                socket_chars += data_read
+                                commands = socket_chars.split(b"\n")
+
+                                # keep last incomplete command
+                                socket_chars = commands.pop()
+
+                                # process all complete commands
                                 for cmd in commands:
                                     if cmd:
-                                        self.process_received_message(cmd)
+                                        self.process_received_message(cmd.decode())
                             else:
                                 # no bytes -> socket closed
                                 break
