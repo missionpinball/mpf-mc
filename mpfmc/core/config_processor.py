@@ -12,6 +12,9 @@ from mpf.core.config_processor import ConfigProcessor as ConfigProcessorBase
 
 
 class ConfigProcessor(ConfigProcessorBase):
+
+    config_spec = None
+
     def __init__(self, machine):
         self.mc = machine
         self.machine = machine
@@ -41,6 +44,37 @@ class ConfigProcessor(ConfigProcessorBase):
     def _init(self):
         self.process_config_file(section_dict=self.machine_sections,
                                  config=self.mc.machine_config)
+
+    def register_load_methods(self):
+        """Register load method for modes."""
+        for section in self.mode_sections:
+            self.machine.mode_controller.register_load_method(
+                load_method=self.process_mode_config,
+                config_section_name=section, section=section)
+
+    def process_config_file(self, section_dict, config):
+        """Called to process a config file (can be a mode or machine config)."""
+        for section in section_dict:
+            if section in section_dict and section in config:
+                self.process_localized_config_section(config=config[section],
+                                                      section=section)
+
+    def process_localized_config_section(self, config, section):
+        """Process a single key within a config file.
+
+        Args:
+            config: The subsection of a config dict to process
+            section: The name of the section, either 'scripts' or 'shows'.
+
+        """
+        self.machine_sections[section](config)
+
+    def process_mode_config(self, config, mode, mode_path, section, **kwargs):
+        """Process a mode config."""
+        del mode
+        del mode_path
+        del kwargs
+        self.process_localized_config_section(config, section)
 
     def process_displays(self, config):
         # config is localized to 'displays' section
