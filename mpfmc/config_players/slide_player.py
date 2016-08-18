@@ -179,6 +179,10 @@ class McSlidePlayer(McConfigPlayer):
             validated_config[event] = dict()
             validated_config[event]['slides'] = dict()
 
+            if isinstance(settings, list):
+                raise AssertionError("Config of slide_player for event {} is broken. "
+                                     "It expects a dict not a list".format(event))
+
             if not isinstance(settings, dict):
                 settings = {settings: dict()}
 

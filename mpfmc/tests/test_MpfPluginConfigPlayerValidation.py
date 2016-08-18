@@ -44,8 +44,6 @@ class TestMpfPluginConfigPlayerValidation(MpfTestCase):
         machine_path = os.path.abspath(os.path.join(
             mpfmc.__path__[0], os.pardir, 'mpfmc', self.getMachinePath()))
 
-        self._mock_data_manager()
-
         try:
             self.loop = TimeTravelLoop()
             self.clock = TestClock(self.loop)
@@ -54,7 +52,7 @@ class TestMpfPluginConfigPlayerValidation(MpfTestCase):
                 os.path.abspath(os.path.join(
                     mpf.core.__path__[0], os.pardir)), machine_path,
                 self.getOptions(),
-                self.machine_config_patches, self.clock, True)
+                self.machine_config_patches, self.clock, {}, True)
 
             while not self.machine.test_init_complete:
                 self.advance_time_and_run(0.01)

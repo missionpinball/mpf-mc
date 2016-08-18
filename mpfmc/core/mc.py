@@ -33,6 +33,7 @@ from mpf.core.events import EventManager
 from mpf.core.player import Player
 from mpf.core.assets import AssetManager
 from mpfmc.assets.image import ImageAsset
+from mpfmc.core.physical_dmd import PhysicalDmd, PhysicalRgbDmd
 
 try:
     from mpfmc.core.audio import SoundSystem
@@ -82,8 +83,8 @@ class MpfMc(App):
         """
 
         self.keyboard = None
-        self.physical_dmd = None
-        self.physical_rgb_dmd = None
+        self.physical_dmds = []
+        self.physical_rgb_dmds = []
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
@@ -130,6 +131,10 @@ class MpfMc(App):
         ImageAsset.initialize(self)
         VideoAsset.initialize(self)
 
+        # Create DMDs
+        self.create_physical_dmds()
+        self.create_physical_rgb_dmds()
+
         # Only initialize sound assets if sound system is loaded and enabled
         if self.sound_system is not None and self.sound_system.enabled:
             SoundAsset.extensions = tuple(
@@ -141,6 +146,8 @@ class MpfMc(App):
             del self.machine_config['mpf-mc']['config_players']['sound']
 
         self.clock.schedule_interval(self._check_crash_queue, 1)
+
+        self.events.add_handler("player_turn_start", self.player_start_turn)
 
     def get_system_config(self):
         return self.machine_config['mpf-mc']
@@ -203,18 +210,19 @@ class MpfMc(App):
         self.events.process_event_queue()
         self._init()
 
-    def create_physical_dmd(self, fps):
-        if 'physical_dmd' in self.machine_config and not self.physical_dmd:
-            from mpfmc.core.physical_dmd import PhysicalDmd
-            self.physical_dmd = PhysicalDmd(
-                self, self.machine_config['physical_dmd'], fps)
+    def create_physical_dmds(self):
+        """Create physical DMDs."""
+        if 'physical_dmds' in self.machine_config:
+            for name, config in self.machine_config['physical_dmds'].items():
+                dmd = PhysicalDmd(self, name, config)
+                self.physical_dmds.append(dmd)
 
-    def create_physical_rgb_dmd(self, fps):
-        if ('physical_rgb_dmd' in self.machine_config and
-                not self.physical_rgb_dmd):
-            from mpfmc.core.physical_dmd import PhysicalRgbDmd
-            self.physical_rgb_dmd = PhysicalRgbDmd(
-                self, self.machine_config['physical_rgb_dmd'], fps)
+    def create_physical_rgb_dmds(self):
+        """Create physical RBG DMDs."""
+        if 'physical_rgb_dmds' in self.machine_config:
+            for name, config in self.machine_config['physical_rgb_dmds'].items():
+                dmd = PhysicalRgbDmd(self, name, config)
+                self.physical_rgb_dmds.append(dmd)
 
     def _init(self):
         # Since the window is so critical in Kivy, we can't continue the
@@ -327,18 +335,19 @@ class MpfMc(App):
         except (IndexError, KeyError):
             pass
 
-    def player_start_turn(self, player_num):
-        if ((self.player and self.player.number != player_num) or
+    def player_start_turn(self, number, **kwargs):
+        del kwargs
+        if ((self.player and self.player.number != number) or
                 not self.player):
 
             try:
-                self.player = self.player_list[int(player_num) - 1]
-                self.events.post('player_turn_start', number=player_num,
+                self.player = self.player_list[int(number) - 1]
+                self.events.post('player_turn_start', number=number,
                                  player=self.player)
             except IndexError:
                 self.log.error('Received player turn start for player %s, but '
                                'only %s player(s) exist',
-                               player_num, len(self.player_list))
+                               number, len(self.player_list))
 
     def set_machine_var(self, name, value, change, prev_value):
         self.machine_vars[name] = value

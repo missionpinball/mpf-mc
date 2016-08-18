@@ -24,7 +24,6 @@ class BcpProcessor(object):
             self.enabled = False
 
         self.bcp_commands = {'config': self._bcp_config,
-                             'dmd_start': self._bcp_dmd_start,
                              'error': self._bcp_error,
                              'goodbye': self._bcp_goodbye,
                              'hello': self._bcp_hello,
@@ -32,11 +31,9 @@ class BcpProcessor(object):
                              'mode_start': self._bcp_mode_start,
                              'mode_stop': self._bcp_mode_stop,
                              'player_added': self._bcp_player_add,
-                             'player_score': self._bcp_player_score,
                              'player_turn_start': self._bcp_player_turn_start,
                              'player_variable': self._bcp_player_variable,
                              'reset': self._bcp_reset,
-                             'rgb_dmd_start': self._bcp_rgb_dmd_start,
                              'switch': self._bcp_switch,
                              'trigger': self._bcp_trigger,
                              }
@@ -52,6 +49,7 @@ class BcpProcessor(object):
         self.send("register_trigger", event="ball_started")
         self.send("register_trigger", event="ball_ended")
         self.send("register_trigger", event="player_add_success")
+        self.send("register_trigger", event="player_turn_start")
 
     def _start_socket_thread(self):
         self.socket_thread = BCPServer(self.mc, self.receive_queue,
@@ -186,14 +184,6 @@ class BcpProcessor(object):
         del kwargs
         self.mc.set_machine_var(name, value, change, prev_value)
 
-    def _bcp_player_score(self, value, prev_value, change, player_num,
-                          **kwargs):
-        """Processes an incoming BCP 'player_score' command."""
-        del change
-        del prev_value
-        del kwargs
-        self.mc.update_player_var('score', value, int(player_num))
-
     def _bcp_player_turn_start(self, player_num, **kwargs):
         """Processes an incoming BCP 'player_turn_start' command."""
         del kwargs
@@ -255,12 +245,3 @@ class BcpProcessor(object):
     def _bcp_reset(self, **kwargs):
         del kwargs
         self.mc.reset()
-
-        # temp todo
-        self.send('reset_complete')
-
-    def _bcp_dmd_start(self, fps):
-        self.mc.create_physical_dmd(fps)
-
-    def _bcp_rgb_dmd_start(self, fps):
-        self.mc.create_physical_rgb_dmd(fps)
