@@ -186,11 +186,10 @@ class SoundSystem(object):
                                                                config['volume'])
         elif config['type'] == 'playlist':
             # TODO: Implement playlist track create
-            pass
+            raise NotImplementedError('Playlist track not yet implemented')
 
         elif config['type'] == 'live_loop':
-            # TODO: Implement playlist track create
-            pass
+            track = self.audio_interface.create_live_loop_track(name, config['volume'])
 
         if track is None:
             raise AudioException("Could not create '{}' track due to an error".format(name))

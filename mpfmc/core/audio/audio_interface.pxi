@@ -182,6 +182,11 @@ ctypedef struct TrackState:
     bint ducking_is_active
     Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
 
+
+# ---------------------------------------------------------------------------
+#    Standard Track types
+# ---------------------------------------------------------------------------
+
 ctypedef struct TrackStandardState:
     # State variables for TrackStandard tracks
     int sound_player_count
@@ -192,6 +197,8 @@ cdef enum SoundPlayerStatus:
     player_idle,
     player_pending,
     player_replacing,
+    player_fading_in,
+    player_fading_out,
     player_playing,
     player_finished,
     player_stopping,
@@ -212,6 +219,11 @@ cdef enum DuckingStage:
     ducking_stage_release,
     ducking_stage_finished
 
+cdef enum FadingStatus:
+    fading_status_not_fading,
+    fading_status_fading_in,
+    fading_status_fading_out
+
 ctypedef struct SoundSettings:
     Mix_Chunk *chunk
     Uint8 volume
@@ -221,6 +233,10 @@ ctypedef struct SoundSettings:
     long sound_id
     long sound_instance_id
     int sound_priority
+    FadingStatus fading_status
+    Uint32 fade_in_duration
+    Uint32 fade_out_duration
+    Uint32 fade_duration_remaining
     int marker_count
     Uint32 markers[MAX_MARKERS]
     bint sound_has_ducking
@@ -237,6 +253,17 @@ ctypedef struct SoundPlayer:
     SoundSettings next
     int track_num
     int player
+
+
+# ---------------------------------------------------------------------------
+#    Live Loop Track types
+# ---------------------------------------------------------------------------
+
+ctypedef struct TrackLiveLoopState:
+    # State variables for TrackLiveLoop tracks
+    SoundPlayer *master_sound_player
+    int slave_sound_player_count
+    SoundPlayer *slave_sound_players
 
 
 # ---------------------------------------------------------------------------
@@ -277,14 +304,15 @@ ctypedef struct RequestMessageDataPlaySound:
     Uint8 volume
     int loops
     int priority
-    Uint32 fade_in
+    Uint32 fade_in_duration
+    Uint32 fade_out_duration
     int marker_count
     Uint32 markers[MAX_MARKERS]
     bint sound_has_ducking
     DuckingSettings ducking_settings
 
 ctypedef struct RequestMessageDataStopSound:
-    Uint32 fade_out
+    Uint32 fade_out_duration
 
 ctypedef struct RequestMessageDataDuckingStart:
     int from_track
@@ -295,7 +323,8 @@ ctypedef struct RequestMessageDataDuckingStart:
 ctypedef struct RequestMessageDataDuckingStop:
     int from_track
     int from_player
-    Uint32 release_duration
+    Uint32 fade_out_duration
+    Uint32 ducking_release_duration
 
 ctypedef union RequestMessageData:
     RequestMessageDataPlaySound play

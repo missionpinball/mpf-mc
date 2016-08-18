@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 """Contains sound-related asset classes used by the audio system"""
 
 import logging
@@ -27,6 +28,7 @@ class SoundPool(AssetPool):
     """
     # Be sure the pool group, if you use it, is first in the file ahead of the
     # asset class.
+    # pylint: disable=invalid-name
     def __init__(self, mc, name, config, member_cls):
         super().__init__(mc, name, config, member_cls)
         self._instances = list()
@@ -48,15 +50,18 @@ class SoundPool(AssetPool):
         """
         sound_instance = self.sound.play(settings)
         self._instances.append(sound_instance)
-        sound_instance.add_finished_handler(self.sound_instance_finished)
+        sound_instance.add_finished_handler(self.on_sound_instance_finished)
         return sound_instance
 
-    def stop(self):
+    def stop(self, fade_out=None):
         """
-        Stops all instances of all sounds contained in the sound pool.
+        Stops all active sound instances in the sound pool.
+        Args:
+            fade_out: The number of seconds over which to fade out the sound instances
+                before stopping.
         """
         for sound_instance in self._instances:
-            sound_instance.stop()
+            sound_instance.stop(fade_out)
 
     def stop_looping(self):
         """Stops looping on all instances of all sounds contained in the sound pool."""
@@ -64,8 +69,9 @@ class SoundPool(AssetPool):
             # Assets contain a list of tuples (sound, number)
             sound_instance.stop_looping()
 
-    def sound_instance_finished(self, sound_instance_id, **kwargs):
-        """Removes the specified sound instance from the list of current instances"""
+    def on_sound_instance_finished(self, sound_instance_id, **kwargs):
+        """Callback function that is called when a sound instance of this sound is finished.
+        Remove the specified sound instance from the list of current instances"""
         del kwargs
         for sound_instance in self._instances:
             if sound_instance.id == sound_instance_id:
@@ -81,7 +87,7 @@ class SoundStealingMethod(Enum):
     newest = 2  # The newest (most-recent) sound will be replaced
 
 
-# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-instance-attributes, too-many-public-methods
 class SoundAsset(Asset):
     """
     Sound asset class contains a single sound that may be played using the audio engine.
@@ -98,7 +104,7 @@ class SoundAsset(Asset):
     pool_config_section = 'sound_pools'  # Will setup groups if present
     asset_group_class = SoundPool  # Class or None to not use pools
 
-    # pylint: disable=too-many-branches, too-many-statements
+    # pylint: disable=too-many-branches, too-many-statements, invalid-name
     def __init__(self, mc, name, file, config):
         """ Constructor"""
         super().__init__(mc, name, file, config)
@@ -109,6 +115,8 @@ class SoundAsset(Asset):
         self.priority = DEFAULT_PRIORITY
         self._max_queue_time = DEFAULT_MAX_QUEUE_TIME
         self._loops = DEFAULT_LOOPS
+        self._fade_in = 0
+        self._fade_out = 0
         self._max_instances = None
         self._stealing_method = SoundStealingMethod.oldest
         self._events_when_played = None
@@ -140,7 +148,8 @@ class SoundAsset(Asset):
                 self.log.error("'%s' is not a valid track name. "
                                "Could not create sound '%s' asset.", self.config['track'], name)
                 raise AudioException("'{}' is not a valid track name. "
-                                     "Could not create sound '{}' asset".format(self.config['track'], name))
+                                     "Could not create sound '{}' asset"
+                                     .format(self.config['track'], name))
 
         self._track = track
 
@@ -162,6 +171,12 @@ class SoundAsset(Asset):
 
         if 'max_instances' in self.config and self.config['max_instances'] is not None:
             self._max_instances = int(self.config['max_instances'])
+
+        if 'fade_in' in self.config and self.config['fade_in'] is not None:
+            self._fade_in = AudioInterface.string_to_secs(self.config['fade_in'])
+
+        if 'fade_out' in self.config and self.config['fade_out'] is not None:
+            self._fade_out = AudioInterface.string_to_secs(self.config['fade_out'])
 
         if 'stealing_method' in self.config and self.config['stealing_method'] is not None:
             method = str(self.config['stealing']).lower()
@@ -213,7 +228,7 @@ class SoundAsset(Asset):
     def __del__(self):
         """Destructor"""
 
-        self.stop()
+        self.stop(0)
         self.unload()
 
         del self.machine.sounds_by_id[self.id]
@@ -258,6 +273,16 @@ class SoundAsset(Asset):
     def volume(self):
         """Return the volume of the sound (float 0.0 to 1.0)"""
         return self._volume
+
+    @property
+    def fade_in(self):
+        """Return the fade in time for the sound (in seconds)"""
+        return self._fade_in
+
+    @property
+    def fade_out(self):
+        """Return the fade out time for the sound (in seconds)"""
+        return self._fade_out
 
     @property
     def max_queue_time(self):
@@ -399,11 +424,16 @@ class SoundAsset(Asset):
 
         return None
 
-    def stop(self):
-        """Stops all instances of the sound playing or pending playback."""
+    def stop(self, fade_out=None):
+        """
+        Stops all instances of the sound playing or pending playback.
+        Args:
+            fade_out: The number of seconds over which to fade out the sound instances
+                before stopping.
+        """
         self.log.debug("Stop sound %s", self.name)
         for sound_instance in self._instances:
-            sound_instance.stop()
+            sound_instance.stop(fade_out)
 
     def stop_looping(self):
         """Stops looping on all instances of the sound playing (and awaiting playback)."""
@@ -548,6 +578,8 @@ class SoundInstance(object):
         self._loops = sound.loops
         self._volume = sound.volume
         self._priority = sound.priority
+        self._fade_in = sound.fade_in
+        self._fade_out = sound.fade_out
         self._max_queue_time = sound.max_queue_time
         self._events_when_played = sound.events_when_played
         self._events_when_stopped = sound.events_when_stopped
@@ -566,6 +598,12 @@ class SoundInstance(object):
 
         if 'priority' in settings and settings['priority'] is not None:
             self._priority = settings['priority']
+
+        if 'fade_in' in settings and settings['fade_in'] is not None:
+            self._fade_in = settings['fade_in']
+
+        if 'fade_out' in settings and settings['fade_out'] is not None:
+            self._fade_out = settings['fade_out']
 
         if 'max_queue_time' in settings:
             self._max_queue_time = settings['max_queue_time']
@@ -656,6 +694,16 @@ class SoundInstance(object):
         """Return the maximum time a sound may be queued before
         playing or being discarded"""
         return self._max_queue_time
+
+    @property
+    def fade_in(self):
+        """Return the fade in time for the sound (in seconds)"""
+        return self._fade_in
+
+    @property
+    def fade_out(self):
+        """Return the fade out time for the sound (in seconds)"""
+        return self._fade_out
 
     @property
     def loops(self):
@@ -809,7 +857,8 @@ class SoundInstance(object):
             via ``remove_finished_handler_by_key``.
         """
         if not callable(handler):
-            raise ValueError("Cannot add finished handler '{}' for sound '{}'".format(handler, self.name))
+            raise ValueError("Cannot add finished handler '{}' for sound '{}'"
+                             .format(handler, self.name))
 
         key = uuid.uuid4()
 
@@ -853,7 +902,7 @@ class SoundInstance(object):
             merged_kwargs['sound_instance_id'] = self.id
             merged_kwargs['sound_id'] = self.sound.id
 
-            result = handler[0](**merged_kwargs)
+            handler[0](**merged_kwargs)
 
         # Remove the instance from the list of active instances for the parent sound
         self.sound.remove_instance(self)
@@ -878,8 +927,15 @@ class SoundInstance(object):
         """Return how many times this sound instance has looped back to the beginning."""
         return self._loop_count
 
-    def stop(self):
-        """Stops the sound instance."""
+    def stop(self, fade_out=None):
+        """
+        Stops the sound instance.
+        Args:
+            fade_out: The number of seconds over which to fade out the sound instance
+                before stopping.
+        """
+        if fade_out is not None and fade_out >= 0.0:
+            self._fade_out = fade_out
         self._track.stop_sound(self)
 
     def stop_looping(self):

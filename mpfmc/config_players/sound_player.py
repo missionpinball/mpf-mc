@@ -100,13 +100,15 @@ Here are several various examples:
 
             # Determine action to perform
             if s['action'].lower() == 'play':
-                sound.play(s)
-                instance_dict[sound_name] = sound
+                sound_instance = sound.play(s)
+                sound_instance.add_finished_handler(self.on_sound_instance_finished, 1, context=context)
+                instance_dict[sound_instance.id] = sound_instance
 
             elif s['action'].lower() == 'stop':
-                sound.stop()
-                if sound_name in instance_dict:
-                    del instance_dict[sound_name]
+                if 'fade_out' in s:
+                    sound.stop(s['fade_out'])
+                else:
+                    sound.stop()
 
             elif s['action'].lower() == 'stop_looping':
                 sound.stop_looping()
@@ -174,6 +176,14 @@ Here are several various examples:
             sound.stop_looping()
         self._reset_instance_dict(context)
 
+    def on_sound_instance_finished(self, sound_instance_id, context, **kwargs):
+        """Callback function that is called when a sound instance triggered by the sound_player
+        is finished. Remove the specified sound instance from the list of current instances
+        started by the sound_player."""
+        del kwargs
+        instance_dict = self._get_instance_dict(context)
+        if sound_instance_id in instance_dict:
+            del instance_dict[sound_instance_id]
 
 class MpfSoundPlayer(PluginPlayer):
     """Base class for part of the sound player which runs as part of MPF.
