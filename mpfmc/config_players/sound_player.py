@@ -188,19 +188,6 @@ class MpfSoundPlayer(PluginPlayer):
     config_file_section = 'sound_player'
     show_section = 'sounds'
 
-    def validate_show_config(self, device, device_settings):
-        """Validates the config in a show"""
-        # device is sound name, device_settings
-
-        device_settings = self.machine.config_validator.validate_config("sound_player",
-                                                                        device_settings)
-
-        return_dict = dict()
-        return_dict[device] = device_settings
-
-        return return_dict
-
-
 player_cls = MpfSoundPlayer
 mc_player_cls = McSoundPlayer
 
