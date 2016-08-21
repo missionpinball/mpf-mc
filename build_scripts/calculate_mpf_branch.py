@@ -4,7 +4,7 @@ import git
 import os
 import sys
 
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
+sys.path.insert(1, os.path.join(os.path.abspath(__file__), '..'))
 from mpfmc._version import __short_version__
 
 mpf_repo = git.Repo('c:\\projects\\mpf')
