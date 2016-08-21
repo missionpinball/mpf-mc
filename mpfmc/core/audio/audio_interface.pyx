@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '30', '0')
+__version_info__ = ('0', '30', '1')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -1614,11 +1614,15 @@ cdef class Track:
             #    1 (exp_time): The time (in ticks) after which the sound expires and should not be played
             #    2 (sound): The Sound object ready for playback
             #    3 (settings): A dictionary of any additional settings for this sound's playback (ducking, etc.)
+            #    4 (canceled): A boolean flag indicating whether or not the sound has been canceled and should
+            #                  not be played.
 
             try:
                 next_sound = self._sound_queue.get_nowait()
                 count -= 1
-                if next_sound[2] is None:
+                if next_sound[4]:
+                    self.log.debug("Next pending sound in queue has been canceled, "
+                                   "skipping sound %s", next_sound)
                     continue
             except Empty:
                 return None
@@ -1654,12 +1658,13 @@ cdef class Track:
         """
 
         # The sounds will not actually be removed from the priority queue because that
-        # could corrupt the queue heap structure, but are simply set to None so they
-        # will not be played.  After marking queue entry as None, the dictionary keeping
-        # track of sounds in the queue is updated.
+        # could corrupt the queue heap structure, but the canceled flag (tuple index 4) is
+        # set to True indicating the sound should not be played as it has been canceled.
+        # After marking queue entry as True, the dictionary keeping track of sounds in the
+        # queue is updated.
         if sound in self._sound_queue_items:
             for entry in self._sound_queue_items[sound]:
-                entry[2] = None
+                entry[4] = True
                 self.log.debug("Removing pending sound from queue %s", sound)
             del self._sound_queue_items[sound]
 
@@ -1781,7 +1786,7 @@ cdef class Track:
         # Note the negative operator in front of priority since this queue
         # retrieves the lowest values first, and MPF uses higher values for
         # higher priorities.
-        entry = [-priority, exp_time, sound, settings]
+        entry = [-priority, exp_time, sound, settings, False]
         self._sound_queue.put(entry)
 
         # Save the new entry in a dictionary of entries keyed by sound.  This
