@@ -12,7 +12,7 @@ widget_styles:
   text_default:
     font_size: 21
     color: red
-  big:
+  bigStyle:
     font_size: 100
     halign: left
 
@@ -20,7 +20,7 @@ slides:
   slide1:
     - type: text
       text: HELLO
-      style: big
+      style: bigStyle
       halign: right
     - type: text
       text: Default Style
@@ -36,7 +36,7 @@ slides:
   slide5:
     - type: text
       text: HELLO
-      style: big
+      style: bigStyle
       font_size: 50
 
 slide_player:
