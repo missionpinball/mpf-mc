@@ -99,16 +99,17 @@ class McWidgetPlayer(McConfigPlayer):
                 if s['key'] in instance_dict:
                     del instance_dict[s['key']]
 
-            slide.add_widgets_from_library(name=widget, **s)
-            instance_dict[s['key']] = slide
+            widgets = slide.add_widgets_from_library(name=widget, **s)
+            instance_dict[s['key']] = (slide, widgets)
 
     def get_express_config(self, value):
         return dict(widget=value)
 
     def clear_context(self, context):
         instance_dict = self._get_instance_dict(context)
-        for key, slide in instance_dict.items():
-            slide.remove_widgets_by_key(key)
+        for slide, widgets in instance_dict.values():
+            for widget in widgets:
+                slide.remove_widget(widget)
 
         self._reset_instance_dict(context)
 
