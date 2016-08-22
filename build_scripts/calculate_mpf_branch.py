@@ -13,7 +13,7 @@ this_mpf_mc_branch = os.environ['APPVEYOR_REPO_BRANCH']
 
 if 'origin/{}'.format(this_mpf_mc_branch) in mpf_repo.refs:
     mpf_branch = this_mpf_mc_branch
-elif 'oritin/{}'.format(__short_version__) in mpf_repo.refs:
+elif 'origin/{}'.format(__short_version__) in mpf_repo.refs:
     mpf_branch = __short_version__
 else:
     mpf_branch = 'dev'
