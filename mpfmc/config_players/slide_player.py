@@ -278,6 +278,8 @@ class MpfSlidePlayer(PluginPlayer):
 
             if dict_is_widgets:
                 device_settings = dict(widgets=[device_settings])
+        else:
+            raise AssertionError("Settings in slide_player {} have to be dict.".format(device))
 
         # todo make transition manager validation static and use that here too
 
