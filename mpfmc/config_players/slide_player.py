@@ -218,12 +218,12 @@ class McSlidePlayer(McConfigPlayer):
                     slide_settings = dict(widgets=[slide_settings])
 
                 validated_config[event]['slides'].update(
-                    self.validate_show_config(slide, slide_settings))
+                    self._validate_config_item(slide, slide_settings))
 
         return validated_config
 
-    def validate_show_config(self, device, device_settings):
-        validated_dict = super().validate_show_config(device, device_settings)
+    def _validate_config_item(self, device, device_settings):
+        validated_dict = super()._validate_config_item(device, device_settings)
 
         # device is slide name
 
@@ -259,7 +259,7 @@ class MpfSlidePlayer(PluginPlayer):
     config_file_section = 'slide_player'
     show_section = 'slides'
 
-    def validate_show_config(self, device, device_settings):
+    def _validate_config_item(self, device, device_settings):
         # device is slide name, device_settings
         dict_is_widgets = False
 

@@ -1,8 +1,10 @@
 """Base class for remote config players."""
-from mpf.core.config_player import ConfigPlayer
+import abc
+
+from mpf.config_players.device_config_player import DeviceConfigPlayer
 
 
-class McConfigPlayer(ConfigPlayer):
+class McConfigPlayer(DeviceConfigPlayer, metaclass=abc.ABCMeta):
 
     """Remote config player which is triggered via BCP."""
 
