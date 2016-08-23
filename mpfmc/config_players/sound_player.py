@@ -157,13 +157,13 @@ Here are several various examples:
                             break
 
                     validated_config[event]['sounds'].update(
-                        self.validate_show_config(sound, sound_settings))
+                        self._validate_config_item(sound, sound_settings))
 
         return validated_config
 
-    def validate_show_config(self, device, device_settings):
+    def _validate_config_item(self, device, device_settings):
         """Validates the config when in a show"""
-        validated_dict = super().validate_show_config(device, device_settings)
+        validated_dict = super()._validate_config_item(device, device_settings)
         # device is sound name
         return validated_dict
 
