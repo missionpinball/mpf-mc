@@ -103,14 +103,19 @@ class MpfTextInput(Text):
 
         self.registered_event_handlers.add(self.mc.events.add_handler(
             self.config['shift_left_event'], self.shift, places=-1))
+        self.mc.bcp_processor.register_trigger(self.config['shift_left_event'])
         self.registered_event_handlers.add(self.mc.events.add_handler(
             self.config['shift_right_event'], self.shift, places=1))
+        self.mc.bcp_processor.register_trigger(self.config['shift_right_event'])
         self.registered_event_handlers.add(self.mc.events.add_handler(
             self.config['select_event'], self.select))
+        self.mc.bcp_processor.register_trigger(self.config['select_event'])
         self.registered_event_handlers.add(self.mc.events.add_handler(
             self.config['abort_event'], self.abort))
+        self.mc.bcp_processor.register_trigger(self.config['abort_event'])
         self.registered_event_handlers.add(self.mc.events.add_handler(
             self.config['force_complete_event'], self.complete))
+        self.mc.bcp_processor.register_trigger(self.config['force_complete_event'])
 
     def _deregister_events(self):
         self.mc.events.remove_handlers_by_keys(self.registered_event_handlers)
