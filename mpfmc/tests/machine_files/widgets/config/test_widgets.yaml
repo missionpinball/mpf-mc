@@ -122,6 +122,10 @@ widget_player:
     widget1:
       target: display2
   add_widget6: widget6
+  remove_widget1_by_key:
+    widget1:
+      action: remove
+      key: widget1
   remove_widget1:
     widget1:
       action: remove
