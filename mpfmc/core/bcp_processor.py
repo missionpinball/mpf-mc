@@ -45,12 +45,16 @@ class BcpProcessor(object):
         del kwargs
         self.send("monitor_machine_vars")
         self.send("monitor_player_vars")
-        self.send("register_trigger", event="ball_started")
-        self.send("register_trigger", event="ball_ended")
-        self.send("register_trigger", event="player_add_success")
-        self.send("register_trigger", event="player_turn_start")
-        self.send("register_trigger", event="master_volume_increase")
-        self.send("register_trigger", event="master_volume_decrease")
+        self.register_trigger("ball_started")
+        self.register_trigger("ball_ended")
+        self.register_trigger("player_add_success")
+        self.register_trigger("player_turn_start")
+        self.register_trigger("master_volume_increase")
+        self.register_trigger("master_volume_decrease")
+
+    def register_trigger(self, event):
+        """Register a trigger for events from MPF."""
+        self.send("register_trigger", event=event)
 
     def _start_socket_thread(self):
         self.socket_thread = BCPServer(self.mc, self.receive_queue,

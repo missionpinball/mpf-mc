@@ -144,10 +144,10 @@ class MpfWidget(object):
                 return
         else:
             try:
-                style = self.mc.machine_config['widget_styles'][self.config['style']]
+                style = self.mc.machine_config['widget_styles'][self.config['style'].lower()]
             except KeyError:
                 raise ValueError("{} has an invalid style name: {}".format(
-                    self, self.config['style']))
+                    self, self.config['style'].lower()))
 
         found = False
 

@@ -32,7 +32,6 @@ class McWidgetPlayer(McConfigPlayer):
         del kwargs
         settings = deepcopy(settings)
         instance_dict = self._get_instance_dict(context)
-        full_context = self._get_full_context(context)
 
         if 'widgets' in settings:
             settings = settings['widgets']
@@ -60,7 +59,7 @@ class McWidgetPlayer(McConfigPlayer):
                 if s['key']:
                     key = s['key']
                 else:
-                    key = widget
+                    key = context + "-" + widget
 
                 if slide:
                     slide.remove_widgets_by_key(key)
@@ -80,6 +79,9 @@ class McWidgetPlayer(McConfigPlayer):
                                 except AttributeError:
                                     pass
 
+                if key in instance_dict:
+                    del instance_dict[key]
+
                 continue
 
             if not slide:
@@ -92,23 +94,34 @@ class McWidgetPlayer(McConfigPlayer):
                 try:
                     s['key'] = s['widget_settings'].pop('key')
                 except (KeyError, AttributeError):
-                    s['key'] = widget
+                    s['key'] = context + "-" + widget
 
             if action == 'update':
                 slide.remove_widgets_by_key(s['key'])
-                if s['key'] in instance_dict:
-                    del instance_dict[s['key']]
 
-            slide.add_widgets_from_library(name=widget, **s)
-            instance_dict[s['key']] = slide
+            widgets = slide.add_widgets_from_library(name=widget, **s)
+            instance_dict[s['key']] = (slide, widgets)
 
     def get_express_config(self, value):
         return dict(widget=value)
 
     def clear_context(self, context):
         instance_dict = self._get_instance_dict(context)
-        for key, slide in instance_dict.items():
-            slide.remove_widgets_by_key(key)
+        for key in instance_dict:
+            for target in self.machine.targets.values():
+                for w in target.slide_frame_parent.walk():
+                    try:
+                        if w.key == key:
+                            w.parent.remove_widget(w)
+                    except AttributeError:
+                        pass
+                for x in target.screens:
+                    for y in x.walk():
+                        try:
+                            if y.key == key:
+                                x.remove_widget(y)
+                        except AttributeError:
+                            pass
 
         self._reset_instance_dict(context)
 
