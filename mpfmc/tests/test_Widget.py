@@ -88,7 +88,7 @@ class TestWidget(MpfMcTestCase):
         self.advance_time()
 
         # widget1 should be on the default slide
-        self.assertIn('widget1', [x.key for x in self.mc.targets[
+        self.assertIn('_global-widget1', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
     def test_widget_player_add_to_named_slide(self):
@@ -369,16 +369,16 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('add_widget7')
         self.advance_time()
 
-        self.assertIn('widget1', [x.key for x in self.mc.targets[
+        self.assertIn('_global-widget1', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
-        self.assertIn('widget7', [x.key for x in self.mc.targets[
+        self.assertIn('_global-widget7', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
         self.advance_time(1)
 
-        self.assertIn('widget1', [x.key for x in self.mc.targets[
+        self.assertIn('_global-widget1', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
-        self.assertNotIn('widget7', [x.key for x in self.mc.targets[
+        self.assertNotIn('_global-widget7', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
     def test_widget_player_expire(self):
@@ -391,16 +391,16 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('add_widget8_expire')
         self.advance_time()
 
-        self.assertIn('widget1', [x.key for x in self.mc.targets[
+        self.assertIn('_global-widget1', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
-        self.assertIn('widget8', [x.key for x in self.mc.targets[
+        self.assertIn('_global-widget8', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
         self.advance_time(1)
 
-        self.assertIn('widget1', [x.key for x in self.mc.targets[
+        self.assertIn('_global-widget1', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
-        self.assertNotIn('widget8', [x.key for x in self.mc.targets[
+        self.assertNotIn('_global-widget8', [x.key for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
     def test_widget_player_custom_widget_settings(self):
@@ -414,7 +414,7 @@ class TestWidget(MpfMcTestCase):
 
         w8 = [x for x in self.mc.targets[
               'default'].current_slide.children[0].children
-              if x.key == 'widget8'][0]
+              if x.key == '_global-widget8'][0]
 
         self.assertEqual([1, 0, 0, 1], w8.color)
         self.assertEqual(70, w8.font_size)
@@ -431,7 +431,7 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('WIDGET NO KEY', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
-        self.mc.events.post('remove_widget1')
+        self.mc.events.post('remove_widget1_by_key')
         self.advance_time()
 
         # make sure the one with key is gone but the other is there
@@ -471,7 +471,7 @@ class TestWidget(MpfMcTestCase):
 
         w8 = [x for x in self.mc.targets[
               'default'].current_slide.children[0].children
-              if x.key == 'widget8'][0]
+              if x.key == '_global-widget8'][0]
 
         self.assertEqual(.5, w8.opacity)
 
@@ -483,7 +483,7 @@ class TestWidget(MpfMcTestCase):
         self.advance_time()
 
         widget = self.mc.targets['default'].current_slide.get_widgets_by_key(
-            'widget1')[0]
+            '_global-widget1')[0]
         self.assertEqual(widget.text, 'A')
         self.assertEqual(widget.color, [1.0, 0.0, 0.0, 1.0])
 
@@ -491,7 +491,7 @@ class TestWidget(MpfMcTestCase):
         self.advance_time()
 
         widget = self.mc.targets['default'].current_slide.get_widgets_by_key(
-            'widget1')[0]
+            '_global-widget1')[0]
         self.assertEqual(widget.text, 'S')
         self.assertEqual(widget.color, [0.0, 1.0, 0.0, 1.0])
 
@@ -499,7 +499,7 @@ class TestWidget(MpfMcTestCase):
         self.advance_time()
 
         widget = self.mc.targets['default'].current_slide.get_widgets_by_key(
-            'widget1')[0]
+            '_global-widget1')[0]
         self.assertEqual(widget.text, 'D')
         self.assertEqual(widget.color, [0.0, 0.0, 1.0, 1.0])
 
