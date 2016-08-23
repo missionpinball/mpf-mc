@@ -23,8 +23,8 @@ class TestAudio(MpfMcTestCase):
 
         if self.mc.sound_system is None:
             log = logging.getLogger('TestAudio')
-            log.warning("Sound system is not enabled - unable to run audio tests")
-            return
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
 
         self.assertIsNotNone(self.mc.sound_system)
         interface = self.mc.sound_system.audio_interface
