@@ -1,7 +1,4 @@
-"""Contains the MpfMc base class, which is the main App instance for the
-mpf-mc.
-
-"""
+"""Contains the MpfMc base class, which is the main App instance for the mpf-mc."""
 import importlib
 import os
 import queue
@@ -46,6 +43,9 @@ except ImportError:
 
 
 class MpfMc(App):
+
+    """Kivy app for the mpf media controller."""
+
     def __init__(self, options, config, machine_path,
                  thread_stopper=None, **kwargs):
 
@@ -58,6 +58,7 @@ class MpfMc(App):
         self.log.info("Machine path: %s", machine_path)
         self.machine_path = machine_path
         self.clock = Clock
+        # pylint: disable-msg=protected-access
         self.log.info("Starting clock at %sHz", Clock._max_fps)
         self._boot_holds = set()
         self.mpf_path = os.path.dirname(mpf.__file__)
@@ -106,16 +107,7 @@ class MpfMc(App):
         self.config_processor = ConfigProcessor(self)
         self.transition_manager = TransitionManager(self)
 
-        # Add local machine fonts path
-        if os.path.isdir(os.path.join(self.machine_path,
-                self.machine_config['mpf-mc']['paths']['fonts'])):
-
-            resource_add_path(os.path.join(self.machine_path,
-                self.machine_config['mpf-mc']['paths']['fonts']))
-
-        # Add mpfmc fonts path
-        resource_add_path(os.path.join(os.path.dirname(mpfmc.__file__),
-                                       'fonts'))
+        self._load_font_paths()
 
         # Initialize the sound system (must be done prior to creating the AssetManager).
         # If the sound system is not available, do not load any other sound-related modules.
@@ -135,6 +127,25 @@ class MpfMc(App):
         self.create_physical_dmds()
         self.create_physical_rgb_dmds()
 
+        self._initialise_sound_system()
+
+        self.clock.schedule_interval(self._check_crash_queue, 1)
+
+        self.events.add_handler("player_turn_start", self.player_start_turn)
+
+    def _load_font_paths(self):
+        # Add local machine fonts path
+        if os.path.isdir(os.path.join(self.machine_path,
+                self.machine_config['mpf-mc']['paths']['fonts'])):
+
+            resource_add_path(os.path.join(self.machine_path,
+                self.machine_config['mpf-mc']['paths']['fonts']))
+
+        # Add mpfmc fonts path
+        resource_add_path(os.path.join(os.path.dirname(mpfmc.__file__),
+                                       'fonts'))
+
+    def _initialise_sound_system(self):
         # Only initialize sound assets if sound system is loaded and enabled
         if self.sound_system is not None and self.sound_system.enabled:
             SoundAsset.extensions = tuple(
@@ -144,10 +155,6 @@ class MpfMc(App):
             # If the sound system is not loaded or enabled, remove the
             # sound_player from the list of config_player modules to setup
             del self.machine_config['mpf-mc']['config_players']['sound']
-
-        self.clock.schedule_interval(self._check_crash_queue, 1)
-
-        self.events.add_handler("player_turn_start", self.player_start_turn)
 
     def get_system_config(self):
         return self.machine_config['mpf-mc']
@@ -280,8 +287,7 @@ class MpfMc(App):
         self.thread_stopper.set()
 
         try:
-            self.log.info("Loop rate {}Hz".format(round(
-                          self.ticks / (time.time() - self.start_time), 2)))
+            self.log.info("Loop rate %s Hz", round(self.ticks / (time.time() - self.start_time), 2))
         except ZeroDivisionError:
             pass
 
