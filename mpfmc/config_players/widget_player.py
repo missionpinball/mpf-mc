@@ -57,9 +57,9 @@ class McWidgetPlayer(McConfigPlayer):
 
             if action == 'remove':
                 if s['key']:
-                    key = context + "-" + s['key']
+                    key = s['key']
                 else:
-                    key = context + "-" + widget
+                    key = widget
 
                 if slide:
                     slide.remove_widgets_by_key(key)
@@ -95,8 +95,6 @@ class McWidgetPlayer(McConfigPlayer):
                     s['key'] = s['widget_settings'].pop('key')
                 except (KeyError, AttributeError):
                     s['key'] = widget
-
-            s['key'] = context + "-" + s['key']
 
             if action == 'update':
                 slide.remove_widgets_by_key(s['key'])
