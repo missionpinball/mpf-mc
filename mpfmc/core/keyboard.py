@@ -1,12 +1,19 @@
+"""Handles key strokes in the media manager."""
+import logging
+
 from kivy.core.window import Window
 from kivy.uix.widget import Widget
 
 
 class Keyboard(Widget):
+
+    """Handles key strokes in the media manager."""
+
     def __init__(self, mc, **kwargs):
         super().__init__(**kwargs)
 
         self.mc = mc
+        self.log = logging.getLogger("Keyboard")
 
         self.keyboard_events = list()
         self.key_map = dict()
@@ -52,7 +59,16 @@ class Keyboard(Widget):
                 event_dict = {'mc_event': mc_event, 'params': params}
                 self.add_key_map(key, mods, event_dict=event_dict)
 
-    def get_key_string(self, key, mods):
+    @staticmethod
+    def get_key_string(key: str, mods: [str]) -> str:
+        """Return string for key + modifiers.
+
+        Args:
+            key: string of key
+            mods: list of modifiers as string
+
+        Returns: string
+        """
         try:
             mods = sorted(mods)
         except AttributeError:
@@ -62,8 +78,7 @@ class Keyboard(Widget):
 
     def add_key_map(self, key, mods, switch_name=None, toggle_key=False,
                     event_dict=None):
-        """Adds an entry to the key_map which is used to see what to do when
-        key events are received.
+        """Add an entry to the key_map which is used to see what to do when key events are received.
 
         Args:
             key: The character or name of the key
@@ -74,7 +89,6 @@ class Keyboard(Widget):
                 (i.e. push on / push off).
             event_dict: Dictionary of events with parameters that will be
             posted when this key combination is pressed. Default is None.
-
         """
         key_string = self.get_key_string(key, mods)
 
@@ -103,7 +117,9 @@ class Keyboard(Widget):
             return self.process_key_down(key, modifiers)
 
     def process_key_down(self, key, mods):
+        """Process a key down event and change switches accordingly."""
         key_string = self.get_key_string(key, mods)
+        self.log.debug("Processing key stroke for key {}".format(key_string))
 
         if key_string not in self.key_map:
             return False
@@ -141,6 +157,7 @@ class Keyboard(Widget):
         return True
 
     def process_key_release(self, key):
+        """Process a key up event and change switches accordingly."""
         action = self.active_keys.pop(key, None)
 
         if action:
@@ -150,4 +167,5 @@ class Keyboard(Widget):
                 self.send_switch(state=0, name=action)
 
     def send_switch(self, name, state):
+        """Notify mpf via BCP about a switch change."""
         self.mc.bcp_processor.send('switch', name=name, state=state)

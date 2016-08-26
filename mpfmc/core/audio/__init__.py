@@ -1,8 +1,6 @@
-"""
-Audio module provides all the audio features (playing of sounds) for the media controller.
-"""
-
+"""Audio module provides all the audio features (playing of sounds) for the media controller."""
 import logging
+
 from kivy.clock import Clock
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException, Track
 
@@ -26,7 +24,9 @@ DEFAULT_TRACK_VOLUME = 0.5
 
 # pylint: disable=too-many-instance-attributes
 class SoundSystem(object):
-    """
+
+    """Sound system for MPF.
+
     The SoundSystem class is used to read the sound system settings from the
     config file and then initialize the audio interface and create the
     specified tracks.
@@ -34,7 +34,7 @@ class SoundSystem(object):
 
     # pylint: disable=invalid-name, too-many-branches
     def __init__(self, mc):
-        """ Constructor """
+        """Initialise sound system."""
         self.mc = mc
         self.log = logging.getLogger('SoundSystem')
         self._initialized = False
@@ -111,41 +111,53 @@ class SoundSystem(object):
         self.audio_interface.enable()
         self._initialized = True
 
+        self.mc.events.add_handler("master_volume_increase", self.master_volume_increase)
+        self.mc.events.add_handler("master_volume_decrease", self.master_volume_decrease)
+
     @property
     def enabled(self):
-        """Return whether or not the sound system has been initialized"""
+        """Return true if enabled."""
         return self._initialized
 
     @property
-    def master_volume(self):
-        """Return the current master volume setting (0.0 to 1.0)"""
+    def master_volume(self) -> float:
+        """Return master volume."""
         return self.audio_interface.get_master_volume()
 
     @master_volume.setter
-    def master_volume(self, value):
-        """Set the master volume (0.0 to 1.0)"""
+    def master_volume(self, value: float):
+        """Set master volume."""
         # Constrain volume to the range 0.0 to 1.0
         value = min(max(value, 0.0), 1.0)
         self.audio_interface.set_master_volume(value)
 
     @property
     def default_track(self):
-        """Return the default track"""
+        """Return default track."""
         return self.audio_interface.get_track(0)
 
-    def master_volume_increase(self):
-        """Increase the master volume by one step"""
-        # TODO: Implement me
-        pass
+    def master_volume_increase(self, delta: float=0.05, **kwargs):
+        """Increase master volume by delta.
 
-    def master_volume_decrease(self):
-        """Decrease the master volume by one step"""
-        # TODO: Implement me
-        pass
-
-    def _create_track(self, name, config=None):
+        Args:
+            delta: How much to increase volume?
         """
-        Creates a track in the audio system with the specified name and configuration.
+        del kwargs
+        self.master_volume += delta
+        self.log.info("Increased master volume by {} to {}.".format(delta, self.master_volume))
+
+    def master_volume_decrease(self, delta: float=0.05, **kwargs):
+        """Decrease master volume by delta.
+
+        Args:
+            delta: How much to decrease volume?
+        """
+        del kwargs
+        self.master_volume -= delta
+        self.log.info("Decreased master volume by {} to {}.".format(delta, self.master_volume))
+
+    def _create_track(self, name, config=None) -> bool:
+        """Create a track in the audio system with the specified name and configuration.
 
         Args:
             name: The track name (which will be used to reference the track, such as

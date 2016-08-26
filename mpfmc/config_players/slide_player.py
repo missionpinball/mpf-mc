@@ -203,11 +203,14 @@ class McSlidePlayer(McConfigPlayer):
                 # for a slide_player. If so, it's slide_player keys. If not,
                 # we assume they're widgets for a slide.
 
-                if isinstance(slide_settings, str):
+                elif isinstance(slide_settings, str):
                     # slide_settings could be a string 'slide: slide_name',
                     # so we rename the key to the slide name with an empty dict
                     slide = slide_settings
                     slide_settings = dict()
+
+                elif not isinstance(slide_settings, dict):
+                    raise AssertionError("Expected a dict in slide_player {}:{}.".format(event, slide))
 
                 for key in slide_settings.keys():
                     if key not in ConfigValidator.config_spec['slide_player']:

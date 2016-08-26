@@ -23,8 +23,7 @@ class BcpProcessor(object):
         else:
             self.enabled = False
 
-        self.bcp_commands = {'config': self._bcp_config,
-                             'error': self._bcp_error,
+        self.bcp_commands = {'error': self._bcp_error,
                              'goodbye': self._bcp_goodbye,
                              'hello': self._bcp_hello,
                              'machine_variable': self._bcp_machine_variable,
@@ -50,6 +49,8 @@ class BcpProcessor(object):
         self.register_trigger("ball_ended")
         self.register_trigger("player_add_success")
         self.register_trigger("player_turn_start")
+        self.register_trigger("master_volume_increase")
+        self.register_trigger("master_volume_decrease")
 
     def register_trigger(self, event):
         """Register a trigger for events from MPF."""
@@ -218,33 +219,6 @@ class BcpProcessor(object):
             the time, rather, only for switches that have been configured to
             send events to BCP.
             '''
-
-    def _bcp_config(self, **kwargs):
-        """Processes an incoming BCP 'config' command."""
-        # for k, v in kwargs.iteritems():
-        #     if k.startswith('volume_'):
-        #         self.bcp_set_volume(track=k.split('volume_')[1], value=v)
-
-        pass  # todo
-
-    def _bcp_set_volume(self, track, value):
-        """Sets the volume based on an incoming BCP 'config' command.
-
-        Args:
-            track: String name of the track the volume will set.
-            value: Float between 0 and 1 which represents the volume level to
-                set.
-
-        Note: At this time only the master volume can be set with this method.
-
-        """
-        if track == 'master':
-            self.sound.set_volume(value)
-
-            # if track in self.sound.tracks:
-            # self.sound.tracks[track]
-
-            # todo add per-track volume support to sound system
 
     def _bcp_reset(self, **kwargs):
         del kwargs
