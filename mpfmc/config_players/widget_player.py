@@ -52,8 +52,10 @@ class McWidgetPlayer(McConfigPlayer):
                 slide_name = s.pop('slide')
                 try:
                     slide = self.machine.active_slides[slide_name]
-                except KeyError:  # pragma: no cover
-                    pass
+                except KeyError:
+                    raise KeyError(
+                        "Cannot add widget to slide '{}' as that is not a "
+                        "valid slide".format(s['slide']))
 
             if action == 'remove':
                 if s['key']:

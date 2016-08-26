@@ -125,6 +125,18 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
+    def test_widget_player_add_to_invalid_slide(self):
+        self.mc.targets['default'].add_slide(name='slide2')
+        self.mc.targets['default'].show_slide('slide2')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide2')
+
+        self.mc.events.post('add_widget2_to_slide1')
+
+        with self.assertRaises(KeyError):
+            self.advance_time()
+
     def test_widget_player_add_to_target(self):
         # create two slides
         self.mc.targets['display2'].add_slide(name='slide1')
