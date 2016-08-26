@@ -2,6 +2,8 @@
 
 # WARNING: Do not import kivy's logger here since that will trigger Kivy to
 # load in the mpf process when MPF processes the MpfSoundPlayer
+from copy import deepcopy
+
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
@@ -78,6 +80,8 @@ Here are several various examples:
 
         """
         instance_dict = self._get_instance_dict(context)
+        settings = deepcopy(settings)
+
         if 'sounds' in settings:
             settings = settings['sounds']
 
