@@ -19,6 +19,7 @@ sound_system:
 
 modes:
  - mode1
+ - mode2
 
 assets:
     sounds:
@@ -28,7 +29,7 @@ assets:
             load: preload
             track: voice
         sfx:
-            load: on_demand
+            load: preload
             track: sfx
         music:
             load: on_demand
