@@ -69,6 +69,26 @@ class Slide(Screen):
 
         self.opacity = config.get('opacity', 1.0)
 
+        self.mc.events.post('slide_{}_created'.format(self.name))
+
+        """event: slide_(name)_created
+
+        desc: A slide called (name) has just been created.
+
+        This means that this slide now exists, but it's not necessarily the
+        active (showing) slide, depending on the priorities of the other slides
+        and/or what else is going on.
+
+        This is useful for things like the widget_player where you want to
+        target a widget for a specific slide, but you can only do so if
+        that slide exists.
+
+        Slide names do not take into account what display or slide frame
+        they're playing on, so be sure to create machine-wide unique names
+        when you're naming your slides.
+
+        """
+
     def __repr__(self):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
             self.priority, self.creation_order)
@@ -228,6 +248,25 @@ class Slide(Screen):
         for widget in self.stencil.children:
             if hasattr(widget, 'prepare_for_removal'):  # try swallows too much
                 widget.prepare_for_removal()
+
+        self.mc.events.post('slide_{}_removed'.format(self.name))
+
+        """event: slide_(name)_removed
+
+        desc: A slide called (name) has just been removed.
+
+        This event is posted whenever a slide is removed, regardless of
+        whether or not that slide was active (showing).
+
+        Note that even though this event is called "removed", it's actually
+        posted as part of the removal process. (e.g. there are still some
+        clean-up things that happen afterwards.)
+
+        Slide names do not take into account what display or slide frame
+        they're playing on, so be sure to create machine-wide unique names
+        when you're naming your slides.
+
+        """
 
     def on_pre_enter(self, *args):
         del args
