@@ -513,10 +513,24 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('widget_4up_red')
         self.advance_time(1)
 
-    def test_widget_player_errors(self):
-        pass
-        # no slide
-        # bad target
-        # todo
+    def test_widget_with_key(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
 
-    # todo test non named widgets?
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # post the event to add widget2 to the default target, default slide
+        self.mc.events.post('show_christmas_slide_full')
+        self.advance_time()
+
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        self.mc.events.post('remove_christmas_full')
+        self.advance_time()
+
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
