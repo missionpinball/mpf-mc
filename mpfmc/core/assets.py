@@ -9,7 +9,7 @@ import sys
 from mpf.core.assets import BaseAssetManager
 
 
-class AssetManager(BaseAssetManager):
+class ThreadedAssetManager(BaseAssetManager):
 
     """AssetManager which uses the Threading module."""
 

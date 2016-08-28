@@ -12,6 +12,8 @@ from kivy.resources import resource_add_path
 from kivy.logger import Logger
 
 # The following line is needed to allow mpfmc modules to use the getLogger(name) method
+from mpfmc.core.assets import ThreadedAssetManager
+
 logging.Logger.manager.root = Logger
 
 from mpfmc.assets.video import VideoAsset
@@ -28,7 +30,6 @@ from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
 from mpf.core.player import Player
-from mpf.core.assets import AssetManager
 from mpfmc.assets.image import ImageAsset
 from mpfmc.core.physical_dmd import PhysicalDmd, PhysicalRgbDmd
 
@@ -116,7 +117,7 @@ class MpfMc(App):
         else:
             self.sound_system = SoundSystem(self)
 
-        self.asset_manager = AssetManager(self)
+        self.asset_manager = ThreadedAssetManager(self)
         self.bcp_processor = BcpProcessor(self)
 
         # Asset classes
