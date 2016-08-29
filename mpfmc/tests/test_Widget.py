@@ -256,6 +256,53 @@ class TestWidget(MpfMcTestCase):
         self.assertNotIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
 
+    def test_removing_mode_widget_with_custom_key_on_mode_stop(self):
+        # create a slide and add some base widgets
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('add_widget1_to_current')
+        self.advance_time()
+
+        # verify widget 1 is there but not widget 2
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # start a mode
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+
+        # post the event to add the widget. This will also test that the
+        # widget_player in a mode can add a widget from the base
+        self.mc.events.post('mode1_add_widget_with_key')
+        self.advance_time()
+
+        # make sure the new widget is there, and the old one is still there
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # make sure the key of the new widget is correct
+        widget2 = self.mc.targets[
+            'default'].current_slide.children[0].children[1]
+        self.assertEqual(widget2.text, 'widget2')
+        self.assertEqual(widget2.key, 'newton_crosby')
+
+        # stop the mode
+        self.mc.modes['mode1'].stop()
+        self.advance_time()
+
+        # make sure the mode widget is gone, but the first one is still there
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
     def test_widgets_in_slide_frame_parent(self):
         # create a slide and add some base widgets
         self.mc.targets['default'].add_slide(name='slide1')
@@ -568,10 +615,3 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('widget_4up_red')
         self.advance_time(1)
 
-    def test_widget_player_errors(self):
-        pass
-        # no slide
-        # bad target
-        # todo
-
-    # todo test non named widgets?
