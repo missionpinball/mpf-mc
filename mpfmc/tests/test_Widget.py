@@ -95,15 +95,17 @@ class TestWidget(MpfMcTestCase):
         # create two slides
         self.mc.targets['default'].add_slide(name='slide1')
         self.mc.targets['default'].show_slide('slide1')
+        self.advance_time()
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 
         self.mc.targets['default'].add_slide(name='slide2')
         self.mc.targets['default'].show_slide('slide2')
+        self.advance_time()
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide2')
 
-        # Add widget1 to slide 1
+        # Add widget2 to slide 1
         self.mc.events.post('add_widget2_to_slide1')
         self.advance_time()
 
@@ -134,7 +136,11 @@ class TestWidget(MpfMcTestCase):
 
         self.mc.events.post('add_widget2_to_slide1')
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(KeyError,
+                msg="Cannot add widget to slide 'slide1' as that is not a "
+                    "valid slide"):
+            self.advance_time()
+
             self.advance_time()
 
     def test_widget_player_add_to_target(self):
@@ -171,6 +177,10 @@ class TestWidget(MpfMcTestCase):
                          'slide1')
         self.assertNotIn('widget1', [x.text for x in self.mc.targets[
             'display2'].current_slide.children[0].children])
+
+    def test_widget_player_add_to_invalid_target(self):
+        pass  # todo
+
 
     def test_removing_mode_widget_on_mode_stop(self):
         # create a slide and add some base widgets
