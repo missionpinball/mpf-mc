@@ -9,3 +9,9 @@ widget_player:
   mode1_add_widget_with_key:
     widget2:
       key: newton_crosby
+  mode1_update_widget2:
+    widget2:
+      action: update
+      key: newton_crosby
+      widget_settings:
+        text: UPDATED TEXT
