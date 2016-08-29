@@ -20,7 +20,7 @@ widgets:
   widget2:
   - type: text
     text: widget2
-    y: -50
+    y: 50
     color: ff0000
     font_size: 100
   widget3:
@@ -111,6 +111,10 @@ widgets:
   box14:
      - type: text
        text: box14
+  widget9:
+     - type: text
+       text: named_widget9
+       key: widget9_key
 
 widget_player:
   add_widget1_to_current: widget1
@@ -121,6 +125,9 @@ widget_player:
   add_widget1_to_display2:
     widget1:
       target: display2
+  add_widget1_to_invalid_target:
+    widget1:
+      target: johnny5
   add_widget6: widget6
   remove_widget1_by_key:
     widget1:
@@ -214,6 +221,9 @@ widget_player:
     widget2:
       action: remove
       key: xmas_intro_keyname
+  show_widget9:
+    widget9:
+      key: wigdet9_wp_key
 
 slide_player:
   show_slide_1:

@@ -95,15 +95,17 @@ class TestWidget(MpfMcTestCase):
         # create two slides
         self.mc.targets['default'].add_slide(name='slide1')
         self.mc.targets['default'].show_slide('slide1')
+        self.advance_time()
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
 
         self.mc.targets['default'].add_slide(name='slide2')
         self.mc.targets['default'].show_slide('slide2')
+        self.advance_time()
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide2')
 
-        # Add widget1 to slide 1
+        # Add widget2 to slide 1
         self.mc.events.post('add_widget2_to_slide1')
         self.advance_time()
 
@@ -124,6 +126,38 @@ class TestWidget(MpfMcTestCase):
                          'slide1')
         self.assertIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
+
+    def test_widget_player_add_to_invalid_slide(self):
+        self.mc.targets['default'].add_slide(name='slide2')
+        self.mc.targets['default'].show_slide('slide2')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide2')
+
+        self.mc.events.post('add_widget2_to_slide1')
+
+        with self.assertRaises(KeyError,
+                msg="Cannot add widget to slide 'slide1' as that is not a "
+                    "valid slide"):
+            self.advance_time()
+
+    def test_widget_player_with_different_key_than_named_widget(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        # widget_player for show_widget9 specifies widget9 with a key
+        # "widget9_wp_key", but widget9 in the widgets: section has a key
+        # "widget9_key"
+
+        self.mc.events.post('show_widget9')
+
+        with self.assertRaises(KeyError,
+                msg="Widget has incoming key 'wigdet9_wp_key' which does not "
+                "match the key in the widget's config 'widget9_key'."):
+
+            self.advance_time()
 
     def test_widget_player_add_to_target(self):
         # create two slides
@@ -160,6 +194,27 @@ class TestWidget(MpfMcTestCase):
         self.assertNotIn('widget1', [x.text for x in self.mc.targets[
             'display2'].current_slide.children[0].children])
 
+    def test_widget_player_add_to_invalid_target(self):
+        # create two slides
+        self.mc.targets['display2'].add_slide(name='slide1')
+        self.mc.targets['display2'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['display2'].current_slide_name,
+                         'slide1')
+
+        self.mc.targets['display2'].add_slide(name='slide2')
+        self.mc.targets['display2'].show_slide('slide2')
+        self.assertEqual(self.mc.targets['display2'].current_slide_name,
+                         'slide2')
+
+        # Add widget1 to invalid target called "johnny5"
+        self.mc.events.post('add_widget1_to_invalid_target')
+
+        with self.assertRaises(KeyError,
+                msg="Cannot add widget to target 'johnny5' as that is not a "
+                    "valid display target"):
+
+            self.advance_time()
+
     def test_removing_mode_widget_on_mode_stop(self):
         # create a slide and add some base widgets
         self.mc.targets['default'].add_slide(name='slide1')
@@ -190,6 +245,53 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.children[0].children])
         self.assertIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
+
+        # stop the mode
+        self.mc.modes['mode1'].stop()
+        self.advance_time()
+
+        # make sure the mode widget is gone, but the first one is still there
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+    def test_removing_mode_widget_with_custom_key_on_mode_stop(self):
+        # create a slide and add some base widgets
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.mc.events.post('add_widget1_to_current')
+        self.advance_time()
+
+        # verify widget 1 is there but not widget 2
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # start a mode
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+
+        # post the event to add the widget. This will also test that the
+        # widget_player in a mode can add a widget from the base
+        self.mc.events.post('mode1_add_widget_with_key')
+        self.advance_time()
+
+        # make sure the new widget is there, and the old one is still there
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # make sure the key of the new widget is correct
+        widget2 = self.mc.targets[
+            'default'].current_slide.children[0].children[1]
+        self.assertEqual(widget2.text, 'widget2')
+        self.assertEqual(widget2.key, 'newton_crosby')
 
         # stop the mode
         self.mc.modes['mode1'].stop()
@@ -534,3 +636,48 @@ class TestWidget(MpfMcTestCase):
 
         self.assertNotIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
+
+    def test_updating_mode_widget_by_key(self):
+        # create a slide and add some base widgets
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+        self.mc.events.post('add_widget1_to_current')
+        self.advance_time()
+
+        # verify widget 1 is there but not widget 2
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # start a mode
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+
+        # post the event to add the widget. This will also test that the
+        # widget_player in a mode can add a widget from the base
+        self.mc.events.post('mode1_add_widget_with_key')
+        self.advance_time()
+
+        # make sure the new widget is there, and the old one is still there
+        self.assertIn('widget1', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # make sure the key of the new widget is correct
+        widget2 = self.mc.targets[
+            'default'].current_slide.children[0].children[1]
+        self.assertEqual(widget2.text, 'widget2')
+        self.assertEqual(widget2.key, 'newton_crosby')
+
+        # update widget2 by key
+        self.mc.events.post('mode1_update_widget2')
+        self.advance_time(1)
+
+        widget2 = self.mc.targets[
+            'default'].current_slide.children[0].children[1]
+        self.assertEqual(widget2.text, 'UPDATED TEXT')
+        self.assertEqual(widget2.key, 'newton_crosby')
