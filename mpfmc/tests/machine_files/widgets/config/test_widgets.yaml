@@ -125,6 +125,9 @@ widget_player:
   add_widget1_to_display2:
     widget1:
       target: display2
+  add_widget1_to_invalid_target:
+    widget1:
+      target: johnny5
   add_widget6: widget6
   remove_widget1_by_key:
     widget1:

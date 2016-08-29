@@ -44,7 +44,10 @@ class McWidgetPlayer(McConfigPlayer):
 
             if s['target']:
                 try:
-                    slide = self.machine.targets[s.pop('target')].current_slide
+                    slide = self.machine.targets[s['target']].current_slide
+                    # need to del here instead of pop so it still exists for
+                    # the exception
+                    del s['target']
                 except KeyError:
                     raise KeyError(
                         "Cannot add widget to target '{}' as that is not a "

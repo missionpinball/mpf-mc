@@ -195,8 +195,25 @@ class TestWidget(MpfMcTestCase):
             'display2'].current_slide.children[0].children])
 
     def test_widget_player_add_to_invalid_target(self):
-        pass  # todo
+        # create two slides
+        self.mc.targets['display2'].add_slide(name='slide1')
+        self.mc.targets['display2'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['display2'].current_slide_name,
+                         'slide1')
 
+        self.mc.targets['display2'].add_slide(name='slide2')
+        self.mc.targets['display2'].show_slide('slide2')
+        self.assertEqual(self.mc.targets['display2'].current_slide_name,
+                         'slide2')
+
+        # Add widget1 to invalid target called "johnny5"
+        self.mc.events.post('add_widget1_to_invalid_target')
+
+        with self.assertRaises(KeyError,
+                msg="Cannot add widget to target 'johnny5' as that is not a "
+                    "valid display target"):
+
+            self.advance_time()
 
     def test_removing_mode_widget_on_mode_stop(self):
         # create a slide and add some base widgets
