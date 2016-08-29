@@ -215,7 +215,7 @@ widget_player:
     widget2:
       widget_settings:
         expire: 5s
-      slide: slide_1
+      slide: slide1
       key: xmas_intro_keyname
   remove_christmas_full:
     widget2:
