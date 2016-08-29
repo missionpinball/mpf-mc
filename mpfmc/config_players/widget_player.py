@@ -60,7 +60,7 @@ class McWidgetPlayer(McConfigPlayer):
                 except KeyError:
                     raise KeyError(
                         "Cannot add widget to slide '{}' as that is not a "
-                        "valid slide".format(s['slide']))
+                        "valid slide".format(slide_name))
 
             if action == 'remove':
                 if s['key']:
