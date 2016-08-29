@@ -30,6 +30,9 @@ class MpfMcTestCase(unittest.TestCase):
         self.sent_bcp_commands = list()
         super().__init__(*args)
 
+        self._events = dict()
+        self._last_event_kwargs = dict()
+
     def get_options(self):
         return dict(machine_path=self.get_machine_path(),
                     mcconfigfile='mpfmc/mcconfig.yaml',
@@ -177,3 +180,46 @@ class MpfMcTestCase(unittest.TestCase):
             return
 
         return super().run(self._test)
+
+    def _mock_event_handler(self, event_name, **kwargs):
+        self._last_event_kwargs[event_name] = kwargs
+        self._events[event_name] += 1
+
+    def mock_event(self, event_name):
+        self._events[event_name] = 0
+        self.mc.events.remove_handler_by_event(
+            event=event_name, handler=self._mock_event_handler)
+        self.mc.events.add_handler(event=event_name,
+                                   handler=self._mock_event_handler,
+                                   event_name=event_name)
+
+    def assertEventNotCalled(self, event_name):
+        """Assert that event was not called."""
+        if event_name not in self._events:
+            raise AssertionError("Event {} not mocked.".format(event_name))
+
+        if self._events[event_name] != 0:
+            raise AssertionError("Event {} was called {} times.".format(
+                event_name, self._events[event_name]))
+
+    def assertEventCalled(self, event_name, times=None):
+        """Assert that event was called."""
+        if event_name not in self._events:
+            raise AssertionError("Event {} not mocked.".format(event_name))
+
+        if self._events[event_name] == 0:
+            raise AssertionError("Event {} was not called.".format(event_name))
+
+        if times is not None and self._events[event_name] != times:
+            raise AssertionError("Event {} was called {} instead of {}.".format(
+                event_name, self._events[event_name], times))
+
+    def assertEventCalledWith(self, event_name, **kwargs):
+        """Assert that event was called with kwargs."""
+        self.assertEventCalled(event_name)
+        self.assertEqual(kwargs, self._last_event_kwargs[event_name],
+                         "Args for {} differ.".format(event_name))
+
+    def reset_mock_events(self):
+        for event in self._events.keys():
+            self._events[event] = 0
