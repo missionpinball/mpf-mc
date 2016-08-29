@@ -25,10 +25,10 @@ The MPF project homepage is here : https://missionpinball.com/mpf/
 
 Installation, Documentation, and Examples
 -----------------------------------------
-* Getting started tutorial : https://missionpinball.com/tutorial
-* Installation : https://missionpinball.com/docs/installing-mpf
-* User documentation : http://docs.missionpinball.com
-* API documentation : http://missionpinball.github.io/mpf_mc
+* Getting started tutorial : http://docs.missionpinball.org/en/stable/tutorial/
+* Installation : http://docs.missionpinball.org/en/stable/install/
+* User documentation : http://docs.missionpinball.org
+* API / developer documentation : http://docs.missionpinball.org/en/stable/api/
 
 Support
 -------
@@ -38,7 +38,7 @@ Authors & Contributing
 ----------------------
 MPF and the MPF-MC are labors of love by awesome pinball-loving people. There's a list of authors in the AUTHORS file.
 We'd love for you to join us! Even if you don't know Python well, there's plenty to do. Drop us a line in the forum, or
-make a change and submit a pull request!
+make a change and submit a pull request! More info [here](http://docs.missionpinball.org/en/stable/contribute/).
 
 License
 -------
