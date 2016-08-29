@@ -1,6 +1,8 @@
 from copy import deepcopy
 
 from mpf.config_players.plugin_player import PluginPlayer
+from mpf.core.events import EventHandlerKey
+
 from mpfmc.core.mc_config_player import McConfigPlayer
 
 
@@ -58,9 +60,19 @@ class McWidgetPlayer(McConfigPlayer):
                 try:
                     slide = self.machine.active_slides[slide_name]
                 except KeyError:
-                    raise KeyError(
-                        "Cannot add widget to slide '{}' as that is not a "
-                        "valid slide".format(slide_name))
+                    # check if slide does exist
+                    if slide_name not in self.machine.slides:
+                        raise KeyError(
+                            "Cannot add widget to slide '{}' as that is not a "
+                            "valid slide".format(slide_name))
+                    else:
+                        assert action == "add"  # TODO: handle other actions
+
+                        handler = self.machine.events.add_handler(
+                            "slide_{}_active".format(slide_name), self._add_widget_to_slide_when_active, slide_name=slide_name,
+                            widget=widget, s=s, context=context)
+                        instance_dict[s['key']] = (slide, handler)
+                        return
 
             if action == 'remove':
                 if s['key']:
@@ -68,23 +80,13 @@ class McWidgetPlayer(McConfigPlayer):
                 else:
                     key = context + "-" + widget
 
+                if key in instance_dict and isinstance(instance_dict[key][1], EventHandlerKey):
+                    self.machine.events.remove_handler_by_key(instance_dict[key][1])
+
                 if slide:
                     slide.remove_widgets_by_key(key)
                 else:
-                    for target in self.machine.targets.values():
-                        for w in target.slide_frame_parent.walk():
-                            try:
-                                if w.key == key:
-                                    w.parent.remove_widget(w)
-                            except AttributeError:
-                                pass
-                        for x in target.screens:
-                            for y in x.walk():
-                                try:
-                                    if y.key == key:
-                                        x.remove_widget(y)
-                                except AttributeError:
-                                    pass
+                    self._remove_widget_by_key(key)
 
                 if key in instance_dict:
                     del instance_dict[key]
@@ -109,26 +111,42 @@ class McWidgetPlayer(McConfigPlayer):
             widgets = slide.add_widgets_from_library(name=widget, **s)
             instance_dict[s['key']] = (slide, widgets)
 
+    def _remove_widget_by_key(self, key):
+        """Remove widget by key."""
+        for target in self.machine.targets.values():
+            for w in target.slide_frame_parent.walk():
+                try:
+                    if w.key == key:
+                        w.parent.remove_widget(w)
+                except AttributeError:
+                    pass
+            for x in target.screens:
+                for y in x.walk():
+                    try:
+                        if y.key == key:
+                            x.remove_widget(y)
+                    except AttributeError:
+                        pass
+
+    def _add_widget_to_slide_when_active(self, slide_name, widget, s, context, **kwargs):
+        del kwargs
+        instance_dict = self._get_instance_dict(context)
+        slide = self.machine.active_slides[slide_name]
+        widgets = slide.add_widgets_from_library(name=widget, **s)
+        if s['key'] in instance_dict and isinstance(instance_dict[s['key']][1], EventHandlerKey):
+            self.machine.events.remove_handler_by_key(instance_dict[s['key']][1])
+        instance_dict[s['key']] = (slide, widgets)
+
     def get_express_config(self, value):
         return dict(widget=value)
 
     def clear_context(self, context):
         instance_dict = self._get_instance_dict(context)
         for key in instance_dict:
-            for target in self.machine.targets.values():
-                for w in target.slide_frame_parent.walk():
-                    try:
-                        if w.key == key:
-                            w.parent.remove_widget(w)
-                    except AttributeError:
-                        pass
-                for x in target.screens:
-                    for y in x.walk():
-                        try:
-                            if y.key == key:
-                                x.remove_widget(y)
-                        except AttributeError:
-                            pass
+            if isinstance(instance_dict[key][1], EventHandlerKey):
+                self.machine.events.remove_handler_by_key(instance_dict[key][1])
+
+            self._remove_widget_by_key(key)
 
         self._reset_instance_dict(context)
 
