@@ -1,4 +1,5 @@
 import logging
+
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from unittest.mock import MagicMock
 
@@ -14,9 +15,6 @@ class TestAudio(MpfMcTestCase):
 
     def get_config_file(self):
         return 'test_audio.yaml'
-
-    def get_sound_file_path(self):
-        return 'tests/machine_files/audio/sounds'
 
     def test_typical_sound_system(self):
         """ Tests the sound system and audio interface with typical settings """
@@ -204,6 +202,41 @@ class TestAudio(MpfMcTestCase):
         # events that get generated, but never processed and cleared from the queue?)
         self.assertEqual(interface.get_in_use_request_message_count(), 0)
         self.assertEqual(interface.get_in_use_notification_message_count(), 0)
+
+
+    def test_mode_sounds(self):
+        """ Test the sound system using sounds specified in a mode """
+
+        print("test_mode_sounds")
+
+        if self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            raise Exception('Sound system is not enabled')
+            # self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        self.assertIsNotNone(interface)
+
+        self.assertTrue(self.mc, 'sounds')
+
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+
+        # Allow some time for sound assets to load
+        self.advance_time(2)
+
+        # Start mode
+        self.send(bcp_command='mode_start', name='mode2', priority=500)
+        self.assertTrue(self.mc.modes['mode2'].active)
+        self.assertEqual(self.mc.modes['mode2'].priority, 500)
+        self.assertIn('boing_mode2', self.mc.sounds)  # .wav
+
+        self.advance_time(1)
+
+        self.mc.events.post('play_sound_boing_in_mode2')
+        self.advance_time(1)
 
         """
         # Add another track with the same name (should not be allowed)
