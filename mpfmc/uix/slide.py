@@ -16,6 +16,7 @@ class Slide(Screen):
         Slide.next_id += 1
         return Slide.next_id
 
+    # pylint: disable-msg=too-many-arguments
     def __init__(self, mc, name, config=None, target='default', key=None,
                  priority=0, play_kwargs=None):
 
@@ -89,7 +90,7 @@ class Slide(Screen):
     def add_widgets_from_config(self, config, key=None, play_kwargs=None,
                                 widget_settings=None):
 
-        if type(config) is not list:
+        if not isinstance(config, list):
             config = [config]
         widgets_added = list()
 

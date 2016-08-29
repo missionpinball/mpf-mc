@@ -190,7 +190,7 @@ class MpfWidget(object):
             pass
 
     def build_animation_from_config(self, config_list):
-
+        """Build animation object from config."""
         if not isinstance(config_list, list):
             raise TypeError('build_animation_from_config requires a list')
 

@@ -76,6 +76,7 @@ class Keyboard(Widget):
 
         return '{}-{}'.format(key, '-'.join(mods))
 
+    # pylint: disable-msg=too-many-arguments
     def add_key_map(self, key, mods, switch_name=None, toggle_key=False,
                     event_dict=None):
         """Add an entry to the key_map which is used to see what to do when key events are received.
@@ -119,7 +120,7 @@ class Keyboard(Widget):
     def process_key_down(self, key, mods):
         """Process a key down event and change switches accordingly."""
         key_string = self.get_key_string(key, mods)
-        self.log.debug("Processing key stroke for key {}".format(key_string))
+        self.log.debug("Processing key stroke for key %s", key_string)
 
         if key_string not in self.key_map:
             return False

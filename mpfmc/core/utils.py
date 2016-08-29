@@ -7,6 +7,7 @@ from mpf.core.utility_functions import Util
 
 
 # pylint: disable-msg=too-many-arguments
+# pylint: disable-msg=too-many-statements
 def set_position(parent_w, parent_h, w, h, x=None, y=None,
                  anchor_x=None, anchor_y=None, adjust_top=None,
                  adjust_right=None, adjust_bottom=None, adjust_left=None):
@@ -92,7 +93,7 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None,
     # ----------------------
 
     # Set position
-    if type(x) is str:
+    if isinstance(x, str):
 
         x = str(x).replace(' ','')
         start_x = 0
@@ -131,7 +132,7 @@ def set_position(parent_w, parent_h, w, h, x=None, y=None,
     # --------------------
 
     # Set position
-    if type(y) is str:
+    if isinstance(y, str):
 
         y = str(y).replace(' ', '')
         start_y = 0

@@ -3,8 +3,6 @@
 import logging
 from collections import namedtuple
 
-from mpf.core.utility_functions import Util
-
 RemoteMethod = namedtuple('RemoteMethod',
                           'method config_section kwargs priority',
                           verbose=False)
@@ -57,14 +55,14 @@ class Mode(object):
     def active(self, active):
         if self._active != active:
             self._active = active
-            self.mc.mode_controller._active_change(self, self._active)
+            self.mc.mode_controller.active_change(self, self._active)
 
     def configure_mode_settings(self, config):
         """Processes this mode's configuration settings from a config
         dictionary.
         """
 
-        if not ('priority' in config and type(config['priority']) is int):
+        if not ('priority' in config and isinstance(config['priority'], int)):
             config['priority'] = 0
 
         try:
@@ -98,7 +96,7 @@ class Mode(object):
         del callback
         del kwargs
 
-        if type(priority) is int:
+        if isinstance(priority, int):
             self.priority = priority
         else:
             self.priority = self.config['mode']['priority']
