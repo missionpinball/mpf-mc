@@ -45,8 +45,10 @@ class McWidgetPlayer(McConfigPlayer):
             if s['target']:
                 try:
                     slide = self.machine.targets[s.pop('target')].current_slide
-                except KeyError:  # pragma: no cover
-                    pass
+                except KeyError:
+                    raise KeyError(
+                        "Cannot add widget to target '{}' as that is not a "
+                        "valid display target".format(s['target']))
 
             if s['slide']:
                 slide_name = s.pop('slide')
