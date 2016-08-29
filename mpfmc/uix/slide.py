@@ -99,9 +99,6 @@ class Slide(Screen):
         if name not in self.mc.widgets:
             raise ValueError("Widget %s not found", name)
 
-        if not key:
-            key = name
-
         return self.add_widgets_from_config(config=self.mc.widgets[name],
                                             key=key,
                                             widget_settings=widget_settings)
@@ -125,8 +122,16 @@ class Slide(Screen):
 
                 widget.update(widget_settings)
 
-            if widget['key']:
-                this_key = widget['key']
+            configured_key = widget.get('key', None)
+
+            if (configured_key and key and not key.startswith('_') and
+                    configured_key != key):
+                raise KeyError("Widget has incoming key '{}' which does not "
+                               "match the key in the widget's config "
+                               "'{}'.".format(key, configured_key))
+
+            if configured_key:
+                this_key = configured_key
             else:
                 this_key = key
 

@@ -141,6 +141,22 @@ class TestWidget(MpfMcTestCase):
                     "valid slide"):
             self.advance_time()
 
+    def test_widget_player_with_different_key_than_named_widget(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        # widget_player for show_widget9 specifies widget9 with a key
+        # "widget9_wp_key", but widget9 in the widgets: section has a key
+        # "widget9_key"
+
+        self.mc.events.post('show_widget9')
+
+        with self.assertRaises(KeyError,
+                msg="Widget has incoming key 'wigdet9_wp_key' which does not "
+                "match the key in the widget's config 'widget9_key'."):
+
             self.advance_time()
 
     def test_widget_player_add_to_target(self):

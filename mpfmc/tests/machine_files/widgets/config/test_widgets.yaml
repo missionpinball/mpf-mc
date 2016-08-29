@@ -111,6 +111,10 @@ widgets:
   box14:
      - type: text
        text: box14
+  widget9:
+     - type: text
+       text: named_widget9
+       key: widget9_key
 
 widget_player:
   add_widget1_to_current: widget1
@@ -204,6 +208,9 @@ widget_player:
         z: -2
         color: red
         y: middle+2
+  show_widget9:
+    widget9:
+      key: wigdet9_wp_key
 
 slide_player:
   show_slide_1:
