@@ -56,7 +56,9 @@ class ThreadedAssetManager(BaseAssetManager):
         # checks the loaded queue and updates loading stats
         try:
             while not self.loaded_queue.empty():
-                self.loaded_queue.get().is_loaded()
+                asset, loaded = self.loaded_queue.get()
+                if loaded:
+                    asset.is_loaded()
                 self.num_assets_loaded += 1
                 self._post_loading_event()
         except AttributeError:
@@ -110,7 +112,9 @@ class AssetLoader(threading.Thread):
                     with asset.lock:
                         if not asset.loaded:
                             asset.do_load()
-                            self.loaded_queue.put(asset)
+                            self.loaded_queue.put((True, asset))
+                        else:
+                            self.loaded_queue.put((False, asset))
 
             return
 

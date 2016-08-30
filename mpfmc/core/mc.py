@@ -287,6 +287,9 @@ class MpfMc(App):
         self.log.info("Stopping...")
         self.thread_stopper.set()
 
+        self.events.post("shutdown")
+        self.events.process_event_queue()
+
         try:
             self.log.info("Loop rate %s Hz", round(self.ticks / (time.time() - self.start_time), 2))
         except ZeroDivisionError:
@@ -403,7 +406,6 @@ class MpfMc(App):
             self.log.info("Shutting down due to child thread crash")
             self.log.info("Crash details: %s", crash)
             self.stop()
-
 
     def register_monitor(self, monitor_class, monitor):
         """Registers a monitor.
