@@ -58,8 +58,6 @@ sounds:
               events: moron_next_marker, last_marker
     210871_synthping:
         events_when_played: synthping_played
-    bad_sound_file:
-        loops: 0
 
 sound_pools:
     drum_group:

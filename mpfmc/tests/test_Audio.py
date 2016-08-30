@@ -93,12 +93,6 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('84480__zgump__drum-fx-4', self.mc.sounds)   # .wav
         self.assertIn('100184__menegass__rick-drum-bd-hard', self.mc.sounds)   # .wav
 
-        # Test bad sound file
-        self.assertIn('bad_sound_file', self.mc.sounds)
-        with self.assertRaises(Exception):
-            self.mc.sounds['bad_sound_file'].do_load()
-        self.assertFalse(self.mc.sounds['bad_sound_file'].loaded)
-
         # /sounds/voice
         self.assertIn('104457_moron_test', self.mc.sounds)  # .wav
         self.assertEqual(self.mc.sounds['104457_moron_test'].volume, 0.6)
@@ -203,17 +197,13 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(interface.get_in_use_request_message_count(), 0)
         self.assertEqual(interface.get_in_use_notification_message_count(), 0)
 
-
     def test_mode_sounds(self):
         """ Test the sound system using sounds specified in a mode """
-
-        print("test_mode_sounds")
 
         if self.mc.sound_system is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
-            raise Exception('Sound system is not enabled')
-            # self.skipTest("Sound system is not enabled")
+            self.skipTest("Sound system is not enabled")
 
         self.assertIsNotNone(self.mc.sound_system)
         interface = self.mc.sound_system.audio_interface
