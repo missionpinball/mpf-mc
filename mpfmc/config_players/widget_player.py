@@ -67,7 +67,7 @@ class McWidgetPlayer(McConfigPlayer):
 
         return slide
 
-    def _action_add(self, s, instance_dict, widget, context):
+    def _action_add(self, s, instance_dict, widget, context, play_kwargs):
         if not s['key']:
             try:
                 s['key'] = s['widget_settings'].pop('key')
@@ -79,7 +79,7 @@ class McWidgetPlayer(McConfigPlayer):
                 self.machine.events.remove_handler_by_key(instance_dict[s['key']])
             handler = self.machine.events.add_handler(
                 "slide_{}_created".format(s['slide']), self._add_widget_to_slide_when_active,
-                slide_name=s['slide'], widget=widget, s=s)
+                slide_name=s['slide'], widget=widget, s=s, play_kwargs=play_kwargs)
             instance_dict[s['key']] = handler
 
         try:
@@ -93,7 +93,7 @@ class McWidgetPlayer(McConfigPlayer):
         if not slide:  # pragma: no cover
             raise ValueError("Cannot add widget. No current slide")
 
-        slide.add_widgets_from_library(name=widget, **s)
+        slide.add_widgets_from_library(name=widget, play_kwargs=play_kwargs, **s)
         if not s['key'] in instance_dict:
             instance_dict[s['key']] = True
 
@@ -123,7 +123,6 @@ class McWidgetPlayer(McConfigPlayer):
         """Play widgets."""
         # **kwargs since this is an event callback
         del priority
-        del kwargs
         settings = deepcopy(settings)
         instance_dict = self._get_instance_dict(context)
 
@@ -136,12 +135,12 @@ class McWidgetPlayer(McConfigPlayer):
             assert action in ('add', 'remove', 'update')
 
             if action == "add":
-                self._action_add(s, instance_dict, widget, context)
+                self._action_add(s, instance_dict, widget, context, kwargs)
             elif action == "remove":
                 self._action_remove(s, instance_dict, widget, context)
             elif action == "update":
                 self._action_remove(s, instance_dict, widget, context)
-                self._action_add(s, instance_dict, widget, context)
+                self._action_add(s, instance_dict, widget, context, kwargs)
             else:
                 raise AssertionError("Invalid action {} in {}".format(action, widget))
 
@@ -162,10 +161,10 @@ class McWidgetPlayer(McConfigPlayer):
                     except AttributeError:
                         pass
 
-    def _add_widget_to_slide_when_active(self, slide_name, widget, s, **kwargs):
+    def _add_widget_to_slide_when_active(self, slide_name, widget, s, play_kwargs, **kwargs):
         del kwargs
         slide = self.machine.active_slides[slide_name]
-        slide.add_widgets_from_library(name=widget, **s)
+        slide.add_widgets_from_library(name=widget, play_kwargs=play_kwargs, **s)
 
     def get_express_config(self, value):
         """Parse express config."""
