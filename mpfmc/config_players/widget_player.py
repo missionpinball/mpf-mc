@@ -68,13 +68,23 @@ class McWidgetPlayer(McConfigPlayer):
         return slide
 
     def _action_add(self, s, instance_dict, widget, context):
+        if not s['key']:
+            try:
+                s['key'] = s['widget_settings'].pop('key')
+            except (KeyError, AttributeError):
+                s['key'] = context + "-" + widget
+
+        if 'slide' in s:
+            if s['key'] in instance_dict and isinstance(instance_dict[s['key']], EventHandlerKey):
+                self.machine.events.remove_handler_by_key(instance_dict[s['key']])
+            handler = self.machine.events.add_handler(
+                "slide_{}_created".format(s['slide']), self._add_widget_to_slide_when_active,
+                slide_name=s['slide'], widget=widget, s=s)
+            instance_dict[s['key']] = handler
+
         try:
             slide = self._get_slide(s)
-        except SlideNotActiveError as e:
-            handler = self.machine.events.add_handler(
-                "slide_{}_active".format(e.slide_name), self._add_widget_to_slide_when_active,
-                slide_name=e.slide_name, widget=widget, s=s, context=context)
-            instance_dict[s['key']] = handler
+        except SlideNotActiveError:
             return
 
         if not slide:
@@ -83,14 +93,9 @@ class McWidgetPlayer(McConfigPlayer):
         if not slide:  # pragma: no cover
             raise ValueError("Cannot add widget. No current slide")
 
-        if not s['key']:
-            try:
-                s['key'] = s['widget_settings'].pop('key')
-            except (KeyError, AttributeError):
-                s['key'] = context + "-" + widget
-
-        widgets = slide.add_widgets_from_library(name=widget, **s)
-        instance_dict[s['key']] = (slide, widgets)
+        slide.add_widgets_from_library(name=widget, **s)
+        if not s['key'] in instance_dict:
+            instance_dict[s['key']] = True
 
     def _action_remove(self, s, instance_dict, widget, context):
         try:
@@ -157,14 +162,10 @@ class McWidgetPlayer(McConfigPlayer):
                     except AttributeError:
                         pass
 
-    def _add_widget_to_slide_when_active(self, slide_name, widget, s, context, **kwargs):
+    def _add_widget_to_slide_when_active(self, slide_name, widget, s, **kwargs):
         del kwargs
-        instance_dict = self._get_instance_dict(context)
         slide = self.machine.active_slides[slide_name]
-        widgets = slide.add_widgets_from_library(name=widget, **s)
-        if s['key'] in instance_dict and isinstance(instance_dict[s['key']], EventHandlerKey):
-            self.machine.events.remove_handler_by_key(instance_dict[s['key']])
-        instance_dict[s['key']] = (slide, widgets)
+        slide.add_widgets_from_library(name=widget, **s)
 
     def get_express_config(self, value):
         """Parse express config."""
