@@ -228,6 +228,27 @@ class TestAudio(MpfMcTestCase):
         self.mc.events.post('play_sound_boing_in_mode2')
         self.advance_time(1)
 
+    def test_sound_fading(self):
+        """ Tests the fading of sounds"""
+
+        if self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        self.assertIsNotNone(interface)
+
+        self.advance_time(2)
+
+        self.assertIn('263774_music', self.mc.sounds)       # .wav
+
+        settings = { 'fade_in': 7.0 }
+        instance = self.mc.sounds['263774_music'].play(settings)
+        self.advance_time(8)
+        instance.stop()
+
         """
         # Add another track with the same name (should not be allowed)
         # Add another track with the same name, but different casing (should not be allowed)

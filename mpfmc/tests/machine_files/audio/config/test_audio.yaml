@@ -58,6 +58,8 @@ sounds:
               events: moron_next_marker, last_marker
     210871_synthping:
         events_when_played: synthping_played
+    263774_music:
+        volume: 1.0
 
 sound_pools:
     drum_group:
