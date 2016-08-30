@@ -112,9 +112,9 @@ class AssetLoader(threading.Thread):
                     with asset.lock:
                         if not asset.loaded:
                             asset.do_load()
-                            self.loaded_queue.put((True, asset))
+                            self.loaded_queue.put((asset, True))
                         else:
-                            self.loaded_queue.put((False, asset))
+                            self.loaded_queue.put((asset, False))
 
             return
 
