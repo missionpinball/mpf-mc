@@ -127,6 +127,7 @@ class MpfMcTestCase(unittest.TestCase):
                            **kwargs)
 
     def run(self, name):
+        self._test_started = time()
         self._test_name = self.id()
         self._test = name
         # This setup is done in run() because we need to give control to the
@@ -171,11 +172,13 @@ class MpfMcTestCase(unittest.TestCase):
         Clock.schedule_once(self.run_test, 0)
         self.mc.run()
 
-    def run_test(self, time):
+    def run_test(self, dt):
         # set the title bar, just for fun. :)
         self.mc.title = str(self._test_name)
 
         if not self.mc.is_init_done:
+            if self._test_started + 5 < time():
+                self.fail("Test setup took too more than 5 seconds.")
             Clock.schedule_once(self.run_test, 0)
             return
 
