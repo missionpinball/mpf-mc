@@ -800,14 +800,14 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         standard_track.sound_players[player].current.loops_remaining = request_message.data.play.loops
         standard_track.sound_players[player].current.sound_priority = request_message.data.play.priority
 
-        # Fading
-        standard_track.sound_players[player].next.fade_in_duration = request_message.data.play.fade_in_duration
-        standard_track.sound_players[player].next.fade_out_duration = request_message.data.play.fade_out_duration
-        standard_track.sound_players[player].next.fade_duration_remaining = request_message.data.play.fade_in_duration
-        if standard_track.sound_players[player].next.fade_duration_remaining > 0:
-            standard_track.sound_players[player].next.fading_status = fading_status_fading_in
+        # Fading (done at control rate; need to calculate the number of steps over which to fade in/out)
+        standard_track.sound_players[player].current.fade_in_steps = request_message.data.play.fade_in_duration // (track.buffer_size // CONTROL_POINTS_PER_BUFFER)
+        standard_track.sound_players[player].current.fade_out_steps = request_message.data.play.fade_out_duration // (track.buffer_size // CONTROL_POINTS_PER_BUFFER)
+        standard_track.sound_players[player].current.fade_steps_remaining = standard_track.sound_players[player].current.fade_in_steps
+        if standard_track.sound_players[player].current.fade_steps_remaining > 0:
+            standard_track.sound_players[player].current.fading_status = fading_status_fading_in
         else:
-            standard_track.sound_players[player].next.fading_status = fading_status_not_fading
+            standard_track.sound_players[player].current.fading_status = fading_status_not_fading
 
         # Markers
         standard_track.sound_players[player].current.marker_count = request_message.data.play.marker_count
@@ -836,8 +836,8 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         standard_track.sound_players[player].status = player_stopping
 
         # Set fade out before stopping (if necessary)
-        standard_track.sound_players[player].next.fade_duration_remaining = request_message.data.stop.fade_out_duration
-        if standard_track.sound_players[player].next.fade_duration_remaining > 0:
+        standard_track.sound_players[player].next.fade_steps_remaining = request_message.data.stop.fade_out_duration // (track.buffer_size // CONTROL_POINTS_PER_BUFFER)
+        if standard_track.sound_players[player].next.fade_steps_remaining > 0:
             standard_track.sound_players[player].next.fading_status = fading_status_fading_out
 
         # Adjust ducking release (if necessary)
@@ -864,11 +864,11 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         standard_track.sound_players[player].next.loops_remaining = request_message.data.play.loops
         standard_track.sound_players[player].next.sound_priority = request_message.data.play.priority
 
-        # Fading
-        standard_track.sound_players[player].next.fade_in_duration = request_message.data.play.fade_in_duration
-        standard_track.sound_players[player].next.fade_out_duration = request_message.data.play.fade_out_duration
-        standard_track.sound_players[player].next.fade_duration_remaining = request_message.data.play.fade_in_duration
-        if standard_track.sound_players[player].next.fade_duration_remaining > 0:
+        # Fading (done at control rate; need to calculate the number of steps over which to fade in/out)
+        standard_track.sound_players[player].next.fade_in_steps = request_message.data.play.fade_in_duration // (track.buffer_size // CONTROL_POINTS_PER_BUFFER)
+        standard_track.sound_players[player].next.fade_out_steps = request_message.data.play.fade_out_duration // (track.buffer_size // CONTROL_POINTS_PER_BUFFER)
+        standard_track.sound_players[player].next.fade_steps_remaining = standard_track.sound_players[player].next.fade_in_steps
+        if standard_track.sound_players[player].next.fade_steps_remaining > 0:
             standard_track.sound_players[player].next.fading_status = fading_status_fading_in
         else:
             standard_track.sound_players[player].next.fading_status = fading_status_not_fading
@@ -913,81 +913,10 @@ cdef void process_live_loop_track_request_message(RequestMessageContainer *reque
 
     live_loop_track = <TrackLiveLoopState*>track.type_state
 
-    if request_message.message == request_sound_play:
-        # Update player to start playing new sound
-        live_loop_track.master_sound_player.status = player_pending
-        live_loop_track.master_sound_player.current.sample_pos = 0
-        live_loop_track.master_sound_player.current.current_loop = 0
-        live_loop_track.master_sound_player.current.sound_id = request_message.sound_id
-        live_loop_track.master_sound_player.current.sound_instance_id = request_message.sound_instance_id
-        live_loop_track.master_sound_player.current.chunk = request_message.data.play.chunk
-        live_loop_track.master_sound_player.current.volume = request_message.data.play.volume
-        live_loop_track.master_sound_player.current.fade_in_duration = request_message.data.play.fade_in_duration
-        live_loop_track.master_sound_player.current.fade_out_duration = request_message.data.play.fade_out_duration
-        live_loop_track.master_sound_player.current.loops_remaining = request_message.data.play.loops
-        live_loop_track.master_sound_player.current.sound_priority = request_message.data.play.priority
-        live_loop_track.master_sound_player.current.marker_count = request_message.data.play.marker_count
+    # TODO: Process request message here for live loop track
 
-        for index in range(request_message.data.play.marker_count):
-            live_loop_track.master_sound_player.current.markers[index] = request_message.data.play.markers[index]
-
-        if request_message.data.play.sound_has_ducking:
-            live_loop_track.master_sound_player.current.sound_has_ducking = True
-            live_loop_track.master_sound_player.current.ducking_settings.track_bit_mask = request_message.data.play.ducking_settings.track_bit_mask
-            live_loop_track.master_sound_player.current.ducking_settings.attack_start_pos = request_message.data.play.ducking_settings.attack_start_pos
-            live_loop_track.master_sound_player.current.ducking_settings.attack_duration = request_message.data.play.ducking_settings.attack_duration
-            live_loop_track.master_sound_player.current.ducking_settings.attenuation_volume = request_message.data.play.ducking_settings.attenuation_volume
-            live_loop_track.master_sound_player.current.ducking_settings.release_start_pos = request_message.data.play.ducking_settings.release_start_pos
-            live_loop_track.master_sound_player.current.ducking_settings.release_duration = request_message.data.play.ducking_settings.release_duration
-            live_loop_track.master_sound_player.current.ducking_stage = ducking_stage_delay
-        
-        else:
-            live_loop_track.master_sound_player.current.sound_has_ducking = False
-
-        # Clear request message since it has been processed
-        request_message.message = request_not_in_use
-
-    elif request_message.message == request_sound_stop:
-        # Update player to stop playing sound
-        live_loop_track.master_sound_player.status = player_stopping
-
-        # Clear request message since it has been processed
-        request_message.message = request_not_in_use
-
-    elif request_message.message == request_sound_replace:
-        # Update player to stop playing current sound and start playing new sound
-        live_loop_track.master_sound_player.status = player_replacing
-        live_loop_track.master_sound_player.next.sample_pos = 0
-        live_loop_track.master_sound_player.next.current_loop = 0
-        live_loop_track.master_sound_player.next.sound_id = request_message.sound_id
-        live_loop_track.master_sound_player.next.sound_instance_id = request_message.sound_instance_id
-        live_loop_track.master_sound_player.next.chunk = request_message.data.play.chunk
-        live_loop_track.master_sound_player.next.volume = request_message.data.play.volume
-        live_loop_track.master_sound_player.next.fade_in_duration = request_message.data.play.fade_in_duration
-        live_loop_track.master_sound_player.next.fade_out_duration = request_message.data.play.fade_out_duration
-        live_loop_track.master_sound_player.next.loops_remaining = request_message.data.play.loops
-        live_loop_track.master_sound_player.next.sound_priority = request_message.data.play.priority
-
-        live_loop_track.master_sound_player.next.marker_count = request_message.data.play.marker_count
-
-        for index in range(request_message.data.play.marker_count):
-            live_loop_track.master_sound_player.next.markers[index] = request_message.data.play.markers[index]
-
-        if request_message.data.play.sound_has_ducking:
-            live_loop_track.master_sound_player.next.sound_has_ducking = True
-            live_loop_track.master_sound_player.next.ducking_settings.track_bit_mask = request_message.data.play.ducking_settings.track_bit_mask
-            live_loop_track.master_sound_player.next.ducking_settings.attack_start_pos = request_message.data.play.ducking_settings.attack_start_pos
-            live_loop_track.master_sound_player.next.ducking_settings.attack_duration = request_message.data.play.ducking_settings.attack_duration
-            live_loop_track.master_sound_player.next.ducking_settings.attenuation_volume = request_message.data.play.ducking_settings.attenuation_volume
-            live_loop_track.master_sound_player.next.ducking_settings.release_start_pos = request_message.data.play.ducking_settings.release_start_pos
-            live_loop_track.master_sound_player.next.ducking_settings.release_duration = request_message.data.play.ducking_settings.release_duration
-            live_loop_track.master_sound_player.next.ducking_stage = ducking_stage_delay
-        
-        else:
-            live_loop_track.master_sound_player.next.sound_has_ducking = False
-
-        # Clear request message since it has been processed
-        request_message.message = request_not_in_use
+    # Clear request message since it has been processed
+    request_message.message = request_not_in_use
 
 cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData *callback_data) nogil:
     """
@@ -1026,6 +955,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
 
     buffer_size = <Uint32>track.buffer_size
     standard_track = <TrackStandardState*>track.type_state
+    samples_per_control_point = buffer_size // CONTROL_POINTS_PER_BUFFER
 
     # Loop over track sound players
     for player in range(standard_track.sound_player_count):
@@ -1201,7 +1131,6 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
             if standard_track.sound_players[player].current.sound_has_ducking:
 
                 ducking_is_active = False
-                samples_per_control_point = buffer_size // CONTROL_POINTS_PER_BUFFER
                 control_point_pos = standard_track.sound_players[player].current.sample_pos
 
                 # Loop over control points in sound
@@ -1259,11 +1188,33 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
                                     callback_data.tracks[track_num].ducking_control_points[control_point] = standard_track.sound_players[player].current.ducking_control_points[control_point]
 
             # Loop over destination buffer, mixing in the source sample
+            volume = standard_track.sound_players[player].current.volume
             while buffer_pos < buffer_size:
+
+                # Calculate volume at the control rate (handle fading)
+                if (buffer_pos % samples_per_control_point) == 0:
+                    if standard_track.sound_players[player].current.fading_status == fading_status_fading_in:
+                        volume = <Uint8> (in_out_quad(
+                            (standard_track.sound_players[player].current.fade_in_steps - standard_track.sound_players[player].current.fade_steps_remaining) /
+                            standard_track.sound_players[player].current.fade_in_steps) * standard_track.sound_players[
+                                              player].current.volume)
+                        standard_track.sound_players[player].current.fade_steps_remaining -= 1
+                        if standard_track.sound_players[player].current.fade_steps_remaining == 0:
+                            standard_track.sound_players[player].current.fading_status = fading_status_not_fading
+
+                    elif standard_track.sound_players[player].current.fading_status == fading_status_fading_out:
+                        volume = <Uint8> (in_out_quad(standard_track.sound_players[player].current.fade_steps_remaining /
+                            standard_track.sound_players[player].current.fade_out_steps) * standard_track.sound_players[
+                                              player].current.volume)
+                        standard_track.sound_players[player].current.fade_steps_remaining -= 1
+                        if standard_track.sound_players[player].current.fade_steps_remaining == 0:
+                            standard_track.sound_players[player].current.fading_status = fading_status_not_fading
+                    else:
+                        volume = standard_track.sound_players[player].current.volume
 
                 mix_sound_sample_to_buffer(sound_buffer,
                                            standard_track.sound_players[player].current.sample_pos,
-                                           standard_track.sound_players[player].current.volume,
+                                           volume,
                                            output_buffer,
                                            buffer_pos)
 

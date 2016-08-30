@@ -234,9 +234,9 @@ ctypedef struct SoundSettings:
     long sound_instance_id
     int sound_priority
     FadingStatus fading_status
-    Uint32 fade_in_duration
-    Uint32 fade_out_duration
-    Uint32 fade_duration_remaining
+    Uint32 fade_in_steps
+    Uint32 fade_out_steps
+    Uint32 fade_steps_remaining
     int marker_count
     Uint32 markers[MAX_MARKERS]
     bint sound_has_ducking
@@ -295,8 +295,6 @@ cdef enum RequestMessage:
     request_sound_replace,            # Request to play a sound that replaces a sound in progress
     request_sound_stop,               # Request to stop a sound that is playing
     request_sound_stop_looping,       # Request to stop looping a sound that is playing
-    request_track_ducking_start,      # Request to start ducking on a track (fade down)
-    request_track_ducking_stop,       # Request to stop ducking on a track (fade up)
 
 
 ctypedef struct RequestMessageDataPlaySound:
@@ -314,23 +312,9 @@ ctypedef struct RequestMessageDataPlaySound:
 ctypedef struct RequestMessageDataStopSound:
     Uint32 fade_out_duration
 
-ctypedef struct RequestMessageDataDuckingStart:
-    int from_track
-    int from_player
-    Uint32 attack_duration
-    float attenuation
-
-ctypedef struct RequestMessageDataDuckingStop:
-    int from_track
-    int from_player
-    Uint32 fade_out_duration
-    Uint32 ducking_release_duration
-
 ctypedef union RequestMessageData:
     RequestMessageDataPlaySound play
     RequestMessageDataStopSound stop
-    RequestMessageDataDuckingStart ducking_start
-    RequestMessageDataDuckingStop ducking_stop
 
 ctypedef struct RequestMessageContainer:
     RequestMessage message
