@@ -330,11 +330,26 @@ class TestSlidePlayer(MpfMcTestCase):
                          'machine_slide_1')
 
     def test_slide_removal(self):
+        # Also test slide events
+        self.mock_event('slide_machine_slide_1_active')
+        self.mock_event('slide_machine_slide_1_created')
+        self.mock_event('slide_machine_slide_1_removed')
+        self.mock_event('slide_machine_slide_4_active')
+        self.mock_event('slide_machine_slide_4_created')
+        self.mock_event('slide_machine_slide_4_removed')
+
         # show a base slide
         self.mc.events.post('show_slide_1')
         self.advance_time()
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_1')
+
+        self.assertEventCalled('slide_machine_slide_1_created')
+        self.assertEventCalled('slide_machine_slide_1_active')
+        self.assertEventNotCalled('slide_machine_slide_1_removed')
+        self.assertEventNotCalled('slide_machine_slide_4_created')
+        self.assertEventNotCalled('slide_machine_slide_4_active')
+        self.assertEventNotCalled('slide_machine_slide_4_removed')
 
         # show another slide
         self.mc.events.post('show_slide_4')
@@ -342,11 +357,25 @@ class TestSlidePlayer(MpfMcTestCase):
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_4')
 
+        self.assertEventCalled('slide_machine_slide_1_created', 1)
+        self.assertEventCalled('slide_machine_slide_1_active', 1)
+        self.assertEventNotCalled('slide_machine_slide_1_removed')
+        self.assertEventCalled('slide_machine_slide_4_created', 1)
+        self.assertEventCalled('slide_machine_slide_4_active', 1)
+        self.assertEventNotCalled('slide_machine_slide_4_removed')
+
         # make sure base slide comes back
         self.mc.events.post('remove_slide_4')
         self.advance_time()
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_1')
+
+        self.assertEventCalled('slide_machine_slide_1_created', 1)
+        self.assertEventCalled('slide_machine_slide_1_active', 2)
+        self.assertEventNotCalled('slide_machine_slide_1_removed')
+        self.assertEventCalled('slide_machine_slide_4_created', 1)
+        self.assertEventCalled('slide_machine_slide_4_active', 1)
+        self.assertEventCalled('slide_machine_slide_4_removed', 1)
 
     def test_slide_removal_new_transition(self):
         # show a base slide
