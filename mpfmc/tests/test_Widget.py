@@ -749,3 +749,13 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.children[0].children[1]
         self.assertEqual(widget2.text, 'UPDATED TEXT')
         self.assertEqual(widget2.key, 'newton_crosby')
+
+    def test_widget_player_with_placeholder(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.mc.events.post('show_widget10', text="asd")
+        self.advance_time()
+
+        # verify asd is there
+        self.assertIn('asd', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])

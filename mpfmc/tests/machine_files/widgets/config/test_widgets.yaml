@@ -115,6 +115,9 @@ widgets:
      - type: text
        text: named_widget9
        key: widget9_key
+  widget10:
+    type: text
+    text: (text)
 
 widget_player:
   add_widget1_to_current: widget1
@@ -224,6 +227,9 @@ widget_player:
   show_widget9:
     widget9:
       key: wigdet9_wp_key
+  show_widget10:
+    widget10:
+      action: add
 
 slide_player:
   show_slide_1:
