@@ -31,7 +31,7 @@ class TestAudio(MpfMcTestCase):
         # Check basic audio interface settings
         settings = interface.get_settings()
         self.assertIsNotNone(settings)
-        self.assertEqual(settings['buffer_samples'], 4096)
+        self.assertEqual(settings['buffer_samples'], 2048)
         self.assertEqual(settings['audio_channels'], 1)
         self.assertEqual(settings['sample_rate'], 44100)
 
@@ -244,10 +244,11 @@ class TestAudio(MpfMcTestCase):
 
         self.assertIn('263774_music', self.mc.sounds)       # .wav
 
-        settings = { 'fade_in': 7.0 }
+        settings = { 'fade_in': 8.5, 'volume': 1.0 }
         instance = self.mc.sounds['263774_music'].play(settings)
-        self.advance_time(8)
-        instance.stop()
+        self.advance_time(9)
+        instance.stop(4.0)
+        self.advance_time(5)
 
         """
         # Add another track with the same name (should not be allowed)

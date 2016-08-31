@@ -1,6 +1,6 @@
 #config_version=4
 sound_system:
-  buffer: 4096
+  buffer: 2048
   frequency: 44100
   channels: 1
   master_volume: 0.9
@@ -58,8 +58,6 @@ sounds:
               events: moron_next_marker, last_marker
     210871_synthping:
         events_when_played: synthping_played
-    263774_music:
-        volume: 1.0
 
 sound_pools:
     drum_group:
