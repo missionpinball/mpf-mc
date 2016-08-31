@@ -303,6 +303,7 @@ ctypedef struct RequestMessageDataPlaySound:
     Uint8 volume
     int loops
     int priority
+    Uint32 start_at_position
     Uint32 fade_in_duration
     Uint32 fade_out_duration
     int marker_count

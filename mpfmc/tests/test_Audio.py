@@ -250,6 +250,28 @@ class TestAudio(MpfMcTestCase):
         instance.stop(4.0)
         self.advance_time(5)
 
+    def test_sound_start_at(self):
+        """ Tests starting a sound at a position other than the beginning"""
+
+        if self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        self.assertIsNotNone(interface)
+
+        self.advance_time(2)
+
+        self.assertIn('263774_music', self.mc.sounds)  # .wav
+
+        settings = {'start_at': 7.382}
+        instance = self.mc.sounds['263774_music'].play(settings)
+        self.advance_time(3)
+        instance.stop()
+        self.advance_time()
+
         """
         # Add another track with the same name (should not be allowed)
         # Add another track with the same name, but different casing (should not be allowed)

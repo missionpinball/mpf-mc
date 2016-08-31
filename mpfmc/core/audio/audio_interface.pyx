@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev05')
+__version_info__ = ('0', '31', '0', 'dev06')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -793,7 +793,7 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
     if request_message.message == request_sound_play:
         # Update player to start playing new sound
         standard_track.sound_players[player].status = player_pending
-        standard_track.sound_players[player].current.sample_pos = 0
+        standard_track.sound_players[player].current.sample_pos = request_message.data.play.start_at_position
         standard_track.sound_players[player].current.current_loop = 0
         standard_track.sound_players[player].current.sound_id = request_message.sound_id
         standard_track.sound_players[player].current.sound_instance_id = request_message.sound_instance_id
@@ -860,7 +860,7 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
     elif request_message.message == request_sound_replace:
         # Update player to stop playing current sound and start playing new sound
         standard_track.sound_players[player].status = player_replacing
-        standard_track.sound_players[player].next.sample_pos = 0
+        standard_track.sound_players[player].next.sample_pos = request_message.data.play.start_at_position
         standard_track.sound_players[player].next.current_loop = 0
         standard_track.sound_players[player].next.sound_id = request_message.sound_id
         standard_track.sound_players[player].next.sound_instance_id = request_message.sound_instance_id
@@ -2283,7 +2283,7 @@ cdef class TrackStandard(Track):
                 # Conversion factor (seconds to bytes/buffer position)
                 seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
 
-                # Fade in/out
+                request_message.data.play.start_at_position = sound_instance.start_at * seconds_to_bytes_factor
                 request_message.data.play.fade_in_duration = sound_instance.fade_in * seconds_to_bytes_factor
                 request_message.data.play.fade_out_duration = sound_instance.fade_out * seconds_to_bytes_factor
 

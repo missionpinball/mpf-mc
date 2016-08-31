@@ -115,6 +115,7 @@ class SoundAsset(Asset):
         self.priority = DEFAULT_PRIORITY
         self._max_queue_time = DEFAULT_MAX_QUEUE_TIME
         self._loops = DEFAULT_LOOPS
+        self._start_at = 0
         self._fade_in = 0
         self._fade_out = 0
         self._max_instances = None
@@ -171,6 +172,9 @@ class SoundAsset(Asset):
 
         if 'max_instances' in self.config and self.config['max_instances'] is not None:
             self._max_instances = int(self.config['max_instances'])
+
+        if 'start_at' in self.config and self.config['start_at'] is not None:
+            self._start_at = AudioInterface.string_to_secs(self.config['start_at'])
 
         if 'fade_in' in self.config and self.config['fade_in'] is not None:
             self._fade_in = AudioInterface.string_to_secs(self.config['fade_in'])
@@ -273,6 +277,11 @@ class SoundAsset(Asset):
     def volume(self):
         """Return the volume of the sound (float 0.0 to 1.0)"""
         return self._volume
+
+    @property
+    def start_at(self):
+        """Return the start at time for the sound (in seconds)"""
+        return self._start_at
 
     @property
     def fade_in(self):
@@ -578,6 +587,7 @@ class SoundInstance(object):
         self._loops = sound.loops
         self._volume = sound.volume
         self._priority = sound.priority
+        self._start_at = sound.start_at
         self._fade_in = sound.fade_in
         self._fade_out = sound.fade_out
         self._max_queue_time = sound.max_queue_time
@@ -598,6 +608,9 @@ class SoundInstance(object):
 
         if 'priority' in settings and settings['priority'] is not None:
             self._priority = settings['priority']
+
+        if 'start_at' in settings and settings['start_at'] is not None:
+            self._start_at = settings['start_at']
 
         if 'fade_in' in settings and settings['fade_in'] is not None:
             self._fade_in = settings['fade_in']
@@ -694,6 +707,11 @@ class SoundInstance(object):
         """Return the maximum time a sound may be queued before
         playing or being discarded"""
         return self._max_queue_time
+
+    @property
+    def start_at(self):
+        """Return the start at time for the sound (in seconds)"""
+        return self._start_at
 
     @property
     def fade_in(self):
