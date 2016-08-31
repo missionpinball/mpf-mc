@@ -276,6 +276,7 @@ ctypedef struct AudioCallbackData:
     # contain any Python objects.
     int sample_rate
     int audio_channels
+    Uint32 buffer_size
     Uint8 master_volume
     int track_count
     TrackState **tracks

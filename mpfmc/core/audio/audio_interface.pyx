@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev03')
+__version_info__ = ('0', '31', '0', 'dev05')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -143,6 +143,7 @@ cdef class AudioInterface:
         # Initialize the audio callback data structure
         self.audio_callback_data.sample_rate = self.sample_rate
         self.audio_callback_data.audio_channels = self.audio_channels
+        self.audio_callback_data.buffer_size = self.buffer_size
         self.audio_callback_data.master_volume = MIX_MAX_VOLUME // 2
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackState**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
@@ -772,7 +773,8 @@ cdef void process_request_messages(AudioCallbackData *callback_data) nogil:
                 # TODO: Implement track request message function call
                 pass
         
-cdef void process_standard_track_request_message(RequestMessageContainer *request_message, TrackState *track) nogil:
+cdef void process_standard_track_request_message(RequestMessageContainer *request_message,
+                                                 TrackState *track) nogil:
     """
     Processes any new standard track request messages that should be processed prior to the
     main audio callback processing (such as sound play and sound stop messages).
@@ -835,10 +837,13 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         # Update player to stop playing sound
         standard_track.sound_players[player].status = player_stopping
 
-        # Set fade out before stopping (if necessary)
-        standard_track.sound_players[player].next.fade_steps_remaining = request_message.data.stop.fade_out_duration // (track.buffer_size // CONTROL_POINTS_PER_BUFFER)
-        if standard_track.sound_players[player].next.fade_steps_remaining > 0:
-            standard_track.sound_players[player].next.fading_status = fading_status_fading_out
+        # Calculate fade out (if necessary)
+        standard_track.sound_players[player].current.fade_steps_remaining = request_message.data.stop.fade_out_duration // (track.buffer_size // CONTROL_POINTS_PER_BUFFER)
+        if standard_track.sound_players[player].current.fade_steps_remaining > 0:
+            standard_track.sound_players[player].current.fade_out_steps = standard_track.sound_players[player].current.fade_steps_remaining
+            standard_track.sound_players[player].current.fading_status = fading_status_fading_out
+        else:
+            standard_track.sound_players[player].current.fading_status = fading_status_not_fading
 
         # Adjust ducking release (if necessary)
         if standard_track.sound_players[player].current.sound_has_ducking:
@@ -967,58 +972,59 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
         buffer_pos = 0
         track.active = True
 
+        # Get source sound buffer (read one byte at a time, bytes will be combined into a
+        # 16-bit sample value before being mixed)
+        sound_buffer = <Uint8*> standard_track.sound_players[player].current.chunk.abuf
+
         # Check if player has been requested to stop a sound
         if standard_track.sound_players[player].status is player_stopping:
-            # Get source sound buffer (read one byte at a time, bytes will be combined into a
-            # 16-bit sample value before being mixed)
-            sound_buffer = <Uint8*> standard_track.sound_players[player].current.chunk.abuf
-
-            sound_samples_remaining = standard_track.sound_players[player].current.chunk.alen - standard_track.sound_players[
-                player].current.sample_pos
-            fade_out_duration = min(buffer_size,
-                                    <Uint32>(callback_data.sample_rate * callback_data.audio_channels *
-                                          QUICK_FADE_DURATION_SECS),
-                                    sound_samples_remaining)
-            volume = standard_track.sound_players[player].current.volume
 
             if standard_track.sound_players[player].current.sound_has_ducking:
                 # Initiate a fast ducking release (10 ms)
                 # TODO: implement ducking release here
                 pass
 
+            volume = standard_track.sound_players[player].current.volume
+
             # Loop over destination buffer, mixing in the source sample
-            while buffer_pos < fade_out_duration:
+            while buffer_pos < buffer_size:
+
+                # Calculate volume at the control rate (handle fading)
+                if (buffer_pos % samples_per_control_point) == 0:
+                    if standard_track.sound_players[player].current.fading_status == fading_status_fading_out:
+                        volume = <Uint8> (in_out_quad(standard_track.sound_players[player].current.fade_steps_remaining /
+                            standard_track.sound_players[player].current.fade_out_steps) * standard_track.sound_players[
+                                              player].current.volume)
+                        standard_track.sound_players[player].current.fade_steps_remaining -= 1
+                        if standard_track.sound_players[player].current.fade_steps_remaining == 0:
+                            standard_track.sound_players[player].current.fading_status = fading_status_not_fading
+                            standard_track.sound_players[player].status = player_finished
+                    else:
+                        volume = standard_track.sound_players[player].current.volume
+                        standard_track.sound_players[player].status = player_finished
+
                 mix_sound_sample_to_buffer(sound_buffer,
                                            standard_track.sound_players[player].current.sample_pos,
                                            volume,
                                            output_buffer,
                                            buffer_pos)
 
-                # Advance the source sample pointer to the next sample (2 bytes)
+                # Advance the source sample pointer to the next sample
                 standard_track.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
 
-                # Advance the output buffer pointer to the next sample (2 bytes)
+                # Advance the output buffer pointer to the next sample
                 buffer_pos += BYTES_PER_SAMPLE
 
                 # Check if we are at the end of the source sample buffer
                 if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.chunk.alen:
                     end_of_sound_processing(cython.address(standard_track.sound_players[player]),
                                             callback_data.notification_messages, sdl_ticks)
-                    if standard_track.sound_players[player].status is player_finished:
-                        break
 
-                # Set volume for next loop
-                volume = <Uint8> (
-                    (1.0 - in_out_quad(buffer_pos / fade_out_duration)) * standard_track.sound_players[player].current.volume)
-
-            # Update sound player status to finished
-            standard_track.sound_players[player].status = player_finished
+                if standard_track.sound_players[player].status is player_finished:
+                    break
 
         # Check if player has been requested to stop a sound and immediately replace it with another sound
         if standard_track.sound_players[player].status is player_replacing:
-            # Get source sound buffer (read one byte at a time, bytes will be combined into a
-            # 16-bit sample value before being mixed)
-            sound_buffer = <Uint8*> standard_track.sound_players[player].current.chunk.abuf
 
             sound_samples_remaining = standard_track.sound_players[player].current.chunk.alen - standard_track.sound_players[
                 player].current.sample_pos
@@ -1094,6 +1100,9 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
             else:
                 standard_track.sound_players[player].current.sound_has_ducking = False
 
+            # Update the current input sound buffer to point to the new sound
+            sound_buffer = <Uint8*> standard_track.sound_players[player].current.chunk.abuf
+
         # Check if player has a sound pending playback (ready to start)
         if standard_track.sound_players[player].status is player_pending:
             # Sound ready to start playback, send event notification and set status to playing
@@ -1122,10 +1131,6 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
         if standard_track.sound_players[player].status is player_playing and \
                         standard_track.sound_players[player].current.volume > 0 and \
                         standard_track.sound_players[player].current.chunk != NULL:
-
-            # Get source sound buffer (read one byte at a time, bytes will be combined into a
-            # 16-bit sample value before being mixed)
-            sound_buffer = <Uint8*> standard_track.sound_players[player].current.chunk.abuf
 
             # Process sound ducking (if applicable)
             if standard_track.sound_players[player].current.sound_has_ducking:
@@ -1202,13 +1207,9 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
                         if standard_track.sound_players[player].current.fade_steps_remaining == 0:
                             standard_track.sound_players[player].current.fading_status = fading_status_not_fading
 
-                    elif standard_track.sound_players[player].current.fading_status == fading_status_fading_out:
-                        volume = <Uint8> (in_out_quad(standard_track.sound_players[player].current.fade_steps_remaining /
-                            standard_track.sound_players[player].current.fade_out_steps) * standard_track.sound_players[
-                                              player].current.volume)
-                        standard_track.sound_players[player].current.fade_steps_remaining -= 1
-                        if standard_track.sound_players[player].current.fade_steps_remaining == 0:
-                            standard_track.sound_players[player].current.fading_status = fading_status_not_fading
+                    # Note: fading out only happens while the sound is stopping and therefore is not
+                    #       handled here
+
                     else:
                         volume = standard_track.sound_players[player].current.volume
 
