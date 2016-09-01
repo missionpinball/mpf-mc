@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev06')
+__version_info__ = ('0', '31', '0', 'dev07')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -2367,17 +2367,19 @@ cdef class TrackStandard(Track):
                 "priority": self.type_state.sound_players[player].current.sound_priority,
                 "loops": self.type_state.sound_players[player].current.loops_remaining,
                 "has_ducking": self.type_state.sound_players[player].current.sound_has_ducking,
+                "sample_pos": self.type_state.sound_players[player].current.sample_pos
             })
 
             self.log.debug("Status - Player %d: Status=%s, Sound=%d, SoundInstance=%d"
-                           "Priority=%d, Loops=%d",
+                           "Priority=%d, Loops=%d, SamplePos=%d",
                            player,
                            TrackStandard.player_status_to_text(
                                self.type_state.sound_players[player].status),
                            self.type_state.sound_players[player].current.sound_id,
                            self.type_state.sound_players[player].current.sound_instance_id,
                            self.type_state.sound_players[player].current.sound_priority,
-                           self.type_state.sound_players[player].current.loops_remaining)
+                           self.type_state.sound_players[player].current.loops_remaining,
+                           self.type_state.sound_players[player].current.sample_pos)
 
         SDL_UnlockMutex(self.mutex)
 

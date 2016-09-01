@@ -262,15 +262,23 @@ class TestAudio(MpfMcTestCase):
         interface = self.mc.sound_system.audio_interface
         self.assertIsNotNone(interface)
 
-        self.advance_time(2)
+        track_music = interface.get_track_by_name("music")
+        self.assertIsNotNone(track_music)
+        self.assertEqual(track_music.name, "music")
+        self.assertEqual(track_music.max_simultaneous_sounds, 1)
+
+        self.advance_time(1)
 
         self.assertIn('263774_music', self.mc.sounds)  # .wav
 
         settings = {'start_at': 7.382}
         instance = self.mc.sounds['263774_music'].play(settings)
-        self.advance_time(3)
-        instance.stop()
         self.advance_time()
+        status = track_music.get_status()
+        self.assertGreater(status[0]['sample_pos'], 7.382 * 44100 * 2)
+        self.advance_time(2)
+        instance.stop(0.25)
+        self.advance_time(0.3)
 
         """
         # Add another track with the same name (should not be allowed)
