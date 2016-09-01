@@ -70,7 +70,8 @@ class SlideFrame(MpfWidget, ScreenManager):
     """A widget which displays slides."""
 
     # pylint: disable-msg=too-many-arguments
-    def __init__(self, mc, name=None, config=None, slide=None, key=None):
+    def __init__(self, mc, name=None, config=None, slide=None, key=None, play_kwargs=None):
+        del play_kwargs
         self.name = name  # needs to be set before super()
         # If this is a the main SlideFrame of a display, it will get its size
         # from its parent. If this is a widget, it will get its size from
