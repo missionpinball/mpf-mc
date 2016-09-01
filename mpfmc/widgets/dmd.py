@@ -234,8 +234,8 @@ class Gain(EffectBase):
 
 
 class DmdLook(EffectBase):
-    """GLSL effect to render an on-screen DMD to look like individual round
-    pixels.
+
+    """GLSL effect to render an on-screen DMD to look like individual round pixels.
 
     Args:
         width: The width in pixels of the DMD widget on the screen. Typically
@@ -267,10 +267,12 @@ class DmdLook(EffectBase):
     Potential bug: This GLSL filter seems to not work on Windows 10 running on
     VMware Fusion on Mac OS X. It works fine on Windows 10 native as well as
     Mac OS X Native.
-
     """
+
+    # pylint: disable-msg=too-many-arguments
     def __init__(self, width, height, dmd_width, blur=0.1,
                  pixel_size=0.6, bg_color=(0.1, 0.1, 0.1, 1.0)):
+        """Initialise DMD Look."""
         super().__init__()
 
         blur = float(blur)

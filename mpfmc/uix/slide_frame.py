@@ -66,6 +66,10 @@ class SlideFrameParent(MpfWidget, FloatLayout):
 
 
 class SlideFrame(MpfWidget, ScreenManager):
+
+    """A widget which displays slides."""
+
+    # pylint: disable-msg=too-many-arguments
     def __init__(self, mc, name=None, config=None, slide=None, key=None, play_kwargs=None):
         del play_kwargs
         self.name = name  # needs to be set before super()
@@ -131,11 +135,13 @@ class SlideFrame(MpfWidget, ScreenManager):
 
     @current_slide.setter
     def current_slide(self, value):
-        """Sets the current slide. You can set it to a Slide object or a
-        string of the slide name."""
+        """Set the current slide.
+
+        You can set it to a Slide object or a string of the slide name.
+        """
         if isinstance(value, Slide):
             self._set_current_slide(value)
-        elif type(value) is str:
+        elif isinstance(value, str):
             self._set_current_slide_name(value)
 
     @property
@@ -151,12 +157,11 @@ class SlideFrame(MpfWidget, ScreenManager):
 
     @property
     def slides(self):
-        """List of slide objects of all the active slides for this slide
-        frame."""
+        """Return list of slide objects of all the active slides for this slide frame."""
         return self.screens
 
-    def add_slide(self, name, config=None, priority=0, key=None,
-                  play_kwargs=None):
+    # pylint: disable-msg=too-many-arguments
+    def add_slide(self, name, config=None, priority=0, key=None, play_kwargs=None):
         # Note this method just adds it. It doesn't show it.
 
         try:
@@ -167,6 +172,7 @@ class SlideFrame(MpfWidget, ScreenManager):
                          config=config, key=key, priority=priority,
                          play_kwargs=play_kwargs)
 
+    # pylint: disable-msg=too-many-arguments
     def show_slide(self, slide_name, transition=None, key=None, force=False,
                    priority=0, show=True, expire=None, play_kwargs=None,
                    **kwargs):
@@ -219,6 +225,7 @@ class SlideFrame(MpfWidget, ScreenManager):
         else:  # Not showing this slide
             return False
 
+    # pylint: disable-msg=too-many-arguments
     def add_and_show_slide(self, widgets=None, slide_name=None,
                            transition=None, priority=0, key=None,
                            force=False, expire=None, play_kwargs=None,

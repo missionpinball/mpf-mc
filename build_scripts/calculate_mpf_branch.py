@@ -6,6 +6,7 @@ import sys
 parent_directory = (os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)))
 
 sys.path.insert(1, parent_directory)
+# pylint: disable-msg=wrong-import-position
 from mpfmc._version import __short_version__
 
 mpf_repo = git.Repo('c:\\projects\\mpf')

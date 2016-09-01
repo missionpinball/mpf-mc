@@ -361,7 +361,7 @@ class MpfSlidePlayer(PluginPlayer):
         for event_name, event_settings in config.items():
 
             # str means it's a list of named animations
-            if type(event_settings) is str:
+            if isinstance(event_settings, str):
                 event_settings = Util.string_to_list(event_settings)
 
             # dict means it's a single set of settings for one animation step
@@ -382,11 +382,11 @@ class MpfSlidePlayer(PluginPlayer):
         # config is localized to a single animation's settings within a list
 
         # str means it's a named animation
-        if type(config) is str:
+        if isinstance(config, str):
             config = dict(named_animation=config)
 
         # dict is settings for an animation
-        elif type(config) is dict:
+        elif isinstance(config, dict):
             self.machine.config_validator.validate_config('widgets:animations',
                                                           config)
 

@@ -175,6 +175,7 @@ class BcpProcessor(object):
         del kwargs
         self.mc.add_player(int(player_num))
 
+    # pylint: disable-msg=too-many-arguments
     def _bcp_player_variable(self, name, value, prev_value, change, player_num,
                              **kwargs):
         """Processes an incoming BCP 'player_variable' command."""
