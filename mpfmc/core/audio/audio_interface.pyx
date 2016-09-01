@@ -2054,9 +2054,14 @@ cdef class TrackStandard(Track):
             if not sound_instance.sound.loading:
                 sound_instance.sound.load()
 
-            self.queue_sound(sound_instance=sound_instance, exp_time=exp_time)
-            self.log.debug("play_sound - Sound %s was not loaded and therefore has been "
-                           "queued for playback.", sound_instance.name)
+            if sound_instance.max_queue_time != 0:
+                self.queue_sound(sound_instance=sound_instance, exp_time=exp_time)
+                self.log.debug("play_sound - Sound %s was not loaded and therefore has been "
+                               "queued for playback.", sound_instance.name)
+            else:
+                self.log.debug("play_sound - Sound %s was not loaded and max_queue_time = 0, "
+                               "therefore it has been discarded and will not be played.", sound_instance.name)
+                sound_instance.set_expired()
         else:
             # If the sound can be played right away (available player) then play it.
             # Is there an available sound player?
@@ -2084,6 +2089,14 @@ cdef class TrackStandard(Track):
                     self._play_sound_on_sound_player(sound_instance=sound_instance,
                                                      player=player,
                                                      force=True)
+                elif sound_instance.max_queue_time == 0:
+                    # The sound could not be played immediately and has now expired (max_queue_time == 0)
+                    self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
+                                   "lowest sound currently playing (%d). Sound could not be played"
+                                   "immediately and has now expired (max_queue_time = 0) and will "
+                                   "not be played.",
+                                   sound_instance.priority, lowest_priority)
+                    sound_instance.set_expired()
                 else:
                     # Add the requested sound to the priority queue
                     self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
@@ -2094,7 +2107,12 @@ cdef class TrackStandard(Track):
         SDL_UnlockMutex(self.mutex)
 
     def replace_sound(self, old_instance not None, sound_instance not None):
-        """Replace a currently playing instance with another sound instance"""
+        """
+        Replace a currently playing instance with another sound instance.
+        Args:
+            old_instance: The currently playing sound instance to replace
+            sound_instance: The new sound instance to begin playing immediately
+        """
 
         self.log.debug("replace_sound - Preparing to replace existing sound with a new sound instance")
 
@@ -2105,7 +2123,7 @@ cdef class TrackStandard(Track):
         if player >= 0:
             self._play_sound_on_sound_player(sound_instance, player, force=True)
         else:
-            self.log.debug("replace_sound - Could not locate specified sound to replace")
+            self.log.debug("replace_sound - Could not locate specified sound instance to replace")
             sound_instance.set_canceled()
 
         SDL_UnlockMutex(self.mutex)
