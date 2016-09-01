@@ -615,13 +615,102 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('widget_4up_red')
         self.advance_time(1)
 
+    def test_widget_with_key(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide1')
+
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # post the event to add widget2 to slide1
+        self.mc.events.post('show_christmas_slide_full')
+        self.advance_time()
+
+        # should be there
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # remove widget2 again
+        self.mc.events.post('remove_christmas_full')
+        self.advance_time()
+
+        # should no longer be there
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # remove slide
+        self.mc.targets['default'].remove_slide('slide1')
+
+        # post the event to add widget2 to slide1
+        self.mc.events.post('show_christmas_slide_full')
+        self.advance_time()
+
+        # slide1 is not there. widget2 should also not be there
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # show slide
+        self.mc.targets['default'].show_slide('slide1')
+        self.advance_time()
+
+        # should be there (automagically)
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # remove slide
+        self.mc.targets['default'].remove_slide('slide1')
+
+        # slide1 is not there. widget2 should also not be there
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # show slide
+        self.mc.targets['default'].show_slide('slide1')
+        self.advance_time()
+
+        # should be there (still)
+        self.assertIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # remove widget2 again
+        self.mc.events.post('remove_christmas_full')
+        self.advance_time()
+
+        # should no longer be there
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # remove slide
+        self.mc.targets['default'].remove_slide('slide1')
+
+        # post the event to add widget2 to slide1
+        self.mc.events.post('show_christmas_slide_full')
+        self.advance_time()
+
+        # slide1 is not there. widget2 should also not be there
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
+        # remove widget2 again
+        self.mc.events.post('remove_christmas_full')
+        self.advance_time()
+
+        # show slide
+        self.mc.targets['default'].show_slide('slide1')
+        self.advance_time()
+
+        # should not appear
+        self.assertNotIn('widget2', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
+
     def test_updating_mode_widget_by_key(self):
         # create a slide and add some base widgets
         self.mc.targets['default'].add_slide(name='slide1')
         self.mc.targets['default'].show_slide('slide1')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide1')
-
         self.mc.events.post('add_widget1_to_current')
         self.advance_time()
 
@@ -660,3 +749,13 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.children[0].children[1]
         self.assertEqual(widget2.text, 'UPDATED TEXT')
         self.assertEqual(widget2.key, 'newton_crosby')
+
+    def test_widget_player_with_placeholder(self):
+        self.mc.targets['default'].add_slide(name='slide1')
+        self.mc.targets['default'].show_slide('slide1')
+        self.mc.events.post('show_widget10', text="asd")
+        self.advance_time()
+
+        # verify asd is there
+        self.assertIn('asd', [x.text for x in self.mc.targets[
+            'default'].current_slide.children[0].children])
