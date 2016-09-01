@@ -12,6 +12,8 @@ from kivy.resources import resource_add_path
 from kivy.logger import Logger
 
 # The following line is needed to allow mpfmc modules to use the getLogger(name) method
+from mpfmc.core.assets import ThreadedAssetManager
+
 logging.Logger.manager.root = Logger
 
 from mpfmc.assets.video import VideoAsset
@@ -28,7 +30,6 @@ from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
 from mpf.core.player import Player
-from mpf.core.assets import AssetManager
 from mpfmc.assets.image import ImageAsset
 from mpfmc.core.physical_dmd import PhysicalDmd, PhysicalRgbDmd
 
@@ -116,7 +117,7 @@ class MpfMc(App):
         else:
             self.sound_system = SoundSystem(self)
 
-        self.asset_manager = AssetManager(self)
+        self.asset_manager = ThreadedAssetManager(self)
         self.bcp_processor = BcpProcessor(self)
 
         # Asset classes
@@ -286,6 +287,9 @@ class MpfMc(App):
         self.log.info("Stopping...")
         self.thread_stopper.set()
 
+        self.events.post("shutdown")
+        self.events.process_event_queue()
+
         try:
             self.log.info("Loop rate %s Hz", round(self.ticks / (time.time() - self.start_time), 2))
         except ZeroDivisionError:
@@ -402,7 +406,6 @@ class MpfMc(App):
             self.log.info("Shutting down due to child thread crash")
             self.log.info("Crash details: %s", crash)
             self.stop()
-
 
     def register_monitor(self, monitor_class, monitor):
         """Registers a monitor.

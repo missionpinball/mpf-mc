@@ -93,7 +93,7 @@ class Widget(ConfigCollection):
                                            event=event_name)
 
             # str means it's a list of named animations
-            if type(event_settings) is str:
+            if isinstance(event_settings, str):
                 event_settings = Util.string_to_list(event_settings)
 
             # dict means it's a single set of settings for one animation step

@@ -10,7 +10,6 @@ from unittest.mock import *
 from mpf.tests.loop import TimeTravelLoop, TestClock
 
 import mpfmc
-from mpf.core.config_player import ConfigPlayer
 from mpf.tests.MpfTestCase import MpfTestCase, TestMachineController
 import mpf.core
 from mpf.core.config_validator import ConfigValidator

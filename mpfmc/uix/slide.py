@@ -16,6 +16,7 @@ class Slide(Screen):
         Slide.next_id += 1
         return Slide.next_id
 
+    # pylint: disable-msg=too-many-arguments
     def __init__(self, mc, name, config=None, target='default', key=None,
                  priority=0, play_kwargs=None):
 
@@ -93,20 +94,20 @@ class Slide(Screen):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
             self.priority, self.creation_order)
 
-    def add_widgets_from_library(self, name, key=None, widget_settings=None,
+    def add_widgets_from_library(self, name, key=None, widget_settings=None, play_kwargs=None,
                                  **kwargs):
-        del kwargs
         if name not in self.mc.widgets:
             raise ValueError("Widget %s not found", name)
 
         return self.add_widgets_from_config(config=self.mc.widgets[name],
                                             key=key,
-                                            widget_settings=widget_settings)
+                                            widget_settings=widget_settings,
+                                            play_kwargs=play_kwargs)
 
     def add_widgets_from_config(self, config, key=None, play_kwargs=None,
                                 widget_settings=None):
 
-        if type(config) is not list:
+        if not isinstance(config, list):
             config = [config]
         widgets_added = list()
 
@@ -136,7 +137,7 @@ class Slide(Screen):
                 this_key = key
 
             widget_obj = self.mc.widgets.type_map[widget['type']](
-                mc=self.mc, config=widget, slide=self, key=this_key)
+                mc=self.mc, config=widget, slide=self, key=this_key, play_kwargs=play_kwargs)
 
             top_widget = widget_obj
 

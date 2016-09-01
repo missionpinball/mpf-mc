@@ -18,6 +18,7 @@ import errno
 
 class Command(object):
 
+    # pylint: disable-msg=too-many-locals
     def __init__(self, mpf_path, machine_path, args):
 
         # undo all of Kivy's built-in logging so we can do it our way
@@ -154,8 +155,7 @@ class Command(object):
         except Exception as e:
             logging.exception(str(e))
 
-        logging.info("Stopping child threads... ({} remaining)".format(
-                     len(threading.enumerate()) - 1))
+        logging.info("Stopping child threads... (%s remaining)", len(threading.enumerate()) - 1)
 
         thread_stopper.set()
 

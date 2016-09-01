@@ -58,18 +58,23 @@ class PhysicalDmdBase(object):
         mc_fps = self.config['fps']
 
         if mc_fps == 0:
+            # pylint: disable-msg=protected-access
             mc_fps = Clock._max_fps
 
+        # pylint: disable-msg=protected-access
         if mc_fps > Clock._max_fps:
             self.mc.log.warning("%s fps is higher than mpf-mc fps. "
                                 "Will use mpf-mc fps setting for the DMD.",
                                 PhysicalDmdBase.dmd_name_string)
+            # pylint: disable-msg=protected-access
             fps = Clock._max_fps
             update = 0
+        # pylint: disable-msg=protected-access
         elif Clock._max_fps > mc_fps > 0:
             fps = mc_fps
             update = 1 / fps
         else:
+            # pylint: disable-msg=protected-access
             fps = Clock._max_fps
             update = 0
 

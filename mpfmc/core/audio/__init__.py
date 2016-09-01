@@ -144,7 +144,7 @@ class SoundSystem(object):
         """
         del kwargs
         self.master_volume += delta
-        self.log.info("Increased master volume by {} to {}.".format(delta, self.master_volume))
+        self.log.info("Increased master volume by %s to %s.", delta, self.master_volume)
 
     def master_volume_decrease(self, delta: float=0.05, **kwargs):
         """Decrease master volume by delta.
@@ -154,7 +154,7 @@ class SoundSystem(object):
         """
         del kwargs
         self.master_volume -= delta
-        self.log.info("Decreased master volume by {} to {}.".format(delta, self.master_volume))
+        self.log.info("Decreased master volume by %s to %s.", delta, self.master_volume)
 
     def _create_track(self, name, config=None) -> bool:
         """Create a track in the audio system with the specified name and configuration.
