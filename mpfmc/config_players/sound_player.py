@@ -57,6 +57,7 @@ Here are several various examples:
     show_section = 'sounds'
     machine_collection_name = 'sounds'
 
+    # pylint: disable=invalid-name
     def play(self, settings, context, priority=0, **kwargs):
         """Plays a validated sounds: section from a sound_player: section of a
         config file or the sounds: section of a show.
@@ -75,8 +76,8 @@ Here are several various examples:
         max_queue_time:
 
         Notes:
-            Ducking settings cannot currently be specified in the sound_player (they
-            must be specified in the sounds section of a config file.
+            Ducking settings and markers cannot currently be specified/overridden in the
+            sound_player (they must be specified in the sounds section of a config file).
 
         """
         instance_dict = self._get_instance_dict(context)
@@ -105,7 +106,8 @@ Here are several various examples:
             # Determine action to perform
             if s['action'].lower() == 'play':
                 sound_instance = sound.play(s)
-                sound_instance.add_finished_handler(self.on_sound_instance_finished, 1, context=context)
+                sound_instance.add_finished_handler(self.on_sound_instance_finished, 1,
+                                                    context=context)
                 instance_dict[sound_instance.id] = sound_instance
 
             elif s['action'].lower() == 'stop':
@@ -125,6 +127,7 @@ Here are several various examples:
         """ express config for sounds is simply a string (sound name)"""
         return dict(sound=value)
 
+    # pylint: disable=too-many-branches
     def validate_config(self, config):
         """Validates the sound_player: section of a config file (either a
         machine-wide config or a mode config).
@@ -164,6 +167,32 @@ Here are several various examples:
 
                     validated_config[event]['sounds'].update(
                         self._validate_config_item(sound, sound_settings))
+
+                # Remove any items from the settings that were not explicitly provided in the
+                # sound_player config section (only want to override sound settings explicitly
+                # and not with any default values).  The default values for these items are not
+                # legal values and therefore we know the user did not provide them.
+                if sound_settings['priority'] is None:
+                    del sound_settings['priority']
+                if sound_settings['volume'] is None:
+                    del sound_settings['volume']
+                if sound_settings['loops'] is None:
+                    del sound_settings['loops']
+                if sound_settings['fade_in'] is None:
+                    del sound_settings['fade_in']
+                if sound_settings['fade_out'] is None:
+                    del sound_settings['fade_out']
+                if sound_settings['max_queue_time'] == -1:
+                    del sound_settings['max_queue_time']
+                if len(sound_settings['events_when_played']) == 1 and \
+                                sound_settings['events_when_played'][0] == 'ignore':
+                    del sound_settings['events_when_played']
+                if len(sound_settings['events_when_stopped']) == 1 and \
+                                sound_settings['events_when_stopped'][0] == 'ignore':
+                    del sound_settings['events_when_stopped']
+                if len(sound_settings['events_when_looping']) == 1 and \
+                                sound_settings['events_when_looping'][0] == 'ignore':
+                    del sound_settings['events_when_looping']
 
         return validated_config
 

@@ -599,23 +599,25 @@ class SoundInstance(object):
         if settings is None:
             settings = dict()
 
+        # TODO: Implement parameter validation for overridden parameters
+
         # Assign any overridden parameter values
-        if 'loops' in settings and settings['loops'] is not None:
+        if 'loops' in settings:
             self._loops = settings['loops']
 
-        if 'volume' in settings and settings['volume'] is not None:
+        if 'volume' in settings:
             self._volume = settings['volume']
 
-        if 'priority' in settings and settings['priority'] is not None:
+        if 'priority' in settings:
             self._priority = settings['priority']
 
-        if 'start_at' in settings and settings['start_at'] is not None:
+        if 'start_at' in settings:
             self._start_at = settings['start_at']
 
-        if 'fade_in' in settings and settings['fade_in'] is not None:
+        if 'fade_in' in settings:
             self._fade_in = settings['fade_in']
 
-        if 'fade_out' in settings and settings['fade_out'] is not None:
+        if 'fade_out' in settings:
             self._fade_out = settings['fade_out']
 
         if 'max_queue_time' in settings:
