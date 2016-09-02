@@ -2465,7 +2465,8 @@ cdef class TrackStandard(Track):
     @staticmethod
     def player_status_to_text(int status):
         """
-        Converts a sound player status value into an equivalent text string
+        Converts a sound player status value into an equivalent text string.  Used for testing
+        purposes only.
         Args:
             status: Integer sound player status value
 
@@ -2483,6 +2484,28 @@ cdef class TrackStandard(Track):
 
         try:
             return status_values.get(status)
+        except KeyError:
+            return "unknown"
+
+    @staticmethod
+    def player_fading_status_to_text(int fading_status):
+        """
+        Converts a sound player fading status value into an equivalent text string.  Used for
+        testing purposes only.
+        Args:
+            fading_status: Integer sound player fading status value
+
+        Returns:
+            string containing the equivalent fading status text
+        """
+        fading_status_values = {
+            fading_status_not_fading: "none",
+            fading_status_fading_in: "fade in",
+            fading_status_fading_out: "fade out",
+        }
+
+        try:
+            return fading_status_values.get(fading_status)
         except KeyError:
             return "unknown"
 
