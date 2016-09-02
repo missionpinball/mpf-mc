@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev07')
+__version_info__ = ('0', '31', '0', 'dev08')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -253,9 +253,19 @@ cdef class AudioInterface:
 
         return min(max(float(gain_string), 0.0), 1.0)
 
-    def convert_seconds_to_samples(self, int seconds):
+    def convert_seconds_to_samples(self, float seconds):
         """Converts the specified number of seconds into samples (based on current sample rate)"""
-        return self.sample_rate * seconds
+        return int(self.sample_rate * seconds)
+
+    def convert_seconds_to_buffer_length(self, float seconds):
+        """Convert the specified number of seconds into a buffer length (based on current
+        sample rate, the number of audio channels, and the number of bytes per sample)."""
+        return int(seconds * self.sample_rate * self.audio_channels * BYTES_PER_SAMPLE)
+
+    def convert_buffer_length_to_seconds(self, int buffer_length):
+        """Convert the specified buffer length into a time in seconds (based on current
+        sample rate, the number of audio channels, and the number of bytes per sample)."""
+        return round(buffer_length / (self.sample_rate * self.audio_channels * BYTES_PER_SAMPLE), 3)
 
     @staticmethod
     def string_to_secs(time):
@@ -2379,6 +2389,7 @@ cdef class TrackStandard(Track):
             status.append({
                 "player": player,
                 "status": TrackStandard.player_status_to_text(self.type_state.sound_players[player].status),
+                "fading_status": TrackStandard.player_fading_status_to_text(self.type_state.sound_players[player].current.fading_status),
                 "volume": self.type_state.sound_players[player].current.volume,
                 "sound_id": self.type_state.sound_players[player].current.sound_id,
                 "sound_instance_id": self.type_state.sound_players[player].current.sound_instance_id,
@@ -2499,7 +2510,7 @@ cdef class TrackStandard(Track):
             string containing the equivalent fading status text
         """
         fading_status_values = {
-            fading_status_not_fading: "none",
+            fading_status_not_fading: "not fading",
             fading_status_fading_in: "fade in",
             fading_status_fading_out: "fade out",
         }
