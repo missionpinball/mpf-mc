@@ -410,6 +410,31 @@ class TestAudio(MpfMcTestCase):
         self.assertFalse(sfx_instance4.playing)
         self.assertTrue(sfx_instance5.playing)
 
+        # Stop all sounds playing on the sfx track to start the next test
+        track_sfx.stop_all_sounds()
+        self.advance_time()
+        self.assertEqual(track_sfx.get_sound_players_in_use_count(), 0)
+        self.assertEqual(track_sfx.get_sound_queue_count(), 0)
+
+        # Test max_instances in sound group (skip stealing method)
+        self.assertIn('drum_group', self.mc.sounds)
+        drum_group = self.mc.sounds['drum_group']
+        self.assertEqual(drum_group.max_instances, 3)
+        self.assertEqual(drum_group.stealing_method, SoundStealingMethod.skip)
+
+        drum_group_instance1 = drum_group.play()
+        drum_group_instance2 = drum_group.play()
+        drum_group_instance3 = drum_group.play()
+        drum_group_instance4 = drum_group.play()
+        drum_group_instance5 = drum_group.play()
+
+        self.advance_time()
+        self.assertTrue(drum_group_instance1.played)
+        self.assertTrue(drum_group_instance2.played)
+        self.assertTrue(drum_group_instance3.played)
+        self.assertIsNone(drum_group_instance4)
+        self.assertIsNone(drum_group_instance5)
+
         """
         # Add another track with the same name (should not be allowed)
         # Add another track with the same name, but different casing (should not be allowed)

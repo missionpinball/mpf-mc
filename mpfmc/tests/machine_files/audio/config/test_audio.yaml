@@ -70,6 +70,8 @@ sound_pools:
     drum_group:
         load: preload
         type: sequence
+        max_instances: 3
+        stealing_method: skip
         sounds:
             4832__zajo__drum07
             84480__zgump__drum-fx-4
