@@ -31,7 +31,25 @@ class SoundPool(AssetPool):
     # pylint: disable=invalid-name
     def __init__(self, mc, name, config, member_cls):
         super().__init__(mc, name, config, member_cls)
+        self._max_instances = None
+        self._stealing_method = SoundStealingMethod.oldest
         self._instances = list()
+        self.log = logging.getLogger('SoundPool')
+
+        if 'max_instances' in self.config and self.config['max_instances'] is not None:
+            self._max_instances = int(self.config['max_instances'])
+
+        if 'stealing_method' in self.config and self.config['stealing_method'] is not None:
+            method = str(self.config['stealing']).lower()
+            if method == 'skip':
+                self._stealing_method = SoundStealingMethod.skip
+            elif method == 'oldest':
+                self._stealing_method = SoundStealingMethod.oldest
+            elif method == 'newest':
+                self._stealing_method = SoundStealingMethod.newest
+            else:
+                raise AudioException("Illegal value for sound_pool.stealing_method. "
+                                     "Could not create sound pool '{}' asset".format(name))
 
     def __repr__(self):
         """String that's returned if someone prints this object"""
@@ -42,16 +60,66 @@ class SoundPool(AssetPool):
         """The currently selected Sound object from the pool"""
         return self.asset
 
+    @property
+    def max_instances(self):
+        """Return the maximum number of instances of the sound pool sounds that may be
+        played simultaneously"""
+        return self._max_instances
+
+    @property
+    def stealing_method(self):
+        """Return the method used when stealing a sound instance (when a new sound
+        instance is requested from the sound pool but the maximum number of instances
+        has currently been reached)."""
+        if self.max_instances is None:
+            return None
+        else:
+            return self._stealing_method
+
     def play(self, settings=None):
         """
         Plays the sound using the specified settings
         Args:
             settings: Optional dictionary of settings to override the default values.
         """
-        sound_instance = self.sound.play(settings)
-        self._instances.append(sound_instance)
-        sound_instance.add_finished_handler(self.on_sound_instance_finished)
-        return sound_instance
+        self.log.debug("Play sound pool %s", self.name)
+
+        # Determine if the maximum number of instances of this sound pool's sounds has been reached
+        if self.max_instances is not None and len(self._instances) == self.max_instances:
+
+            # Perform action based on stealing method
+            if self.stealing_method == SoundStealingMethod.oldest:
+                oldest_instance = self._get_oldest_instance()
+                if oldest_instance is not None:
+                    sound_instance = SoundInstance(self.sound, settings)
+                    sound_instance.track.replace_sound(oldest_instance, sound_instance)
+                    self.log.debug("Sound pool %s has reached the maximum number of instances. "
+                                   "Replacing oldest instance", self.name)
+                    self._instances.append(sound_instance)
+                    sound_instance.add_finished_handler(self.on_sound_instance_finished)
+                    return sound_instance
+            elif self.stealing_method == SoundStealingMethod.newest:
+                newest_instance = self._get_newest_instance()
+                if newest_instance is not None:
+                    sound_instance = SoundInstance(self.sound, settings)
+                    sound_instance.track.replace_sound(newest_instance, sound_instance)
+                    self.log.debug("Sound pool %s has reached the maximum number of instances. "
+                                   "Replacing newest instance", self.name)
+                    self._instances.append(sound_instance)
+                    sound_instance.add_finished_handler(self.on_sound_instance_finished)
+                    return sound_instance
+            else:
+                # New instance will not be played; it will be skipped
+                self.log.info("Sound pool %s has reached the maximum number of instances. "
+                              "Sound will be skipped", self.name)
+        else:
+            sound_instance = SoundInstance(self.sound, settings)
+            sound_instance.track.play_sound(sound_instance)
+            self._instances.append(sound_instance)
+            sound_instance.add_finished_handler(self.on_sound_instance_finished)
+            return sound_instance
+
+        return None
 
     def stop(self, fade_out=None):
         """
@@ -77,6 +145,57 @@ class SoundPool(AssetPool):
             if sound_instance.id == sound_instance_id:
                 self._instances.remove(sound_instance)
                 return
+
+    def get_instance_by_id(self, sound_instance_id):
+        """
+        Return an active sound instance by id
+        Args:
+            sound_instance_id: The id of the sound instance to return
+
+        Returns:
+            SoundInstance if found, None otherwise
+        """
+        for sound_instance in self._instances:
+            if sound_instance.id == sound_instance_id:
+                return sound_instance
+
+        return None
+
+    def remove_instance(self, sound_instance):
+        """Remove the specified sound instance from the list of active sound instances"""
+        try:
+            self._instances.remove(sound_instance)
+        except ValueError:
+            pass
+
+    def _get_oldest_instance(self):
+        """Return the oldest sound instance currently playing"""
+        if len(self._instances) == 0:
+            return None
+
+        oldest_instance = self._instances[0]
+        for sound_instance in self._instances[1:]:
+            if sound_instance.timestamp < oldest_instance.timestamp:
+                oldest_instance = sound_instance
+
+        return oldest_instance
+
+    def _get_newest_instance(self):
+        """Return the newest sound instance currently playing"""
+        if len(self._instances) == 0:
+            return None
+
+        newest_instance = self._instances[0]
+        for sound_instance in self._instances[1:]:
+            if sound_instance.timestamp > newest_instance.timestamp:
+                newest_instance = sound_instance
+
+        return newest_instance
+
+    def get_instance_count(self):
+        """Return the number of instances of this sound pool (currently playing or
+        pending playback)."""
+        return len(self._instances)
 
 
 @unique
@@ -412,6 +531,7 @@ class SoundAsset(Asset):
                     sound_instance.track.replace_sound(oldest_instance, sound_instance)
                     self.log.debug("Sound %s has reached the maximum number of instances. "
                                    "Replacing oldest instance", self.name)
+                    self._instances.append(sound_instance)
                     return sound_instance
             elif self.stealing_method == SoundStealingMethod.newest:
                 newest_instance = self._get_newest_instance()
@@ -420,6 +540,7 @@ class SoundAsset(Asset):
                     sound_instance.track.replace_sound(newest_instance, sound_instance)
                     self.log.debug("Sound %s has reached the maximum number of instances. "
                                    "Replacing newest instance", self.name)
+                    self._instances.append(sound_instance)
                     return sound_instance
             else:
                 # New instance will not be played; it will be skipped
@@ -495,6 +616,11 @@ class SoundAsset(Asset):
                 newest_instance = sound_instance
 
         return newest_instance
+
+    def get_instance_count(self):
+        """Return the number of instances of this sound (currently playing or
+        pending playback)."""
+        return len(self._instances)
 
     @staticmethod
     def load_markers(config, sound_name):
