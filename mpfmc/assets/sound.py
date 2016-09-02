@@ -114,8 +114,10 @@ class SoundPool(AssetPool):
                               "Sound will be skipped", self.name)
                 return None
         else:
-            sound_instance = SoundInstance(self.sound, settings)
-            sound_instance.track.play_sound(sound_instance)
+            sound_instance = self.sound.play(settings)
+            if sound_instance is None:
+                self.log.info("Selected sound pool %s sound could not be played.")
+                return None
             self._instances.append(sound_instance)
             sound_instance.add_finished_handler(self.on_sound_instance_finished)
             return sound_instance
