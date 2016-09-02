@@ -40,7 +40,7 @@ class SoundPool(AssetPool):
             self._max_instances = int(self.config['max_instances'])
 
         if 'stealing_method' in self.config and self.config['stealing_method'] is not None:
-            method = str(self.config['stealing']).lower()
+            method = str(self.config['stealing_method']).lower()
             if method == 'skip':
                 self._stealing_method = SoundStealingMethod.skip
             elif method == 'oldest':
@@ -112,14 +112,13 @@ class SoundPool(AssetPool):
                 # New instance will not be played; it will be skipped
                 self.log.info("Sound pool %s has reached the maximum number of instances. "
                               "Sound will be skipped", self.name)
+                return None
         else:
             sound_instance = SoundInstance(self.sound, settings)
             sound_instance.track.play_sound(sound_instance)
             self._instances.append(sound_instance)
             sound_instance.add_finished_handler(self.on_sound_instance_finished)
             return sound_instance
-
-        return None
 
     def stop(self, fade_out=None):
         """
@@ -302,7 +301,7 @@ class SoundAsset(Asset):
             self._fade_out = AudioInterface.string_to_secs(self.config['fade_out'])
 
         if 'stealing_method' in self.config and self.config['stealing_method'] is not None:
-            method = str(self.config['stealing']).lower()
+            method = str(self.config['stealing_method']).lower()
             if method == 'skip':
                 self._stealing_method = SoundStealingMethod.skip
             elif method == 'oldest':
@@ -546,13 +545,12 @@ class SoundAsset(Asset):
                 # New instance will not be played; it will be skipped
                 self.log.info("Sound %s has reached the maximum number of instances. "
                               "Sound will be skipped", self.name)
+                return None
         else:
             sound_instance = SoundInstance(self, settings)
             sound_instance.track.play_sound(sound_instance)
             self._instances.append(sound_instance)
             return sound_instance
-
-        return None
 
     def stop(self, fade_out=None):
         """
@@ -1057,6 +1055,11 @@ class SoundInstance(object):
     def status(self):
         """Return the current status of the sound instance."""
         return self._status
+
+    @property
+    def playing(self):
+        """Return whether the instance is currently playing"""
+        return self._status == SoundInstanceStatus.playing
 
     @property
     def played(self):
