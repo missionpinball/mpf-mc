@@ -53,6 +53,9 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(interface.string_to_samples("23.5 ms"), 1036)
         self.assertEqual(interface.string_to_samples("-2 ms"), -88)
 
+        self.assertEqual(interface.convert_seconds_to_buffer_length(2.25), 198450)
+        self.assertEqual(interface.convert_buffer_length_to_seconds(198450), 2.25)
+
         # Check tracks
         self.assertEqual(interface.get_track_count(), 3)
         track_voice = interface.get_track_by_name("voice")
@@ -241,15 +244,39 @@ class TestAudio(MpfMcTestCase):
         interface = self.mc.sound_system.audio_interface
         self.assertIsNotNone(interface)
 
+        track_music = interface.get_track_by_name("music")
+        self.assertIsNotNone(track_music)
+        self.assertEqual(track_music.name, "music")
+        self.assertEqual(track_music.max_simultaneous_sounds, 1)
+
         self.advance_time(2)
 
         self.assertIn('263774_music', self.mc.sounds)       # .wav
 
-        settings = { 'fade_in': 8.5, 'volume': 1.0 }
+        settings = { 'fade_in': 3.0, 'volume': 1.0 }
         instance = self.mc.sounds['263774_music'].play(settings)
-        self.advance_time(9)
-        instance.stop(4.0)
-        self.advance_time(5)
+        self.advance_time(2)
+
+        status = track_music.get_status()
+        self.assertEqual(status[0]['sound_instance_id'], instance.id)
+        self.assertEqual(status[0]['status'], "playing")
+        self.assertEqual(status[0]['fading_status'], "fade in")
+
+        self.advance_time(2)
+        status = track_music.get_status()
+        self.assertEqual(status[0]['status'], "playing")
+        self.assertEqual(status[0]['fading_status'], "not fading")
+
+        instance.stop(2)
+        self.advance_time()
+        status = track_music.get_status()
+        self.assertEqual(status[0]['status'], "stopping")
+        self.assertEqual(status[0]['fading_status'], "fade out")
+        self.advance_time(0.9)
+
+        self.advance_time(1.2)
+        status = track_music.get_status()
+        self.assertEqual(status[0]['status'], "idle")
 
     def test_sound_start_at(self):
         """ Tests starting a sound at a position other than the beginning"""
@@ -276,8 +303,8 @@ class TestAudio(MpfMcTestCase):
         instance = self.mc.sounds['263774_music'].play(settings)
         self.advance_time()
         status = track_music.get_status()
-        self.assertGreater(status[0]['sample_pos'], 7.382 * 44100 * 2)
-        self.advance_time(2)
+        self.assertGreater(status[0]['sample_pos'], interface.convert_seconds_to_buffer_length(7.382))
+        self.advance_time(1)
         instance.stop(0.25)
         self.advance_time(0.3)
 
