@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev08')
+__version_info__ = ('0', '31', '0', 'dev09')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -1731,6 +1731,12 @@ cdef class Track:
         """
         raise NotImplementedError('Must be overridden in derived class')
 
+    def stop_all_sounds(self):
+        """
+        Stops all playing sounds immediately on the track.
+        """
+        raise NotImplementedError('Must be overridden in derived class')
+
     def process(self):
         """Processes the track queue each tick."""
         raise NotImplementedError('Must be overridden in derived class')
@@ -2042,6 +2048,22 @@ cdef class TrackStandard(Track):
             sound_instance.set_canceled()
             del self._sound_queue_items[sound_instance]
 
+    def _remove_all_sounds_from_queue(self):
+        """Removes all sounds from the priority sound queue.
+        """
+
+        # The sounds will not actually be removed from the priority queue because that
+        # could corrupt the queue heap structure, but are simply set to None so they
+        # will not be played.  After marking queue entry as None, the dictionary keeping
+        # track of sounds in the queue is updated.
+        for sound_instance in self._sound_queue_items:
+            entry = self._sound_queue_items[sound_instance]
+            entry[2] = None
+            self.log.debug("Removing pending sound from queue %s", sound_instance)
+            sound_instance.set_canceled()
+
+        self._sound_queue_items.clear()
+
     def play_sound(self, sound_instance not None):
         """
         Plays a sound on the current track.
@@ -2229,6 +2251,43 @@ cdef class TrackStandard(Track):
 
         # Remove any instances of the specified sound that are pending in the sound queue.
         self._remove_sound_from_queue(sound_instance)
+
+        SDL_UnlockMutex(self.mutex)
+
+    def stop_all_sounds(self, float fade_out_seconds = 0.0):
+        """
+        Stops all playing sounds immediately on the track.
+        Args:
+            fade_out_seconds: The number of seconds to fade out the sounds before stopping
+        """
+        SDL_LockMutex(self.mutex)
+
+        self.log.debug("Stopping all sounds and removing any pending sounds from queue")
+
+        for i in range(self.type_state.sound_player_count):
+            if self.type_state.sound_players[i].status != player_idle:
+                # Set stop sound event
+                request_message = self._get_available_request_message()
+                if request_message != NULL:
+                    request_message.message = request_sound_stop
+                    request_message.sound_id = self.type_state.sound_players[i].current.sound_id
+                    request_message.sound_instance_id = self.type_state.sound_players[i].current.sound_instance_id
+                    request_message.track = self.number
+                    request_message.player = i
+                    request_message.time = SDL_GetTicks()
+
+                    # Fade out
+                    seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
+                    request_message.data.stop.fade_out_duration = fade_out_seconds * seconds_to_bytes_factor
+
+                    # Adjust ducking (if necessary)
+                    # TODO: trigger ducking here
+                    pass
+                else:
+                    self.log.error("All internal audio messages are currently in use, could not stop all sounds")
+
+        # Remove all sounds that are pending in the sound queue.
+        self._remove_all_sounds_from_queue()
 
         SDL_UnlockMutex(self.mutex)
 
