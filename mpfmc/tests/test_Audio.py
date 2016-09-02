@@ -2,6 +2,7 @@ import logging
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from unittest.mock import MagicMock
+from mpfmc.assets.sound import SoundStealingMethod
 
 
 class TestAudio(MpfMcTestCase):
@@ -279,6 +280,108 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(2)
         instance.stop(0.25)
         self.advance_time(0.3)
+
+    def test_sound_instance_management(self):
+        """ Tests instance management of sounds"""
+
+        if self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        self.assertIsNotNone(interface)
+
+        track_sfx = interface.get_track_by_name("sfx")
+        self.assertIsNotNone(track_sfx)
+        self.assertEqual(track_sfx.name, "sfx")
+        self.assertEqual(track_sfx.max_simultaneous_sounds, 8)
+
+        self.advance_time(1)
+
+        # Test skip stealing method
+        self.assertIn('264828_text', self.mc.sounds)  # .wav
+        text_sound = self.mc.sounds['264828_text']
+        self.assertEqual(text_sound.max_instances, 3)
+        self.assertEqual(text_sound.stealing_method, SoundStealingMethod.skip)
+
+        instance1 = text_sound.play({'loops': 0})
+        instance2 = text_sound.play({'loops': 0})
+        instance3 = text_sound.play({'loops': 0})
+        instance4 = text_sound.play({'loops': 0})
+        instance5 = text_sound.play({'loops': 0})
+
+        self.advance_time(0.25)
+        self.assertTrue(instance1.played)
+        self.assertTrue(instance2.played)
+        self.assertTrue(instance3.played)
+        self.assertIsNone(instance4)
+        self.assertIsNone(instance5)
+
+        # Test oldest stealing method
+        self.assertIn('210871_synthping', self.mc.sounds)  # .wav
+        synthping = self.mc.sounds['210871_synthping']
+        self.assertEqual(synthping.max_instances, 3)
+        self.assertEqual(synthping.stealing_method, SoundStealingMethod.oldest)
+
+        synthping_instance1 = synthping.play()
+        self.advance_time(0.25)
+        self.assertTrue(synthping_instance1.playing)
+        synthping_instance2 = synthping.play()
+        self.advance_time(0.25)
+        self.assertTrue(synthping_instance1.playing)
+        self.assertTrue(synthping_instance2.playing)
+        synthping_instance3 = synthping.play()
+        self.advance_time(0.25)
+        self.assertTrue(synthping_instance1.playing)
+        self.assertTrue(synthping_instance2.playing)
+        self.assertTrue(synthping_instance3.playing)
+        synthping_instance4 = synthping.play()
+        self.advance_time(0.25)
+        self.assertFalse(synthping_instance1.playing)
+        self.assertTrue(synthping_instance2.playing)
+        self.assertTrue(synthping_instance3.playing)
+        self.assertTrue(synthping_instance4.playing)
+        synthping_instance5 = synthping.play()
+        self.advance_time(0.25)
+        self.assertFalse(synthping_instance1.playing)
+        self.assertFalse(synthping_instance2.playing)
+        self.assertTrue(synthping_instance3.playing)
+        self.assertTrue(synthping_instance4.playing)
+        self.assertTrue(synthping_instance5.playing)
+
+        # Test newest stealing method
+        self.assertIn('198361_sfx-028', self.mc.sounds)  # .wav
+        sfx = self.mc.sounds['198361_sfx-028']
+        self.assertEqual(sfx.max_instances, 3)
+        self.assertEqual(sfx.stealing_method, SoundStealingMethod.newest)
+
+        sfx_instance1 = sfx.play()
+        self.advance_time(0.25)
+        self.assertTrue(sfx_instance1.playing)
+        sfx_instance2 = sfx.play()
+        self.advance_time(0.25)
+        self.assertTrue(sfx_instance1.playing)
+        self.assertTrue(sfx_instance2.playing)
+        sfx_instance3 = sfx.play()
+        self.advance_time(0.25)
+        self.assertTrue(sfx_instance1.playing)
+        self.assertTrue(sfx_instance2.playing)
+        self.assertTrue(sfx_instance3.playing)
+        sfx_instance4 = sfx.play()
+        self.advance_time(0.25)
+        self.assertTrue(sfx_instance1.playing)
+        self.assertTrue(sfx_instance2.playing)
+        self.assertFalse(sfx_instance3.playing)
+        self.assertTrue(sfx_instance4.playing)
+        sfx_instance5 = sfx.play()
+        self.advance_time(0.25)
+        self.assertTrue(sfx_instance1.playing)
+        self.assertTrue(sfx_instance2.playing)
+        self.assertFalse(sfx_instance3.playing)
+        self.assertFalse(sfx_instance4.playing)
+        self.assertTrue(sfx_instance5.playing)
 
         """
         # Add another track with the same name (should not be allowed)

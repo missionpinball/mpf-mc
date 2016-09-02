@@ -39,6 +39,8 @@ sounds:
     264828_text:
         events_when_looping: text_sound_looping
         loops: 7
+        max_instances: 3
+        stealing_method: skip
     104457_moron_test:
         events_when_played: moron_test_played
         events_when_stopped: moron_test_stopped
@@ -57,7 +59,12 @@ sounds:
               name: verse_1
               events: moron_next_marker, last_marker
     210871_synthping:
+        max_instances: 3
+        stealing_method: oldest
         events_when_played: synthping_played
+    198361_sfx-028:
+        max_instances: 3
+        stealing_method: newest
 
 sound_pools:
     drum_group:
