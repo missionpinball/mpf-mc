@@ -2,7 +2,15 @@ import logging
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from unittest.mock import MagicMock
-from mpfmc.assets.sound import SoundStealingMethod
+
+try:
+    from mpfmc.core.audio import SoundSystem
+    from mpfmc.assets.sound import SoundStealingMethod
+except ImportError:
+    SoundSystem = None
+    SoundStealingMethod = None
+    logging.warning("mpfmc.core.audio library could not be loaded. Audio "
+                    "features will not be available")
 
 
 class TestAudio(MpfMcTestCase):
@@ -20,7 +28,7 @@ class TestAudio(MpfMcTestCase):
     def test_typical_sound_system(self):
         """ Tests the sound system and audio interface with typical settings """
 
-        if self.mc.sound_system is None:
+        if SoundSystem is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
@@ -204,7 +212,7 @@ class TestAudio(MpfMcTestCase):
     def test_mode_sounds(self):
         """ Test the sound system using sounds specified in a mode """
 
-        if self.mc.sound_system is None:
+        if SoundSystem is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
@@ -235,7 +243,7 @@ class TestAudio(MpfMcTestCase):
     def test_sound_fading(self):
         """ Tests the fading of sounds"""
 
-        if self.mc.sound_system is None:
+        if SoundSystem is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
@@ -281,7 +289,7 @@ class TestAudio(MpfMcTestCase):
     def test_sound_start_at(self):
         """ Tests starting a sound at a position other than the beginning"""
 
-        if self.mc.sound_system is None:
+        if SoundSystem is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
@@ -311,7 +319,7 @@ class TestAudio(MpfMcTestCase):
     def test_sound_instance_management(self):
         """ Tests instance management of sounds"""
 
-        if self.mc.sound_system is None:
+        if SoundSystem is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
@@ -331,7 +339,8 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('264828_text', self.mc.sounds)  # .wav
         text_sound = self.mc.sounds['264828_text']
         self.assertEqual(text_sound.max_instances, 3)
-        self.assertEqual(text_sound.stealing_method, SoundStealingMethod.skip)
+        if SoundStealingMethod is not None:
+            self.assertEqual(text_sound.stealing_method, SoundStealingMethod.skip)
 
         instance1 = text_sound.play({'loops': 0})
         instance2 = text_sound.play({'loops': 0})
@@ -350,7 +359,8 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('210871_synthping', self.mc.sounds)  # .wav
         synthping = self.mc.sounds['210871_synthping']
         self.assertEqual(synthping.max_instances, 3)
-        self.assertEqual(synthping.stealing_method, SoundStealingMethod.oldest)
+        if SoundStealingMethod is not None:
+            self.assertEqual(synthping.stealing_method, SoundStealingMethod.oldest)
 
         synthping_instance1 = synthping.play()
         self.advance_time(0.25)
@@ -382,7 +392,8 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('198361_sfx-028', self.mc.sounds)  # .wav
         sfx = self.mc.sounds['198361_sfx-028']
         self.assertEqual(sfx.max_instances, 3)
-        self.assertEqual(sfx.stealing_method, SoundStealingMethod.newest)
+        if SoundStealingMethod is not None:
+            self.assertEqual(sfx.stealing_method, SoundStealingMethod.newest)
 
         sfx_instance1 = sfx.play()
         self.advance_time(0.25)
@@ -420,7 +431,8 @@ class TestAudio(MpfMcTestCase):
         self.assertIn('drum_group', self.mc.sounds)
         drum_group = self.mc.sounds['drum_group']
         self.assertEqual(drum_group.max_instances, 3)
-        self.assertEqual(drum_group.stealing_method, SoundStealingMethod.skip)
+        if SoundStealingMethod is not None:
+            self.assertEqual(drum_group.stealing_method, SoundStealingMethod.skip)
 
         drum_group_instance1 = drum_group.play()
         drum_group_instance2 = drum_group.play()
