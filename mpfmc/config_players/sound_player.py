@@ -106,9 +106,13 @@ Here are several various examples:
             # Determine action to perform
             if s['action'].lower() == 'play':
                 sound_instance = sound.play(s)
-                sound_instance.add_finished_handler(self.on_sound_instance_finished, 1,
-                                                    context=context)
-                instance_dict[sound_instance.id] = sound_instance
+                if sound_instance is None:
+                    self.machine.log.warning("SoundPlayer: The specified sound "
+                                             "could not be played ('{}').".format(sound_name))
+                else:
+                    sound_instance.add_finished_handler(self.on_sound_instance_finished, 1,
+                                                        context=context)
+                    instance_dict[sound_instance.id] = sound_instance
 
             elif s['action'].lower() == 'stop':
                 if 'fade_out' in s:
