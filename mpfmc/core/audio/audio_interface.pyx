@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev09')
+__version_info__ = ('0', '31', '0', 'dev10')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -66,7 +66,6 @@ cdef class AudioInterface:
     cdef int buffer_samples
     cdef int buffer_size
     cdef int supported_formats
-    cdef int mixer_channel
     cdef list tracks
     cdef object mc
     cdef object log
@@ -79,7 +78,6 @@ cdef class AudioInterface:
         self.buffer_samples = 0
         self.buffer_size = 0
         self.supported_formats = 0
-        self.mixer_channel = -1
         self.audio_callback_data = NULL
 
     def __init__(self, mc, rate=44100, channels=2, buffer_samples=4096):
