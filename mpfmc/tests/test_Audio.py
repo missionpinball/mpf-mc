@@ -41,7 +41,7 @@ class TestAudio(MpfMcTestCase):
         settings = interface.get_settings()
         self.assertIsNotNone(settings)
         self.assertEqual(settings['buffer_samples'], 2048)
-        self.assertEqual(settings['audio_channels'], 1)
+        self.assertEqual(settings['audio_channels'], 2)
         self.assertEqual(settings['sample_rate'], 44100)
 
         # Check static conversion functions (gain, samples)
@@ -61,8 +61,8 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(interface.string_to_samples("23.5 ms"), 1036)
         self.assertEqual(interface.string_to_samples("-2 ms"), -88)
 
-        self.assertEqual(interface.convert_seconds_to_buffer_length(2.25), 198450)
-        self.assertEqual(interface.convert_buffer_length_to_seconds(198450), 2.25)
+        self.assertEqual(interface.convert_seconds_to_buffer_length(2.25), 396900)
+        self.assertEqual(interface.convert_buffer_length_to_seconds(396900), 2.25)
 
         # Check tracks
         self.assertEqual(interface.get_track_count(), 3)
