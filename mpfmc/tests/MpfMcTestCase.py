@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import unittest
@@ -127,6 +128,7 @@ class MpfMcTestCase(unittest.TestCase):
                            **kwargs)
 
     def run(self, name):
+        Clock._events = [[] for i in range(256)]
         self._test_started = time()
         self._test_name = self.id()
         self._test = name
@@ -172,12 +174,25 @@ class MpfMcTestCase(unittest.TestCase):
         Clock.schedule_once(self.run_test, 0)
         self.mc.run()
 
+    def dump_clock(self):
+        print("---------")
+        events = []
+        for slot in Clock._events:
+            for event in slot:
+                events.append(event)
+
+        events.sort(key=lambda x: str(x.get_callback()))
+
+        for event in events:
+            print(event.get_callback(), event.timeout)
+
     def run_test(self, dt):
         # set the title bar, just for fun. :)
         self.mc.title = str(self._test_name)
 
         if not self.mc.is_init_done:
             if self._test_started + 5 < time():
+                self.dump_clock()
                 self.fail("Test setup took too more than 5 seconds.")
             Clock.schedule_once(self.run_test, 0)
             return

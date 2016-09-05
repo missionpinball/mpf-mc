@@ -1,6 +1,8 @@
 from kivy.uix.screenmanager import WipeTransition, FadeTransition
 
 from mpf.core.config_player import ConfigPlayer
+
+from mpfmc.config_players.slide_player import McSlidePlayer
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from mpfmc.transitions.move_in import MoveInTransition
 from mpf.tests.MpfTestCase import MpfTestCase
@@ -152,8 +154,8 @@ class TestSlidePlayer(MpfMcTestCase):
         show_slide_section['widgets'].append(dict(
             type='text', text='TEST FROM SHOW'))
 
-        show_slide_section = ConfigPlayer.show_players[
-            'slides']._validate_config_item('slide1', show_slide_section)
+        player = McSlidePlayer(self.mc)
+        show_slide_section = player._validate_config_item('slide1', show_slide_section)
 
         bcp_string = encode_command_string('trigger', name='slides_play', context='test_context', priority=1,
                                            settings=show_slide_section)
