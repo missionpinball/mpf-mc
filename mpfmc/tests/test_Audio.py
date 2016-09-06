@@ -1,7 +1,7 @@
 import logging
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 try:
     from mpfmc.core.audio import SoundSystem
@@ -328,102 +328,181 @@ class TestAudio(MpfMcTestCase):
         interface = self.mc.sound_system.audio_interface
         self.assertIsNotNone(interface)
 
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+
         track_sfx = interface.get_track_by_name("sfx")
         self.assertIsNotNone(track_sfx)
         self.assertEqual(track_sfx.name, "sfx")
         self.assertEqual(track_sfx.max_simultaneous_sounds, 8)
-
-        self.advance_time(1)
+        self.advance_time()
 
         # Test skip stealing method
         self.assertIn('264828_text', self.mc.sounds)  # .wav
         text_sound = self.mc.sounds['264828_text']
+        if not text_sound.loaded:
+            if not text_sound.loading:
+                text_sound.load()
+            self.advance_time(1)
+            
         self.assertEqual(text_sound.max_instances, 3)
         if SoundStealingMethod is not None:
             self.assertEqual(text_sound.stealing_method, SoundStealingMethod.skip)
 
-        instance1 = text_sound.play({'loops': 0})
-        instance2 = text_sound.play({'loops': 0})
-        instance3 = text_sound.play({'loops': 0})
-        instance4 = text_sound.play({'loops': 0})
-        instance5 = text_sound.play({'loops': 0})
+        instance1 = text_sound.play({'loops': 0, 'events_when_played': ['instance1_played']})
+        instance2 = text_sound.play({'loops': 0, 'events_when_played': ['instance2_played']})
+        instance3 = text_sound.play({'loops': 0, 'events_when_played': ['instance3_played']})
+        instance4 = text_sound.play({'loops': 0, 'events_when_played': ['instance4_played']})
+        instance5 = text_sound.play({'loops': 0, 'events_when_played': ['instance5_played']})
 
-        self.advance_time(0.25)
+        self.advance_time(0.5)
+
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='instance1_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='instance2_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='instance3_played')
+        with self.assertRaises(AssertionError):
+            self.mc.bcp_processor.send.assert_any_call('trigger', name='instance4_played')
+            self.mc.bcp_processor.send.assert_any_call('trigger', name='instance5_played')
+
         self.assertTrue(instance1.played)
         self.assertTrue(instance2.played)
         self.assertTrue(instance3.played)
         self.assertIsNone(instance4)
         self.assertIsNone(instance5)
 
+        track_sfx.stop_all_sounds()
+        self.advance_time()
+
         # Test oldest stealing method
+        self.mc.bcp_processor.send.reset_mock()
         self.assertIn('210871_synthping', self.mc.sounds)  # .wav
         synthping = self.mc.sounds['210871_synthping']
+        if not synthping.loaded:
+            if not synthping.loading:
+                synthping.load()
+            self.advance_time(1)
         self.assertEqual(synthping.max_instances, 3)
         if SoundStealingMethod is not None:
             self.assertEqual(synthping.stealing_method, SoundStealingMethod.oldest)
 
-        synthping_instance1 = synthping.play()
-        self.advance_time(0.25)
-        self.assertTrue(synthping_instance1.playing)
-        synthping_instance2 = synthping.play()
-        self.advance_time(0.25)
-        self.assertTrue(synthping_instance1.playing)
-        self.assertTrue(synthping_instance2.playing)
-        synthping_instance3 = synthping.play()
-        self.advance_time(0.25)
-        self.assertTrue(synthping_instance1.playing)
-        self.assertTrue(synthping_instance2.playing)
-        self.assertTrue(synthping_instance3.playing)
-        synthping_instance4 = synthping.play()
-        self.advance_time(0.25)
-        self.assertFalse(synthping_instance1.playing)
-        self.assertTrue(synthping_instance2.playing)
-        self.assertTrue(synthping_instance3.playing)
-        self.assertTrue(synthping_instance4.playing)
-        synthping_instance5 = synthping.play()
-        self.advance_time(0.25)
-        self.assertFalse(synthping_instance1.playing)
-        self.assertFalse(synthping_instance2.playing)
-        self.assertTrue(synthping_instance3.playing)
-        self.assertTrue(synthping_instance4.playing)
-        self.assertTrue(synthping_instance5.playing)
+        synthping_instance1 = synthping.play(
+            {'events_when_played': ['synthping_instance1_played'],
+             'events_when_stopped': ['synthping_instance1_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played')])
+
+        synthping_instance2 = synthping.play(
+            {'events_when_played': ['synthping_instance2_played'],
+             'events_when_stopped': ['synthping_instance2_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played'),
+                                                     call('trigger', name='synthping_instance2_played')])
+
+        synthping_instance3 = synthping.play(
+            {'events_when_played': ['synthping_instance3_played'],
+             'events_when_stopped': ['synthping_instance3_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played'),
+                                                     call('trigger', name='synthping_instance2_played'),
+                                                     call('trigger', name='synthping_instance3_played')])
+
+        synthping_instance4 = synthping.play(
+            {'events_when_played': ['synthping_instance4_played'],
+             'events_when_stopped': ['synthping_instance4_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played'),
+                                                     call('trigger', name='synthping_instance2_played'),
+                                                     call('trigger', name='synthping_instance3_played'),
+                                                     call('trigger', name='synthping_instance1_stopped'),
+                                                     call('trigger', name='synthping_instance4_played')])
+
+        synthping_instance5 = synthping.play(
+            {'events_when_played': ['synthping_instance5_played'],
+             'events_when_stopped': ['synthping_instance5_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played'),
+                                                     call('trigger', name='synthping_instance2_played'),
+                                                     call('trigger', name='synthping_instance3_played'),
+                                                     call('trigger', name='synthping_instance1_stopped'),
+                                                     call('trigger', name='synthping_instance4_played'),
+                                                     call('trigger', name='synthping_instance2_stopped'),
+                                                     call('trigger', name='synthping_instance5_played')])
+
+        self.assertTrue(synthping_instance1.played)
+        self.assertTrue(synthping_instance2.played)
+        self.assertTrue(synthping_instance3.played)
+        self.assertTrue(synthping_instance4.played)
+        self.assertTrue(synthping_instance5.played)
+
+        track_sfx.stop_all_sounds()
+        self.advance_time()
 
         # Test newest stealing method
+        self.mc.bcp_processor.send.reset_mock()
         self.assertIn('198361_sfx-028', self.mc.sounds)  # .wav
         sfx = self.mc.sounds['198361_sfx-028']
+        if not sfx.loaded:
+            if not sfx.loading:
+                sfx.load()
+            self.advance_time(1)
         self.assertEqual(sfx.max_instances, 3)
         if SoundStealingMethod is not None:
             self.assertEqual(sfx.stealing_method, SoundStealingMethod.newest)
 
-        sfx_instance1 = sfx.play()
-        self.advance_time(0.25)
-        self.assertTrue(sfx_instance1.playing)
-        sfx_instance2 = sfx.play()
-        self.advance_time(0.25)
-        self.assertTrue(sfx_instance1.playing)
-        self.assertTrue(sfx_instance2.playing)
-        sfx_instance3 = sfx.play()
-        self.advance_time(0.25)
-        self.assertTrue(sfx_instance1.playing)
-        self.assertTrue(sfx_instance2.playing)
-        self.assertTrue(sfx_instance3.playing)
-        sfx_instance4 = sfx.play()
-        self.advance_time(0.25)
-        self.assertTrue(sfx_instance1.playing)
-        self.assertTrue(sfx_instance2.playing)
-        self.assertFalse(sfx_instance3.playing)
-        self.assertTrue(sfx_instance4.playing)
-        sfx_instance5 = sfx.play()
-        self.advance_time(0.25)
-        self.assertTrue(sfx_instance1.playing)
-        self.assertTrue(sfx_instance2.playing)
-        self.assertFalse(sfx_instance3.playing)
-        self.assertFalse(sfx_instance4.playing)
-        self.assertTrue(sfx_instance5.playing)
+
+        sfx_instance1 = sfx.play(
+            {'events_when_played': ['sfx_instance1_played'],
+             'events_when_stopped': ['sfx_instance1_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played')])
+
+        sfx_instance2 = sfx.play(
+            {'events_when_played': ['sfx_instance2_played'],
+             'events_when_stopped': ['sfx_instance2_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played'),
+                                                     call('trigger', name='sfx_instance2_played')])
+
+        sfx_instance3 = sfx.play(
+            {'events_when_played': ['sfx_instance3_played'],
+             'events_when_stopped': ['sfx_instance3_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played'),
+                                                     call('trigger', name='sfx_instance2_played'),
+                                                     call('trigger', name='sfx_instance3_played')])
+
+        sfx_instance4 = sfx.play(
+            {'events_when_played': ['sfx_instance4_played'],
+             'events_when_stopped': ['sfx_instance4_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played'),
+                                                     call('trigger', name='sfx_instance2_played'),
+                                                     call('trigger', name='sfx_instance3_played'),
+                                                     call('trigger', name='sfx_instance3_stopped'),
+                                                     call('trigger', name='sfx_instance4_played')])
+
+        sfx_instance5 = sfx.play(
+            {'events_when_played': ['sfx_instance5_played'],
+             'events_when_stopped': ['sfx_instance5_stopped']})
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played'),
+                                                     call('trigger', name='sfx_instance2_played'),
+                                                     call('trigger', name='sfx_instance3_played'),
+                                                     call('trigger', name='sfx_instance3_stopped'),
+                                                     call('trigger', name='sfx_instance4_played'),
+                                                     call('trigger', name='sfx_instance4_stopped'),
+                                                     call('trigger', name='sfx_instance5_played')])
+
+        self.assertTrue(sfx_instance1.played)
+        self.assertTrue(sfx_instance2.played)
+        self.assertTrue(sfx_instance3.played)
+        self.assertTrue(sfx_instance4.played)
+        self.assertTrue(sfx_instance5.played)
 
         # Stop all sounds playing on the sfx track to start the next test
         track_sfx.stop_all_sounds()
         self.advance_time()
+        self.mc.bcp_processor.send.reset_mock()
         self.assertEqual(track_sfx.get_sound_players_in_use_count(), 0)
         self.assertEqual(track_sfx.get_sound_queue_count(), 0)
 
@@ -434,13 +513,20 @@ class TestAudio(MpfMcTestCase):
         if SoundStealingMethod is not None:
             self.assertEqual(drum_group.stealing_method, SoundStealingMethod.skip)
 
-        drum_group_instance1 = drum_group.play()
-        drum_group_instance2 = drum_group.play()
-        drum_group_instance3 = drum_group.play()
-        drum_group_instance4 = drum_group.play()
-        drum_group_instance5 = drum_group.play()
-
+        drum_group_instance1 = drum_group.play({'events_when_played': ['drum_group_instance1_played']})
+        drum_group_instance2 = drum_group.play({'events_when_played': ['drum_group_instance2_played']})
+        drum_group_instance3 = drum_group.play({'events_when_played': ['drum_group_instance3_played']})
+        drum_group_instance4 = drum_group.play({'events_when_played': ['drum_group_instance4_played']})
+        drum_group_instance5 = drum_group.play({'events_when_played': ['drum_group_instance5_played']})
         self.advance_time()
+
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance1_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance2_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance3_played')
+        with self.assertRaises(AssertionError):
+            self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance4_played')
+            self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance5_played')
+
         self.assertTrue(drum_group_instance1.played)
         self.assertTrue(drum_group_instance2.played)
         self.assertTrue(drum_group_instance3.played)
