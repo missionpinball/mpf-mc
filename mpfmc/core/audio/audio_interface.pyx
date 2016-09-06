@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev10')
+__version_info__ = ('0', '31', '0', 'dev11')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -715,7 +715,7 @@ cdef class AudioInterface:
 
             # Call the track's mix function (based on track type)
             if track.type == track_type_standard:
-                standard_track_mix_playing_sounds(track, callback_data)
+                standard_track_mix_playing_sounds(track, buffer_length, callback_data)
             elif track.type == track_type_playlist:
                 # TODO: Implement track mix function call
                 pass
@@ -931,16 +931,16 @@ cdef void process_live_loop_track_request_message(RequestMessageContainer *reque
     # Clear request message since it has been processed
     request_message.message = request_not_in_use
 
-cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData *callback_data) nogil:
+cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil:
     """
     Mixes any sounds that are playing on the specified standard track into the specified audio buffer.
     Args:
         track: A pointer to the TrackState data structure for the track
+        buffer_length: The length of the output buffer (in bytes)
         callback_data: The audio callback data structure
     Notes:
         Notification messages are generated.
     """
-    cdef Uint32 buffer_size
     cdef TrackStandardState *standard_track
 
     if track == NULL or track.type != track_type_standard:
@@ -966,9 +966,8 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
     cdef int track_num
     cdef int marker_id
 
-    buffer_size = <Uint32>track.buffer_size
     standard_track = <TrackStandardState*>track.type_state
-    samples_per_control_point = buffer_size // CONTROL_POINTS_PER_BUFFER
+    samples_per_control_point = buffer_length // CONTROL_POINTS_PER_BUFFER
 
     # Loop over track sound players
     for player in range(standard_track.sound_player_count):
@@ -995,7 +994,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
             volume = standard_track.sound_players[player].current.volume
 
             # Loop over destination buffer, mixing in the source sample
-            while buffer_pos < buffer_size:
+            while buffer_pos < buffer_length:
 
                 # Calculate volume at the control rate (handle fading)
                 if (buffer_pos % samples_per_control_point) == 0:
@@ -1036,7 +1035,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
 
             sound_samples_remaining = standard_track.sound_players[player].current.chunk.alen - standard_track.sound_players[
                 player].current.sample_pos
-            fade_out_duration = min(buffer_size,
+            fade_out_duration = min(buffer_length,
                                     <Uint32>(callback_data.sample_rate * callback_data.audio_channels *
                                           QUICK_FADE_DURATION_SECS),
                                     sound_samples_remaining)
@@ -1125,7 +1124,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
         # Process markers (do any markers fall in the current processing window?)
         for marker_id in range(standard_track.sound_players[player].current.marker_count):
             if standard_track.sound_players[player].current.sample_pos <= standard_track.sound_players[player].current.markers[
-                marker_id] < standard_track.sound_players[player].current.sample_pos + buffer_size:
+                marker_id] < standard_track.sound_players[player].current.sample_pos + buffer_length:
 
                 # Marker is in window, send notification
                 send_sound_marker_notification(track.number, player,
@@ -1202,7 +1201,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, AudioCallbackData
 
             # Loop over destination buffer, mixing in the source sample
             volume = standard_track.sound_players[player].current.volume
-            while buffer_pos < buffer_size:
+            while buffer_pos < buffer_length:
 
                 # Calculate volume at the control rate (handle fading)
                 if (buffer_pos % samples_per_control_point) == 0:
