@@ -82,7 +82,7 @@ class SoundSystem(object):
 
         # Initialize audio interface library (get audio output)
         try:
-            self.audio_interface = AudioInterface.initialize(
+            self.audio_interface = AudioInterface(
                 mc=self.mc,
                 rate=self.config['frequency'],
                 channels=self.config['channels'],
@@ -131,6 +131,7 @@ class SoundSystem(object):
             self.audio_interface = None
 
         self._initialized = False
+        self.mc.sound_system = None
 
     @property
     def enabled(self):

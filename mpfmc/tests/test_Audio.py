@@ -28,7 +28,7 @@ class TestAudio(MpfMcTestCase):
     def test_typical_sound_system(self):
         """ Tests the sound system and audio interface with typical settings """
 
-        if SoundSystem is None:
+        if SoundSystem is None or self.mc.sound_system is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
@@ -212,7 +212,7 @@ class TestAudio(MpfMcTestCase):
     def test_mode_sounds(self):
         """ Test the sound system using sounds specified in a mode """
 
-        if SoundSystem is None:
+        if SoundSystem is None or self.mc.sound_system is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
@@ -243,7 +243,7 @@ class TestAudio(MpfMcTestCase):
     def test_sound_fading(self):
         """ Tests the fading of sounds"""
 
-        if SoundSystem is None:
+        if SoundSystem is None or self.mc.sound_system is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
@@ -303,7 +303,7 @@ class TestAudio(MpfMcTestCase):
     def test_sound_start_at(self):
         """ Tests starting a sound at a position other than the beginning"""
 
-        if SoundSystem is None:
+        if SoundSystem is None or self.mc.sound_system is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
@@ -333,7 +333,7 @@ class TestAudio(MpfMcTestCase):
     def test_sound_instance_management(self):
         """ Tests instance management of sounds"""
 
-        if SoundSystem is None:
+        if SoundSystem is None or self.mc.sound_system is None:
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")

@@ -210,10 +210,8 @@ cdef class AudioInterface:
         SDL_DestroyMutex(self.audio_callback_data.mutex)
         PyMem_Free(self.audio_callback_data)
 
-        # SDL_Mixer and SDL no longer needed
+        # SDL_Mixer no longer needed
         Mix_Quit()
-        SDL_Quit()
-
 
     @staticmethod
     def initialize(int rate=44100, int channels=2, int buffer_samples=4096, **kwargs):
