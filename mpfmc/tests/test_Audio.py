@@ -270,13 +270,13 @@ class TestAudio(MpfMcTestCase):
 
         self.assertTrue(music.loaded)
         instance1 = music.play({'fade_in': 2.0, 'volume': 1.0})
-        self.advance_time(1)
+        self.advance_time()
 
         status = track_music.get_status()
         self.assertEqual(status[0]['sound_instance_id'], instance1.id)
         self.assertEqual(status[0]['status'], "playing")
         self.assertEqual(status[0]['fading_status'], "fade in")
-        self.advance_time(1)
+        self.advance_time(2)
 
         instance1.stop(1)
         self.advance_time()
