@@ -112,26 +112,8 @@ class SoundSystem(object):
         self.audio_interface.enable()
         self._initialized = True
 
-        self.mc.events.add_handler("shutdown", self.shutdown)
         self.mc.events.add_handler("master_volume_increase", self.master_volume_increase)
         self.mc.events.add_handler("master_volume_decrease", self.master_volume_decrease)
-
-    def __del__(self):
-        """Disable sound system/clean up"""
-        self.shutdown()
-
-    def shutdown(self):
-        """Shut down sound system/clean up"""
-        if self.clock_event is not None:
-            self.clock_event.cancel()
-
-        if self.audio_interface is not None:
-            self.audio_interface.shutdown()
-            del self.audio_interface
-            self.audio_interface = None
-
-        self._initialized = False
-        self.mc.sound_system = None
 
     @property
     def enabled(self):

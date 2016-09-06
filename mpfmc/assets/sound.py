@@ -351,7 +351,6 @@ class SoundAsset(Asset):
 
     def __del__(self):
         """Destructor"""
-
         self.stop(0)
         self.unload()
 
