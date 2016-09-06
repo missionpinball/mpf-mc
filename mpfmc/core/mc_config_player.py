@@ -12,9 +12,6 @@ class McConfigPlayer(DeviceConfigPlayer, metaclass=abc.ABCMeta):
     show_section = None
     machine_collection_name = None
 
-    show_players = dict()
-    config_file_players = dict()
-
     def __init__(self, machine):
         super().__init__(machine)
 
