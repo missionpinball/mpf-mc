@@ -261,11 +261,14 @@ class TestAudio(MpfMcTestCase):
 
         self.assertIn('263774_music', self.mc.sounds)       # .wav
         music = self.mc.sounds['263774_music']
-        if not music.loaded:
+        retry_count = 10
+        while not music.loaded and retry_count > 0:
             if not music.loading:
                 music.load()
-            self.advance_time(1.5)
+            self.advance_time(0.5)
+            retry_count -= 1
 
+        self.assertTrue(music.loaded)
         instance1 = music.play({'fade_in': 2.0, 'volume': 1.0})
         self.advance_time(1)
 
