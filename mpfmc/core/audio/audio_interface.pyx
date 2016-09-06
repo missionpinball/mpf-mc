@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '30', '1')
+__version_info__ = ('0', '30', '2')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdlib cimport malloc, free, calloc
@@ -1636,10 +1636,13 @@ cdef class Track:
                                next_sound)
             else:
                 # Remove the queue entry from the list of sounds in the queue
-                if next_sound in self._sound_queue_items[next_sound[2]]:
-                    self._sound_queue_items[next_sound[2]].remove(next_sound)
-                    if len(self._sound_queue_items[next_sound[2]]) == 0:
-                        del self._sound_queue_items[next_sound[2]]
+                try:
+                    if next_sound in self._sound_queue_items[next_sound[2]]:
+                        self._sound_queue_items[next_sound[2]].remove(next_sound)
+                        if len(self._sound_queue_items[next_sound[2]]) == 0:
+                            del self._sound_queue_items[next_sound[2]]
+                except KeyError:
+                    pass
 
                 # Return the next sound from the priority queue if it has not expired
                 if not next_sound[1] or next_sound[1] > time.time():
