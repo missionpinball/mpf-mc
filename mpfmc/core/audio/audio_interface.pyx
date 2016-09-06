@@ -185,7 +185,10 @@ cdef class AudioInterface:
         self.tracks = []
 
     def __del__(self):
+        self.shutdown()
 
+    def shutdown(self):
+        """Shut down the audio interface and clean up allocated memory"""
         self.log.debug("Shutting down and cleaning up allocated memory...")
 
         # Stop audio processing (will stop all SDL callbacks)
@@ -210,6 +213,7 @@ cdef class AudioInterface:
         # SDL_Mixer and SDL no longer needed
         Mix_Quit()
         SDL_Quit()
+
 
     @staticmethod
     def initialize(int rate=44100, int channels=2, int buffer_samples=4096, **kwargs):
