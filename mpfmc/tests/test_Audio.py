@@ -260,29 +260,40 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(2)
 
         self.assertIn('263774_music', self.mc.sounds)       # .wav
+        music = self.mc.sounds['263774_music']
+        if not music.loaded:
+            if not music.loading:
+                music.load()
+            self.advance_time(1.5)
 
-        settings = { 'fade_in': 3.0, 'volume': 1.0 }
-        instance = self.mc.sounds['263774_music'].play(settings)
-        self.advance_time(2)
+        instance1 = music.play({'fade_in': 2.0, 'volume': 1.0})
+        self.advance_time(1)
 
         status = track_music.get_status()
-        self.assertEqual(status[0]['sound_instance_id'], instance.id)
+        self.assertEqual(status[0]['sound_instance_id'], instance1.id)
         self.assertEqual(status[0]['status'], "playing")
         self.assertEqual(status[0]['fading_status'], "fade in")
+        self.advance_time(1)
 
-        self.advance_time(2)
-        status = track_music.get_status()
-        self.assertEqual(status[0]['status'], "playing")
-        self.assertEqual(status[0]['fading_status'], "not fading")
-
-        instance.stop(2)
+        instance1.stop(1)
         self.advance_time()
         status = track_music.get_status()
         self.assertEqual(status[0]['status'], "stopping")
         self.assertEqual(status[0]['fading_status'], "fade out")
-        self.advance_time(0.9)
+        self.advance_time(1)
+        status = track_music.get_status()
+        self.assertEqual(status[0]['status'], "idle")
 
-        self.advance_time(1.2)
+        instance2 = music.play({'fade_in': 0, 'volume': 1.0})
+        self.advance_time(1)
+
+        status = track_music.get_status()
+        self.assertEqual(status[0]['sound_instance_id'], instance2.id)
+        self.assertEqual(status[0]['status'], "playing")
+        self.assertEqual(status[0]['fading_status'], "not fading")
+
+        instance2.stop(0)
+        self.advance_time(0.5)
         status = track_music.get_status()
         self.assertEqual(status[0]['status'], "idle")
 
