@@ -343,18 +343,10 @@ class SoundAsset(Asset):
             if self._ducking.attenuation == 1.0:
                 self._ducking = None
 
-        # Add sound to a dictionary of sound objects keyed by sound id
-        if not hasattr(self.machine, 'sounds_by_id'):
-            setattr(self.machine, 'sounds_by_id', dict())
-
-        self.machine.sounds_by_id[self.id] = self
-
     def __del__(self):
         """Destructor"""
         self.stop(0)
         self.unload()
-
-        del self.machine.sounds_by_id[self.id]
 
     def __repr__(self):
         """String that's returned if someone prints this object"""

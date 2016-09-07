@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev11')
+__version_info__ = ('0', '31', '0', 'dev12')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -69,6 +69,7 @@ cdef class AudioInterface:
     cdef list tracks
     cdef object mc
     cdef object log
+    cdef dict sound_instances_by_id
 
     cdef AudioCallbackData *audio_callback_data
 
@@ -80,7 +81,7 @@ cdef class AudioInterface:
         self.supported_formats = 0
         self.audio_callback_data = NULL
 
-    def __init__(self, mc, rate=44100, channels=2, buffer_samples=4096):
+    def __init__(self, rate=44100, channels=2, buffer_samples=4096):
         """
         Initializes the AudioInterface.
         Args:
@@ -88,7 +89,6 @@ cdef class AudioInterface:
             channels: The number of channels to use (1=mono, 2=stereo)
             buffer_samples: The audio buffer size to use (in number of samples, must be power of two)
         """
-        self.mc = mc
         self.log = logging.getLogger("AudioInterface")
 
         # Initialize threading in the extension library and acquire the Python global interpreter lock
@@ -182,7 +182,8 @@ cdef class AudioInterface:
         # Unlock the SDL audio callback functions
         SDL_UnlockAudio()
 
-        self.tracks = []
+        self.tracks = list()
+        self.sound_instances_by_id = dict()
 
     def __del__(self):
         """Shut down the audio interface and clean up allocated memory"""
@@ -498,7 +499,7 @@ cdef class AudioInterface:
         SDL_LockAudio()
 
         # Create the new standard track
-        new_track = TrackStandard(self.mc,
+        new_track = TrackStandard(self.sound_instances_by_id,
                                   pycapsule.PyCapsule_New(self.audio_callback_data, NULL, NULL),
                                   name,
                                   track_num,
@@ -766,7 +767,7 @@ cdef void process_request_messages(AudioCallbackData *callback_data) nogil:
 
     # Loop over messages
     for i in range(MAX_REQUEST_MESSAGES):
-        
+
         # Dispatch messages to recipient track's request message processing function
         if callback_data.request_messages[i].message != request_not_in_use:
             track_num = callback_data.request_messages[i].track
@@ -780,7 +781,7 @@ cdef void process_request_messages(AudioCallbackData *callback_data) nogil:
                 # process_live_loop_request_message(callback_data.request_messages[i], track)
                 # TODO: Implement track request message function call
                 pass
-        
+
 cdef void process_standard_track_request_message(RequestMessageContainer *request_message,
                                                  TrackState *track) nogil:
     """
@@ -834,7 +835,7 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
             standard_track.sound_players[player].current.ducking_settings.release_start_pos = request_message.data.play.ducking_settings.release_start_pos
             standard_track.sound_players[player].current.ducking_settings.release_duration = request_message.data.play.ducking_settings.release_duration
             standard_track.sound_players[player].current.ducking_stage = ducking_stage_delay
-        
+
         else:
             standard_track.sound_players[player].current.sound_has_ducking = False
 
@@ -901,7 +902,7 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
             standard_track.sound_players[player].next.ducking_settings.release_start_pos = request_message.data.play.ducking_settings.release_start_pos
             standard_track.sound_players[player].next.ducking_settings.release_duration = request_message.data.play.ducking_settings.release_duration
             standard_track.sound_players[player].next.ducking_stage = ducking_stage_delay
-        
+
         else:
             standard_track.sound_players[player].next.sound_has_ducking = False
 
@@ -1092,10 +1093,10 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
             standard_track.sound_players[player].current.loops_remaining = standard_track.sound_players[player].next.loops_remaining
             standard_track.sound_players[player].current.sound_priority = standard_track.sound_players[player].next.sound_priority
             standard_track.sound_players[player].current.marker_count = standard_track.sound_players[player].next.marker_count
-            
+
             for buffer_pos in range(standard_track.sound_players[player].current.marker_count):
                 standard_track.sound_players[player].current.markers[buffer_pos] = standard_track.sound_players[player].next.markers[buffer_pos]
-                
+
             if standard_track.sound_players[player].current.sound_has_ducking:
                 standard_track.sound_players[player].current.sound_has_ducking = True
                 standard_track.sound_players[player].current.ducking_settings.track_bit_mask = standard_track.sound_players[player].next.ducking_settings.track_bit_mask
@@ -1367,7 +1368,7 @@ cdef inline void send_sound_looping_notification(int track_num, int player,
         notification_messages[message_index].sound_instance_id = sound_instance_id
         notification_messages[message_index].time = sdl_ticks
 
-cdef inline void send_sound_marker_notification(int track_num, int player, 
+cdef inline void send_sound_marker_notification(int track_num, int player,
                                                 long sound_id, long sound_instance_id,
                                                 NotificationMessageContainer **notification_messages,
                                                 Uint32 sdl_ticks,
@@ -1612,7 +1613,7 @@ cdef class Track:
     """
     Track base class
     """
-    cdef object mc
+    cdef dict _sound_instances_by_id
     cdef str _name
     cdef int _number
     cdef AudioCallbackData *_audio_callback_data
@@ -1630,11 +1631,11 @@ cdef class Track:
         self._audio_callback_data = NULL
         self.mutex = NULL
 
-    def __init__(self, object mc, object audio_callback_data, str name, int track_num, int buffer_size, float volume=1.0):
+    def __init__(self, dict sound_instances_by_id, object audio_callback_data, str name, int track_num, int buffer_size, float volume=1.0):
         """
         Constructor
         Args:
-            mc: The media controller
+            sound_instances_by_id: A dictionary of all active sound instance objects keyed by id
             audio_callback_data: The AudioCallbackData pointer wrapped in a PyCapsule object
             name: The track name
             track_num: The track number (corresponds to the SDL_Mixer channel number)
@@ -1642,7 +1643,7 @@ cdef class Track:
             volume: The track volume (0.0 to 1.0)
         """
         self.log = logging.getLogger("Track")
-        self.mc = mc
+        self._sound_instances_by_id = sound_instances_by_id
         self._name = name
         self._number = track_num
 
@@ -1752,18 +1753,18 @@ cdef class TrackStandard(Track):
     cdef int _max_simultaneous_sounds
 
     # Track state needs to be stored in a C struct in order for them to be accessible in
-    # the SDL callback functions without the GIL (for performance reasons).  
-    # The TrackStandardState struct is allocated during construction and freed during 
+    # the SDL callback functions without the GIL (for performance reasons).
+    # The TrackStandardState struct is allocated during construction and freed during
     # destruction.
     cdef TrackStandardState *type_state
 
-    def __init__(self, object mc, object audio_callback_data, str name, int track_num, int buffer_size,
+    def __init__(self, dict sound_instances_by_id, object audio_callback_data, str name, int track_num, int buffer_size,
                  int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
                  float volume=1.0):
         """
         Constructor
         Args:
-            mc: The media controller object
+            sound_instances_by_id: A dictionary of all active sound instance objects keyed by id
             audio_callback_data: The AudioCallbackData struct wrapped in a PyCapsule
             name: The track name
             track_num: The track number
@@ -1773,7 +1774,7 @@ cdef class TrackStandard(Track):
             volume: The track volume (0.0 to 1.0)
         """
         # IMPORTANT: Call super class init function to allocate track state memory!
-        super().__init__(mc, audio_callback_data, name, track_num, buffer_size, volume)
+        super().__init__(sound_instances_by_id, audio_callback_data, name, track_num, buffer_size, volume)
 
         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard")
 
@@ -1931,41 +1932,34 @@ cdef class TrackStandard(Track):
             return
 
         if notification_message.message == notification_sound_started:
-            sound = self.mc.sounds_by_id[notification_message.sound_id]
-            if sound is not None:
-                sound_instance = sound.get_instance_by_id(notification_message.sound_instance_id)
-                if sound_instance is not None:
-                    sound_instance.set_playing()
+            sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
+            if sound_instance is not None:
+                sound_instance.set_playing()
 
             # Event has been processed, reset it so it may be used again
             notification_message.message = notification_not_in_use
 
         elif notification_message.message == notification_sound_stopped:
-            sound = self.mc.sounds_by_id[notification_message.sound_id]
-            if sound is not None:
-                sound_instance = sound.get_instance_by_id(notification_message.sound_instance_id)
-                if sound_instance is not None:
-                    sound_instance.set_stopped()
+            sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
+            if sound_instance is not None:
+                sound_instance.set_stopped()
+                del self._sound_instances_by_id[sound_instance.id]
 
             # Event has been processed, reset it so it may be used again
             notification_message.message = notification_not_in_use
 
         elif notification_message.message == notification_sound_looping:
-            sound = self.mc.sounds_by_id[notification_message.sound_id]
-            if sound is not None:
-                sound_instance = sound.get_instance_by_id(notification_message.sound_instance_id)
-                if sound_instance is not None:
-                    sound_instance.set_looping()
+            sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
+            if sound_instance is not None:
+                sound_instance.set_looping()
 
             # Event has been processed, reset it so it may be used again
             notification_message.message = notification_not_in_use
 
         elif notification_message.message == notification_sound_marker:
-            sound = self.mc.sounds_by_id[notification_message.sound_id]
-            if sound is not None:
-                sound_instance = sound.get_instance_by_id(notification_message.sound_instance_id)
-                if sound_instance is not None:
-                    sound_instance.set_marker(notification_message.data.marker.id)
+            sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
+            if sound_instance is not None:
+                sound_instance.set_marker(notification_message.data.marker.id)
 
             # Event has been processed, reset it so it may be used again
             notification_message.message = notification_not_in_use
@@ -2348,6 +2342,10 @@ cdef class TrackStandard(Track):
             # Set play sound event
             request_message = self._get_available_request_message()
             if request_message != NULL:
+
+                # Add sound to the dictionary of active sound instances
+                self._sound_instances_by_id[sound_instance.id] = sound_instance
+
                 if self.type_state.sound_players[player].status != player_idle:
                     request_message.message = request_sound_replace
                 else:
