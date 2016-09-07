@@ -107,8 +107,8 @@ Here are several various examples:
             if s['action'].lower() == 'play':
                 sound_instance = sound.play(s)
                 if sound_instance is None:
-                    self.machine.log.warning("SoundPlayer: The specified sound "
-                                             "could not be played ('{}').".format(sound_name))
+                    self.machine.log.info("SoundPlayer: The specified sound "
+                                          "could not be played ('{}').".format(sound_name))
                 else:
                     sound_instance.add_finished_handler(self.on_sound_instance_finished, 1,
                                                         context=context)
