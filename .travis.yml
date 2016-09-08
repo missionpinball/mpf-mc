@@ -22,8 +22,8 @@ install:
       sudo apt-get -y install xvfb pulseaudio;
       pip install --upgrade cython pillow coveralls setuptools;
       pip install kivy;
-      git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git
-      pip install -e mpf/
+      git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git;
+      pip install -e mpf/;
       python setup.py install;
    fi;
 
