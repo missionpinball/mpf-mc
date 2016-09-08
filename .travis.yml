@@ -56,7 +56,7 @@ before_script:
 
 script:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-      coverage run -m unittest discover -s mpfmc/tests;
+      which coverage && coverage run -m unittest discover -s mpfmc/tests;
     fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
