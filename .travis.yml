@@ -23,10 +23,8 @@ install:
       pip3 install --upgrade cython pillow coveralls setuptools;
       pip3 install kivy;
       git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git;
-      echo "Install MPF";
       pip3 install -e mpf/;
-      echo "Install MPF-MC";
-      python setup.py install;
+      python3 setup.py install;
    fi;
 
  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
