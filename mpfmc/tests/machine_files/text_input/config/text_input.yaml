@@ -17,7 +17,7 @@ slides:
     key: key1
     style: score_entry
     animations:
-      entrance:
+      show_slide:
       - property: opacity
         value: 1
         duration: .25s

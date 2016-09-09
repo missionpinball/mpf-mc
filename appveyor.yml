@@ -17,7 +17,7 @@ environment:
 
 install:
   - "%PYTHON%\\python.exe -m pip install -U setuptools wheel pip mock gitpython twine"
-  - "git clone -q --branch=dev https://github.com/missionpinball/mpf.git C:\\projects\\mpf"
+  - "git clone -q --branch=dev --recursive https://github.com/missionpinball/mpf.git C:\\projects\\mpf"
 
   - "cd build_scripts"
   - "%PYTHON%\\python.exe calculate_mpf_branch.py"

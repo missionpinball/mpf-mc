@@ -8,12 +8,6 @@ displays:
     width: 128
     height: 32
 
-physical_dmd:  # not yet implemented
-  width: 132
-  height: 28
-  physical: no
-  shades: 16
-
 slides:
   slide1:
     - type: dmd
@@ -40,7 +34,7 @@ slides:
       anchor_x: center
       x: 128
       animations:
-        entrance:
+        show_slide:
           - property: x
             value: 10%
             duration: .25s

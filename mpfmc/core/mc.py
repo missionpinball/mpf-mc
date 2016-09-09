@@ -179,6 +179,9 @@ class MpfMc(App):
 
     def clear_boot_hold(self, hold):
         # print('clearing boot hold', hold)
+        if self.is_init_done:
+            self.log.warn("clear boot hold after init done")
+            return
         self._boot_holds.remove(hold)
         if not self._boot_holds:
             self.init_done()

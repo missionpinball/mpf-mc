@@ -20,10 +20,11 @@ install:
       sudo apt-get update;
       sudo apt-get -y install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer0.10-plugins-{good,base,bad,ugly} libgstreamer0.10-dev libxine1-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff4-dev libX11-dev libmtdev-dev build-essential libgl1-mesa-dev libgles2-mesa-dev;
       sudo apt-get -y install xvfb pulseaudio;
-      pip install --upgrade cython pillow coveralls setuptools;
-      pip install kivy;
-      pip install https://github.com/missionpinball/mpf/zipball/${TRAVIS_BRANCH} || pip install https://github.com/missionpinball/mpf/zipball/`python3 get_version.py` || pip install https://github.com/missionpinball/mpf/zipball/dev;
-      python setup.py install;
+      pip3 install --upgrade cython pillow coveralls setuptools;
+      pip3 install kivy;
+      git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
+      pip3 install -e _mpf/;
+      python3 setup.py install;
    fi;
 
  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
@@ -31,13 +32,13 @@ install:
       brew install python3;
       brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
       pip3 install -I Cython==0.23;
-      pip install https://github.com/missionpinball/mpf/zipball/${TRAVIS_BRANCH} || pip install https://github.com/missionpinball/mpf/zipball/`python3 get_version.py` || pip install https://github.com/missionpinball/mpf/zipball/dev;
+      git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
+      pip3 install -e _mpf/;
       USE_OSX_FRAMEWORKS=0 pip3 install kivy;
       pip3 install wheel setuptools --upgrade;
       USE_OSX_FRAMEWORKS=0 pip3 install .;
 
     fi;
- - pip3 install https://github.com/pyserial/pyserial-asyncio/archive/master.zip
 
 before_script:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
@@ -55,7 +56,7 @@ before_script:
 
 script:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-      coverage run -m unittest discover -s mpfmc/tests;
+      coverage3 run -m unittest discover -s mpfmc/tests;
     fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
