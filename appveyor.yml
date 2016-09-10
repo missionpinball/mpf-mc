@@ -41,8 +41,8 @@ install:
 build: off
 
 test_script:
-#  - "%PYTHON%\\python.exe -m unittest discover mpfmc"
-  - "echo SKIPPING TESTS"
+  - "cd c:\\projects\\mpf-mc; %PYTHON%\\python.exe -m unittest discover -s mpfmc/tests"
+#  - "echo SKIPPING TESTS"
 
 after_test:
   - "%PYTHON%\\python.exe setup.py bdist_wheel --plat-name %PLAT_NAME%"
