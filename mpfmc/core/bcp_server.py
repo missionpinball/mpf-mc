@@ -150,15 +150,14 @@ class BCPServer(threading.Thread):
                         pass
 
                     except OSError:
-                        if self.mc.machine_config['mpf-mc'][
-                                'exit_on_disconnect']:
-                            self.mc.stop()
-                        else:
-                            break
+                        break
 
                 # close connection. while loop will not exit if this is not intended.
                 self.connection.close()
                 self.connection = None
+
+                # always exit
+                return self.mc.stop()
 
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
