@@ -101,7 +101,7 @@ class McWidgetPlayer(McConfigPlayer):
         try:
             slide = self._get_slide(s)
         except SlideNotActiveError:
-            slide = None
+            return
 
         if s['key']:
             key = s['key']
