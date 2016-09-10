@@ -41,7 +41,7 @@ install:
 build: off
 
 test_script:
-  - "cd c:\\projects\\mpf-mc; %PYTHON%\\python.exe -m unittest discover -s mpfmc/tests"
+  - "%PYTHON%\\python.exe -m unittest discover -s mpfmc/tests"
 #  - "echo SKIPPING TESTS"
 
 after_test:
