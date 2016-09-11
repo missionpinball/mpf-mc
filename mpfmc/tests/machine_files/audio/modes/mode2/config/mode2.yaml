@@ -1,0 +1,12 @@
+# config_version=4
+
+mode:
+  priority: 500
+
+sounds:
+    boing_mode2:
+        file: 140867__juskiddink__boing.wav
+        events_when_played: boing_sound_played
+
+sound_player:
+    play_sound_boing_in_mode2: boing_mode2

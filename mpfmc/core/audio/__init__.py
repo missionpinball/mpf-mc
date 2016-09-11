@@ -1,13 +1,14 @@
 """Audio module provides all the audio features (playing of sounds) for the media controller."""
+import logging
+
 from kivy.clock import Clock
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException, Track
-import logging
 
 __all__ = ('SoundSystem',
            'AudioInterface',
            'AudioException',
            'Track',
-           )
+          )
 
 # ---------------------------------------------------------------------------
 #    Default sound system and track values
@@ -21,6 +22,7 @@ DEFAULT_TRACK_MAX_SIMULTANEOUS_SOUNDS = 1
 DEFAULT_TRACK_VOLUME = 0.5
 
 
+# pylint: disable=too-many-instance-attributes
 class SoundSystem(object):
 
     """Sound system for MPF.
@@ -30,6 +32,7 @@ class SoundSystem(object):
     specified tracks.
     """
 
+    # pylint: disable=invalid-name, too-many-branches
     def __init__(self, mc):
         """Initialise sound system."""
         self.mc = mc
@@ -39,6 +42,7 @@ class SoundSystem(object):
         self.config = {}
         self.tracks = {}
         self.sound_events = {}
+        self.clock_event = None
 
         self.log.debug("Loading the Sound System")
 
@@ -78,8 +82,7 @@ class SoundSystem(object):
 
         # Initialize audio interface library (get audio output)
         try:
-            self.audio_interface = AudioInterface.initialize(
-                mc=self.mc,
+            self.audio_interface = AudioInterface(
                 rate=self.config['frequency'],
                 channels=self.config['channels'],
                 buffer_samples=self.config['buffer'])
@@ -95,15 +98,14 @@ class SoundSystem(object):
                 self._create_track(track_name, track_config)
         else:
             self._create_track('default')
+            self.log.warning("No audio tracks are specified in your machine config file. "
+                             "a track named 'default' has been created.")
 
         # Set initial master volume level
         self.master_volume = self.config['master_volume']
 
         # Establish machine tick function callback (will process internal audio events)
-        Clock.schedule_interval(self.tick, 0)
-
-        # Establish event callback functions
-        # Setup event triggers (sound events trigger BCP triggers)
+        self.clock_event = Clock.schedule_interval(self.tick, 0)
 
         # Start audio engine processing
         self.audio_interface.enable()
@@ -124,7 +126,7 @@ class SoundSystem(object):
 
     @master_volume.setter
     def master_volume(self, value: float):
-        """Set master colume."""
+        """Set master volume."""
         # Constrain volume to the range 0.0 to 1.0
         value = min(max(value, 0.0), 1.0)
         self.audio_interface.set_master_volume(value)
@@ -162,43 +164,51 @@ class SoundSystem(object):
                 "voice" or "sfx".
             config: A Python dictionary containing the configuration settings for
                 this track.
-
-        Returns:
-            True if the track was successfully created, False otherwise
         """
         if self.audio_interface is None:
-            self.log.error("Could not create '%s' track - the audio interface has "
-                           "not been initialized", name)
-            return False
+            raise AudioException("Could not create '{}' track - the sound_system has "
+                                 "not been initialized".format(name))
 
         # Validate track config parameters
         if name in self.tracks:
-            self.log.error("Could not create '%s' track - a track with that name "
-                           "already exists", name)
-            return False
+            raise AudioException("Could not create '{}' track - a track with that name "
+                                 "already exists".format(name))
 
         if config is None:
             config = {}
 
-        if 'simultaneous_sounds' not in config:
-            config['simultaneous_sounds'] = DEFAULT_TRACK_MAX_SIMULTANEOUS_SOUNDS
-
         if 'volume' not in config:
             config['volume'] = DEFAULT_TRACK_VOLUME
 
-        # Create the track
-        track = self.audio_interface.create_track(name,
-                                                  config['simultaneous_sounds'],
-                                                  config['volume'])
+        if 'type' not in config:
+            config['type'] = 'standard'
+
+        if config['type'] not in ['standard', 'playlist', 'live_loop']:
+            raise AudioException("Could not create '{}' track - an illegal value for "
+                                 "'type' was found".format(name))
+
+        # Validate type-specific parameters and create the track
+        track = None
+        if config['type'] == 'standard':
+            if 'simultaneous_sounds' not in config:
+                config['simultaneous_sounds'] = DEFAULT_TRACK_MAX_SIMULTANEOUS_SOUNDS
+
+            track = self.audio_interface.create_standard_track(name,
+                                                               config['simultaneous_sounds'],
+                                                               config['volume'])
+        elif config['type'] == 'playlist':
+            # TODO: Implement playlist track create
+            raise NotImplementedError('Playlist track not yet implemented')
+
+        elif config['type'] == 'live_loop':
+            track = self.audio_interface.create_live_loop_track(name, config['volume'])
+
         if track is None:
-            return False
+            raise AudioException("Could not create '{}' track due to an error".format(name))
 
         self.tracks[name] = track
-        return True
-
-    def sound_loaded_callback(self):
-        pass
 
     def tick(self, dt):
+        """Clock callback function"""
         del dt
         self.audio_interface.process()

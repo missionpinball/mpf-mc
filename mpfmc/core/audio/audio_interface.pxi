@@ -113,29 +113,21 @@ cdef extern from "SDL_mixer.h" nogil:
     int Mix_Init(int)
     void Mix_Quit()
     int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
-    void Mix_Pause(int channel)
-    void Mix_Resume(int channel)
     void Mix_CloseAudio()
-    int Mix_Playing(int channel)
-    int Mix_Paused(int channel)
-    int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
-    int Mix_HaltChannel(int channel)
-    int Mix_FadeInChannel(int channel, Mix_Chunk *chunk, int loops, int ms)
-    int  Mix_FadeOutChannel(int channel, int ms)
     char *Mix_GetError()
     const SDL_version *Mix_Linked_Version()
-    ctypedef void (*Mix_EffectFunc_t)(int, void *, int, void *)
-    ctypedef void (*Mix_EffectDone_t)(int, void *)
-    int Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void * arg)
-    int Mix_UnregisterAllEffects(int chan)
-    int Mix_AllocateChannels(int numchans)
     Mix_Chunk *Mix_QuickLoad_RAW(Uint8 *mem, Uint32 l)
     Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
     Mix_Chunk *Mix_LoadWAV(char *file)
     void Mix_FreeChunk(Mix_Chunk *chunk)
     int Mix_QuerySpec(int *frequency, Uint16 *format,int *channels)
-    int Mix_Volume(int chan, int volume)
+    void Mix_HookMusic(void (*mix_func)(void *, Uint8 *, int), void *arg)
+    void *Mix_GetMusicHookData()
 
+
+# ---------------------------------------------------------------------------
+#    Helper structures
+# ---------------------------------------------------------------------------
 
 # The following declarations are not from SDL/SDL_Mixer, but are application-
 # specific data structures used in the MPF media controller audio library:
@@ -155,48 +147,82 @@ cdef union Sample16Bit:
     Sint16 value
     Sample16Bytes bytes
 
-ctypedef struct TrackAttributes:
+
+# ---------------------------------------------------------------------------
+#    Settings
+# ---------------------------------------------------------------------------
+
+# The number of control points per audio buffer (sets control rate for ducking)
+DEF CONTROL_POINTS_PER_BUFFER = 8
+
+# The maximum number of markers that can be specified for a single sound
+DEF MAX_MARKERS = 8
+
+
+# ---------------------------------------------------------------------------
+#    Track-related types
+# ---------------------------------------------------------------------------
+
+cdef enum TrackType:
+    # Enumeration of the possible track types
+    track_type_none,
+    track_type_standard,
+    track_type_playlist,
+    track_type_live_loop,
+
+ctypedef struct TrackState:
+    # Common track state variables (for all track types)
+    TrackType type
+    void* type_state
+    bint active
     int number
-    int max_simultaneous_sounds
     Uint8 volume
-    void *buffer
     int buffer_size
+    void *buffer
+    bint ducking_is_active
+    Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
+
+
+# ---------------------------------------------------------------------------
+#    Standard Track types
+# ---------------------------------------------------------------------------
+
+ctypedef struct TrackStandardState:
+    # State variables for TrackStandard tracks
+    int sound_player_count
     SoundPlayer *sound_players
-    DuckingEnvelope **ducking_envelopes
 
 cdef enum SoundPlayerStatus:
-    # Enumeration of the possible AudioSamplePlayer status values.
+    # Enumeration of the possible sound player status values.
     player_idle,
     player_pending,
     player_replacing,
+    player_fading_in,
+    player_fading_out,
     player_playing,
     player_finished,
     player_stopping,
 
 ctypedef struct DuckingSettings:
-    int track
-    int envelope_num
+    int track_bit_mask
     Sint32 attack_start_pos
     Sint32 attack_duration
     Uint8 attenuation_volume
     Sint32 release_start_pos
     Sint32 release_duration
 
-ctypedef struct DuckingEnvelope:
-    DuckingEnvelopeStage stage
-    Sint32 stage_pos
-    Sint32 stage_duration
-    Uint8 stage_initial_volume
-    Uint8 stage_target_volume
-    Uint8 current_volume
+cdef enum DuckingStage:
+    ducking_stage_idle,
+    ducking_stage_delay,
+    ducking_stage_attack,
+    ducking_stage_hold,
+    ducking_stage_release,
+    ducking_stage_finished
 
-cdef enum DuckingEnvelopeStage:
-    envelope_stage_idle,
-    envelope_stage_delay,
-    envelope_stage_attack,
-    envelope_stage_sustain,
-    envelope_stage_release,
-    envelope_stage_finished
+cdef enum FadingStatus:
+    fading_status_not_fading,
+    fading_status_fading_in,
+    fading_status_fading_out
 
 ctypedef struct SoundSettings:
     Mix_Chunk *chunk
@@ -205,9 +231,18 @@ ctypedef struct SoundSettings:
     int current_loop
     Uint32 sample_pos
     long sound_id
+    long sound_instance_id
     int sound_priority
-    int sound_has_ducking
+    FadingStatus fading_status
+    Uint32 fade_in_steps
+    Uint32 fade_out_steps
+    Uint32 fade_steps_remaining
+    int marker_count
+    Uint32 markers[MAX_MARKERS]
+    bint sound_has_ducking
     DuckingSettings ducking_settings
+    DuckingStage ducking_stage
+    Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
 
 ctypedef struct SoundPlayer:
     # The SoundPlayer keeps track of the current sample position in the source audio
@@ -219,50 +254,108 @@ ctypedef struct SoundPlayer:
     int track_num
     int player
 
+
+# ---------------------------------------------------------------------------
+#    Live Loop Track types
+# ---------------------------------------------------------------------------
+
+ctypedef struct TrackLiveLoopState:
+    # State variables for TrackLiveLoop tracks
+    SoundPlayer *master_sound_player
+    int slave_sound_player_count
+    SoundPlayer *slave_sound_players
+
+
+# ---------------------------------------------------------------------------
+#    Audio Callback Data type
+# ---------------------------------------------------------------------------
+
 ctypedef struct AudioCallbackData:
+    # A pointer to this struct is passed to the main audio callback function and
+    # is the only way data is made available to the main audio thread.  Must not
+    # contain any Python objects.
     int sample_rate
     int audio_channels
+    Uint32 buffer_size
     Uint8 master_volume
     int track_count
-    TrackAttributes **tracks
-    AudioMessageContainer **messages
+    TrackState **tracks
+    RequestMessageContainer **request_messages
+    NotificationMessageContainer **notification_messages
     SDL_mutex *mutex
+    FILE *c_log_file
 
-cdef enum AudioMessage:
-    message_not_in_use,               # Message is not in use and is available
-    message_sound_play,               # Request to play a sound
-    message_sound_replace,            # Request to play a sound that replaces a sound in progress
-    message_sound_stop,               # Request to stop a sound that is playing
-    message_sound_started,            # Notification that a sound has started playing
-    message_sound_stopped,            # Notification that a sound has stopped
-    message_sound_looping,            # Notification that a sound is looping back to the beginning
-    message_sound_marker,             # Notification that a sound marker has been reached
-    message_track_ducking_start,      # Request to start ducking on a track (fade down)
-    message_track_ducking_stop,       # Request to stop ducking on a track (fade up)
 
-ctypedef struct AudioMessageDataPlaySound:
+# ---------------------------------------------------------------------------
+#    Request Message types
+# ---------------------------------------------------------------------------
+
+cdef enum RequestMessage:
+    request_not_in_use,               # Message is not in use and is available
+    request_sound_play,               # Request to play a sound
+    request_sound_replace,            # Request to play a sound that replaces a sound in progress
+    request_sound_stop,               # Request to stop a sound that is playing
+    request_sound_stop_looping,       # Request to stop looping a sound that is playing
+
+
+ctypedef struct RequestMessageDataPlaySound:
     Mix_Chunk *chunk
     Uint8 volume
     int loops
     int priority
+    Uint32 start_at_position
+    Uint32 fade_in_duration
+    Uint32 fade_out_duration
+    int marker_count
+    Uint32 markers[MAX_MARKERS]
+    bint sound_has_ducking
+    DuckingSettings ducking_settings
 
-ctypedef struct AudioMessageDataStopSound:
-    int track
-    int player
+ctypedef struct RequestMessageDataStopSound:
+    Uint32 fade_out_duration
 
-ctypedef struct AudioMessageDataMarker:
-    int id
+ctypedef union RequestMessageData:
+    RequestMessageDataPlaySound play
+    RequestMessageDataStopSound stop
 
-ctypedef union AudioMessageData:
-    AudioMessageDataPlaySound play
-    AudioMessageDataStopSound stop
-    AudioMessageDataMarker marker
-
-ctypedef struct AudioMessageContainer:
-    AudioMessage message
+ctypedef struct RequestMessageContainer:
+    RequestMessage message
     long sound_id
+    long sound_instance_id
     int track
     int player
     Uint32 time
-    AudioMessageData data
+    RequestMessageData data
 
+
+# ---------------------------------------------------------------------------
+#    Notification Message types
+# ---------------------------------------------------------------------------
+
+cdef enum NotificationMessage:
+    notification_not_in_use,               # Message is not in use and is available
+    notification_sound_started,            # Notification that a sound has started playing
+    notification_sound_stopped,            # Notification that a sound has stopped
+    notification_sound_looping,            # Notification that a sound is looping back to the beginning
+    notification_sound_marker,             # Notification that a sound marker has been reached
+    notification_player_idle,              # Notification that a player is now idle and ready to play another sound
+
+ctypedef struct NotificationMessageDataLooping:
+    int loop_count
+    int loops_remaining
+
+ctypedef struct NotificationMessageDataMarker:
+    int id
+
+ctypedef union NotificationMessageData:
+    NotificationMessageDataLooping looping
+    NotificationMessageDataMarker marker
+
+ctypedef struct NotificationMessageContainer:
+    NotificationMessage message
+    long sound_id
+    long sound_instance_id
+    int track
+    int player
+    Uint32 time
+    NotificationMessageData data

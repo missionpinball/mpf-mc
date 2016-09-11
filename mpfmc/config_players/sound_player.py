@@ -57,6 +57,7 @@ Here are several various examples:
     show_section = 'sounds'
     machine_collection_name = 'sounds'
 
+    # pylint: disable=invalid-name
     def play(self, settings, context, priority=0, **kwargs):
         """Plays a validated sounds: section from a sound_player: section of a
         config file or the sounds: section of a show.
@@ -75,8 +76,8 @@ Here are several various examples:
         max_queue_time:
 
         Notes:
-            Ducking settings cannot currently be specified in the sound_player (they
-            must be specified in the sounds section of a config file.
+            Ducking settings and markers cannot currently be specified/overridden in the
+            sound_player (they must be specified in the sounds section of a config file).
 
         """
         instance_dict = self._get_instance_dict(context)
@@ -104,13 +105,20 @@ Here are several various examples:
 
             # Determine action to perform
             if s['action'].lower() == 'play':
-                sound.play(s)
-                instance_dict[sound_name] = sound
+                sound_instance = sound.play(s)
+                if sound_instance is None:
+                    self.machine.log.info("SoundPlayer: The specified sound "
+                                          "could not be played ('{}').".format(sound_name))
+                else:
+                    sound_instance.add_finished_handler(self.on_sound_instance_finished, 1,
+                                                        context=context)
+                    instance_dict[sound_instance.id] = sound_instance
 
             elif s['action'].lower() == 'stop':
-                sound.stop()
-                if sound_name in instance_dict:
-                    del instance_dict[sound_name]
+                if 'fade_out' in s:
+                    sound.stop(s['fade_out'])
+                else:
+                    sound.stop()
 
             elif s['action'].lower() == 'stop_looping':
                 sound.stop_looping()
@@ -123,6 +131,7 @@ Here are several various examples:
         """ express config for sounds is simply a string (sound name)"""
         return dict(sound=value)
 
+    # pylint: disable=too-many-branches
     def validate_config(self, config):
         """Validates the sound_player: section of a config file (either a
         machine-wide config or a mode config).
@@ -163,6 +172,32 @@ Here are several various examples:
                     validated_config[event]['sounds'].update(
                         self._validate_config_item(sound, sound_settings))
 
+                # Remove any items from the settings that were not explicitly provided in the
+                # sound_player config section (only want to override sound settings explicitly
+                # and not with any default values).  The default values for these items are not
+                # legal values and therefore we know the user did not provide them.
+                if sound_settings['priority'] is None:
+                    del sound_settings['priority']
+                if sound_settings['volume'] is None:
+                    del sound_settings['volume']
+                if sound_settings['loops'] is None:
+                    del sound_settings['loops']
+                if sound_settings['fade_in'] is None:
+                    del sound_settings['fade_in']
+                if sound_settings['fade_out'] is None:
+                    del sound_settings['fade_out']
+                if sound_settings['max_queue_time'] == -1:
+                    del sound_settings['max_queue_time']
+                if len(sound_settings['events_when_played']) == 1 and \
+                                sound_settings['events_when_played'][0] == 'ignore':
+                    del sound_settings['events_when_played']
+                if len(sound_settings['events_when_stopped']) == 1 and \
+                                sound_settings['events_when_stopped'][0] == 'ignore':
+                    del sound_settings['events_when_stopped']
+                if len(sound_settings['events_when_looping']) == 1 and \
+                                sound_settings['events_when_looping'][0] == 'ignore':
+                    del sound_settings['events_when_looping']
+
         return validated_config
 
     def _validate_config_item(self, device, device_settings):
@@ -174,10 +209,20 @@ Here are several various examples:
     def clear_context(self, context):
         """Stop all sounds from this context."""
         instance_dict = self._get_instance_dict(context)
-        for sound in instance_dict.values():
+        # Iterate over a copy of the dictionary values since it may be modified
+        # during the iteration process.
+        for sound in list(instance_dict.values()):
             sound.stop_looping()
         self._reset_instance_dict(context)
 
+    def on_sound_instance_finished(self, sound_instance_id, context, **kwargs):
+        """Callback function that is called when a sound instance triggered by the sound_player
+        is finished. Remove the specified sound instance from the list of current instances
+        started by the sound_player."""
+        del kwargs
+        instance_dict = self._get_instance_dict(context)
+        if sound_instance_id in instance_dict:
+            del instance_dict[sound_instance_id]
 
 class MpfSoundPlayer(PluginPlayer):
     """Base class for part of the sound player which runs as part of MPF.
