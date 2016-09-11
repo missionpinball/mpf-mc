@@ -9,8 +9,19 @@ slide_player:
   show_slide_mode2:
     slide_mode2:
       action: play
+  show_slide_mode2_frame:
+    slide_mode2_frame:
+      action: play
+  remove_slide_mode2_frame:
+    slide_mode2_frame:
+      action: remove
 
 slides:
   slide_mode2:
   - type: text
     text: Slide Mode2
+  slide_mode2_frame:
+  - type: slide_frame
+    name: frame_mode2
+    width: 800
+    height: 600

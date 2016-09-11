@@ -14,3 +14,17 @@ widgets:
   widget_mode1:
     type: text
     text: Widget Mode 1
+
+slide_player:
+  play_slide_mode1_on_frame_mode2:
+    slide_mode1:
+      target: frame_mode2
+  remove_slide_mode1_on_frame_mode2:
+    slide_mode1:
+      action: remove
+      target: frame_mode2
+
+slides:
+  slide_mode1:
+  - type: text
+    text: Slide Mode 1

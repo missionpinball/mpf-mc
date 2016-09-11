@@ -1,3 +1,7 @@
+import gc
+
+import sys
+
 from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 from mpfmc.tests.MpfSlideTestCase import MpfSlideTestCase
 
@@ -25,3 +29,71 @@ class TestSlidesAndWidgets(MpfIntegrationTestCase, MpfSlideTestCase):
 
         self.assertSlideOnTop("slide_mode2")
         self.assertTextInSlide("Widget Mode 1", "slide_mode2")
+
+    def test_slide_on_target_of_another_mode(self):
+        self.post_event("start_mode1")
+        self.advance_time_and_run()
+        self.post_event("play_slide_mode1_on_frame_mode2")
+        self.advance_time_and_run()
+
+        self.assertTextNotOnTopSlide("Slide Mode 1")
+
+        self.post_event("start_mode2")
+        self.advance_time_and_run()
+        self.post_event("show_slide_mode2_frame")
+        self.advance_time_and_run()
+
+        self.assertSlideOnTop("slide_mode2_frame")
+        self.assertTextInSlide("Slide Mode 1", "slide_mode2_frame")
+        self.assertTextOnTopSlide("Slide Mode 1")
+
+        # remove slide frame
+        self.post_event("remove_slide_mode2_frame")
+        self.advance_time_and_run()
+
+        self.assertTextNotOnTopSlide("Slide Mode 1")
+
+        # add again
+        self.post_event("show_slide_mode2_frame")
+        self.advance_time_and_run()
+
+        # text should be there again
+        self.assertTextOnTopSlide("Slide Mode 1")
+
+        self.post_event("remove_slide_mode1_on_frame_mode2")
+        self.advance_time_and_run()
+
+        # text should not be there
+        self.assertTextNotOnTopSlide("Slide Mode 1")
+
+        # add text
+        self.post_event("play_slide_mode1_on_frame_mode2")
+        self.advance_time_and_run()
+
+        # text should be there again
+        self.assertTextOnTopSlide("Slide Mode 1")
+
+        # remove slide frame
+        self.post_event("remove_slide_mode2_frame")
+        self.advance_time_and_run()
+
+        # add again
+        self.post_event("show_slide_mode2_frame")
+        self.advance_time_and_run()
+
+        # text should be there again
+        self.assertTextOnTopSlide("Slide Mode 1")
+
+        # remove slide frame
+        self.post_event("remove_slide_mode2_frame")
+        self.advance_time_and_run()
+
+        self.post_event("remove_slide_mode1_on_frame_mode2")
+        self.advance_time_and_run()
+
+        # add again
+        self.post_event("show_slide_mode2_frame")
+        self.advance_time_and_run()
+
+        # text should not be there
+        self.assertTextNotOnTopSlide("Slide Mode 1")
