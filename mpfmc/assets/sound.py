@@ -1076,13 +1076,15 @@ class SoundInstance(object):
             fade_out: The number of seconds over which to fade out the sound instance
                 before stopping.
         """
-        if fade_out is not None and fade_out >= 0.0:
-            self._fade_out = fade_out
-        self._track.stop_sound(self)
+        if not self.finished:
+            if fade_out is not None and fade_out >= 0.0:
+                self._fade_out = fade_out
+            self._track.stop_sound(self)
 
     def stop_looping(self):
         """Stops looping the sound instance."""
-        self._track.stop_sound_looping(self)
+        if not self.finished:
+            self._track.stop_sound_looping(self)
 
 
 class DuckingSettings(object):

@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev12')
+__version_info__ = ('0', '31', '0', 'dev13')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -911,27 +911,6 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         # Clear request message since it has been processed
         request_message.message = request_not_in_use
 
-cdef void process_live_loop_track_request_message(RequestMessageContainer *request_message, TrackState *track) nogil:
-    """
-    Processes any new live loop track request messages that should be processed prior to the
-    main audio callback processing (such as sound play and sound stop messages).
-    Args:
-        request_message: The request message to process
-        track: The TrackState struct for this track
-    """
-    cdef int player = request_message.player
-    cdef TrackLiveLoopState *live_loop_track
-
-    if track.type != track_type_live_loop or track.type_state == NULL:
-        return
-
-    live_loop_track = <TrackLiveLoopState*>track.type_state
-
-    # TODO: Process request message here for live loop track
-
-    # Clear request message since it has been processed
-    request_message.message = request_not_in_use
-
 cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil:
     """
     Mixes any sounds that are playing on the specified standard track into the specified audio buffer.
@@ -1252,18 +1231,6 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                                      callback_data.notification_messages,
                                      sdl_ticks)
             standard_track.sound_players[player].status = player_idle
-
-cdef void live_loop_track_mix_playing_sounds(TrackState *track, AudioCallbackData *callback_data) nogil:
-    """
-    Mixes any sounds that are playing on the specified live loop track into the specified audio buffer.
-    Args:
-        track: A pointer to the TrackState data structure for the track
-        callback_data: The audio callback data structure
-    Notes:
-        Notification messages are generated.
-    """
-    # TODO: Implement me
-    pass
 
 cdef inline void end_of_sound_processing(SoundPlayer* player,
                                          NotificationMessageContainer **notification_messages,
@@ -1695,13 +1662,13 @@ cdef class Track:
         return number
 
     @property
-    def accepts_in_memory_sounds(self):
-        """Return whether or not track accepts in-memory sounds"""
+    def supports_in_memory_sounds(self):
+        """Return whether or not track supports in-memory sounds"""
         raise NotImplementedError('Must be overridden in derived class')
 
     @property
-    def accepts_streaming_sounds(self):
-        """Return whether or not track accepts streaming sounds"""
+    def supports_streaming_sounds(self):
+        """Return whether or not track supports streaming sounds"""
         raise NotImplementedError('Must be overridden in derived class')
 
     def play_sound(self, sound_instance not None):
@@ -1850,12 +1817,12 @@ cdef class TrackStandard(Track):
         return '<Track.{}.Standard.{}>'.format(self.number, self.name)
 
     @property
-    def accepts_in_memory_sounds(self):
+    def supports_in_memory_sounds(self):
         """Return whether or not track accepts in-memory sounds"""
         return True
 
     @property
-    def accepts_streaming_sounds(self):
+    def supports_streaming_sounds(self):
         """Return whether or not track accepts streaming sounds"""
         return False
 
@@ -2649,12 +2616,12 @@ cdef class TrackLiveLoop(Track):
         return '<Track.{}.LiveLoop.{}>'.format(self.number, self.name)
 
     @property
-    def accepts_in_memory_sounds(self):
+    def supports_in_memory_sounds(self):
         """Return whether or not track supports in-memory sounds"""
         return True
 
     @property
-    def accepts_streaming_sounds(self):
+    def supports_streaming_sounds(self):
         """Return whether or not track supports streaming sounds"""
         return False
 
@@ -2696,6 +2663,16 @@ cdef class TrackLiveLoop(Track):
             sound_instance: The Sound to stop
         """
 
+        SDL_LockMutex(self.mutex)
+
+        # TODO: stop looping the sound instance
+
+        SDL_UnlockMutex(self.mutex)
+
+    def stop_all_sounds(self):
+        """
+        Stops all playing sounds immediately on the track.
+        """
         SDL_LockMutex(self.mutex)
 
         # TODO: stop looping the sound instance

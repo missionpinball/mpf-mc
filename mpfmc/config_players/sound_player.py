@@ -209,7 +209,9 @@ Here are several various examples:
     def clear_context(self, context):
         """Stop all sounds from this context."""
         instance_dict = self._get_instance_dict(context)
-        for sound in instance_dict.values():
+        # Iterate over a copy of the dictionary values since it may be modified
+        # during the iteration process.
+        for sound in list(instance_dict.values()):
             sound.stop_looping()
         self._reset_instance_dict(context)
 
