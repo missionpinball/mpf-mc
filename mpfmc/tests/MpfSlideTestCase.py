@@ -4,12 +4,18 @@ from mpf.tests.MpfTestCase import MpfTestCase
 class MpfSlideTestCase(MpfTestCase):
 
     def assertSlideOnTop(self, slide_name, target="default"):
+        if not self.mc.targets[target].current_slide:
+            self.fail("There is no slide on target {}".format(target))
         self.assertEqual(slide_name, self.mc.targets[target].current_slide.name)
 
     def assertTextOnTopSlide(self, text, target="default"):
+        if not self.mc.targets[target].current_slide:
+            self.fail("There is no slide on target {}".format(target))
         self.assertTextInSlide(text, self.mc.targets[target].current_slide.name)
 
     def assertTextNotOnTopSlide(self, text, target="default"):
+        if not self.mc.targets[target].current_slide:
+            return
         self.assertTextNotInSlide(text, self.mc.targets[target].current_slide.name)
 
     def assertSlideActive(self, slide_name):
