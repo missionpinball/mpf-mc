@@ -8,7 +8,7 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
         return 'config.yaml'
 
     def getMachinePath(self):
-        return 'tests/machine_files/service_mode/'
+        return 'integration/machine_files/service_mode/'
 
     def test_service_slides(self):
         # open door

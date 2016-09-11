@@ -8,7 +8,7 @@ class TestSlidesAndWidgets(MpfIntegrationTestCase, MpfSlideTestCase):
         return 'config.yaml'
 
     def getMachinePath(self):
-        return 'tests/machine_files/widgets_and_slides/'
+        return 'integration/machine_files/widgets_and_slides/'
 
     def test_widget_on_slide_of_another_mode(self):
         self.post_event("start_mode1")
