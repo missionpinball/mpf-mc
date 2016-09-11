@@ -18,12 +18,22 @@ class MpfSlideTestCase(MpfTestCase):
     def assertSlideNotActive(self, slide_name):
         self.assertNotIn(slide_name, self.mc.active_slides, "Slide {} is active but should not.".format(slide_name))
 
+    def _get_texts_from_slide(self, slide):
+        texts = []
+        for children in slide.children:
+            if children.children:
+                texts.extend(self._get_texts_from_slide(children))
+            if hasattr(children, "text"):
+                texts.append(children.text)
+
+        return texts
+
     def assertTextInSlide(self, text, slide_name):
         self.assertSlideActive(slide_name)
-        self.assertIn(text, [x.text for x in self.mc.active_slides[slide_name].children[0].children],
+        self.assertIn(text, self._get_texts_from_slide(self.mc.active_slides[slide_name]),
                       "Text {} not found in slide {}.".format(text, slide_name))
 
     def assertTextNotInSlide(self, text, slide_name):
         self.assertSlideActive(slide_name)
-        self.assertNotIn(text, [x.text for x in self.mc.active_slides[slide_name].children[0].children],
+        self.assertNotIn(text, self._get_texts_from_slide(self.mc.active_slides[slide_name]),
                          "Text {} found in slide {} but should not be there.".format(text, slide_name))
