@@ -1,7 +1,3 @@
-import gc
-
-import sys
-
 from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 from mpfmc.tests.MpfSlideTestCase import MpfSlideTestCase
 
