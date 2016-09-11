@@ -518,6 +518,10 @@ class TestSlidePlayer(MpfMcTestCase):
 
     def test_animation_triggers(self):
         bcp_command = ('register_trigger', None, {'event': 'flash_widget_1'})
+        self.assertNotIn(bcp_command, self.sent_bcp_commands)
+
+        self.mc.events.post("client_connected")
+        self.advance_time()
         self.assertIn(bcp_command, self.sent_bcp_commands)
 
         bcp_command = ('register_trigger', None, {'event': 'flash_widget_2'})

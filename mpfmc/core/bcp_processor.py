@@ -76,7 +76,9 @@ class BcpProcessor(object):
                 command string.
 
         """
-        if self.enabled and self.mc.bcp_client_connected:
+        if self.enabled:
+            if not self.mc.bcp_client_connected:
+                raise AssertionError("Not connected to MPF.")
 
             self.sending_queue.put(
                 (bcp.encode_command_string(bcp_command, **kwargs), rawbytes))

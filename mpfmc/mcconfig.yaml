@@ -18,7 +18,6 @@ mpf-mc:
         - move_out
 
     port: 5050
-    exit_on_disconnect: yes
 
     paths:
         shows: shows
