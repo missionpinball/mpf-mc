@@ -37,7 +37,9 @@ assets:
 
 sounds:
     264828_text:
+        events_when_played: text_sound_played
         events_when_looping: text_sound_looping
+        events_when_stopped: text_sound_stopped
         loops: 7
         max_instances: 3
         stealing_method: skip
@@ -100,3 +102,17 @@ sound_player:
         263774_music:
             action: stop
     play_sound_drum_group: drum_group
+    play_sound_text_default_params: 264828_text
+    play_sound_text_param_set_1:
+        264828_text:
+            volume: 0.67
+            loops: 2
+            priority: 1000
+            start_at: 0.05s
+            fade_in: 0.25s
+            fade_out: 0.1s
+            max_queue_time: 0.15s
+            events_when_played: text_sound_played_param_set_1
+            events_when_stopped: text_sound_stopped_param_set_1
+            events_when_looping: text_sound_looping_param_set_1
+

@@ -547,6 +547,75 @@ class TestAudio(MpfMcTestCase):
         self.assertIsNone(drum_group_instance4)
         self.assertIsNone(drum_group_instance5)
 
+    def test_sound_player_parameters(self):
+        """ Tests sound parameters overridden in the sound_player"""
+
+        if SoundSystem is None or self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        self.assertIsNotNone(interface)
+
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+
+        track_sfx = interface.get_track_by_name("sfx")
+        self.assertIsNotNone(track_sfx)
+        self.assertEqual(track_sfx.name, "sfx")
+        self.assertEqual(track_sfx.max_simultaneous_sounds, 8)
+
+        self.advance_time(1)
+
+        self.assertIn('264828_text', self.mc.sounds)  # .wav
+        text_sound = self.mc.sounds['264828_text']
+
+        # Test sound played from sound_player with all default parameter values
+        self.mc.events.post('play_sound_text_default_params')
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_played')
+        status = track_sfx.get_status()
+        self.assertEqual(status[0]['sound_id'], text_sound.id)
+        instance_id = status[0]['sound_instance_id']
+        text_sound_instance = text_sound.get_instance_by_id(instance_id)
+        self.assertIsNotNone(text_sound_instance)
+        self.assertEqual(text_sound_instance.volume, 0.5)
+        self.assertEqual(text_sound_instance.loops, 7)
+        self.assertEqual(text_sound_instance.priority, 0)
+        self.assertEqual(text_sound_instance.start_at, 0)
+        self.assertEqual(text_sound_instance.fade_out, 0)
+        self.assertEqual(text_sound_instance.fade_out, 0)
+        self.assertIsNone(text_sound_instance.max_queue_time)
+        self.assertEqual(text_sound_instance.max_instances, 3)
+
+        track_sfx.stop_all_sounds()
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_stopped')
+
+        # Now test sound played from sound_player with overridden parameter values
+        self.mc.events.post('play_sound_text_param_set_1')
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_played_param_set_1')
+        status = track_sfx.get_status()
+        self.assertEqual(status[0]['sound_id'], text_sound.id)
+        instance_id = status[0]['sound_instance_id']
+        text_sound_instance = text_sound.get_instance_by_id(instance_id)
+        self.assertIsNotNone(text_sound_instance)
+        self.assertEqual(text_sound_instance.volume, 0.67)
+        self.assertEqual(text_sound_instance.loops, 2)
+        self.assertEqual(text_sound_instance.priority, 1000)
+        self.assertEqual(text_sound_instance.start_at, 0.05)
+        self.assertEqual(text_sound_instance.fade_in, 0.25)
+        self.assertEqual(text_sound_instance.fade_out, 0.1)
+        self.assertEqual(text_sound_instance.max_queue_time, 0.15)
+        self.assertEqual(text_sound_instance.max_instances, 3)
+
+        track_sfx.stop_all_sounds()
+        self.advance_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_stopped_param_set_1')
+
         """
         # Add another track with the same name (should not be allowed)
         # Add another track with the same name, but different casing (should not be allowed)
