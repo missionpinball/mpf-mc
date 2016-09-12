@@ -1,3 +1,5 @@
+from functools import partial
+
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
 from mpfmc.core.config_collection import ConfigCollection
@@ -81,6 +83,10 @@ class Widget(ConfigCollection):
 
         return config
 
+    def _register_trigger(self, event_name, **kwargs):
+        del kwargs
+        self.mc.bcp_processor.register_trigger(event=event_name)
+
     def process_animations(self, config):
         # config is localized to the slide's 'animations' section
 
@@ -89,8 +95,7 @@ class Widget(ConfigCollection):
             # make sure the event_name is registered as a trigger event so MPF
             # will send those events as triggers via BCP
             if event_name != 'entrance':
-                self.mc.bcp_processor.send(bcp_command='register_trigger',
-                                           event=event_name)
+                self.mc.events.add_handler("client_connected", partial(self._register_trigger, event_name))
 
             # str means it's a list of named animations
             if isinstance(event_settings, str):
