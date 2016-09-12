@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev13')
+__version_info__ = ('0', '31', '0', 'dev14')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -1898,40 +1898,41 @@ cdef class TrackStandard(Track):
         if notification_message == NULL:
             return
 
-        if notification_message.message == notification_sound_started:
+        if notification_message.sound_instance_id not in self._sound_instances_by_id:
+            self.log.error("Received a notification message for a sound instance (id: %d) "
+                           "that is no longer managed in the audio library",
+                           notification_message.sound_instance_id)
+            raise AudioException("Received a notification message for a sound instance (id: %d) "
+                                 "that is no longer managed in the audio library",
+                                 notification_message.sound_instance_id)
+
+        elif notification_message.message == notification_sound_started:
             sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_playing()
-
-            # Event has been processed, reset it so it may be used again
-            notification_message.message = notification_not_in_use
 
         elif notification_message.message == notification_sound_stopped:
             sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_stopped()
+                self.log.debug("Removing sound instance %s from active sound dictionary", str(sound_instance))
                 del self._sound_instances_by_id[sound_instance.id]
-
-            # Event has been processed, reset it so it may be used again
-            notification_message.message = notification_not_in_use
 
         elif notification_message.message == notification_sound_looping:
             sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_looping()
 
-            # Event has been processed, reset it so it may be used again
-            notification_message.message = notification_not_in_use
-
         elif notification_message.message == notification_sound_marker:
             sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_marker(notification_message.data.marker.id)
 
-            # Event has been processed, reset it so it may be used again
-            notification_message.message = notification_not_in_use
         else:
             raise AudioException("Unknown notification message received on Track %s", self.name)
+
+        # Event has been processed, reset it so it may be used again
+        notification_message.message = notification_not_in_use
 
     def _get_next_sound(self):
         """
@@ -2028,7 +2029,7 @@ cdef class TrackStandard(Track):
         Args:
             sound_instance: The SoundInstance object to play
         """
-        self.log.debug("play_sound - Processing sound '%s' for playback (%s).", sound_instance.name)
+        self.log.debug("play_sound - Processing sound '%s' for playback.", sound_instance.name)
 
         SDL_LockMutex(self.mutex)
 
@@ -2157,6 +2158,8 @@ cdef class TrackStandard(Track):
 
         SDL_LockMutex(self.mutex)
 
+        self.log.debug("Stopping sound %s and removing any pending instances from queue", sound_instance.name)
+
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle and self.type_state.sound_players[
                 i].current.sound_instance_id == sound_instance.id:
@@ -2186,8 +2189,6 @@ cdef class TrackStandard(Track):
 
         # Remove any instances of the specified sound that are pending in the sound queue.
         self._remove_sound_from_queue(sound_instance)
-
-        self.log.debug("Stopping sound %s and removing any pending instances from queue", sound_instance.name)
 
         SDL_UnlockMutex(self.mutex)
 
@@ -2288,6 +2289,7 @@ cdef class TrackStandard(Track):
             True if sound instance was able to be played, False otherwise
         """
         # NOTE: The SDL Mutex must be held while calling this function
+        self.log.debug("_play_sound_on_sound_player: %s, %s, %s", str(sound_instance), str(player), str(force))
 
         # Get the sound sample buffer container
         cdef MixChunkContainer chunk_container = sound_instance.container
@@ -2300,6 +2302,7 @@ cdef class TrackStandard(Track):
 
         # Make sure the player in range
         if player in range(self.type_state.sound_player_count):
+
             # If the specified sound player is not idle do not play the sound if force is not set
             if self.type_state.sound_players[player].status != player_idle and not force:
                 self.log.debug("All sound players are currently in use, "
@@ -2311,6 +2314,7 @@ cdef class TrackStandard(Track):
             if request_message != NULL:
 
                 # Add sound to the dictionary of active sound instances
+                self.log.debug("Adding sound instance %s to active sound dictionary", str(sound_instance))
                 self._sound_instances_by_id[sound_instance.id] = sound_instance
 
                 if self.type_state.sound_players[player].status != player_idle:
@@ -2332,9 +2336,9 @@ cdef class TrackStandard(Track):
                 # Conversion factor (seconds to bytes/buffer position)
                 seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
 
-                request_message.data.play.start_at_position = sound_instance.start_at * seconds_to_bytes_factor
-                request_message.data.play.fade_in_duration = sound_instance.fade_in * seconds_to_bytes_factor
-                request_message.data.play.fade_out_duration = sound_instance.fade_out * seconds_to_bytes_factor
+                request_message.data.play.start_at_position = <Uint32>(sound_instance.start_at * seconds_to_bytes_factor)
+                request_message.data.play.fade_in_duration = <Uint32>(sound_instance.fade_in * seconds_to_bytes_factor)
+                request_message.data.play.fade_out_duration = <Uint32>(sound_instance.fade_out * seconds_to_bytes_factor)
 
                 # Volume must be converted from a float (0.0 to 1.0) to an 8-bit integer (0..MIX_MAX_VOLUME)
                 request_message.data.play.volume = <Uint8>(sound_instance.volume * MIX_MAX_VOLUME)
@@ -2359,8 +2363,6 @@ cdef class TrackStandard(Track):
                     request_message.data.play.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * MIX_MAX_VOLUME)
                     request_message.data.play.ducking_settings.release_start_pos = sound_instance.ducking.release_point * seconds_to_bytes_factor
                     request_message.data.play.ducking_settings.release_duration = sound_instance.ducking.release * seconds_to_bytes_factor
-
-                    self.log.debug("Adding ducking settings to sound %s", sound_instance.name)
                 else:
                     request_message.data.play.sound_has_ducking = False
     

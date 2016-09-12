@@ -182,6 +182,8 @@ Here are several various examples:
                     del sound_settings['volume']
                 if sound_settings['loops'] is None:
                     del sound_settings['loops']
+                if sound_settings['start_at'] is None:
+                    del sound_settings['start_at']
                 if sound_settings['fade_in'] is None:
                     del sound_settings['fade_in']
                 if sound_settings['fade_out'] is None:
@@ -189,13 +191,13 @@ Here are several various examples:
                 if sound_settings['max_queue_time'] == -1:
                     del sound_settings['max_queue_time']
                 if len(sound_settings['events_when_played']) == 1 and \
-                                sound_settings['events_when_played'][0] == 'ignore':
+                                sound_settings['events_when_played'][0] == 'use_sound_setting':
                     del sound_settings['events_when_played']
                 if len(sound_settings['events_when_stopped']) == 1 and \
-                                sound_settings['events_when_stopped'][0] == 'ignore':
+                                sound_settings['events_when_stopped'][0] == 'use_sound_setting':
                     del sound_settings['events_when_stopped']
                 if len(sound_settings['events_when_looping']) == 1 and \
-                                sound_settings['events_when_looping'][0] == 'ignore':
+                                sound_settings['events_when_looping'][0] == 'use_sound_setting':
                     del sound_settings['events_when_looping']
 
         return validated_config

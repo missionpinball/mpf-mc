@@ -345,7 +345,6 @@ class SoundAsset(Asset):
 
     def __del__(self):
         """Destructor"""
-        self.stop(0)
         self.unload()
 
     def __repr__(self):
@@ -494,7 +493,8 @@ class SoundAsset(Asset):
 
     def _do_unload(self):
         """Unloads the asset from memory"""
-
+        self.log.debug("Sound %s unloading from memory", self.name)
+        self.stop(0)
         AudioInterface.unload_sound_chunk(self._container)
         self._container = None
 
@@ -719,22 +719,22 @@ class SoundInstance(object):
         # TODO: Implement parameter validation for overridden parameters
 
         # Assign any overridden parameter values
-        if 'loops' in settings:
+        if 'loops' in settings and settings['loops'] is not None:
             self._loops = settings['loops']
 
-        if 'volume' in settings:
+        if 'volume' in settings and settings['volume'] is not None:
             self._volume = settings['volume']
 
-        if 'priority' in settings:
+        if 'priority' in settings and settings['priority'] is not None:
             self._priority = settings['priority']
 
-        if 'start_at' in settings:
+        if 'start_at' in settings and settings['start_at'] is not None:
             self._start_at = settings['start_at']
 
-        if 'fade_in' in settings:
+        if 'fade_in' in settings and settings['fade_in'] is not None:
             self._fade_in = settings['fade_in']
 
-        if 'fade_out' in settings:
+        if 'fade_out' in settings and settings['fade_out'] is not None:
             self._fade_out = settings['fade_out']
 
         if 'max_queue_time' in settings:
@@ -754,8 +754,8 @@ class SoundInstance(object):
 
     def __repr__(self):
         """String that's returned if someone prints this object"""
-        return '<SoundInstance: {} ({}), Volume={}, Loops={}, Loaded={}, Track={}>'.format(
-            self.sound.name, self.id, self.volume, self.loops, self.sound.loaded, self.track.name)
+        return '<SoundInstance: {} ({}), Volume={}, Loops={}, Priority={}, Loaded={}, Track={}>'.format(
+            self.sound.name, self.id, self.volume, self.loops, self.priority, self.sound.loaded, self.track.name)
 
     def __lt__(self, other):
         """Less than comparison operator"""
