@@ -125,7 +125,7 @@ class Slide(Screen):
 
             configured_key = widget.get('key', None)
 
-            if (configured_key and key and not key.startswith('_') and
+            if (configured_key and key and "." not in key and
                     configured_key != key):
                 raise KeyError("Widget has incoming key '{}' which does not "
                                "match the key in the widget's config "
