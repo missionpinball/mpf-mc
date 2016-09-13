@@ -41,16 +41,6 @@ class McWidgetPlayer(McConfigPlayer):
 
     def _get_slide(self, s):
         slide = None
-        if s['target']:
-            try:
-                slide = self.machine.targets[s['target']].current_slide
-                # need to del here instead of pop so it still exists for
-                # the exception
-                del s['target']
-            except KeyError:
-                raise KeyError(
-                    "Cannot add widget to target '{}' as that is not a "
-                    "valid display target".format(s['target']))
 
         if s['slide']:
             slide_name = s.pop('slide')
@@ -98,11 +88,6 @@ class McWidgetPlayer(McConfigPlayer):
             instance_dict[s['key']] = True
 
     def _action_remove(self, s, instance_dict, widget, context):
-        try:
-            slide = self._get_slide(s)
-        except SlideNotActiveError:
-            return
-
         if s['key']:
             key = s['key']
         else:
@@ -111,13 +96,18 @@ class McWidgetPlayer(McConfigPlayer):
         if key in instance_dict and isinstance(instance_dict[key], EventHandlerKey):
             self.machine.events.remove_handler_by_key(instance_dict[key])
 
+        if key in instance_dict:
+            del instance_dict[key]
+
+        try:
+            slide = self._get_slide(s)
+        except SlideNotActiveError:
+            return
+
         if slide:
             slide.remove_widgets_by_key(key)
         else:
             self._remove_widget_by_key(key)
-
-        if key in instance_dict:
-            del instance_dict[key]
 
     def play(self, settings, context, priority=0, **kwargs):
         """Play widgets."""
