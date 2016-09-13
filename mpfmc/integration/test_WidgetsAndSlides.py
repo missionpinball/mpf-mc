@@ -2,7 +2,7 @@ from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 from mpfmc.tests.MpfSlideTestCase import MpfSlideTestCase
 
 
-class TestSlidesAndWidgets(MpfIntegrationTestCase, MpfSlideTestCase):
+class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfSlideTestCase):
 
     def getConfigFile(self):
         return 'config.yaml'
@@ -93,3 +93,28 @@ class TestSlidesAndWidgets(MpfIntegrationTestCase, MpfSlideTestCase):
 
         # text should not be there
         self.assertTextNotOnTopSlide("Slide Mode 1")
+
+    def test_moving_slide_frame(self):
+        self.post_event("start_mode3")
+        self.advance_time_and_run()
+        self.assertModeRunning("mode3")
+
+        self.post_event("show_top_slide")
+        self.advance_time_and_run()
+        self.post_event("show_content_slide")
+        self.advance_time_and_run()
+
+        self.assertTextOnTopSlide("ASD")
+        self.assertTextOnTopSlide("ASD2")
+
+        self.assertAlmostEqual(-134.0, self.mc.active_slides['top_slide'].children[0].children[1].y)
+
+        self.post_event("move_out")
+        self.advance_time_and_run()
+        self.assertAlmostEqual(-100.0, self.mc.active_slides['top_slide'].children[0].children[1].y)
+        self.post_event("move_back")
+        self.advance_time_and_run()
+
+        self.assertAlmostEqual(-134.0, self.mc.active_slides['top_slide'].children[0].children[1].y)
+
+

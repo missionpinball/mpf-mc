@@ -3,6 +3,7 @@
 modes:
     - mode1
     - mode2
+    - mode3
 
 physical_dmd:
   shades: 16
