@@ -91,12 +91,12 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(len(self.mc.animations['multi']), 2)
         self.assertIs(type(self.mc.animations['multi'][0]), dict)
         self.assertEqual(self.mc.animations['multi'][0]['property'],
-                         ['height'])
+                         ['y'])
         self.assertEqual(self.mc.animations['multi'][0]['easing'],
                          'linear')
         self.assertIs(type(self.mc.animations['multi'][1]), dict)
         self.assertEqual(self.mc.animations['multi'][1]['property'],
-                         ['width'])
+                         ['x'])
         self.assertEqual(self.mc.animations['multi'][1]['easing'],
                          'linear')
 
@@ -289,6 +289,7 @@ class TestAnimation(MpfMcTestCase):
 
     def test_named_animation(self):
         self.mc.events.post('show_slide3')
+
         self.advance_time()
         self.assertEqual(self.mc.targets['default'].current_slide_name,
                          'slide3')
@@ -300,9 +301,57 @@ class TestAnimation(MpfMcTestCase):
         # make sure it's not animating
         self.assertIsNone(widget.animation)
 
+        # make sure initial values are set
+        self.assertEqual(widget.opacity, 0)
+        self.assertEqual(widget.x, 177)
+        self.assertEqual(widget.y, 138)
+
         # post the event to animate it
         self.mc.events.post('entrance3')
+        self.advance_time(1.1)
+
+        # post-animation opacity should be 1
+        self.assertEqual(widget.opacity, 1)
+
+        # advance past animation step 2
+        self.advance_time(1.2)
+
+        # check properties
+        self.assertEqual(widget.x, 0)
+        self.assertEqual(widget.y, 0)
+
+        # add widget2
+        self.mc.events.post('show_widget2')
         self.advance_time()
+
+        # grab this widget
+        widget = self.mc.targets['default'].current_slide.children[0].children[1]
+        self.assertTrue(widget.text == 'widget2')
+
+        # make sure it's not animating
+        self.assertIsNone(widget.animation)
+
+        # make sure initial values are set
+        self.assertEqual(widget.opacity, 0)
+        self.assertEqual(widget.x, 164.5)
+        self.assertEqual(widget.y, 138)
+
+        # post the event to animate it
+        self.mc.events.post('animate_widget2')
+        self.advance_time(1.1)
+
+        # post-animation opacity should be 1
+        self.assertEqual(widget.opacity, 1)
+
+        # advance past animation step 2
+        self.advance_time(1.2)
+
+        # check properties
+        self.assertEqual(widget.x, 0)
+        self.assertEqual(widget.y, 0)
+
+        self.mc.events.post('pulse_widget2')
+        self.advance_time(1)
 
     def test_add_to_slide_from_offscreen(self):
         self.mc.events.post('show_slide8')

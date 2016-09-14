@@ -41,6 +41,8 @@ slides:
   slide3:
     type: text
     text: text3
+    color: green
+    opacity: 0
     animations:
       entrance3: fade_in, multi
 
@@ -215,8 +217,18 @@ widgets:
           timing: after_previous
      expire: 2s
 
+  widget2:
+    type: text
+    text: widget2
+    color: red
+    opacity: 0
+    animations:
+      animate_widget2: fade_in, multi
+      pulse_widget2: pulse, pulse, pulse, pulse
+
 widget_player:
   show_widget1: widget1
+  show_widget2: widget2
 
 animations:
   fade_in:
@@ -227,11 +239,20 @@ animations:
     repeat: True
 
   multi:
-  - property: height
-    value: 100%
+  - property: y
+    value: 0
     duration: 1s
-  - property: width
+  - property: x
     value: 0%
     duration: 100ms
     timing: after_previous
     repeat: False
+
+  pulse:
+  - property: opacity
+    value: 0
+    duration: 100ms
+  - property: opacity
+    value: 1
+    duration: 100ms
+    timing: after_previous
