@@ -165,10 +165,10 @@ DEF MAX_MARKERS = 8
 
 cdef enum TrackType:
     # Enumeration of the possible track types
-    track_type_none,
-    track_type_standard,
-    track_type_playlist,
-    track_type_live_loop,
+    track_type_none = 0
+    track_type_standard = 1
+    track_type_playlist = 2
+    track_type_live_loop = 3
 
 ctypedef struct TrackState:
     # Common track state variables (for all track types)
@@ -194,14 +194,14 @@ ctypedef struct TrackStandardState:
 
 cdef enum SoundPlayerStatus:
     # Enumeration of the possible sound player status values.
-    player_idle,
-    player_pending,
-    player_replacing,
-    player_fading_in,
-    player_fading_out,
-    player_playing,
-    player_finished,
-    player_stopping,
+    player_idle = 0
+    player_pending = 1
+    player_replacing = 2
+    player_fading_in = 3
+    player_fading_out = 4
+    player_playing = 5
+    player_finished = 6
+    player_stopping = 7
 
 ctypedef struct DuckingSettings:
     int track_bit_mask
@@ -212,17 +212,17 @@ ctypedef struct DuckingSettings:
     Sint32 release_duration
 
 cdef enum DuckingStage:
-    ducking_stage_idle,
-    ducking_stage_delay,
-    ducking_stage_attack,
-    ducking_stage_hold,
-    ducking_stage_release,
-    ducking_stage_finished
+    ducking_stage_idle = 0
+    ducking_stage_delay = 1
+    ducking_stage_attack = 2
+    ducking_stage_hold = 3
+    ducking_stage_release = 4
+    ducking_stage_finished = 5
 
 cdef enum FadingStatus:
-    fading_status_not_fading,
-    fading_status_fading_in,
-    fading_status_fading_out
+    fading_status_not_fading = 0
+    fading_status_fading_in = 1
+    fading_status_fading_out = 2
 
 ctypedef struct SoundSettings:
     Mix_Chunk *chunk
@@ -291,11 +291,11 @@ ctypedef struct AudioCallbackData:
 # ---------------------------------------------------------------------------
 
 cdef enum RequestMessage:
-    request_not_in_use,               # Message is not in use and is available
-    request_sound_play,               # Request to play a sound
-    request_sound_replace,            # Request to play a sound that replaces a sound in progress
-    request_sound_stop,               # Request to stop a sound that is playing
-    request_sound_stop_looping,       # Request to stop looping a sound that is playing
+    request_not_in_use = 0               # Message is not in use and is available
+    request_sound_play = 1               # Request to play a sound
+    request_sound_replace = 2            # Request to play a sound that replaces a sound in progress
+    request_sound_stop = 3               # Request to stop a sound that is playing
+    request_sound_stop_looping = 4       # Request to stop looping a sound that is playing
 
 
 ctypedef struct RequestMessageDataPlaySound:
@@ -333,12 +333,12 @@ ctypedef struct RequestMessageContainer:
 # ---------------------------------------------------------------------------
 
 cdef enum NotificationMessage:
-    notification_not_in_use,               # Message is not in use and is available
-    notification_sound_started,            # Notification that a sound has started playing
-    notification_sound_stopped,            # Notification that a sound has stopped
-    notification_sound_looping,            # Notification that a sound is looping back to the beginning
-    notification_sound_marker,             # Notification that a sound marker has been reached
-    notification_player_idle,              # Notification that a player is now idle and ready to play another sound
+    notification_not_in_use = 0               # Message is not in use and is available
+    notification_sound_started = 1            # Notification that a sound has started playing
+    notification_sound_stopped = 2            # Notification that a sound has stopped
+    notification_sound_looping = 3            # Notification that a sound is looping back to the beginning
+    notification_sound_marker = 4             # Notification that a sound marker has been reached
+    notification_player_idle = 5              # Notification that a player is now idle and ready to play another sound
 
 ctypedef struct NotificationMessageDataLooping:
     int loop_count
