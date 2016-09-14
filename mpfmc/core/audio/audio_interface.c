@@ -1880,7 +1880,7 @@ static const char __pyx_k_clear[] = "clear";
 static const char __pyx_k_close[] = "close";
 static const char __pyx_k_debug[] = "debug";
 static const char __pyx_k_delay[] = "delay";
-static const char __pyx_k_dev16[] = "dev16";
+static const char __pyx_k_dev15[] = "dev15";
 static const char __pyx_k_error[] = "error";
 static const char __pyx_k_items[] = "items";
 static const char __pyx_k_loops[] = "loops";
@@ -2173,7 +2173,7 @@ static PyObject *__pyx_n_s_db;
 static PyObject *__pyx_n_s_db_to_gain;
 static PyObject *__pyx_n_s_debug;
 static PyObject *__pyx_n_s_delay;
-static PyObject *__pyx_n_u_dev16;
+static PyObject *__pyx_n_u_dev15;
 static PyObject *__pyx_n_s_disable;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_n_s_ducking;
@@ -28551,7 +28551,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_db_to_gain, __pyx_k_db_to_gain, sizeof(__pyx_k_db_to_gain), 0, 0, 1, 1},
   {&__pyx_n_s_debug, __pyx_k_debug, sizeof(__pyx_k_debug), 0, 0, 1, 1},
   {&__pyx_n_s_delay, __pyx_k_delay, sizeof(__pyx_k_delay), 0, 0, 1, 1},
-  {&__pyx_n_u_dev16, __pyx_k_dev16, sizeof(__pyx_k_dev16), 0, 1, 0, 1},
+  {&__pyx_n_u_dev15, __pyx_k_dev15, sizeof(__pyx_k_dev15), 0, 1, 0, 1},
   {&__pyx_n_s_disable, __pyx_k_disable, sizeof(__pyx_k_disable), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_n_s_ducking, __pyx_k_ducking, sizeof(__pyx_k_ducking), 0, 0, 1, 1},
@@ -29000,11 +29000,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":15
  *            )
  * 
- * __version_info__ = ('0', '31', '0', 'dev16')             # <<<<<<<<<<<<<<
+ * __version_info__ = ('0', '31', '0', 'dev15')             # <<<<<<<<<<<<<<
  * __version__ = '.'.join(__version_info__)
  * 
  */
-  __pyx_tuple__27 = PyTuple_Pack(4, __pyx_kp_u_0, __pyx_kp_u_31, __pyx_kp_u_0, __pyx_n_u_dev16); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_tuple__27 = PyTuple_Pack(4, __pyx_kp_u_0, __pyx_kp_u_31, __pyx_kp_u_0, __pyx_n_u_dev15); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__27);
   __Pyx_GIVEREF(__pyx_tuple__27);
 
@@ -29368,7 +29368,7 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":15
  *            )
  * 
- * __version_info__ = ('0', '31', '0', 'dev16')             # <<<<<<<<<<<<<<
+ * __version_info__ = ('0', '31', '0', 'dev15')             # <<<<<<<<<<<<<<
  * __version__ = '.'.join(__version_info__)
  * 
  */
@@ -29376,7 +29376,7 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
 
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":16
  * 
- * __version_info__ = ('0', '31', '0', 'dev16')
+ * __version_info__ = ('0', '31', '0', 'dev15')
  * __version__ = '.'.join(__version_info__)             # <<<<<<<<<<<<<<
  * 
  * from libc.stdio cimport FILE, fopen, fprintf
