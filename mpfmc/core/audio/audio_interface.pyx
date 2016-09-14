@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev15')
+__version_info__ = ('0', '31', '0', 'dev16')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -1751,7 +1751,7 @@ cdef class TrackStandard(Track):
         # IMPORTANT: Call super class init function to allocate track state memory!
         super().__init__(sound_instances_by_id, audio_callback_data, name, track_num, buffer_size, volume)
 
-        self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard")
+        self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard." + name)
 
         SDL_LockMutex(self.mutex)
 

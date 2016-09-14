@@ -1880,7 +1880,7 @@ static const char __pyx_k_clear[] = "clear";
 static const char __pyx_k_close[] = "close";
 static const char __pyx_k_debug[] = "debug";
 static const char __pyx_k_delay[] = "delay";
-static const char __pyx_k_dev15[] = "dev15";
+static const char __pyx_k_dev16[] = "dev16";
 static const char __pyx_k_error[] = "error";
 static const char __pyx_k_items[] = "items";
 static const char __pyx_k_loops[] = "loops";
@@ -1976,7 +1976,7 @@ static const char __pyx_k_version_info[] = "__version_info__";
 static const char __pyx_k_Initialized_s[] = "Initialized %s";
 static const char __pyx_k_PriorityQueue[] = "PriorityQueue";
 static const char __pyx_k_TrackLiveLoop[] = ".TrackLiveLoop";
-static const char __pyx_k_TrackStandard[] = ".TrackStandard";
+static const char __pyx_k_TrackStandard[] = ".TrackStandard.";
 static const char __pyx_k_fading_status[] = "fading_status";
 static const char __pyx_k_release_point[] = "release_point";
 static const char __pyx_k_status_values[] = "status_values";
@@ -2173,7 +2173,7 @@ static PyObject *__pyx_n_s_db;
 static PyObject *__pyx_n_s_db_to_gain;
 static PyObject *__pyx_n_s_debug;
 static PyObject *__pyx_n_s_delay;
-static PyObject *__pyx_n_u_dev15;
+static PyObject *__pyx_n_u_dev16;
 static PyObject *__pyx_n_s_disable;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_n_s_ducking;
@@ -16643,7 +16643,7 @@ static int __pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface_13Tra
  *         # IMPORTANT: Call super class init function to allocate track state memory!
  *         super().__init__(sound_instances_by_id, audio_callback_data, name, track_num, buffer_size, volume)             # <<<<<<<<<<<<<<
  * 
- *         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard")
+ *         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard." + name)
  */
   __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1752, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -16709,7 +16709,7 @@ static int __pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface_13Tra
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1754
  *         super().__init__(sound_instances_by_id, audio_callback_data, name, track_num, buffer_size, volume)
  * 
- *         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard")             # <<<<<<<<<<<<<<
+ *         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard." + name)             # <<<<<<<<<<<<<<
  * 
  *         SDL_LockMutex(self.mutex)
  */
@@ -16734,27 +16734,30 @@ static int __pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface_13Tra
   __pyx_t_2 = __Pyx_PyUnicode_Concat(__pyx_t_5, __pyx_kp_u_TrackStandard); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 1754, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = NULL;
+  __pyx_t_5 = __Pyx_PyUnicode_ConcatSafe(__pyx_t_2, __pyx_v_name); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 1754, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_5);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_t_2 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_8))) {
-    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_8);
-    if (likely(__pyx_t_5)) {
+    __pyx_t_2 = PyMethod_GET_SELF(__pyx_t_8);
+    if (likely(__pyx_t_2)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_8);
-      __Pyx_INCREF(__pyx_t_5);
+      __Pyx_INCREF(__pyx_t_2);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_8, function);
     }
   }
-  if (!__pyx_t_5) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1754, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (!__pyx_t_2) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1754, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else {
     __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 1754, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
-    __Pyx_GIVEREF(__pyx_t_2);
-    PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_t_2);
-    __pyx_t_2 = 0;
+    __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2); __pyx_t_2 = NULL;
+    __Pyx_GIVEREF(__pyx_t_5);
+    PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_t_5);
+    __pyx_t_5 = 0;
     __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1754, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -16767,7 +16770,7 @@ static int __pyx_pf_7Pinball_6mpf_mc_5mpfmc_4core_5audio_15audio_interface_13Tra
   __pyx_t_1 = 0;
 
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":1756
- *         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard")
+ *         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard." + name)
  * 
  *         SDL_LockMutex(self.mutex)             # <<<<<<<<<<<<<<
  * 
@@ -28551,7 +28554,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_db_to_gain, __pyx_k_db_to_gain, sizeof(__pyx_k_db_to_gain), 0, 0, 1, 1},
   {&__pyx_n_s_debug, __pyx_k_debug, sizeof(__pyx_k_debug), 0, 0, 1, 1},
   {&__pyx_n_s_delay, __pyx_k_delay, sizeof(__pyx_k_delay), 0, 0, 1, 1},
-  {&__pyx_n_u_dev15, __pyx_k_dev15, sizeof(__pyx_k_dev15), 0, 1, 0, 1},
+  {&__pyx_n_u_dev16, __pyx_k_dev16, sizeof(__pyx_k_dev16), 0, 1, 0, 1},
   {&__pyx_n_s_disable, __pyx_k_disable, sizeof(__pyx_k_disable), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_n_s_ducking, __pyx_k_ducking, sizeof(__pyx_k_ducking), 0, 0, 1, 1},
@@ -29000,11 +29003,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":15
  *            )
  * 
- * __version_info__ = ('0', '31', '0', 'dev15')             # <<<<<<<<<<<<<<
+ * __version_info__ = ('0', '31', '0', 'dev16')             # <<<<<<<<<<<<<<
  * __version__ = '.'.join(__version_info__)
  * 
  */
-  __pyx_tuple__27 = PyTuple_Pack(4, __pyx_kp_u_0, __pyx_kp_u_31, __pyx_kp_u_0, __pyx_n_u_dev15); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_tuple__27 = PyTuple_Pack(4, __pyx_kp_u_0, __pyx_kp_u_31, __pyx_kp_u_0, __pyx_n_u_dev16); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__27);
   __Pyx_GIVEREF(__pyx_tuple__27);
 
@@ -29368,7 +29371,7 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":15
  *            )
  * 
- * __version_info__ = ('0', '31', '0', 'dev15')             # <<<<<<<<<<<<<<
+ * __version_info__ = ('0', '31', '0', 'dev16')             # <<<<<<<<<<<<<<
  * __version__ = '.'.join(__version_info__)
  * 
  */
@@ -29376,7 +29379,7 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
 
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":16
  * 
- * __version_info__ = ('0', '31', '0', 'dev15')
+ * __version_info__ = ('0', '31', '0', 'dev16')
  * __version__ = '.'.join(__version_info__)             # <<<<<<<<<<<<<<
  * 
  * from libc.stdio cimport FILE, fopen, fprintf
