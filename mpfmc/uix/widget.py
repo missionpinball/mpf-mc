@@ -14,7 +14,7 @@ magic_events = ('add_to_slide',
                 'slide_leave',
                 'slide_play',
                 'entrance')
-"""Magic Events are events that are used to trigger widget animations that
+"""Magic Events are events that are used to trigger widget actions that
 are not real MPF events, rather, they're used to trigger animations from
 things the slide is doing."""
 
