@@ -57,7 +57,7 @@ before_script:
 script:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
       coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests;
-      coverage3 run -a --concurrency=thread -m unittest discover -s _mpf/mpf/integration;
+      coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;
     fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then

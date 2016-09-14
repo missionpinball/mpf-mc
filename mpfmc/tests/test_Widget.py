@@ -159,62 +159,6 @@ class TestWidget(MpfMcTestCase):
 
             self.advance_time()
 
-    def test_widget_player_add_to_target(self):
-        # create two slides
-        self.mc.targets['display2'].add_slide(name='slide1')
-        self.mc.targets['display2'].show_slide('slide1')
-        self.assertEqual(self.mc.targets['display2'].current_slide_name,
-                         'slide1')
-
-        self.mc.targets['display2'].add_slide(name='slide2')
-        self.mc.targets['display2'].show_slide('slide2')
-        self.assertEqual(self.mc.targets['display2'].current_slide_name,
-                         'slide2')
-
-        # Add widget1 to slide 1
-        self.mc.events.post('add_widget1_to_display2')
-        self.advance_time()
-
-        # widget1 should be in slide2, the current on display2. It should
-        # not be in slide1
-        self.assertIn('widget1',
-                      [x.text for x in
-                       self.mc.active_slides['slide2'].children[0].children])
-        self.assertIn('widget1', [x.text for x in self.mc.targets[
-            'display2'].current_slide.children[0].children])
-        self.assertNotIn('widget1',
-                         [x.text for x in
-                          self.mc.active_slides['slide1'].children[
-                              0].children])
-
-        # show slide1 and make sure the widget is not there
-        self.mc.targets['display2'].current_slide = 'slide1'
-        self.assertEqual(self.mc.targets['display2'].current_slide_name,
-                         'slide1')
-        self.assertNotIn('widget1', [x.text for x in self.mc.targets[
-            'display2'].current_slide.children[0].children])
-
-    def test_widget_player_add_to_invalid_target(self):
-        # create two slides
-        self.mc.targets['display2'].add_slide(name='slide1')
-        self.mc.targets['display2'].show_slide('slide1')
-        self.assertEqual(self.mc.targets['display2'].current_slide_name,
-                         'slide1')
-
-        self.mc.targets['display2'].add_slide(name='slide2')
-        self.mc.targets['display2'].show_slide('slide2')
-        self.assertEqual(self.mc.targets['display2'].current_slide_name,
-                         'slide2')
-
-        # Add widget1 to invalid target called "johnny5"
-        self.mc.events.post('add_widget1_to_invalid_target')
-
-        with self.assertRaises(KeyError,
-                msg="Cannot add widget to target 'johnny5' as that is not a "
-                    "valid display target"):
-
-            self.advance_time()
-
     def test_removing_mode_widget_on_mode_stop(self):
         # create a slide and add some base widgets
         self.mc.targets['default'].add_slide(name='slide1')

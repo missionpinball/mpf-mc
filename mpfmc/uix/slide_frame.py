@@ -64,6 +64,12 @@ class SlideFrameParent(MpfWidget, FloatLayout):
         self.stencil.add_widget(widget, bisect_left(
             self.stencil.children, widget))
 
+    def prepare_for_removal(self):
+        """Remove slide frame from targets."""
+        super().prepare_for_removal()
+        self.mc.targets[self.name].prepare_for_removal()
+        del self.mc.targets[self.name]
+
 
 class SlideFrame(MpfWidget, ScreenManager):
 
