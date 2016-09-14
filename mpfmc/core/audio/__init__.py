@@ -105,10 +105,10 @@ class SoundSystem(object):
         self.master_volume = self.config['master_volume']
 
         # Establish machine tick function callback (will process internal audio events)
-        #self.clock_event = Clock.schedule_interval(self.tick, 0)
+        self.clock_event = Clock.schedule_interval(self.tick, 0)
 
         # Start audio engine processing
-        #self.audio_interface.enable()
+        self.audio_interface.enable()
         self._initialized = True
 
         self.mc.events.add_handler("master_volume_increase", self.master_volume_increase)
