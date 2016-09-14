@@ -358,21 +358,16 @@ class TestAnimation(MpfMcTestCase):
         self.advance_time()
 
         self.mc.events.post('show_widget1')
-        self.advance_time(.1)
+        self.advance_time()
 
         widget = self.mc.targets['default'].current_slide.children[0].children[1]
-
-        # make sure we got the right widget
         self.assertEqual('WIDGET 1', widget.text)
+        self.assertEqual(widget.pos[0], -144.5)
 
-        # widget starts at -100, but thta's the center, so it's real x start
-        # is somewhere less than -100
-        self.assertLess(widget.pos[0], -100)
+        self.mc.events.post('move_on_slide')
+        self.advance_time(.6)
+        self.assertEqual(widget.pos[0], 100)
 
-        # right most position now should be somewhere around 80
-        self.advance_time(.4)
-        self.assertGreater(widget.pos[0], 70)
-
-        # animation should be done, make sure it's back to -100
+        self.mc.events.post('move_off_slide')
         self.advance_time(.6)
         self.assertEqual(widget.pos[0], -100)

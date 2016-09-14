@@ -206,11 +206,12 @@ widgets:
      color: red
      x: -100
      animations:
-       add_to_slide:
+       move_on_slide:
         - property: x
           value: 100
           duration: 500ms
           timing: after_previous
+       move_off_slide:
         - property: x
           value: -100
           duration: 500ms
