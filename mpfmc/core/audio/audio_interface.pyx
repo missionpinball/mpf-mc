@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev14')
+__version_info__ = ('0', '31', '0', 'dev15')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -426,6 +426,8 @@ cdef class AudioInterface:
         """
         self.log.debug("Disabling audio playback")
 
+        self.stop_all_sounds()
+
         SDL_LockAudio()
         # Remove custom music hook/callback function
         Mix_HookMusic(NULL, NULL)
@@ -622,6 +624,11 @@ cdef class AudioInterface:
         """
         for track in self.tracks:
             track.stop_sound(sound_instance)
+
+    def stop_all_sounds(self):
+        """Stops all playing and pending sounds in all tracks"""
+        for track in self.tracks:
+            track.stop_all_sounds()
 
     def process(self):
         """Process tick function for the audio interface."""
@@ -953,7 +960,8 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
     for player in range(standard_track.sound_player_count):
 
         # If the player is idle, there is nothing to do so move on to the next player
-        if standard_track.sound_players[player].status is player_idle:
+        if standard_track.sound_players[player].status is player_idle \
+                or standard_track.sound_players[player].current.chunk == NULL:
             continue
 
         buffer_pos = 0
@@ -2411,8 +2419,8 @@ cdef class TrackStandard(Track):
         for player in range(self.type_state.sound_player_count):
             status.append({
                 "player": player,
-                "status": TrackStandard.player_status_to_text(self.type_state.sound_players[player].status),
-                "fading_status": TrackStandard.player_fading_status_to_text(self.type_state.sound_players[player].current.fading_status),
+                "status": TrackStandard.player_status_to_text(<int>self.type_state.sound_players[player].status),
+                "fading_status": TrackStandard.player_fading_status_to_text(<int>self.type_state.sound_players[player].current.fading_status),
                 "volume": self.type_state.sound_players[player].current.volume,
                 "sound_id": self.type_state.sound_players[player].current.sound_id,
                 "sound_instance_id": self.type_state.sound_players[player].current.sound_instance_id,
