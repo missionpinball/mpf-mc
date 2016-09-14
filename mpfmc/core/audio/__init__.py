@@ -113,6 +113,13 @@ class SoundSystem(object):
 
         self.mc.events.add_handler("master_volume_increase", self.master_volume_increase)
         self.mc.events.add_handler("master_volume_decrease", self.master_volume_decrease)
+        self.mc.events.add_handler("shutdown", self.shutdown)
+
+    def shutdown(self):
+        """Shuts down the audio interface"""
+        if self.enabled:
+            self.audio_interface.disable()
+            self._initialized = False
 
     @property
     def enabled(self):
