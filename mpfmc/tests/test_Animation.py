@@ -75,7 +75,7 @@ class TestAnimation(MpfMcTestCase):
 
         # Move on to test the named animations section
 
-        self.assertEqual(len(self.mc.animations), 2)
+        self.assertEqual(len(self.mc.animations), 3)
 
         # single animation, dict
         self.assertIs(type(self.mc.animations['fade_in']), list)
