@@ -6,6 +6,18 @@ from kivy.clock import Clock
 
 from mpfmc.core.utils import set_position, percent_to_float
 
+magic_events = ('add_to_slide',
+                'remove_from_slide',
+                'pre_show_slide',
+                'show_slide',
+                'pre_slide_leave',
+                'slide_leave',
+                'slide_play',
+                'entrance')
+"""Magic Events are events that are used to trigger widget animations that
+are not real MPF events, rather, they're used to trigger animations from
+things the slide is doing."""
+
 
 class MpfWidget(object):
     """Mixin class that's used to extend all the Kivy widget base classes with
@@ -49,10 +61,6 @@ class MpfWidget(object):
         # restore them later
 
         self._default_style = None
-        self._magic_events = ('add_to_slide', 'remove_from_slide',
-                              'pre_show_slide', 'show_slide',
-                              'pre_slide_leave', 'slide_leave',
-                              'slide_play', 'entrance')
 
         # some attributes can be expressed in percentages. This dict holds
         # those, key is attribute name, val is max value
@@ -98,17 +106,17 @@ class MpfWidget(object):
                         "name has been changed to 'add_to_slide', "
                         "'pre_show_slide', and/or 'show_slide' to give more "
                         "flexibility. See the docs for more details. "
-                        "'entrance' will be removed in 0.31.")
+                        "'entrance' will be removed in 0.32.")
 
-                elif k not in self._magic_events:
+                elif k not in magic_events:
                     self._register_animation_events(k)
         else:
             self.config['animations'] = dict()
 
-        # why is this needed? Why is it not config validated by here?
+        # why is this needed? Why is it not config validated by here? todo
         if 'reset_animations_events' in self.config:
             for event in [x for x in self.config['reset_animations_events']
-                    if x not in self._magic_events]:
+                    if x not in magic_events]:
                 self._animation_event_keys.add(self.mc.events.add_handler(
                     event=event, handler=self.reset_animations))
 
