@@ -3,6 +3,7 @@ from functools import partial
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
 from mpfmc.core.config_collection import ConfigCollection
+from mpfmc.uix.widget import magic_events
 from mpfmc.uix.slide_frame import SlideFrame
 from mpfmc.widgets.image import ImageWidget
 from mpfmc.widgets.text import Text
@@ -93,8 +94,9 @@ class Widget(ConfigCollection):
         for event_name, event_settings in config.items():
 
             # make sure the event_name is registered as a trigger event so MPF
-            # will send those events as triggers via BCP
-            if event_name != 'entrance':
+            # will send those events as triggers via BCP. But we don't want
+            # to register magic events since those aren't real MPF events.
+            if event_name not in magic_events:
                 self.mc.events.add_handler("client_connected", partial(self._register_trigger, event_name))
 
             # str means it's a list of named animations

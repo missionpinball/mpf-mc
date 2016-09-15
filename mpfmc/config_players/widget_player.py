@@ -49,9 +49,11 @@ class McWidgetPlayer(McConfigPlayer):
             except KeyError:
                 # check if slide does exist
                 if slide_name not in self.machine.slides:
+                    s['slide'] = slide_name
                     raise KeyError(
-                        "Cannot add widget to slide '{}' as that is not a "
-                        "valid slide".format(slide_name))
+                        "Widget Player Error: Slide name '{}' is not valid "
+                        "slide. Widget config that caused this: "
+                        "{}".format(slide_name, s))
                 else:
                     raise SlideNotActiveError(slide_name=slide_name)
 

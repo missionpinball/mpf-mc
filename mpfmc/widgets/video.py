@@ -1,7 +1,7 @@
 from kivy.uix.video import Video
 from kivy.core.video import Video as CoreVideo
 
-from mpfmc.uix.widget import MpfWidget
+from mpfmc.uix.widget import MpfWidget, magic_events
 
 
 class VideoWidget(MpfWidget, Video):
@@ -18,12 +18,9 @@ class VideoWidget(MpfWidget, Video):
                              "valid video name.".format(self.config['video']))
 
         self._control_events = list()
-        self._magic_events = ('add_to_slide', 'remove_from_slide',
-                              'pre_show_slide', 'show_slide',
-                              'pre_slide_leave', 'slide_leave', 'slide_play')
 
         self._registered_magic_events = dict()
-        for event in self._magic_events:
+        for event in magic_events:
             self._registered_magic_events[event] = list()
 
         self.merge_asset_config(self.video)
@@ -79,7 +76,7 @@ class VideoWidget(MpfWidget, Video):
                 raise AssertionError("Invalid control_event action {} in "
                                      "video".format(entry['action']), self)
 
-            if entry['event'] in self._magic_events:
+            if entry['event'] in magic_events:
                 self._registered_magic_events[entry['event']].append(
                     (handler, kwargs))
 

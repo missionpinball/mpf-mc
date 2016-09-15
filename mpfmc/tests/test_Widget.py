@@ -136,9 +136,7 @@ class TestWidget(MpfMcTestCase):
 
         self.mc.events.post('add_widget2_to_slide1')
 
-        with self.assertRaises(KeyError,
-                msg="Cannot add widget to slide 'slide1' as that is not a "
-                    "valid slide"):
+        with self.assertRaises(KeyError):
             self.advance_time()
 
     def test_widget_player_with_different_key_than_named_widget(self):
