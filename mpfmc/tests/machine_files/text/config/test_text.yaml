@@ -153,7 +153,7 @@ slides:
   mpfmc_font:
     - type: text
       text: MPF-MC FONT TEST
-      font_name: dmd7
+      font_name: pixelmix
 
   machine_font:
     - type: text
