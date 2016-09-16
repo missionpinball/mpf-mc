@@ -7,7 +7,6 @@ from copy import deepcopy
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
-from mpfmc.assets.sound import ModeEndAction
 
 
 class McSoundPlayer(McConfigPlayer):
@@ -219,9 +218,9 @@ Here are several various examples:
         # during the iteration process.
         self.machine.log.debug("SoundPlayer: Clearing context - applying mode_end_action for all active sounds")
         for sound_instance in list(instance_dict.values()):
-            if sound_instance.mode_end_action == ModeEndAction.stop:
+            if sound_instance.stop_on_mode_end:
                 sound_instance.stop()
-            elif sound_instance.mode_end_action == ModeEndAction.stop_looping:
+            else:
                 sound_instance.stop_looping()
 
         self._reset_instance_dict(context)

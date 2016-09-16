@@ -470,6 +470,11 @@ class SoundAsset(Asset):
         return self._mode_end_action
 
     @property
+    def stop_on_mode_end(self):
+        """Return whether or not the sound should stop immediately upon mode end"""
+        return self._mode_end_action == ModeEndAction.stop
+
+    @property
     def markers(self):
         """List of marker dictionary objects containing markers for this sound (optional)"""
         return self._markers
@@ -911,6 +916,11 @@ class SoundInstance(object):
     def mode_end_action(self):
         """Return the action to take when the owning mode (context) ends"""
         return self._mode_end_action
+
+    @property
+    def stop_on_mode_end(self):
+        """Return whether or not the sound should stop immediately upon mode end"""
+        return self._mode_end_action == ModeEndAction.stop
 
     @property
     def markers(self):
