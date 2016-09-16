@@ -321,7 +321,7 @@ class TestText(MpfMcTestCase):
     def test_custom_fonts(self):
         self.mc.events.post('mpfmc_font')
         self.advance_time()
-        self.assertEqual('dmd7', self.get_widget().font_name)
+        self.assertEqual('pixelmix', self.get_widget().font_name)
         self.mc.events.post('machine_font')
         self.advance_time()
         self.assertEqual('big_noodle_titling', self.get_widget().font_name)

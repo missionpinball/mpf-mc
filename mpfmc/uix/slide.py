@@ -152,14 +152,14 @@ class Slide(Screen):
                                           self.height,
                                           widget_obj.width,
                                           widget_obj.height,
-                                          widget['x'],
-                                          widget['y'],
-                                          widget['anchor_x'],
-                                          widget['anchor_y'],
-                                          widget['adjust_top'],
-                                          widget['adjust_right'],
-                                          widget['adjust_bottom'],
-                                          widget['adjust_left'])
+                                          widget_obj.config['x'],
+                                          widget_obj.config['y'],
+                                          widget_obj.config['anchor_x'],
+                                          widget_obj.config['anchor_y'],
+                                          widget_obj.config['adjust_top'],
+                                          widget_obj.config['adjust_right'],
+                                          widget_obj.config['adjust_bottom'],
+                                          widget_obj.config['adjust_left'])
             widgets_added.append(widget_obj)
 
         return widgets_added

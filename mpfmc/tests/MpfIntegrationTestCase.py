@@ -38,6 +38,8 @@ class TestBcpClient(MockBcpClient):
 
 class MpfIntegrationTestCase(MpfTestCase):
 
+    fps = 30
+
     def getAbsoluteMachinePath(self):
         # creates an absolute path based on machine_path
         return os.path.abspath(os.path.join(
@@ -170,17 +172,17 @@ class MpfIntegrationTestCase(MpfTestCase):
         Clock._events = [[] for i in range(256)]
         with patch("mpfmc.core.bcp_processor.BCPServer"):
             self._start_mc()
-        self.mc_task = self.clock.schedule_interval(self._run_mc, 1 / 30)
+        self.mc_task = self.clock.schedule_interval(self._run_mc, 1 / self.fps)
 
         client = self.machine.bcp.transport.get_named_client("local_display")
         bcp_mc = self.mc.bcp_processor
         bcp_mc.send = client.receive
         self.mc.events.post("client_connected")
-        self.machine_run()
+        self.advance_time_and_run()
         while not client.queue.empty():
             bcp_mc.receive_queue.put(client.queue.get())
         client.queue = bcp_mc.receive_queue
-        self.machine_run()
+        self.advance_time_and_run()
 
     def tearDown(self):
         self.mc.stop()

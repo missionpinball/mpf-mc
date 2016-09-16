@@ -63,3 +63,6 @@ _cache
 
 # MPF build files
 build_scripts/wheels
+
+# Mac OS files
+.DS_Store
