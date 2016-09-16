@@ -359,7 +359,7 @@ class TestAudio(MpfMcTestCase):
                 text_sound.load()
             self.advance_time(1)
             
-        self.assertEqual(text_sound.max_instances, 3)
+        self.assertEqual(text_sound.simultaneous_limit, 3)
         if SoundStealingMethod is not None:
             self.assertEqual(text_sound.stealing_method, SoundStealingMethod.skip)
 
@@ -395,7 +395,7 @@ class TestAudio(MpfMcTestCase):
             if not synthping.loading:
                 synthping.load()
             self.advance_time(1)
-        self.assertEqual(synthping.max_instances, 3)
+        self.assertEqual(synthping.simultaneous_limit, 3)
         if SoundStealingMethod is not None:
             self.assertEqual(synthping.stealing_method, SoundStealingMethod.oldest)
 
@@ -459,7 +459,7 @@ class TestAudio(MpfMcTestCase):
             if not sfx.loading:
                 sfx.load()
             self.advance_time(1)
-        self.assertEqual(sfx.max_instances, 3)
+        self.assertEqual(sfx.simultaneous_limit, 3)
         if SoundStealingMethod is not None:
             self.assertEqual(sfx.stealing_method, SoundStealingMethod.newest)
 
@@ -520,10 +520,10 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(track_sfx.get_sound_players_in_use_count(), 0)
         self.assertEqual(track_sfx.get_sound_queue_count(), 0)
 
-        # Test max_instances in sound group (skip stealing method)
+        # Test simultaneous_limit in sound group (skip stealing method)
         self.assertIn('drum_group', self.mc.sounds)
         drum_group = self.mc.sounds['drum_group']
-        self.assertEqual(drum_group.max_instances, 3)
+        self.assertEqual(drum_group.simultaneous_limit, 3)
         if SoundStealingMethod is not None:
             self.assertEqual(drum_group.stealing_method, SoundStealingMethod.skip)
 
@@ -588,7 +588,7 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(text_sound_instance.fade_out, 0)
         self.assertEqual(text_sound_instance.fade_out, 0)
         self.assertIsNone(text_sound_instance.max_queue_time)
-        self.assertEqual(text_sound_instance.max_instances, 3)
+        self.assertEqual(text_sound_instance.simultaneous_limit, 3)
 
         track_sfx.stop_all_sounds()
         self.advance_time()
@@ -610,7 +610,7 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(text_sound_instance.fade_in, 0.25)
         self.assertEqual(text_sound_instance.fade_out, 0.1)
         self.assertEqual(text_sound_instance.max_queue_time, 0.15)
-        self.assertEqual(text_sound_instance.max_instances, 3)
+        self.assertEqual(text_sound_instance.simultaneous_limit, 3)
 
         track_sfx.stop_all_sounds()
         self.advance_time()
