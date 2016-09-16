@@ -31,13 +31,13 @@ class SoundPool(AssetPool):
     # pylint: disable=invalid-name
     def __init__(self, mc, name, config, member_cls):
         super().__init__(mc, name, config, member_cls)
-        self._max_instances = None
+        self._simultaneous_limit = None
         self._stealing_method = SoundStealingMethod.oldest
         self._instances = list()
         self.log = logging.getLogger('SoundPool')
 
-        if 'max_instances' in self.config and self.config['max_instances'] is not None:
-            self._max_instances = int(self.config['max_instances'])
+        if 'simultaneous_limit' in self.config and self.config['simultaneous_limit'] is not None:
+            self._simultaneous_limit = int(self.config['simultaneous_limit'])
 
         if 'stealing_method' in self.config and self.config['stealing_method'] is not None:
             method = str(self.config['stealing_method']).lower()
@@ -61,17 +61,17 @@ class SoundPool(AssetPool):
         return self.asset
 
     @property
-    def max_instances(self):
+    def simultaneous_limit(self):
         """Return the maximum number of instances of the sound pool sounds that may be
         played simultaneously"""
-        return self._max_instances
+        return self._simultaneous_limit
 
     @property
     def stealing_method(self):
         """Return the method used when stealing a sound instance (when a new sound
         instance is requested from the sound pool but the maximum number of instances
         has currently been reached)."""
-        if self.max_instances is None:
+        if self.simultaneous_limit is None:
             return None
         else:
             return self._stealing_method
@@ -85,7 +85,7 @@ class SoundPool(AssetPool):
         self.log.debug("Play sound pool %s", self.name)
 
         # Determine if the maximum number of instances of this sound pool's sounds has been reached
-        if self.max_instances is not None and len(self._instances) == self.max_instances:
+        if self.simultaneous_limit is not None and len(self._instances) == self.simultaneous_limit:
 
             # Perform action based on stealing method
             if self.stealing_method == SoundStealingMethod.oldest:
@@ -238,7 +238,7 @@ class SoundAsset(Asset):
         self._start_at = 0
         self._fade_in = 0
         self._fade_out = 0
-        self._max_instances = None
+        self._simultaneous_limit = None
         self._stealing_method = SoundStealingMethod.oldest
         self._events_when_played = None
         self._events_when_stopped = None
@@ -290,8 +290,8 @@ class SoundAsset(Asset):
         if 'loops' in self.config:
             self._loops = int(self.config['loops'])
 
-        if 'max_instances' in self.config and self.config['max_instances'] is not None:
-            self._max_instances = int(self.config['max_instances'])
+        if 'simultaneous_limit' in self.config and self.config['simultaneous_limit'] is not None:
+            self._simultaneous_limit = int(self.config['simultaneous_limit'])
 
         if 'start_at' in self.config and self.config['start_at'] is not None:
             self._start_at = AudioInterface.string_to_secs(self.config['start_at'])
@@ -417,17 +417,17 @@ class SoundAsset(Asset):
         return self._loops
 
     @property
-    def max_instances(self):
+    def simultaneous_limit(self):
         """Return the maximum number of instances of the sound that may be
         played simultaneously"""
-        return self._max_instances
+        return self._simultaneous_limit
 
     @property
     def stealing_method(self):
         """Return the method used when stealing a sound instance (when a new sound
         instance is requested but the maximum number of instances has currently
         been reached)."""
-        if self.max_instances is None:
+        if self.simultaneous_limit is None:
             return None
         else:
             return self._stealing_method
@@ -513,7 +513,7 @@ class SoundAsset(Asset):
         self.log.debug("Play sound %s on track %s", self.name, self.track)
 
         # Determine if the maxmimum number of instances of this sound has been reached
-        if self.max_instances is not None and len(self._instances) == self.max_instances:
+        if self.simultaneous_limit is not None and len(self._instances) == self.simultaneous_limit:
 
             # Perform action based on stealing method
             if self.stealing_method == SoundStealingMethod.oldest:
@@ -850,10 +850,10 @@ class SoundInstance(object):
         return self._loops
 
     @property
-    def max_instances(self):
+    def simultaneous_limit(self):
         """Return the maximum number of instances of the sound that may be
         played simultaneously"""
-        return self._sound.max_instances
+        return self._sound.simultaneous_limit
 
     @property
     def stealing_method(self):

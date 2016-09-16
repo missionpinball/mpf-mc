@@ -41,7 +41,7 @@ sounds:
         events_when_looping: text_sound_looping
         events_when_stopped: text_sound_stopped
         loops: 7
-        max_instances: 3
+        simultaneous_limit: 3
         stealing_method: skip
     104457_moron_test:
         events_when_played: moron_test_played
@@ -61,18 +61,18 @@ sounds:
               name: verse_1
               events: moron_next_marker, last_marker
     210871_synthping:
-        max_instances: 3
+        simultaneous_limit: 3
         stealing_method: oldest
         events_when_played: synthping_played
     198361_sfx-028:
-        max_instances: 3
+        simultaneous_limit: 3
         stealing_method: newest
 
 sound_pools:
     drum_group:
         load: preload
         type: sequence
-        max_instances: 3
+        simultaneous_limit: 3
         stealing_method: skip
         sounds:
             4832__zajo__drum07
