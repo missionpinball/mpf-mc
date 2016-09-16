@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0', 'dev16')
+__version_info__ = ('0', '31', '0', 'dev17')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -1906,13 +1906,14 @@ cdef class TrackStandard(Track):
         if notification_message == NULL:
             return
 
+        self.log.debug("Processing notification message %d for sound instance (id: %d)",
+                       notification_message.message, notification_message.sound_instance_id)
+
         if notification_message.sound_instance_id not in self._sound_instances_by_id:
-            self.log.error("Received a notification message for a sound instance (id: %d) "
-                           "that is no longer managed in the audio library",
-                           notification_message.sound_instance_id)
-            raise AudioException("Received a notification message for a sound instance (id: %d) "
-                                 "that is no longer managed in the audio library",
-                                 notification_message.sound_instance_id)
+            self.log.warning("Received a notification message for a sound instance (id: %d) "
+                             "that is no longer managed in the audio library. "
+                             "Notification will be discarded.",
+                             notification_message.sound_instance_id)
 
         elif notification_message.message == notification_sound_started:
             sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
@@ -1937,10 +1938,12 @@ cdef class TrackStandard(Track):
                 sound_instance.set_marker(notification_message.data.marker.id)
 
         else:
-            raise AudioException("Unknown notification message received on Track %s", self.name)
+            raise AudioException("Unknown notification message received on %s track", self.name)
 
         # Event has been processed, reset it so it may be used again
         notification_message.message = notification_not_in_use
+        notification_message.sound_id = 0
+        notification_message.sound_instance_id = 0
 
     def _get_next_sound(self):
         """
@@ -2379,6 +2382,7 @@ cdef class TrackStandard(Track):
                 self.log.warning("All internal audio messages are "
                                "currently in use, could not play sound %s"
                                , sound_instance.name)
+                return False
 
             self.log.debug("Sound %s is set to begin playback on player %d (loops=%d)",
                            sound_instance.name, player, sound_instance.loops)
