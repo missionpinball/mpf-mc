@@ -207,6 +207,12 @@ class SoundStealingMethod(Enum):
     newest = 2  # The newest (most-recent) sound will be replaced
 
 
+@unique
+class ModeEndAction(Enum):
+    """Enumerated class containing sound mode (context) end actions."""
+    stop = 0          # Sound will stop immediately (uses fade_out setting)
+    stop_looping = 1  # Looping will be canceled and the sound will be allowed to finish
+
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
 class SoundAsset(Asset):
     """
@@ -243,6 +249,7 @@ class SoundAsset(Asset):
         self._events_when_played = None
         self._events_when_stopped = None
         self._events_when_looping = None
+        self._mode_end_action = ModeEndAction.stop_looping
         self._markers = list()
         self._container = None  # holds the actual sound samples in memory
         self._ducking = None
@@ -325,6 +332,16 @@ class SoundAsset(Asset):
         if 'events_when_looping' in self.config and isinstance(
                 self.config['events_when_looping'], str):
             self._events_when_looping = Util.string_to_list(self.config['events_when_looping'])
+
+        if 'mode_end_action' in self.config and self.config['mode_end_action'] is not None:
+            action = str(self.config['mode_end_action']).lower()
+            if action == 'stop':
+                self._mode_end_action = ModeEndAction.stop
+            elif action == 'stop_looping':
+                self._mode_end_action = ModeEndAction.stop_looping
+            else:
+                raise AudioException("Illegal value for sound.mode_end_action. "
+                                     "Could not create sound '{}' asset".format(name))
 
         if 'markers' in self.config:
             self._markers = SoundAsset.load_markers(self.config['markers'], self.name)
@@ -446,6 +463,11 @@ class SoundAsset(Asset):
     def events_when_looping(self):
         """Return the list of events that are posted when the sound begins a new loop"""
         return self._events_when_looping
+
+    @property
+    def mode_end_action(self):
+        """Return the action to take when the owning mode (context) ends"""
+        return self._mode_end_action
 
     @property
     def markers(self):
@@ -711,6 +733,7 @@ class SoundInstance(object):
         self._events_when_played = sound.events_when_played
         self._events_when_stopped = sound.events_when_stopped
         self._events_when_looping = sound.events_when_looping
+        self._mode_end_action = sound.mode_end_action
         self._markers = sound.markers
 
         if settings is None:
@@ -748,6 +771,13 @@ class SoundInstance(object):
 
         if 'events_when_looping' in settings:
             self._events_when_looping = settings['events_when_looping']
+
+        if 'mode_end_action' in settings and settings['mode_end_action'] is not None:
+            action = str(settings['mode_end_action']).lower()
+            if action == 'stop':
+                self._mode_end_action = ModeEndAction.stop
+            elif action == 'stop_looping':
+                self._mode_end_action = ModeEndAction.stop_looping
 
         if settings is not None and 'markers' in settings:
             self._markers = SoundAsset.load_markers(settings['markers'], self.name)
@@ -876,6 +906,11 @@ class SoundInstance(object):
     def events_when_looping(self):
         """Return the list of events that are posted when the sound begins a new loop"""
         return self._events_when_looping
+
+    @property
+    def mode_end_action(self):
+        """Return the action to take when the owning mode (context) ends"""
+        return self._mode_end_action
 
     @property
     def markers(self):

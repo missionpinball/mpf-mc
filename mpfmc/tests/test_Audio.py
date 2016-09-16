@@ -226,6 +226,17 @@ class TestAudio(MpfMcTestCase):
         # Mock BCP send method
         self.mc.bcp_processor.send = MagicMock()
 
+        # Get tracks
+        track_sfx = interface.get_track_by_name("sfx")
+        self.assertIsNotNone(track_sfx)
+        self.assertEqual(track_sfx.name, "sfx")
+        track_music = interface.get_track_by_name("music")
+        self.assertIsNotNone(track_music)
+        self.assertEqual(track_music.name, "music")
+
+        self.assertIn('263774_music', self.mc.sounds)  # .wav
+        music_sound = self.mc.sounds['263774_music']
+
         # Allow some time for sound assets to load
         self.advance_time(2)
 
@@ -234,11 +245,28 @@ class TestAudio(MpfMcTestCase):
         self.assertTrue(self.mc.modes['mode2'].active)
         self.assertEqual(self.mc.modes['mode2'].priority, 500)
         self.assertIn('boing_mode2', self.mc.sounds)  # .wav
+        boing_sound = self.mc.sounds['boing_mode2']
+        self.advance_time()
 
-        self.advance_time(1)
-
+        # Play a longer music sound (launched by sound_player in mode2).  Will test
+        # sound's mode_end_action when the mode ends.
         self.mc.events.post('play_sound_boing_in_mode2')
+        self.advance_time()
+        self.assertTrue(track_sfx.sound_is_playing(boing_sound))
         self.advance_time(1)
+
+        self.mc.events.post('play_sound_music_fade_at_mode_end')
+        self.advance_time()
+        self.assertTrue(track_music.sound_is_playing(music_sound))
+        self.advance_time(2)
+
+        # End mode (sound should fade out for 1 second then stop)
+        self.send(bcp_command='mode_stop', name='mode2')
+        self.assertFalse(self.mc.modes['mode2'].active)
+        self.advance_time()
+        self.assertTrue(track_music.sound_is_playing(music_sound))
+        self.advance_time(1.1)
+        self.assertFalse(track_music.sound_is_playing(music_sound))
 
     def test_sound_fading(self):
         """ Tests the fading of sounds"""

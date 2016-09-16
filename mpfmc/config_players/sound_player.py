@@ -7,6 +7,7 @@ from copy import deepcopy
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
+from mpfmc.assets.sound import ModeEndAction
 
 
 class McSoundPlayer(McConfigPlayer):
@@ -199,6 +200,9 @@ Here are several various examples:
                 if len(sound_settings['events_when_looping']) == 1 and \
                                 sound_settings['events_when_looping'][0] == 'use_sound_setting':
                     del sound_settings['events_when_looping']
+                if sound_settings['mode_end_action'] is None or \
+                                sound_settings['mode_end_action'] == 'use_sound_setting':
+                    del sound_settings['mode_end_action']
 
         return validated_config
 
@@ -213,8 +217,13 @@ Here are several various examples:
         instance_dict = self._get_instance_dict(context)
         # Iterate over a copy of the dictionary values since it may be modified
         # during the iteration process.
-        for sound in list(instance_dict.values()):
-            sound.stop_looping()
+        self.machine.log.debug("SoundPlayer: Clearing context - applying mode_end_action for all active sounds")
+        for sound_instance in list(instance_dict.values()):
+            if sound_instance.mode_end_action == ModeEndAction.stop:
+                sound_instance.stop()
+            elif sound_instance.mode_end_action == ModeEndAction.stop_looping:
+                sound_instance.stop_looping()
+
         self._reset_instance_dict(context)
 
     def on_sound_instance_finished(self, sound_instance_id, context, **kwargs):
