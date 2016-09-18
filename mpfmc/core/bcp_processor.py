@@ -14,6 +14,7 @@ class BcpProcessor(object):
         self.mc = mc
         self.log = logging.getLogger('BcpProcessor')
 
+        self.socket_thread = None
         self.receive_queue = queue.Queue()
         self.sending_queue = queue.Queue()
 
@@ -57,10 +58,16 @@ class BcpProcessor(object):
         self.send("register_trigger", event=event)
 
     def _start_socket_thread(self):
+
+        if self.socket_thread:
+            return
+
         self.socket_thread = BCPServer(self.mc, self.receive_queue,
                                        self.sending_queue)
         self.socket_thread.daemon = True
         self.socket_thread.start()
+
+        self.mc.events.remove_handler(self._start_socket_thread)
 
     def send(self, bcp_command, callback=None, rawbytes=None, **kwargs):
         """Sends a BCP command to the connected pinball controller.
