@@ -1,3 +1,6 @@
+integration:
+	python3 -m unittest discover -s mpfmc/integration
+
 unit:
 	python3 -m unittest discover -s mpfmc/tests
 
