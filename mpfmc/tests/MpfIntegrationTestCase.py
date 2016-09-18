@@ -40,6 +40,9 @@ class MpfIntegrationTestCase(MpfTestCase):
 
     fps = 30
 
+    def get_use_bcp(self):
+        return True
+
     def getAbsoluteMachinePath(self):
         # creates an absolute path based on machine_path
         return os.path.abspath(os.path.join(
