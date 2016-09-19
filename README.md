@@ -19,9 +19,9 @@ separate machine. It runs as a separate process from MPF, so it works well on a 
 
 The MPF project homepage is here : https://missionpinball.com/mpf/
 
-[![Coverage Status](https://coveralls.io/repos/missionpinball/mpf-mc/badge.svg?branch=0.30&service=github)](https://coveralls.io/github/missionpinball/mpf-mc?branch=0.30)
-[![Build Status](https://travis-ci.org/missionpinball/mpf-mc.svg?branch=0.30)](https://travis-ci.org/missionpinball/mpf-mc)
-[![Code Health](https://landscape.io/github/missionpinball/mpf-mc/0.30/landscape.svg?style=flat)](https://landscape.io/github/missionpinball/mpf-mc/0.30)
+[![Coverage Status](https://coveralls.io/repos/missionpinball/mpf-mc/badge.svg?branch=0.31&service=github)](https://coveralls.io/github/missionpinball/mpf-mc?branch=0.31)
+[![Build Status](https://travis-ci.org/missionpinball/mpf-mc.svg?branch=0.31)](https://travis-ci.org/missionpinball/mpf-mc)
+[![Code Health](https://landscape.io/github/missionpinball/mpf-mc/0.31/landscape.svg?style=flat)](https://landscape.io/github/missionpinball/mpf-mc/0.31)
 
 Installation, Documentation, and Examples
 -----------------------------------------
@@ -36,7 +36,7 @@ We have a user support forum at : https://groups.google.com/forum/#!forum/mpf-us
 
 Authors & Contributing
 ----------------------
-MPF and the MPF-MC are labors of love by awesome pinball-loving people. There's a list of authors in the AUTHORS file.
+MPF and the MPF-MC are labors of love created by awesome pinball-loving people. There's a list of authors in the AUTHORS file.
 We'd love for you to join us! Even if you don't know Python well, there's plenty to do. Drop us a line in the forum, or
 make a change and submit a pull request! More info [here](http://docs.missionpinball.org/en/stable/contribute/).
 
