@@ -58,6 +58,6 @@ deploy_script:
   - "%PYTHON%\\python.exe -m twine upload -u %pypi_user% -p %pypi_password% --skip-existing *"
 
 cache:
-  - C:\\tmp\\%PLATFORM%\\mingwpy -> appveyor.yml
-  - C:\\tmp\\%PLATFORM%\\deps -> appveyor.yml
-  - C:\\tmp\\%PLATFORM%\\gstreamer -> appveyor.yml
+  - 'C:\\tmp\\%PLATFORM%\\mingwpy -> appveyor.yml'
+  - 'C:\\tmp\\%PLATFORM%\\deps -> appveyor.yml'
+  - 'C:\\tmp\\%PLATFORM%\\gstreamer -> appveyor.yml'
