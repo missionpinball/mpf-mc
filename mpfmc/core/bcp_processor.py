@@ -57,7 +57,8 @@ class BcpProcessor(object):
         """Register a trigger for events from MPF."""
         self.send("register_trigger", event=event)
 
-    def _start_socket_thread(self):
+    def _start_socket_thread(self, **kwargs):
+        del kwargs
 
         if self.socket_thread:
             return
