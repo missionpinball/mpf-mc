@@ -115,8 +115,9 @@ class SoundSystem(object):
         self.mc.events.add_handler("master_volume_decrease", self.master_volume_decrease)
         self.mc.events.add_handler("shutdown", self.shutdown)
 
-    def shutdown(self):
+    def shutdown(self, **kwargs):
         """Shuts down the audio interface"""
+        del kwargs
         if self.enabled:
             self.audio_interface.disable()
             self._initialized = False

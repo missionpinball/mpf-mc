@@ -135,7 +135,8 @@ class MpfTextInput(Text):
 
         self.shift(0, True)
 
-    def shift(self, places=1, force=False):
+    def shift(self, places=1, force=False, **kwargs):
+        del kwargs
         if self.active or force:
             self.char_list.rotate(-places)
 
@@ -155,7 +156,8 @@ class MpfTextInput(Text):
             if self.config['dynamic_x'] and self.linked_text_widget:
                 self.set_relative_position()
 
-    def select(self):
+    def select(self, **kwargs):
+        del kwargs
         if not self.active:
             return
 
@@ -190,7 +192,8 @@ class MpfTextInput(Text):
             self.x += (self.linked_text_widget_right_edge +
                        self.config['dynamic_x_pad'] - self.x)
 
-    def complete(self):
+    def complete(self, **kwargs):
+        del kwargs
         self.done()
         self.mc.bcp_processor.send(bcp_command='trigger',
             name='text_input_{}_complete'.format(self.key),
@@ -206,7 +209,8 @@ class MpfTextInput(Text):
             text: A string of the final characters that were entered.
         """
 
-    def abort(self):
+    def abort(self, **kwargs):
+        del kwargs
         self.done()
         self.mc.events.post('text_input_{}_abort'.format(self.key),
                             text=self.linked_text_widget.text)

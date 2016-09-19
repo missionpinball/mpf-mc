@@ -18,7 +18,8 @@ class McConfigPlayer(DeviceConfigPlayer, metaclass=abc.ABCMeta):
     def __repr__(self):
         return 'McConfigPlayer.{}'.format(self.show_section)
 
-    def _initialise_system_wide(self):
+    def _initialise_system_wide(self, **kwargs):
+        del kwargs
         # this does not call super() since the base class uses self.config
         # and the mc uses self.machine_config
         if self.machine_collection_name:
