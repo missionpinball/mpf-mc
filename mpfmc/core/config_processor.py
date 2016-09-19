@@ -41,7 +41,8 @@ class ConfigProcessor(ConfigProcessorBase):
             from mpfmc.uix.display import Display
             Display.create_default_display(self.mc)
 
-    def _init(self):
+    def _init(self, **kwargs):
+        del kwargs
         self.process_config_file(section_dict=self.machine_sections,
                                  config=self.mc.machine_config)
 

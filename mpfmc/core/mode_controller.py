@@ -46,7 +46,8 @@ class ModeController(object):
             self.mc.events.add_handler('init_phase_2',
                                        self._load_modes)
 
-    def _load_modes(self):
+    def _load_modes(self, **kwargs):
+        del kwargs
         # Loads the modes from the modes: section of the machine configuration
         # file.
 
