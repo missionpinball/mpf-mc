@@ -1842,7 +1842,7 @@ static const char __pyx_k_D[] = "D";
 static const char __pyx_k_H[] = "H";
 static const char __pyx_k_M[] = "M";
 static const char __pyx_k_S[] = "S";
-static const char __pyx_k_31[] = "31";
+static const char __pyx_k_32[] = "32";
 static const char __pyx_k_DB[] = "DB";
 static const char __pyx_k_MS[] = "MS";
 static const char __pyx_k__6[] = "";
@@ -1883,7 +1883,6 @@ static const char __pyx_k_clear[] = "clear";
 static const char __pyx_k_close[] = "close";
 static const char __pyx_k_debug[] = "debug";
 static const char __pyx_k_delay[] = "delay";
-static const char __pyx_k_dev17[] = "dev17";
 static const char __pyx_k_error[] = "error";
 static const char __pyx_k_items[] = "items";
 static const char __pyx_k_loops[] = "loops";
@@ -1906,6 +1905,7 @@ static const char __pyx_k_number[] = "number";
 static const char __pyx_k_player[] = "player";
 static const char __pyx_k_status[] = "status";
 static const char __pyx_k_volume[] = "volume";
+static const char __pyx_k_0_dev01[] = "0-dev01";
 static const char __pyx_k_Track_2[] = "<Track.{}.{}>";
 static const char __pyx_k_Track_3[] = "Track.";
 static const char __pyx_k_disable[] = "disable";
@@ -2080,7 +2080,8 @@ static const char __pyx_k_play_sound_Processing_sound_s_fo_2[] = "play_sound - P
 static const char __pyx_k_play_sound_Sound_priority_d_is_l_2[] = "play_sound - Sound priority (%d) is less than or equal to the lowest sound currently playing (%d). Sound will be queued for playback.";
 static const char __pyx_k_play_sound_Sound_s_was_not_loade_2[] = "play_sound - Sound %s was not loaded and max_queue_time = 0, therefore it has been discarded and will not be played.";
 static PyObject *__pyx_kp_u_0;
-static PyObject *__pyx_kp_u_31;
+static PyObject *__pyx_kp_u_0_dev01;
+static PyObject *__pyx_kp_u_32;
 static PyObject *__pyx_kp_u_Add_track_failed_the_maximum_num;
 static PyObject *__pyx_kp_u_Add_track_failed_the_track_name;
 static PyObject *__pyx_kp_u_Adding_sound_instance_s_to_activ;
@@ -2178,7 +2179,6 @@ static PyObject *__pyx_n_s_db;
 static PyObject *__pyx_n_s_db_to_gain;
 static PyObject *__pyx_n_s_debug;
 static PyObject *__pyx_n_s_delay;
-static PyObject *__pyx_n_u_dev17;
 static PyObject *__pyx_n_s_disable;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_n_s_ducking;
@@ -28496,7 +28496,8 @@ static struct PyModuleDef __pyx_moduledef = {
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_0, __pyx_k_0, sizeof(__pyx_k_0), 0, 1, 0, 0},
-  {&__pyx_kp_u_31, __pyx_k_31, sizeof(__pyx_k_31), 0, 1, 0, 0},
+  {&__pyx_kp_u_0_dev01, __pyx_k_0_dev01, sizeof(__pyx_k_0_dev01), 0, 1, 0, 0},
+  {&__pyx_kp_u_32, __pyx_k_32, sizeof(__pyx_k_32), 0, 1, 0, 0},
   {&__pyx_kp_u_Add_track_failed_the_maximum_num, __pyx_k_Add_track_failed_the_maximum_num, sizeof(__pyx_k_Add_track_failed_the_maximum_num), 0, 1, 0, 0},
   {&__pyx_kp_u_Add_track_failed_the_track_name, __pyx_k_Add_track_failed_the_track_name, sizeof(__pyx_k_Add_track_failed_the_track_name), 0, 1, 0, 0},
   {&__pyx_kp_u_Adding_sound_instance_s_to_activ, __pyx_k_Adding_sound_instance_s_to_activ, sizeof(__pyx_k_Adding_sound_instance_s_to_activ), 0, 1, 0, 0},
@@ -28594,7 +28595,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_db_to_gain, __pyx_k_db_to_gain, sizeof(__pyx_k_db_to_gain), 0, 0, 1, 1},
   {&__pyx_n_s_debug, __pyx_k_debug, sizeof(__pyx_k_debug), 0, 0, 1, 1},
   {&__pyx_n_s_delay, __pyx_k_delay, sizeof(__pyx_k_delay), 0, 0, 1, 1},
-  {&__pyx_n_u_dev17, __pyx_k_dev17, sizeof(__pyx_k_dev17), 0, 1, 0, 1},
   {&__pyx_n_s_disable, __pyx_k_disable, sizeof(__pyx_k_disable), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_n_s_ducking, __pyx_k_ducking, sizeof(__pyx_k_ducking), 0, 0, 1, 1},
@@ -29043,11 +29043,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":15
  *            )
  * 
- * __version_info__ = ('0', '31', '0', 'dev17')             # <<<<<<<<<<<<<<
+ * __version_info__ = ('0', '32', '0-dev01')             # <<<<<<<<<<<<<<
  * __version__ = '.'.join(__version_info__)
  * 
  */
-  __pyx_tuple__27 = PyTuple_Pack(4, __pyx_kp_u_0, __pyx_kp_u_31, __pyx_kp_u_0, __pyx_n_u_dev17); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_tuple__27 = PyTuple_Pack(3, __pyx_kp_u_0, __pyx_kp_u_32, __pyx_kp_u_0_dev01); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__27);
   __Pyx_GIVEREF(__pyx_tuple__27);
 
@@ -29411,7 +29411,7 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":15
  *            )
  * 
- * __version_info__ = ('0', '31', '0', 'dev17')             # <<<<<<<<<<<<<<
+ * __version_info__ = ('0', '32', '0-dev01')             # <<<<<<<<<<<<<<
  * __version__ = '.'.join(__version_info__)
  * 
  */
@@ -29419,7 +29419,7 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
 
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":16
  * 
- * __version_info__ = ('0', '31', '0', 'dev17')
+ * __version_info__ = ('0', '32', '0-dev01')
  * __version__ = '.'.join(__version_info__)             # <<<<<<<<<<<<<<
  * 
  * from libc.stdio cimport FILE, fopen, fprintf
