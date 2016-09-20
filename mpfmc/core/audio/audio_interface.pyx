@@ -1636,7 +1636,13 @@ cdef class Track:
         self.state.buffer = <void *>PyMem_Malloc(buffer_size)
         self.state.buffer_size = buffer_size
         self.log.debug("Allocated track audio buffer (%d bytes)", buffer_size)
+
+        self.status = track_status_playing
         self.volume = volume
+        self.current_volume = self.volume
+        self.fading = False
+        self.fade_steps = 0
+        self.fade_steps_remaining = 0
 
     def __repr__(self):
         return '<Track.{}.{}>'.format(self.number, self.name)

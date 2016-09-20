@@ -3,6 +3,8 @@ import logging
 
 from kivy.clock import Clock
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException, Track
+from mpf.core.case_insensitive_dict import CaseInsensitiveDict
+
 
 __all__ = ('SoundSystem',
            'AudioInterface',
@@ -40,7 +42,6 @@ class SoundSystem(object):
         self._initialized = False
         self.audio_interface = None
         self.config = {}
-        self.tracks = {}
         self.sound_events = {}
         self.clock_event = None
 
@@ -93,6 +94,11 @@ class SoundSystem(object):
             return
 
         # Setup tracks in audio system (including initial volume levels)
+        if not hasattr(self.mc, 'tracks'):
+            # some assets of different classes use the same mc attribute, like
+            # images and animated_images
+            setattr(self.mc, 'tracks', CaseInsensitiveDict())
+
         if 'tracks' in self.config:
             for track_name, track_config in self.config['tracks'].items():
                 self._create_track(track_name, track_config)
@@ -178,7 +184,7 @@ class SoundSystem(object):
                                  "not been initialized".format(name))
 
         # Validate track config parameters
-        if name in self.tracks:
+        if name in self.mc.tracks:
             raise AudioException("Could not create '{}' track - a track with that name "
                                  "already exists".format(name))
 
@@ -214,7 +220,7 @@ class SoundSystem(object):
         if track is None:
             raise AudioException("Could not create '{}' track due to an error".format(name))
 
-        self.tracks[name] = track
+        self.mc.tracks[name] = track
 
     def tick(self, dt):
         """Clock callback function"""

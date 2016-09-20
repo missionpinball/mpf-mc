@@ -213,6 +213,7 @@ class ModeEndAction(Enum):
     stop = 0          # Sound will stop immediately (uses fade_out setting)
     stop_looping = 1  # Looping will be canceled and the sound will be allowed to finish
 
+
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
 class SoundAsset(Asset):
     """

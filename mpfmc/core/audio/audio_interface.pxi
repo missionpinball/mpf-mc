@@ -170,13 +170,25 @@ cdef enum TrackType:
     track_type_playlist = 2
     track_type_live_loop = 3
 
+cdef enum TrackStatus:
+    track_status_stopped = 0
+    track_status_stopping = 1
+    track_status_playing = 2
+    track_status_pausing = 3
+    track_status_paused = 4
+
 ctypedef struct TrackState:
     # Common track state variables (for all track types)
     TrackType type
     void* type_state
+    TrackStatus status
     bint active
     int number
     Uint8 volume
+    bint fading
+    Uint current_volume
+    Uint32 fade_steps
+    Uint32 fade_steps_remaining
     int buffer_size
     void *buffer
     bint ducking_is_active
