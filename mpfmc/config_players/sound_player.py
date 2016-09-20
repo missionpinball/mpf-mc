@@ -172,43 +172,46 @@ Here are several various examples:
                     validated_config[event]['sounds'].update(
                         self._validate_config_item(sound, sound_settings))
 
-                # Remove any items from the settings that were not explicitly provided in the
-                # sound_player config section (only want to override sound settings explicitly
-                # and not with any default values).  The default values for these items are not
-                # legal values and therefore we know the user did not provide them.
-                if sound_settings['priority'] is None:
-                    del sound_settings['priority']
-                if sound_settings['volume'] is None:
-                    del sound_settings['volume']
-                if sound_settings['loops'] is None:
-                    del sound_settings['loops']
-                if sound_settings['start_at'] is None:
-                    del sound_settings['start_at']
-                if sound_settings['fade_in'] is None:
-                    del sound_settings['fade_in']
-                if sound_settings['fade_out'] is None:
-                    del sound_settings['fade_out']
-                if sound_settings['max_queue_time'] == -1:
-                    del sound_settings['max_queue_time']
-                if len(sound_settings['events_when_played']) == 1 and \
-                                sound_settings['events_when_played'][0] == 'use_sound_setting':
-                    del sound_settings['events_when_played']
-                if len(sound_settings['events_when_stopped']) == 1 and \
-                                sound_settings['events_when_stopped'][0] == 'use_sound_setting':
-                    del sound_settings['events_when_stopped']
-                if len(sound_settings['events_when_looping']) == 1 and \
-                                sound_settings['events_when_looping'][0] == 'use_sound_setting':
-                    del sound_settings['events_when_looping']
-                if sound_settings['mode_end_action'] is None or \
-                                sound_settings['mode_end_action'] == 'use_sound_setting':
-                    del sound_settings['mode_end_action']
-
         return validated_config
 
     def _validate_config_item(self, device, device_settings):
-        """Validates the config when in a show"""
-        validated_dict = super()._validate_config_item(device, device_settings)
+        """Validates the config when in a show or in a player"""
+
         # device is sound name
+        # Validate the settings against the config spec
+        validated_dict = super()._validate_config_item(device, device_settings)
+
+        # Remove any items from the settings that were not explicitly provided in the
+        # sound_player config section (only want to override sound settings explicitly
+        # and not with any default values).  The default values for these items are not
+        # legal values and therefore we know the user did not provide them.
+        if validated_dict[device]['priority'] is None:
+            del validated_dict[device]['priority']
+        if validated_dict[device]['volume'] is None:
+            del validated_dict[device]['volume']
+        if validated_dict[device]['loops'] is None:
+            del validated_dict[device]['loops']
+        if validated_dict[device]['start_at'] is None:
+            del validated_dict[device]['start_at']
+        if validated_dict[device]['fade_in'] is None:
+            del validated_dict[device]['fade_in']
+        if validated_dict[device]['fade_out'] is None:
+            del validated_dict[device]['fade_out']
+        if validated_dict[device]['max_queue_time'] == -1:
+            del validated_dict[device]['max_queue_time']
+        if len(validated_dict[device]['events_when_played']) == 1 and \
+                        validated_dict[device]['events_when_played'][0] == 'use_sound_setting':
+            del validated_dict[device]['events_when_played']
+        if len(validated_dict[device]['events_when_stopped']) == 1 and \
+                        validated_dict[device]['events_when_stopped'][0] == 'use_sound_setting':
+            del validated_dict[device]['events_when_stopped']
+        if len(validated_dict[device]['events_when_looping']) == 1 and \
+                        validated_dict[device]['events_when_looping'][0] == 'use_sound_setting':
+            del validated_dict[device]['events_when_looping']
+        if validated_dict[device]['mode_end_action'] is None or \
+                        validated_dict[device]['mode_end_action'] == 'use_sound_setting':
+            del validated_dict[device]['mode_end_action']
+
         return validated_dict
 
     def clear_context(self, context):
