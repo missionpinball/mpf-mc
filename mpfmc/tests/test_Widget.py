@@ -23,22 +23,22 @@ class TestWidget(MpfMcTestCase):
         self.assertIs(type(self.mc.widgets['widget3']), list)
         self.assertEqual(len(self.mc.widgets['widget3']), 3)
 
-        # Ensure they're in order. Order is the order they're drawn,
-        # so the highest priority one is last. We don't care about z values
-        # at this point since those are threaded in when the widgets are
-        # added to the slides, but we want to make sure that widgets of the
-        # same z are in the order based on their order in the config file.
+        # Ensure they're in order. Order is the order they're drawn. We don't
+        # care about z values at this point since those are threaded in when
+        # the widgets are added to the slides, but we want to make sure that
+        # widgets of the same z are in the order based on their order in the
+        # config file.
         self.assertEqual(self.mc.widgets['widget3'][0]['text'],
-                         'widget3.3')
+                         'widget3.1')
         self.assertEqual(self.mc.widgets['widget3'][1]['text'],
                          'widget3.2')
         self.assertEqual(self.mc.widgets['widget3'][2]['text'],
-                         'widget3.1')
+                         'widget3.3')
 
         # List with multiple items and custom z orders
         self.assertIn('widget4', self.mc.widgets)
 
-    def test_adding_widgets_to_slide(self):
+    def test_widget_z_order_from_named_widget(self):
         self.mc.targets['default'].add_slide(name='slide1')
         self.mc.targets['default'].show_slide('slide1')
         self.assertEqual(self.mc.targets['default'].current_slide_name,
@@ -59,7 +59,7 @@ class TestWidget(MpfMcTestCase):
         # Order should be by z order (highest first), then by order in the
         # config. The entire list should be backwards, lowest, priority first.
 
-        target_order = ['4.7', '4.6', '4.3', '4.4', '4.1', '4.5', '4.2']
+        target_order = ['4.3', '4.6', '4.7', '4.1', '4.4', '4.2', '4.5']
         for widget, index in zip(
                 self.mc.targets['default'].current_slide.children[0].children,
                 target_order):
@@ -69,8 +69,56 @@ class TestWidget(MpfMcTestCase):
         self.mc.targets['default'].current_slide.add_widgets_from_library(
                 'widget5')
 
-        # should be inserted between 4.1 and 4.5
-        target_order = ['4.7', '4.6', '4.3', '4.4', '4.1', '5', '4.5', '4.2']
+        # should be inserted between 4.4 and 4.2
+        target_order = ['4.3', '4.6', '4.7', '4.1', '4.4', '5', '4.2', '4.5']
+        for widget, index in zip(
+                self.mc.targets['default'].current_slide.children[0].children,
+                target_order):
+            self.assertEqual(widget.text, 'widget{}'.format(index))
+
+    def test_widget_z_order_from_slide_player(self):
+        self.mc.events.post('show_slide_with_widgets')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide_1')
+
+        # initial order & z orders from config
+        # 4.1 / 1
+        # 4.2 / 1000
+        # 4.3 / None
+        # 4.4 / 1
+        # 4.5 / 1000
+        # 4.6 / None
+        # 4.7 / None
+
+        # Order should be by z order (highest first), then by order in the
+        # config. The entire list should be backwards, lowest, priority first.
+
+        target_order = ['4.3', '4.6', '4.7', '4.1', '4.4', '4.2', '4.5']
+        for widget, index in zip(
+                self.mc.targets['default'].current_slide.children[0].children,
+                target_order):
+            self.assertEqual(widget.text, 'widget{}'.format(index))
+
+    def test_widget_z_order_from_named_slide(self):
+        self.mc.events.post('show_slide_with_lots_of_widgets')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['default'].current_slide_name,
+                         'slide_with_lots_of_widgets')
+
+        # initial order & z orders from config
+        # 4.1 / 1
+        # 4.2 / 1000
+        # 4.3 / None
+        # 4.4 / 1
+        # 4.5 / 1000
+        # 4.6 / None
+        # 4.7 / None
+
+        # Order should be by z order (highest first), then by order in the
+        # config. The entire list should be backwards, lowest, priority first.
+
+        target_order = ['4.3', '4.6', '4.7', '4.1', '4.4', '4.2', '4.5']
         for widget, index in zip(
                 self.mc.targets['default'].current_slide.children[0].children,
                 target_order):
