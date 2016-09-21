@@ -17,7 +17,7 @@ GPU of the computer it's running on. There's also [another media controller opti
 MPF-MC can run on Windows, OS X, and Linux. It can run on the same machine as the core MPF engine, or it can be a
 separate machine. It runs as a separate process from MPF, so it works well on a multi-core computer.
 
-The MPF project homepage is here : https://missionpinball.com/mpf/
+The MPF project homepage is here : http://missionpinball.org
 
 [![Coverage Status](https://coveralls.io/repos/missionpinball/mpf-mc/badge.svg?branch=0.30&service=github)](https://coveralls.io/github/missionpinball/mpf-mc?branch=0.30)
 [![Build Status](https://travis-ci.org/missionpinball/mpf-mc.svg?branch=0.30)](https://travis-ci.org/missionpinball/mpf-mc)
