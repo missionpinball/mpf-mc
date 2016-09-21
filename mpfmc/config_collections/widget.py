@@ -46,8 +46,6 @@ class Widget(ConfigCollection):
         if isinstance(config, dict):
             config = [config]
 
-        config.reverse()
-
         widget_list = list()
 
         for widget in config:

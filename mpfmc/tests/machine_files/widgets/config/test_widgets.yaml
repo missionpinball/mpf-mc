@@ -258,19 +258,87 @@ slide_player:
       - type: text
         text: WIDGET REPLACEMENT
         y: 25%
-#      - key: box11
-#        type: text
-#        text: box11
-#        x: 260
-#      - key: box12
-#        type: text
-#        text: box12
-#        x: 180
-#      - key: box13
-#        type: text
-#        text: box13
-#        x: 100
-#      - key: box14
-#        type: text
-#        text: box14
-#        x: 20
+  show_slide_with_widgets:
+    slide_1:
+      - type: text
+        text: widget4.1
+        y: 300
+        z: 1
+        color: ff0000
+        font_size: 100
+      - type: text
+        text: widget4.2
+        z: 1000
+        y: 250
+        color: ffff00
+        font_size: 100
+      - type: text
+        text: widget4.3
+        y: 200
+        color: 00ff00
+        font_size: 100
+      - type: text
+        text: widget4.4
+        z: 1
+        y: 150
+        color: 00ffff
+        font_size: 100
+      - type: text
+        text: widget4.5
+        z: 1000
+        y: 100
+        color: 0000ff
+        font_size: 100
+      - type: text
+        text: widget4.6
+        color: ff00ff
+        font_size: 100
+        y: 50
+      - type: text
+        text: widget4.7
+        y: 0
+        color: 888888
+        font_size: 100
+  show_slide_with_lots_of_widgets: slide_with_lots_of_widgets
+
+slides:
+    slide_with_lots_of_widgets:
+      - type: text
+        text: widget4.1
+        y: 300
+        z: 1
+        color: ff0000
+        font_size: 100
+      - type: text
+        text: widget4.2
+        z: 1000
+        y: 250
+        color: ffff00
+        font_size: 100
+      - type: text
+        text: widget4.3
+        y: 200
+        color: 00ff00
+        font_size: 100
+      - type: text
+        text: widget4.4
+        z: 1
+        y: 150
+        color: 00ffff
+        font_size: 100
+      - type: text
+        text: widget4.5
+        z: 1000
+        y: 100
+        color: 0000ff
+        font_size: 100
+      - type: text
+        text: widget4.6
+        color: ff00ff
+        font_size: 100
+        y: 50
+      - type: text
+        text: widget4.7
+        y: 0
+        color: 888888
+        font_size: 100
