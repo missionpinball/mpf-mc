@@ -152,9 +152,9 @@ setup(
         MIT licensed, actively developed by fun people, and supported by a
         vibrant pinball-loving community.''',
 
-    url='https://missionpinball.com/mpf',
+    url='https://missionpinball.org',
     author='The Mission Pinball Framework Team',
-    author_email='brian@missionpinball.com',
+    author_email='brian@missionpinball.org',
     license='MIT',
 
     classifiers=[
