@@ -50,7 +50,7 @@ Here are several various examples:
     """
     config_file_section = 'track_player'
     show_section = 'tracks'
-    machine_collection_name = 'tracks'
+    machine_collection_name = None
 
     # pylint: disable=invalid-name
     def play(self, settings, context, priority=0, **kwargs):
