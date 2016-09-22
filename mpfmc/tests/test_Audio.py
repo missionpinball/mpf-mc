@@ -644,6 +644,51 @@ class TestAudio(MpfMcTestCase):
         self.advance_time()
         self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_stopped_param_set_1')
 
+    def test_track_player(self):
+        """Tests the track_player"""
+
+        if SoundSystem is None or self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        self.assertIsNotNone(interface)
+
+        track_music = interface.get_track_by_name("music")
+        self.assertIsNotNone(track_music)
+        self.assertEqual(track_music.name, "music")
+        self.assertEqual(track_music.max_simultaneous_sounds, 1)
+
+        self.advance_time(1)
+
+        self.assertIn('263774_music', self.mc.sounds)  # .wav
+
+        # TODO: Improve test (need some automated status checks for track control)
+        instance = self.mc.sounds['263774_music'].play()
+        self.advance_time(2)
+        self.mc.events.post('pause_music_track')
+        self.advance_time(2)
+        self.mc.events.post('resume_music_track')
+        self.advance_time(2)
+
+        self.mc.events.post('stop_music_track')
+        self.advance_time(2)
+        self.mc.events.post('play_music_track')
+        self.advance_time(1)
+        instance = self.mc.sounds['263774_music'].play()
+        self.advance_time(2)
+        self.mc.events.post('set_music_track_volume_quiet')
+        self.advance_time(2)
+        self.mc.events.post('set_music_track_volume_loud')
+        self.advance_time(2)
+        self.mc.events.post('stop_all_sounds_on_music_track')
+        self.advance_time(1)
+
+        # TODO: Add integration test for sound_player
+        # TODO: Add integration test for track_player
+
         """
         # Add another track with the same name (should not be allowed)
         # Add another track with the same name, but different casing (should not be allowed)
