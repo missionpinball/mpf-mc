@@ -41,8 +41,9 @@ class SoundSystem(object):
         self.log = logging.getLogger('SoundSystem')
         self._initialized = False
         self.audio_interface = None
-        self.config = {}
-        self.sound_events = {}
+        self.config = dict()
+        self.sound_events = dict()
+        self.tracks = CaseInsensitiveDict()
         self.clock_event = None
 
         self.log.debug("Loading the Sound System")
@@ -50,7 +51,7 @@ class SoundSystem(object):
         # Load configuration for sound system
         if 'sound_system' not in self.mc.machine_config:
             self.log.info("SoundSystem: Using default 'sound_system' settings")
-            self.config = {}
+            self.config = dict()
         else:
             self.config = self.mc.machine_config['sound_system']
 
@@ -94,11 +95,6 @@ class SoundSystem(object):
             return
 
         # Setup tracks in audio system (including initial volume levels)
-        if not hasattr(self.mc, 'tracks'):
-            # some assets of different classes use the same mc attribute, like
-            # images and animated_images
-            setattr(self.mc, 'tracks', CaseInsensitiveDict())
-
         if 'tracks' in self.config:
             for track_name, track_config in self.config['tracks'].items():
                 self._create_track(track_name, track_config)
@@ -170,7 +166,7 @@ class SoundSystem(object):
         self.master_volume -= delta
         self.log.info("Decreased master volume by %s to %s.", delta, self.master_volume)
 
-    def _create_track(self, name, config=None) -> bool:
+    def _create_track(self, name, config=None):
         """Create a track in the audio system with the specified name and configuration.
 
         Args:
@@ -184,7 +180,7 @@ class SoundSystem(object):
                                  "not been initialized".format(name))
 
         # Validate track config parameters
-        if name in self.mc.tracks:
+        if name in self.tracks:
             raise AudioException("Could not create '{}' track - a track with that name "
                                  "already exists".format(name))
 
@@ -220,7 +216,7 @@ class SoundSystem(object):
         if track is None:
             raise AudioException("Could not create '{}' track due to an error".format(name))
 
-        self.mc.tracks[name] = track
+        self.tracks[name] = track
 
     def tick(self, dt):
         """Clock callback function"""
