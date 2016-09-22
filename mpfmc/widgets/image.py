@@ -7,8 +7,8 @@ class ImageWidget(MpfWidget, Image):
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
 
-    def __init__(self, mc, config, slide, key=None, **kwargs):
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def __init__(self, mc, config, key=None, **kwargs):
+        super().__init__(mc=mc, config=config, key=key)
 
         try:
             self.image = self.mc.images[self.config['image']]

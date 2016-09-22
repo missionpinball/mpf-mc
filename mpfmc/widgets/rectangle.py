@@ -11,28 +11,29 @@ class Rectangle(MpfWidget, Widget):
 
     widget_type_name = 'Rectangle'
 
-    def __init__(self, mc, config, slide, key=None, **kwargs):
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def on_pos(self, *args):
+        del args
 
-        pos = set_position(slide.width,
-                           slide.height,
-                           self.width, self.height,
-                           self.config['x'],
-                           self.config['y'],
-                           self.config['anchor_x'],
-                           self.config['anchor_y'],
-                           self.config['adjust_top'],
-                           self.config['adjust_right'],
-                           self.config['adjust_bottom'],
-                           self.config['adjust_left'])
+        self.pos = set_position(self.parent.width,
+                                self.parent.height,
+                                self.width,
+                                self.height,
+                                self.config['x'],
+                                self.config['y'],
+                                self.config['anchor_x'],
+                                self.config['anchor_y'],
+                                self.config['adjust_top'],
+                                self.config['adjust_right'],
+                                self.config['adjust_bottom'],
+                                self.config['adjust_left'])
 
         with self.canvas:
             Color(*self.config['color'])
 
             if self.config['corner_radius']:
-                RoundedRectangle(pos=pos, size=self.size,
+                RoundedRectangle(pos=self.pos, size=self.size,
                                  radius=(self.config['corner_radius'],
                                          self.config['corner_radius']),
                                  segments=self.config['corner_segments'])
             else:
-                KivyRectangle(pos=pos, size=self.size)
+                KivyRectangle(pos=self.pos, size=self.size)

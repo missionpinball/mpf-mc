@@ -6,12 +6,10 @@ from mpfmc.uix.widget import MpfWidget
 
 class Point(MpfWidget, Widget):
 
-    widget_type_name = 'Line'
+    widget_type_name = 'Point'
 
-    def __init__(self, mc, config, slide, key=None, **kwargs):
-        config['pointsize'] = config.pop('size')
-
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def on_pos(self, *args):
+        del args
 
         with self.canvas:
             Color(*self.config['color'])

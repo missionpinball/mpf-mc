@@ -10,8 +10,8 @@ from kivy.uix.stencilview import StencilView
 class Dmd(MpfWidget, Widget):
     widget_type_name = 'DMD'
 
-    def __init__(self, mc, config, slide, key=None, **kwargs):
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def __init__(self, mc, config, key=None, **kwargs):
+        super().__init__(mc=mc, config=config, key=key)
 
         self.source = self.mc.displays[self.config['source_display']]
 
@@ -28,21 +28,9 @@ class Dmd(MpfWidget, Widget):
 
         self.add_widget(self.dmd_frame)
 
-        self.dmd_frame.add_widget(DmdSource(mc, config, slide, key))
+        self.dmd_frame.add_widget(DmdSource(mc, config, key))
 
         self.dmd_frame.size = self.size
-
-        self.dmd_frame.pos = set_position(slide.width,
-                                          slide.height,
-                                          self.width, self.height,
-                                          self.config['x'],
-                                          self.config['y'],
-                                          self.config['anchor_x'],
-                                          self.config['anchor_y'],
-                                          self.config['adjust_top'],
-                                          self.config['adjust_right'],
-                                          self.config['adjust_bottom'],
-                                          self.config['adjust_left'])
 
     def __repr__(self):  # pragma: no cover
         try:
@@ -51,6 +39,19 @@ class Dmd(MpfWidget, Widget):
         except AttributeError:
             return '<DMD size={}, source_size=(none)>'.format(
                     self.size)
+
+    def on_pos(self, *args):
+        self.dmd_frame.pos = set_position(self.parent.width,
+                                  self.parent.height,
+                                  self.width, self.height,
+                                  self.config['x'],
+                                  self.config['y'],
+                                  self.config['anchor_x'],
+                                  self.config['anchor_y'],
+                                  self.config['adjust_top'],
+                                  self.config['adjust_right'],
+                                  self.config['adjust_bottom'],
+                                  self.config['adjust_left'])
 
 
 class ColorDmd(Dmd):
@@ -68,8 +69,8 @@ class ColorDmd(Dmd):
 class DmdSource(MpfWidget, Scatter, Widget):
     widget_type_name = 'DMD Source'
 
-    def __init__(self, mc, config, slide, key=None, **kwargs):
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def __init__(self, mc, config, key=None, **kwargs):
+        super().__init__(mc=mc, config=config, key=key)
 
         self.source = self.mc.displays[self.config['source_display']]
 
