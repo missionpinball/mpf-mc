@@ -5,7 +5,9 @@ mode:
 
 widget_player:
   mode1_add_widgets: widget2
-  mode1_add_widget6: widget6
+  mode1_add_widget6:
+    widget6:
+      target: default
   mode1_add_widget_with_key:
     widget2:
       key: newton_crosby

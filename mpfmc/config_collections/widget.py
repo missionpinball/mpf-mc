@@ -80,6 +80,17 @@ class Widget(ConfigCollection):
         else:
             config['animations'] = None
 
+        if config.get('z', 0) < 0:
+            raise ValueError(
+                "\nWidget with negative z value in config: {}.\n\nAs of MPF "
+                "v0.30.3, negative z: "
+                "values are no longer used to put widgets in 'parent' frames. "
+                "Instead add a 'target:' setting to the 'widget_player:' entry"
+                " and set that to the name of the display target (display or "
+                "slide_frame) you want to add this widget to. Note that "
+                "'target: default' is valid and will add the widget to the "
+                "default display on top of any slides.\n".format(config))
+
         return config
 
     def _register_trigger(self, event_name, **kwargs):

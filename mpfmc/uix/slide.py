@@ -6,6 +6,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
 
 from mpfmc.core.utils import set_position
+from mpfmc.uix.widget import create_widget_objects_from_config
 
 
 class Slide(Screen):
@@ -54,13 +55,17 @@ class Slide(Screen):
         super().add_widget(self.stencil)
 
         if 'widgets' in config:  # don't want try, swallows too much
-            self.add_widgets_from_config(config=config['widgets'],
-                                         key=self.key,
-                                         play_kwargs=play_kwargs)
+
+            widgets = create_widget_objects_from_config(
+                mc=self.mc,
+                config=config['widgets'], key=self.key,
+                play_kwargs=play_kwargs)
+
+            self.add_widgets(widgets)
 
         self.mc.active_slides[name] = self
         target.add_widget(self)
-        mc.slides[name] = config
+        self.mc.slides[name] = config
 
         bg = config.get('background_color', [0.0, 0.0, 0.0, 1.0])
         if bg != [0.0, 0.0, 0.0, 0.0]:
@@ -164,6 +169,10 @@ class Slide(Screen):
 
         return widgets_added
 
+    def add_widgets(self, widgets):
+        for w in widgets:
+            self.add_widget(w)
+
     def add_widget(self, widget, **kwargs):
         """Adds a widget to this slide.
 
@@ -222,11 +231,6 @@ class Slide(Screen):
 
         Widgets added to the parent slide_frame stay active and visible even
         if the slide in the frame changes.
-
-        Note that negative z-order values tell the widget it should be applied
-        to the parent frame instead of the slide, but the absolute value of the
-        values is used to control their z-order. e.g. -100 widget shows on top
-        of a -50 widget.
 
         """
         self.manager.parent.parent.add_widget(widget)

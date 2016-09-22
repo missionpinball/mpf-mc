@@ -5,6 +5,9 @@ from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.events import EventHandlerKey
 
 from mpfmc.core.mc_config_player import McConfigPlayer
+from mpfmc.uix.slide_frame import SlideFrame
+from mpfmc.uix.widget import create_widget_objects_from_config, \
+                             create_widget_objects_from_library
 
 
 class MpfWidgetPlayer(PluginPlayer):
@@ -65,6 +68,28 @@ class McWidgetPlayer(McConfigPlayer):
                 s['key'] = s['widget_settings'].pop('key')
             except (KeyError, AttributeError):
                 s['key'] = context + "-" + widget
+
+        if s.get('target'):
+
+            try:
+                target = self.machine.targets[s['target']]
+
+            except KeyError:
+                raise KeyError("Widget player invalid target '{}'. Current "
+                               "valid targets: {} Settings: "
+                               "{} Widget: {} Context: {} Play kwargs: {}".
+                               format(self.machine.targets, s['target'], s,
+                                      widget, context, play_kwargs))
+
+                # todo add delayed adding like in slide_player
+
+            target.add_widgets_to_frame(
+                create_widget_objects_from_library(mc=self.machine,
+                                                   name=widget,
+                                                   play_kwargs=play_kwargs,
+                                                   **s))  # todo
+
+            return
 
         if 'slide' in s:
             if s['key'] in instance_dict and isinstance(instance_dict[s['key']], EventHandlerKey):
@@ -139,6 +164,9 @@ class McWidgetPlayer(McConfigPlayer):
     def _remove_widget_by_key(self, key):
         """Remove widget by key."""
         for target in self.machine.targets.values():
+
+            target.remove_widgets_by_key(key)
+
             for w in target.slide_frame_parent.walk():
                 try:
                     if w.key == key:
@@ -164,6 +192,7 @@ class McWidgetPlayer(McConfigPlayer):
 
     def clear_context(self, context):
         """Clear context."""
+
         instance_dict = self._get_instance_dict(context)
         for key in instance_dict:
             if isinstance(instance_dict[key], EventHandlerKey):

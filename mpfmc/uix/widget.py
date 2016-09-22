@@ -19,6 +19,63 @@ are not real MPF events, rather, they're used to trigger animations from
 things the slide is doing."""
 
 
+def create_widget_objects_from_config(mc, config, key=None, play_kwargs=None,
+                                      widget_settings=None):
+
+    if not isinstance(config, list):
+        config = [config]
+    widgets_added = list()
+
+    if not play_kwargs:
+        play_kwargs = dict()  # todo
+
+    for widget in config:
+
+        if widget_settings:
+            widget_settings = mc.config_validator.validate_config(
+                'widgets:{}'.format(widget['type']), widget_settings,
+                base_spec='widgets:common', add_missing_keys=False)
+
+            widget.update(widget_settings)
+
+        configured_key = widget.get('key', None)
+
+        if (configured_key and key and "." not in key and
+                configured_key != key):
+            raise KeyError("Widget has incoming key '{}' which does not "
+                           "match the key in the widget's config "
+                           "'{}'.".format(key, configured_key))
+
+        if configured_key:
+            this_key = configured_key
+        else:
+            this_key = key
+
+        widget_obj = mc.widgets.type_map[widget['type']](
+            mc=mc, config=widget, key=this_key, play_kwargs=play_kwargs)
+
+        top_widget = widget_obj
+
+        # some widgets (like slide frames) have parents, so we need to make
+        # sure that we add the parent widget to the slide
+        while top_widget.parent:
+            top_widget = top_widget.parent
+
+        widgets_added.append(top_widget)
+
+    return widgets_added
+
+
+def create_widget_objects_from_library(mc, name, key=None,
+        widget_settings=None, play_kwargs=None, **kwargs):
+        if name not in mc.widgets:
+            raise ValueError("Widget %s not found", name)
+
+        return create_widget_objects_from_config(mc=mc,
+            config=mc.widgets[name], key=key, widget_settings=widget_settings,
+                                                 play_kwargs=play_kwargs)
+
+
 class MpfWidget(object):
     """Mixin class that's used to extend all the Kivy widget base classes with
     a few extra attributes and methods we need for everything to work with MPF.
@@ -37,13 +94,11 @@ class MpfWidget(object):
 
     merge_settings = tuple()
 
-    def __init__(self, mc, slide=None, config=None, key=None, **kwargs):
+    def __init__(self, mc, config=None, key=None, **kwargs):
         del kwargs
         self.size_hint = (None, None)
 
         super().__init__()
-
-        self.slide = slide
 
         self.config = deepcopy(config)
         # needs to be deepcopy since configs can have nested dicts
@@ -60,19 +115,9 @@ class MpfWidget(object):
         # dict of original values of settings that were animated so we can
         # restore them later
 
-        self._default_style = None
+        self._percent_prop_dicts = dict()
 
-        # some attributes can be expressed in percentages. This dict holds
-        # those, key is attribute name, val is max value
-        try:
-            self._percent_prop_dicts = dict(x=slide.width,
-                                            y=slide.height,
-                                            width=slide.width,
-                                            height=slide.height,
-                                            opacity=1,
-                                            line_height=1)
-        except AttributeError:
-            self._percent_prop_dicts = dict()
+        self._default_style = None
 
         self._set_default_style()
         self._apply_style()
@@ -129,7 +174,7 @@ class MpfWidget(object):
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
     def __lt__(self, other):
-        return self.config['z'] < other.config['z']
+        return other.config['z'] < self.config['z']
 
     # todo change to classmethod
     def _set_default_style(self):
@@ -194,6 +239,21 @@ class MpfWidget(object):
                                     self.config['adjust_bottom'],
                                     self.config['adjust_left'])
 
+        except AttributeError:
+            pass
+
+    def on_pos(self, *args):
+        del args
+
+        # some attributes can be expressed in percentages. This dict holds
+        # those, key is attribute name, val is max value
+        try:
+            self._percent_prop_dicts = dict(x=self.parent.width,
+                                            y=self.parent.height,
+                                            width=self.parent.width,
+                                            height=self.parent.height,
+                                            opacity=1,
+                                            line_height=1)
         except AttributeError:
             pass
 
@@ -278,7 +338,7 @@ class MpfWidget(object):
     def schedule_removal(self, secs):
         self.mc.clock.schedule_once(self.remove, secs)
 
-    def remove(self, dt):
+    def remove(self, *dt):
         del dt
 
         try:

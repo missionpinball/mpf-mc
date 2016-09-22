@@ -13,8 +13,8 @@ class Text(MpfWidget, Label):
                       'max_lines', 'strip', 'shorten_from', 'split_str',
                       'unicode_errors', 'color')
 
-    def __init__(self, mc, config, slide, key=None, play_kwargs=None, **kwargs):
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def __init__(self, mc, config, key=None, play_kwargs=None, **kwargs):
+        super().__init__(mc=mc, config=config, key=key)
 
         self.original_text = self._get_text_string(config.get('text', ''))
 

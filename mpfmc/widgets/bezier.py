@@ -8,8 +8,8 @@ class Bezier(MpfWidget, Widget):
 
     widget_type_name = 'Line'
 
-    def __init__(self, mc, config, slide, key=None, **kwargs):
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def __init__(self, mc, config, key=None, **kwargs):
+        super().__init__(mc=mc, config=config, key=key)
 
         with self.canvas:
             Color(*self.config['color'])

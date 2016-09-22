@@ -8,8 +8,8 @@ class Quad(MpfWidget, Widget):
 
     widget_type_name = 'Quad'
 
-    def __init__(self, mc, config, slide, key=None, **kwargs):
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def on_pos(self, *args):
+        del args
 
         with self.canvas:
             Color(*self.config['color'])

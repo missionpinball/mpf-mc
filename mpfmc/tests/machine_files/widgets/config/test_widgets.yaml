@@ -83,7 +83,7 @@ widgets:
   widget6:
     type: text
     text: widget6
-    z: -100
+    z: 100
     color: 774303
     font_size: 100
   widget7:
@@ -123,7 +123,9 @@ widget_player:
   add_widget2_to_slide1:
     widget2:
       slide: slide1
-  add_widget6: widget6
+  add_widget6:
+    widget6:
+      target: default
   remove_widget1_by_key:
     widget1:
       action: remove
@@ -136,6 +138,11 @@ widget_player:
       widget8:
         widget_settings:
           expire: 1s
+  add_widget8_expire_parent:
+      widget8:
+        widget_settings:
+          expire: 1s
+        target: default
   add_widget8_custom_settings:
       widget8:
         widget_settings:
@@ -199,11 +206,12 @@ widget_player:
         color: red
   widget_to_parent:
     box11:
+      target: default
       widget_settings:
-        z: -1
+        z: 1
     box12:
       widget_settings:
-        z: -2
+        z: 2
         color: red
         y: middle+2
   show_christmas_slide_full:
@@ -300,6 +308,13 @@ slide_player:
         color: 888888
         font_size: 100
   show_slide_with_lots_of_widgets: slide_with_lots_of_widgets
+  show_new_slide:
+    new_slide2:
+      widgets:
+      - type: text
+        text: NEW SLIDE
+        y: 0
+        anchor_y: bottom
 
 slides:
     slide_with_lots_of_widgets:
