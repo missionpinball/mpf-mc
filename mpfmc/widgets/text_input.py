@@ -15,8 +15,8 @@ from mpfmc.widgets.text import Text
 class MpfTextInput(Text):
     widget_type_name = 'text_input'
 
-    def __init__(self, mc, config, slide, key=None, **kwargs):
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def __init__(self, mc, config, key=None, **kwargs):
+        super().__init__(mc=mc, config=config, key=key)
         """
 
         Note that this class is called *MpfTextInput* instead of *TextInput*
@@ -49,7 +49,7 @@ class MpfTextInput(Text):
         del dt
 
         for target in self.mc.targets.values():
-            for w in target.slide_frame_parent.walk():
+            for w in target.parent.walk():
                 try:
                     if w.key == self.config['key']:
                         self.linked_text_widget = w
@@ -223,7 +223,7 @@ class MpfTextInput(Text):
         self._deregister_events()
         self.active = False
         self.text = ''
-        self.slide.remove_widget(self)
+        self.parent.remove_widget(self)
 
     def prepare_for_removal(self):
         self.done()

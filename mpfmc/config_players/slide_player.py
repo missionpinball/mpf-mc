@@ -146,13 +146,15 @@ class McSlidePlayer(McConfigPlayer):
                     target = self.machine.targets[target_name]
                 except KeyError:
                     # target does not exist yet. perform action when it appears
-                    self._delayed_actions(target_name, s, slide, instance_dict, full_context)
+                    self._delayed_actions(target_name, s, slide, instance_dict,
+                                          full_context)
                     return
             else:
                 target = self.machine.targets['default']
                 target_name = "default"
 
-            self._delayed_actions(target_name, s, slide, instance_dict, full_context)
+            self._delayed_actions(target_name, s, slide, instance_dict,
+                                  full_context)
 
             # remove target
             s.pop("target")
@@ -160,7 +162,8 @@ class McSlidePlayer(McConfigPlayer):
             if s['action'] == 'play':
                 # is this a named slide, or a new slide?
                 if 'widgets' in s:
-                    target.add_and_show_slide(key=full_context, slide_name=slide, **s)
+                    target.add_and_show_slide(key=full_context,
+                                              slide_name=slide, **s)
                 else:
                     target.show_slide(slide_name=slide, key=full_context, **s)
 

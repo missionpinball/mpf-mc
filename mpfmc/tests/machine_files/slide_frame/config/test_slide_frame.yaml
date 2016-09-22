@@ -11,25 +11,36 @@ slides:
     width: 200
     height: 100
     name: frame1
-    y: 100%
-    anchor_y: top
-    x: 100%
-    anchor_x: right
+    y: 50
+    x: 50
+    anchor_y: bottom
+    anchor_x: left
   - type: text
-    text: SLIDE FRAME BASE
-    font_size: 100
+    text: SLIDE FRAME IN SLIDE 1
+    font_size: 20
+    y: bottom
+    anchor_y: bottom
   frame1_text:
   - type: text
-    text: TEXT IN FRAME
-    color: 00ff00
-    font_size: 200
+    text: SLIDE 1 IN FRAME
+    color: lime
+    font_size: 10
+  - type: rectangle
+    width: 200
+    height: 100
+    color: 550000
   frame1_text2:
   - type: text
-    text: MORE TEXT
-    color: 00ffff
-    font_size: 100
+    text: SLIDE 2 IN FRAME
+    color: black
+    font_size: 10
+  - type: rectangle
+    width: 200
+    height: 100
+    color: 00ff00
 
 slide_player:
+  show_slide1: slide1
   show_frame_text:
     frame1_text:
       target: frame1

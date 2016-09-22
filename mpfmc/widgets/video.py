@@ -8,8 +8,8 @@ class VideoWidget(MpfWidget, Video):
     widget_type_name = 'Video'
     merge_settings = ('height', 'width')
 
-    def __init__(self, mc, config, slide, key=None, **kwargs):
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
+    def __init__(self, mc, config, key=None, **kwargs):
+        super().__init__(mc=mc, config=config, key=key)
 
         try:
             self.video = self.mc.videos[self.config['video']]
