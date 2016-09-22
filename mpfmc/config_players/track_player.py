@@ -69,7 +69,6 @@ Here are several various examples:
         fade:
         """
         del priority
-        instance_dict = self._get_instance_dict(context)
         settings = deepcopy(settings)
 
         if 'tracks' in settings:
@@ -79,29 +78,34 @@ Here are several various examples:
 
             # Retrieve track by name
             try:
-                sound = self.machine.tracks[track_name]
+                track = self.machine.sound_system.tracks[track_name]
             except KeyError:
-                self.machine.log.error("TrackPlayer: The specified track "
+                self.machine.log.error("TrackPlayer: The specified audio track "
                                        "does not exist ('{}').".format(track_name))
                 return
 
             s.update(kwargs)
 
+            # TODO: perform validation on parameters
+
             # Determine action to perform
             if s['action'].lower() == 'play':
-                pass
+                track.play(s['fade'])
 
             elif s['action'].lower() == 'stop':
-                pass
+                track.stop(s['fade'])
 
             elif s['action'].lower() == 'pause':
-                pass
+                track.pause(s['fade'])
 
             elif s['action'].lower() == 'resume':
-                pass
+                track.resume(s['fade'])
 
             elif s['action'].lower() == 'set_volume':
-                pass
+                track.set_volume(s['volume'], s['fade'])
+
+            elif s['action'].lower() == 'stop_all_sounds':
+                track.stop_all_sounds(s['fade'])
 
             else:
                 self.machine.log.error("TrackPlayer: The specified action "
@@ -163,8 +167,10 @@ Here are several various examples:
 
     def clear_context(self, context):
         """Because tracks are persistent for the life of the application, there is nothing
-        to clear when the context ends."""
+        to clear when the context ends. No new track instances are created using the
+        track_player."""
         del context
+
 
 class MpfTrackPlayer(PluginPlayer):
     """Base class for part of the track player which runs as part of MPF.
