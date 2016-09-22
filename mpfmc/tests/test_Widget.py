@@ -57,9 +57,9 @@ class TestWidget(MpfMcTestCase):
         # 4.7 / None
 
         # Order should be by z order (highest first), then by order in the
-        # config. The entire list should be backwards, lowest, priority first.
+        # config.
 
-        target_order = ['4.3', '4.6', '4.7', '4.1', '4.4', '4.2', '4.5']
+        target_order = ['4.2', '4.5', '4.1', '4.4', '4.3', '4.6', '4.7']
         for widget, index in zip(
                 self.mc.targets['default'].current_slide.children[0].children,
                 target_order):
@@ -69,8 +69,8 @@ class TestWidget(MpfMcTestCase):
         self.mc.targets['default'].current_slide.add_widgets_from_library(
                 'widget5')
 
-        # should be inserted between 4.4 and 4.2
-        target_order = ['4.3', '4.6', '4.7', '4.1', '4.4', '5', '4.2', '4.5']
+        # should be inserted between 4.5 and 4.1
+        target_order = ['4.2', '4.5', '5', '4.1', '4.4', '4.3', '4.6', '4.7']
         for widget, index in zip(
                 self.mc.targets['default'].current_slide.children[0].children,
                 target_order):
@@ -92,9 +92,9 @@ class TestWidget(MpfMcTestCase):
         # 4.7 / None
 
         # Order should be by z order (highest first), then by order in the
-        # config. The entire list should be backwards, lowest, priority first.
+        # config.
 
-        target_order = ['4.3', '4.6', '4.7', '4.1', '4.4', '4.2', '4.5']
+        target_order = ['4.2', '4.5', '4.1', '4.4', '4.3', '4.6', '4.7']
         for widget, index in zip(
                 self.mc.targets['default'].current_slide.children[0].children,
                 target_order):
@@ -116,9 +116,9 @@ class TestWidget(MpfMcTestCase):
         # 4.7 / None
 
         # Order should be by z order (highest first), then by order in the
-        # config. The entire list should be backwards, lowest, priority first.
+        # config.
 
-        target_order = ['4.3', '4.6', '4.7', '4.1', '4.4', '4.2', '4.5']
+        target_order = ['4.2', '4.5', '4.1', '4.4', '4.3', '4.6', '4.7']
         for widget, index in zip(
                 self.mc.targets['default'].current_slide.children[0].children,
                 target_order):

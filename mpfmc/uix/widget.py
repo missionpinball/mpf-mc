@@ -129,7 +129,7 @@ class MpfWidget(object):
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
     def __lt__(self, other):
-        return self.config['z'] < other.config['z']
+        return other.config['z'] < self.config['z']
 
     # todo change to classmethod
     def _set_default_style(self):
