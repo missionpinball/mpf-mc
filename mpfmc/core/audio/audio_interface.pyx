@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev01')
+__version_info__ = ('0', '32', '0-dev02')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -721,6 +721,10 @@ cdef class AudioInterface:
         for track_num in range(callback_data.track_count):
             track = callback_data.tracks[track_num]
 
+            # No need to process/mix the track if the track is stopped or paused
+            if track.status == track_status_stopped or track.status == track_status_paused:
+                continue
+
             # Call the track's mix function (based on track type)
             if track.type == track_type_standard:
                 standard_track_mix_playing_sounds(track, buffer_length, callback_data)
@@ -741,8 +745,8 @@ cdef class AudioInterface:
                 apply_track_ducking(callback_data.tracks[track_num], buffer_length, callback_data)
 
                 # Apply track volume and mix to output buffer
-                mix_track_to_output(<Uint8*> callback_data.tracks[track_num].buffer,
-                                    callback_data.tracks[track_num].volume,
+                mix_track_to_output(<TrackState*> callback_data.tracks[track_num],
+                                    callback_data,
                                     output_buffer,
                                     buffer_length)
 
@@ -1369,6 +1373,42 @@ cdef inline void send_sound_marker_notification(int track_num, int player,
         notification_messages[message_index].time = sdl_ticks
         notification_messages[message_index].data.marker.id = marker_id
 
+cdef inline void send_track_stopped_notification(int track_num, NotificationMessageContainer **notification_messages,
+                                                 Uint32 sdl_ticks) nogil:
+    """
+    Sends a track stopped notification
+    Args:
+        track_num: The track number on which the event occurred
+        notification_messages: A pointer to the notification messages structures
+        sdl_ticks: The current SDL tick time
+    """
+    cdef int message_index = get_available_notification_message(notification_messages)
+    if message_index != -1:
+        notification_messages[message_index].message = notification_track_stopped
+        notification_messages[message_index].track = track_num
+        notification_messages[message_index].player = 0
+        notification_messages[message_index].sound_id = 0
+        notification_messages[message_index].sound_instance_id = 0
+        notification_messages[message_index].time = sdl_ticks
+
+cdef inline void send_track_paused_notification(int track_num, NotificationMessageContainer **notification_messages,
+                                                Uint32 sdl_ticks) nogil:
+    """
+    Sends a track paused notification
+    Args:
+        track_num: The track number on which the event occurred
+        notification_messages: A pointer to the notification messages structures
+        sdl_ticks: The current SDL tick time
+    """
+    cdef int message_index = get_available_notification_message(notification_messages)
+    if message_index != -1:
+        notification_messages[message_index].message = notification_track_paused
+        notification_messages[message_index].track = track_num
+        notification_messages[message_index].player = 0
+        notification_messages[message_index].sound_id = 0
+        notification_messages[message_index].sound_instance_id = 0
+        notification_messages[message_index].time = sdl_ticks
+
 cdef void apply_track_ducking(TrackState* track, Uint32 buffer_size, AudioCallbackData* callback_data) nogil:
     """
     Applies ducking to the specified track (if applicable).
@@ -1516,12 +1556,13 @@ cdef inline float in_out_quad(float progress) nogil:
     p -= 1.0
     return -0.5 * (p * (p - 2.0) - 1.0)
 
-cdef void mix_track_to_output(Uint8 *track_buffer, Uint8 track_volume, Uint8 *output_buffer, Uint32 buffer_size) nogil:
+cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_data,
+                              Uint8 *output_buffer, Uint32 buffer_size) nogil:
     """
     Mixes a track buffer into the master audio output buffer.
     Args:
-        track_buffer: A track's audio buffer
-        track_volume: The track volume (0 to 128)
+        track: The track's state structure
+        callback_data: The audio callback data structure
         output_buffer: The master audio output buffer.
         buffer_size: The audio buffer size to process.
 
@@ -1529,40 +1570,101 @@ cdef void mix_track_to_output(Uint8 *track_buffer, Uint8 track_volume, Uint8 *ou
 
     cdef Sample16Bit track_sample
     cdef Sample16Bit output_sample
-
     cdef int temp_sample
     cdef Uint32 index
+    cdef Uint8 *track_buffer
+    cdef Uint32 samples_per_control_point
 
     index = 0
-    while index < buffer_size:
 
-        # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
-        track_sample.bytes.byte0 = track_buffer[index]
-        track_sample.bytes.byte1 = track_buffer[index + 1]
-        track_sample.value = track_sample.value * track_volume // MIX_MAX_VOLUME
+    if track == NULL or track.status == track_status_stopped or track.status == track_status_paused:
+        return
 
-        # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
-        output_sample.bytes.byte0 = output_buffer[index]
-        output_sample.bytes.byte1 = output_buffer[index + 1]
+    track_buffer = <Uint8*>track.buffer
 
-        # Calculate the new output sample (mix the existing output sample with
-        # the track sample).  The temp sample is a 32-bit value to avoid overflow.
-        temp_sample = output_sample.value + track_sample.value
+    # Determine if track is currently fading
+    if track.fade_steps_remaining > 0:
+        # A fade is in progress, apply fade to track buffer when mixing to output
+        samples_per_control_point = track.buffer_size // CONTROL_POINTS_PER_BUFFER
+        while index < buffer_size:
 
-        # Clip the temp sample back to a 16-bit value (will cause distortion if samples
-        # on channel are too loud)
-        if temp_sample > MAX_AUDIO_VALUE_S16:
-            temp_sample = MAX_AUDIO_VALUE_S16
-        elif temp_sample < MIN_AUDIO_VALUE_S16:
-            temp_sample = MIN_AUDIO_VALUE_S16
+            # Calculate volume at the control rate (handle fading)
+            if (index % samples_per_control_point) == 0:
+                if track.fade_steps_remaining > 0:
+                    # Note: if the volume interpolation function below appears to be backwards, it is
+                    # because the fraction is going from 1 to 0 over the fade and not from a more
+                    # traditional 0 to 1.  This saves a few calculation cycles and is for efficiency.
+                    track.fade_volume_current = <Uint8> (lerpU8(in_out_quad(track.fade_steps_remaining / track.fade_steps),
+                                                                track.fade_volume_target, track.fade_volume_start))
+                    track.fade_steps_remaining -= 1
+                else:
+                    track.fade_volume_current = track.fade_volume_target
+                    if track.status == track_status_stopping:
+                        track.status = track_status_stopped
+                        send_track_stopped_notification(track.number, callback_data.notification_messages, SDL_GetTicks())
+                    elif track.status == track_status_pausing:
+                        track.status = track_status_paused
+                        send_track_paused_notification(track.number, callback_data.notification_messages, SDL_GetTicks())
 
-        # Write the new output sample back to the output buffer (from
-        # a 32-bit value back to a 16-bit value that we know is in 16-bit value range)
-        output_sample.value = temp_sample
-        output_buffer[index] = output_sample.bytes.byte0
-        output_buffer[index + 1] = output_sample.bytes.byte1
+            # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
+            track_sample.bytes.byte0 = track_buffer[index]
+            track_sample.bytes.byte1 = track_buffer[index + 1]
+            track_sample.value = track_sample.value * track.fade_volume_current // MIX_MAX_VOLUME
 
-        index += BYTES_PER_SAMPLE
+            # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
+            output_sample.bytes.byte0 = output_buffer[index]
+            output_sample.bytes.byte1 = output_buffer[index + 1]
+
+            # Calculate the new output sample (mix the existing output sample with
+            # the track sample).  The temp sample is a 32-bit value to avoid overflow.
+            temp_sample = output_sample.value + track_sample.value
+
+            # Clip the temp sample back to a 16-bit value (will cause distortion if samples
+            # on channel are too loud)
+            if temp_sample > MAX_AUDIO_VALUE_S16:
+                temp_sample = MAX_AUDIO_VALUE_S16
+            elif temp_sample < MIN_AUDIO_VALUE_S16:
+                temp_sample = MIN_AUDIO_VALUE_S16
+
+            # Write the new output sample back to the output buffer (from
+            # a 32-bit value back to a 16-bit value that we know is in 16-bit value range)
+            output_sample.value = temp_sample
+            output_buffer[index] = output_sample.bytes.byte0
+            output_buffer[index + 1] = output_sample.bytes.byte1
+
+            index += BYTES_PER_SAMPLE
+
+    else:
+        # No fade in progress: volume is constant over entire output buffer
+        while index < buffer_size:
+
+            # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
+            track_sample.bytes.byte0 = track_buffer[index]
+            track_sample.bytes.byte1 = track_buffer[index + 1]
+            track_sample.value = track_sample.value * track.volume // MIX_MAX_VOLUME
+
+            # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
+            output_sample.bytes.byte0 = output_buffer[index]
+            output_sample.bytes.byte1 = output_buffer[index + 1]
+
+            # Calculate the new output sample (mix the existing output sample with
+            # the track sample).  The temp sample is a 32-bit value to avoid overflow.
+            temp_sample = output_sample.value + track_sample.value
+
+            # Clip the temp sample back to a 16-bit value (will cause distortion if samples
+            # on channel are too loud)
+            if temp_sample > MAX_AUDIO_VALUE_S16:
+                temp_sample = MAX_AUDIO_VALUE_S16
+            elif temp_sample < MIN_AUDIO_VALUE_S16:
+                temp_sample = MIN_AUDIO_VALUE_S16
+
+            # Write the new output sample back to the output buffer (from
+            # a 32-bit value back to a 16-bit value that we know is in 16-bit value range)
+            output_sample.value = temp_sample
+            output_buffer[index] = output_sample.bytes.byte0
+            output_buffer[index + 1] = output_sample.bytes.byte1
+
+            index += BYTES_PER_SAMPLE
 
 cdef int get_available_notification_message(NotificationMessageContainer **notification_messages) nogil:
     """
@@ -1637,12 +1739,14 @@ cdef class Track:
         self.state.buffer_size = buffer_size
         self.log.debug("Allocated track audio buffer (%d bytes)", buffer_size)
 
-        self.status = track_status_playing
-        self.volume = volume
-        self.current_volume = self.volume
-        self.fading = False
-        self.fade_steps = 0
-        self.fade_steps_remaining = 0
+        self.state.status = track_status_playing
+        self.state.fade_steps = 0
+        self.state.fade_steps_remaining = 0
+        new_volume = <Uint8>min(max(volume * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
+        self.state.volume = new_volume
+        self.state.fade_volume_current = new_volume
+        self.state.fade_volume_start = new_volume
+        self.state.fade_volume_target = new_volume
 
     def __repr__(self):
         return '<Track.{}.{}>'.format(self.number, self.name)
@@ -1657,13 +1761,6 @@ cdef class Track:
     property volume:
         def __get__(self):
             return round(self.state.volume / MIX_MAX_VOLUME, 2)
-
-        def __set__(self, float volume):
-            if self.state != NULL:
-                # Volume used in SDL_Mixer is an integer between 0 and MIX_MAX_VOLUME (0 to 128)
-                SDL_LockMutex(self.mutex)
-                self.state.volume = <Uint8>min(max(volume * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
-                SDL_UnlockMutex(self.mutex)
 
     @property
     def number(self):
@@ -1684,6 +1781,204 @@ cdef class Track:
     def supports_streaming_sounds(self):
         """Return whether or not track supports streaming sounds"""
         raise NotImplementedError('Must be overridden in derived class')
+
+    @property
+    def fading(self):
+        """Return whether or not the track is currently fading"""
+        cdef bint fading = False
+        if self.state != NULL:
+            SDL_LockMutex(self.mutex)
+            fading = self.state.fade_steps_remaining > 0
+            SDL_UnlockMutex(self.mutex)
+        return fading
+
+    def set_volume(self, float volume, float fade_seconds = 0.0):
+        """Sets the current track volume with an optional fade time"""
+        cdef Uint8 new_volume = <Uint8>min(max(volume * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
+        SDL_LockMutex(self.mutex)
+
+        # Fades require special logic
+        if fade_seconds > 0:
+            if self.state.status in [track_status_stopping, track_status_pausing]:
+                # Fade is ignored if track is in the process of stopping or pausing
+                self.state.volume = new_volume
+            else:
+                # If the track is currently in the middle of a fade, the existing fade
+                # will be interrupted and a new fade will be calculated from the current
+                # point of the existing fade
+                if self.state.fade_steps_remaining > 0:
+                    self.log.debug("set_volume - Interrupting an existing fade on this track so "
+                                   "start a new fade")
+
+                self.log.debug("set_volume - Applying %s second fade to new volume level", str(fade_seconds))
+
+                # Calculate fade
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
+                self.state.fade_steps = <Uint32>(fade_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps_remaining = self.state.fade_steps
+                self.state.fade_volume_start = self.state.fade_volume_current
+                self.state.fade_volume_target = new_volume
+                self.state.volume = new_volume
+        else:
+            self.state.volume = new_volume
+            self.state.fade_volume_current = new_volume
+            self.state.fade_volume_start = new_volume
+            self.state.fade_volume_target = new_volume
+
+        SDL_UnlockMutex(self.mutex)
+
+    def play(self, float fade_in_seconds = 0.0):
+        """
+        Starts playing the track so it can begin processing sounds. Function has no effect if
+        the track is already playing.
+        Args:
+            fade_in_seconds: The number of seconds to fade in the track
+        """
+        self.log.debug("play - Begin sound processing on track")
+
+        SDL_LockMutex(self.mutex)
+
+        # Play is only supported when a track is stopped or is in the process of stopping
+        if self.state.status in [track_status_stopped, track_status_stopping]:
+
+            if fade_in_seconds > 0:
+                # Calculate fade data (steps and volume)
+                self.log.debug("play - Applying %s second fade in", str(fade_in_seconds))
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
+                self.state.fade_steps = <Uint32>(fade_in_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps_remaining = self.state.fade_steps
+                self.state.fade_volume_start = self.state.fade_volume_current
+                self.state.fade_volume_target = self.state.volume
+            else:
+                # No fade will occur, simply set volume
+                self.state.fade_steps = 0
+                self.state.fade_steps_remaining = 0
+                self.state.fade_volume_current = self.state.volume
+                self.state.fade_volume_start = self.state.volume
+                self.state.fade_volume_target = self.state.volume
+
+            self.state.status = track_status_playing
+        else:
+            self.log.warning("play - Action may only be used when a track is stopped or is in the process "
+                             "of stopping; action will be ignored.")
+
+        SDL_UnlockMutex(self.mutex)
+
+    def stop(self, float fade_out_seconds = 0.0):
+        """
+        Stops the track and clears out any playing sounds. Function has no effect if the track is
+        already stopped.
+        Args:
+            fade_out_seconds: The number of seconds to fade out the track
+        """
+        self.log.debug("stop - Stop sound processing on track and clear state")
+
+        SDL_LockMutex(self.mutex)
+
+        # Stop is only supported when a track is playing
+        if self.state.status in [track_status_playing, track_status_stopping, track_status_pausing]:
+
+            if fade_out_seconds > 0:
+                # Calculate fade data (steps and volume)
+                self.log.debug("stop - Applying %s second fade out", str(fade_out_seconds))
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
+                self.state.fade_steps = <Uint32>(fade_out_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps_remaining = self.state.fade_steps
+                self.state.fade_volume_start = self.state.fade_volume_current
+                self.state.fade_volume_target = 0
+                self.state.status = track_status_stopping
+
+            else:
+                # No fade will occur, simply set volume
+                self.state.fade_steps = 0
+                self.state.fade_steps_remaining = 0
+                self.state.fade_volume_current = 0
+                self.state.fade_volume_start = 0
+                self.state.fade_volume_target = 0
+                self.state.status = track_status_stopped
+                send_track_stopped_notification(self.number, self._audio_callback_data.notification_messages, SDL_GetTicks())
+
+        else:
+            self.log.warning("stop - Action may only be used when a track is playing; action "
+                             "will be ignored.")
+
+        SDL_UnlockMutex(self.mutex)
+
+    def resume(self, float fade_in_seconds = 0.0):
+        """
+        Resumes playing a paused track so it can continue processing sounds. Function has no effect
+        unless the track is paused.
+        Args:
+            fade_in_seconds: The number of seconds to fade in the track
+        """
+        self.log.debug("resume - Resume sound processing on track")
+
+        SDL_LockMutex(self.mutex)
+
+        # Play is only supported when a track is paused or is in the process of pausing
+        if self.state.status in [track_status_paused, track_status_pausing]:
+
+            if fade_in_seconds > 0:
+                # Calculate fade data (steps and volume)
+                self.log.debug("resume - Applying %s second fade in", str(fade_in_seconds))
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
+                self.state.fade_steps = <Uint32>(fade_in_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps_remaining = self.state.fade_steps
+                self.state.fade_volume_start = self.state.fade_volume_current
+                self.state.fade_volume_target = self.state.volume
+            else:
+                # No fade will occur, simply set volume
+                self.state.fade_steps = 0
+                self.state.fade_steps_remaining = 0
+                self.state.fade_volume_current = self.state.volume
+                self.state.fade_volume_start = self.state.volume
+                self.state.fade_volume_target = self.state.volume
+
+            self.state.status = track_status_playing
+        else:
+            self.log.warning("resume - Action may only be used when a track is paused or is in the process "
+                             "of pausing; action will be ignored.")
+
+        SDL_UnlockMutex(self.mutex)
+
+    def pause(self, float fade_out_seconds = 0.0):
+        """
+        Pauses the track. Sounds will continue from where they left off when the track is resumed.
+        Function has no effect unless the track is playing.
+        Args:
+            fade_out_seconds: The number of seconds to fade out the track
+        """
+        self.log.debug("pause - Pause sound processing on track")
+
+        SDL_LockMutex(self.mutex)
+
+        # Stop is only supported when a track is playing
+        if self.state.status in [track_status_playing, track_status_stopping, track_status_pausing]:
+
+            if fade_out_seconds > 0:
+                # Calculate fade data (steps and volume)
+                self.log.debug("pause - Applying %s second fade out", str(fade_out_seconds))
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.audio_channels * BYTES_PER_SAMPLE
+                self.state.fade_steps = <Uint32>(fade_out_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps_remaining = self.state.fade_steps
+                self.state.fade_volume_start = self.state.fade_volume_current
+                self.state.fade_volume_target = 0
+                self.state.status = track_status_pausing
+            else:
+                # No fade will occur, simply set volume
+                self.state.fade_steps = 0
+                self.state.fade_steps_remaining = 0
+                self.state.fade_volume_current = 0
+                self.state.fade_volume_start = 0
+                self.state.fade_volume_target = 0
+                self.state.status = track_status_paused
+                send_track_paused_notification(self.number, self._audio_callback_data.notification_messages, SDL_GetTicks())
+
+        else:
+            self.log.warning("pause - Action may only be used when a track is playing; action "
+                             "will be ignored.")
+
+        SDL_UnlockMutex(self.mutex)
 
     def play_sound(self, sound_instance not None):
         """
@@ -1710,9 +2005,11 @@ cdef class Track:
         """
         raise NotImplementedError('Must be overridden in derived class')
 
-    def stop_all_sounds(self):
+    def stop_all_sounds(self, float fade_out_seconds = 0.0):
         """
         Stops all playing sounds immediately on the track.
+        Args:
+            fade_out_seconds: The number of seconds to fade out the sounds before stopping
         """
         raise NotImplementedError('Must be overridden in derived class')
 
@@ -1915,6 +2212,20 @@ cdef class TrackStandard(Track):
         self.log.debug("Processing notification message %d for sound instance (id: %d)",
                        notification_message.message, notification_message.sound_instance_id)
 
+        # Check for track notification messages first (they do not need sound instance information)
+        if notification_message.message in (notification_track_stopped, notification_track_paused):
+            if notification_message.message == notification_track_stopped:
+                self._reset_state()
+                # TODO: Send notification events for track stopped
+            elif notification_message.message == notification_track_paused:
+                # TODO: send notification events for track paused
+                pass
+
+            notification_message.message = notification_not_in_use
+            notification_message.sound_id = 0
+            notification_message.sound_instance_id = 0
+            return
+
         if notification_message.sound_instance_id not in self._sound_instances_by_id:
             self.log.warning("Received a notification message for a sound instance (id: %d) "
                              "that is no longer managed in the audio library. "
@@ -1942,7 +2253,6 @@ cdef class TrackStandard(Track):
             sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_marker(notification_message.data.marker.id)
-
         else:
             raise AudioException("Unknown notification message received on %s track", self.name)
 
@@ -2227,6 +2537,28 @@ cdef class TrackStandard(Track):
 
         # Remove any instances of the specified sound that are pending in the sound queue.
         self._remove_sound_from_queue(sound_instance)
+
+        SDL_UnlockMutex(self.mutex)
+
+    def _reset_state(self):
+        """Resets the track state (stops all sounds and clears the queue)"""
+        SDL_LockMutex(self.mutex)
+
+        self.log.debug("Resetting track state (sounds will be stopped and queue cleared")
+
+        for i in range(self.type_state.sound_player_count):
+            if self.type_state.sound_players[i].status != player_idle:
+                # Set stop sound event
+                send_sound_stopped_notification(self.number,
+                                                i,
+                                                self.type_state.sound_players[i].current.sound_id,
+                                                self.type_state.sound_players[i].current.sound_instance_id,
+                                                self._audio_callback_data.notification_messages,
+                                                SDL_GetTicks())
+                self.type_state.sound_players[i].status = player_idle
+
+        # Remove all sounds that are pending in the sound queue.
+        self._remove_all_sounds_from_queue()
 
         SDL_UnlockMutex(self.mutex)
 
@@ -2689,7 +3021,7 @@ cdef class TrackLiveLoop(Track):
 
         SDL_UnlockMutex(self.mutex)
 
-    def stop_all_sounds(self):
+    def stop_all_sounds(self, float fade_out_seconds = 0.0):
         """
         Stops all playing sounds immediately on the track.
         """

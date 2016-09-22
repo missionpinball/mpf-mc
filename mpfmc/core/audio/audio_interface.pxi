@@ -185,8 +185,9 @@ ctypedef struct TrackState:
     bint active
     int number
     Uint8 volume
-    bint fading
-    Uint current_volume
+    Uint8 fade_volume_start
+    Uint8 fade_volume_target
+    Uint8 fade_volume_current
     Uint32 fade_steps
     Uint32 fade_steps_remaining
     int buffer_size
@@ -351,6 +352,8 @@ cdef enum NotificationMessage:
     notification_sound_looping = 3            # Notification that a sound is looping back to the beginning
     notification_sound_marker = 4             # Notification that a sound marker has been reached
     notification_player_idle = 5              # Notification that a player is now idle and ready to play another sound
+    notification_track_stopped = 6            # Notification that the track has stopped
+    notification_track_paused = 7             # Notification that the track has been paused
 
 ctypedef struct NotificationMessageDataLooping:
     int loop_count
