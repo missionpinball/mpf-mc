@@ -162,7 +162,18 @@ Here are several various examples:
     def _validate_config_item(self, device, device_settings):
         """Validates the config when in a show"""
         validated_dict = super()._validate_config_item(device, device_settings)
-        # device is sound name
+        # device is track name
+
+        # Ensure volume parameter value has been provided for 'set_volume' actions
+        if validated_dict[device]['action'] is 'set_volume' and \
+                        validated_dict[device]['volume'] is None:
+            raise ValueError("track_player: 'volume' must be provided for all 'set_volume' "
+                             "actions ({} track)".format(device))
+
+        if validated_dict[device]['fade'] < 0:
+            raise ValueError("track_player: 'fade' must be greater than or equal to zero for all "
+                             "actions ({} track)".format(device))
+
         return validated_dict
 
     def clear_context(self, context):
