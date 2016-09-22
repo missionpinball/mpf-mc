@@ -123,15 +123,16 @@ class MpfMc(App):
         ImageAsset.initialize(self)
         VideoAsset.initialize(self)
 
-        # Create DMDs
-        self.create_physical_dmds()
-        self.create_physical_rgb_dmds()
-
         self._initialise_sound_system()
 
         self.clock.schedule_interval(self._check_crash_queue, 1)
 
+        self.events.add_handler("client_connected", self._create_physical_dmds)
         self.events.add_handler("player_turn_start", self.player_start_turn)
+
+    def _create_physical_dmds(self, **kwargs):
+        self.create_physical_dmds()
+        self.create_physical_rgb_dmds()
 
     def _load_font_paths(self):
         # Add local machine fonts path

@@ -98,7 +98,7 @@ class ModeController(object):
 
             if os.path.isfile(mpf_mode_config):
                 config = ConfigProcessor.load_config_file(mpf_mode_config,
-                                                          'mode')
+                                                          'mode', ignore_unknown_sections=True)
 
                 if self.debug:
                     self.log.debug("Loading config from %s", mpf_mode_config)
@@ -119,7 +119,7 @@ class ModeController(object):
             if os.path.isfile(mode_config_file):
                 config = Util.dict_merge(config,
                             ConfigProcessor.load_config_file(
-                                mode_config_file, 'mode'))
+                                mode_config_file, 'mode', ignore_unknown_sections=True))
 
                 if self.debug:
                     self.log.debug("Loading config from %s", mode_config_file)

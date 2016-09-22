@@ -17,8 +17,11 @@ class PhysicalDmdBase(object):
 
     def __init__(self, mc, name, config):
         """Initialise DMD."""
+
         self.mc = mc
         self.name = name
+
+        self.mc.log.info('Initializing Physical DMD')
 
         self.config = self._get_validated_config(config)
 
