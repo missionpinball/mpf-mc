@@ -107,14 +107,14 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfSlideTestCase):
         self.assertTextOnTopSlide("ASD")
         self.assertTextOnTopSlide("ASD2")
 
-        self.assertAlmostEqual(-134.0, self.mc.active_slides['top_slide'].children[0].children[1].y)
+        self.assertAlmostEqual(-134.0, self.mc.active_slides['top_slide'].children[0].children[0].y)
 
         self.post_event("move_out")
         self.advance_time_and_run()
-        self.assertAlmostEqual(-100.0, self.mc.active_slides['top_slide'].children[0].children[1].y)
+        self.assertAlmostEqual(-100.0, self.mc.active_slides['top_slide'].children[0].children[0].y)
         self.post_event("move_back")
         self.advance_time_and_run()
 
-        self.assertAlmostEqual(-134.0, self.mc.active_slides['top_slide'].children[0].children[1].y)
+        self.assertAlmostEqual(-134.0, self.mc.active_slides['top_slide'].children[0].children[0].y)
 
 

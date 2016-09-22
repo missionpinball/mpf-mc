@@ -46,13 +46,18 @@ class SlideFrameParent(MpfWidget, FloatLayout):
                                                               self.parent)
 
     def on_pos(self, *args):
-        self.pos = set_position(self.parent.width,
-                                        self.parent.height,
-                        self.width, self.height,
-                        self.slide_frame.config['x'],
-                        self.slide_frame.config['y'],
-                        self.slide_frame.config['anchor_x'],
-                        self.slide_frame.config['anchor_y'])
+
+        # if this is the initial positioning, calculate it from the config
+        # otherwise just update the slide frame and stencil
+
+        if not self.slide_frame.pos:
+            self.pos = set_position(self.parent.width,
+                                    self.parent.height,
+                                    self.width, self.height,
+                                    self.slide_frame.config['x'],
+                                    self.slide_frame.config['y'],
+                                    self.slide_frame.config['anchor_x'],
+                                    self.slide_frame.config['anchor_y'])
 
         self.stencil.pos = self.pos
         self.slide_frame.pos = self.pos
