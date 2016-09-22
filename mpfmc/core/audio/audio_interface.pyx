@@ -1799,7 +1799,7 @@ cdef class Track:
 
         # Fades require special logic
         if fade_seconds > 0:
-            if self.state.status in [track_status_stopping, track_status_pausing]:
+            if self.state.status == track_status_stopping or self.state.status == track_status_pausing:
                 # Fade is ignored if track is in the process of stopping or pausing
                 self.state.volume = new_volume
             else:
@@ -1839,8 +1839,7 @@ cdef class Track:
         SDL_LockMutex(self.mutex)
 
         # Play is only supported when a track is stopped or is in the process of stopping
-        if self.state.status in [track_status_stopped, track_status_stopping]:
-
+        if self.state.status == track_status_stopped or self.state.status == track_status_stopping:
             if fade_in_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("play - Applying %s second fade in", str(fade_in_seconds))
@@ -1916,8 +1915,7 @@ cdef class Track:
         SDL_LockMutex(self.mutex)
 
         # Play is only supported when a track is paused or is in the process of pausing
-        if self.state.status in [track_status_paused, track_status_pausing]:
-
+        if self.state.status == track_status_paused or self.state.status == track_status_pausing:
             if fade_in_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("resume - Applying %s second fade in", str(fade_in_seconds))
@@ -1954,7 +1952,6 @@ cdef class Track:
 
         # Stop is only supported when a track is playing
         if self.state.status in [track_status_playing, track_status_stopping, track_status_pausing]:
-
             if fade_out_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("pause - Applying %s second fade out", str(fade_out_seconds))
@@ -2360,6 +2357,14 @@ cdef class TrackStandard(Track):
 
         SDL_LockMutex(self.mutex)
 
+        # Sound instance cannot be played if the track is stopped or paused
+        if self.state.status == track_status_stopped or self.state.status == track_status_paused:
+            self.log.debug("play_sound - %s track is not currently playing and "
+                           "therefore the request to play sound %s will be canceled",
+                           self.name, sound_instance.name)
+            sound_instance.set_canceled()
+            return
+
         if sound_instance.max_queue_time is None:
             exp_time = None
         else:
@@ -2541,7 +2546,7 @@ cdef class TrackStandard(Track):
         SDL_UnlockMutex(self.mutex)
 
     def _reset_state(self):
-        """Resets the track state (stops all sounds and clears the queue)"""
+        """Resets the track state (stops all sounds immediately and clears the queue)"""
         SDL_LockMutex(self.mutex)
 
         self.log.debug("Resetting track state (sounds will be stopped and queue cleared")
@@ -2639,6 +2644,14 @@ cdef class TrackStandard(Track):
         """
         # NOTE: The SDL Mutex must be held while calling this function
         self.log.debug("_play_sound_on_sound_player: %s, %s, %s", str(sound_instance), str(player), str(force))
+
+        # The sound cannot be played if the track is stopped or paused
+        if self.state.status == track_status_stopped or self.state.status == track_status_paused:
+            self.log.debug("_play_sound_on_sound_player - %s track is not currently playing and "
+                           "therefore the request to play sound %s will be canceled",
+                           self.name, sound_instance.name)
+            sound_instance.set_canceled()
+            return False
 
         # Get the sound sample buffer container
         cdef MixChunkContainer chunk_container = sound_instance.container
