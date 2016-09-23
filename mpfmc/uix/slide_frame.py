@@ -384,4 +384,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             self.parent.parent.remove_widget(widget)
 
     def get_widgets_by_key(self, key):
-        return [x for x in self.parent.children if x.key == key]
+        try:
+            return [x for x in self.parent.children if x.key == key]
+        except ArithmeticError:
+            return []
