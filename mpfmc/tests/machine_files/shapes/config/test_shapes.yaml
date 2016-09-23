@@ -9,7 +9,7 @@ slides:
   slide1:
     - type: points
       points: 50, 50, 75, 50, 100, 30, 200, 50, 68, 250
-      size: 3
+      pointsize: 3
     - type: line
       points: 0, 0, 100, 100, 100, 200
       color: 00ff00
@@ -30,7 +30,7 @@ slides:
       height: 100
       color: purple
       angle_start: 0
-      angle_end: 90
+      angle_end: 45
     - type: rectangle
       x: 250
       y: 125

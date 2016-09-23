@@ -160,7 +160,7 @@ class BcpProcessor(object):
             self.mc.game_start()
 
         if name in self.mc.modes:
-            self.mc.modes[name].start(priority=int(priority))
+            self.mc.modes[name].start(mode_priority=int(priority))
 
     def _bcp_mode_stop(self, name, **kwargs):
         """Processes an incoming BCP 'mode_stop' command."""

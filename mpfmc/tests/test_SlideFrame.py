@@ -14,7 +14,8 @@ class TestSlideFrame(MpfMcTestCase):
         self.mc.targets['default'].add_slide(name='slide1',
                                              config=self.mc.slides[
                                                  'slide1'])
-        self.mc.targets['default'].show_slide('slide1')
+        self.mc.events.post('show_slide1')
+        self.advance_time()
 
         # make sure our slide frame is a valid target
         self.assertIn('frame1', self.mc.targets)
@@ -41,11 +42,11 @@ class TestSlideFrame(MpfMcTestCase):
 
         # make sure the slide frame is the right size and in the right pos
         self.assertEqual(frame1_frame.size, [200, 100])
-        self.assertEqual(frame1_frame.pos, [200, 200])
+        self.assertEqual(frame1_frame.pos, [50, 50])
 
         # it's parent should be the same size and pos
         self.assertEqual(frame1_frame_parent.size, [200, 100])
-        self.assertEqual(frame1_frame_parent.pos, [200, 200])
+        self.assertEqual(frame1_frame_parent.pos, [50, 50])
 
         # it's parent's parent is the display
         self.assertEqual(frame1_frame_parent.parent.size, [400, 300])
@@ -53,29 +54,29 @@ class TestSlideFrame(MpfMcTestCase):
 
         # add a widget to the frame
         self.mc.events.post('show_frame_text')
-        self.advance_time()
+        self.advance_time(1)
 
         # make sure the text is in the frame
         self.assertEqual(
             frame1_frame.current_slide.children[0].children[0].text,
-            'TEXT IN FRAME')
+            'SLIDE 1 IN FRAME')
 
         # flip frame to a different slide
         self.mc.events.post('show_frame_text2')
-        self.advance_time()
+        self.advance_time(1)
 
         # make sure the next text is there
         self.assertEqual(
             frame1_frame.current_slide.children[0].children[0].text,
-            'MORE TEXT')
+            'SLIDE 2 IN FRAME')
 
         # flip back to the first frame and make sure that text is there
         self.mc.events.post('show_frame_text')
-        self.advance_time()
+        self.advance_time(1)
 
         self.assertEqual(
             frame1_frame.current_slide.children[0].children[0].text,
-            'TEXT IN FRAME')
+            'SLIDE 1 IN FRAME')
 
     def test_remove_non_existent_slide(self):
         self.assertFalse(self.mc.targets['default'].remove_slide('hello'))

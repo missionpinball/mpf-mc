@@ -27,6 +27,7 @@ class SlideFrameParent(MpfWidget, FloatLayout):
         self.mc = mc
         self.name = slide_frame.name
         self.config = config
+        self.slide_frame = slide_frame
 
         self.ready = False
         self.size_hint = (None, None)
@@ -40,20 +41,26 @@ class SlideFrameParent(MpfWidget, FloatLayout):
         super().add_widget(self.stencil)
         self.add_widget(slide_frame)
 
-        self.stencil.pos = set_position(self.width, self.height,
-                                slide_frame.native_size[0],
-                                slide_frame.native_size[1],
-                                slide_frame.config['x'],
-                                slide_frame.config['y'],
-                                slide_frame.config['anchor_x'],
-                                slide_frame.config['anchor_y'])
-
     def __repr__(self):
         return '<SlideFrameParent name={}, parent={}>'.format(self.name,
                                                               self.parent)
 
-    # def __lt__(self, other):
-    #     return self.stencil.config['z'] < other.stencil.config['z']
+    def on_pos(self, *args):
+
+        # if this is the initial positioning, calculate it from the config
+        # otherwise just update the slide frame and stencil
+
+        if not self.slide_frame.pos:
+            self.pos = set_position(self.parent.width,
+                                    self.parent.height,
+                                    self.width, self.height,
+                                    self.slide_frame.config['x'],
+                                    self.slide_frame.config['y'],
+                                    self.slide_frame.config['anchor_x'],
+                                    self.slide_frame.config['anchor_y'])
+
+        self.stencil.pos = self.pos
+        self.slide_frame.pos = self.pos
 
     def add_widget(self, widget, **kwargs):
         del kwargs
@@ -76,7 +83,7 @@ class SlideFrame(MpfWidget, ScreenManager):
     """A widget which displays slides."""
 
     # pylint: disable-msg=too-many-arguments
-    def __init__(self, mc, name=None, config=None, slide=None, key=None, play_kwargs=None):
+    def __init__(self, mc, name=None, config=None, key=None, play_kwargs=None):
         del play_kwargs
         self.name = name  # needs to be set before super()
         # If this is a the main SlideFrame of a display, it will get its size
@@ -85,10 +92,9 @@ class SlideFrame(MpfWidget, ScreenManager):
         try:
             self.native_size = (config['width'], config['height'])
         except (KeyError, TypeError):
-            self.native_size = self.slide.native_size
+            self.native_size = self.parent.native_size
 
-        super().__init__(mc=mc, slide=slide, config=config, key=key)
-        self.slide_frame_parent = None
+        super().__init__(mc=mc, config=config, key=key)
 
         # minimal config needed if this is a widget
         if not config:
@@ -365,3 +371,17 @@ class SlideFrame(MpfWidget, ScreenManager):
                 new_slide = s
 
         return new_slide
+
+    def add_widget_to_frame(self, widget):
+        self.parent.parent.add_widget(widget)
+
+    def add_widgets_to_frame(self, widgets):
+        for w in widgets:
+            self.add_widget_to_frame(w)
+
+    def remove_widgets_by_key(self, key):
+        for widget in self.get_widgets_by_key(key):
+            self.parent.parent.remove_widget(widget)
+
+    def get_widgets_by_key(self, key):
+        return [x for x in self.parent.children if x.key == key]
