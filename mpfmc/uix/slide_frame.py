@@ -386,5 +386,5 @@ class SlideFrame(MpfWidget, ScreenManager):
     def get_widgets_by_key(self, key):
         try:
             return [x for x in self.parent.children if x.key == key]
-        except ArithmeticError:
+        except AttributeError:
             return []
