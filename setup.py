@@ -190,9 +190,9 @@ setup(
 
     entry_points="""
     [mpf.config_player]
-    sound_player=mpfmc.config_players.sound_player:register_with_mpf
-    widget_player=mpfmc.config_players.widget_player:register_with_mpf
-    slide_player=mpfmc.config_players.slide_player:register_with_mpf
+    sound_player=mpfmc.config_players.plugins.sound_player:register_with_mpf
+    widget_player=mpfmc.config_players.plugins.widget_player:register_with_mpf
+    slide_player=mpfmc.config_players.plugins.slide_player:register_with_mpf
 
     [mpf.command]
     mc=mpfmc.commands.mc:get_command
