@@ -1,10 +1,6 @@
 """Contains the sound config player class"""
 
-# WARNING: Do not import kivy's logger here since that will trigger Kivy to
-# load in the mpf process when MPF processes the MpfSoundPlayer
 from copy import deepcopy
-
-from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
 
@@ -237,23 +233,4 @@ Here are several various examples:
         if sound_instance_id in instance_dict:
             del instance_dict[sound_instance_id]
 
-class MpfSoundPlayer(PluginPlayer):
-    """Base class for part of the sound player which runs as part of MPF.
-
-    Note: This class is loaded by MPF and everything in it is in the context of
-    MPF, not the mpf-mc. MPF finds this instance because the mpf-mc setup.py
-    has the following entry_point configured:
-
-        sound_player=mpfmc.config_players.sound_player:register_with_mpf
-
-    """
-    config_file_section = 'sound_player'
-    show_section = 'sounds'
-
-player_cls = MpfSoundPlayer
 mc_player_cls = McSoundPlayer
-
-
-def register_with_mpf(machine):
-    """Registers the sound player plug-in with MPF"""
-    return 'sound', MpfSoundPlayer(machine)

@@ -142,7 +142,8 @@ class Slide(Screen):
                 this_key = key
 
             widget_obj = self.mc.widgets.type_map[widget['type']](
-                mc=self.mc, config=widget, slide=self, key=this_key, play_kwargs=play_kwargs)
+                mc=self.mc, config=widget, key=this_key,
+                play_kwargs=play_kwargs)
 
             top_widget = widget_obj
 

@@ -1,24 +1,9 @@
 """Widget player which can add and remove widgets from slides."""
+
 from copy import deepcopy
-
-from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.events import EventHandlerKey
-
 from mpfmc.core.mc_config_player import McConfigPlayer
-from mpfmc.uix.slide_frame import SlideFrame
-from mpfmc.uix.widget import create_widget_objects_from_config, \
-                             create_widget_objects_from_library
-
-
-class MpfWidgetPlayer(PluginPlayer):
-
-    """Widget Player in MPF.
-
-    Note: This class is loaded by MPF and everything in it is in the context of MPF.
-    """
-
-    config_file_section = 'widget_player'
-    show_section = 'widgets'
+from mpfmc.uix.widget import create_widget_objects_from_library
 
 
 class SlideNotActiveError(Exception):
@@ -202,10 +187,5 @@ class McWidgetPlayer(McConfigPlayer):
 
         self._reset_instance_dict(context)
 
-player_cls = MpfWidgetPlayer
+
 mc_player_cls = McWidgetPlayer
-
-
-def register_with_mpf(machine):
-    """Register widget player in MPF module."""
-    return 'widget', MpfWidgetPlayer(machine)
