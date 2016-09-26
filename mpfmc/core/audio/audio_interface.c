@@ -8,9 +8,10 @@
             "C:\\Python34\\include\\SDL2\\SDL_mixer.h",
             "gstreamer_helper.h"
         ],
-        "extra_compile_args": [
-            "-ggdb",
-            "-O2"
+        "extra_link_args": [
+            "-LC:\\Python34\\include\\SDL2",
+            "-L/usr/local/include/SDL2",
+            "-L/usr/include/SDL2"
         ],
         "include_dirs": [
             "C:\\Python34\\include\\SDL2",
@@ -19,7 +20,11 @@
         ],
         "libraries": [
             "SDL2",
-            "SDL2_mixer"
+            "SDL2_mixer",
+            "gstreamer-1.0",
+            "gobject-2.0",
+            "glib-2.0",
+            "intl"
         ],
         "library_dirs": [
             "C:\\Python34\\libs"
@@ -1936,7 +1941,7 @@ static const char __pyx_k_number[] = "number";
 static const char __pyx_k_player[] = "player";
 static const char __pyx_k_status[] = "status";
 static const char __pyx_k_volume[] = "volume";
-static const char __pyx_k_0_dev04[] = "0-dev04";
+static const char __pyx_k_0_dev05[] = "0-dev05";
 static const char __pyx_k_Track_2[] = "<Track.{}.{}>";
 static const char __pyx_k_Track_3[] = "Track.";
 static const char __pyx_k_disable[] = "disable";
@@ -2137,7 +2142,7 @@ static const char __pyx_k_play_sound_Processing_sound_s_fo_2[] = "play_sound - P
 static const char __pyx_k_play_sound_Sound_priority_d_is_l_2[] = "play_sound - Sound priority (%d) is less than or equal to the lowest sound currently playing (%d). Sound will be queued for playback.";
 static const char __pyx_k_play_sound_Sound_s_was_not_loade_2[] = "play_sound - Sound %s was not loaded and max_queue_time = 0, therefore it has been discarded and will not be played.";
 static PyObject *__pyx_kp_u_0;
-static PyObject *__pyx_kp_u_0_dev04;
+static PyObject *__pyx_kp_u_0_dev05;
 static PyObject *__pyx_kp_u_32;
 static PyObject *__pyx_kp_u_Add_track_failed_the_maximum_num;
 static PyObject *__pyx_kp_u_Add_track_failed_the_track_name;
@@ -32793,7 +32798,7 @@ static struct PyModuleDef __pyx_moduledef = {
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_u_0, __pyx_k_0, sizeof(__pyx_k_0), 0, 1, 0, 0},
-  {&__pyx_kp_u_0_dev04, __pyx_k_0_dev04, sizeof(__pyx_k_0_dev04), 0, 1, 0, 0},
+  {&__pyx_kp_u_0_dev05, __pyx_k_0_dev05, sizeof(__pyx_k_0_dev05), 0, 1, 0, 0},
   {&__pyx_kp_u_32, __pyx_k_32, sizeof(__pyx_k_32), 0, 1, 0, 0},
   {&__pyx_kp_u_Add_track_failed_the_maximum_num, __pyx_k_Add_track_failed_the_maximum_num, sizeof(__pyx_k_Add_track_failed_the_maximum_num), 0, 1, 0, 0},
   {&__pyx_kp_u_Add_track_failed_the_track_name, __pyx_k_Add_track_failed_the_track_name, sizeof(__pyx_k_Add_track_failed_the_track_name), 0, 1, 0, 0},
@@ -33486,11 +33491,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":15
  *            )
  * 
- * __version_info__ = ('0', '32', '0-dev04')             # <<<<<<<<<<<<<<
+ * __version_info__ = ('0', '32', '0-dev05')             # <<<<<<<<<<<<<<
  * __version__ = '.'.join(__version_info__)
  * 
  */
-  __pyx_tuple__37 = PyTuple_Pack(3, __pyx_kp_u_0, __pyx_kp_u_32, __pyx_kp_u_0_dev04); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_tuple__37 = PyTuple_Pack(3, __pyx_kp_u_0, __pyx_kp_u_32, __pyx_kp_u_0_dev05); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__37);
   __Pyx_GIVEREF(__pyx_tuple__37);
 
@@ -33878,7 +33883,7 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":15
  *            )
  * 
- * __version_info__ = ('0', '32', '0-dev04')             # <<<<<<<<<<<<<<
+ * __version_info__ = ('0', '32', '0-dev05')             # <<<<<<<<<<<<<<
  * __version__ = '.'.join(__version_info__)
  * 
  */
@@ -33886,7 +33891,7 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
 
   /* "Pinball/mpf_mc/mpfmc/core/audio/audio_interface.pyx":16
  * 
- * __version_info__ = ('0', '32', '0-dev04')
+ * __version_info__ = ('0', '32', '0-dev05')
  * __version__ = '.'.join(__version_info__)             # <<<<<<<<<<<<<<
  * 
  * from libc.stdio cimport FILE, fopen, fprintf
