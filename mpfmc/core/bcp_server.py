@@ -70,9 +70,13 @@ class BCPServer(threading.Thread):
         try:
             while not self.mc.thread_stopper.is_set():
                 self.log.info("Waiting for a connection...")
-                self.mc.events.post('client_disconnected',
-                                    host=self.socket.getsockname()[0],
-                                    port=self.socket.getsockname()[1])
+                # Since posting an event from a thread is not safe, we just
+                # drop the event we want into the receive queue and let the
+                # main loop pick it up
+                self.receive_queue.put(('trigger',
+                                        {'name': 'client_disconnected',
+                                        'host': self.socket.getsockname()[0],
+                                        'port': self.socket.getsockname()[1]}))
                 '''event: client_disconnected
                 desc: Posted on the MPF-MC only (e.g. not in MPF) when the BCP
                 client disconnects. This event is also posted when the MPF-MC
@@ -103,10 +107,14 @@ class BCPServer(threading.Thread):
                 self.log.info("Received connection from: %s:%s",
                               client_address[0], client_address[1])
 
-                # TODO: events is not thread safe. move this somewhere else!
-                self.mc.events.post('client_connected',
-                                    address=client_address[0],
-                                    port=client_address[1])
+                # Since posting an event from a thread is not safe, we just
+                # drop the event we want into the receive queue and let the
+                # main loop pick it up
+                self.receive_queue.put(('trigger',
+                                        {'name': 'client_connected',
+                                        'host': client_address[0],
+                                        'port': client_address[1]}))
+
                 '''event: client_connected
                 desc: Posted on the MPF-MC only when a BCP client has
                 connected.
