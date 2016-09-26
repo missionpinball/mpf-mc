@@ -99,7 +99,7 @@ cdef extern from 'gst/gst.h':
     bool gst_element_add_pad(GstElement *element, GstPad *pad)
     void gst_bus_enable_sync_message_emission(GstBus *bus)
     GstBus *gst_pipeline_get_bus(GstPipeline *pipeline)
-    #GstSample *gst_app_sink_pull_sample(GstAppSink *appsink)
+    GstSample *gst_app_sink_pull_sample(GstAppSink *appsink)
     GstBuffer *gst_sample_get_buffer(GstSample *sample)
     GstCaps *gst_sample_get_caps(GstSample *sample)
     GstStateChangeReturn gst_element_get_state(
