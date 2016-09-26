@@ -21,6 +21,22 @@ class Keyboard(Widget):
         self.inverted_keys = list()
         self.active_keys = dict()
 
+        # todo need to change the parsing logic to make these work
+        self.special_keys = {
+            'equals':'=',
+            'minus':'-',
+            'dash':'-',
+            'leftbracket':'[',
+            'rightbracket':']',
+            'backslash':'\\',
+            'apostrophe':"'",
+            'semicolon':';',
+            'colon':':',
+            'comma':',',
+            'period':'.',
+            'slash':'/',
+        }
+
         self.keyboard = Window.request_keyboard(callback=None, target=self)
 
         self.keyboard.bind(on_key_down=self._on_keyboard_down,
@@ -169,4 +185,5 @@ class Keyboard(Widget):
 
     def send_switch(self, name, state):
         """Notify mpf via BCP about a switch change."""
-        self.mc.bcp_processor.send('switch', name=name, state=state)
+        if self.mc.bcp_client_connected:
+            self.mc.bcp_processor.send('switch', name=name, state=state)
