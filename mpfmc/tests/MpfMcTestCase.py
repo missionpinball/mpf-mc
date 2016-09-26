@@ -120,6 +120,8 @@ class MpfMcTestCase(unittest.TestCase):
         # this is used to send BCP commands to mpf-mc
         self.send = self.mc.bcp_processor._process_command
 
+        self.mc.bcp_client_connected = True
+
     def _bcp_send(self, bcp_command, callback=None, **kwargs):
         # used for commands sent from the MC to the PC
         # print((bcp_command, callback, kwargs))
