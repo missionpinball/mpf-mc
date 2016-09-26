@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev02')
+__version_info__ = ('0', '32', '0-dev03')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -28,6 +28,8 @@ import time
 import logging
 
 
+include "sdl.pxi"
+include "gstreamer.pxi"
 include "audio_interface.pxi"
 
 # ---------------------------------------------------------------------------
@@ -51,6 +53,48 @@ DEF MIN_AUDIO_VALUE_S16 = -(1 << (16 - 1))
 class AudioException(Exception):
     """Exception returned by the audio module"""
     pass
+
+
+# ---------------------------------------------------------------------------
+#    Global GStreamer helper functions
+# ---------------------------------------------------------------------------
+def _gst_init():
+    """Initializes the GStreamer library"""
+    if gst_is_initialized():
+        return True
+    cdef int argc = 0
+    cdef char **argv = NULL
+    cdef GError *error
+    if not gst_init_check(&argc, &argv, &error):
+        msg = 'Unable to initialize GStreamer: code={} message={}'.format(
+                error.code, <bytes>error.message)
+        raise AudioException(msg)
+
+def get_gst_version():
+    """Returns the current version of GStreamer"""
+    cdef unsigned int major, minor, micro, nano
+    gst_version(&major, &minor, &micro, &nano)
+    return major, minor, micro, nano
+
+cdef void _on_gst_bus_message(void *userdata, GstMessage *message) with gil:
+    cdef AudioInterface interface = <AudioInterface>userdata
+    cdef GError *err = NULL
+    if message.type == GST_MESSAGE_EOS:
+        pass
+    elif message.type == GST_MESSAGE_ERROR:
+        gst_message_parse_error(message, &err, NULL)
+        interface.write_gst_log_message('error', err.message)
+        g_error_free(err)
+    elif message.type == GST_MESSAGE_WARNING:
+        gst_message_parse_warning(message, &err, NULL)
+        interface.write_gst_log_message('warning', err.message)
+        g_error_free(err)
+    elif message.type == GST_MESSAGE_INFO:
+        gst_message_parse_info(message, &err, NULL)
+        interface.write_gst_log_message('info', err.message)
+        g_error_free(err)
+    else:
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -142,7 +186,7 @@ cdef class AudioInterface:
         self.audio_callback_data.sample_rate = self.sample_rate
         self.audio_callback_data.audio_channels = self.audio_channels
         self.audio_callback_data.buffer_size = self.buffer_size
-        self.audio_callback_data.master_volume = MIX_MAX_VOLUME // 2
+        self.audio_callback_data.master_volume = SDL_MIX_MAXVOLUME // 2
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackState**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
         self.audio_callback_data.c_log_file = NULL
@@ -356,6 +400,16 @@ cdef class AudioInterface:
         return 'SDL {}.{}.{}'.format(version.major, version.minor, version.patch)
 
     @classmethod
+    def get_gstreamer_version(cls):
+        """
+        Returns the version of the GStreamer library
+        :return: GStreamer library version string
+        """
+        gst_version = get_gst_version()
+        return 'GStreamer {}.{}.{}.{}'.format(
+            gst_version[0], gst_version[1], gst_version[2], gst_version[3])
+
+    @classmethod
     def get_sdl_mixer_version(cls):
         """
         Returns the version of the dynamically linked SDL_Mixer library
@@ -378,11 +432,11 @@ cdef class AudioInterface:
         return extensions
 
     def get_master_volume(self):
-        return round(self.audio_callback_data.master_volume / MIX_MAX_VOLUME, 2)
+        return round(self.audio_callback_data.master_volume / SDL_MIX_MAXVOLUME, 2)
 
     def set_master_volume(self, float volume):
         SDL_LockMutex(self.audio_callback_data.mutex)
-        self.audio_callback_data.master_volume = <Uint8>min(max(volume * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
+        self.audio_callback_data.master_volume = <Uint8>min(max(volume * SDL_MIX_MAXVOLUME, 0), SDL_MIX_MAXVOLUME)
         SDL_UnlockMutex(self.audio_callback_data.mutex)
 
     def get_settings(self):
@@ -1143,14 +1197,14 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                     # Determine control point ducking stage and calculate control point
                     if control_point_pos >= standard_track.sound_players[player].current.ducking_settings.release_start_pos + standard_track.sound_players[player].current.ducking_settings.release_duration:
                         # Ducking finished
-                        standard_track.sound_players[player].current.ducking_control_points[control_point] = MIX_MAX_VOLUME
+                        standard_track.sound_players[player].current.ducking_control_points[control_point] = SDL_MIX_MAXVOLUME
 
                     elif control_point_pos >= standard_track.sound_players[player].current.ducking_settings.release_start_pos:
                         # Ducking release stage
                         ducking_is_active = True
                         progress = (control_point_pos - standard_track.sound_players[player].current.ducking_settings.release_start_pos) / standard_track.sound_players[player].current.ducking_settings.release_duration
                         standard_track.sound_players[player].current.ducking_control_points[control_point] = \
-                            lerpU8(in_out_quad(progress), standard_track.sound_players[player].current.ducking_settings.attenuation_volume, MIX_MAX_VOLUME)
+                            lerpU8(in_out_quad(progress), standard_track.sound_players[player].current.ducking_settings.attenuation_volume, SDL_MIX_MAXVOLUME)
 
                     elif control_point_pos >= standard_track.sound_players[player].current.ducking_settings.attack_start_pos + standard_track.sound_players[player].current.ducking_settings.attack_duration:
                         # Ducking hold state
@@ -1162,11 +1216,11 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                         ducking_is_active = True
                         progress = (control_point_pos - standard_track.sound_players[player].current.ducking_settings.attack_start_pos) / standard_track.sound_players[player].current.ducking_settings.attack_duration
                         standard_track.sound_players[player].current.ducking_control_points[control_point] = \
-                            lerpU8(in_out_quad(progress), MIX_MAX_VOLUME, standard_track.sound_players[player].current.ducking_settings.attenuation_volume)
+                            lerpU8(in_out_quad(progress), SDL_MIX_MAXVOLUME, standard_track.sound_players[player].current.ducking_settings.attenuation_volume)
 
                     else:
                         # Ducking delay stage
-                        standard_track.sound_players[player].current.ducking_control_points[control_point] = MIX_MAX_VOLUME
+                        standard_track.sound_players[player].current.ducking_control_points[control_point] = SDL_MIX_MAXVOLUME
 
                     # Move to next control point
                     control_point_pos += samples_per_control_point
@@ -1430,7 +1484,7 @@ cdef void apply_track_ducking(TrackState* track, Uint32 buffer_size, AudioCallba
         # Loop over track buffer
         for control_point in range(CONTROL_POINTS_PER_BUFFER):
             ducking_volume = track.ducking_control_points[control_point]
-            if ducking_volume < MIX_MAX_VOLUME:
+            if ducking_volume < SDL_MIX_MAXVOLUME:
                 apply_volume_to_buffer_range(<Uint8*> track.buffer, buffer_pos, ducking_volume,
                                              samples_per_control_point)
 
@@ -1443,7 +1497,7 @@ cdef inline void apply_volume_to_buffer_range(Uint8 *buffer, Uint32 start_pos, U
     Args:
         buffer: The audio buffer
         start_pos: The starting audio buffer position at which to apply the volume level
-        volume: The volume level to apply (8-bit unsigned value 0 to MIX_MAX_VOLUME)
+        volume: The volume level to apply (8-bit unsigned value 0 to SDL_MIX_MAXVOLUME)
         length: The number of bytes to apply the volume to
     """
     cdef Sample16Bit buffer_sample
@@ -1452,7 +1506,7 @@ cdef inline void apply_volume_to_buffer_range(Uint8 *buffer, Uint32 start_pos, U
     while buffer_pos < start_pos + length:
         buffer_sample.bytes.byte0 = buffer[buffer_pos]
         buffer_sample.bytes.byte1 = buffer[buffer_pos + 1]
-        buffer_sample.value = (buffer_sample.value * volume) // MIX_MAX_VOLUME
+        buffer_sample.value = (buffer_sample.value * volume) // SDL_MIX_MAXVOLUME
         buffer[buffer_pos] = buffer_sample.bytes.byte0
         buffer[buffer_pos + 1] = buffer_sample.bytes.byte1
         buffer_pos += BYTES_PER_SAMPLE
@@ -1463,7 +1517,7 @@ cdef void apply_volume_to_buffer(Uint8 *buffer, int buffer_length, Uint8 volume)
     Args:
         buffer: The audio buffer
         buffer_length: The length of the audio buffer (in bytes)
-        volume: The volume level to apply (8-bit unsigned value 0 to MIX_MAX_VOLUME)
+        volume: The volume level to apply (8-bit unsigned value 0 to SDL_MIX_MAXVOLUME)
     """
     cdef int temp_sample
     cdef Sample16Bit sample
@@ -1474,7 +1528,7 @@ cdef void apply_volume_to_buffer(Uint8 *buffer, int buffer_length, Uint8 volume)
         # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
         sample.bytes.byte0 = buffer[buffer_pos]
         sample.bytes.byte1 = buffer[buffer_pos + 1]
-        temp_sample = (sample.value * volume) // MIX_MAX_VOLUME
+        temp_sample = (sample.value * volume) // SDL_MIX_MAXVOLUME
 
         # Put the new sample back into the output buffer (from a 32-bit value
         # back to a 16-bit value that we know is in 16-bit value range)
@@ -1508,7 +1562,7 @@ cdef inline void mix_sound_sample_to_buffer(Uint8 *sound_buffer, Uint32 sample_p
     output_sample.bytes.byte1 = output_buffer[buffer_pos + 1]
 
     # Apply volume to sound sample
-    sound_sample.value = (sound_sample.value * sound_volume) // MIX_MAX_VOLUME
+    sound_sample.value = (sound_sample.value * sound_volume) // SDL_MIX_MAXVOLUME
 
     # Calculate the new output sample (mix the existing output sample with
     # the new source sound).  The temp sample is a 32-bit value to avoid overflow.
@@ -1609,7 +1663,7 @@ cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_dat
             # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
             track_sample.bytes.byte0 = track_buffer[index]
             track_sample.bytes.byte1 = track_buffer[index + 1]
-            track_sample.value = track_sample.value * track.fade_volume_current // MIX_MAX_VOLUME
+            track_sample.value = track_sample.value * track.fade_volume_current // SDL_MIX_MAXVOLUME
 
             # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
             output_sample.bytes.byte0 = output_buffer[index]
@@ -1641,7 +1695,7 @@ cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_dat
             # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
             track_sample.bytes.byte0 = track_buffer[index]
             track_sample.bytes.byte1 = track_buffer[index + 1]
-            track_sample.value = track_sample.value * track.volume // MIX_MAX_VOLUME
+            track_sample.value = track_sample.value * track.volume // SDL_MIX_MAXVOLUME
 
             # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
             output_sample.bytes.byte0 = output_buffer[index]
@@ -1742,7 +1796,7 @@ cdef class Track:
         self.state.status = track_status_playing
         self.state.fade_steps = 0
         self.state.fade_steps_remaining = 0
-        new_volume = <Uint8>min(max(volume * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
+        new_volume = <Uint8>min(max(volume * SDL_MIX_MAXVOLUME, 0), SDL_MIX_MAXVOLUME)
         self.state.volume = new_volume
         self.state.fade_volume_current = new_volume
         self.state.fade_volume_start = new_volume
@@ -1760,7 +1814,7 @@ cdef class Track:
 
     property volume:
         def __get__(self):
-            return round(self.state.volume / MIX_MAX_VOLUME, 2)
+            return round(self.state.volume / SDL_MIX_MAXVOLUME, 2)
 
     @property
     def number(self):
@@ -1794,7 +1848,7 @@ cdef class Track:
 
     def set_volume(self, float volume, float fade_seconds = 0.0):
         """Sets the current track volume with an optional fade time"""
-        cdef Uint8 new_volume = <Uint8>min(max(volume * MIX_MAX_VOLUME, 0), MIX_MAX_VOLUME)
+        cdef Uint8 new_volume = <Uint8>min(max(volume * SDL_MIX_MAXVOLUME, 0), SDL_MIX_MAXVOLUME)
         SDL_LockMutex(self.mutex)
 
         # Fades require special logic
@@ -2702,8 +2756,8 @@ cdef class TrackStandard(Track):
                 request_message.data.play.fade_in_duration = <Uint32>(sound_instance.fade_in * seconds_to_bytes_factor)
                 request_message.data.play.fade_out_duration = <Uint32>(sound_instance.fade_out * seconds_to_bytes_factor)
 
-                # Volume must be converted from a float (0.0 to 1.0) to an 8-bit integer (0..MIX_MAX_VOLUME)
-                request_message.data.play.volume = <Uint8>(sound_instance.volume * MIX_MAX_VOLUME)
+                # Volume must be converted from a float (0.0 to 1.0) to an 8-bit integer (0..SDL_MIX_MAXVOLUME)
+                request_message.data.play.volume = <Uint8>(sound_instance.volume * SDL_MIX_MAXVOLUME)
 
                 # If the sound has any markers, set them
                 request_message.data.play.marker_count = sound_instance.marker_count
@@ -2722,7 +2776,7 @@ cdef class TrackStandard(Track):
                     request_message.data.play.ducking_settings.track_bit_mask = sound_instance.ducking.track_bit_mask
                     request_message.data.play.ducking_settings.attack_start_pos = sound_instance.ducking.delay * seconds_to_bytes_factor
                     request_message.data.play.ducking_settings.attack_duration = sound_instance.ducking.attack * seconds_to_bytes_factor
-                    request_message.data.play.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * MIX_MAX_VOLUME)
+                    request_message.data.play.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * SDL_MIX_MAXVOLUME)
                     request_message.data.play.ducking_settings.release_start_pos = sound_instance.ducking.release_point * seconds_to_bytes_factor
                     request_message.data.play.ducking_settings.release_duration = sound_instance.ducking.release * seconds_to_bytes_factor
                 else:
