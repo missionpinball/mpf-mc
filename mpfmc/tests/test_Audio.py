@@ -256,7 +256,7 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(1)
 
         self.mc.events.post('play_sound_music_fade_at_mode_end')
-        self.advance_time()
+        self.advance_time(0.25)
         self.assertTrue(track_music.sound_is_playing(music_sound))
         self.advance_time(2)
 

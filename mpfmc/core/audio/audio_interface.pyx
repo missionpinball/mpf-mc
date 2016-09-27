@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '31', '0')
+__version_info__ = ('0', '31', '1')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -1726,6 +1726,7 @@ cdef class TrackStandard(Track):
     cdef object _sound_queue
     cdef dict _sound_queue_items
     cdef int _max_simultaneous_sounds
+    cdef int _queue_entry_id
 
     # Track state needs to be stored in a C struct in order for them to be accessible in
     # the SDL callback functions without the GIL (for performance reasons).
@@ -1757,6 +1758,7 @@ cdef class TrackStandard(Track):
 
         self._sound_queue = PriorityQueue()
         self._sound_queue_items = dict()
+        self._queue_entry_id = 0
 
         # Set track type specific settings
         self.state.type = track_type_standard
@@ -1959,24 +1961,39 @@ cdef class TrackStandard(Track):
         # in this method so keep track of the number of items we are
         # retrieving from the queue and exit when we have gone through
         # all items once.
-        count = self._sound_queue.qsize()
-        while count > 0:
+        cdef list queue_entry_ids_retrieved = list()
+        while True:
 
             # Each item in the queue is a list containing the following items:
             #    0 (priority): The priority of the returned sound
             #    1 (exp_time): The time (in ticks) after which the sound expires and should not be played
-            #    2 (sound): The Sound object ready for playback
+            #    2 (entry_id): The unique identifier for this queue entry (used to ensure queue can always
+            #                  be properly sorted
+            #    3 (sound): The Sound object ready for playback
 
             try:
+                # Get the next item in the queue (sorted by priority and expiration time)
                 queue_entry = self._sound_queue.get_nowait()
-                count -= 1
-                if queue_entry[2] is None:
+
+                # Check if we've already processed the entry during this call
+                if queue_entry[2] in queue_entry_ids_retrieved:
+                    # Already processed, put it back in the queue and return None
+                    self._sound_queue.put(queue_entry)
+                    return None
+
+                # Keep track of entries we've processed during this call
+                queue_entry_ids_retrieved.append(queue_entry[2])
+
+                # Check if entry has already been marked as removed (sound is None)
+                if queue_entry[3] is None:
                     continue
+
             except Empty:
+                # Queue is empty
                 return None
 
             # If the sound is still loading and not expired, put it back in the queue
-            sound_instance = queue_entry[2]
+            sound_instance = queue_entry[3]
             exp_time = queue_entry[1]
             if not sound_instance.sound.loaded and sound_instance.sound.loading and \
                     (exp_time is None or exp_time > time.time()):
@@ -1990,7 +2007,7 @@ cdef class TrackStandard(Track):
                     del self._sound_queue_items[sound_instance]
 
                 # Return the next sound from the priority queue if it has not expired
-                if not exp_time or exp_time > time.time():
+                if exp_time is None or exp_time > time.time():
                     self.log.debug("Retrieving next pending sound from queue %s", queue_entry)
                     sound_instance.set_pending()  # Notify sound instance it is no longer queued
                     return sound_instance
@@ -2013,7 +2030,7 @@ cdef class TrackStandard(Track):
         # track of sounds in the queue is updated.
         if sound_instance in self._sound_queue_items:
             entry = self._sound_queue_items[sound_instance]
-            entry[2] = None
+            entry[3] = None
             self.log.debug("Removing pending sound from queue %s", sound_instance)
             sound_instance.set_canceled()
             del self._sound_queue_items[sound_instance]
@@ -2028,7 +2045,7 @@ cdef class TrackStandard(Track):
         # track of sounds in the queue is updated.
         for sound_instance in self._sound_queue_items:
             entry = self._sound_queue_items[sound_instance]
-            entry[2] = None
+            entry[3] = None
             self.log.debug("Removing pending sound from queue %s", sound_instance)
             sound_instance.set_canceled()
 
@@ -2057,7 +2074,7 @@ cdef class TrackStandard(Track):
                 sound_instance.sound.load()
 
             if sound_instance.max_queue_time != 0:
-                self.queue_sound(sound_instance=sound_instance, exp_time=exp_time)
+                self._queue_sound(sound_instance=sound_instance, exp_time=exp_time)
                 self.log.debug("play_sound - Sound %s was not loaded and therefore has been "
                                "queued for playback.", sound_instance.name)
             else:
@@ -2104,7 +2121,7 @@ cdef class TrackStandard(Track):
                     self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
                                    "lowest sound currently playing (%d). Sound will be queued "
                                    "for playback.", sound_instance.priority, lowest_priority)
-                    self.queue_sound(sound_instance=sound_instance, exp_time=exp_time)
+                    self._queue_sound(sound_instance=sound_instance, exp_time=exp_time)
 
         SDL_UnlockMutex(self.mutex)
 
@@ -2130,7 +2147,7 @@ cdef class TrackStandard(Track):
 
         SDL_UnlockMutex(self.mutex)
 
-    def queue_sound(self, sound_instance, exp_time=None):
+    def _queue_sound(self, sound_instance, exp_time=None):
         """Adds a sound to the queue to be played when a sound player becomes available.
 
         Args:
@@ -2147,8 +2164,9 @@ cdef class TrackStandard(Track):
         # Note the negative operator in front of priority since this queue
         # retrieves the lowest values first, and MPF uses higher values for
         # higher priorities.
-        entry = [-sound_instance.priority, exp_time, sound_instance]
+        entry = [-sound_instance.priority, exp_time, self._queue_entry_id, sound_instance]
         self._sound_queue.put(entry)
+        self._queue_entry_id += 1
 
         # Notify sound instance it has been queued
         sound_instance.set_queued()
