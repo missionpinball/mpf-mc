@@ -26,6 +26,7 @@ from queue import PriorityQueue, Empty
 from math import pow
 import time
 import logging
+import os
 
 
 include "sdl.pxi"
@@ -176,6 +177,7 @@ cdef class AudioInterface:
         self.log.info("Initialized %s", AudioInterface.get_version())
         self.log.debug("Loaded %s", AudioInterface.get_sdl_version())
         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
+        self.log.debug("Loaded %s", AudioInterface.get_glib_version())
 
         # Determine the actual audio format in use by the opened audio device.  This may or may not match
         # the parameters used to initialize the audio interface.
@@ -248,11 +250,10 @@ cdef class AudioInterface:
 
         PyMem_Free(self.audio_callback_data.request_messages)
         PyMem_Free(self.audio_callback_data.notification_messages)
-
         PyMem_Free(self.audio_callback_data.tracks)
         PyMem_Free(self.audio_callback_data)
 
-        # SDL_Mixer no longer needed
+        # SDL no longer needed
         SDL_Quit()
 
     @staticmethod
@@ -407,6 +408,15 @@ cdef class AudioInterface:
         gst_version = get_gst_version()
         return 'GStreamer {}.{}.{}.{}'.format(
             gst_version[0], gst_version[1], gst_version[2], gst_version[3])
+
+    @classmethod
+    def get_glib_version(cls):
+        """
+        Returns the version of the GLib library
+        :return: GLib library version string
+        """
+        return 'GLib {}.{}.{}'.format(
+            glib_major_version, glib_minor_version, glib_micro_version)
 
     def supported_extensions(self):
         """
@@ -3106,6 +3116,141 @@ cdef class TrackLiveLoop(Track):
         pass
 
 
+
+
+
+# ---------------------------------------------------------------------------
+#    SoundMemoryFile class
+# ---------------------------------------------------------------------------
+cdef class SoundMemoryFile:
+    """SoundMemoryFile is a wrapper class to manage sound sample data stored
+    in memory."""
+    cdef str file_name
+    cdef int sample_rate
+    cdef int channels
+    cdef buffer_size
+    cdef void *data
+    cdef int _length
+
+    def __init__(self, str file_name, int sample_rate, int channels, int buffer_size):
+        self.file_name = file_name
+        self.sample_rate = sample_rate
+        self.channels = channels
+        self.buffer_size = buffer_size
+        self.data = NULL
+        self._length = 0
+
+    def __dealloc__(self):
+        if self.data != NULL:
+            g_free(self.data)
+            self.data = NULL
+
+    def _gst_init(self):
+        if gst_is_initialized():
+            return True
+        cdef int argc = 0
+        cdef char **argv = NULL
+        cdef GError *error
+        if not gst_init_check(&argc, &argv, &error):
+            msg = 'Unable to initialize gstreamer: code={} message={}'.format(
+                    error.code, <bytes>error.message)
+            raise AudioException(msg)
+
+    def _load(self):
+        """Loads the sound into memory using GStreamer"""
+        cdef str pipeline_string
+        cdef str file_path
+        cdef GstElement *pipeline
+        cdef GstElement *sink
+        cdef GError *error
+        cdef GstStateChangeReturn ret
+        cdef GstState state
+        cdef GstSample *sample
+        cdef GstBuffer *buffer
+        cdef GstMapInfo map_info
+        cdef bytes temp_data
+        cdef gint64 duration = -1
+        cdef gboolean is_eos
+
+        self._gst_init()
+
+        temp_data = bytes()
+
+        if not os.path.isfile(self.file_name):
+            raise AudioException('Could not locate file')
+
+        # Pipeline structure: uridecodebin --> audioconvert --> audioresample --> appsink
+
+        # Create GStreamer pipeline with the specified caps (from a string)
+        file_path = 'file:///' + self.file_name.replace('\\', '/')
+        pipeline_string = 'uridecodebin uri="{}" ! audioconvert ! audioresample ! appsink name=sink caps="audio/x-raw,rate={},channels={},format=S16LE,layout=interleaved" sync=false blocksize=44100'.format(
+            file_path, str(self.sample_rate), str(self.channels))
+
+        print(pipeline_string)
+
+        error = NULL
+        pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)
+
+        if error != NULL:
+            print('error')
+            raise AudioException('Unable to create a pipeline')
+
+        # Get sink
+        sink = gst_bin_get_by_name(<GstBin*>pipeline, "sink")
+
+        # Set to PAUSED to make the first frame arrive in the sink
+        ret = gst_element_set_state(pipeline, GST_STATE_PAUSED)
+        gst_element_get_state(pipeline, &state, NULL, <GstClockTime>GST_SECOND)
+        gst_element_query_duration(pipeline, GST_FORMAT_TIME, &duration)
+        print("duration:", duration/GST_SECOND)
+
+        # get ready!
+        print("Playing")
+        with nogil:
+            # gst_element_set_state(pipeline, GST_STATE_READY)
+            gst_element_set_state(pipeline, GST_STATE_PLAYING)
+
+        while True:
+            sample = c_appsink_pull_sample(sink)
+            if sample == NULL:
+                break
+
+            is_eos = g_object_get_bool(sink, "eos")
+            if is_eos:
+                break
+
+            buffer = gst_sample_get_buffer(sample)
+
+            if not gst_buffer_map(buffer, &map_info, GST_MAP_READ):
+                gst_sample_unref(sample)
+                raise AudioException("Unable to map buffer")
+
+            temp_data += map_info.data[:<int>map_info.size]
+            gst_buffer_unmap(buffer, &map_info)
+
+        # Copy the sound data to it's permanent home
+        self._length = len(temp_data)
+        print("Final sample data length: ", self._length)
+
+        # Cleanup the loader pipeline
+        print("Stopping pipeline")
+        gst_element_set_state(pipeline, GST_STATE_NULL)
+        gst_object_unref (pipeline)
+
+    @property
+    def loaded(self):
+        """Returns whether or not the sound file data is loaded in memory"""
+        return self.data != NULL
+
+    @property
+    def length(self):
+        """Returns the length of the sound data (in bytes)"""
+        if self.data == NULL:
+            return 0
+        else:
+            return self.length
+
+
 # ---------------------------------------------------------------------------
 #    MixChunkContainer class
 # ---------------------------------------------------------------------------
@@ -3138,3 +3283,4 @@ cdef class MixChunkContainer:
             return 0
         else:
             return self.chunk.alen
+

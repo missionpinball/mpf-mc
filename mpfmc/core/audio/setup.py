@@ -114,6 +114,7 @@ def determine_sdl2():
 
 
 gst_flags = pkgconfig('gstreamer-1.0')
+print("gst_flags:", gst_flags)
 if 'libraries' not in gst_flags:
     print('Missing GStreamer framework')
     raise EnvironmentError('Missing GStreamer framework')
@@ -125,12 +126,12 @@ if 'libraries' not in sdl2_flags:
     print('Missing SDL2 framework')
     raise EnvironmentError('Missing SDL2 framework')
 
-flags = merge(sdl2_flags, gst_flags)
+flags = merge(gst_flags, sdl2_flags)
 print(flags)
 
 libraries = flags['libraries']
 library_dirs = [join(dirname(sys.executable), 'libs')]
-include_dirs = sdl2_flags['include_dirs']
+include_dirs = flags['include_dirs']
 extra_objects = []
 extra_compile_args = ['-ggdb', '-O2'].append(flags['extra_compile_args'])
 extra_link_args = flags['extra_link_args']

@@ -1,6 +1,7 @@
 #include <glib.h>
 #include <gst/gst.h>
 
+
 static void c_glib_iteration(int count)
 {
 	while (count > 0 && g_main_context_pending(NULL))
@@ -49,6 +50,13 @@ static void g_object_set_element(GstElement *element, char *name, GstElement *va
 static void g_object_set_pad(GstElement *element, char *name, GstPad *pad)
 {
     g_object_set(G_OBJECT(element), name, pad, NULL);
+}
+
+static gboolean g_object_get_bool(GstElement *element, char *name)
+{
+    gboolean value;
+    g_object_get(G_OBJECT(element), name, &value, NULL);
+    return value;
 }
 
 typedef void (*appcallback_t)(void *, int, int, char *, int);
@@ -141,6 +149,18 @@ static void c_signal_free_data(gpointer data, GClosure *closure)
 	callback_data_t *cdata = data;
 	Py_DECREF(cdata->userdata);
 	free(cdata);
+}
+
+static GstSample *c_appsink_pull_sample(GstElement *appsink)
+{
+	GstSample *sample = NULL;
+
+	g_signal_emit_by_name(appsink, "pull-sample", &sample);
+	if (sample == NULL) {
+		g_warning("Could not get sample");
+    }
+
+    return sample;
 }
 
 static gulong c_appsink_set_sample_callback(GstElement *appsink, appcallback_t callback, PyObject *userdata)

@@ -7,6 +7,7 @@ from os import environ
 from os.path import join, dirname, exists, isdir
 from distutils.version import LooseVersion
 from setuptools import setup, Extension
+from copy import deepcopy
 
 platform = sys.platform
 
@@ -15,6 +16,43 @@ def ver_equal(self, other):
     return self.version == other
 
 LooseVersion.__eq__ = ver_equal
+
+def getoutput(cmd):
+    import subprocess
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    p.wait()
+    if p.returncode:  # if not returncode == 0
+        print('WARNING: A problem occured while running {0} (code {1})\n'
+              .format(cmd, p.returncode))
+        stderr_content = p.stderr.read()
+        if stderr_content:
+            print('{0}\n'.format(stderr_content))
+        return ""
+    return p.stdout.read()
+
+def pkgconfig(*packages, **kw):
+    flag_map = {'-I': 'include_dirs', '-L': 'library_dirs', '-l': 'libraries'}
+    cmd = 'pkg-config --libs --cflags {}'.format(' '.join(packages))
+    results = getoutput(cmd).split()
+    for token in results:
+        ext = token[:2].decode('utf-8')
+        flag = flag_map.get(ext)
+        if not flag:
+            continue
+        kw.setdefault(flag, []).append(token[2:].decode('utf-8'))
+    return kw
+
+def merge(d1, *args):
+    d1 = deepcopy(d1)
+    for d2 in args:
+        for key, value in d2.items():
+            value = deepcopy(value)
+            if key in d1:
+                d1[key].extend(value)
+            else:
+                d1[key] = value
+    return d1
 
 # Detect 32/64bit for OSX (http://stackoverflow.com/a/1405971/798575)
 if sys.platform == 'darwin':
@@ -54,7 +92,7 @@ def determine_sdl2():
     sdl2_path = environ.get('KIVY_SDL2_PATH', None)
 
     if not sdl2_path and platform == 'darwin':
-        return dict(libraries=[], include_dirs=['/usr/local/include/SDL2'])
+        return flags
 
     # no pkgconfig info, or we want to use a specific sdl2 path, so perform
     # manual configuration
@@ -98,20 +136,36 @@ def determine_sdl2():
     return flags
 
 
-# Get the build flags for compiling/building against the SDL2 libraries
+gst_flags = pkgconfig('gstreamer-1.0')
+if 'libraries' not in gst_flags:
+    print('Missing GStreamer framework')
+    raise EnvironmentError('Missing GStreamer framework')
+
+# configure the env
 sdl2_flags = determine_sdl2()
 
+if 'libraries' not in sdl2_flags:
+    print('Missing SDL2 framework')
+    raise EnvironmentError('Missing SDL2 framework')
+
+flags = merge(sdl2_flags, gst_flags)
+print(flags)
+
+libraries = flags['libraries']
+library_dirs = [join(dirname(sys.executable), 'libs')]
+include_dirs = sdl2_flags['include_dirs']
+extra_objects = []
+extra_compile_args = ['-ggdb', '-O2'].append(flags['extra_compile_args'])
+extra_link_args = flags['extra_link_args']
 extensions = [
-    # Custom audio library
-    Extension('mpfmc.core.audio.audio_interface',
-              ['mpfmc/core/audio/audio_interface.c'],
-              include_dirs=sdl2_flags['include_dirs'],
-              library_dirs=[join(dirname(sys.executable), 'libs')],
-              libraries=sdl2_flags['libraries'],
-              extra_objects=[],
-              extra_compile_args=['-ggdb', '-O2'],
-              extra_link_args=[]
-              )
+    Extension('audio_interface',
+              ['mpfmc/core/audio/audio_interface.pyx'],
+              include_dirs=include_dirs,
+              library_dirs=library_dirs,
+              libraries=libraries,
+              extra_objects=extra_objects,
+              extra_compile_args=extra_compile_args,
+              extra_link_args=extra_link_args),
 ]
 
 ext_modules = extensions

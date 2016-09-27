@@ -14,16 +14,18 @@ cdef extern from 'gst/gst.h':
     ctypedef void *GstMemory
     ctypedef void *GstBin
     ctypedef void *GstCaps
-    ctypedef void *GstAppSink
     ctypedef void *GstTimedValueControlSource
     ctypedef void (*appcallback_t)(void *, int, int, char *, int)
     ctypedef void (*buscallback_t)(void *, GstMessage *)
+    ctypedef int gint
     ctypedef unsigned int guint
+    ctypedef unsigned long gulong
     ctypedef unsigned char guint8
     ctypedef unsigned int guint32
     ctypedef unsigned long gulong
     ctypedef unsigned int gsize
     ctypedef void *gpointer
+    ctypedef const void *gconstpointer
     ctypedef char const_gchar 'const gchar'
     ctypedef int gint
     ctypedef long int gint64
@@ -99,8 +101,10 @@ cdef extern from 'gst/gst.h':
     bool gst_element_add_pad(GstElement *element, GstPad *pad)
     void gst_bus_enable_sync_message_emission(GstBus *bus)
     GstBus *gst_pipeline_get_bus(GstPipeline *pipeline)
-    GstSample *gst_app_sink_pull_sample(GstAppSink *appsink)
     GstBuffer *gst_sample_get_buffer(GstSample *sample)
+    void gst_sample_unref(GstSample *sample)
+    gboolean gst_buffer_map(GstBuffer *buffer, GstMapInfo *info, GstMapFlags flags)
+    void gst_buffer_unmap(GstBuffer *buffer, GstMapInfo *info)
     GstCaps *gst_sample_get_caps(GstSample *sample)
     GstStateChangeReturn gst_element_get_state(
             GstElement *element, GstState *state, GstState *pending,
@@ -131,6 +135,45 @@ cdef extern from 'gst/gst.h':
 
 
 # ---------------------------------------------------------------------------
+#    glib declarations from glib.h
+# ---------------------------------------------------------------------------
+cdef extern from 'glib.h':
+    int glib_major_version
+    int glib_minor_version
+    int glib_micro_version
+
+    ctypedef void (*GDestroyNotify)(gpointer data)
+    ctypedef gpointer (*GReallocFunc)(gpointer data, gsize size)
+    void g_free(gpointer mem)
+    gpointer g_malloc(gsize n_bytes)
+    gpointer g_realloc(gpointer mem, gsize n_bytes)
+
+    ctypedef struct GByteArray:
+        guint8 *data
+        guint len
+
+    GByteArray *g_byte_array_new()
+    void g_byte_array_unref(GByteArray *array)
+    GByteArray *g_byte_array_append(GByteArray *array, const guint8 *data, guint len)
+
+    ctypedef struct _GBytes:
+        gconstpointer data
+        gsize size
+        gint ref_count
+        GDestroyNotify free_func
+        gpointer user_data
+
+    ctypedef _GBytes GBytes
+
+    GBytes *g_byte_array_free_to_bytes(GByteArray *array)
+    GBytes *g_bytes_new (gconstpointer data, gsize size)
+    gconstpointer g_bytes_get_data (GBytes *bytes, gsize *size)
+    gsize g_bytes_get_size(GBytes *bytes)
+    GBytes *g_bytes_ref(GBytes *bytes)
+    void g_bytes_unref(GBytes *bytes)
+
+
+# ---------------------------------------------------------------------------
 #    GStreamer helper functions defined in gstreamer_helper.h
 # ---------------------------------------------------------------------------
 cdef extern from 'gstreamer_helper.h':
@@ -142,6 +185,8 @@ cdef extern from 'gstreamer_helper.h':
     void g_object_set_char(GstElement *element, char *name, char *value)
     void g_object_set_element(GstElement *element, char *name, GstElement *value)
     void g_object_set_pad(GstElement *element, char *name, GstPad *pad)
+    gboolean g_object_get_bool(GstElement *element, char *name)
+    GstSample *c_appsink_pull_sample(GstElement *appsink)
     gulong c_appsink_set_sample_callback(GstElement *appsink,
             appcallback_t callback, void *userdata)
     void c_appsink_pull_preroll(GstElement *appsink,
