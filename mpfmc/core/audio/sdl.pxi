@@ -24,6 +24,11 @@ cdef extern from "SDL.h" nogil:
     ctypedef signed short Sint16
     ctypedef unsigned short Uint16
 
+    int SDL_AUDIO_ALLOW_FREQUENCY_CHANGE
+    int SDL_AUDIO_ALLOW_FORMAT_CHANGE
+    int SDL_AUDIO_ALLOW_CHANNELS_CHANGE
+    int SDL_AUDIO_ALLOW_ANY_CHANGE
+
     enum Enum_temp_random_970738:
         SDL_FALSE
         SDL_TRUE
@@ -50,6 +55,19 @@ cdef extern from "SDL.h" nogil:
 
     struct SDL_Thread:
         pass
+
+    ctypedef Uint32 SDL_AudioDeviceID
+    SDL_AudioDeviceID SDL_OpenAudioDevice(char *device, int iscapture, SDL_AudioSpec *desired, SDL_AudioSpec *obtained, int allowed_changes)
+    void SDL_LockAudioDevice(SDL_AudioDeviceID dev)
+    void SDL_UnlockAudioDevice(SDL_AudioDeviceID dev)
+    cdef enum Enum_temp_random_404053:
+        SDL_AUDIO_STOPPED
+        SDL_AUDIO_PLAYING
+        SDL_AUDIO_PAUSED
+    ctypedef Enum_temp_random_404053 SDL_AudioStatus
+    SDL_AudioStatus SDL_GetAudioStatus()
+    SDL_AudioStatus SDL_GetAudioDeviceStatus(SDL_AudioDeviceID dev)
+    void SDL_PauseAudioDevice(SDL_AudioDeviceID dev, int pause_on)
 
     SDL_mutex *SDL_CreateMutex()
     void SDL_DestroyMutex(SDL_mutex *)
@@ -178,14 +196,6 @@ cdef extern from "SDL_mixer.h" nogil:
         MIX_NO_FADING,
         MIX_FADING_OUT,
         MIX_FADING_IN
-
-    enum Mix_MusicType:
-        MUS_NONE,
-        MUS_WAV,
-        MUS_OGG,
-        MUS_MP3,
-        MUS_MP3_MAD,
-        MUS_FLAC
 
     int Mix_Init(int)
     void Mix_Quit()
