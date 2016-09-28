@@ -154,12 +154,7 @@ static void c_signal_free_data(gpointer data, GClosure *closure)
 static GstSample *c_appsink_pull_sample(GstElement *appsink)
 {
 	GstSample *sample = NULL;
-
 	g_signal_emit_by_name(appsink, "pull-sample", &sample);
-	if (sample == NULL) {
-		g_warning("Could not get sample");
-    }
-
     return sample;
 }
 

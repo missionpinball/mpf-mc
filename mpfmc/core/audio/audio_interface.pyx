@@ -12,17 +12,17 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev06')
+__version_info__ = ('0', '32', '0-dev07')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
 from libc.stdlib cimport malloc, free, calloc
 from libc.string cimport memset, memcpy
-from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
 cimport cpython.pycapsule as pycapsule
 import cython
 
-from queue import PriorityQueue, Empty
+from heapq import heappush, heappop, heapify
 from math import pow
 import time
 import logging
@@ -424,12 +424,7 @@ cdef class AudioInterface:
         Returns:
             A list of file extensions supported.
         """
-        extensions = ["wav"]
-        if self.supported_formats & MIX_INIT_FLAC:
-            extensions.append("flac")
-        if self.supported_formats & MIX_INIT_OGG:
-            extensions.append("ogg")
-        return extensions
+        return ["wav", "ogg", "flac", "m4a", "aiff"]
 
     def get_master_volume(self):
         return round(self.audio_callback_data.master_volume / SDL_MIX_MAXVOLUME, 2)
@@ -609,49 +604,31 @@ cdef class AudioInterface:
 
         return new_track
 
-    @staticmethod
-    def load_sound_chunk(str file_name):
+    def load_sound_file_to_memory(self, str file_name):
         """
-        Loads an audio file into a MixChunkContainer wrapper object for use in a Sound object.
+        Loads an audio file into a SoundMemoryFile wrapper object for use in a Sound object.
         Used in asset loading for Sound objects.
         Args:
             file_name: The audio file name to load.
 
         Returns:
-            A MixChunkContainer wrapper object containing a pointer to the sound sample
-            in memory.  None is returned if the sound file was unable to be loaded.
+            A SoundMemoryFile wrapper object containing a pointer to the sound sample
+            data in memory.  An exception is thrown if the sound is unable to be loaded.
         """
-        # String conversion from Python to char* (it takes a few steps)
-        # See http://docs.cython.org/src/tutorial/strings.html for more information.
-        # 1) convert the python string (str) to a byte string (use UTF-8 encoding)
-        # 2) convert the python byte string to a C char* (can just do an assign)
-        # 3) the C char* string is now ready for use in calls to the C library
-        py_byte_file_name = file_name.encode('UTF-8')
-        cdef char *c_file_name = py_byte_file_name
+        # TODO: Determine endianness (LE, BE)
+        return SoundMemoryFile(file_name, self.sample_rate, self.channels, self.buffer_size)
 
-        # Attempt to load the file
-        cdef Mix_Chunk *chunk = Mix_LoadWAV(c_file_name)
-        if chunk == NULL:
-            raise AudioException("Unable to load sound from source file '{}' - {}"
-                                 .format(file_name, SDL_GetError()))
-
-        # Create a Python container object to wrap the Mix_Chunk C pointer
-        cdef MixChunkContainer mc = MixChunkContainer()
-        mc.chunk = chunk
-        return mc
-
-    @staticmethod
-    def unload_sound_chunk(container):
+    def unload_sound_file_from_memory(self, container not None):
         """
-        Unloads the source sample (Mix_Chunk) from the supplied container (used in Sound
+        Unloads the source sample from the supplied container (used in Sound
         asset unloading).  The sound will no longer be in memory.
         Args:
-            container: A MixChunkContainer object
+            container: A SoundMemoryFile object
         """
-        if not isinstance(container, MixChunkContainer):
+        if not isinstance(container, SoundMemoryFile):
             return
 
-        # TODO: Implement new unload function
+        container.unload()
 
     def stop_sound(self, sound_instance not None):
         """
@@ -847,7 +824,7 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         standard_track.sound_players[player].current.current_loop = 0
         standard_track.sound_players[player].current.sound_id = request_message.sound_id
         standard_track.sound_players[player].current.sound_instance_id = request_message.sound_instance_id
-        standard_track.sound_players[player].current.chunk = request_message.data.play.chunk
+        standard_track.sound_players[player].current.sample = request_message.data.play.sample
         standard_track.sound_players[player].current.volume = request_message.data.play.volume
         standard_track.sound_players[player].current.loops_remaining = request_message.data.play.loops
         standard_track.sound_players[player].current.sound_priority = request_message.data.play.priority
@@ -914,7 +891,7 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         standard_track.sound_players[player].next.current_loop = 0
         standard_track.sound_players[player].next.sound_id = request_message.sound_id
         standard_track.sound_players[player].next.sound_instance_id = request_message.sound_instance_id
-        standard_track.sound_players[player].next.chunk = request_message.data.play.chunk
+        standard_track.sound_players[player].next.sample = request_message.data.play.sample
         standard_track.sound_players[player].next.volume = request_message.data.play.volume
         standard_track.sound_players[player].next.loops_remaining = request_message.data.play.loops
         standard_track.sound_players[player].next.sound_priority = request_message.data.play.priority
@@ -995,7 +972,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
 
         # If the player is idle, there is nothing to do so move on to the next player
         if standard_track.sound_players[player].status is player_idle \
-                or standard_track.sound_players[player].current.chunk == NULL:
+                or standard_track.sound_players[player].current.sample == NULL:
             continue
 
         buffer_pos = 0
@@ -1003,7 +980,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
 
         # Get source sound buffer (read one byte at a time, bytes will be combined into a
         # 16-bit sample value before being mixed)
-        sound_buffer = <Uint8*> standard_track.sound_players[player].current.chunk.abuf
+        sound_buffer = <Uint8*> standard_track.sound_players[player].current.sample.data
 
         # Check if player has been requested to stop a sound
         if standard_track.sound_players[player].status is player_stopping:
@@ -1045,7 +1022,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 buffer_pos += BYTES_PER_SAMPLE
 
                 # Check if we are at the end of the source sample buffer
-                if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.chunk.alen:
+                if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.sample.size:
                     end_of_sound_processing(cython.address(standard_track.sound_players[player]),
                                             callback_data.notification_messages, sdl_ticks)
 
@@ -1055,7 +1032,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
         # Check if player has been requested to stop a sound and immediately replace it with another sound
         if standard_track.sound_players[player].status is player_replacing:
 
-            sound_samples_remaining = standard_track.sound_players[player].current.chunk.alen - standard_track.sound_players[
+            sound_samples_remaining = standard_track.sound_players[player].current.sample.size - standard_track.sound_players[
                 player].current.sample_pos
             fade_out_duration = min(buffer_length,
                                     <Uint32>(callback_data.sample_rate * callback_data.channels *
@@ -1083,7 +1060,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 buffer_pos += BYTES_PER_SAMPLE
 
                 # Check if we are at the end of the source sample buffer (loop if applicable)
-                if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.chunk.alen:
+                if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.sample.size:
                     end_of_sound_processing(cython.address(standard_track.sound_players[player]),
                                             callback_data.notification_messages, sdl_ticks)
                     if standard_track.sound_players[player].status is player_finished:
@@ -1109,7 +1086,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
             standard_track.sound_players[player].current.current_loop = standard_track.sound_players[player].next.current_loop
             standard_track.sound_players[player].current.sound_id = standard_track.sound_players[player].next.sound_id
             standard_track.sound_players[player].current.sound_instance_id = standard_track.sound_players[player].next.sound_instance_id
-            standard_track.sound_players[player].current.chunk = standard_track.sound_players[player].next.chunk
+            standard_track.sound_players[player].current.sample = standard_track.sound_players[player].next.sample
             standard_track.sound_players[player].current.volume = standard_track.sound_players[player].next.volume
             standard_track.sound_players[player].current.loops_remaining = standard_track.sound_players[player].next.loops_remaining
             standard_track.sound_players[player].current.sound_priority = standard_track.sound_players[player].next.sound_priority
@@ -1130,7 +1107,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 standard_track.sound_players[player].current.sound_has_ducking = False
 
             # Update the current input sound buffer to point to the new sound
-            sound_buffer = <Uint8*> standard_track.sound_players[player].current.chunk.abuf
+            sound_buffer = <Uint8*> standard_track.sound_players[player].current.sample.data
 
         # Check if player has a sound pending playback (ready to start)
         if standard_track.sound_players[player].status is player_pending:
@@ -1159,7 +1136,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
         # If audio playback object is playing, add it's samples to the output buffer (scaled by sample volume)
         if standard_track.sound_players[player].status is player_playing and \
                         standard_track.sound_players[player].current.volume > 0 and \
-                        standard_track.sound_players[player].current.chunk != NULL:
+                        standard_track.sound_players[player].current.sample != NULL:
 
             # Process sound ducking (if applicable)
             if standard_track.sound_players[player].current.sound_has_ducking:
@@ -1202,8 +1179,8 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                     control_point_pos += samples_per_control_point
 
                     # Loop back to beginning of sound (if looping)
-                    if control_point_pos >= standard_track.sound_players[player].current.chunk.alen and standard_track.sound_players[player].current.loops_remaining != 0:
-                        control_point_pos -= standard_track.sound_players[player].current.chunk.alen
+                    if control_point_pos >= standard_track.sound_players[player].current.sample.size and standard_track.sound_players[player].current.loops_remaining != 0:
+                        control_point_pos -= standard_track.sound_players[player].current.sample.size
 
                 # Apply ducking to target track(s) (when applicable)
                 if ducking_is_active:
@@ -1255,7 +1232,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 buffer_pos += BYTES_PER_SAMPLE
 
                 # Check if we are at the end of the source sample buffer (loop if applicable)
-                if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.chunk.alen:
+                if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.sample.size:
                     end_of_sound_processing(cython.address(standard_track.sound_players[player]),
                                             callback_data.notification_messages, sdl_ticks)
                     if standard_track.sound_players[player].status is player_finished:
@@ -2053,10 +2030,8 @@ cdef class TrackStandard(Track):
     Track class
     """
     # The name of the track
-    cdef object _sound_queue
-    cdef dict _sound_queue_items
+    cdef list _sound_queue
     cdef int _max_simultaneous_sounds
-    cdef int _next_queue_entry_id
 
     # Track state needs to be stored in a C struct in order for them to be accessible in
     # the SDL callback functions without the GIL (for performance reasons).
@@ -2086,9 +2061,7 @@ cdef class TrackStandard(Track):
 
         SDL_LockAudioDevice(self.device_id)
 
-        self._sound_queue = PriorityQueue()
-        self._sound_queue_items = dict()
-        self._next_queue_entry_id = 0
+        self._sound_queue = list()
 
         # Set track type specific settings
         self.state.type = track_type_standard
@@ -2117,7 +2090,7 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].status = player_idle
             self.type_state.sound_players[i].track_num = self.number
             self.type_state.sound_players[i].player = i
-            self.type_state.sound_players[i].current.chunk = NULL
+            self.type_state.sound_players[i].current.sample = NULL
             self.type_state.sound_players[i].current.loops_remaining = 0
             self.type_state.sound_players[i].current.current_loop = 0
             self.type_state.sound_players[i].current.volume = 0
@@ -2127,7 +2100,7 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].current.sound_priority = 0
             self.type_state.sound_players[i].current.sound_has_ducking = False
             self.type_state.sound_players[i].current.ducking_stage = ducking_stage_idle
-            self.type_state.sound_players[i].next.chunk = NULL
+            self.type_state.sound_players[i].next.sample = NULL
             self.type_state.sound_players[i].next.loops_remaining = 0
             self.type_state.sound_players[i].next.current_loop = 0
             self.type_state.sound_players[i].next.volume = 0
@@ -2310,58 +2283,39 @@ cdef class TrackStandard(Track):
         # in this method so keep track of the entry ids of the items we've
         # processed.  Once an item has been processed and retrieved again,
         # we are done and return None.
-        cdef list queue_entry_ids_retrieved = list()
+        cdef list sound_instances_retrieved_from_queue = list()
         while True:
-
-            # Each item in the queue is a list containing the following items:
-            #    0 (priority): The priority of the returned sound
-            #    1 (exp_time): The time (in ticks) after which the sound expires and should not be played
-            #    2 (entry_id): The unique identifier for this queue entry (used to ensure queue can always
-            #                  be properly sorted
-            #    3 (sound): The Sound object ready for playback
-
-            try:
-                # Get the next item in the queue (sorted by priority and expiration time)
-                queue_entry = self._sound_queue.get_nowait()
-
-                # Check if we've already processed the entry during this call
-                if queue_entry[2] in queue_entry_ids_retrieved:
-                    # Already processed, put it back in the queue and return None
-                    self._sound_queue.put(queue_entry)
-                    return None
-
-                # Keep track of entries we've processed during this call
-                queue_entry_ids_retrieved.append(queue_entry[2])
-
-                # Check if entry has already been marked as removed (sound is None)
-                if queue_entry[3] is None:
-                    continue
-
-            except Empty:
-                # Queue is empty
+            # Return none if sound queue is empty
+            if len(self._sound_queue) == 0:
                 return None
 
+            # Get the next item in the queue (sorted by priority and expiration time)
+            sound_instance = heappop(self._sound_queue)
+
+            # Check if we've already processed the sound instance during this call (if
+            # so, put it back in the queue and return)
+            if sound_instance in sound_instances_retrieved_from_queue:
+                heappush(self._sound_queue, sound_instance)
+                return None
+
+            # Keep track of entries we've processed during this call
+            sound_instances_retrieved_from_queue.append(sound_instance)
+
             # If the sound is still loading and not expired, put it back in the queue
-            sound_instance = queue_entry[3]
-            exp_time = queue_entry[1]
             if not sound_instance.sound.loaded and sound_instance.sound.loading and \
-                    (exp_time is None or exp_time > time.time()):
-                self._sound_queue.put(queue_entry)
+                    (sound_instance.exp_time is None or sound_instance.exp_time > time.time()):
+                heappush(self._sound_queue, sound_instance)
                 self.log.debug("Next pending sound in queue is still loading, "
                                "re-queueing sound %s",
-                               queue_entry)
+                               sound_instance)
             else:
-                # Remove the queue entry from the list of sounds in the queue
-                if sound_instance in self._sound_queue_items:
-                    del self._sound_queue_items[sound_instance]
-
                 # Return the next sound from the priority queue if it has not expired
-                if exp_time is None or exp_time > time.time():
-                    self.log.debug("Retrieving next pending sound from queue %s", queue_entry)
+                if sound_instance.exp_time is None or sound_instance.exp_time > time.time():
+                    self.log.debug("Retrieving next pending sound from queue %s", sound_instance)
                     sound_instance.set_pending()  # Notify sound instance it is no longer queued
                     return sound_instance
                 else:
-                    self.log.debug("Discarding expired sound from queue %s", queue_entry)
+                    self.log.debug("Discarding expired sound from queue %s", sound_instance)
                     sound_instance.set_expired()  # Notify sound instance it has expired
 
         return None
@@ -2372,33 +2326,22 @@ cdef class TrackStandard(Track):
         Args:
             sound_instance: The sound object to remove
         """
-
-        # The sounds will not actually be removed from the priority queue because that
-        # could corrupt the queue heap structure, but are simply set to None so they
-        # will not be played.  After marking queue entry as None, the dictionary keeping
-        # track of sounds in the queue is updated.
-        if sound_instance in self._sound_queue_items:
-            entry = self._sound_queue_items[sound_instance]
-            entry[2] = None
+        try:
+            self._sound_queue.remove(sound_instance)
             self.log.debug("Removing pending sound from queue %s", sound_instance)
             sound_instance.set_canceled()
-            del self._sound_queue_items[sound_instance]
+            heapify(self._sound_queue)
+        except ValueError:
+            pass
 
     def _remove_all_sounds_from_queue(self):
         """Removes all sounds from the priority sound queue.
         """
-
-        # The sounds will not actually be removed from the priority queue because that
-        # could corrupt the queue heap structure, but are simply set to None so they
-        # will not be played.  After marking queue entry as None, the dictionary keeping
-        # track of sounds in the queue is updated.
-        for sound_instance in self._sound_queue_items:
-            entry = self._sound_queue_items[sound_instance]
-            entry[2] = None
+        for sound_instance in self._sound_queue:
             self.log.debug("Removing pending sound from queue %s", sound_instance)
             sound_instance.set_canceled()
 
-        self._sound_queue_items.clear()
+        self._sound_queue.clear()
 
     def play_sound(self, sound_instance not None):
         """
@@ -2420,9 +2363,9 @@ cdef class TrackStandard(Track):
             return
 
         if sound_instance.max_queue_time is None:
-            exp_time = None
+            sound_instance.exp_time = None
         else:
-            exp_time = time.time() + sound_instance.max_queue_time
+            sound_instance.exp_time = time.time() + sound_instance.max_queue_time
 
         # Make sure sound is loaded.  If not, we assume the sound is being loaded and we
         # add it to the queue so it will be picked up on the next loop.
@@ -2432,7 +2375,7 @@ cdef class TrackStandard(Track):
                 sound_instance.sound.load()
 
             if sound_instance.max_queue_time != 0:
-                self._queue_sound(sound_instance=sound_instance, exp_time=exp_time)
+                self._queue_sound(sound_instance)
                 self.log.debug("play_sound - Sound %s was not loaded and therefore has been "
                                "queued for playback.", sound_instance.name)
             else:
@@ -2479,7 +2422,7 @@ cdef class TrackStandard(Track):
                     self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
                                    "lowest sound currently playing (%d). Sound will be queued "
                                    "for playback.", sound_instance.priority, lowest_priority)
-                    self._queue_sound(sound_instance=sound_instance, exp_time=exp_time)
+                    self._queue_sound(sound_instance)
 
         SDL_UnlockAudioDevice(self.device_id)
 
@@ -2505,35 +2448,21 @@ cdef class TrackStandard(Track):
 
         SDL_UnlockAudioDevice(self.device_id)
 
-    def _queue_sound(self, sound_instance, exp_time=None):
+    def _queue_sound(self, sound_instance not None):
         """Adds a sound to the queue to be played when a sound player becomes available.
 
         Args:
             sound_instance: The SoundInstance object to play.
-            exp_time: Real world time of when this sound will expire.  It will not play
-                if the queue is freed up after it expires.  None indicates the sound
-                never expires and will eventually be played.
 
         Note that this method will insert this sound into a position in the
         queue based on its priority, so highest-priority sounds are played
         first.
         """
-
-        # Note the negative operator in front of priority since this queue
-        # retrieves the lowest values first, and MPF uses higher values for
-        # higher priorities.
-        entry = [-sound_instance.priority, exp_time, self._next_queue_entry_id, sound_instance]
-        self._sound_queue.put(entry)
-        self._next_queue_entry_id += 1
+        heappush(self._sound_queue, sound_instance)
 
         # Notify sound instance it has been queued
         sound_instance.set_queued()
-
-        # Save the new entry in a dictionary of entries keyed by sound.  This
-        # dictionary is used to remove pending sounds from the priority queue.
-        self._sound_queue_items[sound_instance] = entry
-
-        self.log.debug("Queueing sound %s", entry)
+        self.log.debug("Queueing sound %s", sound_instance)
 
     def stop_sound(self, sound_instance not None):
         """
@@ -2575,7 +2504,8 @@ cdef class TrackStandard(Track):
                         "in use, could not stop sound %s", sound_instance.name)
 
         # Remove any instances of the specified sound that are pending in the sound queue.
-        self._remove_sound_from_queue(sound_instance)
+        if self.sound_instance_is_in_queue(sound_instance):
+            self._remove_sound_from_queue(sound_instance)
 
         SDL_UnlockAudioDevice(self.device_id)
 
@@ -2596,7 +2526,8 @@ cdef class TrackStandard(Track):
                 self.type_state.sound_players[i].current.loops_remaining = 0
 
         # Remove any instances of the specified sound that are pending in the sound queue.
-        self._remove_sound_from_queue(sound_instance)
+        if self.sound_instance_is_in_queue(sound_instance):
+            self._remove_sound_from_queue(sound_instance)
 
         SDL_UnlockAudioDevice(self.device_id)
 
@@ -2712,7 +2643,7 @@ cdef class TrackStandard(Track):
             return False
 
         # Get the sound sample buffer container
-        cdef MixChunkContainer chunk_container = sound_instance.container
+        cdef SoundMemoryFile sound_container = sound_instance.container
         cdef RequestMessageContainer *request_message
 
         if not sound_instance.sound.loaded:
@@ -2753,7 +2684,7 @@ cdef class TrackStandard(Track):
                 request_message.time = SDL_GetTicks()
                 request_message.data.play.loops = sound_instance.loops
                 request_message.data.play.priority = sound_instance.priority
-                request_message.data.play.chunk = chunk_container.chunk
+                request_message.data.play.sample = cython.address(sound_container.sample)
 
                 # Conversion factor (seconds to bytes/buffer position)
                 seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
@@ -2871,7 +2802,7 @@ cdef class TrackStandard(Track):
         Returns:
             Integer number of sounds currently in the track sound queue.
         """
-        return self._sound_queue.qsize()
+        return len(self._sound_queue)
 
     def get_sound_players_in_use_count(self):
         """
@@ -2914,7 +2845,7 @@ cdef class TrackStandard(Track):
 
     def sound_is_in_queue(self, sound not None):
         """Returns whether or not an instance of the specified sound is currently in the queue"""
-        for sound_instance in self._sound_queue_items:
+        for sound_instance in self._sound_queue:
             if sound_instance.sound.id == sound.id:
                 return True
 
@@ -2922,7 +2853,7 @@ cdef class TrackStandard(Track):
 
     def sound_instance_is_in_queue(self, sound_instance not None):
         """Returns whether or not the specified sound instance is currently in the queue"""
-        return sound_instance in self._sound_queue_items
+        return sound_instance in self._sound_queue
 
     @staticmethod
     def player_status_to_text(int status):
@@ -3129,21 +3060,25 @@ cdef class SoundMemoryFile:
     cdef int sample_rate
     cdef int channels
     cdef buffer_size
-    cdef void *data
-    cdef int _length
+    cdef bint little_endian
+    cdef SampleMemory sample
 
-    def __init__(self, str file_name, int sample_rate, int channels, int buffer_size):
+    def __init__(self, str file_name, int sample_rate, int channels, int buffer_size, bint little_endian = True):
         self.file_name = file_name
         self.sample_rate = sample_rate
         self.channels = channels
         self.buffer_size = buffer_size
-        self.data = NULL
-        self._length = 0
+        self.little_endian = little_endian
+        self.sample.data = NULL
+        self.sample.size = 0
+
+        self.load()
 
     def __dealloc__(self):
-        if self.data != NULL:
-            g_free(self.data)
-            self.data = NULL
+        if self.sample.data != NULL:
+            PyMem_Free(self.sample.data)
+            self.sample.data = NULL
+            self.sample.size = 0
 
     def _gst_init(self):
         if gst_is_initialized():
@@ -3156,7 +3091,7 @@ cdef class SoundMemoryFile:
                     error.code, <bytes>error.message)
             raise AudioException(msg)
 
-    def _load(self):
+    def load(self):
         """Loads the sound into memory using GStreamer"""
         cdef str pipeline_string
         cdef str file_path
@@ -3168,23 +3103,26 @@ cdef class SoundMemoryFile:
         cdef GstSample *sample
         cdef GstBuffer *buffer
         cdef GstMapInfo map_info
-        cdef bytes temp_data
-        cdef gint64 duration = -1
         cdef gboolean is_eos
+
+        if self.loaded:
+            return
 
         self._gst_init()
 
-        temp_data = bytes()
-
         if not os.path.isfile(self.file_name):
-            raise AudioException('Could not locate file')
+            raise AudioException('Could not locate file ' + self.file_name)
 
         # Pipeline structure: uridecodebin --> audioconvert --> audioresample --> appsink
 
         # Create GStreamer pipeline with the specified caps (from a string)
         file_path = 'file:///' + self.file_name.replace('\\', '/')
-        pipeline_string = 'uridecodebin uri="{}" ! audioconvert ! audioresample ! appsink name=sink caps="audio/x-raw,rate={},channels={},format=S16LE,layout=interleaved" sync=false blocksize=44100'.format(
-            file_path, str(self.sample_rate), str(self.channels))
+        if self.little_endian:
+            audio_format = "S16LE"
+        else:
+            audio_format = "S16BE"
+        pipeline_string = 'uridecodebin uri="{}" ! audioconvert ! audioresample ! appsink name=sink caps="audio/x-raw,rate={},channels={},format={},layout=interleaved" sync=false blocksize=44100'.format(
+            file_path, str(self.sample_rate), str(self.channels), audio_format)
 
         print(pipeline_string)
 
@@ -3192,23 +3130,18 @@ cdef class SoundMemoryFile:
         pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)
 
         if error != NULL:
-            print('error')
-            raise AudioException('Unable to create a pipeline')
+            msg = 'Unable to create a GStreamer pipeline: code={} message={}'.format(error.code, <bytes>error.message)
+            raise AudioException(msg)
 
         # Get sink
         sink = gst_bin_get_by_name(<GstBin*>pipeline, "sink")
 
         # Set to PAUSED to make the first frame arrive in the sink
-        ret = gst_element_set_state(pipeline, GST_STATE_PAUSED)
-        gst_element_get_state(pipeline, &state, NULL, <GstClockTime>GST_SECOND)
-        gst_element_query_duration(pipeline, GST_FORMAT_TIME, &duration)
-        print("duration:", duration/GST_SECOND)
+        #ret = gst_element_set_state(pipeline, GST_STATE_PAUSED)
 
         # get ready!
-        print("Playing")
         with nogil:
-            # gst_element_set_state(pipeline, GST_STATE_READY)
-            gst_element_set_state(pipeline, GST_STATE_PLAYING)
+            ret = gst_element_set_state(pipeline, GST_STATE_PLAYING)
 
         while True:
             sample = c_appsink_pull_sample(sink)
@@ -3223,64 +3156,48 @@ cdef class SoundMemoryFile:
 
             if not gst_buffer_map(buffer, &map_info, GST_MAP_READ):
                 gst_sample_unref(sample)
-                raise AudioException("Unable to map buffer")
+                if self.sample.data != NULL:
+                    g_free(self.sample.data)
+                    self.sample.data = NULL
+                    self.sample.size = 0
+                raise AudioException("Unable to map GStreamer buffer")
 
-            temp_data += map_info.data[:<int>map_info.size]
+            if self.sample.data == NULL:
+                self.sample.data = PyMem_Malloc(map_info.size)
+                self.sample.size = map_info.size
+                memcpy(self.sample.data, map_info.data, map_info.size)
+            else:
+                self.sample.data = PyMem_Realloc(self.sample.data, self.sample.size + map_info.size)
+                memcpy(self.sample.data + self.sample.size, map_info.data, map_info.size)
+                self.sample.size += map_info.size
+
             gst_buffer_unmap(buffer, &map_info)
 
         # Copy the sound data to it's permanent home
-        self._length = len(temp_data)
-        print("Final sample data length: ", self._length)
+        print("Final sample data length: ", self.sample.size)
 
         # Cleanup the loader pipeline
-        print("Stopping pipeline")
         gst_element_set_state(pipeline, GST_STATE_NULL)
         gst_object_unref (pipeline)
+
+    def unload(self):
+        """Unloads the sample data from memory"""
+        if self.sample.data != NULL:
+            PyMem_Free(self.sample.data)
+            self.sample.data = NULL
+            self.sample.size = 0
 
     @property
     def loaded(self):
         """Returns whether or not the sound file data is loaded in memory"""
-        return self.data != NULL
+        return self.sample.data != NULL and self.sample.size > 0
 
     @property
     def length(self):
         """Returns the length of the sound data (in bytes)"""
-        if self.data == NULL:
+        if self.sample.data == NULL:
             return 0
         else:
-            return self.length
+            return self.sample.size
 
-
-# ---------------------------------------------------------------------------
-#    MixChunkContainer class
-# ---------------------------------------------------------------------------
-cdef class MixChunkContainer:
-    """
-    MixChunkContainer is a wrapper class to manage a SDL_Mixer Mix_Chunk C pointer (points
-    to a block of memory that contains an audio sample in a format ready for playback).
-    This class will properly unload/free the memory allocated when loading the sound when
-    it is destroyed.
-    """
-    cdef Mix_Chunk *chunk
-
-    def __init__(self):
-        self.chunk = NULL
-
-    def __dealloc__(self):
-        if self.chunk != NULL:
-            Mix_FreeChunk(self.chunk)
-            self.chunk = NULL
-
-    @property
-    def loaded(self):
-        """Returns whether or not the chunk is loaded in memory"""
-        return self.chunk != NULL
-
-    @property
-    def length(self):
-        """Returns the length of the Mix_Chunk (in samples)"""
-        if self.chunk == NULL:
-            return 0
-        else:
-            return self.chunk.alen
 

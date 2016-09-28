@@ -2,7 +2,7 @@
 #    Helper structures
 # ---------------------------------------------------------------------------
 
-# The following declarations are not from SDL/SDL_Mixer, but are application-
+# The following declarations are not from SDL, but are application-
 # specific data structures used in the MPF media controller audio library:
 
 cdef struct Sample16Bytes:
@@ -20,6 +20,9 @@ cdef union Sample16Bit:
     Sint16 value
     Sample16Bytes bytes
 
+ctypedef struct SampleMemory:
+    gpointer data
+    gsize size
 
 # ---------------------------------------------------------------------------
 #    Settings
@@ -111,7 +114,7 @@ cdef enum FadingStatus:
     fading_status_fading_out = 2
 
 ctypedef struct SoundSettings:
-    Mix_Chunk *chunk
+    SampleMemory *sample
     Uint8 volume
     int loops_remaining
     int current_loop
@@ -132,7 +135,7 @@ ctypedef struct SoundSettings:
 
 ctypedef struct SoundPlayer:
     # The SoundPlayer keeps track of the current sample position in the source audio
-    # chunk and is also keeps track of variables for sound looping and determining when the
+    # samples and is also keeps track of variables for sound looping and determining when the
     # sound has finished playing.
     SoundPlayerStatus status
     SoundSettings current
@@ -187,7 +190,7 @@ cdef enum RequestMessage:
 
 
 ctypedef struct RequestMessageDataPlaySound:
-    Mix_Chunk *chunk
+    SampleMemory *sample
     Uint8 volume
     int loops
     int priority
