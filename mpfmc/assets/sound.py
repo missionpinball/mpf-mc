@@ -482,7 +482,7 @@ class SoundAsset(Asset):
 
     @property
     def container(self):
-        """The container object wrapping the SDL structure containing the actual sound data"""
+        """The container object wrapping the structure containing the actual sound data"""
         return self._container
 
     @property
@@ -499,8 +499,13 @@ class SoundAsset(Asset):
         """Loads the sound asset from disk."""
 
         # Load the sound file into memory
+        if self._container is not None and self._container.loaded:
+            self.log.debug("Sound %s already loaded in memory", self.name)
+            return
+
+        self.log.debug("Sound %s loading to memory", self.name)
         try:
-            self._container = AudioInterface.load_sound_chunk(self.file)
+            self._container = self.machine.sound_system.audio_interface.load_sound_file_to_memory(self.file)
         except AudioException as exception:
             self.log.error("Load sound %s failed due to an exception - %s",
                            self.name, str(exception))
@@ -523,8 +528,8 @@ class SoundAsset(Asset):
         """Unloads the asset from memory"""
         self.log.debug("Sound %s unloading from memory", self.name)
         self.stop(0)
-        AudioInterface.unload_sound_chunk(self._container)
-        self._container = None
+        self.machine.sound_system.audio_interface.unload_sound_chunk(self._container)
+        del self._container
 
     def is_loaded(self):
         """Called when the asset has finished loading"""
@@ -538,6 +543,7 @@ class SoundAsset(Asset):
         Args:
             settings: Optional dictionary of settings to override the default values.
         """
+        print("Play sound", self.name, self.track)
         self.log.debug("Play sound %s on track %s", self.name, self.track)
 
         # Determine if the maxmimum number of instances of this sound has been reached
@@ -741,6 +747,7 @@ class SoundInstance(object):
         self._events_when_looping = sound.events_when_looping
         self._mode_end_action = sound.mode_end_action
         self._markers = sound.markers
+        self._exp_time = None
 
         if settings is None:
             settings = dict()
@@ -793,15 +800,17 @@ class SoundInstance(object):
         return '<SoundInstance: {} ({}), Volume={}, Loops={}, Priority={}, Loaded={}, Track={}>'.format(
             self.sound.name, self.id, self.volume, self.loops, self.priority, self.sound.loaded, self.track.name)
 
-    def __lt__(self, other):
-        """Less than comparison operator"""
-        # Note this is "backwards" (It's the __lt__ method but the formula uses
-        # greater than because the PriorityQueue puts lowest first.)
-        if other is None:
-            return False
-        else:
-            return ("%s, %s, %s" % (self.priority, self.sound.get_id(), self.id) >
-                    "%s, %s, %s" % (other.priority, other.sound.get_id(), other.id))
+    def __cmp__(self, other):
+        """Comparison operator"""
+        if self.priority != other.priority:
+            return other.priority - self.priority
+        if self.exp_time is None and other.exp_time is not None:
+            return 1
+        if self.exp_time is not None and other.exp_time is None:
+            return -1
+        if self.exp_time != other.exp_time:
+            return self.exp_time - other.exp_time
+        return self.id - other.id
 
     # pylint: disable=invalid-name
     @property
@@ -820,6 +829,16 @@ class SoundInstance(object):
     def timestamp(self):
         """Return the time at which the sound instance was created"""
         return self._timestamp
+
+    @property
+    def exp_time(self):
+        """Return the expiration time of the sound instance"""
+        return self._exp_time
+
+    @exp_time.setter
+    def exp_time(self, value):
+        """Set the expiration time of the sound instance"""
+        self._exp_time = value
 
     @property
     def sound(self):
