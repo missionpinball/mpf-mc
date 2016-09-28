@@ -32,7 +32,7 @@ assets:
             load: preload
             track: sfx
         music:
-            load: on_demand
+            load: preload
             track: music
 
 sounds:
