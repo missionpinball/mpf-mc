@@ -117,7 +117,7 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         self.mc.targets[self.name] = self
 
-        self.mc.events.post('display_{}_ready'.format(self.name))
+        self.mc.post_mc_native_event('display_{}_ready'.format(self.name))
         '''event: display_(name)_ready
         desc: The display target called (name) is now ready and available to
         show slides.
@@ -326,7 +326,7 @@ class SlideFrame(MpfWidget, ScreenManager):
             self.add_widget(slide)
             self.current = slide.name
 
-        self.mc.events.post('slide_{}_active'.format(slide.name))
+        self.mc.post_mc_native_event('slide_{}_active'.format(slide.name))
 
         """event: slide_(name)_active
 

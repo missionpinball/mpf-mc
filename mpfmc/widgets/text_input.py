@@ -192,11 +192,8 @@ class MpfTextInput(Text):
 
     def complete(self):
         self.done()
-        self.mc.bcp_processor.send(bcp_command='trigger',
-            name='text_input_{}_complete'.format(self.key),
-            text=self.linked_text_widget.text)
-        self.mc.events.post('text_input_{}_complete'.format(self.key),
-                            text=self.linked_text_widget.text)
+        self.mc.post_mc_native_event('text_input_{}_complete'.format(self.key),
+                                     text=self.linked_text_widget.text)
         """event: text_input_(key)_complete
 
         desc: This event is posted by a *text_input* display widget when the
@@ -208,8 +205,8 @@ class MpfTextInput(Text):
 
     def abort(self):
         self.done()
-        self.mc.events.post('text_input_{}_abort'.format(self.key),
-                            text=self.linked_text_widget.text)
+        self.mc.post_mc_native_event('text_input_{}_abort'.format(self.key),
+                                     text=self.linked_text_widget.text)
         """event: text_input_(key)_abort
 
         desc: This event is posted by a *text_input* display widget when the

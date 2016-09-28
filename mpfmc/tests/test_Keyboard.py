@@ -77,12 +77,16 @@ class TestKeyboard(MpfMcTestCase):
         self.assertIn(bcp_command, self.sent_bcp_commands)
 
     def test_mpf_event(self):
+        self.mc.bcp_processor.enabled = True
+
         self.press('d')
 
         bcp_command = ('trigger', None, {'name': 'event_d'})
         self.assertIn(bcp_command, self.sent_bcp_commands)
 
     def test_mpf_event_with_params(self):
+        self.mc.bcp_processor.enabled = True
+
         self.press('e')
 
         bcp_command = ('trigger', None, {'mission': 'pinball', 'foo': 'bar',
