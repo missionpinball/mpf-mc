@@ -194,19 +194,6 @@ cdef class AudioInterface:
                        self.audio_callback_data.buffer_samples, self.audio_callback_data.buffer_size,
                        self.audio_callback_data.bytes_per_sample)
 
-        # Initialize request messages
-        self.audio_callback_data.request_messages = <RequestMessageContainer**> PyMem_Malloc(
-            MAX_REQUEST_MESSAGES * sizeof(RequestMessageContainer*))
-
-        for i in range(MAX_REQUEST_MESSAGES):
-            self.audio_callback_data.request_messages[i] = <RequestMessageContainer*> PyMem_Malloc(sizeof(RequestMessageContainer))
-            self.audio_callback_data.request_messages[i].message = request_not_in_use
-            self.audio_callback_data.request_messages[i].sound_id = 0
-            self.audio_callback_data.request_messages[i].sound_instance_id = 0
-            self.audio_callback_data.request_messages[i].track = 0
-            self.audio_callback_data.request_messages[i].player = 0
-            self.audio_callback_data.request_messages[i].time = 0
-
         # Initialize notification messages
         self.audio_callback_data.notification_messages = <NotificationMessageContainer**> PyMem_Malloc(
             MAX_NOTIFICATION_MESSAGES * sizeof(NotificationMessageContainer*))
@@ -234,12 +221,9 @@ cdef class AudioInterface:
         self.tracks.clear()
 
         # Free all allocated memory
-        for i in range(MAX_REQUEST_MESSAGES):
-            PyMem_Free(self.audio_callback_data.request_messages[i])
         for i in range(MAX_NOTIFICATION_MESSAGES):
             PyMem_Free(self.audio_callback_data.notification_messages[i])
 
-        PyMem_Free(self.audio_callback_data.request_messages)
         PyMem_Free(self.audio_callback_data.notification_messages)
         PyMem_Free(self.audio_callback_data.tracks)
 
@@ -667,19 +651,6 @@ cdef class AudioInterface:
 
         SDL_UnlockAudioDevice(self.audio_callback_data.device_id)
 
-    def get_in_use_request_message_count(self):
-        """
-        Returns the number of request messages currently in use.  Used for debugging and testing.
-        """
-        in_use_message_count = 0
-        SDL_LockAudioDevice(self.audio_callback_data.device_id)
-        for message_num in range(MAX_REQUEST_MESSAGES):
-            if self.audio_callback_data.request_messages[message_num].message != request_not_in_use:
-                in_use_message_count += 1
-
-        SDL_UnlockAudioDevice(self.audio_callback_data.device_id)
-        return in_use_message_count
-
     def get_in_use_notification_message_count(self):
         """
         Returns the number of notification messages currently in use.  Used for debugging and testing.
@@ -780,30 +751,38 @@ cdef class AudioInterface:
 
 cdef void process_request_messages(AudioCallbackData *callback_data) nogil:
     """
-    Processes any new sound messages that should be processed prior to the main
+    Processes any new request messages that should be processed prior to the main
     audio callback processing (such as sound play and sound stop messages).
     Args:
         callback_data: The audio callback data structure
     """
-    cdef int i, track_num
+    cdef int track_num
     cdef TrackState *track
 
-    # Loop over messages
-    for i in range(MAX_REQUEST_MESSAGES):
+    # Loop over all the tracks
+    for track_num in range(callback_data.track_count):
+        track = callback_data.tracks[track_num]
 
-        # Dispatch messages to recipient track's request message processing function
-        if callback_data.request_messages[i].message != request_not_in_use:
-            track_num = callback_data.request_messages[i].track
-            track = callback_data.tracks[track_num]
-            if track.type == track_type_standard:
-                process_standard_track_request_message(callback_data.request_messages[i], track)
-            elif track.type == track_type_playlist:
-                # TODO: Implement track request message function call
-                pass
-            elif track.type == track_type_live_loop:
-                # process_live_loop_request_message(callback_data.request_messages[i], track)
-                # TODO: Implement track request message function call
-                pass
+        # Reverse the list since the messages were added in reverse order for efficiency
+        track.request_messages = g_slist_reverse(track.request_messages)
+
+        # Process the request message list based on the track type
+        if track.type == track_type_standard:
+            g_slist_foreach(track.request_messages, <GFunc>process_standard_track_request_message, track)
+        elif track.type == track_type_playlist:
+            # TODO: Implement track request message function call
+            #g_slist_foreach(track.request_messages, <GFunc>process_playlist_request_message, track)
+            pass
+        elif track.type == track_type_live_loop:
+            # TODO: Implement track request message function call
+            #g_slist_foreach(track.request_messages, <GFunc>process_live_loop_request_message, track)
+            pass
+
+        # Free the linked list.
+        # IMPORTANT: the list item processing functions must free the request message memory of there
+        # will be a big memory leak here!
+        g_slist_free(track.request_messages)
+        track.request_messages = NULL
 
 cdef void process_standard_track_request_message(RequestMessageContainer *request_message,
                                                  TrackState *track) nogil:
@@ -931,8 +910,8 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
 
         # TODO: Figure out how to handle ducking when replacing an existing sound
 
-        # Clear request message since it has been processed
-        request_message.message = request_not_in_use
+        # Free request message memory since it has been processed
+        g_slice_free1(sizeof(RequestMessageContainer), request_message)
 
 cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil:
     """
@@ -1760,6 +1739,9 @@ cdef class Track:
         self.state.fade_volume_start = new_volume
         self.state.fade_volume_target = new_volume
 
+        self.state.request_messages = NULL
+        self.state.notification_messages = NULL
+
     def __repr__(self):
         return '<Track.{}.{}>'.format(self.number, self.name)
 
@@ -2192,24 +2174,19 @@ cdef class TrackStandard(Track):
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockAudioDevice(self.device_id)
 
-    cdef RequestMessageContainer* _get_available_request_message(self):
+    cdef inline RequestMessageContainer* _create_request_message(self):
         """
-        Returns a pointer to the first available request message.
-        If all request messages are currently in use, NULL is returned.
-        :return: The index of the first available audio event.  -1 if all
-            are in use.
+        Returns a pointer to a new request message container
         """
-        SDL_LockAudioDevice(self.device_id)
+        return <RequestMessageContainer*>g_slice_alloc0(sizeof(RequestMessageContainer))
 
-        cdef RequestMessageContainer *request_message
-        for i in range(MAX_REQUEST_MESSAGES):
-            if self._audio_callback_data.request_messages[i].message == request_not_in_use:
-                request_message = <RequestMessageContainer*> self._audio_callback_data.request_messages[i]
-                SDL_UnlockAudioDevice(self.device_id)
-                return request_message
-
-        SDL_UnlockAudioDevice(self.device_id)
-        return NULL
+    cdef inline void _add_request_message(self, RequestMessageContainer* request_message):
+        """
+        Adds the request message to the queue of request messages
+        """
+        # Note: we are prepending the item to the list (more efficient), however this means the
+        # list is in the reverse order and should be reversed before processing.
+        self.state.request_messages = g_slist_prepend(self.state.request_messages, request_message)
 
     def process_notification_message(self, int message_num):
         """Process a notification message to this track"""
@@ -2485,7 +2462,7 @@ cdef class TrackStandard(Track):
             if self.type_state.sound_players[i].status != player_idle and self.type_state.sound_players[
                 i].current.sound_instance_id == sound_instance.id:
                 # Set stop sound event
-                request_message = self._get_available_request_message()
+                request_message = self._create_request_message()
                 if request_message != NULL:
                     request_message.message = request_sound_stop
                     request_message.sound_id = self.type_state.sound_players[i].current.sound_id
@@ -2503,6 +2480,8 @@ cdef class TrackStandard(Track):
                         request_message.data.stop.ducking_release_duration = min(
                             sound_instance.ducking.release * seconds_to_bytes_factor,
                             request_message.data.stop.fade_out_duration)
+
+                    self._add_request_message(request_message)
                 else:
                     self.log.error(
                         "All internal audio messages are currently "
@@ -2571,7 +2550,7 @@ cdef class TrackStandard(Track):
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle:
                 # Set stop sound event
-                request_message = self._get_available_request_message()
+                request_message = self._create_request_message()
                 if request_message != NULL:
                     request_message.message = request_sound_stop
                     request_message.sound_id = self.type_state.sound_players[i].current.sound_id
@@ -2586,7 +2565,8 @@ cdef class TrackStandard(Track):
 
                     # Adjust ducking (if necessary)
                     # TODO: trigger ducking here
-                    pass
+
+                    self._add_request_message(request_message)
                 else:
                     self.log.error("All internal audio messages are currently in use, could not stop all sounds")
 
@@ -2668,7 +2648,7 @@ cdef class TrackStandard(Track):
                 return False
 
             # Set play sound event
-            request_message = self._get_available_request_message()
+            request_message = self._create_request_message()
             if request_message != NULL:
 
                 # Add sound to the dictionary of active sound instances
@@ -2724,7 +2704,7 @@ cdef class TrackStandard(Track):
                 else:
                     request_message.data.play.sound_has_ducking = False
     
-
+                self._add_request_message(request_message)
             else:
                 self.log.warning("All internal audio messages are "
                                "currently in use, could not play sound %s"

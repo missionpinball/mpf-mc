@@ -120,7 +120,6 @@ class TestAudio(MpfMcTestCase):
         self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
 
         # Test baseline internal audio message count
-        self.assertEqual(interface.get_in_use_request_message_count(), 0)
         self.assertEqual(interface.get_in_use_notification_message_count(), 0)
 
         # Test sound_player
@@ -206,7 +205,6 @@ class TestAudio(MpfMcTestCase):
 
         # Check for internal sound message processing leaks (are there any internal sound
         # events that get generated, but never processed and cleared from the queue?)
-        self.assertEqual(interface.get_in_use_request_message_count(), 0)
         self.assertEqual(interface.get_in_use_notification_message_count(), 0)
 
     def test_mode_sounds(self):

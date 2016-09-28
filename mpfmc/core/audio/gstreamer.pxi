@@ -142,35 +142,32 @@ cdef extern from 'glib.h':
     int glib_minor_version
     int glib_micro_version
 
+    ctypedef void (*GFunc)(gpointer data, gpointer user_data)
+
+    # Memory management
     ctypedef void (*GDestroyNotify)(gpointer data)
     ctypedef gpointer (*GReallocFunc)(gpointer data, gsize size)
     void g_free(gpointer mem)
     gpointer g_malloc(gsize n_bytes)
     gpointer g_realloc(gpointer mem, gsize n_bytes)
 
-    ctypedef struct GByteArray:
-        guint8 *data
-        guint len
+    # Linked list
+    ctypedef _GSList GSList
+    ctypedef struct _GSList:
+        gpointer data
+        GSList *next
+    GSList* g_slist_append(GSList *list, gpointer data) nogil
+    GSList* g_slist_prepend(GSList *list, gpointer data) nogil
+    void g_slist_free (GSList *list) nogil
+    guint g_slist_length (GSList *list) nogil
+    GSList *g_slist_reverse(GSList *list) nogil
+    void g_slist_foreach(GSList *list, GFunc func, gpointer user_data) nogil
 
-    GByteArray *g_byte_array_new()
-    void g_byte_array_unref(GByteArray *array)
-    GByteArray *g_byte_array_append(GByteArray *array, const guint8 *data, guint len)
-
-    ctypedef struct _GBytes:
-        gconstpointer data
-        gsize size
-        gint ref_count
-        GDestroyNotify free_func
-        gpointer user_data
-
-    ctypedef _GBytes GBytes
-
-    GBytes *g_byte_array_free_to_bytes(GByteArray *array)
-    GBytes *g_bytes_new (gconstpointer data, gsize size)
-    gconstpointer g_bytes_get_data (GBytes *bytes, gsize *size)
-    gsize g_bytes_get_size(GBytes *bytes)
-    GBytes *g_bytes_ref(GBytes *bytes)
-    void g_bytes_unref(GBytes *bytes)
+    # Memory slices
+    gpointer g_slice_alloc(gsize block_size) nogil
+    gpointer g_slice_alloc0(gsize block_size) nogil
+    void g_slice_free1(gsize block_size, gpointer mem_block) nogil
+    gpointer g_slice_copy(gsize block_size, gconstpointer mem_block) nogil
 
 
 # ---------------------------------------------------------------------------

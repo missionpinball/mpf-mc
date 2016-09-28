@@ -68,6 +68,8 @@ ctypedef struct TrackState:
     Uint32 fade_steps_remaining
     int buffer_size
     void *buffer
+    GSList *request_messages
+    GSList *notification_messages
     bint ducking_is_active
     Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
 
@@ -175,7 +177,6 @@ ctypedef struct AudioCallbackData:
     Uint8 silence
     int track_count
     TrackState **tracks
-    RequestMessageContainer **request_messages
     NotificationMessageContainer **notification_messages
     FILE *c_log_file
 
