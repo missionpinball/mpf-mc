@@ -236,6 +236,7 @@ class TestAudio(MpfMcTestCase):
 
         self.assertIn('263774_music', self.mc.sounds)  # .wav
         music_sound = self.mc.sounds['263774_music']
+        music_sound.load()
 
         # Allow some time for sound assets to load
         self.advance_time(2)
@@ -256,7 +257,7 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(1)
 
         self.mc.events.post('play_sound_music_fade_at_mode_end')
-        self.advance_time()
+        self.advance_time(0.25)
         self.assertTrue(track_music.sound_is_playing(music_sound))
         self.advance_time(2)
 
@@ -345,10 +346,13 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(track_music.name, "music")
         self.assertEqual(track_music.max_simultaneous_sounds, 1)
 
-        self.advance_time(1)
-
         self.assertIn('263774_music', self.mc.sounds)  # .wav
+        music_sound = self.mc.sounds['263774_music']
+        music_sound.load()
 
+        self.advance_time(2)
+
+        self.assertTrue(music_sound.loaded)
         settings = {'start_at': 7.382}
         instance = self.mc.sounds['263774_music'].play(settings)
         self.advance_time()
