@@ -194,19 +194,6 @@ cdef class AudioInterface:
                        self.audio_callback_data.buffer_samples, self.audio_callback_data.buffer_size,
                        self.audio_callback_data.bytes_per_sample)
 
-        # Initialize notification messages
-        self.audio_callback_data.notification_messages = <NotificationMessageContainer**> PyMem_Malloc(
-            MAX_NOTIFICATION_MESSAGES * sizeof(NotificationMessageContainer*))
-
-        for i in range(MAX_REQUEST_MESSAGES):
-            self.audio_callback_data.notification_messages[i] = <NotificationMessageContainer*> PyMem_Malloc(sizeof(NotificationMessageContainer))
-            self.audio_callback_data.notification_messages[i].message = notification_not_in_use
-            self.audio_callback_data.notification_messages[i].sound_id = 0
-            self.audio_callback_data.notification_messages[i].sound_instance_id = 0
-            self.audio_callback_data.notification_messages[i].track = 0
-            self.audio_callback_data.notification_messages[i].player = 0
-            self.audio_callback_data.notification_messages[i].time = 0
-
         self.tracks = list()
         self.sound_instances_by_id = dict()
 
@@ -220,11 +207,6 @@ cdef class AudioInterface:
         # Remove tracks
         self.tracks.clear()
 
-        # Free all allocated memory
-        for i in range(MAX_NOTIFICATION_MESSAGES):
-            PyMem_Free(self.audio_callback_data.notification_messages[i])
-
-        PyMem_Free(self.audio_callback_data.notification_messages)
         PyMem_Free(self.audio_callback_data.tracks)
 
         # SDL no longer needed
@@ -635,34 +617,8 @@ cdef class AudioInterface:
 
     def process(self):
         """Process tick function for the audio interface."""
-
-        # Process tracks
         for track in self.tracks:
             track.process()
-
-        # Process any internal notification messages that may cause other messages to be generated
-        SDL_LockAudioDevice(self.audio_callback_data.device_id)
-        for message_num in range(MAX_NOTIFICATION_MESSAGES):
-            if self.audio_callback_data.notification_messages[message_num].message != notification_not_in_use:
-                # Dispatch message processing to target track
-                track = self.get_track(self.audio_callback_data.notification_messages[message_num].track)
-                if track is not None:
-                    track.process_notification_message(message_num)
-
-        SDL_UnlockAudioDevice(self.audio_callback_data.device_id)
-
-    def get_in_use_notification_message_count(self):
-        """
-        Returns the number of notification messages currently in use.  Used for debugging and testing.
-        """
-        in_use_message_count = 0
-        SDL_LockAudioDevice(self.audio_callback_data.device_id)
-        for message_num in range(MAX_NOTIFICATION_MESSAGES):
-            if self.audio_callback_data.notification_messages[message_num].message != notification_not_in_use:
-                in_use_message_count += 1
-
-        SDL_UnlockAudioDevice(self.audio_callback_data.device_id)
-        return in_use_message_count
 
     @staticmethod
     cdef void audio_callback(void* data, Uint8 *output_buffer, int length) nogil:
@@ -1008,7 +964,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 # Check if we are at the end of the source sample buffer
                 if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.sample.size:
                     end_of_sound_processing(cython.address(standard_track.sound_players[player]),
-                                            callback_data.notification_messages, sdl_ticks)
+                                            track, sdl_ticks)
 
                 if standard_track.sound_players[player].status is player_finished:
                     break
@@ -1046,7 +1002,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 # Check if we are at the end of the source sample buffer (loop if applicable)
                 if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.sample.size:
                     end_of_sound_processing(cython.address(standard_track.sound_players[player]),
-                                            callback_data.notification_messages, sdl_ticks)
+                                            track, sdl_ticks)
                     if standard_track.sound_players[player].status is player_finished:
                         break
 
@@ -1058,7 +1014,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
             send_sound_stopped_notification(track.number, player,
                                      standard_track.sound_players[player].current.sound_id,
                                      standard_track.sound_players[player].current.sound_instance_id,
-                                     callback_data.notification_messages,
+                                     track,
                                      sdl_ticks)
 
             # Update sound player status to finished
@@ -1099,7 +1055,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
             send_sound_started_notification(track.number, player,
                                             standard_track.sound_players[player].current.sound_id,
                                             standard_track.sound_players[player].current.sound_instance_id,
-                                            callback_data.notification_messages,
+                                            track,
                                             sdl_ticks)
 
             standard_track.sound_players[player].status = player_playing
@@ -1113,7 +1069,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 send_sound_marker_notification(track.number, player,
                                                standard_track.sound_players[player].current.sound_id,
                                                standard_track.sound_players[player].current.sound_instance_id,
-                                               callback_data.notification_messages,
+                                               track,
                                                sdl_ticks,
                                                marker_id)
 
@@ -1218,7 +1174,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 # Check if we are at the end of the source sample buffer (loop if applicable)
                 if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.sample.size:
                     end_of_sound_processing(cython.address(standard_track.sound_players[player]),
-                                            callback_data.notification_messages, sdl_ticks)
+                                            track, sdl_ticks)
                     if standard_track.sound_players[player].status is player_finished:
                         break
 
@@ -1231,12 +1187,12 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
             send_sound_stopped_notification(track.number, player,
                                      standard_track.sound_players[player].current.sound_id,
                                      standard_track.sound_players[player].current.sound_instance_id,
-                                     callback_data.notification_messages,
+                                     track,
                                      sdl_ticks)
             standard_track.sound_players[player].status = player_idle
 
 cdef inline void end_of_sound_processing(SoundPlayer* player,
-                                         NotificationMessageContainer **notification_messages,
+                                         TrackState *track,
                                          Uint32 sdl_ticks) nogil:
     """
     Determines the action to take at the end of the sound (loop or stop) based on
@@ -1244,7 +1200,7 @@ cdef inline void end_of_sound_processing(SoundPlayer* player,
     loop has reached the end of the source buffer.
     Args:
         player: SoundPlayer pointer
-        notification_messages: The NotificationMessageContainer object containing all notification messages
+        track: TrackState pointer for the current track
         sdl_ticks: The current SDL timestamp (in ticks)
     """
     # Check if we are at the end of the source sample buffer (loop if applicable)
@@ -1253,9 +1209,9 @@ cdef inline void end_of_sound_processing(SoundPlayer* player,
         player.current.loops_remaining -= 1
         player.current.sample_pos = 0
         player.current.current_loop += 1
-        send_sound_looping_notification(player.track_num, player.player,
+        send_sound_looping_notification(track.number, player.player,
                                  player.current.sound_id, player.current.sound_instance_id,
-                                 notification_messages, sdl_ticks)
+                                 track, sdl_ticks)
 
     elif player.current.loops_remaining == 0:
         # At the end and not looping, the sample has finished playing
@@ -1265,13 +1221,13 @@ cdef inline void end_of_sound_processing(SoundPlayer* player,
         # Looping infinitely, loop back to the beginning
         player.current.sample_pos = 0
         player.current.current_loop += 1
-        send_sound_looping_notification(player.track_num, player.player,
+        send_sound_looping_notification(track.number, player.player,
                                  player.current.sound_id, player.current.sound_instance_id,
-                                 notification_messages, sdl_ticks)
+                                 track, sdl_ticks)
 
 cdef inline void send_sound_started_notification(int track_num, int player,
                                                  long sound_id, long sound_instance_id,
-                                                 NotificationMessageContainer **notification_messages,
+                                                 TrackState *track,
                                                  Uint32 sdl_ticks) nogil:
     """
     Sends a sound started notification
@@ -1280,21 +1236,23 @@ cdef inline void send_sound_started_notification(int track_num, int player,
         player: The sound player number on which the event occurred
         sound_id: The sound id
         sound_instance_id: The sound instance id
-        notification_messages: A pointer to the notification messages structures
+        track: The TrackState pointer
         sdl_ticks: The current SDL tick time
     """
-    cdef int message_index = get_available_notification_message(notification_messages)
-    if message_index != -1:
-        notification_messages[message_index].message = notification_sound_started
-        notification_messages[message_index].track = track_num
-        notification_messages[message_index].player = player
-        notification_messages[message_index].sound_id = sound_id
-        notification_messages[message_index].sound_instance_id = sound_instance_id
-        notification_messages[message_index].time = sdl_ticks
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_sound_started
+        notification_message.track = track_num
+        notification_message.player = player
+        notification_message.sound_id = sound_id
+        notification_message.sound_instance_id = sound_instance_id
+        notification_message.time = sdl_ticks
+
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
 cdef inline void send_sound_stopped_notification(int track_num, int player,
                                                  long sound_id, long sound_instance_id,
-                                                 NotificationMessageContainer **notification_messages,
+                                                 TrackState *track,
                                                  Uint32 sdl_ticks) nogil:
     """
     Sends a sound stopped notification
@@ -1303,21 +1261,23 @@ cdef inline void send_sound_stopped_notification(int track_num, int player,
         player: The sound player number on which the event occurred
         sound_id: The sound id
         sound_instance_id: The sound instance id
-        notification_messages: A pointer to the notification messages structures
+        track: The TrackState pointer
         sdl_ticks: The current SDL tick time
     """
-    cdef int message_index = get_available_notification_message(notification_messages)
-    if message_index != -1:
-        notification_messages[message_index].message = notification_sound_stopped
-        notification_messages[message_index].track = track_num
-        notification_messages[message_index].player = player
-        notification_messages[message_index].sound_id = sound_id
-        notification_messages[message_index].sound_instance_id = sound_instance_id
-        notification_messages[message_index].time = sdl_ticks
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_sound_stopped
+        notification_message.track = track_num
+        notification_message.player = player
+        notification_message.sound_id = sound_id
+        notification_message.sound_instance_id = sound_instance_id
+        notification_message.time = sdl_ticks
+
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
 cdef inline void send_sound_looping_notification(int track_num, int player,
                                                  long sound_id, long sound_instance_id,
-                                                 NotificationMessageContainer **notification_messages,
+                                                 TrackState *track,
                                                  Uint32 sdl_ticks) nogil:
     """
     Sends a sound looping notification
@@ -1326,21 +1286,23 @@ cdef inline void send_sound_looping_notification(int track_num, int player,
         player: The sound player number on which the event occurred
         sound_id: The sound id
         sound_instance_id: The sound instance id
-        notification_messages: A pointer to the notification messages structures
+        track: The TrackState pointer
         sdl_ticks: The current SDL tick time
     """
-    cdef int message_index = get_available_notification_message(notification_messages)
-    if message_index != -1:
-        notification_messages[message_index].message = notification_sound_looping
-        notification_messages[message_index].track = track_num
-        notification_messages[message_index].player = player
-        notification_messages[message_index].sound_id = sound_id
-        notification_messages[message_index].sound_instance_id = sound_instance_id
-        notification_messages[message_index].time = sdl_ticks
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_sound_looping
+        notification_message.track = track_num
+        notification_message.player = player
+        notification_message.sound_id = sound_id
+        notification_message.sound_instance_id = sound_instance_id
+        notification_message.time = sdl_ticks
+
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
 cdef inline void send_sound_marker_notification(int track_num, int player,
                                                 long sound_id, long sound_instance_id,
-                                                NotificationMessageContainer **notification_messages,
+                                                TrackState *track,
                                                 Uint32 sdl_ticks,
                                                 int marker_id) nogil:
     """
@@ -1350,55 +1312,55 @@ cdef inline void send_sound_marker_notification(int track_num, int player,
         player: The sound player number on which the event occurred
         sound_id: The sound id
         sound_instance_id: The sound instance id
-        notification_messages: A pointer to the notification messages structures
+        track: The TrackState pointer
         sdl_ticks: The current SDL tick time
         marker_id: The id of the marker being sent for the specified sound
     """
-    cdef int message_index = get_available_notification_message(notification_messages)
-    if message_index != -1:
-        notification_messages[message_index].message = notification_sound_marker
-        notification_messages[message_index].track = track_num
-        notification_messages[message_index].player = player
-        notification_messages[message_index].sound_id = sound_id
-        notification_messages[message_index].sound_instance_id = sound_instance_id
-        notification_messages[message_index].time = sdl_ticks
-        notification_messages[message_index].data.marker.id = marker_id
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_sound_marker
+        notification_message.track = track_num
+        notification_message.player = player
+        notification_message.sound_id = sound_id
+        notification_message.sound_instance_id = sound_instance_id
+        notification_message.time = sdl_ticks
+        notification_message.data.marker.id = marker_id
 
-cdef inline void send_track_stopped_notification(int track_num, NotificationMessageContainer **notification_messages,
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+
+cdef inline void send_track_stopped_notification(int track_num, TrackState *track,
                                                  Uint32 sdl_ticks) nogil:
     """
     Sends a track stopped notification
     Args:
         track_num: The track number on which the event occurred
-        notification_messages: A pointer to the notification messages structures
+        track: The TrackState pointer
         sdl_ticks: The current SDL tick time
     """
-    cdef int message_index = get_available_notification_message(notification_messages)
-    if message_index != -1:
-        notification_messages[message_index].message = notification_track_stopped
-        notification_messages[message_index].track = track_num
-        notification_messages[message_index].player = 0
-        notification_messages[message_index].sound_id = 0
-        notification_messages[message_index].sound_instance_id = 0
-        notification_messages[message_index].time = sdl_ticks
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_track_stopped
+        notification_message.track = track_num
+        notification_message.time = sdl_ticks
 
-cdef inline void send_track_paused_notification(int track_num, NotificationMessageContainer **notification_messages,
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+
+cdef inline void send_track_paused_notification(int track_num, TrackState *track,
                                                 Uint32 sdl_ticks) nogil:
     """
     Sends a track paused notification
     Args:
         track_num: The track number on which the event occurred
-        notification_messages: A pointer to the notification messages structures
+        track: The TrackState pointer
         sdl_ticks: The current SDL tick time
     """
-    cdef int message_index = get_available_notification_message(notification_messages)
-    if message_index != -1:
-        notification_messages[message_index].message = notification_track_paused
-        notification_messages[message_index].track = track_num
-        notification_messages[message_index].player = 0
-        notification_messages[message_index].sound_id = 0
-        notification_messages[message_index].sound_instance_id = 0
-        notification_messages[message_index].time = sdl_ticks
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_track_paused
+        notification_message.track = track_num
+        notification_message.time = sdl_ticks
+
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
 cdef void apply_track_ducking(TrackState* track, Uint32 buffer_size, AudioCallbackData* callback_data) nogil:
     """
@@ -1592,10 +1554,10 @@ cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_dat
                     track.fade_volume_current = track.fade_volume_target
                     if track.status == track_status_stopping:
                         track.status = track_status_stopped
-                        send_track_stopped_notification(track.number, callback_data.notification_messages, SDL_GetTicks())
+                        send_track_stopped_notification(track.number, track, SDL_GetTicks())
                     elif track.status == track_status_pausing:
                         track.status = track_status_paused
-                        send_track_paused_notification(track.number, callback_data.notification_messages, SDL_GetTicks())
+                        send_track_paused_notification(track.number, track, SDL_GetTicks())
 
             # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
             track_sample.bytes.byte0 = track_buffer[index]
@@ -1657,21 +1619,12 @@ cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_dat
 
             index += BYTES_PER_SAMPLE
 
-cdef int get_available_notification_message(NotificationMessageContainer **notification_messages) nogil:
+cdef inline NotificationMessageContainer *_create_notification_message() nogil:
     """
-    Returns the index of the first available notification message. If all notification messages
-    are currently in use, -1 is returned.
-    :param notification_messages: The pool of audio messages
-    :return: The index of the first available notification message.  -1 if all are in use.
+    Creates a new notification message.
+    :return: A pointer to the new notification message.
     """
-    if notification_messages == NULL:
-        return -1
-
-    for i in range(MAX_NOTIFICATION_MESSAGES):
-        if notification_messages[i].message == notification_not_in_use:
-            return i
-
-    return -1
+    return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))
 
 
 # ---------------------------------------------------------------------------
@@ -1889,7 +1842,7 @@ cdef class Track:
                 self.state.fade_volume_start = 0
                 self.state.fade_volume_target = 0
                 self.state.status = track_status_stopped
-                send_track_stopped_notification(self.number, self._audio_callback_data.notification_messages, SDL_GetTicks())
+                send_track_stopped_notification(self.number, self.state, SDL_GetTicks())
 
         else:
             self.log.warning("stop - Action may only be used when a track is playing; action "
@@ -1963,7 +1916,7 @@ cdef class Track:
                 self.state.fade_volume_start = 0
                 self.state.fade_volume_target = 0
                 self.state.status = track_status_paused
-                send_track_paused_notification(self.number, self._audio_callback_data.notification_messages, SDL_GetTicks())
+                send_track_paused_notification(self.number, self.state, SDL_GetTicks())
 
         else:
             self.log.warning("pause - Action may only be used when a track is playing; action "
@@ -2151,6 +2104,7 @@ cdef class TrackStandard(Track):
 
         cdef bint keep_checking = True
         cdef int idle_sound_player
+        cdef GSList *iterator = NULL
 
         # Lock the mutex to ensure no audio data is changed during the playback processing
         # (multi-threaded protection)
@@ -2171,6 +2125,18 @@ cdef class TrackStandard(Track):
             else:
                 keep_checking = False
 
+        # Process track notification messages
+        if self.state.notification_messages != NULL:
+            self.state.notification_messages = g_slist_reverse(self.state.notification_messages)
+            iterator = self.state.notification_messages
+            while iterator != NULL:
+                self.process_notification_message(<NotificationMessageContainer*>iterator.data)
+                g_slice_free1(sizeof(NotificationMessageContainer), iterator.data)
+                iterator = iterator.next
+
+            g_slist_free(self.state.notification_messages)
+            self.state.notification_messages = NULL
+
         # Unlock the mutex since we are done accessing the audio data
         SDL_UnlockAudioDevice(self.device_id)
 
@@ -2188,17 +2154,13 @@ cdef class TrackStandard(Track):
         # list is in the reverse order and should be reversed before processing.
         self.state.request_messages = g_slist_prepend(self.state.request_messages, request_message)
 
-    def process_notification_message(self, int message_num):
+    cdef process_notification_message(self, NotificationMessageContainer *notification_message):
         """Process a notification message to this track"""
-        cdef NotificationMessageContainer *notification_message = self._audio_callback_data.notification_messages[message_num]
 
         if notification_message == NULL:
             return
 
         SDL_LockAudioDevice(self.device_id)
-
-        self.log.debug("Processing notification message %d for sound instance (id: %d)",
-                       notification_message.message, notification_message.sound_instance_id)
 
         # Check for track notification messages first (they do not need sound instance information)
         if notification_message.message in (notification_track_stopped, notification_track_paused):
@@ -2209,11 +2171,11 @@ cdef class TrackStandard(Track):
                 # TODO: send notification events for track paused
                 pass
 
-            notification_message.message = notification_not_in_use
-            notification_message.sound_id = 0
-            notification_message.sound_instance_id = 0
             SDL_UnlockAudioDevice(self.device_id)
             return
+
+        self.log.debug("Processing notification message %d for sound instance (id: %d)",
+                       notification_message.message, notification_message.sound_instance_id)
 
         if notification_message.sound_instance_id not in self._sound_instances_by_id:
             self.log.warning("Received a notification message for a sound instance (id: %d) "
@@ -2245,10 +2207,6 @@ cdef class TrackStandard(Track):
         else:
             raise AudioException("Unknown notification message received on %s track", self.name)
 
-        # Event has been processed, reset it so it may be used again
-        notification_message.message = notification_not_in_use
-        notification_message.sound_id = 0
-        notification_message.sound_instance_id = 0
         SDL_UnlockAudioDevice(self.device_id)
 
     def _get_next_sound(self):
@@ -2528,7 +2486,7 @@ cdef class TrackStandard(Track):
                                                 i,
                                                 self.type_state.sound_players[i].current.sound_id,
                                                 self.type_state.sound_players[i].current.sound_instance_id,
-                                                self._audio_callback_data.notification_messages,
+                                                self.state,
                                                 SDL_GetTicks())
                 self.type_state.sound_players[i].status = player_idle
 

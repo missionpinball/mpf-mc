@@ -119,9 +119,6 @@ class TestAudio(MpfMcTestCase):
         # Make sure sound has ducking (since it was specified in the config files)
         self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
 
-        # Test baseline internal audio message count
-        self.assertEqual(interface.get_in_use_notification_message_count(), 0)
-
         # Test sound_player
         self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
         self.mc.events.post('play_sound_text')
@@ -202,10 +199,6 @@ class TestAudio(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_marker')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_next_marker')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='last_marker')
-
-        # Check for internal sound message processing leaks (are there any internal sound
-        # events that get generated, but never processed and cleared from the queue?)
-        self.assertEqual(interface.get_in_use_notification_message_count(), 0)
 
     def test_mode_sounds(self):
         """ Test the sound system using sounds specified in a mode """

@@ -177,7 +177,6 @@ ctypedef struct AudioCallbackData:
     Uint8 silence
     int track_count
     TrackState **tracks
-    NotificationMessageContainer **notification_messages
     FILE *c_log_file
 
 
