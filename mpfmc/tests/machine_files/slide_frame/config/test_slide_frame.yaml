@@ -20,6 +20,9 @@ slides:
     font_size: 20
     y: bottom
     anchor_y: bottom
+  slide2:
+  - type: text
+    text: slide2
   frame1_text:
   - type: text
     text: SLIDE 1 IN FRAME
@@ -41,6 +44,7 @@ slides:
 
 slide_player:
   show_slide1: slide1
+  show_slide2: slide2
   show_frame_text:
     frame1_text:
       target: frame1

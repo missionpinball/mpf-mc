@@ -117,6 +117,15 @@ class SlideFrame(MpfWidget, ScreenManager):
 
         self.mc.targets[self.name] = self
 
+        # create a blank slide for this display. Why?
+        # 1. sometimes people try to play widgets with no slide. This makes
+        # that work.
+        # 2. the first slide that's created and added to this frame will be
+        # automatically show, which we don't want. Also we want to ensure that
+        # our slide event will be called which only happens when this slide is
+        # switched to, rather than automatically added.
+        self._set_current_slide(None)
+
         self.mc.post_mc_native_event('display_{}_ready'.format(self.name))
         '''event: display_(name)_ready
         desc: The display target called (name) is now ready and available to
@@ -319,6 +328,9 @@ class SlideFrame(MpfWidget, ScreenManager):
         if not slide:
             slide = self.add_slide(name='blank', priority=0, key=None)
 
+        if self.current == slide.name:
+            return
+
         try:
             self.current = slide.name
         except WidgetException:
@@ -326,25 +338,11 @@ class SlideFrame(MpfWidget, ScreenManager):
             self.add_widget(slide)
             self.current = slide.name
 
-        self.mc.post_mc_native_event('slide_{}_active'.format(slide.name))
+        # Post the event via callback at the end of the frame in case more than
+        # one slide was set in this frame, so we only want to post the event
+        # for the slide that actually became active.
 
-        """event: slide_(name)_active
-
-        desc: A slide called (name) has just become active, meaning that
-        it's now showing as the current slide.
-
-        This is useful for things like the widget_player where you want to
-        target a widget for a specific slide, but you can only do so if
-        that slide exists.
-
-        Note that this event will be posted anytime this slide is asked to
-        become the active slide, even if was already active.
-
-        Slide names do not take into account what display or slide frame
-        they're playing on, so be sure to create machine-wide unique names
-        when you're naming your slides.
-
-        """
+        self.mc.clock.schedule_once(self._post_active_slide_event, -1)
 
     def _set_current_slide_name(self, slide_name):
         try:
@@ -388,3 +386,21 @@ class SlideFrame(MpfWidget, ScreenManager):
             return [x for x in self.parent.children if x.key == key]
         except AttributeError:
             return []
+
+    def _post_active_slide_event(self, dt):
+        del dt
+        self.mc.post_mc_native_event('slide_{}_active'.format(self.current))
+
+        """event: slide_(name)_active
+
+        desc: A slide called (name) has just become active, meaning that
+        it's now showing as the current slide.
+
+        This is useful for things like the widget_player where you want to
+        target a widget for a specific slide, but you can only do so if
+        that slide exists.
+
+        Slide names do not take into account what display or slide frame
+        they're playing on, so be sure to create machine-wide unique names
+        when you're naming your slides.
+        """
