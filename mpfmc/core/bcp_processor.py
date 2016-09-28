@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import queue
 import logging
 from distutils.version import LooseVersion
@@ -23,6 +25,8 @@ class BcpProcessor(object):
             self.enabled = True
         else:
             self.enabled = False
+
+        self.debug_log = self.mc.machine_config['bcp']['debug']
 
         self.bcp_commands = {'error': self._bcp_error,
                              'goodbye': self._bcp_goodbye,
@@ -119,7 +123,18 @@ class BcpProcessor(object):
             self._process_command(cmd, **kwargs)
 
     def _process_command(self, bcp_command, **kwargs):
-        self.log.debug("Processing command: %s %s", bcp_command, kwargs)
+
+        if self.debug_log:
+            if 'rawbytes' in kwargs:
+                debug_kwargs = deepcopy(kwargs)
+                debug_kwargs['rawbytes'] = '<{} bytes>'.format(
+                    len(debug_kwargs.pop('rawbytes')))
+
+                self.log.debug("Processing command: %s %s", bcp_command,
+                               debug_kwargs)
+            else:
+                self.log.debug("Processing command: %s %s", bcp_command,
+                               kwargs)
 
         # Can't use try/except KeyError here becasue there could be a KeyError
         # in the callback which we don't want it to swallow.
