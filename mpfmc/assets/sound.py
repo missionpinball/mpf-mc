@@ -528,7 +528,7 @@ class SoundAsset(Asset):
         """Unloads the asset from memory"""
         self.log.debug("Sound %s unloading from memory", self.name)
         self.stop(0)
-        self.machine.sound_system.audio_interface.unload_sound_chunk(self._container)
+        self.machine.sound_system.audio_interface.unload_sound_file_from_memory(self._container)
         del self._container
 
     def is_loaded(self):
