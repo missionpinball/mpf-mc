@@ -979,7 +979,7 @@ class SoundInstance(object):
         self._played = True
         if self.events_when_played is not None:
             for event in self.events_when_played:
-                self.mc.bcp_processor.send('trigger', name=event)
+                self.mc.post_mc_native_event(event)
 
     def set_stopped(self):
         """Notifies the sound instance that it has now stopped and triggers any
@@ -988,7 +988,7 @@ class SoundInstance(object):
         # Trigger any events
         if self.events_when_stopped is not None:
             for event in self.events_when_stopped:
-                self.mc.bcp_processor.send('trigger', name=event)
+                self.mc.post_mc_native_event(event)
 
         self._finished()
 
@@ -1001,7 +1001,7 @@ class SoundInstance(object):
         # Trigger any events
         if self.events_when_looping is not None:
             for event in self.events_when_looping:
-                self.mc.bcp_processor.send('trigger', name=event)
+                self.mc.post_mc_native_event(event)
 
     def set_marker(self, marker_id):
         """Notifies the sound instance that the specified marker has just been reached
@@ -1015,7 +1015,7 @@ class SoundInstance(object):
         # Trigger any events
         if marker['events'] is not None:
             for event in marker['events']:
-                self.mc.bcp_processor.send('trigger', name=event)
+                self.mc.post_mc_native_event(event)
 
     def set_expired(self):
         """Notifies the sound instance that it has expired and will not be played."""
