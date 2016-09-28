@@ -164,10 +164,13 @@ ctypedef struct AudioCallbackData:
     # is the only way data is made available to the main audio thread.  Must not
     # contain any Python objects.
     SDL_AudioDeviceID device_id
+    SDL_AudioFormat format
     int sample_rate
     int channels
     Uint16 buffer_samples
     Uint32 buffer_size
+    Uint16 buffer_samples_per_control_point
+    int bytes_per_sample
     Uint8 master_volume
     Uint8 silence
     int track_count

@@ -23,6 +23,7 @@ cdef extern from "SDL.h" nogil:
     ctypedef signed long long Sint64
     ctypedef signed short Sint16
     ctypedef unsigned short Uint16
+    ctypedef Uint16 SDL_AudioFormat
 
     int SDL_AUDIO_ALLOW_FREQUENCY_CHANGE
     int SDL_AUDIO_ALLOW_FORMAT_CHANGE
@@ -38,6 +39,9 @@ cdef extern from "SDL.h" nogil:
     int AUDIO_S16SYS
 
     int SDL_MIX_MAXVOLUME
+
+    bint SDL_AUDIO_ISLITTLEENDIAN(SDL_AudioFormat format)
+    int SDL_AUDIO_BITSIZE(SDL_AudioFormat)
 
     struct SDL_AudioSpec:
         int freq

@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev07')
+__version_info__ = ('0', '32', '0-dev08')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -106,25 +106,16 @@ cdef class AudioInterface:
     The AudioInterface class provides a management wrapper around the SDL2 and SDL_Mixer
     libraries.
     """
-    cdef public int sample_rate
-    cdef int channels
-    cdef int buffer_samples
-    cdef int buffer_size
     cdef int supported_formats
     cdef list tracks
     cdef object mc
     cdef object log
     cdef dict sound_instances_by_id
 
-    cdef AudioCallbackData *audio_callback_data
+    cdef AudioCallbackData audio_callback_data
 
     def __cinit__(self, *args, **kw):
-        self.sample_rate = 0
-        self.channels = 0
-        self.buffer_samples = 0
-        self.buffer_size = 0
         self.supported_formats = 0
-        self.audio_callback_data = NULL
 
     def __init__(self, rate=44100, channels=2, buffer_samples=4096):
         """
@@ -151,10 +142,6 @@ cdef class AudioInterface:
             self.log.warning('NOTE: You may experience noise and other undesirable sound artifacts '
                              'when you set your buffer at 1024 or smaller.')
 
-        # Allocate memory for the audio callback data structure (needed before audio device can
-        # be opened).
-        self.audio_callback_data = <AudioCallbackData*> PyMem_Malloc(sizeof(AudioCallbackData))
-
         # Initialize the SDL audio system
         if SDL_Init(SDL_INIT_AUDIO) < 0:
             self.log.error('SDL_Init error - %s' % SDL_GetError())
@@ -166,7 +153,7 @@ cdef class AudioInterface:
         desired.channels = channels
         desired.samples = buffer_samples
         desired.callback = AudioInterface.audio_callback
-        desired.userdata = self.audio_callback_data
+        desired.userdata = &self.audio_callback_data
 
         # Open the audio device using the desired settings
         self.audio_callback_data.device_id = SDL_OpenAudioDevice(NULL, 0, &desired, &obtained, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE)
@@ -174,34 +161,38 @@ cdef class AudioInterface:
             self.log.error('SDL_OpenAudioDevice error - %s' % SDL_GetError())
             raise AudioException('Unable to open audio for output (SDL_OpenAudioDevice failed: %s)' % SDL_GetError())
 
+        # Initialize GStreamer
+        self._initialize_gstreamer()
+
         self.log.info("Initialized %s", AudioInterface.get_version())
         self.log.debug("Loaded %s", AudioInterface.get_sdl_version())
         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
         self.log.debug("Loaded %s", AudioInterface.get_glib_version())
 
-        # Determine the actual audio format in use by the opened audio device.  This may or may not match
-        # the parameters used to initialize the audio interface.
-        self.sample_rate = obtained.freq
-        self.channels = obtained.channels
-        self.buffer_samples = obtained.samples
-        self.buffer_size = obtained.size
-
-        self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
-                       rate, channels, buffer_samples)
-        self.log.debug('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes)',
-                       self.sample_rate, self.channels, self.buffer_samples, self.buffer_size)
-
-        # Initialize the audio callback data structure
-        self.audio_callback_data.sample_rate = self.sample_rate
-        self.audio_callback_data.channels = self.channels
-        self.audio_callback_data.buffer_samples = self.buffer_samples
-        self.audio_callback_data.buffer_size = self.buffer_size
+        # Store the actual audio format in use by the opened audio device.  This may or may not match
+        # the requested values used to initialize the audio interface.  A pointer to the audio_callback_data
+        # structure is passed to the SDL audio callback function and is the source of all audio state
+        # and mixing data needed to generate the output signal.
+        self.audio_callback_data.sample_rate = obtained.freq
+        self.audio_callback_data.channels = obtained.channels
+        self.audio_callback_data.format = obtained.format
+        self.audio_callback_data.buffer_samples = obtained.samples
+        self.audio_callback_data.buffer_size = obtained.size
+        self.audio_callback_data.buffer_samples_per_control_point = obtained.samples // CONTROL_POINTS_PER_BUFFER
+        self.audio_callback_data.bytes_per_sample = SDL_AUDIO_BITSIZE(obtained.format) // 8
         self.audio_callback_data.master_volume = SDL_MIX_MAXVOLUME // 2
         self.audio_callback_data.silence = obtained.silence
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackState**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
         self.audio_callback_data.c_log_file = NULL
         #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+
+        self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
+                       rate, channels, buffer_samples)
+        self.log.debug('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',
+                       self.audio_callback_data.sample_rate, self.audio_callback_data.channels,
+                       self.audio_callback_data.buffer_samples, self.audio_callback_data.buffer_size,
+                       self.audio_callback_data.bytes_per_sample)
 
         # Initialize request messages
         self.audio_callback_data.request_messages = <RequestMessageContainer**> PyMem_Malloc(
@@ -251,10 +242,21 @@ cdef class AudioInterface:
         PyMem_Free(self.audio_callback_data.request_messages)
         PyMem_Free(self.audio_callback_data.notification_messages)
         PyMem_Free(self.audio_callback_data.tracks)
-        PyMem_Free(self.audio_callback_data)
 
         # SDL no longer needed
         SDL_Quit()
+
+    def _initialize_gstreamer(self):
+        """Initialize the GStreamer library"""
+        if gst_is_initialized():
+            return True
+
+        cdef int argc = 0
+        cdef char **argv = NULL
+        cdef GError *error
+        if not gst_init_check(&argc, &argv, &error):
+            msg = 'Unable to initialize gstreamer: code={} message={}'.format(error.code, <bytes>error.message)
+            raise AudioException(msg)
 
     @staticmethod
     def initialize(int rate=44100, int channels=2, int buffer_samples=4096, **kwargs):
@@ -298,17 +300,17 @@ cdef class AudioInterface:
 
     def convert_seconds_to_samples(self, float seconds):
         """Converts the specified number of seconds into samples (based on current sample rate)"""
-        return int(self.sample_rate * seconds)
+        return int(self.audio_callback_data.sample_rate * seconds)
 
     def convert_seconds_to_buffer_length(self, float seconds):
         """Convert the specified number of seconds into a buffer length (based on current
         sample rate, the number of audio channels, and the number of bytes per sample)."""
-        return int(seconds * self.sample_rate * self.channels * BYTES_PER_SAMPLE)
+        return int(seconds * self.audio_callback_data.sample_rate * self.audio_callback_data.channels * BYTES_PER_SAMPLE)
 
     def convert_buffer_length_to_seconds(self, int buffer_length):
         """Convert the specified buffer length into a time in seconds (based on current
         sample rate, the number of audio channels, and the number of bytes per sample)."""
-        return round(buffer_length / (self.sample_rate * self.channels * BYTES_PER_SAMPLE), 3)
+        return round(buffer_length / (self.audio_callback_data.sample_rate * self.audio_callback_data.channels * BYTES_PER_SAMPLE), 3)
 
     @staticmethod
     def string_to_secs(time):
@@ -379,7 +381,7 @@ cdef class AudioInterface:
         # Time strings are also permitted and will be converted to seconds
         # and then to samples using the current sample rate.
         cdef float seconds = AudioInterface.string_to_secs(samples_string)
-        return int(self.sample_rate * seconds)
+        return int(self.audio_callback_data.sample_rate * seconds)
 
     @classmethod
     def get_version(cls):
@@ -442,10 +444,10 @@ cdef class AudioInterface:
             audio interface is not enabled.
         """
         if self.enabled:
-            return {'sample_rate': self.sample_rate,
-                    'audio_channels': self.channels,
-                    'buffer_samples': self.buffer_samples,
-                    'buffer_size': self.buffer_size
+            return {'sample_rate': self.audio_callback_data.sample_rate,
+                    'audio_channels': self.audio_callback_data.channels,
+                    'buffer_samples': self.audio_callback_data.buffer_samples,
+                    'buffer_size': self.audio_callback_data.buffer_size
                     }
         else:
             return None
@@ -539,10 +541,10 @@ cdef class AudioInterface:
 
         # Create the new standard track
         new_track = TrackStandard(self.sound_instances_by_id,
-                                  pycapsule.PyCapsule_New(self.audio_callback_data, NULL, NULL),
+                                  pycapsule.PyCapsule_New(&self.audio_callback_data, NULL, NULL),
                                   name,
                                   track_num,
-                                  self.buffer_size,
+                                  self.audio_callback_data.buffer_size,
                                   max_simultaneous_sounds,
                                   volume)
         self.tracks.append(new_track)
@@ -586,10 +588,10 @@ cdef class AudioInterface:
 
         # Create the new live loop track
         new_track = TrackLiveLoop(self.mc,
-                                  pycapsule.PyCapsule_New(self.audio_callback_data, NULL, NULL),
+                                  pycapsule.PyCapsule_New(&self.audio_callback_data, NULL, NULL),
                                   name,
                                   track_num,
-                                  self.buffer_size,
+                                  self.audio_callback_data.buffer_size,
                                   volume)
         self.tracks.append(new_track)
 
@@ -615,8 +617,11 @@ cdef class AudioInterface:
             A SoundMemoryFile wrapper object containing a pointer to the sound sample
             data in memory.  An exception is thrown if the sound is unable to be loaded.
         """
-        # TODO: Determine endianness (LE, BE)
-        return SoundMemoryFile(file_name, self.sample_rate, self.channels, self.buffer_size)
+        return SoundMemoryFile(file_name,
+                               self.audio_callback_data.sample_rate,
+                               self.audio_callback_data.channels,
+                               self.audio_callback_data.buffer_size,
+                               SDL_AUDIO_ISLITTLEENDIAN(self.audio_callback_data.format))
 
     def unload_sound_file_from_memory(self, container not None):
         """
