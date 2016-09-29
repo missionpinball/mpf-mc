@@ -24,6 +24,9 @@ class TestBcpClient(MockBcpClient):
         self.queue = Queue()
         self.exit_on_close = False
 
+    def connect(self, config):
+        return True
+
     def send(self, bcp_command, kwargs):
         self.queue.put((bcp_command, kwargs))
 
