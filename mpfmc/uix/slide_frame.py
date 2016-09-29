@@ -126,6 +126,8 @@ class SlideFrame(MpfWidget, ScreenManager):
         # switched to, rather than automatically added.
         self._set_current_slide(None)
 
+        self._flag_slide_changed = False
+
         self.mc.post_mc_native_event('display_{}_ready'.format(self.name))
         '''event: display_(name)_ready
         desc: The display target called (name) is now ready and available to
@@ -314,8 +316,8 @@ class SlideFrame(MpfWidget, ScreenManager):
 
     def _set_current_slide(self, slide):
         # slide frame requires at least one slide, so if you try to set current
-        # to None, it will create a new slide called 'blank' at priority 0 and
-        # show that one
+        # to None, it will create a new slide called '<display name>_blank' at
+        # priority 0 and show that one
 
         # I think there's a bug in Kivy 1.9.1. According to the docs, you
         # should be able to set self.current to a screen name. But if that
@@ -324,9 +326,9 @@ class SlideFrame(MpfWidget, ScreenManager):
         # easy to fix by subclassing. So this is sort of a hack that looks
         # for that exception, and if it sees it, it just removes and
         # re-adds the screen.
-
         if not slide:
-            slide = self.add_slide(name='blank', priority=0, key=None)
+            slide = self.add_slide(name='{}_blank'.format(self.name),
+                                   priority=0, key=None)
 
         if self.current == slide.name:
             return
@@ -342,7 +344,9 @@ class SlideFrame(MpfWidget, ScreenManager):
         # one slide was set in this frame, so we only want to post the event
         # for the slide that actually became active.
 
-        self.mc.clock.schedule_once(self._post_active_slide_event, -1)
+        if not self._flag_slide_changed:  # only call this once per frame
+            self.mc.clock.schedule_once(self._post_active_slide_event, -1)
+            self._flag_slide_changed = True
 
     def _set_current_slide_name(self, slide_name):
         try:
@@ -389,8 +393,10 @@ class SlideFrame(MpfWidget, ScreenManager):
 
     def _post_active_slide_event(self, dt):
         del dt
-        self.mc.post_mc_native_event('slide_{}_active'.format(self.current))
 
+        self._flag_slide_changed = False
+
+        self.mc.post_mc_native_event('slide_{}_active'.format(self.current))
         """event: slide_(name)_active
 
         desc: A slide called (name) has just become active, meaning that
