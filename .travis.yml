@@ -17,8 +17,12 @@ install:
 
  - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
       yes | sudo add-apt-repository ppa:zoogie/sdl2-snapshots;
+      yes | sudo add-apt-repository ppa:gstreamer-developers/ppa;
       sudo apt-get update;
-      sudo apt-get -y install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer0.10-plugins-{good,base,bad,ugly} libgstreamer0.10-dev libxine1-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff4-dev libX11-dev libmtdev-dev build-essential libgl1-mesa-dev libgles2-mesa-dev;
+      sudo apt-get -y install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev;
+      sudo apt-get -y install libgstreamer1.0-dev gstreamer1.0-alsa gstreamer1.0-plugins-{good,base,bad,ugly};
+      sudo apt-get -y install python-dev libxine1-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff4-dev libX11-dev libmtdev-dev;
+      sudo apt-get -y install python-setuptools build-essential libgl1-mesa-dev libgles2-mesa-dev;
       sudo apt-get -y install xvfb pulseaudio;
       pip3 install --upgrade cython pillow coveralls setuptools;
       pip3 install kivy;
