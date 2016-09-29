@@ -163,11 +163,14 @@ class Keyboard(Widget):
                 event_params = event_dict['params'] or {}
 
                 if 'event' in event_dict:
-                    self.mc.bcp_processor.send(bcp_command='trigger',
-                                               name=str(event_dict['event']),
-                                               **event_params)
+                    self.mc.post_mc_native_event(str(event_dict['event']),
+                                                 **event_params)
 
                 elif 'mc_event' in event_dict:
+                    self.log.warning("The keyboard setting 'mc_event:' will "
+                                     "go away soon since now regular 'event:'"
+                                     "entries are posted to the MC and MPF.")
+                    # todo deprecate this
                     self.mc.events.post(event_dict['mc_event'],
                                         **event_params)
 

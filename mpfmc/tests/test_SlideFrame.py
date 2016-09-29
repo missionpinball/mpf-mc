@@ -81,3 +81,14 @@ class TestSlideFrame(MpfMcTestCase):
     def test_remove_non_existent_slide(self):
         self.assertFalse(self.mc.targets['default'].remove_slide('hello'))
         self.advance_time()
+
+    def test_two_slides_in_one_tick(self):
+        self.mock_event('slide_slide1_active')
+        self.mock_event('slide_slide2_active')
+
+        self.mc.events.post('show_slide1')
+        self.mc.events.post('show_slide2')
+        self.advance_time()
+
+        self.assertEventCalled('slide_slide2_active', 1)
+        self.assertEventNotCalled('slide_slide1_active')

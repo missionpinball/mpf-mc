@@ -75,7 +75,8 @@ class Slide(Screen):
 
         self.opacity = config.get('opacity', 1.0)
 
-        self.mc.events.post('slide_{}_created'.format(self.name))
+        self.mc.post_mc_native_event(
+            'slide_{}_created'.format(self.name))
 
         """event: slide_(name)_created
 
@@ -259,7 +260,7 @@ class Slide(Screen):
             if hasattr(widget, 'prepare_for_removal'):  # try swallows too much
                 widget.prepare_for_removal()
 
-        self.mc.events.post('slide_{}_removed'.format(self.name))
+        self.mc.post_mc_native_event('slide_{}_removed'.format(self.name))
 
         """event: slide_(name)_removed
 

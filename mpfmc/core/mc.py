@@ -440,3 +440,9 @@ class MpfMc(App):
             self.monitors[monitor_class] = set()
 
         self.monitors[monitor_class].add(monitor)
+
+    def post_mc_native_event(self, event, **kwargs):
+        if self.bcp_processor.enabled and self.bcp_client_connected:
+            self.bcp_processor.send('trigger', name=event, **kwargs)
+
+        self.events.post(event, **kwargs)
