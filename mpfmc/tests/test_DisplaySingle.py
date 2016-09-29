@@ -44,7 +44,12 @@ class TestDisplaySingle(MpfMcTestCase):
         self.assertTrue(isinstance(widget, SlideFrameParent))
 
     def test_current_slide_properties(self):
+        # make sure we get the default blank slide
+        self.assertEqual(self.mc.displays['window'].current_slide_name,
+                         'window_blank')
+
         slide1 = Slide(mc=self.mc, name='slide1')
+        self.mc.targets['default'].current_slide = 'slide1'
 
         # test display properties
         self.assertEqual(self.mc.displays['window'].current_slide, slide1)
@@ -113,9 +118,9 @@ class TestDisplaySingle(MpfMcTestCase):
         self.mc.targets['window'].remove_slide(slide2)
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
 
-        # add another slide so we have 2
+        # add another slide so we have 3
         slide3 = Slide(mc=self.mc, name='slide3', config={})
-        self.assertEqual(len(self.mc.targets['window'].slides), 2)
+        self.assertEqual(len(self.mc.targets['window'].slides), 3)
 
         # also test removing by name
         self.mc.targets['window'].remove_slide('slide1')

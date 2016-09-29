@@ -161,7 +161,7 @@ class TestVideo(MpfMcTestCase):
         self.mc.targets['default'].remove_slide('video_test2')
         self.advance_time()
         self.assertEqual(self.mc.targets['default'].current_slide_name,
-                         'blank')
+                         'default_blank')
 
         self.assertFalse(self.mc.events.does_event_exist('play1'))
         self.assertFalse(self.mc.events.does_event_exist('stop1'))
