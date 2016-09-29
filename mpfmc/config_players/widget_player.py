@@ -168,8 +168,9 @@ class McWidgetPlayer(McConfigPlayer):
 
     def _add_widget_to_slide_when_active(self, slide_name, widget, s, play_kwargs, **kwargs):
         del kwargs
-        slide = self.machine.active_slides[slide_name]
-        slide.add_widgets_from_library(name=widget, play_kwargs=play_kwargs, **s)
+        if slide_name in self.machine.active_slides:
+            slide = self.machine.active_slides[slide_name]
+            slide.add_widgets_from_library(name=widget, play_kwargs=play_kwargs, **s)
 
     def get_express_config(self, value):
         """Parse express config."""

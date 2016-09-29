@@ -88,6 +88,8 @@ class TestAudio(MpfMcTestCase):
 
         # Mock BCP send method
         self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
+
 
         # Allow some time for sound assets to load
         self.advance_time(2)
@@ -216,6 +218,7 @@ class TestAudio(MpfMcTestCase):
 
         # Mock BCP send method
         self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
 
         # Get tracks
         track_sfx = interface.get_track_by_name("sfx")
@@ -367,6 +370,7 @@ class TestAudio(MpfMcTestCase):
 
         # Mock BCP send method
         self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
 
         track_sfx = interface.get_track_by_name("sfx")
         self.assertIsNotNone(track_sfx)
@@ -381,7 +385,7 @@ class TestAudio(MpfMcTestCase):
             if not text_sound.loading:
                 text_sound.load()
             self.advance_time(1)
-            
+
         self.assertEqual(text_sound.simultaneous_limit, 3)
         if SoundStealingMethod is not None:
             self.assertEqual(text_sound.stealing_method, SoundStealingMethod.skip)
@@ -584,6 +588,7 @@ class TestAudio(MpfMcTestCase):
 
         # Mock BCP send method
         self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
 
         track_sfx = interface.get_track_by_name("sfx")
         self.assertIsNotNone(track_sfx)
