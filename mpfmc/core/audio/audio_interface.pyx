@@ -29,7 +29,7 @@ import logging
 import os
 
 
-include "sdl.pxi"
+include "sdl2.pxi"
 include "gstreamer.pxi"
 include "audio_interface.pxi"
 
@@ -271,12 +271,12 @@ cdef class AudioInterface:
     def convert_seconds_to_buffer_length(self, float seconds):
         """Convert the specified number of seconds into a buffer length (based on current
         sample rate, the number of audio channels, and the number of bytes per sample)."""
-        return int(seconds * self.audio_callback_data.sample_rate * self.audio_callback_data.channels * BYTES_PER_SAMPLE)
+        return int(seconds * self.audio_callback_data.sample_rate * self.audio_callback_data.channels * self.audio_callback_data.bytes_per_sample)
 
     def convert_buffer_length_to_seconds(self, int buffer_length):
         """Convert the specified buffer length into a time in seconds (based on current
         sample rate, the number of audio channels, and the number of bytes per sample)."""
-        return round(buffer_length / (self.audio_callback_data.sample_rate * self.audio_callback_data.channels * BYTES_PER_SAMPLE), 3)
+        return round(buffer_length / (self.audio_callback_data.sample_rate * self.audio_callback_data.channels * self.audio_callback_data.bytes_per_sample), 3)
 
     @staticmethod
     def string_to_secs(time):
@@ -628,8 +628,8 @@ cdef class AudioInterface:
             data: A pointer to the AudioCallbackData class for the channel (contains all audio
                 processing-related settings and state, ex: interface settings, tracks, sound
                 players, ducking envelopes, etc.)
-            output_buffer: The music audio buffer for SDL_Mixer to process
-            length: The length (bytes) of the audio buffer
+            output_buffer: A pointer to the audio data buffer for SDL2 to process
+            length: The length of the audio buffer (in bytes)
 
         Notes:
             This static function is responsible for filling the supplied audio buffer with sound.
@@ -693,7 +693,7 @@ cdef class AudioInterface:
                                     buffer_length)
 
         # Apply master volume to output buffer
-        apply_volume_to_buffer(output_buffer, buffer_length, callback_data.master_volume)
+        SDL_MixAudioFormat(output_buffer, output_buffer, callback_data.format, buffer_length, callback_data.master_volume)
 
 # ---------------------------------------------------------------------------
 #    Global C functions designed to be called from the static audio callback
@@ -949,17 +949,15 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                         volume = standard_track.sound_players[player].current.volume
                         standard_track.sound_players[player].status = player_finished
 
-                mix_sound_sample_to_buffer(sound_buffer,
-                                           standard_track.sound_players[player].current.sample_pos,
-                                           volume,
-                                           output_buffer,
-                                           buffer_pos)
+                SDL_MixAudioFormat(output_buffer + buffer_pos,
+                                   sound_buffer + standard_track.sound_players[player].current.sample_pos,
+                                   callback_data.format, callback_data.bytes_per_sample, volume)
 
                 # Advance the source sample pointer to the next sample
-                standard_track.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
+                standard_track.sound_players[player].current.sample_pos += callback_data.bytes_per_sample
 
                 # Advance the output buffer pointer to the next sample
-                buffer_pos += BYTES_PER_SAMPLE
+                buffer_pos += callback_data.bytes_per_sample
 
                 # Check if we are at the end of the source sample buffer
                 if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.sample.size:
@@ -987,17 +985,15 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
 
             # Loop over destination buffer, mixing in the source sample
             while buffer_pos < fade_out_duration:
-                mix_sound_sample_to_buffer(sound_buffer,
-                                           standard_track.sound_players[player].current.sample_pos,
-                                           volume,
-                                           output_buffer,
-                                           buffer_pos)
+                SDL_MixAudioFormat(output_buffer + buffer_pos,
+                                   sound_buffer + standard_track.sound_players[player].current.sample_pos,
+                                   callback_data.format, callback_data.bytes_per_sample, volume)
 
                 # Advance the source sample pointer to the next sample (2 bytes)
-                standard_track.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
+                standard_track.sound_players[player].current.sample_pos += callback_data.bytes_per_sample
 
                 # Advance the output buffer pointer to the next sample (2 bytes)
-                buffer_pos += BYTES_PER_SAMPLE
+                buffer_pos += callback_data.bytes_per_sample
 
                 # Check if we are at the end of the source sample buffer (loop if applicable)
                 if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.sample.size:
@@ -1159,17 +1155,15 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                     else:
                         volume = standard_track.sound_players[player].current.volume
 
-                mix_sound_sample_to_buffer(sound_buffer,
-                                           standard_track.sound_players[player].current.sample_pos,
-                                           volume,
-                                           output_buffer,
-                                           buffer_pos)
+                SDL_MixAudioFormat(output_buffer + buffer_pos,
+                                   sound_buffer + standard_track.sound_players[player].current.sample_pos,
+                                   callback_data.format, callback_data.bytes_per_sample, volume)
 
                 # Advance the source sample pointer to the next sample (2 bytes)
-                standard_track.sound_players[player].current.sample_pos += BYTES_PER_SAMPLE
+                standard_track.sound_players[player].current.sample_pos += callback_data.bytes_per_sample
 
                 # Advance the output buffer pointer to the next sample (2 bytes)
-                buffer_pos += BYTES_PER_SAMPLE
+                buffer_pos += callback_data.bytes_per_sample
 
                 # Check if we are at the end of the source sample buffer (loop if applicable)
                 if standard_track.sound_players[player].current.sample_pos >= standard_track.sound_players[player].current.sample.size:
@@ -1384,8 +1378,7 @@ cdef void apply_track_ducking(TrackState* track, Uint32 buffer_size, AudioCallba
         for control_point in range(CONTROL_POINTS_PER_BUFFER):
             ducking_volume = track.ducking_control_points[control_point]
             if ducking_volume < SDL_MIX_MAXVOLUME:
-                apply_volume_to_buffer_range(<Uint8*> track.buffer, buffer_pos, ducking_volume,
-                                             samples_per_control_point)
+                apply_volume_to_buffer_range(<Uint8*> track.buffer, buffer_pos, ducking_volume, samples_per_control_point)
 
             buffer_pos += samples_per_control_point
 
@@ -1409,76 +1402,6 @@ cdef inline void apply_volume_to_buffer_range(Uint8 *buffer, Uint32 start_pos, U
         buffer[buffer_pos] = buffer_sample.bytes.byte0
         buffer[buffer_pos + 1] = buffer_sample.bytes.byte1
         buffer_pos += BYTES_PER_SAMPLE
-
-cdef void apply_volume_to_buffer(Uint8 *buffer, int buffer_length, Uint8 volume) nogil:
-    """
-    Applies the specified volume to an entire audio buffer.
-    Args:
-        buffer: The audio buffer
-        buffer_length: The length of the audio buffer (in bytes)
-        volume: The volume level to apply (8-bit unsigned value 0 to SDL_MIX_MAXVOLUME)
-    """
-    cdef int temp_sample
-    cdef Sample16Bit sample
-    cdef int buffer_pos = 0
-
-    while buffer_pos < buffer_length:
-
-        # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
-        sample.bytes.byte0 = buffer[buffer_pos]
-        sample.bytes.byte1 = buffer[buffer_pos + 1]
-        temp_sample = (sample.value * volume) // SDL_MIX_MAXVOLUME
-
-        # Put the new sample back into the output buffer (from a 32-bit value
-        # back to a 16-bit value that we know is in 16-bit value range)
-        sample.value = temp_sample
-        buffer[buffer_pos] = sample.bytes.byte0
-        buffer[buffer_pos + 1] = sample.bytes.byte1
-
-        buffer_pos += BYTES_PER_SAMPLE
-
-cdef inline void mix_sound_sample_to_buffer(Uint8 *sound_buffer, Uint32 sample_pos, Uint8 sound_volume,
-                                            Uint8 *output_buffer, Uint32 buffer_pos) nogil:
-    """
-    Mixes a single sample into a buffer at the specified volume
-    Args:
-        sound_buffer: The source sound buffer
-        sample_pos: The source sound sample position (buffer index)
-        sound_volume: The volume to apply to the source sound
-        output_buffer: The output sound buffer
-        buffer_pos: The output sound buffer position (buffer index)
-    """
-    cdef int temp_sample
-    cdef Sample16Bit sound_sample
-    cdef Sample16Bit output_sample
-
-    # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
-    sound_sample.bytes.byte0 = sound_buffer[sample_pos]
-    sound_sample.bytes.byte1 = sound_buffer[sample_pos + 1]
-
-    # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
-    output_sample.bytes.byte0 = output_buffer[buffer_pos]
-    output_sample.bytes.byte1 = output_buffer[buffer_pos + 1]
-
-    # Apply volume to sound sample
-    sound_sample.value = (sound_sample.value * sound_volume) // SDL_MIX_MAXVOLUME
-
-    # Calculate the new output sample (mix the existing output sample with
-    # the new source sound).  The temp sample is a 32-bit value to avoid overflow.
-    temp_sample = output_sample.value + sound_sample.value
-
-    # Clip the temp sample back to a 16-bit value (will cause distortion if samples
-    # on channel are too loud)
-    if temp_sample > MAX_AUDIO_VALUE_S16:
-        temp_sample = MAX_AUDIO_VALUE_S16
-    elif temp_sample < MIN_AUDIO_VALUE_S16:
-        temp_sample = MIN_AUDIO_VALUE_S16
-
-    # Put the new mixed output sample back into the output buffer (from a 32-bit value
-    # back to a 16-bit value that we know is in 16-bit value range)
-    output_sample.value = temp_sample
-    output_buffer[buffer_pos] = output_sample.bytes.byte0
-    output_buffer[buffer_pos + 1] = output_sample.bytes.byte1
 
 cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:
     """
@@ -1585,39 +1508,11 @@ cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_dat
             output_buffer[index] = output_sample.bytes.byte0
             output_buffer[index + 1] = output_sample.bytes.byte1
 
-            index += BYTES_PER_SAMPLE
+            index += callback_data.bytes_per_sample
 
     else:
         # No fade in progress: volume is constant over entire output buffer
-        while index < buffer_size:
-
-            # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
-            track_sample.bytes.byte0 = track_buffer[index]
-            track_sample.bytes.byte1 = track_buffer[index + 1]
-            track_sample.value = track_sample.value * track.volume // SDL_MIX_MAXVOLUME
-
-            # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
-            output_sample.bytes.byte0 = output_buffer[index]
-            output_sample.bytes.byte1 = output_buffer[index + 1]
-
-            # Calculate the new output sample (mix the existing output sample with
-            # the track sample).  The temp sample is a 32-bit value to avoid overflow.
-            temp_sample = output_sample.value + track_sample.value
-
-            # Clip the temp sample back to a 16-bit value (will cause distortion if samples
-            # on channel are too loud)
-            if temp_sample > MAX_AUDIO_VALUE_S16:
-                temp_sample = MAX_AUDIO_VALUE_S16
-            elif temp_sample < MIN_AUDIO_VALUE_S16:
-                temp_sample = MIN_AUDIO_VALUE_S16
-
-            # Write the new output sample back to the output buffer (from
-            # a 32-bit value back to a 16-bit value that we know is in 16-bit value range)
-            output_sample.value = temp_sample
-            output_buffer[index] = output_sample.bytes.byte0
-            output_buffer[index + 1] = output_sample.bytes.byte1
-
-            index += BYTES_PER_SAMPLE
+        SDL_MixAudioFormat(output_buffer, track_buffer, callback_data.format, buffer_size, track.volume)
 
 cdef inline NotificationMessageContainer *_create_notification_message() nogil:
     """
@@ -1760,7 +1655,7 @@ cdef class Track:
                 self.log.debug("set_volume - Applying %s second fade to new volume level", str(fade_seconds))
 
                 # Calculate fade
-                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * self._audio_callback_data.bytes_per_sample
                 self.state.fade_steps = <Uint32>(fade_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
@@ -1790,7 +1685,7 @@ cdef class Track:
             if fade_in_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("play - Applying %s second fade in", str(fade_in_seconds))
-                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * self._audio_callback_data.bytes_per_sample
                 self.state.fade_steps = <Uint32>(fade_in_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
@@ -1827,7 +1722,7 @@ cdef class Track:
             if fade_out_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("stop - Applying %s second fade out", str(fade_out_seconds))
-                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * self._audio_callback_data.bytes_per_sample
                 self.state.fade_steps = <Uint32>(fade_out_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
@@ -1866,7 +1761,7 @@ cdef class Track:
             if fade_in_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("resume - Applying %s second fade in", str(fade_in_seconds))
-                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * self._audio_callback_data.bytes_per_sample
                 self.state.fade_steps = <Uint32>(fade_in_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
@@ -1902,7 +1797,7 @@ cdef class Track:
             if fade_out_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("pause - Applying %s second fade out", str(fade_out_seconds))
-                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * self._audio_callback_data.bytes_per_sample
                 self.state.fade_steps = <Uint32>(fade_out_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
@@ -2430,7 +2325,7 @@ cdef class TrackStandard(Track):
                     request_message.time = SDL_GetTicks()
 
                     # Fade out
-                    seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
+                    seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * self._audio_callback_data.bytes_per_sample
                     request_message.data.stop.fade_out_duration = sound_instance.fade_out * seconds_to_bytes_factor
 
                     # Adjust ducking (if necessary)
@@ -2518,7 +2413,7 @@ cdef class TrackStandard(Track):
                     request_message.time = SDL_GetTicks()
 
                     # Fade out
-                    seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
+                    seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * self._audio_callback_data.bytes_per_sample
                     request_message.data.stop.fade_out_duration = fade_out_seconds * seconds_to_bytes_factor
 
                     # Adjust ducking (if necessary)
@@ -2630,7 +2525,7 @@ cdef class TrackStandard(Track):
                 request_message.data.play.sample = cython.address(sound_container.sample)
 
                 # Conversion factor (seconds to bytes/buffer position)
-                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
+                seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * self._audio_callback_data.bytes_per_sample
 
                 request_message.data.play.start_at_position = <Uint32>(sound_instance.start_at * seconds_to_bytes_factor)
                 request_message.data.play.fade_in_duration = <Uint32>(sound_instance.fade_in * seconds_to_bytes_factor)
@@ -2650,7 +2545,7 @@ cdef class TrackStandard(Track):
                     # To convert between the number of seconds and a buffer position (bytes), we need to
                     # account for the sample rate (sampes per second), the number of audio channels, and the
                     # number of bytes per sample (all samples are 16 bits)
-                    seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * BYTES_PER_SAMPLE
+                    seconds_to_bytes_factor = self._audio_callback_data.sample_rate * self._audio_callback_data.channels * self._audio_callback_data.bytes_per_sample
     
                     request_message.data.play.sound_has_ducking = True
                     request_message.data.play.ducking_settings.track_bit_mask = sound_instance.ducking.track_bit_mask
