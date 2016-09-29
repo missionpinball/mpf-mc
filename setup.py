@@ -86,10 +86,11 @@ if exists('/usr/lib/arm-linux-gnueabihf/libMali.so'):
 c_options = OrderedDict()
 c_options['use_rpi'] = platform == 'rpi'
 c_options['use_mali'] = platform == 'mali'
+c_options['use_osx_frameworks'] = platform == 'darwin'
+
+# SDL2 and GStreamer are required for mpfmc
 c_options['use_sdl2'] = True
 c_options['use_gstreamer'] = True
-c_options['use_avfoundation'] = platform == 'darwin'
-c_options['use_osx_frameworks'] = platform == 'darwin'
 
 # now check if environ is changing the default values
 for key in list(c_options.keys()):
@@ -98,6 +99,15 @@ for key in list(c_options.keys()):
         value = bool(int(environ[ukey]))
         print('Environ change {0} -> {1}'.format(key, value))
         c_options[key] = value
+
+if not c_options['use_sdl2']:
+    print('SDL2 framework is required for mpfmc compilation')
+    raise EnvironmentError('SDL2 framework is required for mpfmc compilation')
+
+if not c_options['use_gstreamer']:
+    print('GStreamer framework is required for mpfmc compilation')
+    raise EnvironmentError('GStreamer framework is required for mpfmc compilation')
+
 
 # -----------------------------------------------------------------------------
 # Cython check
@@ -177,7 +187,7 @@ if not have_cython:
 # -----------------------------------------------------------------------------
 # Setup classes
 
-# the build path where MPFMC is being compiled
+# the build path where mpfmc is being compiled
 src_path = build_path = dirname(__file__)
 
 if platform == 'darwin':
@@ -201,6 +211,8 @@ if platform not in ('ios', 'android') and (c_options['use_gstreamer']
         if not exists(f_path):
             c_options['use_gstreamer'] = False
             print('Missing GStreamer framework {}'.format(f_path))
+            raise EnvironmentError('Missing GStreamer framework {}'.format(f_path))
+
         else:
             c_options['use_gstreamer'] = True
             gst_flags = {
@@ -250,8 +262,8 @@ if c_options['use_sdl2'] or (
 
         if not sdl2_valid:
             c_options['use_sdl2'] = False
-            print('Cannot perform MPFMC compilation due to missing SDL2 framework')
-            raise EnvironmentError('Cannot perform MPFMC compilation due to missing SDL2 framework')
+            print('Cannot perform mpfmc compilation due to missing SDL2 framework')
+            raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
         else:
             c_options['use_sdl2'] = True
             print('Activate SDL2 compilation')
@@ -262,8 +274,8 @@ if c_options['use_sdl2'] or (
         if 'libraries' in sdl2_flags:
             c_options['use_sdl2'] = True
         else:
-            print('Cannot perform MPFMC compilation due to missing SDL2 framework')
-            raise EnvironmentError('Cannot perform MPFMC compilation due to missing SDL2 framework')
+            print('Cannot perform mpfmc compilation due to missing SDL2 framework')
+            raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
 
 
 # -----------------------------------------------------------------------------
@@ -358,7 +370,7 @@ def determine_sdl2():
 
     # no pkgconfig info, or we want to use a specific sdl2 path, so perform
     # manual configuration
-    flags['libraries'] = ['SDL2']
+    flags['libraries'] = ['SDL2',]
     split_chr = ';' if platform == 'win32' else ':'
     sdl2_paths = sdl2_path.split(split_chr) if sdl2_path else []
 
@@ -377,7 +389,7 @@ def determine_sdl2():
         ['-L/usr/local/lib/'])
 
     # ensure headers for all the SDL2 library is available
-    libs_to_check = ['SDL']
+    libs_to_check = ['SDL',]
     can_compile = True
     for lib in libs_to_check:
         found = False
@@ -394,9 +406,8 @@ def determine_sdl2():
 
     if not can_compile:
         c_options['use_sdl2'] = False
-        print('Cannot perform MPFMC compilation due to missing SDL2 framework')
-        raise EnvironmentError('Cannot perform MPFMC compilation due to missing SDL2 framework')
-        return {}
+        print('Cannot perform mpfmc compilation due to missing SDL2 framework')
+        raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
 
     return flags
 
@@ -411,41 +422,11 @@ sources = {}
 if c_options['use_sdl2'] and c_options['use_gstreamer']:
     sdl2_flags = determine_sdl2()
     if sdl2_flags:
-        sdl2_depends = {'depends': ['core/audio/sdl2.pxi']}
+        sdl2_depends = {'depends': ['core/audio/sdl2.pxi',]}
         gst_depends = {'depends': ['core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi']}
         for source_file in ('core/audio/audio_interface.pyx',):
             sources[source_file] = merge(
                 base_flags, gst_flags, gst_depends, sdl2_flags, sdl2_depends)
-
-if platform in ('darwin', 'ios'):
-    # activate ImageIO provider for our core image
-    if platform == 'ios':
-        osx_flags = {'extra_link_args': [
-            '-framework', 'Foundation',
-            '-framework', 'UIKit',
-            '-framework', 'AudioToolbox',
-            '-framework', 'CoreGraphics',
-            '-framework', 'QuartzCore',
-            '-framework', 'ImageIO',
-            '-framework', 'Accelerate']}
-    else:
-        osx_flags = {'extra_link_args': [
-            '-framework', 'ApplicationServices']}
-    sources['core/image/img_imageio.pyx'] = merge(
-        base_flags, osx_flags)
-
-if c_options['use_avfoundation']:
-    import platform as _platform
-    mac_ver = [int(x) for x in _platform.mac_ver()[0].split('.')[:2]]
-    if mac_ver >= [10, 7]:
-        osx_flags = {
-            'extra_link_args': ['-framework', 'AVFoundation'],
-            'extra_compile_args': ['-ObjC++'],
-            'depends': ['core/camera/camera_avfoundation_implem.m']}
-        sources['core/camera/camera_avfoundation.pyx'] = merge(
-            base_flags, osx_flags)
-    else:
-        print('AVFoundation cannot be used, OSX >= 10.7 is required')
 
 if c_options['use_rpi']:
     sources['lib/vidcore_lite/egl.pyx'] = merge(
@@ -453,8 +434,6 @@ if c_options['use_rpi']:
     sources['lib/vidcore_lite/bcm.pyx'] = merge(
             base_flags, gl_flags)
 
-if c_options['use_gstreamer']:
-    pass
 
 # -----------------------------------------------------------------------------
 # extension modules
