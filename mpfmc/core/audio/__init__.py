@@ -4,7 +4,7 @@ import logging
 from kivy.clock import Clock
 from mpfmc.core.audio.audio_interface import AudioInterface, AudioException, Track
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
-
+from mpf.core.utility_functions import Util
 
 __all__ = ('SoundSystem',
            'AudioInterface',
@@ -203,7 +203,8 @@ class SoundSystem(object):
             if 'simultaneous_sounds' not in config:
                 config['simultaneous_sounds'] = DEFAULT_TRACK_MAX_SIMULTANEOUS_SOUNDS
 
-            track = self.audio_interface.create_standard_track(name,
+            track = self.audio_interface.create_standard_track(self.mc,
+                                                               name,
                                                                config['simultaneous_sounds'],
                                                                config['volume'])
         elif config['type'] == 'playlist':
@@ -211,13 +212,25 @@ class SoundSystem(object):
             raise NotImplementedError('Playlist track not yet implemented')
 
         elif config['type'] == 'live_loop':
-            track = self.audio_interface.create_live_loop_track(name, config['volume'])
+            track = self.audio_interface.create_live_loop_track(self.mc, name, config['volume'])
 
         if track is None:
             raise AudioException("Could not create '{}' track due to an error".format(name))
 
         self.tracks[name] = track
+        
+        if 'events_when_stopped' in config and config['events_when_stopped'] is not None:
+            track.events_when_stopped = Util.string_to_list(config['events_when_stopped'])
 
+        if 'events_when_played' in config and config['events_when_played'] is not None:
+            track.events_when_played = Util.string_to_list(config['events_when_played'])
+
+        if 'events_when_paused' in config and config['events_when_paused'] is not None:
+            track.events_when_paused = Util.string_to_list(config['events_when_paused'])
+
+        if 'events_when_resumed' in config and config['events_when_resumed'] is not None:
+            track.events_when_resumed = Util.string_to_list(config['events_when_resumed'])
+    
     def tick(self, dt):
         """Clock callback function"""
         del dt

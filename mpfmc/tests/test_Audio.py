@@ -652,6 +652,10 @@ class TestAudio(MpfMcTestCase):
             log.warning("Sound system is not enabled - skipping audio tests")
             self.skipTest("Sound system is not enabled")
 
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
+
         self.assertIsNotNone(self.mc.sound_system)
         interface = self.mc.sound_system.audio_interface
         self.assertIsNotNone(interface)
@@ -670,13 +674,21 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(2)
         self.mc.events.post('pause_music_track')
         self.advance_time(2)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_paused')
+
         self.mc.events.post('resume_music_track')
         self.advance_time(2)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_resumed')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='keep_going')
 
         self.mc.events.post('stop_music_track')
         self.advance_time(2)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_stopped')
+
         self.mc.events.post('play_music_track')
         self.advance_time(1)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_played')
+
         instance = self.mc.sounds['263774_music'].play()
         self.advance_time(2)
         self.mc.events.post('set_music_track_volume_quiet')

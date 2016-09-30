@@ -110,7 +110,6 @@ cdef class AudioInterface:
     cdef list tracks
     cdef object mc
     cdef object log
-    cdef dict sound_instances_by_id
 
     cdef AudioCallbackData audio_callback_data
 
@@ -205,7 +204,6 @@ cdef class AudioInterface:
                        self.audio_callback_data.bytes_per_sample)
 
         self.tracks = list()
-        self.sound_instances_by_id = dict()
 
     def __del__(self):
         """Shut down the audio interface and clean up allocated memory"""
@@ -496,12 +494,13 @@ cdef class AudioInterface:
 
         return None
 
-    def create_standard_track(self, str name not None,
+    def create_standard_track(self, object mc, str name not None,
                               int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
                               float volume=1.0):
         """
         Creates a new standard track in the audio interface
         Args:
+            mc: The media controller app
             name: The name of the new track
             max_simultaneous_sounds: The maximum number of sounds that may be played at one time on the track
             volume: The track volume (0.0 to 1.0)
@@ -526,7 +525,7 @@ cdef class AudioInterface:
         SDL_LockAudioDevice(self.audio_callback_data.device_id)
 
         # Create the new standard track
-        new_track = TrackStandard(self.sound_instances_by_id,
+        new_track = TrackStandard(mc,
                                   pycapsule.PyCapsule_New(&self.audio_callback_data, NULL, NULL),
                                   name,
                                   track_num,
@@ -546,10 +545,11 @@ cdef class AudioInterface:
 
         return new_track
 
-    def create_live_loop_track(self, str name not None, float volume=1.0):
+    def create_live_loop_track(self, object mc, str name not None, float volume=1.0):
         """
         Creates a new live loop track in the audio interface
         Args:
+            mc: The media controller app
             name: The name of the new track
             volume: The track volume (0.0 to 1.0)
 
@@ -573,7 +573,7 @@ cdef class AudioInterface:
         SDL_LockAudioDevice(self.audio_callback_data.device_id)
 
         # Create the new live loop track
-        new_track = TrackLiveLoop(self.mc,
+        new_track = TrackLiveLoop(mc,
                                   pycapsule.PyCapsule_New(&self.audio_callback_data, NULL, NULL),
                                   name,
                                   track_num,
@@ -1452,6 +1452,11 @@ cdef class Track:
     cdef dict _sound_instances_by_id
     cdef str _name
     cdef int _number
+    cdef list _events_when_stopped
+    cdef list _events_when_played
+    cdef list _events_when_paused
+    cdef list _events_when_resumed
+    cdef object mc
     cdef SDL_AudioDeviceID device_id
     cdef object log
 
@@ -1465,11 +1470,11 @@ cdef class Track:
         self.state = NULL
         self.device_id = 0
 
-    def __init__(self, dict sound_instances_by_id, object audio_callback_data, str name, int track_num, int buffer_size, float volume=1.0):
+    def __init__(self, object mc, object audio_callback_data, str name, int track_num, int buffer_size, float volume=1.0):
         """
         Constructor
         Args:
-            sound_instances_by_id: A dictionary of all active sound instance objects keyed by id
+            mc: The media controller app
             audio_callback_data: The AudioCallbackData pointer wrapped in a PyCapsule object
             name: The track name
             track_num: The track number (corresponds to the SDL_Mixer channel number)
@@ -1477,9 +1482,14 @@ cdef class Track:
             volume: The track volume (0.0 to 1.0)
         """
         self.log = logging.getLogger("Track")
-        self._sound_instances_by_id = sound_instances_by_id
+        self.mc = mc
+        self._sound_instances_by_id = dict()
         self._name = name
         self._number = track_num
+        self._events_when_stopped = None
+        self._events_when_played = None
+        self._events_when_paused = None
+        self._events_when_resumed = None
 
         # Allocate memory for the track state (common among all track types)
         self.state = <TrackState*> PyMem_Malloc(sizeof(TrackState))
@@ -1531,6 +1541,46 @@ cdef class Track:
             number = self.state.number
             SDL_UnlockAudioDevice(self.device_id)
         return number
+    
+    @property
+    def events_when_stopped(self):
+        """Return the list of events that are posted when the track is stopped"""
+        return self._events_when_stopped
+    
+    @events_when_stopped.setter
+    def events_when_stopped(self, events):
+        """Sets the list of events that are posted when the track is stopped"""
+        self._events_when_stopped = events
+
+    @property
+    def events_when_played(self):
+        """Return the list of events that are posted when the track is played"""
+        return self._events_when_played
+
+    @events_when_played.setter
+    def events_when_played(self, events):
+        """Sets the list of events that are posted when the track is played"""
+        self._events_when_played = events
+
+    @property
+    def events_when_paused(self):
+        """Return the list of events that are posted when the track is paused"""
+        return self._events_when_paused
+
+    @events_when_paused.setter
+    def events_when_paused(self, events):
+        """Sets the list of events that are posted when the track is paused"""
+        self._events_when_paused = events
+
+    @property
+    def events_when_resumed(self):
+        """Return the list of events that are posted when the track is resumed"""
+        return self._events_when_resumed
+
+    @events_when_resumed.setter
+    def events_when_resumed(self, events):
+        """Sets the list of events that are posted when the track is resumed"""
+        self._events_when_resumed = events
 
     @property
     def supports_in_memory_sounds(self):
@@ -1615,6 +1665,11 @@ cdef class Track:
                 self.state.fade_volume_target = self.state.volume
 
             self.state.status = track_status_playing
+
+            # Trigger any events
+            if self.events_when_played is not None:
+                for event in self.events_when_played:
+                    self.mc.post_mc_native_event(event)
         else:
             self.log.warning("play - Action may only be used when a track is stopped or is in the process "
                              "of stopping; action will be ignored.")
@@ -1689,6 +1744,11 @@ cdef class Track:
                 self.state.fade_volume_target = self.state.volume
 
             self.state.status = track_status_playing
+
+            # Trigger any events
+            if self.events_when_resumed is not None:
+                for event in self.events_when_resumed:
+                    self.mc.post_mc_native_event(event)
         else:
             self.log.warning("resume - Action may only be used when a track is paused or is in the process "
                              "of pausing; action will be ignored.")
@@ -1787,13 +1847,13 @@ cdef class TrackStandard(Track):
     # destruction.
     cdef TrackStandardState *type_state
 
-    def __init__(self, dict sound_instances_by_id, object audio_callback_data, str name, int track_num, int buffer_size,
+    def __init__(self, object mc, object audio_callback_data, str name, int track_num, int buffer_size,
                  int max_simultaneous_sounds=MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
                  float volume=1.0):
         """
         Constructor
         Args:
-            sound_instances_by_id: A dictionary of all active sound instance objects keyed by id
+            mc: The media controller app
             audio_callback_data: The AudioCallbackData struct wrapped in a PyCapsule
             name: The track name
             track_num: The track number
@@ -1803,7 +1863,7 @@ cdef class TrackStandard(Track):
             volume: The track volume (0.0 to 1.0)
         """
         # IMPORTANT: Call super class init function to allocate track state memory!
-        super().__init__(sound_instances_by_id, audio_callback_data, name, track_num, buffer_size, volume)
+        super().__init__(mc, audio_callback_data, name, track_num, buffer_size, volume)
 
         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard." + name)
 
@@ -1976,9 +2036,16 @@ cdef class TrackStandard(Track):
         if notification_message.message in (notification_track_stopped, notification_track_paused):
             if notification_message.message == notification_track_stopped:
                 self._reset_state()
-                # TODO: Send notification events for track stopped
+                # Trigger any events
+                if self.events_when_stopped is not None:
+                    for event in self.events_when_stopped:
+                        self.mc.post_mc_native_event(event)
+
             elif notification_message.message == notification_track_paused:
-                # TODO: send notification events for track paused
+                # Trigger any events
+                if self.events_when_paused is not None:
+                    for event in self.events_when_paused:
+                        self.mc.post_mc_native_event(event)
                 pass
 
             SDL_UnlockAudioDevice(self.device_id)
