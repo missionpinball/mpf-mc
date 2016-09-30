@@ -184,6 +184,7 @@ ctypedef struct AudioCallbackData:
     Uint32 buffer_size
     Uint16 bytes_per_control_point
     Uint8 bytes_per_sample
+    double seconds_to_bytes_factor
     Uint8 quick_fade_steps
     Uint8 master_volume
     Uint8 silence

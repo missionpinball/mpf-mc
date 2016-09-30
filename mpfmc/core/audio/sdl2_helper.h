@@ -26,6 +26,7 @@ static int convert_audio_to_desired_format(SDL_AudioSpec input_spec, SDL_AudioSp
         return (-1);
     }
 
+    /* Copy the input sample data to the conversion buffer */
     SDL_memcpy(cvt.buf, input_buffer, input_size);
 
     /* Run the audio converter */
@@ -35,8 +36,9 @@ static int convert_audio_to_desired_format(SDL_AudioSpec input_spec, SDL_AudioSp
         return (return_value);
     }
 
-    /* Return the converted audio data */
-    *output_buffer = cvt.buf;
+    /* Return the converted audio data (reallocate output buffer in case it got smaller as
+       a result of conversion). */
+    *output_buffer = SDL_realloc(cvt.buf, cvt.len_cvt);
     *output_size = cvt.len_cvt;
 
     return 1;

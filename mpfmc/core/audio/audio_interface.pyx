@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev09')
+__version_info__ = ('0', '32', '0-dev10')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -182,18 +182,18 @@ cdef class AudioInterface:
         self.audio_callback_data.buffer_size = obtained.size
         self.audio_callback_data.bytes_per_control_point = obtained.size // CONTROL_POINTS_PER_BUFFER
         self.audio_callback_data.bytes_per_sample = SDL_AUDIO_BITSIZE(obtained.format) // 8
+        self.audio_callback_data.seconds_to_bytes_factor = self.audio_callback_data.sample_rate * self.audio_callback_data.channels * self.audio_callback_data.bytes_per_sample
         self.audio_callback_data.master_volume = SDL_MIX_MAXVOLUME // 2
-        #self.audio_callback_data.quick_fade_steps = (<int>(QUICK_FADE_DURATION_SECS *
-        #                                             self.audio_callback_data.sample_rate *
-        #                                             self.audio_callback_data.channels *
-        #                                             self.audio_callback_data.bytes_per_sample
-        #                                                   )) // self.audio_callback_data.bytes_per_control_point
-        self.audio_callback_data.quick_fade_steps = 2
+        self.audio_callback_data.quick_fade_steps = (<int>(QUICK_FADE_DURATION_SECS *
+                                                     self.audio_callback_data.sample_rate *
+                                                     self.audio_callback_data.channels *
+                                                     self.audio_callback_data.bytes_per_sample
+                                                           )) // self.audio_callback_data.bytes_per_control_point
         self.audio_callback_data.silence = obtained.silence
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackState**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
         self.audio_callback_data.c_log_file = NULL
-        #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+        # self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
 
         print("quick_fade_steps", self.audio_callback_data.quick_fade_steps)
 
@@ -630,10 +630,10 @@ cdef class AudioInterface:
         for track in self.tracks:
             track.stop_sound(sound_instance)
 
-    def stop_all_sounds(self):
+    def stop_all_sounds(self, float fade_out_seconds = 0.0):
         """Stops all playing and pending sounds in all tracks"""
         for track in self.tracks:
-            track.stop_all_sounds()
+            track.stop_all_sounds(fade_out_seconds)
 
     def process(self):
         """Process tick function for the audio interface."""
@@ -769,7 +769,8 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
                                                  TrackState *track) nogil:
     """
     Processes any new standard track request messages that should be processed prior to the
-    main audio callback processing (such as sound play and sound stop messages).
+    main audio callback processing (such as sound play and sound stop messages).  This function
+    is called in the SDL callback thread.
     Args:
         request_message: The request message to process
         track: The TrackState struct for this track
@@ -927,7 +928,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
     standard_track = <TrackStandardState*>track.type_state
 
     # Setup local variables
-    cdef Uint32 buffer_bytes_remaining = buffer_length
+    cdef Uint32 buffer_bytes_remaining
     cdef Uint32 current_chunk_bytes
     cdef Uint32 buffer_pos
     cdef Uint8 control_point
@@ -939,7 +940,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
         player = cython.address(standard_track.sound_players[player_num])
 
         # If the player is idle, there is nothing to do so move on to the next player
-        if player == NULL or player.status == player_idle or player.current.sample == NULL:
+        if player == NULL or player.status == player_idle or player.current.sample.data == NULL:
             continue
 
         # Set flag indicating there is at least some activity on the track (it is active)
@@ -948,6 +949,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
         end_of_sound = False
         buffer_pos = 0
         control_point = 0
+        buffer_bytes_remaining = buffer_length
 
         # Loop over output buffer at control rate
         while buffer_bytes_remaining > 0:
@@ -1283,9 +1285,8 @@ cdef void apply_track_ducking(TrackState* track, Uint32 buffer_size, AudioCallba
         callback_data: The AudioCallbackData struct
     """
     cdef Uint32 buffer_pos = 0
-    cdef Uint32 samples_per_control_point = buffer_size // CONTROL_POINTS_PER_BUFFER
     cdef Uint8 ducking_volume
-    cdef int control_point
+    cdef int control_point = 0
 
     if track == NULL:
         return
@@ -1293,12 +1294,13 @@ cdef void apply_track_ducking(TrackState* track, Uint32 buffer_size, AudioCallba
     # Only need to process when ducking is active
     if track.ducking_is_active:
         # Loop over track buffer
-        for control_point in range(CONTROL_POINTS_PER_BUFFER):
+        while buffer_pos < buffer_size and control_point < CONTROL_POINTS_PER_BUFFER:
             ducking_volume = track.ducking_control_points[control_point]
             if ducking_volume < SDL_MIX_MAXVOLUME:
-                apply_volume_to_buffer_range(<Uint8*> track.buffer, buffer_pos, ducking_volume, samples_per_control_point)
+                apply_volume_to_buffer_range(<Uint8*> track.buffer, buffer_pos, ducking_volume, callback_data.bytes_per_control_point)
 
-            buffer_pos += samples_per_control_point
+            buffer_pos += callback_data.bytes_per_control_point
+            control_point += 1
 
 cdef inline void apply_volume_to_buffer_range(Uint8 *buffer, Uint32 start_pos, Uint8 volume, Uint32 length=2) nogil:
     """
@@ -1571,8 +1573,7 @@ cdef class Track:
                 self.log.debug("set_volume - Applying %s second fade to new volume level", str(fade_seconds))
 
                 # Calculate fade
-                seconds_to_bytes_factor = self.state.callback_data.sample_rate * self.state.callback_data.channels * self.state.callback_data.bytes_per_sample
-                self.state.fade_steps = <Uint32>(fade_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps = <Uint32>(fade_seconds * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
                 self.state.fade_volume_target = new_volume
@@ -1601,8 +1602,7 @@ cdef class Track:
             if fade_in_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("play - Applying %s second fade in", str(fade_in_seconds))
-                seconds_to_bytes_factor = self.state.callback_data.sample_rate * self.state.callback_data.channels * self.state.callback_data.bytes_per_sample
-                self.state.fade_steps = <Uint32>(fade_in_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps = <Uint32>(fade_in_seconds * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
                 self.state.fade_volume_target = self.state.volume
@@ -1638,8 +1638,7 @@ cdef class Track:
             if fade_out_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("stop - Applying %s second fade out", str(fade_out_seconds))
-                seconds_to_bytes_factor = self.state.callback_data.sample_rate * self.state.callback_data.channels * self.state.callback_data.bytes_per_sample
-                self.state.fade_steps = <Uint32>(fade_out_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps = <Uint32>(fade_out_seconds * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
                 self.state.fade_volume_target = 0
@@ -1677,8 +1676,7 @@ cdef class Track:
             if fade_in_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("resume - Applying %s second fade in", str(fade_in_seconds))
-                seconds_to_bytes_factor = self.state.callback_data.sample_rate * self.state.callback_data.channels * self.state.callback_data.bytes_per_sample
-                self.state.fade_steps = <Uint32>(fade_in_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps = <Uint32>(fade_in_seconds * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
                 self.state.fade_volume_target = self.state.volume
@@ -1713,8 +1711,7 @@ cdef class Track:
             if fade_out_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("pause - Applying %s second fade out", str(fade_out_seconds))
-                seconds_to_bytes_factor = self.state.callback_data.sample_rate * self.state.callback_data.channels * self.state.callback_data.bytes_per_sample
-                self.state.fade_steps = <Uint32>(fade_out_seconds * seconds_to_bytes_factor) // (self.state.buffer_size // CONTROL_POINTS_PER_BUFFER)
+                self.state.fade_steps = <Uint32>(fade_out_seconds * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
                 self.state.fade_steps_remaining = self.state.fade_steps
                 self.state.fade_volume_start = self.state.fade_volume_current
                 self.state.fade_volume_target = 0
@@ -2241,13 +2238,12 @@ cdef class TrackStandard(Track):
                     request_message.player = i
 
                     # Fade out
-                    seconds_to_bytes_factor = self.state.callback_data.sample_rate * self.state.callback_data.channels * self.state.callback_data.bytes_per_sample
-                    request_message.data.stop.fade_out_duration = sound_instance.fade_out * seconds_to_bytes_factor
+                    request_message.data.stop.fade_out_duration = sound_instance.fade_out * self.state.callback_data.seconds_to_bytes_factor
 
                     # Adjust ducking (if necessary)
                     if sound_instance.ducking is not None:
                         request_message.data.stop.ducking_release_duration = min(
-                            sound_instance.ducking.release * seconds_to_bytes_factor,
+                            sound_instance.ducking.release * self.state.callback_data.seconds_to_bytes_factor,
                             request_message.data.stop.fade_out_duration)
 
                     self._add_request_message(request_message)
@@ -2325,8 +2321,7 @@ cdef class TrackStandard(Track):
                     request_message.player = i
 
                     # Fade out
-                    seconds_to_bytes_factor = self.state.callback_data.sample_rate * self.state.callback_data.channels * self.state.callback_data.bytes_per_sample
-                    request_message.data.stop.fade_out_duration = fade_out_seconds * seconds_to_bytes_factor
+                    request_message.data.stop.fade_out_duration = <Uint32>(fade_out_seconds * self.state.callback_data.seconds_to_bytes_factor)
 
                     # Adjust ducking (if necessary)
                     # TODO: trigger ducking here
@@ -2436,11 +2431,9 @@ cdef class TrackStandard(Track):
                 request_message.data.play.sample = cython.address(sound_container.sample)
 
                 # Conversion factor (seconds to bytes/buffer position)
-                seconds_to_bytes_factor = self.state.callback_data.sample_rate * self.state.callback_data.channels * self.state.callback_data.bytes_per_sample
-
-                request_message.data.play.start_at_position = <Uint32>(sound_instance.start_at * seconds_to_bytes_factor)
-                request_message.data.play.fade_in_duration = <Uint32>(sound_instance.fade_in * seconds_to_bytes_factor)
-                request_message.data.play.fade_out_duration = <Uint32>(sound_instance.fade_out * seconds_to_bytes_factor)
+                request_message.data.play.start_at_position = <Uint32>(sound_instance.start_at * self.state.callback_data.seconds_to_bytes_factor)
+                request_message.data.play.fade_in_duration = <Uint32>(sound_instance.fade_in * self.state.callback_data.seconds_to_bytes_factor)
+                request_message.data.play.fade_out_duration = <Uint32>(sound_instance.fade_out * self.state.callback_data.seconds_to_bytes_factor)
 
                 # Volume must be converted from a float (0.0 to 1.0) to an 8-bit integer (0..SDL_MIX_MAXVOLUME)
                 request_message.data.play.volume = <Uint8>(sound_instance.volume * SDL_MIX_MAXVOLUME)
@@ -2449,22 +2442,20 @@ cdef class TrackStandard(Track):
                 request_message.data.play.marker_count = sound_instance.marker_count
                 if sound_instance.marker_count > 0:
                     for index in range(sound_instance.marker_count):
-                        request_message.data.play.markers[index] = <long>(sound_instance.markers[index]['time'] * seconds_to_bytes_factor)
+                        request_message.data.play.markers[index] = <long>(sound_instance.markers[index]['time'] * self.state.callback_data.seconds_to_bytes_factor)
 
                 # If the sound has ducking settings, apply them
                 if sound_instance.ducking is not None and sound_instance.ducking.track_bit_mask != 0:
                     # To convert between the number of seconds and a buffer position (bytes), we need to
                     # account for the sample rate (sampes per second), the number of audio channels, and the
                     # number of bytes per sample (all samples are 16 bits)
-                    seconds_to_bytes_factor = self.state.callback_data.sample_rate * self.state.callback_data.channels * self.state.callback_data.bytes_per_sample
-    
                     request_message.data.play.sound_has_ducking = True
                     request_message.data.play.ducking_settings.track_bit_mask = sound_instance.ducking.track_bit_mask
-                    request_message.data.play.ducking_settings.attack_start_pos = sound_instance.ducking.delay * seconds_to_bytes_factor
-                    request_message.data.play.ducking_settings.attack_duration = sound_instance.ducking.attack * seconds_to_bytes_factor
+                    request_message.data.play.ducking_settings.attack_start_pos = sound_instance.ducking.delay * self.state.callback_data.seconds_to_bytes_factor
+                    request_message.data.play.ducking_settings.attack_duration = sound_instance.ducking.attack * self.state.callback_data.seconds_to_bytes_factor
                     request_message.data.play.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * SDL_MIX_MAXVOLUME)
-                    request_message.data.play.ducking_settings.release_start_pos = sound_instance.ducking.release_point * seconds_to_bytes_factor
-                    request_message.data.play.ducking_settings.release_duration = sound_instance.ducking.release * seconds_to_bytes_factor
+                    request_message.data.play.ducking_settings.release_start_pos = sound_instance.ducking.release_point * self.state.callback_data.seconds_to_bytes_factor
+                    request_message.data.play.ducking_settings.release_duration = sound_instance.ducking.release * self.state.callback_data.seconds_to_bytes_factor
                 else:
                     request_message.data.play.sound_has_ducking = False
     
@@ -2894,6 +2885,7 @@ cdef class SoundMemoryFile:
                 raise AudioException(msg)
 
             else:
+                # Reallocate sample buffer as it is very possible it shrank during the conversion process
                 self.sample.size = <gsize>converted_sample_size
                 self.sample.data = <gpointer>converted_sample_data
                 SDL_FreeWAV(temp_sample_data)
