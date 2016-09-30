@@ -422,8 +422,8 @@ sources = {}
 if c_options['use_sdl2'] and c_options['use_gstreamer']:
     sdl2_flags = determine_sdl2()
     if sdl2_flags:
-        sdl2_depends = {'depends': ['core/audio/sdl2.pxi',]}
-        gst_depends = {'depends': ['core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi']}
+        sdl2_depends = {'depends': ['core/audio/sdl2_helper.h', 'core/audio/sdl2.pxi',]}
+        gst_depends = {'depends': ['core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi',]}
         for source_file in ('core/audio/audio_interface.pyx',):
             sources[source_file] = merge(
                 base_flags, gst_flags, gst_depends, sdl2_flags, sdl2_depends)

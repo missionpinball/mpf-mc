@@ -169,6 +169,8 @@ cdef class AudioInterface:
         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
         self.log.debug("Loaded %s", AudioInterface.get_glib_version())
 
+        print(AudioInterface.get_version(), AudioInterface.get_sdl_version(), AudioInterface.get_gstreamer_version(), AudioInterface.get_glib_version())
+
         # Store the actual audio format in use by the opened audio device.  This may or may not match
         # the requested values used to initialize the audio interface.  A pointer to the audio_callback_data
         # structure is passed to the SDL audio callback function and is the source of all audio state
@@ -603,9 +605,9 @@ cdef class AudioInterface:
         """
         return SoundMemoryFile(file_name,
                                self.audio_callback_data.sample_rate,
+                               self.audio_callback_data.format,
                                self.audio_callback_data.channels,
-                               self.audio_callback_data.buffer_size,
-                               SDL_AUDIO_ISLITTLEENDIAN(self.audio_callback_data.format))
+                               self.audio_callback_data.buffer_size)
 
     def unload_sound_file_from_memory(self, container not None):
         """
@@ -795,8 +797,8 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         player.current.sound_priority = request_message.data.play.priority
 
         # Fading (done at control rate; need to calculate the number of steps over which to fade in/out)
-        player.current.fade_in_steps = request_message.data.play.fade_in_duration // (track.buffer_size // CONTROL_POINTS_PER_BUFFER)
-        player.current.fade_out_steps = request_message.data.play.fade_out_duration // (track.buffer_size // CONTROL_POINTS_PER_BUFFER)
+        player.current.fade_in_steps = request_message.data.play.fade_in_duration // track.callback_data.bytes_per_control_point
+        player.current.fade_out_steps = request_message.data.play.fade_out_duration // track.callback_data.bytes_per_control_point
         player.current.fade_steps_remaining = player.current.fade_in_steps
         if player.current.fade_steps_remaining > 0:
             player.current.fading_status = fading_status_fading_in
@@ -827,13 +829,13 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
 
     elif request_message.message == request_sound_stop:
         # Update player to stop playing sound
-        player.status = player_stopping
 
         # Calculate fade out (if necessary)
         player.current.fade_steps_remaining = request_message.data.stop.fade_out_duration // track.callback_data.bytes_per_control_point
         if player.current.fade_steps_remaining > 0:
             player.current.fade_out_steps = player.current.fade_steps_remaining
             player.current.fading_status = fading_status_fading_out
+            player.status = player_stopping
         else:
             # Sound will stop immediately - send sound stopped notification
             send_sound_stopped_notification(request_message.player, player.current.sound_id, player.current.sound_instance_id, track)
@@ -928,7 +930,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
     cdef Uint32 buffer_bytes_remaining = buffer_length
     cdef Uint32 current_chunk_bytes
     cdef Uint32 buffer_pos
-    cdef Uint8 control_point = 0
+    cdef Uint8 control_point
     cdef float progress
 
     # Loop over track sound players
@@ -945,6 +947,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
 
         end_of_sound = False
         buffer_pos = 0
+        control_point = 0
 
         # Loop over output buffer at control rate
         while buffer_bytes_remaining > 0:
@@ -954,15 +957,12 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
 
             # Calculate volume of chunk (handle fading)
             if player.current.fading_status == fading_status_fading_in:
-                volume = <Uint8> (in_out_quad(
-                    (player.current.fade_in_steps - player.current.fade_steps_remaining) /
-                    player.current.fade_in_steps) * player.current.volume)
+                volume = <Uint8> (in_out_quad((player.current.fade_in_steps - player.current.fade_steps_remaining) / player.current.fade_in_steps) * player.current.volume)
                 player.current.fade_steps_remaining -= 1
                 if player.current.fade_steps_remaining == 0:
                     player.current.fading_status = fading_status_not_fading
             elif player.current.fading_status == fading_status_fading_out:
-                volume = <Uint8> (in_out_quad(player.current.fade_steps_remaining /
-                    player.current.fade_out_steps) * player.current.volume)
+                volume = <Uint8> (in_out_quad(player.current.fade_steps_remaining / player.current.fade_out_steps) * player.current.volume)
                 player.current.fade_steps_remaining -= 1
             else:
                 volume = player.current.volume
@@ -2804,27 +2804,26 @@ cdef class SoundMemoryFile:
     in memory."""
     cdef str file_name
     cdef int sample_rate
-    cdef int channels
+    cdef SDL_AudioFormat format
+    cdef Uint8 channels
     cdef buffer_size
-    cdef bint little_endian
     cdef SampleMemory sample
+    cdef bint _loaded_using_sdl
 
-    def __init__(self, str file_name, int sample_rate, int channels, int buffer_size, bint little_endian = True):
+    def __init__(self, str file_name, int sample_rate, SDL_AudioFormat format, int channels, int buffer_size):
         self.file_name = file_name
         self.sample_rate = sample_rate
-        self.channels = channels
+        self.format = format
+        self.channels = <Uint8>channels
         self.buffer_size = buffer_size
-        self.little_endian = little_endian
         self.sample.data = NULL
         self.sample.size = 0
+        self._loaded_using_sdl = False
 
         self.load()
 
     def __dealloc__(self):
-        if self.sample.data != NULL:
-            PyMem_Free(self.sample.data)
-            self.sample.data = NULL
-            self.sample.size = 0
+        self.unload()
 
     def _gst_init(self):
         if gst_is_initialized():
@@ -2838,6 +2837,72 @@ cdef class SoundMemoryFile:
             raise AudioException(msg)
 
     def load(self):
+        """Loads the sound into memory using the most appropriate library for the format."""
+
+        if self.loaded:
+            return
+
+        if not os.path.isfile(self.file_name):
+            raise AudioException('Could not locate file ' + self.file_name)
+
+        #return self._load_using_gstreamer()
+
+        # Determine which loader to use based on the file extension
+        if os.path.splitext(self.file_name)[1].lower() == ".wav":
+            # Wave files are loaded using SDL2 (very fast)
+            self._load_using_sdl()
+        else:
+            # All other formats are loaded using GStreamer
+            self._load_using_gstreamer()
+
+    def _load_using_sdl(self):
+        """Loads the sound into memory using SDL2 (much faster than GStreamer, but only
+        supports WAV files."""
+        cdef SDL_AudioSpec wave_spec
+        cdef SDL_AudioSpec desired_spec
+        cdef SDL_AudioSpec *loaded
+        cdef SDL_AudioCVT wavecvt
+        cdef Uint8 *temp_sample_data = NULL
+        cdef Uint32 temp_sample_size = 0
+        cdef Uint8* converted_sample_data = NULL
+        cdef Uint32 converted_sample_size = 0
+
+        self._loaded_using_sdl = True
+        print("Loading sound asset using SDL", self.file_name)
+
+        # Load the WAV file into memory (memory is allocated during the load)
+        loaded = SDL_LoadWAV(self.file_name.encode('utf-8'), &wave_spec, &temp_sample_data, &temp_sample_size)
+        if loaded == NULL:
+            msg = "Could not load sound file {} due to an error: {}".format(self.file_name, SDL_GetError())
+            print(msg)
+            raise AudioException(msg)
+
+        desired_spec.freq = self.sample_rate
+        desired_spec.format = self.format
+        desired_spec.channels = self.channels
+
+        print("Sound file loaded spec", wave_spec.freq, wave_spec.format, wave_spec.channels, temp_sample_size)
+
+        if wave_spec.freq != self.sample_rate or wave_spec.format != self.format or wave_spec.channels != self.channels:
+            print("Conversion needed")
+
+            # Now we need to check if the audio format must be converted to match the audio interface output format
+            if convert_audio_to_desired_format(wave_spec, desired_spec, temp_sample_data, temp_sample_size, &converted_sample_data, &converted_sample_size) < 0:
+                SDL_FreeWAV(temp_sample_data)
+                msg = "Could not convert sound file {} to required format".format(self.file_name)
+                print(msg)
+                raise AudioException(msg)
+
+            else:
+                self.sample.size = <gsize>converted_sample_size
+                self.sample.data = <gpointer>converted_sample_data
+                SDL_FreeWAV(temp_sample_data)
+
+        else:
+            self.sample.size = <gsize>temp_sample_size
+            self.sample.data = <gpointer>temp_sample_data
+
+    def _load_using_gstreamer(self):
         """Loads the sound into memory using GStreamer"""
         cdef str pipeline_string
         cdef str file_path
@@ -2851,19 +2916,14 @@ cdef class SoundMemoryFile:
         cdef GstMapInfo map_info
         cdef gboolean is_eos
 
-        if self.loaded:
-            return
-
+        self._loaded_using_sdl = False
         self._gst_init()
-
-        if not os.path.isfile(self.file_name):
-            raise AudioException('Could not locate file ' + self.file_name)
 
         # Pipeline structure: uridecodebin --> audioconvert --> audioresample --> appsink
 
         # Create GStreamer pipeline with the specified caps (from a string)
         file_path = 'file:///' + self.file_name.replace('\\', '/')
-        if self.little_endian:
+        if SDL_AUDIO_ISLITTLEENDIAN(self.format):
             audio_format = "S16LE"
         else:
             audio_format = "S16BE"
@@ -2929,7 +2989,11 @@ cdef class SoundMemoryFile:
     def unload(self):
         """Unloads the sample data from memory"""
         if self.sample.data != NULL:
-            PyMem_Free(self.sample.data)
+            if self._loaded_using_sdl:
+                SDL_FreeWAV(<Uint8*>self.sample.data)
+            else:
+                PyMem_Free(self.sample.data)
+
             self.sample.data = NULL
             self.sample.size = 0
 

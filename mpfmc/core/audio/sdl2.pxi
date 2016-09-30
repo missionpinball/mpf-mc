@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-#    Definitions from SDL2 and SDL_Mixer libraries
+#    Definitions from SDL2 library
 # ---------------------------------------------------------------------------
 
 cdef extern from "Python.h":
@@ -45,7 +45,7 @@ cdef extern from "SDL.h" nogil:
 
     struct SDL_AudioSpec:
         int freq
-        Uint16 format
+        SDL_AudioFormat format
         Uint8 channels
         Uint8 silence
         Uint16 samples
@@ -119,6 +119,8 @@ cdef extern from "SDL.h" nogil:
     void SDL_MixAudio(Uint8 *dst, const Uint8 *src, Uint32 len, int volume)
     void SDL_MixAudioFormat(Uint8 *dst, const Uint8 *src, SDL_AudioFormat format,
                                                 Uint32 len, int volume)
+    SDL_AudioSpec* SDL_LoadWAV(const char* file, SDL_AudioSpec* spec, Uint8** audio_buf, Uint32* audio_len)
+    void SDL_FreeWAV(Uint8* audio_buf)
 
     Uint32 SDL_GetTicks()
 
@@ -144,6 +146,10 @@ cdef extern from "SDL.h" nogil:
         double len_ratio
         SDL_AudioFilter filters[10]
         int filter_index
+
+    int SDL_BuildAudioCVT(SDL_AudioCVT *cvt, SDL_AudioFormat src_fmt, Uint8 src_channels, int src_rate,
+                          SDL_AudioFormat dst_fmt, Uint8 dst_channels, int dst_rate)
+    int SDL_ConvertAudio(SDL_AudioCVT *cvt)
 
     int RW_SEEK_SET
     int RW_SEEK_CUR
@@ -179,39 +185,9 @@ cdef extern from "SDL.h" nogil:
     SDL_RWops *SDL_RWFromFile(const char *file, const char *mode)
 
 # ---------------------------------------------------------------------------
-#    SDL_Mixer
+#    SDL2 helper functions defined in sdl2_helper.h
 # ---------------------------------------------------------------------------
-
-cdef extern from "SDL_mixer.h" nogil:
-    struct Mix_Chunk:
-        int allocated
-        Uint8 *abuf
-        Uint32 alen
-        Uint8 volume
-
-    int MIX_MAX_VOLUME
-
-    enum MIX_InitFlags:
-        MIX_INIT_FLAC        = 0x00000001,
-        MIX_INIT_MP3         = 0x00000008,
-        MIX_INIT_OGG         = 0x00000010
-
-    enum Mix_Fading:
-        MIX_NO_FADING,
-        MIX_FADING_OUT,
-        MIX_FADING_IN
-
-    int Mix_Init(int)
-    void Mix_Quit()
-    int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
-    void Mix_CloseAudio()
-    char *Mix_GetError()
-    const SDL_version *Mix_Linked_Version()
-    Mix_Chunk *Mix_QuickLoad_RAW(Uint8 *mem, Uint32 l)
-    Mix_Chunk *Mix_LoadWAV_RW(SDL_RWops *src, int freesrc)
-    Mix_Chunk *Mix_LoadWAV(char *file)
-    void Mix_FreeChunk(Mix_Chunk *chunk)
-    int Mix_QuerySpec(int *frequency, Uint16 *format,int *channels)
-    void Mix_HookMusic(void (*mix_func)(void *, Uint8 *, int), void *arg)
-    void *Mix_GetMusicHookData()
+cdef extern from 'sdl2_helper.h':
+    int convert_audio_to_desired_format(SDL_AudioSpec input_spec, SDL_AudioSpec desired_spec,
+                                        Uint8* input_buffer, Uint32 input_size, Uint8** output_buffer, Uint32 *output_size)
 
