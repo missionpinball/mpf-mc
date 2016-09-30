@@ -543,7 +543,6 @@ class SoundAsset(Asset):
         Args:
             settings: Optional dictionary of settings to override the default values.
         """
-        print("Play sound", self.name, self.track)
         self.log.debug("Play sound %s on track %s", self.name, self.track)
 
         # Determine if the maxmimum number of instances of this sound has been reached
