@@ -24,6 +24,11 @@ ctypedef struct SampleMemory:
     gpointer data
     gsize size
 
+ctypedef struct SampleStream:
+    GstElement* pipeline
+    GstElement* sink
+
+
 # ---------------------------------------------------------------------------
 #    Settings
 # ---------------------------------------------------------------------------
@@ -55,6 +60,7 @@ cdef enum TrackStatus:
 
 ctypedef struct TrackState:
     # Common track state variables (for all track types)
+    AudioCallbackData *callback_data
     TrackType type
     void* type_state
     TrackStatus status
@@ -67,7 +73,7 @@ ctypedef struct TrackState:
     Uint32 fade_steps
     Uint32 fade_steps_remaining
     int buffer_size
-    void *buffer
+    Uint8 *buffer
     GSList *request_messages
     GSList *notification_messages
     bint ducking_is_active
@@ -115,7 +121,12 @@ cdef enum FadingStatus:
     fading_status_fading_in = 1
     fading_status_fading_out = 2
 
+cdef enum SoundType:
+    sound_type_memory = 0
+    sound_type_streaming = 1
+
 ctypedef struct SoundSettings:
+    SoundType sound_type
     SampleMemory *sample
     Uint8 volume
     int loops_remaining
@@ -128,7 +139,7 @@ ctypedef struct SoundSettings:
     Uint32 fade_in_steps
     Uint32 fade_out_steps
     Uint32 fade_steps_remaining
-    int marker_count
+    Uint8 marker_count
     Uint32 markers[MAX_MARKERS]
     bint sound_has_ducking
     DuckingSettings ducking_settings
@@ -167,15 +178,16 @@ ctypedef struct AudioCallbackData:
     # contain any Python objects.
     SDL_AudioDeviceID device_id
     SDL_AudioFormat format
-    int sample_rate
-    int channels
+    Uint16 sample_rate
+    Uint8 channels
     Uint16 buffer_samples
     Uint32 buffer_size
-    Uint16 buffer_samples_per_control_point
-    int bytes_per_sample
+    Uint16 bytes_per_control_point
+    Uint8 bytes_per_sample
+    Uint8 quick_fade_steps
     Uint8 master_volume
     Uint8 silence
-    int track_count
+    Uint8 track_count
     TrackState **tracks
     FILE *c_log_file
 
@@ -193,6 +205,7 @@ cdef enum RequestMessage:
 
 
 ctypedef struct RequestMessageDataPlaySound:
+    SoundType sound_type
     SampleMemory *sample
     Uint8 volume
     int loops
@@ -216,9 +229,7 @@ ctypedef struct RequestMessageContainer:
     RequestMessage message
     long sound_id
     long sound_instance_id
-    int track
     int player
-    Uint32 time
     RequestMessageData data
 
 
@@ -251,7 +262,5 @@ ctypedef struct NotificationMessageContainer:
     NotificationMessage message
     long sound_id
     long sound_instance_id
-    int track
     int player
-    Uint32 time
     NotificationMessageData data
