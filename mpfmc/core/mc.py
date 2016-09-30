@@ -341,7 +341,8 @@ class MpfMc(App):
 
     def add_player(self, player_num):
         if player_num > len(self.player_list):
-            player = Player(self, self.player_list)
+            player = Player(self, len(self.player_list))
+            self.player_list.append(player)
 
             self.events.post('player_add_success', player=player,
                              num=player_num)
