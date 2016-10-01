@@ -76,40 +76,52 @@ Here are several various examples:
 
         for track_name, s in settings.items():
 
-            # Retrieve track by name
-            try:
-                track = self.machine.sound_system.tracks[track_name]
-            except KeyError:
-                self.machine.log.error("TrackPlayer: The specified audio track "
-                                       "does not exist ('{}').".format(track_name))
-                return
+            selected_tracks = dict()
+
+            # Track name '__all__' indicates the action should be performed on all tracks
+            if track_name == "__all__":
+                selected_tracks = self.machine.sound_system.tracks
+            else:
+                # Single track name specified - retrieve track by name
+                try:
+                    selected_track = self.machine.sound_system.tracks[track_name]
+                    selected_tracks[selected_track.name] = selected_track
+                except KeyError:
+                    self.machine.log.error("TrackPlayer: The specified audio track "
+                                           "does not exist ('{}').".format(track_name))
+                    return
 
             s.update(kwargs)
 
             # TODO: perform validation on parameters
 
-            # Determine action to perform
-            if s['action'].lower() == 'play':
-                track.play(s['fade'])
+            print(selected_tracks)
 
-            elif s['action'].lower() == 'stop':
-                track.stop(s['fade'])
+            # Loop over selected tracks performing action with settings on each one
+            for name, track in selected_tracks.items():
 
-            elif s['action'].lower() == 'pause':
-                track.pause(s['fade'])
+                # Determine action to perform
+                if s['action'].lower() == 'play':
+                    track.play(s['fade'])
 
-            elif s['action'].lower() == 'resume':
-                track.resume(s['fade'])
+                elif s['action'].lower() == 'stop':
+                    track.stop(s['fade'])
 
-            elif s['action'].lower() == 'set_volume':
-                track.set_volume(s['volume'], s['fade'])
+                elif s['action'].lower() == 'pause':
+                    track.pause(s['fade'])
 
-            elif s['action'].lower() == 'stop_all_sounds':
-                track.stop_all_sounds(s['fade'])
+                elif s['action'].lower() == 'resume':
+                    track.resume(s['fade'])
 
-            else:
-                self.machine.log.error("TrackPlayer: The specified action "
-                                       "is not valid ('{}').".format(s['action']))
+                elif s['action'].lower() == 'set_volume':
+                    track.set_volume(s['volume'], s['fade'])
+
+                elif s['action'].lower() == 'stop_all_sounds':
+                    track.stop_all_sounds(s['fade'])
+
+                else:
+                    self.machine.log.error("TrackPlayer: The specified action "
+                                           "is not valid ('{}').".format(s['action']))
 
     def get_express_config(self, value):
         """ express config for tracks is not supported"""

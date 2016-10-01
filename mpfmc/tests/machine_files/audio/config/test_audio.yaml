@@ -127,6 +127,10 @@ sound_player:
             events_when_looping: text_sound_looping_param_set_1
 
 track_player:
+    stop_all_tracks:
+        __all__:
+            action: stop
+            fade: 1.5 sec
     stop_music_track:
         music:
             action: stop

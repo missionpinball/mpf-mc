@@ -687,7 +687,7 @@ class TestAudio(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_resumed')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='keep_going')
 
-        self.mc.events.post('stop_music_track')
+        self.mc.events.post('stop_all_tracks')
         self.advance_time(2)
         self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_stopped')
 
