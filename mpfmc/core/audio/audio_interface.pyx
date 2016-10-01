@@ -168,8 +168,6 @@ cdef class AudioInterface:
         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
         self.log.debug("Loaded %s", AudioInterface.get_glib_version())
 
-        print(AudioInterface.get_version(), AudioInterface.get_sdl_version(), AudioInterface.get_gstreamer_version(), AudioInterface.get_glib_version())
-
         # Store the actual audio format in use by the opened audio device.  This may or may not match
         # the requested values used to initialize the audio interface.  A pointer to the audio_callback_data
         # structure is passed to the SDL audio callback function and is the source of all audio state
@@ -193,8 +191,6 @@ cdef class AudioInterface:
         self.audio_callback_data.tracks = <TrackState**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
         self.audio_callback_data.c_log_file = NULL
         # self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
-
-        print("quick_fade_steps", self.audio_callback_data.quick_fade_steps)
 
         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
                        rate, channels, buffer_samples)

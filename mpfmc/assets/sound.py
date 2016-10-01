@@ -55,6 +55,12 @@ class SoundPool(AssetPool):
         """String that's returned if someone prints this object"""
         return '<SoundPool: {}>'.format(self.name)
 
+    def unload(self):
+        """Unloads all sounds in the pool"""
+        for asset in self.assets:
+            if asset[0].loaded:
+                asset[0].unload()
+
     @property
     def sound(self):
         """The currently selected Sound object from the pool"""
@@ -499,7 +505,7 @@ class SoundAsset(Asset):
         """Loads the sound asset from disk."""
 
         # Load the sound file into memory
-        if self._container is not None and self._container.loaded:
+        if self._container is not None:
             self.log.debug("Sound %s already loaded in memory", self.name)
             return
 
@@ -528,8 +534,9 @@ class SoundAsset(Asset):
         """Unloads the asset from memory"""
         self.log.debug("Sound %s unloading from memory", self.name)
         self.stop(0)
-        self.machine.sound_system.audio_interface.unload_sound_file_from_memory(self._container)
-        del self._container
+        if self._container is not None:
+            self.machine.sound_system.audio_interface.unload_sound_file_from_memory(self._container)
+            self._container = None
 
     def is_loaded(self):
         """Called when the asset has finished loading"""

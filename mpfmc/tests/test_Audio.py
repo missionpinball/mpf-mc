@@ -668,9 +668,15 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(1)
 
         self.assertIn('263774_music', self.mc.sounds)  # .wav
+        sound_music = self.mc.sounds['263774_music']
+        self.assertFalse(sound_music.loaded)
+
+        self.mc.events.post('load_music')
+        self.advance_time(2)
+        self.assertTrue(sound_music.loaded)
 
         # TODO: Improve test (need some automated status checks for track control)
-        instance = self.mc.sounds['263774_music'].play()
+        instance = sound_music.play()
         self.advance_time(2)
         self.mc.events.post('pause_music_track')
         self.advance_time(2)
@@ -697,6 +703,11 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(2)
         self.mc.events.post('stop_all_sounds_on_music_track')
         self.advance_time(1)
+
+        self.assertTrue(sound_music.loaded)
+        self.mc.events.post('unload_music')
+        self.advance_time()
+        self.assertFalse(sound_music.loaded)
 
         # TODO: Add integration test for sound_player
         # TODO: Add integration test for track_player

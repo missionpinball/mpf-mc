@@ -119,6 +119,12 @@ Here are several various examples:
             elif s['action'].lower() == 'stop_looping':
                 sound.stop_looping()
 
+            elif s['action'].lower() == 'load':
+                sound.load()
+
+            elif s['action'].lower() == 'unload':
+                sound.unload()
+
             else:
                 self.machine.log.error("SoundPlayer: The specified action "
                                        "is not valid ('{}').".format(s['action']))

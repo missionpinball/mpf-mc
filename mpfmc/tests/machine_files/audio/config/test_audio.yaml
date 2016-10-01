@@ -36,7 +36,7 @@ assets:
             load: preload
             track: sfx
         music:
-            load: preload
+            load: on_demand
             track: music
 
 sounds:
@@ -84,6 +84,12 @@ sound_pools:
             100184__menegass__rick-drum-bd-hard
 
 sound_player:
+    load_music:
+        263774_music:
+            action: load
+    unload_music:
+        263774_music:
+            action: unload
     play_sound_synthping: 210871_synthping
     play_sound_text:
         264828_text:
