@@ -95,8 +95,6 @@ Here are several various examples:
 
             # TODO: perform validation on parameters
 
-            print(selected_tracks)
-
             # Loop over selected tracks performing action with settings on each one
             for name, track in selected_tracks.items():
 
