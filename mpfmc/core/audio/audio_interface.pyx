@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev13')
+__version_info__ = ('0', '32', '0-dev14')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf, sprintf
@@ -42,10 +42,6 @@ DEF MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
 DEF MAX_REQUEST_MESSAGES = 32
 DEF MAX_NOTIFICATION_MESSAGES = 32
 DEF QUICK_FADE_DURATION_SECS = 0.05
-DEF BYTES_PER_SAMPLE = 2
-
-DEF MAX_AUDIO_VALUE_S16 = ((1 << (16 - 1)) - 1)
-DEF MIN_AUDIO_VALUE_S16 = -(1 << (16 - 1))
 
 
 # ---------------------------------------------------------------------------
@@ -722,10 +718,7 @@ cdef class AudioInterface:
             # Only mix the track to the master output if it is active
             if callback_data.tracks[track_num].active:
 
-                # Apply ducking to track audio buffer (when applicable)
-                apply_track_ducking(callback_data.tracks[track_num], buffer_length, callback_data)
-
-                # Apply track volume and mix to output buffer
+                # Apply track ducking and volume and mix to output buffer
                 mix_track_to_output(<TrackState*> callback_data.tracks[track_num],
                                     callback_data,
                                     output_buffer,
@@ -1107,14 +1100,16 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
 cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
                                    TrackState *track, int player_num) nogil:
     """
+    Retrieves the specified number of bytes from the source sound memory buffer and mixes them into
+    the track output buffer at the specified volume.
 
     Args:
-        sound:
-        length:
-        output_buffer:
-        volume:
-        track:
-        player_num
+        sound: A pointer to a SoundSettings struct (contains all sound state and settings to play the sound)
+        length: The number of samples to retrieve and place in the output buffer
+        output_buffer: The output buffer
+        volume: The volume to apply to the output buffer (fixed for the duration of this method)
+        track: A pointer to the TrackState struct for the current track
+        player_num: The sound player number currently playing the sound (used for notification messages)
 
     Returns:
         True if sound is finished, False otherwise
@@ -1122,19 +1117,36 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
     if sound == NULL or output_buffer == NULL:
         return True
 
+    cdef Uint32 samples_remaining_to_output = length
+    cdef Uint32 samples_remaining_in_sound
     cdef Uint32 buffer_pos = 0
     cdef Uint8 *sound_buffer = <Uint8*>sound.sample.data.memory.data
     if sound_buffer == NULL:
         return True
 
-    while buffer_pos < length:
-        # Mix the sound sample to the output buffer
-        SDL_MixAudioFormat(output_buffer + buffer_pos, sound_buffer + sound.sample_pos,
-                           track.callback_data.format, track.callback_data.bytes_per_sample, volume)
+    while samples_remaining_to_output > 0:
 
-        # Advance to next sample
-        buffer_pos += track.callback_data.bytes_per_sample
-        sound.sample_pos += track.callback_data.bytes_per_sample
+        # Determine how many samples are remaining in the sound buffer before the end of the sound
+        samples_remaining_in_sound = sound.sample.data.memory.size - sound.sample_pos
+
+        # Determine if we are consuming the entire remaining sound buffer, or just a portion of it
+        if samples_remaining_to_output < samples_remaining_in_sound:
+            # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
+            SDL_MixAudioFormat(output_buffer + buffer_pos, <Uint8*>sound.sample.data.memory.data + sound.sample_pos, track.callback_data.format, samples_remaining_to_output, volume)
+
+            # Update buffer position pointers
+            sound.sample_pos += samples_remaining_to_output
+
+            # Sound is not finished, but the output buffer has been filled
+            return False
+        else:
+            # Entire sound buffer consumed. Mix in remaining samples
+            SDL_MixAudioFormat(output_buffer + buffer_pos, <Uint8*>sound.sample.data.memory.data + sound.sample_pos, track.callback_data.format, samples_remaining_in_sound, volume)
+
+            # Update buffer position pointers/samples remaining to place in the output buffer
+            samples_remaining_to_output -= samples_remaining_in_sound
+            sound.sample_pos += samples_remaining_in_sound
+            buffer_pos += samples_remaining_in_sound
 
         # Check if we are at the end of the source sample buffer (loop if applicable)
         if sound.sample_pos >= sound.sample.data.memory.size:
@@ -1160,6 +1172,8 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
 cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
                                       TrackState *track, int player_num) nogil:
     """
+    Retrieves the specified number of bytes from the source sound streaming buffer and mixes them
+    into the track output buffer at the specified volume.
 
     Args:
         sound: A pointer to a SoundSettings struct (contains all sound state and settings to play the sound)
@@ -1173,10 +1187,11 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
         True if sound is finished, False otherwise
 
     Notes:
-        The tricky part about retrieving samples from the streaming sound source is the buffer size used by
-        SDL2 (output) and GStreamer (input) may be very different. A buffer is "pulled" synchronously from
-        the streaming source and is held until it is completely consumed.  At which point either the sound
-        ends if the source reports is at the end of stream (eos), or another buffer is pulled.
+        The important thing to consider about retrieving samples from the streaming sound source
+        is the buffer size used by SDL2 (output) and GStreamer (input) may be very different. A
+        buffer is "pulled" synchronously from the streaming source and is held until it is
+        completely consumed.  At which point either the sound ends if the source reports is at the
+        end of stream (eos), or another buffer is pulled.
     """
     if sound == NULL or output_buffer == NULL or sound.sample.data.stream.pipeline == NULL:
         return True
@@ -1184,7 +1199,6 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
     cdef Uint32 samples_remaining_to_output = length
     cdef Uint32 samples_remaining_in_map
     cdef Uint32 buffer_pos = 0
-    cdef gboolean is_eos
 
     while samples_remaining_to_output > 0:
 
@@ -1221,11 +1235,10 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
                 sound.sample.data.stream.map_buffer_pos = 0
                 sound.sample.data.stream.map_contains_valid_sample_data = 0
 
-                g_gst_log_info("audio_interface.pyx", "get_streaming_sound_samples", 1202, NULL, "streaming: map samples consumed, check for more data")
-
         # Check for eos (end of stream)
-        is_eos = g_object_get_bool(sound.sample.data.stream.sink, "eos")
-        if is_eos:
+        if g_object_get_bool(sound.sample.data.stream.sink, "eos"):
+
+            # At the end of the stream - check if sound should loop or end
             if sound.loops_remaining > 0:
                 # At the end and still loops remaining, loop back to the beginning
                 sound.loops_remaining -= 1
@@ -1243,10 +1256,10 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
                 sound.current_loop += 1
                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
 
-            g_gst_log_info("audio_interface.pyx", "get_streaming_sound_samples", 1247, NULL, "streaming: looping back to the beginning using seek")
+            # Seek back to the beginning of the sound's source file
             gst_element_seek_simple(sound.sample.data.stream.pipeline, GST_FORMAT_TIME, <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT), 0)
 
-        # Retrieve the next buffer from the pipeline
+        # Retrieve the next buffer from the streaming pipeline
         sound.sample.data.stream.sample = c_appsink_pull_sample(sound.sample.data.stream.sink)
 
         if sound.sample.data.stream.sample == NULL:
@@ -1267,7 +1280,6 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
                 sound.sample.data.stream.map_buffer_pos = 0
                 gst_sample_unref(sound.sample.data.stream.sample)
                 sound.sample.data.stream.sample = NULL
-                g_gst_log_info("audio_interface.pyx", "get_streaming_sound_samples", 1270, NULL, "streaming: could not map buffer")
 
     # The sound has not finished playing, but the output buffer has been filled
     return False
@@ -1405,53 +1417,6 @@ cdef inline void send_track_paused_notification(TrackState *track) nogil:
         notification_message.message = notification_track_paused
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
-cdef void apply_track_ducking(TrackState* track, Uint32 buffer_size, AudioCallbackData* callback_data) nogil:
-    """
-    Applies ducking to the specified track (if applicable).
-    Args:
-        track: A pointer to the TrackState struct for the track
-        buffer_size: The size of the current output audio buffer (in bytes)
-        callback_data: The AudioCallbackData struct
-    """
-    cdef Uint32 buffer_pos = 0
-    cdef Uint8 ducking_volume
-    cdef int control_point = 0
-
-    if track == NULL:
-        return
-
-    # Only need to process when ducking is active
-    if track.ducking_is_active:
-        # Loop over track buffer
-        while buffer_pos < buffer_size and control_point < CONTROL_POINTS_PER_BUFFER:
-            ducking_volume = track.ducking_control_points[control_point]
-            if ducking_volume < SDL_MIX_MAXVOLUME:
-                apply_volume_to_buffer_range(<Uint8*> track.buffer, buffer_pos, ducking_volume, callback_data.bytes_per_control_point)
-
-            buffer_pos += callback_data.bytes_per_control_point
-            control_point += 1
-
-cdef inline void apply_volume_to_buffer_range(Uint8 *buffer, Uint32 start_pos, Uint8 volume, Uint32 length=2) nogil:
-    """
-    Applies the specified volume to a range of samples in an audio buffer at the specified
-    buffer position.
-    Args:
-        buffer: The audio buffer
-        start_pos: The starting audio buffer position at which to apply the volume level
-        volume: The volume level to apply (8-bit unsigned value 0 to SDL_MIX_MAXVOLUME)
-        length: The number of bytes to apply the volume to
-    """
-    cdef Sample16Bit buffer_sample
-    cdef Uint32 buffer_pos = start_pos
-
-    while buffer_pos < start_pos + length:
-        buffer_sample.bytes.byte0 = buffer[buffer_pos]
-        buffer_sample.bytes.byte1 = buffer[buffer_pos + 1]
-        buffer_sample.value = (buffer_sample.value * volume) // SDL_MIX_MAXVOLUME
-        buffer[buffer_pos] = buffer_sample.bytes.byte0
-        buffer[buffer_pos + 1] = buffer_sample.bytes.byte1
-        buffer_pos += BYTES_PER_SAMPLE
-
 cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:
     """
     Linearly interpolate between 2 8-bit values.
@@ -1482,86 +1447,66 @@ cdef inline float in_out_quad(float progress) nogil:
     return -0.5 * (p * (p - 2.0) - 1.0)
 
 cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_data,
-                              Uint8 *output_buffer, Uint32 buffer_size) nogil:
+                              Uint8 *output_buffer, Uint32 buffer_length) nogil:
     """
-    Mixes a track buffer into the master audio output buffer.
+    Applies ducking and mixes a track buffer into the master audio output buffer.
     Args:
         track: The track's state structure
         callback_data: The audio callback data structure
         output_buffer: The master audio output buffer.
-        buffer_size: The audio buffer size to process.
+        buffer_length: The audio buffer size to process.
 
     """
 
-    cdef Sample16Bit track_sample
-    cdef Sample16Bit output_sample
-    cdef int temp_sample
-    cdef Uint32 index
     cdef Uint8 *track_buffer
-    cdef Uint32 samples_per_control_point
-
-    index = 0
+    cdef Uint32 output_buffer_bytes_remaining = buffer_length
+    cdef Uint32 current_chunk_bytes
+    cdef Uint32 buffer_pos = 0
+    cdef Uint8 control_point = 0
+    cdef Uint8 ducking_volume
+    cdef Uint8 track_volume
 
     if track == NULL or track.status == track_status_stopped or track.status == track_status_paused:
         return
 
     track_buffer = <Uint8*>track.buffer
 
-    # Determine if track is currently fading
-    if track.fade_steps_remaining > 0:
-        # A fade is in progress, apply fade to track buffer when mixing to output
-        samples_per_control_point = track.buffer_size // CONTROL_POINTS_PER_BUFFER
-        while index < buffer_size:
+    # Loop over output buffer at control rate
+    while output_buffer_bytes_remaining > 0:
 
-            # Calculate volume at the control rate (handle fading)
-            if (index % samples_per_control_point) == 0:
-                if track.fade_steps_remaining > 0:
-                    # Note: if the volume interpolation function below appears to be backwards, it is
-                    # because the fraction is going from 1 to 0 over the fade and not from a more
-                    # traditional 0 to 1.  This saves a few calculation cycles and is for efficiency.
-                    track.fade_volume_current = <Uint8> (lerpU8(in_out_quad(track.fade_steps_remaining / track.fade_steps),
-                                                                track.fade_volume_target, track.fade_volume_start))
-                    track.fade_steps_remaining -= 1
-                else:
-                    track.fade_volume_current = track.fade_volume_target
-                    if track.status == track_status_stopping:
-                        track.status = track_status_stopped
-                        send_track_stopped_notification(track)
-                    elif track.status == track_status_pausing:
-                        track.status = track_status_paused
-                        send_track_paused_notification(track)
+        # Determine the number of bytes to process in the current chunk
+        current_chunk_bytes = min(output_buffer_bytes_remaining, callback_data.bytes_per_control_point)
 
-            # Get sound sample (2 bytes), combine into a 16-bit value and apply sound volume
-            track_sample.bytes.byte0 = track_buffer[index]
-            track_sample.bytes.byte1 = track_buffer[index + 1]
-            track_sample.value = track_sample.value * track.fade_volume_current // SDL_MIX_MAXVOLUME
+        # Apply any ducking to the track
+        if track.ducking_is_active and control_point < CONTROL_POINTS_PER_BUFFER:
+            ducking_volume = track.ducking_control_points[control_point]
+        else:
+            ducking_volume = SDL_MIX_MAXVOLUME
 
-            # Get sample (2 bytes) already in the output buffer and combine into 16-bit value
-            output_sample.bytes.byte0 = output_buffer[index]
-            output_sample.bytes.byte1 = output_buffer[index + 1]
+        # Calculate track volume (handle track fading)
+        if track.fade_steps_remaining > 0:
+            # Note: if the volume interpolation function below appears to be backwards, it is
+            # because the fraction is going from 1 to 0 over the fade and not from a more
+            # traditional 0 to 1.  This saves a few calculation cycles and is for efficiency.
+            track.fade_volume_current = <Uint8> (lerpU8(in_out_quad(track.fade_steps_remaining / track.fade_steps),
+                                                        track.fade_volume_target, track.fade_volume_start))
+            track.fade_steps_remaining -= 1
+        else:
+            track.fade_volume_current = track.fade_volume_target
+            if track.status == track_status_stopping:
+                track.status = track_status_stopped
+                send_track_stopped_notification(track)
+            elif track.status == track_status_pausing:
+                track.status = track_status_paused
+                send_track_paused_notification(track)
 
-            # Calculate the new output sample (mix the existing output sample with
-            # the track sample).  The temp sample is a 32-bit value to avoid overflow.
-            temp_sample = output_sample.value + track_sample.value
+        track_volume = ducking_volume * track.fade_volume_current // SDL_MIX_MAXVOLUME
 
-            # Clip the temp sample back to a 16-bit value (will cause distortion if samples
-            # on channel are too loud)
-            if temp_sample > MAX_AUDIO_VALUE_S16:
-                temp_sample = MAX_AUDIO_VALUE_S16
-            elif temp_sample < MIN_AUDIO_VALUE_S16:
-                temp_sample = MIN_AUDIO_VALUE_S16
+        SDL_MixAudioFormat(output_buffer + buffer_pos, track_buffer + buffer_pos, callback_data.format, current_chunk_bytes, track_volume)
 
-            # Write the new output sample back to the output buffer (from
-            # a 32-bit value back to a 16-bit value that we know is in 16-bit value range)
-            output_sample.value = temp_sample
-            output_buffer[index] = output_sample.bytes.byte0
-            output_buffer[index + 1] = output_sample.bytes.byte1
-
-            index += callback_data.bytes_per_sample
-
-    else:
-        # No fade in progress: volume is constant over entire output buffer
-        SDL_MixAudioFormat(output_buffer, track_buffer, callback_data.format, buffer_size, track.volume)
+        output_buffer_bytes_remaining -= current_chunk_bytes
+        buffer_pos += current_chunk_bytes
+        control_point += 1
 
 cdef inline NotificationMessageContainer *_create_notification_message() nogil:
     """
@@ -2074,7 +2019,7 @@ cdef class TrackStandard(Track):
     @property
     def supports_streaming_sounds(self):
         """Return whether or not track accepts streaming sounds"""
-        return False
+        return True
 
     @property
     def max_simultaneous_sounds(self):
@@ -3094,29 +3039,23 @@ cdef class SoundMemoryFile(SoundFile):
         cdef Uint32 converted_sample_size = 0
 
         self._loaded_using_sdl = True
-        print("Loading sound asset using SDL", self.file_name)
 
         # Load the WAV file into memory (memory is allocated during the load)
         loaded = SDL_LoadWAV(self.file_name.encode('utf-8'), &wave_spec, &temp_sample_data, &temp_sample_size)
         if loaded == NULL:
             msg = "Could not load sound file {} due to an error: {}".format(self.file_name, SDL_GetError())
-            print(msg)
             raise AudioException(msg)
 
         desired_spec.freq = self.sample_rate
         desired_spec.format = self.format
         desired_spec.channels = self.channels
 
-        print("Sound file loaded spec", wave_spec.freq, wave_spec.format, wave_spec.channels, temp_sample_size)
-
         if wave_spec.freq != self.sample_rate or wave_spec.format != self.format or wave_spec.channels != self.channels:
-            print("Conversion needed")
 
             # Now we need to check if the audio format must be converted to match the audio interface output format
             if convert_audio_to_desired_format(wave_spec, desired_spec, temp_sample_data, temp_sample_size, &converted_sample_data, &converted_sample_size) < 0:
                 SDL_FreeWAV(temp_sample_data)
                 msg = "Could not convert sound file {} to required format".format(self.file_name)
-                print(msg)
                 raise AudioException(msg)
 
             else:
@@ -3156,8 +3095,6 @@ cdef class SoundMemoryFile(SoundFile):
             audio_format = "S16BE"
         pipeline_string = 'uridecodebin uri="{}" ! audioconvert ! audioresample ! appsink name=sink caps="audio/x-raw,rate={},channels={},format={},layout=interleaved" sync=false blocksize=44100'.format(
             file_path, str(self.sample_rate), str(self.channels), audio_format)
-
-        print(pipeline_string)
 
         error = NULL
         pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)
@@ -3206,9 +3143,6 @@ cdef class SoundMemoryFile(SoundFile):
 
             gst_buffer_unmap(buffer, &map_info)
             gst_sample_unref(sample)
-
-        # Copy the sound data to it's permanent home
-        print("Final sample data length: ", self.sample.data.memory.size)
 
         # Cleanup the loader pipeline
         gst_element_set_state(pipeline, GST_STATE_NULL)
@@ -3339,8 +3273,6 @@ cdef class SoundStreamingFile(SoundFile):
             audio_format = "S16BE"
         pipeline_string = 'uridecodebin uri="{}" ! audioconvert ! audioresample ! appsink name=sink caps="audio/x-raw,rate={},channels={},format={},layout=interleaved" sync=true blocksize={}'.format(
             file_path, str(self.sample_rate), str(self.channels), audio_format, self.buffer_size)
-
-        print(pipeline_string)
 
         error = NULL
         self.pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)

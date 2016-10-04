@@ -181,23 +181,10 @@ cdef extern from 'gstreamer_helper.h':
     void g_gst_log_warning(const_gchar *file, const_gchar *function, gint line, GObject *object, const_gchar *message) nogil
     void g_gst_log_info(const_gchar *file, const_gchar *function, gint line, GObject *object, const_gchar *message) nogil
     void g_gst_log_debug(const_gchar *file, const_gchar *function, gint line, GObject *object, const_gchar *message) nogil
-    void g_object_set_void(GstElement *element, char *name, void *value)
-    void g_object_set_double(GstElement *element, char *name, double value) nogil
-    void g_object_set_caps(GstElement *element, char *value)
-    void g_object_set_int(GstElement *element, char *name, int value)
-    void g_object_set_bool(GstElement *element, char *name, gboolean value) nogil
-    void g_object_set_char(GstElement *element, char *name, char *value)
-    void g_object_set_element(GstElement *element, char *name, GstElement *value)
-    void g_object_set_pad(GstElement *element, char *name, GstPad *pad)
     gboolean g_object_get_bool(GstElement *element, char *name) nogil
     GstSample *c_appsink_pull_sample(GstElement *appsink) nogil
-    gulong c_appsink_set_sample_callback(GstElement *appsink,
-            appcallback_t callback, void *userdata)
-    void c_appsink_pull_preroll(GstElement *appsink,
-            appcallback_t callback, void *userdata) nogil
     gulong c_bus_connect_message(GstBus *bus,
             buscallback_t callback, void *userdata)
     void c_signal_disconnect(GstElement *appsink, gulong handler_id)
-    void c_glib_iteration(int count)
 
 
