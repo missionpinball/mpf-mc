@@ -30,6 +30,7 @@ ctypedef struct SampleStream:
     GstSample *sample
     GstBuffer *buffer
     GstMapInfo map_info
+    gint64 duration
     Uint32 map_buffer_pos
     gboolean map_contains_valid_sample_data
     gint null_buffer_count

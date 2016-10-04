@@ -120,7 +120,8 @@ cdef class AudioInterface:
             channels: The number of channels to use (1=mono, 2=stereo)
             buffer_samples: The audio buffer size to use (in number of samples, must be power of two)
         """
-        cdef SDL_AudioSpec desired, obtained
+        cdef SDL_AudioSpec desired
+        cdef SDL_AudioSpec obtained
         self.log = logging.getLogger("AudioInterface")
 
         # Initialize threading in the extension library and acquire the Python global interpreter lock
@@ -2947,8 +2948,10 @@ cdef class SoundFile:
     cdef Uint8 channels
     cdef buffer_size
     cdef SoundSample sample
+    cdef object log
 
     def __init__(self, str file_name, int sample_rate, SDL_AudioFormat format, int channels, int buffer_size):
+        self.log = logging.getLogger("SoundFile")
         self.file_name = file_name
         self.sample_rate = sample_rate
         self.format = format
@@ -2978,6 +2981,7 @@ cdef class SoundMemoryFile(SoundFile):
     def __init__(self, str file_name, int sample_rate, SDL_AudioFormat format, int channels, int buffer_size):
         # IMPORTANT: Call super class init function
         super().__init__(file_name, sample_rate, format, channels, buffer_size)
+        self.log = logging.getLogger("SoundMemoryFile")
         self.sample.type = sound_type_memory
         self.sample.data.memory = <SampleMemory*>PyMem_Malloc(sizeof(SampleMemory))
         self.sample.data.memory.data = NULL
@@ -2992,9 +2996,10 @@ cdef class SoundMemoryFile(SoundFile):
             PyMem_Free(self.sample.data.memory)
 
     def __repr__(self):
-        if self.sample.data.memory.data == NULL:
+        if self.loaded:
+            return '<SoundMemoryFile(Loaded=True, {} bytes)>'.format(self.sample.data.memory.size)
+        else:
             return '<SoundMemoryFile(Loaded=False)>'
-        return '<SoundMemoryFile(Loaded=True, {} bytes)>'.format(self.sample.data.memory.size)
 
     def _gst_init(self):
         if gst_is_initialized():
@@ -3195,6 +3200,7 @@ cdef class SoundStreamingFile(SoundFile):
     def __init__(self, str file_name, int sample_rate, SDL_AudioFormat format, int channels, int buffer_size):
         # IMPORTANT: Call super class init function
         super().__init__(file_name, sample_rate, format, channels, buffer_size)
+        self.log = logging.getLogger("SoundStreamingFile")
 
         self.sample.type = sound_type_streaming
         self.sample.data.stream = <SampleStream*>PyMem_Malloc(sizeof(SampleStream))
@@ -3202,6 +3208,7 @@ cdef class SoundStreamingFile(SoundFile):
         self.sample.data.stream.sink = NULL
         self.sample.data.stream.sample = NULL
         self.sample.data.stream.buffer = NULL
+        self.sample.data.stream.duration = 0
         self.sample.data.stream.map_contains_valid_sample_data = 0
         self.sample.data.stream.map_buffer_pos = 0
         self.sample.data.stream.null_buffer_count = 0
@@ -3213,9 +3220,9 @@ cdef class SoundStreamingFile(SoundFile):
             PyMem_Free(self.sample.data.stream)
 
     def __repr__(self):
-        if self.sample.data.stream.pipeline == NULL:
-            return '<SoundStreamingFile(Loaded=False)>'
-        return '<SoundStreamingFile(Loaded=True)>'
+        if self.loaded:
+            return '<SoundStreamingFile(Loaded=True)>'
+        return '<SoundStreamingFile(Loaded=False)>'
 
     def _gst_init(self):
         if gst_is_initialized():
@@ -3296,6 +3303,9 @@ cdef class SoundStreamingFile(SoundFile):
         # Set to PAUSED to make the first frame arrive in the sink
         ret = gst_element_set_state(self.pipeline, GST_STATE_PAUSED)
 
+        # Get duration of audio file (in nanoseconds)
+        gst_element_query_duration(self.pipeline, GST_FORMAT_TIME, &self.sample.data.stream.duration)
+
         # The pipeline should now be ready to play.  Store the pointers to the pipeline
         # and appsink in the SampleStream struct for use in the application.
         self.sample.data.stream.pipeline = self.pipeline
@@ -3312,21 +3322,27 @@ cdef class SoundStreamingFile(SoundFile):
 
     def unload(self):
         """Unloads the sample data from memory"""
-        # TODO: clean-up and destroy pipeline and associated elements (don't forget an open map)
 
+        # Done with the streaming buffer, release references to it
         if self.sample.data.stream.map_contains_valid_sample_data:
-            self.sample.data.stream.pipeline = NULL
-            self.sample.data.stream.sink = NULL
-            self.sample.data.stream.sample = NULL
-            self.sample.data.stream.buffer = NULL
-            self.sample.data.stream.map_contains_valid_sample_data = 0
-            self.sample.data.stream.map_buffer_pos = 0
-            self.sample.data.stream.null_buffer_count = 0
+            gst_buffer_unmap(self.sample.data.stream.buffer, &self.sample.data.stream.map_info)
+            gst_sample_unref(self.sample.data.stream.sample)
 
-        pass
+            self.sample.data.stream.buffer = NULL
+            self.sample.data.stream.sample = NULL
+            self.sample.data.stream.map_buffer_pos = 0
+            self.sample.data.stream.map_contains_valid_sample_data = 0
+
+        # Cleanup the streaming pipeline
+        gst_element_set_state(self.pipeline, GST_STATE_NULL)
+        gst_object_unref(self.pipeline)
 
     @property
     def loaded(self):
         """Returns whether or not the sound file data is loaded in memory"""
         return self.sample.data.stream != NULL and self.sample.data.stream.pipeline != NULL and self.sample.data.stream.sink != NULL
 
+    @property
+    def length(self):
+        """Returns the length of the sound data (in seconds)"""
+        return self.sample.data.stream.duration / GST_SECOND
