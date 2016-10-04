@@ -48,6 +48,7 @@ sounds:
         simultaneous_limit: 3
         stealing_method: skip
     104457_moron_test:
+        streaming: False
         events_when_played: moron_test_played
         events_when_stopped: moron_test_stopped
         volume: 0.6
@@ -71,6 +72,8 @@ sounds:
     198361_sfx-028:
         simultaneous_limit: 3
         stealing_method: newest
+    263774_music:
+        streaming: True
 
 sound_pools:
     drum_group:
@@ -159,3 +162,6 @@ track_player:
         music:
              action: stop_all_sounds
              fade: 0.5 sec
+    stop_all_sounds:
+        __all__:
+             action: stop_all_sounds
