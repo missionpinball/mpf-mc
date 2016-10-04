@@ -25,8 +25,14 @@ ctypedef struct SampleMemory:
     gsize size
 
 ctypedef struct SampleStream:
-    GstElement* pipeline
-    GstElement* sink
+    GstElement *pipeline
+    GstElement *sink
+    GstSample *sample
+    GstBuffer *buffer
+    GstMapInfo map_info
+    Uint32 map_buffer_pos
+    gboolean map_contains_valid_sample_data
+    gint null_buffer_count
 
 
 # ---------------------------------------------------------------------------
@@ -38,6 +44,10 @@ DEF CONTROL_POINTS_PER_BUFFER = 8
 
 # The maximum number of markers that can be specified for a single sound
 DEF MAX_MARKERS = 8
+
+# The maximum number of consecutive null buffers to receive while streaming before
+# terminating the sound (will cause drop outs)
+DEF CONSECUTIVE_NULL_STREAMING_BUFFER_LIMIT = 2
 
 
 # ---------------------------------------------------------------------------
@@ -125,9 +135,16 @@ cdef enum SoundType:
     sound_type_memory = 0
     sound_type_streaming = 1
 
+ctypedef union SoundSampleData:
+    SampleMemory *memory
+    SampleStream *stream
+
+ctypedef struct SoundSample:
+    SoundType type
+    SoundSampleData data
+
 ctypedef struct SoundSettings:
-    SoundType sound_type
-    SampleMemory *sample
+    SoundSample *sample
     Uint8 volume
     int loops_remaining
     int current_loop
@@ -206,8 +223,7 @@ cdef enum RequestMessage:
 
 
 ctypedef struct RequestMessageDataPlaySound:
-    SoundType sound_type
-    SampleMemory *sample
+    SoundSample *sample
     Uint8 volume
     int loops
     int priority

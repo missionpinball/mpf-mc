@@ -101,10 +101,11 @@ cdef extern from 'gst/gst.h':
     bool gst_element_add_pad(GstElement *element, GstPad *pad)
     void gst_bus_enable_sync_message_emission(GstBus *bus)
     GstBus *gst_pipeline_get_bus(GstPipeline *pipeline)
-    GstBuffer *gst_sample_get_buffer(GstSample *sample)
-    void gst_sample_unref(GstSample *sample)
-    gboolean gst_buffer_map(GstBuffer *buffer, GstMapInfo *info, GstMapFlags flags)
-    void gst_buffer_unmap(GstBuffer *buffer, GstMapInfo *info)
+    GstBuffer *gst_sample_get_buffer(GstSample *sample) nogil
+    void gst_buffer_unref(GstBuffer *buffer) nogil
+    void gst_sample_unref(GstSample *sample) nogil
+    gboolean gst_buffer_map(GstBuffer *buffer, GstMapInfo *info, GstMapFlags flags) nogil
+    void gst_buffer_unmap(GstBuffer *buffer, GstMapInfo *info) nogil
     GstCaps *gst_sample_get_caps(GstSample *sample)
     GstStateChangeReturn gst_element_get_state(
             GstElement *element, GstState *state, GstState *pending,
@@ -182,8 +183,8 @@ cdef extern from 'gstreamer_helper.h':
     void g_object_set_char(GstElement *element, char *name, char *value)
     void g_object_set_element(GstElement *element, char *name, GstElement *value)
     void g_object_set_pad(GstElement *element, char *name, GstPad *pad)
-    gboolean g_object_get_bool(GstElement *element, char *name)
-    GstSample *c_appsink_pull_sample(GstElement *appsink)
+    gboolean g_object_get_bool(GstElement *element, char *name) nogil
+    GstSample *c_appsink_pull_sample(GstElement *appsink) nogil
     gulong c_appsink_set_sample_callback(GstElement *appsink,
             appcallback_t callback, void *userdata)
     void c_appsink_pull_preroll(GstElement *appsink,

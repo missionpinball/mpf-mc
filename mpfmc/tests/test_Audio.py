@@ -351,7 +351,7 @@ class TestAudio(MpfMcTestCase):
         instance = self.mc.sounds['263774_music'].play(settings)
         self.advance_time()
         status = track_music.get_status()
-        self.assertGreater(status[0]['sample_pos'], interface.convert_seconds_to_buffer_length(7.382))
+        self.assertGreaterEqual(status[0]['sample_pos'], interface.convert_seconds_to_buffer_length(7.382))
         self.advance_time(1)
         instance.stop(0.25)
         self.advance_time(0.3)

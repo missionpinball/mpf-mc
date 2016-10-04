@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev10')
+__version_info__ = ('0', '32', '0-dev11')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf
@@ -190,7 +190,7 @@ cdef class AudioInterface:
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackState**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
         self.audio_callback_data.c_log_file = NULL
-        # self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+        #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
 
         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
                        rate, channels, buffer_samples)
@@ -787,7 +787,6 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         player.current.current_loop = 0
         player.current.sound_id = request_message.sound_id
         player.current.sound_instance_id = request_message.sound_instance_id
-        player.current.sound_type = request_message.data.play.sound_type
         player.current.sample = request_message.data.play.sample
         player.current.volume = request_message.data.play.volume
         player.current.loops_remaining = request_message.data.play.loops
@@ -861,7 +860,6 @@ cdef void process_standard_track_request_message(RequestMessageContainer *reques
         player.next.current_loop = 0
         player.next.sound_id = request_message.sound_id
         player.next.sound_instance_id = request_message.sound_instance_id
-        player.next.sound_type = request_message.data.play.sound_type
         player.next.sample = request_message.data.play.sample
         player.next.volume = request_message.data.play.volume
         player.next.loops_remaining = request_message.data.play.loops
@@ -926,7 +924,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
     # Setup local variables
     cdef Uint32 buffer_bytes_remaining
     cdef Uint32 current_chunk_bytes
-    cdef Uint32 buffer_pos
+    cdef Uint32 track_buffer_pos
     cdef Uint8 control_point
     cdef float progress
 
@@ -936,14 +934,14 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
         player = cython.address(standard_track.sound_players[player_num])
 
         # If the player is idle, there is nothing to do so move on to the next player
-        if player == NULL or player.status == player_idle or player.current.sample.data == NULL:
+        if player == NULL or player.status == player_idle:
             continue
 
         # Set flag indicating there is at least some activity on the track (it is active)
         track.active = True
 
         end_of_sound = False
-        buffer_pos = 0
+        track_buffer_pos = 0
         control_point = 0
         buffer_bytes_remaining = buffer_length
 
@@ -966,8 +964,8 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 volume = player.current.volume
 
             # Copy samples for chunk to output buffer and apply volume
-            if player.current.sound_type == sound_type_memory:
-                end_of_sound = get_memory_sound_samples(cython.address(player.current), current_chunk_bytes, track.buffer + buffer_pos, volume, track, player_num)
+            if player.current.sample.type == sound_type_memory:
+                end_of_sound = get_memory_sound_samples(cython.address(player.current), current_chunk_bytes, track.buffer + track_buffer_pos, volume, track, player_num)
 
             # Process sound ducking (if applicable)
             if player.current.sound_has_ducking:
@@ -1015,8 +1013,10 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 # case, silence should be generated until the ducking is done.
 
             # Process markers (do any markers fall in the current chunk?)
+            # Note: the current sample position has already been incremented when the sample data was received so
+            # we need to look backwards from the current position to determine if marker falls in chunk window.
             for marker_id in range(player.current.marker_count):
-                if player.current.sample_pos <= player.current.markers[marker_id] < player.current.sample_pos + current_chunk_bytes:
+                if player.current.sample_pos - current_chunk_bytes <= player.current.markers[marker_id] < player.current.sample_pos:
                     # Marker is in window, send notification
                     send_sound_marker_notification(player_num,
                                                    player.current.sound_id,
@@ -1024,9 +1024,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                                                    track,
                                                    marker_id)
                 # Special check if buffer wraps back around to the beginning of the sample
-                if not end_of_sound and \
-                                player.current.sample_pos + current_chunk_bytes >= player.current.sample.size and \
-                                player.current.markers[marker_id] < player.current.sample_pos + current_chunk_bytes % player.current.sample.size:
+                if not end_of_sound and player.current.sample_pos - current_chunk_bytes < 0 and player.current.markers[marker_id] < player.current.sample_pos:
                     # Marker is in window, send notification
                     send_sound_marker_notification(player_num,
                                                    player.current.sound_id,
@@ -1045,7 +1043,6 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 # End of sound behavior depends upon player status
                 if player.status == player_replacing:
                     # Replacing the current sound with a new one: copy sound player settings from next sound to current
-                    player.current.sound_type = player.next.sound_type
                     player.current.sample = player.next.sample
                     player.current.sample_pos = player.next.sample_pos
                     player.current.current_loop = player.next.current_loop
@@ -1084,7 +1081,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
 
             # Move to next chunk
             buffer_bytes_remaining -= current_chunk_bytes
-            buffer_pos += current_chunk_bytes
+            track_buffer_pos += current_chunk_bytes
             control_point += 1
 
 cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
@@ -1106,7 +1103,9 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
         return True
 
     cdef Uint32 buffer_pos = 0
-    cdef Uint8 *sound_buffer = <Uint8*>sound.sample.data
+    cdef Uint8 *sound_buffer = <Uint8*>sound.sample.data.memory.data
+    if sound_buffer == NULL:
+        return True
 
     while buffer_pos < length:
         # Mix the sound sample to the output buffer
@@ -1118,7 +1117,7 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
         sound.sample_pos += track.callback_data.bytes_per_sample
 
         # Check if we are at the end of the source sample buffer (loop if applicable)
-        if sound.sample_pos >= sound.sample.size:
+        if sound.sample_pos >= sound.sample.data.memory.size:
             if sound.loops_remaining > 0:
                 # At the end and still loops remaining, loop back to the beginning
                 sound.loops_remaining -= 1
@@ -1137,6 +1136,94 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
 
     return False
+
+cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
+                                      TrackState *track, int player_num) nogil:
+    """
+
+    Args:
+        sound:
+        length:
+        output_buffer:
+        volume:
+        track:
+        player_num
+
+    Returns:
+        True if sound is finished, False otherwise
+    """
+    if sound == NULL or output_buffer == NULL or sound.sample.data.stream.pipeline == NULL:
+        return True
+
+    cdef Uint32 samples_remaining_to_output = length
+    cdef Uint32 samples_remaining_in_map
+    cdef Uint32 buffer_pos = 0
+    cdef gboolean is_eos
+
+    while samples_remaining_to_output > 0:
+
+        # Copy any samples remaining in the buffer from the last call
+        if sound.sample.data.stream.map_contains_valid_sample_data:
+            samples_remaining_in_map = sound.sample.data.stream.map_info.size - sound.sample.data.stream.map_buffer_pos
+            # Determine if we are consuming the entire buffer of leftover samples
+            if samples_remaining_to_output < samples_remaining_in_map:
+                # We are not consuming the entire buffer of leftover samples.  There will still be some for the next call.
+                SDL_MixAudioFormat(output_buffer + buffer_pos, sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos, track.callback_data.format, samples_remaining_to_output, volume)
+                sound.sample.data.stream.map_buffer_pos += samples_remaining_to_output
+                sound.sample_pos += samples_remaining_to_output
+                return False
+            else:
+                # Entire buffer of leftover samples consumed.  Free the buffer resources to prepare for next call
+                SDL_MixAudioFormat(output_buffer + buffer_pos, sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos, track.callback_data.format, samples_remaining_in_map, volume)
+                samples_remaining_to_output -= samples_remaining_in_map
+                sound.sample_pos += samples_remaining_in_map
+
+                gst_buffer_unmap(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info)
+                gst_sample_unref(sound.sample.data.stream.sample)
+                gst_buffer_unref(sound.sample.data.stream.buffer)
+                sound.sample.data.stream.buffer = NULL
+                sound.sample.data.stream.sample = NULL
+                sound.sample.data.stream.map_buffer_pos = 0
+                sound.sample.data.stream.map_contains_valid_sample_data = 0
+
+        # Check for EOS (end of stream)
+        is_eos = g_object_get_bool(sound.sample.data.stream.sink, "eos")
+        if is_eos:
+            if sound.loops_remaining > 0:
+                # At the end and still loops remaining, loop back to the beginning
+                sound.loops_remaining -= 1
+                sound.sample_pos = 0
+                sound.current_loop += 1
+                send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
+
+            elif sound.loops_remaining == 0:
+                # At the end and not looping, the sample has finished playing (return True for end of sound)
+                return True
+
+            else:
+                # Looping infinitely, loop back to the beginning
+                sound.sample_pos = 0
+                sound.current_loop += 1
+                send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
+
+            gst_element_seek_simple(sound.sample.data.stream.pipeline, GST_FORMAT_TIME, <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT), 0)
+            return False
+
+        # Retrieve the next buffer from the pipeline
+        sound.sample.data.stream.sample = c_appsink_pull_sample(sound.sample.data.stream.sink)
+        if sound.sample.data.stream.sample == NULL:
+            sound.sample.data.stream.null_buffer_count += 1
+
+            # If we've received too many consecutive null buffers, end the sound
+            if sound.sample.data.stream.null_buffer_count > CONSECUTIVE_NULL_STREAMING_BUFFER_LIMIT:
+                return True
+        else:
+            sound.sample.data.stream.null_buffer_count = 0
+            sound.sample.data.stream.buffer = gst_sample_get_buffer(sound.sample.data.stream.sample)
+
+            if not gst_buffer_map(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info, GST_MAP_READ):
+                gst_sample_unref(sound.sample.data.stream.sample)
+                sound.sample.data.stream.sample = NULL
 
 
 cdef inline void end_of_sound_processing(SoundPlayer* player,
@@ -1894,7 +1981,6 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].status = player_idle
             self.type_state.sound_players[i].track_num = self.number
             self.type_state.sound_players[i].player = i
-            self.type_state.sound_players[i].current.sound_type = sound_type_memory
             self.type_state.sound_players[i].current.sample = NULL
             self.type_state.sound_players[i].current.loops_remaining = 0
             self.type_state.sound_players[i].current.current_loop = 0
@@ -1905,7 +1991,6 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].current.sound_priority = 0
             self.type_state.sound_players[i].current.sound_has_ducking = False
             self.type_state.sound_players[i].current.ducking_stage = ducking_stage_idle
-            self.type_state.sound_players[i].next.sound_type = sound_type_memory
             self.type_state.sound_players[i].next.sample = NULL
             self.type_state.sound_players[i].next.loops_remaining = 0
             self.type_state.sound_players[i].next.current_loop = 0
@@ -2451,7 +2536,7 @@ cdef class TrackStandard(Track):
             return False
 
         # Get the sound sample buffer container
-        cdef SoundMemoryFile sound_container = sound_instance.container
+        cdef SoundFile sound_container = sound_instance.container
         cdef RequestMessageContainer *request_message
 
         if not sound_instance.sound.loaded:
@@ -2490,7 +2575,6 @@ cdef class TrackStandard(Track):
                 request_message.player = player
                 request_message.data.play.loops = sound_instance.loops
                 request_message.data.play.priority = sound_instance.priority
-                request_message.data.play.sound_type = sound_type_memory
                 request_message.data.play.sample = cython.address(sound_container.sample)
 
                 # Conversion factor (seconds to bytes/buffer position)
@@ -2523,6 +2607,17 @@ cdef class TrackStandard(Track):
                     request_message.data.play.sound_has_ducking = False
     
                 self._add_request_message(request_message)
+
+                # Special handling is needed to start streaming for the specified sound
+                if sound_instance.container.sample.type == sound_type_streaming:
+                    # Seek to the specified start position
+                    gst_element_seek_simple(sound_instance.container.sample.data.stream.pipeline,
+                                            GST_FORMAT_TIME,
+                                            <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
+                                            sound_instance.start_at * GST_SECOND)
+                    with nogil:
+                        ret = gst_element_set_state(sound_instance.container.sample.data.stream.pipeline, GST_STATE_PLAYING)
+
             else:
                 self.log.warning("All internal audio messages are "
                                "currently in use, could not play sound %s"
@@ -2851,18 +2946,16 @@ cdef class TrackLiveLoop(Track):
 
 
 # ---------------------------------------------------------------------------
-#    SoundMemoryFile class
+#    SoundFile class
 # ---------------------------------------------------------------------------
-cdef class SoundMemoryFile:
-    """SoundMemoryFile is a wrapper class to manage sound sample data stored
-    in memory."""
+cdef class SoundFile:
+    """SoundMemoryFile is the base class for wrapper classes used to manage sound sample data."""
     cdef str file_name
     cdef int sample_rate
     cdef SDL_AudioFormat format
     cdef Uint8 channels
     cdef buffer_size
-    cdef SampleMemory sample
-    cdef bint _loaded_using_sdl
+    cdef SoundSample sample
 
     def __init__(self, str file_name, int sample_rate, SDL_AudioFormat format, int channels, int buffer_size):
         self.file_name = file_name
@@ -2870,14 +2963,47 @@ cdef class SoundMemoryFile:
         self.format = format
         self.channels = <Uint8>channels
         self.buffer_size = buffer_size
-        self.sample.data = NULL
-        self.sample.size = 0
+
+    def __repr__(self):
+        return '<SoundFile>'
+
+    def load(self):
+        """Load the sound file"""
+        raise NotImplementedError("Must be implemented in derived class")
+
+    def unload(self):
+        """Unload the sound file"""
+        raise NotImplementedError("Must be implemented in derived class")
+
+
+# ---------------------------------------------------------------------------
+#    SoundMemoryFile class
+# ---------------------------------------------------------------------------
+cdef class SoundMemoryFile(SoundFile):
+    """SoundMemoryFile is a wrapper class to manage sound sample data stored
+    in memory."""
+    cdef bint _loaded_using_sdl
+
+    def __init__(self, str file_name, int sample_rate, SDL_AudioFormat format, int channels, int buffer_size):
+        # IMPORTANT: Call super class init function
+        super().__init__(file_name, sample_rate, format, channels, buffer_size)
+        self.sample.type = sound_type_memory
+        self.sample.data.memory = <SampleMemory*>PyMem_Malloc(sizeof(SampleMemory))
+        self.sample.data.memory.data = NULL
+        self.sample.data.memory.size = 0
         self._loaded_using_sdl = False
 
         self.load()
 
     def __dealloc__(self):
         self.unload()
+        if self.sample.data.memory != NULL:
+            PyMem_Free(self.sample.data.memory)
+
+    def __repr__(self):
+        if self.sample.data.memory.data == NULL:
+            return '<SoundMemoryFile(Loaded=False)>'
+        return '<SoundMemoryFile(Loaded=True, {} bytes)>'.format(self.sample.data.memory.size)
 
     def _gst_init(self):
         if gst_is_initialized():
@@ -2949,13 +3075,13 @@ cdef class SoundMemoryFile:
 
             else:
                 # Reallocate sample buffer as it is very possible it shrank during the conversion process
-                self.sample.size = <gsize>converted_sample_size
-                self.sample.data = <gpointer>converted_sample_data
+                self.sample.data.memory.size = <gsize>converted_sample_size
+                self.sample.data.memory.data = <gpointer>converted_sample_data
                 SDL_FreeWAV(temp_sample_data)
 
         else:
-            self.sample.size = <gsize>temp_sample_size
-            self.sample.data = <gpointer>temp_sample_data
+            self.sample.data.memory.size = <gsize>temp_sample_size
+            self.sample.data.memory.data = <gpointer>temp_sample_data
 
     def _load_using_gstreamer(self):
         """Loads the sound into memory using GStreamer"""
@@ -3017,25 +3143,26 @@ cdef class SoundMemoryFile:
 
             if not gst_buffer_map(buffer, &map_info, GST_MAP_READ):
                 gst_sample_unref(sample)
-                if self.sample.data != NULL:
-                    g_free(self.sample.data)
-                    self.sample.data = NULL
-                    self.sample.size = 0
+                if self.sample.data.memory.data != NULL:
+                    g_free(self.sample.data.memory.data)
+                    self.sample.data.memory.data = NULL
+                    self.sample.data.memory.size = 0
                 raise AudioException("Unable to map GStreamer buffer")
 
-            if self.sample.data == NULL:
-                self.sample.data = PyMem_Malloc(map_info.size)
-                self.sample.size = map_info.size
-                memcpy(self.sample.data, map_info.data, map_info.size)
+            if self.sample.data.memory.data == NULL:
+                self.sample.data.memory.data = PyMem_Malloc(map_info.size)
+                self.sample.data.memory.size = map_info.size
+                memcpy(self.sample.data.memory.data, map_info.data, map_info.size)
             else:
-                self.sample.data = PyMem_Realloc(self.sample.data, self.sample.size + map_info.size)
-                memcpy(self.sample.data + self.sample.size, map_info.data, map_info.size)
-                self.sample.size += map_info.size
+                self.sample.data.memory.data = PyMem_Realloc(self.sample.data.memory.data, self.sample.data.memory.size + map_info.size)
+                memcpy(self.sample.data.memory.data + self.sample.data.memory.size, map_info.data, map_info.size)
+                self.sample.data.memory.size += map_info.size
 
             gst_buffer_unmap(buffer, &map_info)
+            gst_sample_unref(sample)
 
         # Copy the sound data to it's permanent home
-        print("Final sample data length: ", self.sample.size)
+        print("Final sample data length: ", self.sample.data.memory.size)
 
         # Cleanup the loader pipeline
         gst_element_set_state(pipeline, GST_STATE_NULL)
@@ -3043,42 +3170,34 @@ cdef class SoundMemoryFile:
 
     def unload(self):
         """Unloads the sample data from memory"""
-        if self.sample.data != NULL:
+        if self.sample.data.memory.data != NULL:
             if self._loaded_using_sdl:
-                SDL_FreeWAV(<Uint8*>self.sample.data)
+                SDL_FreeWAV(<Uint8*>self.sample.data.memory.data)
             else:
-                PyMem_Free(self.sample.data)
+                PyMem_Free(self.sample.data.memory.data)
 
-            self.sample.data = NULL
-            self.sample.size = 0
+            self.sample.data.memory.data = NULL
+            self.sample.data.memory.size = 0
 
     @property
     def loaded(self):
         """Returns whether or not the sound file data is loaded in memory"""
-        return self.sample.data != NULL and self.sample.size > 0
+        return self.sample.data.memory.data != NULL and self.sample.data.memory.size > 0
 
     @property
     def length(self):
         """Returns the length of the sound data (in bytes)"""
-        if self.sample.data == NULL:
+        if self.sample.data.memory.data == NULL:
             return 0
         else:
-            return self.sample.size
+            return self.sample.data.memory.size
 
 
 # ---------------------------------------------------------------------------
 #    SoundStreamingFile class
 # ---------------------------------------------------------------------------
-cdef class SoundStreamingFile:
+cdef class SoundStreamingFile(SoundFile):
     """SoundStreamingFile is a wrapper class to manage streaming sound sample data."""
-    cdef object audio_interface
-    cdef str file_name
-    cdef int sample_rate
-    cdef int channels
-    cdef buffer_size
-    cdef bint little_endian
-    cdef SampleMemory sample
-
     cdef GstElement *pipeline
     cdef GstElement *source
     cdef GstElement *convert
@@ -3093,18 +3212,23 @@ cdef class SoundStreamingFile:
         self.bus = NULL
         self.bus_message_handler_id = 0
 
-    def __init__(self, object audio_interface, str file_name, int sample_rate, int channels, int buffer_size, bint little_endian = True):
-        self.audio_interface = audio_interface
-        self.file_name = file_name
-        self.sample_rate = sample_rate
-        self.channels = channels
-        self.buffer_size = buffer_size
-        self.little_endian = little_endian
+    def __init__(self, str file_name, int sample_rate, SDL_AudioFormat format, int channels, int buffer_size):
+        # IMPORTANT: Call super class init function
+        super().__init__(file_name, sample_rate, format, channels, buffer_size)
+
+        self.sample.type = sound_type_streaming
+        self.sample.data.stream = <SampleStream*>PyMem_Malloc(sizeof(SampleStream))
 
         self.load()
 
     def __dealloc__(self):
-        pass
+        if self.sample.data.stream != NULL:
+            PyMem_Free(self.sample.data.stream)
+
+    def __repr__(self):
+        if self.sample.data.stream.pipeline == NULL:
+            return '<SoundStreamingFile(Loaded=False)>'
+        return '<SoundStreamingFile(Loaded=True)>'
 
     def _gst_init(self):
         if gst_is_initialized():
@@ -3186,7 +3310,7 @@ cdef class SoundStreamingFile:
             raise AudioException('Unable to create sound resampler element (audioresample)')
 
         # Set appsink properties
-        if self.little_endian:
+        if SDL_AUDIO_ISLITTLEENDIAN(self.format):
             audio_format = "S16LE"
         else:
             audio_format = "S16BE"
@@ -3259,62 +3383,21 @@ cdef class SoundStreamingFile:
 
         # get ready!
         with nogil:
-            ret = gst_element_set_state(pipeline, GST_STATE_PLAYING)
+            ret = gst_element_set_state(pipeline, GST_STATE_PAUSED)
 
-        while True:
-            sample = c_appsink_pull_sample(sink)
-            if sample == NULL:
-                break
+        # The pipeline should now be ready to play.  Store the pointers to the pipeline
+        # and appsink in the SampleStream struct for use in the application.
+        self.sample.data.stream.pipeline = pipeline
+        self.sample.data.stream.sink = sink
 
-            is_eos = g_object_get_bool(sink, "eos")
-            if is_eos:
-                break
-
-            buffer = gst_sample_get_buffer(sample)
-
-            if not gst_buffer_map(buffer, &map_info, GST_MAP_READ):
-                gst_sample_unref(sample)
-                if self.sample.data != NULL:
-                    g_free(self.sample.data)
-                    self.sample.data = NULL
-                    self.sample.size = 0
-                raise AudioException("Unable to map GStreamer buffer")
-
-            if self.sample.data == NULL:
-                self.sample.data = PyMem_Malloc(map_info.size)
-                self.sample.size = map_info.size
-                memcpy(self.sample.data, map_info.data, map_info.size)
-            else:
-                self.sample.data = PyMem_Realloc(self.sample.data, self.sample.size + map_info.size)
-                memcpy(self.sample.data + self.sample.size, map_info.data, map_info.size)
-                self.sample.size += map_info.size
-
-            gst_buffer_unmap(buffer, &map_info)
-
-        # Copy the sound data to it's permanent home
-        print("Final sample data length: ", self.sample.size)
-
-        # Cleanup the loader pipeline
-        gst_element_set_state(pipeline, GST_STATE_NULL)
-        gst_object_unref (pipeline)
 
     def unload(self):
         """Unloads the sample data from memory"""
-        if self.sample.data != NULL:
-            PyMem_Free(self.sample.data)
-            self.sample.data = NULL
-            self.sample.size = 0
+        # TODO: clean-up and destroy pipeline and associated elements (don't forget an open map)
+        pass
 
     @property
     def loaded(self):
         """Returns whether or not the sound file data is loaded in memory"""
-        return self.sample.data != NULL and self.sample.size > 0
-
-    @property
-    def length(self):
-        """Returns the length of the sound data (in bytes)"""
-        if self.sample.data == NULL:
-            return 0
-        else:
-            return self.sample.size
+        return self.sample.data.stream != NULL and self.sample.data.stream.pipeline != NULL and self.sample.data.stream.sink != NULL
 
