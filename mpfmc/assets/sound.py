@@ -292,6 +292,19 @@ class SoundAsset(Asset):
         if 'streaming' in self.config:
             self._streaming = self.config['streaming']
 
+        # Validate that the assigned track supports the sound loading method selected
+        if self._streaming and not track.supports_streaming_sounds:
+            self.log.error("Track %s does not support streaming sounds. You must set "
+                           "'streaming: False' for the %s sound.", self._track.name, self.name)
+            raise AudioException("Track {} does not support streaming sounds. You must set "
+                                 "'streaming: False' for the {} sound.".format(self._track.name, self.name))
+
+        if not self._streaming and not track.supports_in_memory_sounds:
+            self.log.error("Track %s does not support in-memory sounds. You must set "
+                           "'streaming: True' for the %s sound.", self._track.name, self.name)
+            raise AudioException("Track {} does not support in-memory sounds. You must set "
+                                 "'streaming: True' for the {} sound.".format(self._track.name, self.name))
+
         if 'volume' in self.config:
             self._volume = min(max(float(self.config['volume']), 0.0), 1.0)
 

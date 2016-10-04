@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev12')
+__version_info__ = ('0', '32', '0-dev13')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf, sprintf
@@ -2657,7 +2657,6 @@ cdef class TrackStandard(Track):
                 # Special handling is needed to start streaming for the specified sound
                 if sound_container.sample.type == sound_type_streaming:
                     # Seek to the specified start position
-                    print("_play_sound_on_sound_player - streaming sound seek to start and then play")
                     gst_element_seek_simple(sound_container.sample.data.stream.pipeline,
                                             GST_FORMAT_TIME,
                                             <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
