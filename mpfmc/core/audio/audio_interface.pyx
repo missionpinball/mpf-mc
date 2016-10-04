@@ -12,10 +12,10 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev11')
+__version_info__ = ('0', '32', '0-dev12')
 __version__ = '.'.join(__version_info__)
 
-from libc.stdio cimport FILE, fopen, fprintf
+from libc.stdio cimport FILE, fopen, fprintf, sprintf
 from libc.stdlib cimport malloc, free, calloc
 from libc.string cimport memset, memcpy
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
@@ -422,7 +422,7 @@ cdef class AudioInterface:
         else:
             return None
 
-    def write_gst_log_message(self, message_type, message):
+    cdef write_gst_log_message(self, message_type, message):
         """Write GStreamer log message to the mpfmc log"""
         print(message_type, message)
         if message_type == 'error':
@@ -605,17 +605,35 @@ cdef class AudioInterface:
                                self.audio_callback_data.channels,
                                self.audio_callback_data.buffer_size)
 
-    def unload_sound_file_from_memory(self, container not None):
+    def load_sound_file_for_streaming(self, str file_name):
+        """
+        Loads an audio file into a SoundMemoryFile wrapper object for use in a Sound object.
+        Used in asset loading for Sound objects.
+        Args:
+            file_name: The audio file name to load.
+
+        Returns:
+            A SoundMemoryFile wrapper object containing a pointer to the sound sample
+            data in memory.  An exception is thrown if the sound is unable to be loaded.
+        """
+        return SoundStreamingFile(file_name,
+                               self.audio_callback_data.sample_rate,
+                               self.audio_callback_data.format,
+                               self.audio_callback_data.channels,
+                               self.audio_callback_data.buffer_size)
+
+    def unload_sound_file(self, container not None):
         """
         Unloads the source sample from the supplied container (used in Sound
         asset unloading).  The sound will no longer be in memory.
         Args:
-            container: A SoundMemoryFile object
+            container: A SoundFile object
         """
-        if not isinstance(container, SoundMemoryFile):
+        if not isinstance(container, SoundFile):
             return
 
         container.unload()
+
 
     def stop_sound(self, sound_instance not None):
         """
@@ -966,6 +984,8 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
             # Copy samples for chunk to output buffer and apply volume
             if player.current.sample.type == sound_type_memory:
                 end_of_sound = get_memory_sound_samples(cython.address(player.current), current_chunk_bytes, track.buffer + track_buffer_pos, volume, track, player_num)
+            elif player.current.sample.type == sound_type_streaming:
+                end_of_sound = get_streaming_sound_samples(cython.address(player.current), current_chunk_bytes, track.buffer + track_buffer_pos, volume, track, player_num)
 
             # Process sound ducking (if applicable)
             if player.current.sound_has_ducking:
@@ -1142,15 +1162,21 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
     """
 
     Args:
-        sound:
-        length:
-        output_buffer:
-        volume:
-        track:
-        player_num
+        sound: A pointer to a SoundSettings struct (contains all sound state and settings to play the sound)
+        length: The number of samples to retrieve and place in the output buffer
+        output_buffer: The output buffer
+        volume: The volume to apply to the output buffer (fixed for the duration of this method)
+        track: A pointer to the TrackState struct for the current track
+        player_num: The sound player number currently playing the sound (used for notification messages)
 
     Returns:
         True if sound is finished, False otherwise
+
+    Notes:
+        The tricky part about retrieving samples from the streaming sound source is the buffer size used by
+        SDL2 (output) and GStreamer (input) may be very different. A buffer is "pulled" synchronously from
+        the streaming source and is held until it is completely consumed.  At which point either the sound
+        ends if the source reports is at the end of stream (eos), or another buffer is pulled.
     """
     if sound == NULL or output_buffer == NULL or sound.sample.data.stream.pipeline == NULL:
         return True
@@ -1162,31 +1188,42 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
 
     while samples_remaining_to_output > 0:
 
-        # Copy any samples remaining in the buffer from the last call
+        # Copy any samples remaining in the streaming buffer
         if sound.sample.data.stream.map_contains_valid_sample_data:
             samples_remaining_in_map = sound.sample.data.stream.map_info.size - sound.sample.data.stream.map_buffer_pos
-            # Determine if we are consuming the entire buffer of leftover samples
+
+            # Determine if we are consuming the entire buffer of streaming samples, or just a portion of it
             if samples_remaining_to_output < samples_remaining_in_map:
-                # We are not consuming the entire buffer of leftover samples.  There will still be some for the next call.
+                # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
                 SDL_MixAudioFormat(output_buffer + buffer_pos, sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos, track.callback_data.format, samples_remaining_to_output, volume)
+
+                # Update buffer position pointers
                 sound.sample.data.stream.map_buffer_pos += samples_remaining_to_output
                 sound.sample_pos += samples_remaining_to_output
+
+                # Sound is not finished, but the output buffer has been filled
                 return False
             else:
                 # Entire buffer of leftover samples consumed.  Free the buffer resources to prepare for next call
                 SDL_MixAudioFormat(output_buffer + buffer_pos, sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos, track.callback_data.format, samples_remaining_in_map, volume)
+
+                # Update buffer position pointers/samples remaining to place in the output buffer
                 samples_remaining_to_output -= samples_remaining_in_map
                 sound.sample_pos += samples_remaining_in_map
+                buffer_pos += samples_remaining_in_map
 
+                # Done with the streaming buffer, release references to it
                 gst_buffer_unmap(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info)
                 gst_sample_unref(sound.sample.data.stream.sample)
-                gst_buffer_unref(sound.sample.data.stream.buffer)
+
                 sound.sample.data.stream.buffer = NULL
                 sound.sample.data.stream.sample = NULL
                 sound.sample.data.stream.map_buffer_pos = 0
                 sound.sample.data.stream.map_contains_valid_sample_data = 0
 
-        # Check for EOS (end of stream)
+                g_gst_log_info("audio_interface.pyx", "get_streaming_sound_samples", 1202, NULL, "streaming: map samples consumed, check for more data")
+
+        # Check for eos (end of stream)
         is_eos = g_object_get_bool(sound.sample.data.stream.sink, "eos")
         if is_eos:
             if sound.loops_remaining > 0:
@@ -1206,11 +1243,12 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
                 sound.current_loop += 1
                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
 
+            g_gst_log_info("audio_interface.pyx", "get_streaming_sound_samples", 1247, NULL, "streaming: looping back to the beginning using seek")
             gst_element_seek_simple(sound.sample.data.stream.pipeline, GST_FORMAT_TIME, <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT), 0)
-            return False
 
         # Retrieve the next buffer from the pipeline
         sound.sample.data.stream.sample = c_appsink_pull_sample(sound.sample.data.stream.sink)
+
         if sound.sample.data.stream.sample == NULL:
             sound.sample.data.stream.null_buffer_count += 1
 
@@ -1221,10 +1259,18 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
             sound.sample.data.stream.null_buffer_count = 0
             sound.sample.data.stream.buffer = gst_sample_get_buffer(sound.sample.data.stream.sample)
 
-            if not gst_buffer_map(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info, GST_MAP_READ):
+            if gst_buffer_map(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info, GST_MAP_READ):
+                sound.sample.data.stream.map_contains_valid_sample_data = 1
+                sound.sample.data.stream.map_buffer_pos = 0
+            else:
+                sound.sample.data.stream.map_contains_valid_sample_data = 0
+                sound.sample.data.stream.map_buffer_pos = 0
                 gst_sample_unref(sound.sample.data.stream.sample)
                 sound.sample.data.stream.sample = NULL
+                g_gst_log_info("audio_interface.pyx", "get_streaming_sound_samples", 1270, NULL, "streaming: could not map buffer")
 
+    # The sound has not finished playing, but the output buffer has been filled
+    return False
 
 cdef inline void end_of_sound_processing(SoundPlayer* player,
                                          TrackState *track) nogil:
@@ -2609,14 +2655,15 @@ cdef class TrackStandard(Track):
                 self._add_request_message(request_message)
 
                 # Special handling is needed to start streaming for the specified sound
-                if sound_instance.container.sample.type == sound_type_streaming:
+                if sound_container.sample.type == sound_type_streaming:
                     # Seek to the specified start position
-                    gst_element_seek_simple(sound_instance.container.sample.data.stream.pipeline,
+                    print("_play_sound_on_sound_player - streaming sound seek to start and then play")
+                    gst_element_seek_simple(sound_container.sample.data.stream.pipeline,
                                             GST_FORMAT_TIME,
                                             <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
                                             sound_instance.start_at * GST_SECOND)
                     with nogil:
-                        ret = gst_element_set_state(sound_instance.container.sample.data.stream.pipeline, GST_STATE_PLAYING)
+                        ret = gst_element_set_state(sound_container.sample.data.stream.pipeline, GST_STATE_PLAYING)
 
             else:
                 self.log.warning("All internal audio messages are "
@@ -3218,6 +3265,13 @@ cdef class SoundStreamingFile(SoundFile):
 
         self.sample.type = sound_type_streaming
         self.sample.data.stream = <SampleStream*>PyMem_Malloc(sizeof(SampleStream))
+        self.sample.data.stream.pipeline = NULL
+        self.sample.data.stream.sink = NULL
+        self.sample.data.stream.sample = NULL
+        self.sample.data.stream.buffer = NULL
+        self.sample.data.stream.map_contains_valid_sample_data = 0
+        self.sample.data.stream.map_buffer_pos = 0
+        self.sample.data.stream.null_buffer_count = 0
 
         self.load()
 
@@ -3268,6 +3322,7 @@ cdef class SoundStreamingFile(SoundFile):
 
     def _construct_pipeline(self):
         """Creates the GStreamer pipeline used to stream the sound data"""
+        cdef GError *error
 
         # Pipeline structure: uridecodebin --> audioconvert --> audioresample --> appsink
 
@@ -3275,10 +3330,25 @@ cdef class SoundStreamingFile(SoundFile):
         if self.pipeline != NULL:
             self._destroy_pipeline()
 
-        # Create the pipeline
-        self.pipeline = gst_pipeline_new('streaming_sound_player')
-        if self.pipeline == NULL:
-            raise AudioException('Unable to create a GStreamer pipeline')
+        # Pipeline structure: uridecodebin --> audioconvert --> audioresample --> appsink
+
+        # Create GStreamer pipeline with the specified caps (from a string)
+        file_path = 'file:///' + self.file_name.replace('\\', '/')
+        if SDL_AUDIO_ISLITTLEENDIAN(self.format):
+            audio_format = "S16LE"
+        else:
+            audio_format = "S16BE"
+        pipeline_string = 'uridecodebin uri="{}" ! audioconvert ! audioresample ! appsink name=sink caps="audio/x-raw,rate={},channels={},format={},layout=interleaved" sync=true blocksize={}'.format(
+            file_path, str(self.sample_rate), str(self.channels), audio_format, self.buffer_size)
+
+        print(pipeline_string)
+
+        error = NULL
+        self.pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)
+
+        if error != NULL:
+            msg = 'Unable to create a GStreamer pipeline: code={} message={}'.format(error.code, <bytes>error.message)
+            raise AudioException(msg)
 
         # Get the pipeline bus (the bus allows applications to receive pipeline messages)
         self.bus = gst_pipeline_get_bus(<GstPipeline*>self.pipeline)
@@ -3286,114 +3356,42 @@ cdef class SoundStreamingFile(SoundFile):
             raise AudioException('Unable to get bus from the pipeline')
 
         # Enable pipeline messages and callback message handler
-        gst_bus_enable_sync_message_emission(self.bus)
-        self.bus_message_handler_id = c_bus_connect_message(self.bus, _on_gst_bus_message, <void*>self.audio_interface)
-
-        # Create the urldecodebin element
-        self.source = gst_element_factory_make('urldecodebin', 'source')
-        if self.source == NULL:
-            raise AudioException('Unable to create sound source element (urldecodebin)')
-
-        # Create the audioconvert element
-        self.convert = gst_element_factory_make('audioconvert', 'convert')
-        if self.convert == NULL:
-            raise AudioException('Unable to create sound converter element (audioconvert)')
-
-        # Create the audioresample element
-        self.resample = gst_element_factory_make('audioresample', 'resample')
-        if self.resample == NULL:
-            raise AudioException('Unable to create sound resampler element (audioresample)')
-
-        # Create the appsink element
-        self.sink = gst_element_factory_make('appsink', 'sink')
-        if self.sink == NULL:
-            raise AudioException('Unable to create sound resampler element (audioresample)')
-
-        # Set appsink properties
-        if SDL_AUDIO_ISLITTLEENDIAN(self.format):
-            audio_format = "S16LE"
-        else:
-            audio_format = "S16BE"
-        caps_string = 'audio/x-raw,rate={},channels={},format={},layout=interleaved'.format(
-            str(self.sample_rate), str(self.channels), audio_format)
-
-        g_object_set_caps(self.sink, caps_string.encode('utf-8'))
-        g_object_set_bool(self.sink, "sync", False)
-        g_object_set_int(self.sink, "blocksize", self.buffer_size)
-
-        # Add the elements to the pipeline
-        gst_bin_add(<GstBin*>self.pipeline, self.source)
-        gst_bin_add(<GstBin*>self.pipeline, self.convert)
-        gst_bin_add(<GstBin*>self.pipeline, self.resample)
-        gst_bin_add(<GstBin*>self.pipeline, self.sink)
-
-        # Link elements together: uridecodebin --> audioconvert --> audioresample --> appsink
-        gst_element_link(self.source, self.convert)
-        gst_element_link(self.convert, self.resample)
-        gst_element_link(self.resample, self.sink)
-
-
-    def load(self):
-        """Loads the sound into memory using GStreamer"""
-        cdef str pipeline_string
-        cdef str file_path
-        cdef GstElement *pipeline
-        cdef GstElement *sink
-        cdef GError *error
-        cdef GstStateChangeReturn ret
-        cdef GstState state
-        cdef GstSample *sample
-        cdef GstBuffer *buffer
-        cdef GstMapInfo map_info
-        cdef gboolean is_eos
-
-        if self.loaded:
-            return
-
-        self._gst_init()
-
-        if not os.path.isfile(self.file_name):
-            raise AudioException('Could not locate file ' + self.file_name)
-
-        # Pipeline structure: uridecodebin --> audioconvert --> audioresample --> appsink
-
-        # Create GStreamer pipeline with the specified caps (from a string)
-        file_path = 'file:///' + self.file_name.replace('\\', '/')
-        if self.little_endian:
-            audio_format = "S16LE"
-        else:
-            audio_format = "S16BE"
-        pipeline_string = 'playbin uri="{}" ! appsink name=sink caps="audio/x-raw,rate={},channels={},format={},layout=interleaved" sync=false blocksize=44100'.format(
-            file_path, str(self.sample_rate), str(self.channels), audio_format)
-
-        print(pipeline_string)
-
-        error = NULL
-        pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)
-
-        if error != NULL:
-            msg = 'Unable to create a GStreamer pipeline: code={} message={}'.format(error.code, <bytes>error.message)
-            raise AudioException(msg)
+        #gst_bus_enable_sync_message_emission(self.bus)
+        #self.bus_message_handler_id = c_bus_connect_message(self.bus, _on_gst_bus_message, <void*>self.audio_interface)
 
         # Get sink
-        sink = gst_bin_get_by_name(<GstBin*>pipeline, "sink")
+        self.sink = gst_bin_get_by_name(<GstBin*>self.pipeline, "sink")
 
         # Set to PAUSED to make the first frame arrive in the sink
-        #ret = gst_element_set_state(pipeline, GST_STATE_PAUSED)
-
-        # get ready!
-        with nogil:
-            ret = gst_element_set_state(pipeline, GST_STATE_PAUSED)
+        ret = gst_element_set_state(self.pipeline, GST_STATE_PAUSED)
 
         # The pipeline should now be ready to play.  Store the pointers to the pipeline
         # and appsink in the SampleStream struct for use in the application.
-        self.sample.data.stream.pipeline = pipeline
-        self.sample.data.stream.sink = sink
+        self.sample.data.stream.pipeline = self.pipeline
+        self.sample.data.stream.sink = self.sink
 
+    def load(self):
+        """Loads the sound into memory using GStreamer"""
+
+        #if self.loaded:
+        #    return
+
+        self._gst_init()
+        self._construct_pipeline()
 
     def unload(self):
         """Unloads the sample data from memory"""
         # TODO: clean-up and destroy pipeline and associated elements (don't forget an open map)
+
+        if self.sample.data.stream.map_contains_valid_sample_data:
+            self.sample.data.stream.pipeline = NULL
+            self.sample.data.stream.sink = NULL
+            self.sample.data.stream.sample = NULL
+            self.sample.data.stream.buffer = NULL
+            self.sample.data.stream.map_contains_valid_sample_data = 0
+            self.sample.data.stream.map_buffer_pos = 0
+            self.sample.data.stream.null_buffer_count = 0
+
         pass
 
     @property

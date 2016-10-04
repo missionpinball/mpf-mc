@@ -15,6 +15,7 @@ cdef extern from 'gst/gst.h':
     ctypedef void *GstBin
     ctypedef void *GstCaps
     ctypedef void *GstTimedValueControlSource
+    ctypedef void *GObject
     ctypedef void (*appcallback_t)(void *, int, int, char *, int)
     ctypedef void (*buscallback_t)(void *, GstMessage *)
     ctypedef int gint
@@ -26,6 +27,7 @@ cdef extern from 'gst/gst.h':
     ctypedef unsigned int gsize
     ctypedef void *gpointer
     ctypedef const void *gconstpointer
+    ctypedef char gchar
     ctypedef char const_gchar 'const gchar'
     ctypedef int gint
     ctypedef long int gint64
@@ -175,6 +177,10 @@ cdef extern from 'glib.h':
 #    GStreamer helper functions defined in gstreamer_helper.h
 # ---------------------------------------------------------------------------
 cdef extern from 'gstreamer_helper.h':
+    void g_gst_log_error(const_gchar *file, const_gchar *function, gint line, GObject *object, const_gchar *message) nogil
+    void g_gst_log_warning(const_gchar *file, const_gchar *function, gint line, GObject *object, const_gchar *message) nogil
+    void g_gst_log_info(const_gchar *file, const_gchar *function, gint line, GObject *object, const_gchar *message) nogil
+    void g_gst_log_debug(const_gchar *file, const_gchar *function, gint line, GObject *object, const_gchar *message) nogil
     void g_object_set_void(GstElement *element, char *name, void *value)
     void g_object_set_double(GstElement *element, char *name, double value) nogil
     void g_object_set_caps(GstElement *element, char *value)

@@ -11,6 +11,26 @@ static void c_glib_iteration(int count)
 	}
 }
 
+static void g_gst_log_error(const gchar *file, const gchar *function, gint line, GObject *object, const gchar *message)
+{
+    gst_debug_log(GST_CAT_DEFAULT, GST_LEVEL_ERROR, file, function, line, object, message);
+}
+
+static void g_gst_log_warning(const gchar *file, const gchar *function, gint line, GObject *object, const gchar *message)
+{
+    gst_debug_log(GST_CAT_DEFAULT, GST_LEVEL_WARNING, file, function, line, object, message);
+}
+
+static void g_gst_log_info(const gchar *file, const gchar *function, gint line, GObject *object, const gchar *message)
+{
+    gst_debug_log(GST_CAT_DEFAULT, GST_LEVEL_INFO, file, function, line, object, message);
+}
+
+static void g_gst_log_debug(const gchar *file, const gchar *function, gint line, GObject *object, const gchar *message)
+{
+    gst_debug_log(GST_CAT_DEFAULT, GST_LEVEL_DEBUG, file, function, line, object, message);
+}
+
 static void g_object_set_void(GstElement *element, char *name, void *value)
 {
 	g_object_set(G_OBJECT(element), name, value, NULL);

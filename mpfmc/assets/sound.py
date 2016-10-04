@@ -242,8 +242,8 @@ class SoundAsset(Asset):
         """ Constructor"""
         super().__init__(mc, name, file, config)
 
-        self._load_in_memory = False
         self._track = None
+        self._streaming = False
         self._volume = DEFAULT_VOLUME
         self.priority = DEFAULT_PRIORITY
         self._max_queue_time = DEFAULT_MAX_QUEUE_TIME
@@ -289,8 +289,8 @@ class SoundAsset(Asset):
         self._track = track
 
         # Validate sound attributes and provide default values
-        if 'load_in_memory' in self.config:
-            self._load_in_memory = self.config['load_in_memory']
+        if 'streaming' in self.config:
+            self._streaming = self.config['streaming']
 
         if 'volume' in self.config:
             self._volume = min(max(float(self.config['volume']), 0.0), 1.0)
@@ -398,9 +398,9 @@ class SoundAsset(Asset):
         return id(self)
 
     @property
-    def load_in_memory(self):
-        """Return whether or not this sound is loaded in memory (if not it will be streamed)"""
-        return self._load_in_memory
+    def streaming(self):
+        """Return whether or not this sound streamed (if not it will be loaded in memory)"""
+        return self._streaming
 
     @property
     def track(self):
@@ -444,7 +444,12 @@ class SoundAsset(Asset):
     def simultaneous_limit(self):
         """Return the maximum number of instances of the sound that may be
         played simultaneously"""
-        return self._simultaneous_limit
+        if self.streaming:
+            # Streamed sounds only support a single instance at a time, no matter what the
+            # 'simultaneous_limit' setting is.
+            return 1
+        else:
+            return self._simultaneous_limit
 
     @property
     def stealing_method(self):
@@ -506,12 +511,17 @@ class SoundAsset(Asset):
 
         # Load the sound file into memory
         if self._container is not None:
-            self.log.debug("Sound %s already loaded in memory", self.name)
+            self.log.debug("Sound %s already loaded", self.name)
             return
 
-        self.log.debug("Sound %s loading to memory", self.name)
         try:
-            self._container = self.machine.sound_system.audio_interface.load_sound_file_to_memory(self.file)
+            if self.streaming:
+                self.log.debug("Sound %s loading for streaming", self.name)
+                self._container = self.machine.sound_system.audio_interface.load_sound_file_for_streaming(self.file)
+            else:
+                self.log.debug("Sound %s loading to memory", self.name)
+                self._container = self.machine.sound_system.audio_interface.load_sound_file_to_memory(self.file)
+
         except AudioException as exception:
             self.log.error("Load sound %s failed due to an exception - %s",
                            self.name, str(exception))
@@ -532,10 +542,10 @@ class SoundAsset(Asset):
 
     def _do_unload(self):
         """Unloads the asset from memory"""
-        self.log.debug("Sound %s unloading from memory", self.name)
+        self.log.debug("Sound %s unloading", self.name)
         self.stop(0)
         if self._container is not None:
-            self.machine.sound_system.audio_interface.unload_sound_file_from_memory(self._container)
+            self.machine.sound_system.audio_interface.unload_sound_file(self._container)
             self._container = None
 
     def is_loaded(self):
@@ -852,10 +862,10 @@ class SoundInstance(object):
         return self._sound
 
     @property
-    def load_in_memory(self):
-        """Return whether or not the wrapped sound is loaded in memory
-        (if not it will be streamed)"""
-        return self._sound.load_in_memory
+    def streaming(self):
+        """Return whether or not the wrapped sound is streamed
+        (if not it will be loaded in memory)"""
+        return self._sound.streaming
 
     @property
     def loaded(self):

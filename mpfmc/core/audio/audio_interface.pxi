@@ -237,6 +237,7 @@ ctypedef struct RequestMessageDataPlaySound:
 
 ctypedef struct RequestMessageDataStopSound:
     Uint32 fade_out_duration
+    Uint32 ducking_release_duration
 
 ctypedef union RequestMessageData:
     RequestMessageDataPlaySound play
