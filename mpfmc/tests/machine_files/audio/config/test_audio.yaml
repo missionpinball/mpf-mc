@@ -73,7 +73,7 @@ sounds:
         simultaneous_limit: 3
         stealing_method: newest
     263774_music:
-        streaming: True
+        streaming: False
 
 sound_pools:
     drum_group:
