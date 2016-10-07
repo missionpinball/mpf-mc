@@ -5,6 +5,9 @@ displays:
     width: 400
     height: 300
 
+modes:
+  - mode1
+
 slides:
   video_test:
     - type: video
@@ -87,10 +90,12 @@ slides:
       control_events:
         - event: play1
           action: play
-      control_events:
         - event: seek1
           action: seek
           value: .9
+  video_test9:
+    - type: text
+      text: Machine slide, no video
 
 slide_player:
   show_slide1: video_test
@@ -101,8 +106,7 @@ slide_player:
   show_slide6: video_test6
   show_slide7: video_test7
   show_slide8: video_test8
-
-
+  show_slide9: video_test9
 
 videos:
   mpf_video_small_test:

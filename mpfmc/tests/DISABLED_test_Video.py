@@ -1,4 +1,5 @@
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc.widgets.video import VideoWidget
 
 
 class TestVideo(MpfMcTestCase):
@@ -221,10 +222,10 @@ class TestVideo(MpfMcTestCase):
         # wait for the video to end and make sure it stops
         self.mc.events.post('seek1')
         self.advance_time(2)
-        self.assertAlmostEqual(video_widget.video.position, 7.1, delta=.3)
+        self.assertEqual(video_widget.video.position, 0.0)
 
         self.advance_time(1)
-        self.assertAlmostEqual(video_widget.video.position, 7.1, delta=.3)
+        self.assertEqual(video_widget.video.position, 0.0)
 
     def test_pre_show_slide(self):
         self.mc.events.post('show_slide3')
@@ -241,3 +242,27 @@ class TestVideo(MpfMcTestCase):
     def test_slide_leave(self):
         self.mc.events.post('show_slide6')
         self.advance_time()
+
+    def test_video_stops_on_slide_removal(self):
+        self.mc.events.post('show_slide9')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['default'].current_slide.name, 'video_test9')
+
+        # start mode1, its slide with video should come up
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+
+        self.mc.events.post('mode_mode1_started')
+        self.advance_time(2)
+        self.assertEqual(self.mc.targets['default'].current_slide.name, 'mode1_slide1')
+
+        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        self.assertTrue(isinstance(video_widget, VideoWidget))
+        self.assertEqual(video_widget.state, 'play')
+
+        # stop mode 1, should unload the slide
+        self.mc.modes['mode1'].stop()
+        self.advance_time()
+        self.assertEqual(self.mc.targets['default'].current_slide.name, 'video_test9')
+
+        self.assertEqual(video_widget.state, 'stop')
