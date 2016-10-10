@@ -138,6 +138,9 @@ class McSlidePlayer(McConfigPlayer):
         for slide, s in settings.items():
             s.update(kwargs)
 
+            if s["slide"]:
+                slide = s['slide']
+
             try:
                 s['priority'] += priority
             except (KeyError, TypeError):
