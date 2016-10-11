@@ -87,6 +87,8 @@ class SoundPool(AssetPool):
         Plays the sound using the specified settings
         Args:
             settings: Optional dictionary of settings to override the default values.
+        Returns:
+            A new sound instance or None if sound could not be played
         """
         self.log.debug("Play sound pool %s", self.name)
 

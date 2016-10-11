@@ -30,7 +30,6 @@ ctypedef struct SampleStream:
     GstSample *sample
     GstBuffer *buffer
     GstMapInfo map_info
-    gint64 duration
     Uint32 map_buffer_pos
     gboolean map_contains_valid_sample_data
     gint null_buffer_count
@@ -85,7 +84,6 @@ ctypedef struct TrackState:
     Uint32 fade_steps_remaining
     int buffer_size
     Uint8 *buffer
-    GSList *request_messages
     GSList *notification_messages
     bint ducking_is_active
     Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
@@ -143,6 +141,7 @@ ctypedef union SoundSampleData:
 ctypedef struct SoundSample:
     SoundType type
     SoundSampleData data
+    double duration
 
 ctypedef struct SoundSettings:
     SoundSample *sample
@@ -159,6 +158,7 @@ ctypedef struct SoundSettings:
     Uint32 fade_steps_remaining
     Uint8 marker_count
     Uint32 markers[MAX_MARKERS]
+    Uint32 almost_finished_marker
     bint sound_has_ducking
     DuckingSettings ducking_settings
     DuckingStage ducking_stage
@@ -172,7 +172,18 @@ ctypedef struct SoundPlayer:
     SoundSettings current
     SoundSettings next
     int track_num
-    int player
+    int number
+
+
+# ---------------------------------------------------------------------------
+#    Playlist Track types
+# ---------------------------------------------------------------------------
+
+ctypedef struct TrackPlaylistState:
+    # State variables for TrackPlaylist tracks
+    SoundPlayer *player_one
+    SoundPlayer *player_two
+    float crossfade_seconds
 
 
 # ---------------------------------------------------------------------------
@@ -216,11 +227,11 @@ ctypedef struct AudioCallbackData:
 # ---------------------------------------------------------------------------
 
 cdef enum RequestMessage:
-    request_not_in_use = 0               # Message is not in use and is available
-    request_sound_play = 1               # Request to play a sound
-    request_sound_replace = 2            # Request to play a sound that replaces a sound in progress
-    request_sound_stop = 3               # Request to stop a sound that is playing
-    request_sound_stop_looping = 4       # Request to stop looping a sound that is playing
+    request_sound_play = 1                # Request to play a sound
+    request_sound_play_when_finished = 2  # Request to play a sound when the current one is finished
+    request_sound_replace = 3             # Request to play a sound that replaces a sound in progress
+    request_sound_stop = 4                # Request to stop a sound that is playing
+    request_sound_stop_looping = 5        # Request to stop looping a sound that is playing
 
 
 ctypedef struct RequestMessageDataPlaySound:
@@ -257,14 +268,14 @@ ctypedef struct RequestMessageContainer:
 # ---------------------------------------------------------------------------
 
 cdef enum NotificationMessage:
-    notification_not_in_use = 0               # Message is not in use and is available
     notification_sound_started = 1            # Notification that a sound has started playing
     notification_sound_stopped = 2            # Notification that a sound has stopped
     notification_sound_looping = 3            # Notification that a sound is looping back to the beginning
     notification_sound_marker = 4             # Notification that a sound marker has been reached
-    notification_player_idle = 5              # Notification that a player is now idle and ready to play another sound
-    notification_track_stopped = 6            # Notification that the track has stopped
-    notification_track_paused = 7             # Notification that the track has been paused
+    notification_sound_about_to_finish = 5    # Notification that a sound is about to finish playing
+    notification_player_idle = 10             # Notification that a player is now idle and ready to play another sound
+    notification_track_stopped = 0            # Notification that the track has stopped
+    notification_track_paused = 21            # Notification that the track has been paused
 
 ctypedef struct NotificationMessageDataLooping:
     int loop_count

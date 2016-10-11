@@ -29,6 +29,13 @@ static gboolean g_object_get_bool(GstElement *element, char *name)
     return value;
 }
 
+static GstSample *c_appsink_pull_preroll(GstElement *appsink)
+{
+	GstSample *sample = NULL;
+	g_signal_emit_by_name(appsink, "pull-preroll", &sample);
+    return sample;
+}
+
 static GstSample *c_appsink_pull_sample(GstElement *appsink)
 {
 	GstSample *sample = NULL;

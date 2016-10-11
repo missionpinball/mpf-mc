@@ -15,6 +15,7 @@ cdef extern from 'gst/gst.h':
     ctypedef void *GstBin
     ctypedef void *GstCaps
     ctypedef void *GstTimedValueControlSource
+    ctypedef void *GstQuery
     ctypedef void *GObject
     ctypedef void (*appcallback_t)(void *, int, int, char *, int)
     ctypedef void (*buscallback_t)(void *, GstMessage *)
@@ -95,6 +96,10 @@ cdef extern from 'gst/gst.h':
     bool gst_bin_remove(GstBin *bin, GstElement *element)
     GstElement *gst_bin_get_by_name(GstBin *bin, const_gchar *name)
     void gst_object_unref(void *pointer) nogil
+    bool gst_element_query(GstElement *element, GstQuery *query)
+    GstQuery *gst_query_new_duration(GstFormat format)
+    void gst_query_parse_duration(GstQuery *query, GstFormat *format, gint64 *duration)
+    void gst_query_unref(GstQuery *q)
     GstElement *gst_pipeline_new(const_gchar *name)
     GstPad *gst_element_get_static_pad(GstElement *element, const_gchar *name)
     GstPad *gst_element_get_request_pad(GstElement *element, const_gchar *name)
@@ -182,6 +187,7 @@ cdef extern from 'gstreamer_helper.h':
     void g_gst_log_info(const_gchar *file, const_gchar *function, gint line, GObject *object, const_gchar *message) nogil
     void g_gst_log_debug(const_gchar *file, const_gchar *function, gint line, GObject *object, const_gchar *message) nogil
     gboolean g_object_get_bool(GstElement *element, char *name) nogil
+    GstSample *c_appsink_pull_preroll(GstElement *appsink) nogil
     GstSample *c_appsink_pull_sample(GstElement *appsink) nogil
     gulong c_bus_connect_message(GstBus *bus,
             buscallback_t callback, void *userdata)
