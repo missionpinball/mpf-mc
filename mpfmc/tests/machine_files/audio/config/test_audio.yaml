@@ -9,9 +9,8 @@ sound_system:
       volume: 0.5
       simultaneous_sounds: 1
       events_when_stopped: music_track_stopped
-      events_when_played: music_track_played
+      events_when_played: music_track_played, keep_going
       events_when_paused: music_track_paused
-      events_when_resumed: music_track_resumed, keep_going
     sfx:
       volume: 0.4
       simultaneous_sounds: 8
@@ -147,7 +146,7 @@ track_player:
              action: pause
     resume_music_track:
         music:
-             action: resume
+             action: play
     set_music_track_volume_loud:
         music:
              action: set_volume

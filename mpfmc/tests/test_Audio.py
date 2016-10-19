@@ -681,19 +681,23 @@ class TestAudio(MpfMcTestCase):
         self.mc.events.post('pause_music_track')
         self.advance_time(2)
         self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_paused')
+        self.mc.bcp_processor.send.reset_mock()
 
         self.mc.events.post('resume_music_track')
         self.advance_time(2)
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_resumed')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_played')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='keep_going')
+        self.mc.bcp_processor.send.reset_mock()
 
         self.mc.events.post('stop_all_tracks')
         self.advance_time(2)
         self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_stopped')
+        self.mc.bcp_processor.send.reset_mock()
 
         self.mc.events.post('play_music_track')
         self.advance_time(1)
         self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_played')
+        self.mc.bcp_processor.send.reset_mock()
 
         instance = self.mc.sounds['263774_music'].play()
         self.advance_time(2)

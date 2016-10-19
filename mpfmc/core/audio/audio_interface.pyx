@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev15')
+__version_info__ = ('0', '32', '0-dev16')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf, sprintf
@@ -1344,7 +1344,6 @@ cdef class Track:
     cdef list _events_when_stopped
     cdef list _events_when_played
     cdef list _events_when_paused
-    cdef list _events_when_resumed
     cdef object mc
     cdef SDL_AudioDeviceID device_id
     cdef object log
@@ -1378,7 +1377,6 @@ cdef class Track:
         self._events_when_stopped = None
         self._events_when_played = None
         self._events_when_paused = None
-        self._events_when_resumed = None
 
         # Allocate memory for the track state (common among all track types)
         self.state = <TrackState*> PyMem_Malloc(sizeof(TrackState))
@@ -1461,16 +1459,6 @@ cdef class Track:
         self._events_when_paused = events
 
     @property
-    def events_when_resumed(self):
-        """Return the list of events that are posted when the track is resumed"""
-        return self._events_when_resumed
-
-    @events_when_resumed.setter
-    def events_when_resumed(self, events):
-        """Sets the list of events that are posted when the track is resumed"""
-        self._events_when_resumed = events
-
-    @property
     def supports_in_memory_sounds(self):
         """Return whether or not track supports in-memory sounds"""
         raise NotImplementedError('Must be overridden in derived class')
@@ -1535,8 +1523,10 @@ cdef class Track:
 
         SDL_LockAudioDevice(self.device_id)
 
-        # Play is only supported when a track is stopped or is in the process of stopping
-        if self.state.status == track_status_stopped or self.state.status == track_status_stopping:
+        # Play is only supported when a track is paused, stopped, or is in the process of stopping
+        if self.state.status == track_status_paused or \
+                        self.state.status == track_status_stopped or \
+                        self.state.status == track_status_stopping:
             if fade_in_seconds > 0:
                 # Calculate fade data (steps and volume)
                 self.log.debug("play - Applying %s second fade in", str(fade_in_seconds))
@@ -1600,46 +1590,6 @@ cdef class Track:
         else:
             self.log.warning("stop - Action may only be used when a track is playing; action "
                              "will be ignored.")
-
-        SDL_UnlockAudioDevice(self.device_id)
-
-    def resume(self, float fade_in_seconds = 0.0):
-        """
-        Resumes playing a paused track so it can continue processing sounds. Function has no effect
-        unless the track is paused.
-        Args:
-            fade_in_seconds: The number of seconds to fade in the track
-        """
-        self.log.debug("resume - Resume sound processing on track")
-
-        SDL_LockAudioDevice(self.device_id)
-
-        # Play is only supported when a track is paused or is in the process of pausing
-        if self.state.status == track_status_paused or self.state.status == track_status_pausing:
-            if fade_in_seconds > 0:
-                # Calculate fade data (steps and volume)
-                self.log.debug("resume - Applying %s second fade in", str(fade_in_seconds))
-                self.state.fade_steps = <Uint32>(fade_in_seconds * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
-                self.state.fade_steps_remaining = self.state.fade_steps
-                self.state.fade_volume_start = self.state.fade_volume_current
-                self.state.fade_volume_target = self.state.volume
-            else:
-                # No fade will occur, simply set volume
-                self.state.fade_steps = 0
-                self.state.fade_steps_remaining = 0
-                self.state.fade_volume_current = self.state.volume
-                self.state.fade_volume_start = self.state.volume
-                self.state.fade_volume_target = self.state.volume
-
-            self.state.status = track_status_playing
-
-            # Trigger any events
-            if self.events_when_resumed is not None:
-                for event in self.events_when_resumed:
-                    self.mc.post_mc_native_event(event)
-        else:
-            self.log.warning("resume - Action may only be used when a track is paused or is in the process "
-                             "of pausing; action will be ignored.")
 
         SDL_UnlockAudioDevice(self.device_id)
 
@@ -2924,7 +2874,7 @@ cdef class TrackPlaylist(Track):
         """
         if player != NULL and player.status != player_idle:
             # Calculate fade out (if necessary)
-            player.current.fade_steps_remaining = fade_out_seconds * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
+            player.current.fade_steps_remaining = <Uint32>(fade_out_seconds * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point)
             if player.current.fade_steps_remaining > 0:
                 player.current.fade_out_steps = player.current.fade_steps_remaining
                 player.current.fading_status = fading_status_fading_out

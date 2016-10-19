@@ -108,9 +108,6 @@ Here are several various examples:
                 elif s['action'].lower() == 'pause':
                     track.pause(s['fade'])
 
-                elif s['action'].lower() == 'resume':
-                    track.resume(s['fade'])
-
                 elif s['action'].lower() == 'set_volume':
                     track.set_volume(s['volume'], s['fade'])
 
