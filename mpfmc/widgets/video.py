@@ -125,14 +125,17 @@ class VideoWidget(MpfWidget, Video):
     def play(self, **kwargs):
         del kwargs
         self.video.play()
+        self.state = 'play'
 
     def pause(self, **kwargs):
         del kwargs
         self.video.pause()
+        self.state = 'pause'
 
     def stop(self, **kwargs):
         del kwargs
         self.video.stop()
+        self.state = 'stop'
 
     def seek(self, percent, **kwargs):
         del kwargs
@@ -157,7 +160,6 @@ class VideoWidget(MpfWidget, Video):
         if CoreVideo is None:
             raise TypeError("Could not find a video provider to play back "
                             "the video '{}'".format(self.video.file))
-
 
         self.volume = self.config['volume']
         if self.config['auto_play']:
@@ -201,3 +203,4 @@ class VideoWidget(MpfWidget, Video):
         super().prepare_for_removal()
         self.mc.events.remove_handlers_by_keys(self._control_events)
         self._control_events = list()
+        self.stop()

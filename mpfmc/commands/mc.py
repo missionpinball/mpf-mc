@@ -84,6 +84,12 @@ class Command(object):
                             "when launching in a separate window so you can "
                             "see any errors before the window closes.")
 
+        parser.add_argument("-f",
+                            action="store_true", dest="force_assets_load", default=False,
+                            help="Load all assets upon startup. Useful for "
+                            "ensuring all assets are set up properly "
+                            "during development.")
+
         # The following are just included for full compatibility with mpf.py which is
         # needed when launching from a batch file or shell script.
         parser.add_argument("-x",
