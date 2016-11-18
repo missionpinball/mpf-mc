@@ -1,4 +1,4 @@
-"""Contains the parent class for Scriptlets."""
+"""Contains the parent class for Scriptlets used in MPF-MC."""
 
 
 class Scriptlet(object):
