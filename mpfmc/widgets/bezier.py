@@ -6,7 +6,7 @@ from mpfmc.uix.widget import MpfWidget
 
 class Bezier(MpfWidget, Widget):
 
-    widget_type_name = 'Line'
+    widget_type_name = 'Bezier'
 
     def __init__(self, mc, config, key=None, **kwargs):
         super().__init__(mc=mc, config=config, key=key)
