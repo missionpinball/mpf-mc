@@ -1,14 +1,17 @@
-sudo: required
+language: generic
 
 matrix:
   fast_finish: true
   include:
    - os: linux
      env: LINUX=ubuntu1404
+     sudo: required
    - os: linux
      env: LINUX=ubuntu1604
+     sudo: required
    - os: linux
      env: LINUX=debian-jessie
+     sudo: required
    - os: osx
 
 services:
@@ -21,7 +24,6 @@ before_install:
   - git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
 
 install:
-  - pip3 install coveralls
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       brew update;
       brew install python3;
@@ -34,6 +36,7 @@ install:
       USE_OSX_FRAMEWORKS=0 pip3 install .;
 
     fi;
+  - pip3 install coveralls
 
 env:
   global:
