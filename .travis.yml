@@ -4,7 +4,7 @@ services:
   - docker
 
 before_install:
-  - docker build -t mpf-mc/ubuntu1604
+  - docker build -t mpf-mc/ubuntu1604 .
   - git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
 
 env:
