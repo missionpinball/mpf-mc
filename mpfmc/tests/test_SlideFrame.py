@@ -90,5 +90,5 @@ class TestSlideFrame(MpfMcTestCase):
         self.mc.events.post('show_slide2')
         self.advance_time()
 
-        self.assertEventCalled('slide_slide2_active', 1)
         self.assertEventNotCalled('slide_slide1_active')
+        self.assertEventCalled('slide_slide2_active', 1)
