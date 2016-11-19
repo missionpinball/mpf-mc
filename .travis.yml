@@ -5,12 +5,15 @@ matrix:
   include:
    - os: linux
      env: LINUX=ubuntu1404
+     dist: precise
      sudo: required
    - os: linux
      env: LINUX=ubuntu1604
+     dist: precise
      sudo: required
    - os: linux
      env: LINUX=debian-jessie
+     dist: precise
      sudo: required
    - os: osx
 
