@@ -1,33 +1,35 @@
+dist: trusty
+sudo: required
+
 matrix:
   fast_finish: true
   include:
-   - language: python
-     python: 3.4
-     os: linux
-   - language: python
-     python: 3.5
-     os: linux
-   - language: generic
-     os: osx
-env:
-  global:
-     secure: "WNvNRbHmintW6NlclAw3rbP4EzJ0Zt7gqVSha/+gC8Vo2pkbWphltgH5YwBGGM37ZRRbJ90Qm7aaLsFSpxOLnWlOlTw6/NBdKFEjvZISU8x7VcxlScNKTgDmeMYrDTsfbzoZJx7A6ZzxIm3fvRDcfhQcB0kI6wvLhcD1jHGqy0omfOHyFw51RfvRq07xsqavHN2Km9ObSqRCyMSuKNSCBHuIvGq7WnMfv+yU+iEV9pfQOEIo6JC7aySfIJ0gdgXK68RbWPLg1x4KwLsni9VDnOxXw9lPQbJfv9bpY1Fv3RWOQE763mHGojyorODrLCcYnKW+f177+h8PfBgIMMJdcF4CmanoGSrJG6QCp0GdauNzaqSXhGPFGIBToHPdFAW9XbHyVivFOP+rK8fo52euxX4rOgAF0oYuTxaz1SZn0x52u/BWG44Za9pQur8mZZHuZr9JpSzYF2u1FO3T4wj3noCBkXXe250WQp/zA1VrWgRPZgB9r6nxfguWsbzpia2dhcRDY+/jChJvc2mvHio8wlw3WhFhoUjUQkoGzmr/uio2j4SEo84wAClcQ5S6yzGY4IE8i8b4NZuJy9tsVS8+99TaR4TrUET1r+LqU7T4uN2Bp85zaw1ekmlj5xUD5/aJWagIM6kCv35nSD2camIQWVq0eiBqzOsu0npH9EhML0A="
+   - os: linux
+     env: LINUX=ubuntu1404
+     sudo: required
+     language: python
+   - os: linux
+     env: LINUX=ubuntu1604
+     sudo: required
+     language: python
+   - os: linux
+     env: LINUX=debian-jessie
+     sudo: required
+     language: python
+   - os: osx
+     language: generic
+
+services:
+  - docker
+
+before_install:
+  - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
+       cd docker/${LINUX}; docker build -t mpf-mc/image .; cd ../../;
+    fi;
+  - git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
 
 install:
-
- - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-      yes | sudo add-apt-repository ppa:zoogie/sdl2-snapshots;
-      sudo apt-get update;
-      sudo apt-get -y install libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer0.10-plugins-{good,base,bad,ugly} libgstreamer0.10-dev libxine1-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff4-dev libX11-dev libmtdev-dev build-essential libgl1-mesa-dev libgles2-mesa-dev;
-      sudo apt-get -y install xvfb pulseaudio;
-      pip3 install --upgrade cython pillow coveralls setuptools;
-      pip3 install kivy;
-      git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
-      pip3 install -e _mpf/;
-      python3 setup.py install;
-   fi;
-
- - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       brew update;
       brew install python3;
       brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
@@ -39,29 +41,15 @@ install:
       USE_OSX_FRAMEWORKS=0 pip3 install .;
 
     fi;
+  - pip3 install coveralls
 
-before_script:
-  - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-      export DISPLAY=:99.0;
-      /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX;
-      export PYTHONPATH=$PYTHONPATH:$(pwd);
-    fi;
-
-#  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-#      export CC=clang;
-#      export CXX=clang;
-#      export FFLAGS=-ff2c;
-#      export USE_OPENGL_MOCK=1;
-#    fi;
+env:
+  global:
+     secure: "WNvNRbHmintW6NlclAw3rbP4EzJ0Zt7gqVSha/+gC8Vo2pkbWphltgH5YwBGGM37ZRRbJ90Qm7aaLsFSpxOLnWlOlTw6/NBdKFEjvZISU8x7VcxlScNKTgDmeMYrDTsfbzoZJx7A6ZzxIm3fvRDcfhQcB0kI6wvLhcD1jHGqy0omfOHyFw51RfvRq07xsqavHN2Km9ObSqRCyMSuKNSCBHuIvGq7WnMfv+yU+iEV9pfQOEIo6JC7aySfIJ0gdgXK68RbWPLg1x4KwLsni9VDnOxXw9lPQbJfv9bpY1Fv3RWOQE763mHGojyorODrLCcYnKW+f177+h8PfBgIMMJdcF4CmanoGSrJG6QCp0GdauNzaqSXhGPFGIBToHPdFAW9XbHyVivFOP+rK8fo52euxX4rOgAF0oYuTxaz1SZn0x52u/BWG44Za9pQur8mZZHuZr9JpSzYF2u1FO3T4wj3noCBkXXe250WQp/zA1VrWgRPZgB9r6nxfguWsbzpia2dhcRDY+/jChJvc2mvHio8wlw3WhFhoUjUQkoGzmr/uio2j4SEo84wAClcQ5S6yzGY4IE8i8b4NZuJy9tsVS8+99TaR4TrUET1r+LqU7T4uN2Bp85zaw1ekmlj5xUD5/aJWagIM6kCv35nSD2camIQWVq0eiBqzOsu0npH9EhML0A="
 
 script:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-      coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests;
-      coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;
-    fi;
-
-  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      echo skipping tests;
+      docker run -v $PWD:$PWD -w $PWD mpf-mc/image /bin/sh -c "pip3 install --upgrade cython pillow coveralls setuptools pip; apt-get remove python-pip python-pip3; pip3 install kivy; pip3 install -e _mpf/; python3 setup.py install; export DISPLAY=:99.0; /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX; export PYTHONPATH=$PYTHONPATH:$(pwd); coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests; coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;";
     fi;
 
 after_success:
