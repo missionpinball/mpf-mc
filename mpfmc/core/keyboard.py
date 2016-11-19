@@ -35,6 +35,7 @@ class Keyboard(Widget):
             'comma':',',
             'period':'.',
             'slash':'/',
+            'question':'?',
         }
 
         self.keyboard = Window.request_keyboard(callback=None, target=self)
