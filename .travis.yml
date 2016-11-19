@@ -24,7 +24,7 @@ services:
 
 before_install:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-       cd docker/${LINUX}; docker build -t mpf-mc/image .;
+       cd docker/${LINUX}; docker build -t mpf-mc/image .; cd ../../;
     fi;
   - git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
 
