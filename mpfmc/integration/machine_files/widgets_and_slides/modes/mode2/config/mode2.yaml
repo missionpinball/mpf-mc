@@ -4,6 +4,7 @@ mode:
   stop_events: stop_mode2
   priority: 200
   start_priority: 1
+  game_mode: False
 
 slide_player:
   show_slide_mode2:

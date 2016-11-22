@@ -1,7 +1,9 @@
-"""Contains the MpfMc base class, which is the main App instance for the mpf-mc."""
+"""Contains the MpfMc base class, which is the main App instance for the
+mpf-mc."""
 import importlib
 import os
 import queue
+import sys
 import threading
 import time
 import logging
@@ -11,7 +13,10 @@ from kivy.clock import Clock
 from kivy.resources import resource_add_path
 from kivy.logger import Logger
 
-# The following line is needed to allow mpfmc modules to use the getLogger(name) method
+# The following line is needed to allow mpfmc modules to use the
+# getLogger(name) method
+
+from mpf.core.utility_functions import Util
 from mpfmc.core.assets import ThreadedAssetManager
 
 logging.Logger.manager.root = Logger
@@ -107,6 +112,8 @@ class MpfMc(App):
         self.config_processor = ConfigProcessor(self)
         self.transition_manager = TransitionManager(self)
 
+        self._set_machine_path()
+
         self._load_font_paths()
 
         # Initialize the sound system (must be done prior to creating the AssetManager).
@@ -173,6 +180,12 @@ class MpfMc(App):
 
     def get_config(self):
         return self.machine_config
+
+    def _set_machine_path(self):
+        self.log.debug("Machine path: %s", self.machine_path)
+
+        # Add the machine folder to sys.path so we can import modules from it
+        sys.path.insert(0, self.machine_path)
 
     def register_boot_hold(self, hold):
         # print('registering boot hold', hold)
@@ -393,17 +406,21 @@ class MpfMc(App):
 
     def _load_scriptlets(self):
         if 'mc_scriptlets' in self.machine_config:
-            self.machine_config['mc_scriptlets'] = self.machine_config[
-                'mc_scriptlets'].split(' ')
+            self.machine_config['mc_scriptlets'] = (
+                self.machine_config['mc_scriptlets'].split(' '))
+
+            self.log.debug("Loading scriptlets...")
 
             for scriptlet in self.machine_config['mc_scriptlets']:
-                i = __import__(
-                    self.machine_config['mpf-mc']['paths']['scriptlets'] +
-                    '.' + scriptlet.split('.')[0], fromlist=[''])
 
-                self.scriptlets.append(getattr(i, scriptlet.split('.')[1])
-                                       (mc=self,
-                                        name=scriptlet.split('.')[1]))
+                self.log.debug("Loading '%s' scriptlet", scriptlet)
+
+                scriptlet_obj = Util.string_to_class(
+                    self.machine_config['mpf-mc']['paths']['scriptlets'] +
+                    "." + scriptlet)(mc=self,
+                                     name=scriptlet.split('.')[1])
+
+                self.scriptlets.append(scriptlet_obj)
 
     def _check_crash_queue(self, time):
         del time

@@ -188,7 +188,9 @@ def set_machine_path(machine_path, machine_files_default='machine_files'):
     machine_path = os.path.abspath(machine_path)
 
     # Add the machine folder to sys.path so we can import modules from it
-    sys.path.append(machine_path)
+    if machine_path not in sys.path:
+        sys.path.append(machine_path)
+
     return machine_path
 
 
