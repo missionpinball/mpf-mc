@@ -152,7 +152,7 @@ setup(
         MIT licensed, actively developed by fun people, and supported by a
         vibrant pinball-loving community.''',
 
-    url='https://missionpinball.org',
+    url='http://missionpinball.org',
     author='The Mission Pinball Framework Team',
     author_email='brian@missionpinball.org',
     license='MIT',
