@@ -212,7 +212,8 @@ class SoundSystem(object):
             raise NotImplementedError('Playlist track not yet implemented')
 
         elif config['type'] == 'live_loop':
-            track = self.audio_interface.create_live_loop_track(self.mc, name, config['volume'])
+            raise NotImplementedError('LiveLoop track not yet implemented')
+            # track = self.audio_interface.create_live_loop_track(self.mc, name, config['volume'])
 
         if track is None:
             raise AudioException("Could not create '{}' track due to an error".format(name))
