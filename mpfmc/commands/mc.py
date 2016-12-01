@@ -41,6 +41,30 @@ class Command(object):
 
         parser = argparse.ArgumentParser(description='Starts the MPF Media Controller')
 
+        parser.add_argument("-b",
+                            action="store_false", dest="bcp", default=True,
+                            help="Do not set up the BCP server threads")
+
+        parser.add_argument("-c",
+                            action="store", dest="configfile",
+                            default="config", metavar='config_file(s)',
+                            help="The name of a config file to load. Default is "
+                                 "config.yaml. Multiple files can be used via a comma-"
+                                 "separated list (no spaces between)")
+
+        parser.add_argument("-C",
+                            action="store", dest="mcconfigfile",
+                            default="mcconfig.yaml",
+                            metavar='config_file',
+                            help="The MPF framework default config file. Default is "
+                                 "<mpf-mc install folder>/mcconfig.yaml")
+
+        parser.add_argument("-f",
+                            action="store_true", dest="force_assets_load", default=False,
+                            help="Load all assets upon startup. Useful for "
+                            "ensuring all assets are set up properly "
+                            "during development.")
+
         parser.add_argument("-l",
                             action="store", dest="logfile",
                             metavar='file_name',
@@ -49,12 +73,11 @@ class Command(object):
                                 ".log")),
                             help="The name (and path) of the log file")
 
-        parser.add_argument("-c",
-                            action="store", dest="configfile",
-                            default="config", metavar='config_file(s)',
-                            help="The name of a config file to load. Default is "
-                                 "config.yaml. Multiple files can be used via a comma-"
-                                 "separated list (no spaces between)")
+        parser.add_argument("-p",
+                            action="store_true", dest="pause", default=False,
+                            help="Pause the terminal window on exit. Useful "
+                            "when launching in a separate window so you can "
+                            "see any errors before the window closes.")
 
         parser.add_argument("-v",
                             action="store_const", dest="loglevel", const=logging.DEBUG,
@@ -67,31 +90,17 @@ class Command(object):
                             help="Enables verbose logging to the console. Do NOT on "
                                  "Windows platforms")
 
-        parser.add_argument("-C",
-                            action="store", dest="mcconfigfile",
-                            default="mcconfig.yaml",
-                            metavar='config_file',
-                            help="The MPF framework default config file. Default is "
-                                 "<mpf-mc install folder>/mcconfig.yaml")
+        # The following are just included for full compatibility with mpf.py
+        # which is needed when using "mpf both".
 
-        parser.add_argument("-b",
-                            action="store_false", dest="bcp", default=True,
-                            help="Do not set up the BCP server threads")
+        parser.add_argument("-a",
+                            action="store_const", dest="force_platform",
+                            const='no_load_cache', help=argparse.SUPPRESS)
 
-        parser.add_argument("-p",
-                            action="store_true", dest="pause", default=False,
-                            help="Pause the terminal window on exit. Useful "
-                            "when launching in a separate window so you can "
-                            "see any errors before the window closes.")
+        parser.add_argument("-A",
+                            action="store_const", dest="force_platform",
+                            const='create_config_cache', help=argparse.SUPPRESS)
 
-        parser.add_argument("-f",
-                            action="store_true", dest="force_assets_load", default=False,
-                            help="Load all assets upon startup. Useful for "
-                            "ensuring all assets are set up properly "
-                            "during development.")
-
-        # The following are just included for full compatibility with mpf.py which is
-        # needed when launching from a batch file or shell script.
         parser.add_argument("-x",
                             action="store_const", dest="force_platform",
                             const='virtual', help=argparse.SUPPRESS)
