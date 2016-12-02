@@ -1,0 +1,5 @@
+# Audio library build files
+audio_interface.def
+audio_interface.o
+audio_interface.pyd
+

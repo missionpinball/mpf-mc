@@ -106,8 +106,7 @@ class MpfMc(App):
         self.config_validator = ConfigValidator(self)
         self.events = EventManager(self)
         self.mode_controller = ModeController(self)
-        create_config_collections(self, self.machine_config['mpf-mc'][
-            'config_collections'])
+        create_config_collections(self, self.machine_config['mpf-mc']['config_collections'])
         ConfigValidator.load_config_spec()
 
         self.config_processor = ConfigProcessor(self)
@@ -162,8 +161,9 @@ class MpfMc(App):
             SoundAsset.initialize(self)
         else:
             # If the sound system is not loaded or enabled, remove the
-            # sound_player from the list of config_player modules to setup
+            # sound_player and track_player from the list of config_player modules to setup
             del self.machine_config['mpf-mc']['config_players']['sound']
+            del self.machine_config['mpf-mc']['config_players']['track']
 
     def get_system_config(self):
         return self.machine_config['mpf-mc']

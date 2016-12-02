@@ -121,10 +121,6 @@ class TestAudio(MpfMcTestCase):
         # Make sure sound has ducking (since it was specified in the config files)
         self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
 
-        # Test baseline internal audio message count
-        self.assertEqual(interface.get_in_use_request_message_count(), 0)
-        self.assertEqual(interface.get_in_use_notification_message_count(), 0)
-
         # Test sound_player
         self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
         self.mc.events.post('play_sound_text')
@@ -206,11 +202,6 @@ class TestAudio(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_next_marker')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='last_marker')
 
-        # Check for internal sound message processing leaks (are there any internal sound
-        # events that get generated, but never processed and cleared from the queue?)
-        self.assertEqual(interface.get_in_use_request_message_count(), 0)
-        self.assertEqual(interface.get_in_use_notification_message_count(), 0)
-
     def test_mode_sounds(self):
         """ Test the sound system using sounds specified in a mode """
 
@@ -239,6 +230,7 @@ class TestAudio(MpfMcTestCase):
 
         self.assertIn('263774_music', self.mc.sounds)  # .wav
         music_sound = self.mc.sounds['263774_music']
+        music_sound.load()
 
         # Allow some time for sound assets to load
         self.advance_time(2)
@@ -259,7 +251,7 @@ class TestAudio(MpfMcTestCase):
         self.advance_time(1)
 
         self.mc.events.post('play_sound_music_fade_at_mode_end')
-        self.advance_time()
+        self.advance_time(0.25)
         self.assertTrue(track_music.sound_is_playing(music_sound))
         self.advance_time(2)
 
@@ -348,15 +340,18 @@ class TestAudio(MpfMcTestCase):
         self.assertEqual(track_music.name, "music")
         self.assertEqual(track_music.max_simultaneous_sounds, 1)
 
-        self.advance_time(1)
-
         self.assertIn('263774_music', self.mc.sounds)  # .wav
+        music_sound = self.mc.sounds['263774_music']
+        music_sound.load()
 
+        self.advance_time(2)
+
+        self.assertTrue(music_sound.loaded)
         settings = {'start_at': 7.382}
         instance = self.mc.sounds['263774_music'].play(settings)
         self.advance_time()
         status = track_music.get_status()
-        self.assertGreater(status[0]['sample_pos'], interface.convert_seconds_to_buffer_length(7.382))
+        self.assertGreaterEqual(status[0]['sample_pos'], interface.convert_seconds_to_buffer_length(7.382))
         self.advance_time(1)
         instance.stop(0.25)
         self.advance_time(0.3)
@@ -648,6 +643,78 @@ class TestAudio(MpfMcTestCase):
         track_sfx.stop_all_sounds()
         self.advance_time()
         self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_stopped_param_set_1')
+
+    def test_track_player(self):
+        """Tests the track_player"""
+
+        if SoundSystem is None or self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        self.assertIsNotNone(interface)
+
+        track_music = interface.get_track_by_name("music")
+        self.assertIsNotNone(track_music)
+        self.assertEqual(track_music.name, "music")
+        self.assertEqual(track_music.max_simultaneous_sounds, 1)
+
+        self.advance_time(1)
+
+        self.assertIn('263774_music', self.mc.sounds)  # .wav
+        sound_music = self.mc.sounds['263774_music']
+        self.assertFalse(sound_music.loaded)
+
+        self.mc.events.post('load_music')
+        self.advance_time(2)
+        self.assertTrue(sound_music.loaded)
+
+        # TODO: Improve test (need some automated status checks for track control)
+        instance = sound_music.play()
+        self.advance_time(2)
+        self.mc.events.post('pause_music_track')
+        self.advance_time(2)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_paused')
+        self.mc.bcp_processor.send.reset_mock()
+
+        self.mc.events.post('resume_music_track')
+        self.advance_time(2)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='keep_going')
+        self.mc.bcp_processor.send.reset_mock()
+
+        self.mc.events.post('stop_all_tracks')
+        self.advance_time(2)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_stopped')
+        self.mc.bcp_processor.send.reset_mock()
+
+        self.mc.events.post('play_music_track')
+        self.advance_time(1)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_played')
+        self.mc.bcp_processor.send.reset_mock()
+
+        instance = self.mc.sounds['263774_music'].play()
+        self.advance_time(2)
+        self.mc.events.post('set_music_track_volume_quiet')
+        self.advance_time(2)
+        self.mc.events.post('set_music_track_volume_loud')
+        self.advance_time(2)
+        self.mc.events.post('stop_all_sounds_on_music_track')
+        self.advance_time(1)
+
+        self.assertTrue(sound_music.loaded)
+        self.mc.events.post('unload_music')
+        self.advance_time()
+        self.assertFalse(sound_music.loaded)
+
+        # TODO: Add integration test for sound_player
+        # TODO: Add integration test for track_player
 
         """
         # Add another track with the same name (should not be allowed)

@@ -55,6 +55,12 @@ class SoundPool(AssetPool):
         """String that's returned if someone prints this object"""
         return '<SoundPool: {}>'.format(self.name)
 
+    def unload(self):
+        """Unloads all sounds in the pool"""
+        for asset in self.assets:
+            if asset[0].loaded:
+                asset[0].unload()
+
     @property
     def sound(self):
         """The currently selected Sound object from the pool"""
@@ -81,6 +87,8 @@ class SoundPool(AssetPool):
         Plays the sound using the specified settings
         Args:
             settings: Optional dictionary of settings to override the default values.
+        Returns:
+            A new sound instance or None if sound could not be played
         """
         self.log.debug("Play sound pool %s", self.name)
 
@@ -213,6 +221,7 @@ class ModeEndAction(Enum):
     stop = 0          # Sound will stop immediately (uses fade_out setting)
     stop_looping = 1  # Looping will be canceled and the sound will be allowed to finish
 
+
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
 class SoundAsset(Asset):
     """
@@ -235,8 +244,8 @@ class SoundAsset(Asset):
         """ Constructor"""
         super().__init__(mc, name, file, config)
 
-        self._load_in_memory = False
         self._track = None
+        self._streaming = False
         self._volume = DEFAULT_VOLUME
         self.priority = DEFAULT_PRIORITY
         self._max_queue_time = DEFAULT_MAX_QUEUE_TIME
@@ -282,8 +291,21 @@ class SoundAsset(Asset):
         self._track = track
 
         # Validate sound attributes and provide default values
-        if 'load_in_memory' in self.config:
-            self._load_in_memory = self.config['load_in_memory']
+        if 'streaming' in self.config:
+            self._streaming = self.config['streaming']
+
+        # Validate that the assigned track supports the sound loading method selected
+        if self._streaming and not track.supports_streaming_sounds:
+            self.log.error("Track %s does not support streaming sounds. You must set "
+                           "'streaming: False' for the %s sound.", self._track.name, self.name)
+            raise AudioException("Track {} does not support streaming sounds. You must set "
+                                 "'streaming: False' for the {} sound.".format(self._track.name, self.name))
+
+        if not self._streaming and not track.supports_in_memory_sounds:
+            self.log.error("Track %s does not support in-memory sounds. You must set "
+                           "'streaming: True' for the %s sound.", self._track.name, self.name)
+            raise AudioException("Track {} does not support in-memory sounds. You must set "
+                                 "'streaming: True' for the {} sound.".format(self._track.name, self.name))
 
         if 'volume' in self.config:
             self._volume = min(max(float(self.config['volume']), 0.0), 1.0)
@@ -391,9 +413,9 @@ class SoundAsset(Asset):
         return id(self)
 
     @property
-    def load_in_memory(self):
-        """Return whether or not this sound is loaded in memory (if not it will be streamed)"""
-        return self._load_in_memory
+    def streaming(self):
+        """Return whether or not this sound streamed (if not it will be loaded in memory)"""
+        return self._streaming
 
     @property
     def track(self):
@@ -437,7 +459,12 @@ class SoundAsset(Asset):
     def simultaneous_limit(self):
         """Return the maximum number of instances of the sound that may be
         played simultaneously"""
-        return self._simultaneous_limit
+        if self.streaming:
+            # Streamed sounds only support a single instance at a time, no matter what the
+            # 'simultaneous_limit' setting is.
+            return 1
+        else:
+            return self._simultaneous_limit
 
     @property
     def stealing_method(self):
@@ -481,7 +508,7 @@ class SoundAsset(Asset):
 
     @property
     def container(self):
-        """The container object wrapping the SDL structure containing the actual sound data"""
+        """The container object wrapping the structure containing the actual sound data"""
         return self._container
 
     @property
@@ -498,8 +525,18 @@ class SoundAsset(Asset):
         """Loads the sound asset from disk."""
 
         # Load the sound file into memory
+        if self._container is not None:
+            self.log.debug("Sound %s already loaded", self.name)
+            return
+
         try:
-            self._container = AudioInterface.load_sound_chunk(self.file)
+            if self.streaming:
+                self.log.debug("Sound %s loading for streaming", self.name)
+                self._container = self.machine.sound_system.audio_interface.load_sound_file_for_streaming(self.file)
+            else:
+                self.log.debug("Sound %s loading to memory", self.name)
+                self._container = self.machine.sound_system.audio_interface.load_sound_file_to_memory(self.file)
+
         except AudioException as exception:
             self.log.error("Load sound %s failed due to an exception - %s",
                            self.name, str(exception))
@@ -520,10 +557,11 @@ class SoundAsset(Asset):
 
     def _do_unload(self):
         """Unloads the asset from memory"""
-        self.log.debug("Sound %s unloading from memory", self.name)
+        self.log.debug("Sound %s unloading", self.name)
         self.stop(0)
-        AudioInterface.unload_sound_chunk(self._container)
-        self._container = None
+        if self._container is not None:
+            self.machine.sound_system.audio_interface.unload_sound_file(self._container)
+            self._container = None
 
     def is_loaded(self):
         """Called when the asset has finished loading"""
@@ -740,6 +778,7 @@ class SoundInstance(object):
         self._events_when_looping = sound.events_when_looping
         self._mode_end_action = sound.mode_end_action
         self._markers = sound.markers
+        self._exp_time = None
 
         if settings is None:
             settings = dict()
@@ -792,15 +831,17 @@ class SoundInstance(object):
         return '<SoundInstance: {} ({}), Volume={}, Loops={}, Priority={}, Loaded={}, Track={}>'.format(
             self.sound.name, self.id, self.volume, self.loops, self.priority, self.sound.loaded, self.track.name)
 
-    def __lt__(self, other):
-        """Less than comparison operator"""
-        # Note this is "backwards" (It's the __lt__ method but the formula uses
-        # greater than because the PriorityQueue puts lowest first.)
-        if other is None:
-            return False
-        else:
-            return ("%s, %s, %s" % (self.priority, self.sound.get_id(), self.id) >
-                    "%s, %s, %s" % (other.priority, other.sound.get_id(), other.id))
+    def __cmp__(self, other):
+        """Comparison operator"""
+        if self.priority != other.priority:
+            return other.priority - self.priority
+        if self.exp_time is None and other.exp_time is not None:
+            return 1
+        if self.exp_time is not None and other.exp_time is None:
+            return -1
+        if self.exp_time != other.exp_time:
+            return self.exp_time - other.exp_time
+        return self.id - other.id
 
     # pylint: disable=invalid-name
     @property
@@ -821,15 +862,25 @@ class SoundInstance(object):
         return self._timestamp
 
     @property
+    def exp_time(self):
+        """Return the expiration time of the sound instance"""
+        return self._exp_time
+
+    @exp_time.setter
+    def exp_time(self, value):
+        """Set the expiration time of the sound instance"""
+        self._exp_time = value
+
+    @property
     def sound(self):
         """The sound asset wrapped by this object"""
         return self._sound
 
     @property
-    def load_in_memory(self):
-        """Return whether or not the wrapped sound is loaded in memory
-        (if not it will be streamed)"""
-        return self._sound.load_in_memory
+    def streaming(self):
+        """Return whether or not the wrapped sound is streamed
+        (if not it will be loaded in memory)"""
+        return self._sound.streaming
 
     @property
     def loaded(self):
