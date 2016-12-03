@@ -33,6 +33,7 @@ install:
       brew update;
       brew install python3;
       brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
+      pip3 install pip --upgrade;
       pip3 install -I Cython==0.24.1;
       git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
       pip3 install -e _mpf/;
@@ -58,7 +59,7 @@ after_success:
     fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      python3 setup.py bdist_wheel;
+      python3 setup.py bdist_wheel -d dist;
       cd dist;
       python3 ../build_scripts/rename_wheels.py;
       pip3 install twine;
