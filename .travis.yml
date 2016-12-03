@@ -59,7 +59,8 @@ after_success:
     fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      python3 setup.py bdist_wheel -d dist;
+      USE_OSX_FRAMEWORKS=0 python3 setup.py bdist_wheel;
+      ls;
       cd dist;
       python3 ../build_scripts/rename_wheels.py;
       pip3 install twine;
