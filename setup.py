@@ -548,6 +548,8 @@ setup(
     keywords='pinball',
     ext_modules=ext_modules,
 
+    include_package_data=True,
+
     packages=['mpfmc',],
     package_dir={'mpfmc': 'mpfmc'},
     package_data={'mpfmc': ['core/audio/*.pyx', 'core/audio/*.pxi', 'core/audio/*.c']},
