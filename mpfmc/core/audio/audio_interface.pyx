@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '0-dev17')
+__version_info__ = ('0', '32', '3')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf, sprintf
@@ -419,7 +419,7 @@ cdef class AudioInterface:
 
     cdef write_gst_log_message(self, message_type, message):
         """Write GStreamer log message to the mpfmc log"""
-        print(message_type, message)
+        # print(message_type, message)
         if message_type == 'error':
             self.log.error(message)
         elif message_type == 'warning':
@@ -2578,7 +2578,7 @@ cdef class SoundMemoryFile(SoundFile):
 
     def __repr__(self):
         if self.loaded:
-            return '<SoundMemoryFile({}, Loaded=True, {} seconds)>'.format(self.file_name, self.sample.duration)
+            return '<SoundMemoryFile({}, Loaded=True, sample_duration={}s)>'.format(self.file_name, self.sample.duration)
         else:
             return "<SoundMemoryFile({}, Loaded=False)>".format(self.file_name)
 
@@ -2612,7 +2612,8 @@ cdef class SoundMemoryFile(SoundFile):
             # All other formats are loaded using GStreamer
             self._load_using_gstreamer()
 
-        print(self)
+        self.log.debug('Loaded file: %s Sample duration: %s',
+                       self.file_name, self.sample.duration)
 
     def _load_using_sdl(self):
         """Loads the sound into memory using SDL2 (much faster than GStreamer, but only
@@ -2800,7 +2801,7 @@ cdef class SoundStreamingFile(SoundFile):
 
     def __repr__(self):
         if self.loaded:
-            return '<SoundStreamingFile({}, Loaded=True, {} seconds)>'.format(self.file_name,self.sample.duration)
+            return '<SoundStreamingFile({}, Loaded=True, sample_duration={}s)>'.format(self.file_name,self.sample.duration)
         return "<SoundStreamingFile({}, Loaded=False)>".format(self.file_name)
 
     def _gst_init(self):
@@ -2910,7 +2911,9 @@ cdef class SoundStreamingFile(SoundFile):
 
         self._gst_init()
         self._construct_pipeline()
-        print(self)
+
+        self.log.debug('Loaded file: %s Sample duration: %s',
+                       self.file_name, self.sample.duration)
 
     def unload(self):
         """Unloads the sample data from memory"""
