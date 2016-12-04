@@ -552,7 +552,7 @@ setup(
 
     packages=['mpfmc',],
     package_dir={'mpfmc': 'mpfmc'},
-    package_data={'mpfmc': ['core/audio/*.pyx', 'core/audio/*.pxi', 'core/audio/*.c']},
+    package_data={'mpfmc': ['*']},
     zip_safe=False,
 
     install_requires=install_requires,
