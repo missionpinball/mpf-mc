@@ -27,6 +27,10 @@ MAX_CYTHON_STRING = '0.24.1'
 MAX_CYTHON_VERSION = LooseVersion(MAX_CYTHON_STRING)
 CYTHON_UNSUPPORTED = ()
 
+PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
+                             'mp4', 'm4v', 'so', 'pyd', 'dylib', 'wav', 'ogg',
+                             'pxi', 'pyx', 'ttf')
+
 
 def getoutput(cmd, env=None):
     import subprocess
@@ -503,6 +507,19 @@ if platform == 'win32':
                          ]
 
 # -----------------------------------------------------------------------------
+# automatically detect package files
+package_files = dict(mpfmc=list())
+for root, subFolders, files in walk('mpfmc'):
+    for fn in files:
+        ext = fn.split('.')[-1].lower()
+        if ext not in PACKAGE_FILES_ALLOWED_EXT:
+            continue
+
+        filename = join(root, fn)
+        directory = dirname(filename)
+        package_files['mpfmc'].append('/'.join(filename.split(os.sep)[1:]))
+
+# -----------------------------------------------------------------------------
 # setup !
 setup(
     name='mpf-mc',
@@ -548,11 +565,9 @@ setup(
     keywords='pinball',
     ext_modules=ext_modules,
 
-    include_package_data=True,
-
     packages=['mpfmc',],
     package_dir={'mpfmc': 'mpfmc'},
-    package_data={'mpfmc': ['*']},
+    package_data=package_files,
     zip_safe=False,
 
     install_requires=install_requires,
