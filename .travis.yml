@@ -5,15 +5,15 @@ matrix:
   fast_finish: true
   include:
    - os: linux
-     env: LINUX=ubuntu1404
+     env: LINUX=ubuntu:14.04
      sudo: required
      language: python
    - os: linux
-     env: LINUX=ubuntu1604
+     env: LINUX=ubuntu:16.04
      sudo: required
      language: python
    - os: linux
-     env: LINUX=debian-jessie
+     env: LINUX=debian:jessie
      sudo: required
      language: python
    - os: osx
@@ -23,10 +23,8 @@ services:
   - docker
 
 before_install:
-  - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-       cd docker/${LINUX}; docker build -t mpf-mc/image .; cd ../../;
-    fi;
   - git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
+  - git clone --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf-debian-installer.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf-debian-installer.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf-debian-installer.git _mpf_installer;
 
 install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
@@ -50,7 +48,7 @@ env:
 
 script:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-      docker run -v $PWD:$PWD -w $PWD mpf-mc/image /bin/sh -c "pip3 install --upgrade pillow coveralls setuptools pip; apt-get remove python-pip python-pip3; pip3 install -I Cython==0.24.1; pip3 install kivy; pip3 install -e _mpf/; python3 setup.py install; export DISPLAY=:99.0; /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX; export PYTHONPATH=$PYTHONPATH:$(pwd); coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests; coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;";
+      docker run -v $PWD:$PWD -w $PWD $LINUX /bin/sh -c "_mpf_installer/install-mpf && pip3 install --upgrade coveralls && apt-get install xvfb && pip3 install -e _mpf/ && python3 setup.py install && export DISPLAY=:99.0 && /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX && export PYTHONPATH=$PYTHONPATH:$(pwd) && coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests && coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;";
     fi;
 
 after_success:
