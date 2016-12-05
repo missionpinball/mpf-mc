@@ -24,7 +24,7 @@ services:
 
 before_install:
   - git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
-  - git clone --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf-debian-installer.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf-debian-installer.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf-debian-installer.git _mpf_installer;
+  - git clone --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf-debian-installer.git _mpf_installer || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf-debian-installer.git _mpf_installer || git clone --recursive --branch dev https://github.com/missionpinball/mpf-debian-installer.git _mpf_installer;
 
 install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
