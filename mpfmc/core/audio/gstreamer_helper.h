@@ -32,21 +32,8 @@ typedef struct {
 	PyObject *userdata;
 } callback_data_t;
 
-static void c_signal_free_data(gpointer data, GClosure *closure)
-{
-	callback_data_t *cdata = data;
-	Py_DECREF(cdata->userdata);
-	free(cdata);
-}
-
 static void c_signal_disconnect(GstElement *element, gulong handler_id)
 {
 	g_signal_handler_disconnect(element, handler_id);
 }
 
-static gboolean c_on_bus_message(GstBus *bus, GstMessage *message, callback_data_t *data)
-{
-	//g_return_val_if_fail( GST_MESSAGE_TYPE( message ) == GST_MESSAGE_EOS, FALSE);
-	data->bcallback(data->userdata, message);
-	return TRUE;
-}
