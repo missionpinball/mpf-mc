@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '3')
+__version_info__ = ('0', '32', '4')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf, sprintf
@@ -70,26 +70,6 @@ def get_gst_version():
     cdef unsigned int major, minor, micro, nano
     gst_version(&major, &minor, &micro, &nano)
     return major, minor, micro, nano
-
-cdef void _on_gst_bus_message(void *userdata, GstMessage *message) with gil:
-    cdef AudioInterface interface = <AudioInterface>userdata
-    cdef GError *err = NULL
-    if message.type == GST_MESSAGE_EOS:
-        pass
-    elif message.type == GST_MESSAGE_ERROR:
-        gst_message_parse_error(message, &err, NULL)
-        interface.write_gst_log_message('error', err.message)
-        g_error_free(err)
-    elif message.type == GST_MESSAGE_WARNING:
-        gst_message_parse_warning(message, &err, NULL)
-        interface.write_gst_log_message('warning', err.message)
-        g_error_free(err)
-    elif message.type == GST_MESSAGE_INFO:
-        gst_message_parse_info(message, &err, NULL)
-        interface.write_gst_log_message('info', err.message)
-        g_error_free(err)
-    else:
-        pass
 
 
 # ---------------------------------------------------------------------------
