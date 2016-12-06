@@ -314,7 +314,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(widget.opacity, 1)
 
         # advance past animation step 2
-        self.advance_time(1.2)
+        self.advance_time(2.1)
 
         # check properties
         self.assertEqual(widget.x, 0)
