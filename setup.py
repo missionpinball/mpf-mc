@@ -432,13 +432,6 @@ if c_options['use_sdl2'] and c_options['use_gstreamer']:
             sources[source_file] = merge(
                 base_flags, gst_flags, gst_depends, sdl2_flags, sdl2_depends)
 
-if c_options['use_rpi']:
-    sources['lib/vidcore_lite/egl.pyx'] = merge(
-            base_flags, gl_flags)
-    sources['lib/vidcore_lite/bcm.pyx'] = merge(
-            base_flags, gl_flags)
-
-
 # -----------------------------------------------------------------------------
 # extension modules
 
