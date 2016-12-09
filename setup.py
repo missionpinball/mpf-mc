@@ -29,7 +29,7 @@ CYTHON_UNSUPPORTED = ()
 
 PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
                              'mp4', 'm4v', 'so', 'pyd', 'dylib', 'wav', 'ogg',
-                             'pxi', 'pyx', 'ttf')
+                             'pxi', 'pyx', 'c', 'h', 'ttf')
 
 
 def getoutput(cmd, env=None):
