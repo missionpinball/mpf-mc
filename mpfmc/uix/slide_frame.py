@@ -23,7 +23,11 @@ transition_map = dict(none=NoTransition,
 
 
 class SlideFrameParent(MpfWidget, FloatLayout):
-    def __init__(self, mc, config, slide_frame):
+
+    """Parent of a slide frame."""
+
+    def __init__(self, mc, config, slide_frame, **kwargs):
+        del kwargs
         self.mc = mc
         self.name = slide_frame.name
         self.config = config
@@ -83,8 +87,9 @@ class SlideFrame(MpfWidget, ScreenManager):
     """A widget which displays slides."""
 
     # pylint: disable-msg=too-many-arguments
-    def __init__(self, mc, name=None, config=None, key=None, play_kwargs=None):
+    def __init__(self, mc, name=None, config=None, key=None, play_kwargs=None, **kwargs):
         del play_kwargs
+        del kwargs
         self.name = name  # needs to be set before super()
         # If this is a the main SlideFrame of a display, it will get its size
         # from its parent. If this is a widget, it will get its size from
