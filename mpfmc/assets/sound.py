@@ -831,17 +831,21 @@ class SoundInstance(object):
         return '<SoundInstance: {} ({}), Volume={}, Loops={}, Priority={}, Loaded={}, Track={}>'.format(
             self.sound.name, self.id, self.volume, self.loops, self.priority, self.sound.loaded, self.track.name)
 
-    def __cmp__(self, other):
-        """Comparison operator"""
+    def __lt__(self, other):
+        """Less than comparison operator"""
+        # Note this is "backwards" (It's the __lt__ method but the formula uses
+        # greater than because the PriorityQueue puts lowest first.)
+        if other is None:
+            return False
         if self.priority != other.priority:
-            return other.priority - self.priority
+            return self.priority > other.priority
         if self.exp_time is None and other.exp_time is not None:
-            return 1
+            return True
         if self.exp_time is not None and other.exp_time is None:
-            return -1
+            return False
         if self.exp_time != other.exp_time:
-            return self.exp_time - other.exp_time
-        return self.id - other.id
+            return self.exp_time > other.exp_time
+        return self.id > other.id
 
     # pylint: disable=invalid-name
     @property
