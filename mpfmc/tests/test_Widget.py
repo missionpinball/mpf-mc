@@ -1,3 +1,4 @@
+"""Test widgets."""
 from mpfmc.uix.slide_frame import SlideFrame
 from mpfmc.uix.widget import MpfWidget
 from mpfmc.widgets.text import Text
@@ -201,10 +202,8 @@ class TestWidget(MpfMcTestCase):
 
         self.mc.events.post('show_widget9')
 
-        with self.assertRaises(KeyError,
-                msg="Widget has incoming key 'wigdet9_wp_key' which does not "
-                "match the key in the widget's config 'widget9_key'."):
-
+        with self.assertRaises(KeyError, msg="Widget has incoming key 'wigdet9_wp_key' which does not "
+                                             "match the key in the widget's config 'widget9_key'."):
             self.advance_time()
 
     def test_removing_mode_widget_on_mode_stop(self):
@@ -785,3 +784,7 @@ class TestWidget(MpfMcTestCase):
         # verify asd is there
         self.assertIn('asd', [x.text for x in self.mc.targets[
             'default'].current_slide.children[0].children])
+
+    def test_slide_frame_widget(self):
+        self.mc.events.post("show_info_frame")
+        self.advance_time(1)
