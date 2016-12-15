@@ -100,8 +100,8 @@ class SoundSystem(object):
                 self._create_track(track_name, track_config)
         else:
             self._create_track('default')
-            self.log.warning("No audio tracks are specified in your machine config file. "
-                             "a track named 'default' has been created.")
+            self.log.info("No audio tracks are specified in your machine config file. "
+                          "a track named 'default' has been created.")
 
         # Set initial master volume level
         self.master_volume = self.config['master_volume']
