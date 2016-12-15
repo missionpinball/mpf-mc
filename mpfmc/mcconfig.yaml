@@ -18,7 +18,8 @@ mpf-mc:
         - move_in
         - move_out
 
-    port: 5050
+    bcp_port: 5050
+    bcp_interface: localhost
 
     paths:
         shows: shows

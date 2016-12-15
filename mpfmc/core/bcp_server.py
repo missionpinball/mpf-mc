@@ -36,7 +36,8 @@ class BCPServer(threading.Thread):
         self.socket = None
         self.done = False
 
-        self.setup_server_socket()
+        self.setup_server_socket(mc.machine_config['mpf-mc']['bcp_interface'],
+                                 mc.machine_config['mpf-mc']['bcp_port'])
         self.sending_thread = threading.Thread(target=self.sending_loop)
         self.sending_thread.daemon = True
         self.sending_thread.start()
