@@ -72,6 +72,7 @@ cdef extern from "SDL.h" nogil:
     SDL_AudioStatus SDL_GetAudioStatus()
     SDL_AudioStatus SDL_GetAudioDeviceStatus(SDL_AudioDeviceID dev)
     void SDL_PauseAudioDevice(SDL_AudioDeviceID dev, int pause_on)
+    void SDL_CloseAudioDevice(SDL_AudioDeviceID dev)
 
     SDL_mutex *SDL_CreateMutex()
     void SDL_DestroyMutex(SDL_mutex *)

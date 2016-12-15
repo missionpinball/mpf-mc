@@ -12,7 +12,7 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '32', '4')
+__version_info__ = ('0', '33', 'dev01')
 __version__ = '.'.join(__version_info__)
 
 from libc.stdio cimport FILE, fopen, fprintf, sprintf
@@ -181,7 +181,7 @@ cdef class AudioInterface:
         self.log.debug("Shutting down and cleaning up allocated memory...")
 
         # Stop audio processing (will stop all SDL callbacks)
-        self.disable()
+        self.shutdown()
 
         # Remove tracks
         self.tracks.clear()
@@ -426,6 +426,14 @@ cdef class AudioInterface:
         self.log.debug("Disabling audio playback")
         self.stop_all_sounds()
         SDL_PauseAudioDevice(self.audio_callback_data.device_id, 1)
+
+    def shutdown(self):
+        """
+        Shuts down the audio device
+        """
+        self.disable()
+        SDL_CloseAudioDevice(self.audio_callback_data.device_id)
+        self.audio_callback_data.device_id = 0
 
     @staticmethod
     def get_max_tracks():
