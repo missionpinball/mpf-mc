@@ -121,7 +121,7 @@ class SoundSystem(object):
         """Shuts down the audio interface"""
         del kwargs
         if self.enabled:
-            self.audio_interface.disable()
+            self.audio_interface.shutdown()
             self._initialized = False
 
     @property
