@@ -33,6 +33,7 @@ class MpfMcTestCase(unittest.TestCase):
 
         self._events = dict()
         self._last_event_kwargs = dict()
+        self.max_test_setup_secs = 30
 
     def get_options(self):
         return dict(machine_path=self.get_machine_path(),
@@ -193,9 +194,10 @@ class MpfMcTestCase(unittest.TestCase):
         self.mc.title = str(self._test_name)
 
         if not self.mc.is_init_done:
-            if self._test_started + 5 < time():
+            if self._test_started + self.max_test_setup_secs < time():
                 self.dump_clock()
-                self.fail("Test setup took too more than 5 seconds.")
+                self.fail("Test setup took more than {} seconds.".format(
+                    self.max_test_setup_secs))
             Clock.schedule_once(self.run_test, 0)
             return
 
