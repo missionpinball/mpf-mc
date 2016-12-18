@@ -41,6 +41,10 @@ class MpfMcTestCase(unittest.TestCase):
                     configfile=Util.string_to_list(self.get_config_file()),
                     bcp=False)
 
+    def getAbsoluteMachinePath(self):
+        return os.path.abspath(os.path.join(
+            mpfmc.__path__[0], os.pardir, 'mpfmc', self.get_machine_path()))
+
     def get_machine_path(self):
         raise NotImplementedError
 
@@ -155,8 +159,7 @@ class MpfMcTestCase(unittest.TestCase):
             os.path.join(mpfmc.__path__[0], os.pardir,
                          self.get_options()['mcconfigfile'])), 'machine')
 
-        machine_path = os.path.abspath(os.path.join(
-            mpfmc.__path__[0], os.pardir, 'mpfmc', self.get_machine_path()))
+        machine_path = self.getAbsoluteMachinePath()
 
         mpf_config = load_machine_config(
                 Util.string_to_list(self.get_config_file()),
