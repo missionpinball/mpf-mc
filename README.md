@@ -19,9 +19,9 @@ separate machine. It runs as a separate process from MPF, so it works well on a 
 
 The MPF project homepage is here : http://missionpinball.org
 
-[![Coverage Status](https://coveralls.io/repos/missionpinball/mpf-mc/badge.svg?branch=0.30&service=github)](https://coveralls.io/github/missionpinball/mpf-mc?branch=0.30)
-[![Build Status](https://travis-ci.org/missionpinball/mpf-mc.svg?branch=0.30)](https://travis-ci.org/missionpinball/mpf-mc)
-[![Code Health](https://landscape.io/github/missionpinball/mpf-mc/0.30/landscape.svg?style=flat)](https://landscape.io/github/missionpinball/mpf-mc/0.30)
+[![Coverage Status](https://coveralls.io/repos/missionpinball/mpf-mc/badge.svg?branch=dev&service=github)](https://coveralls.io/github/missionpinball/mpf-mc?branch=dev)
+[![Build Status](https://travis-ci.org/missionpinball/mpf-mc.svg?branch=dev)](https://travis-ci.org/missionpinball/mpf-mc)
+[![Code Health](https://landscape.io/github/missionpinball/mpf-mc/dev/landscape.svg?style=flat)](https://landscape.io/github/missionpinball/mpf-mc/dev)
 
 Installation, Documentation, and Examples
 -----------------------------------------
