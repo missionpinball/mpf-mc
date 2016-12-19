@@ -381,7 +381,13 @@ class MpfMc(App):
                                'only %s player(s) exist',
                                number, len(self.player_list))
 
-    def set_machine_var(self, name, value, change, prev_value):
+    def set_machine_var(self, name, value):
+        """Set machine var and send it via BCP to MPF."""
+        if hasattr(self, "bcp_processor") and self.bcp_processor.connected:
+            self.bcp_processor.send_machine_var_to_mpf(name, value)
+
+    def receive_machine_var_update(self, name, value, change, prev_value):
+        """Update a machine var received via BCP."""
         self.machine_vars[name] = value
 
         if change:
