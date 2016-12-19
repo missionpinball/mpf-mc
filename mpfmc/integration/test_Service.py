@@ -62,3 +62,18 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
         self.hit_and_release_switch("s_service_up")
         self.advance_time_and_run()
         self.assertTextOnTopSlide("Settings")
+
+        # exit service menu
+        self.hit_and_release_switch("s_service_esc")
+        self.advance_time_and_run()
+
+        if not self.mc.sound_system or not self.mc.sound_system.audio_interface:
+            return
+
+        # test volume
+        self.assertEqual(0.8, self.machine.get_machine_var("master_volume"))
+
+        self.hit_and_release_switch("s_service_up")
+        self.advance_time_and_run()
+        self.assertEqual(0.84, self.machine.get_machine_var("master_volume"))
+

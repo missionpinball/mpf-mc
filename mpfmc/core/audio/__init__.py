@@ -116,6 +116,11 @@ class SoundSystem(object):
         self.mc.events.add_handler("master_volume_increase", self.master_volume_increase)
         self.mc.events.add_handler("master_volume_decrease", self.master_volume_decrease)
         self.mc.events.add_handler("shutdown", self.shutdown)
+        self.mc.events.add_handler("client_connected", self._send_volume, -1)
+
+    def _send_volume(self, **kwargs):
+        del kwargs
+        self.mc.set_machine_var("master_volume", self.audio_interface.get_master_volume())
 
     def shutdown(self, **kwargs):
         """Shuts down the audio interface"""
@@ -140,6 +145,7 @@ class SoundSystem(object):
         # Constrain volume to the range 0.0 to 1.0
         value = min(max(value, 0.0), 1.0)
         self.audio_interface.set_master_volume(value)
+        self._send_volume()
 
     @property
     def default_track(self):

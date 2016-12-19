@@ -17,6 +17,7 @@ class BcpProcessor(object):
         self.log = logging.getLogger('BcpProcessor')
 
         self.socket_thread = None
+        self.connected = False
         self.receive_queue = queue.Queue()
         self.sending_queue = queue.Queue()
 
@@ -56,6 +57,7 @@ class BcpProcessor(object):
         self.register_trigger("player_turn_start")
         self.register_trigger("master_volume_increase")
         self.register_trigger("master_volume_decrease")
+        self.connected = True
 
     def register_trigger(self, event):
         """Register a trigger for events from MPF."""
@@ -209,11 +211,15 @@ class BcpProcessor(object):
         del kwargs
         self.mc.update_player_var(name, value, int(player_num))
 
+    def send_machine_var_to_mpf(self, name, value):
+        """Set machine var in MPF via BCP."""
+        self.send("set_machine_var", name=name, value=value)
+
     def _bcp_machine_variable(self, name, value, change=True, prev_value=None,
                               **kwargs):
         """Processes an incoming BCP 'machine_variable' command."""
         del kwargs
-        self.mc.set_machine_var(name, value, change, prev_value)
+        self.mc.receive_machine_var_update(name, value, change, prev_value)
 
     def _bcp_player_turn_start(self, player_num, **kwargs):
         """Processes an incoming BCP 'player_turn_start' command."""
