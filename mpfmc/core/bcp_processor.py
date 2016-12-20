@@ -39,6 +39,7 @@ class BcpProcessor(object):
                              'player_turn_start': self._bcp_player_turn_start,
                              'player_variable': self._bcp_player_variable,
                              'reset': self._bcp_reset,
+                             'settings': self._bcp_settings,
                              'switch': self._bcp_switch,
                              'trigger': self._bcp_trigger,
                              }
@@ -191,6 +192,11 @@ class BcpProcessor(object):
 
         if name in self.mc.modes:
             self.mc.modes[name].stop()
+
+    def _bcp_settings(self, settings, **kwargs):
+        del kwargs
+        for setting in settings:
+            self.mc.settings.add_setting(setting)
 
     def _bcp_error(self, **kwargs):
         """Processes an incoming BCP 'error' command."""

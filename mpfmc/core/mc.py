@@ -15,9 +15,10 @@ from kivy.logger import Logger
 
 # The following line is needed to allow mpfmc modules to use the
 # getLogger(name) method
-
 from mpf.core.utility_functions import Util
 from mpfmc.core.assets import ThreadedAssetManager
+from mpfmc.core.mc_placeholder_manager import McPlaceholderManager
+from mpfmc.core.mc_settings_controller import McSettingsController
 
 logging.Logger.manager.root = Logger
 
@@ -73,6 +74,8 @@ class MpfMc(App):
         self.player = None
         self.num_players = 0
         self.bcp_client_connected = False
+        self.placeholder_manager = McPlaceholderManager(self)
+        self.settings = McSettingsController(self)
 
         self.animation_configs = dict()
         self.active_slides = dict()
@@ -380,6 +383,10 @@ class MpfMc(App):
                 self.log.error('Received player turn start for player %s, but '
                                'only %s player(s) exist',
                                number, len(self.player_list))
+
+    def create_machine_var(self, name, value):
+        """Same as set_machine_var."""
+        self.set_machine_var(name, value)
 
     def set_machine_var(self, name, value):
         """Set machine var and send it via BCP to MPF."""
