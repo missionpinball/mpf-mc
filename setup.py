@@ -92,10 +92,6 @@ c_options['use_rpi'] = platform == 'rpi'
 c_options['use_mali'] = platform == 'mali'
 c_options['use_osx_frameworks'] = platform == 'darwin'
 
-# SDL2 and GStreamer are required for mpfmc
-c_options['use_sdl2'] = True
-c_options['use_gstreamer'] = True
-
 # now check if environ is changing the default values
 for key in list(c_options.keys()):
     ukey = key.upper()
@@ -103,15 +99,6 @@ for key in list(c_options.keys()):
         value = bool(int(environ[ukey]))
         print('Environ change {0} -> {1}'.format(key, value))
         c_options[key] = value
-
-if not c_options['use_sdl2']:
-    print('SDL2 framework is required for mpfmc compilation')
-    raise EnvironmentError('SDL2 framework is required for mpfmc compilation')
-
-if not c_options['use_gstreamer']:
-    print('GStreamer framework is required for mpfmc compilation')
-    raise EnvironmentError('GStreamer framework is required for mpfmc compilation')
-
 
 # -----------------------------------------------------------------------------
 # Cython check
@@ -205,81 +192,61 @@ if platform == 'darwin':
 
 gst_flags = {}
 
-# detect gstreamer, only on desktop
-# works if we forced the options or in autodetection
-if platform not in ('ios', 'android') and (c_options['use_gstreamer']
-                                           in (None, True)):
-    if c_options['use_osx_frameworks'] and platform == 'darwin':
-        # check the existence of frameworks
-        f_path = '/Library/Frameworks/GStreamer.framework'
-        if not exists(f_path):
-            c_options['use_gstreamer'] = False
-            print('Missing GStreamer framework {}'.format(f_path))
-            raise EnvironmentError('Missing GStreamer framework {}'.format(f_path))
-
-        else:
-            c_options['use_gstreamer'] = True
-            gst_flags = {
-                'extra_link_args': [
-                    '-F/Library/Frameworks',
-                    '-Xlinker', '-rpath',
-                    '-Xlinker', '/Library/Frameworks',
-                    '-Xlinker', '-headerpad',
-                    '-Xlinker', '190',
-                    '-framework', 'GStreamer'],
-                'include_dirs': [join(f_path, 'Headers')]}
+if platform == 'darwin':
+    # check the existence of frameworks
+    f_path = '/Library/Frameworks/GStreamer.framework'
+    if not exists(f_path):
+        raise EnvironmentError('Missing GStreamer framework {}'.format(f_path))
 
     else:
-        # use pkg-config approach instead
-        gst_flags = pkgconfig('gstreamer-1.0')
-        if 'libraries' in gst_flags:
-            c_options['use_gstreamer'] = True
-
-
-# detect SDL2, only on desktop and iOS, or android if explicitly enabled
-# works if we forced the options or in autodetection
-sdl2_flags = {}
-if c_options['use_sdl2'] or (
-        platform not in ('android',) and c_options['use_sdl2'] is None):
-
-    if c_options['use_osx_frameworks'] and platform == 'darwin':
-        # check the existence of frameworks
-        sdl2_valid = True
-        sdl2_flags = {
+        gst_flags = {
             'extra_link_args': [
                 '-F/Library/Frameworks',
                 '-Xlinker', '-rpath',
                 '-Xlinker', '/Library/Frameworks',
                 '-Xlinker', '-headerpad',
-                '-Xlinker', '190'],
-            'include_dirs': [],
-            'extra_compile_args': ['-F/Library/Frameworks']
-        }
-        f_path = '/Library/Frameworks/{}.framework'.format('SDL2')
-        if exists(f_path):
-            sdl2_flags['extra_link_args'] += ['-framework', 'SDL2']
-            sdl2_flags['include_dirs'] += [join(f_path, 'Headers')]
-            print('Found sdl2 frameworks: {}'.format(f_path))
-        else:
-            print('Missing framework {}'.format(f_path))
-            sdl2_valid = False
+                '-Xlinker', '190',
+                '-framework', 'GStreamer'],
+            'include_dirs': [join(f_path, 'Headers')]}
 
-        if not sdl2_valid:
-            c_options['use_sdl2'] = False
-            print('Cannot perform mpfmc compilation due to missing SDL2 framework')
-            raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
-        else:
-            c_options['use_sdl2'] = True
-            print('Activate SDL2 compilation')
+else:
+    # use pkg-config approach instead
+    gst_flags = pkgconfig('gstreamer-1.0')
 
-    elif platform != "ios":
-        # use pkg-config approach instead
-        sdl2_flags = pkgconfig('sdl2')
-        if 'libraries' in sdl2_flags:
-            c_options['use_sdl2'] = True
-        else:
-            print('Cannot perform mpfmc compilation due to missing SDL2 framework')
-            raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
+# detect SDL2
+sdl2_flags = {}
+
+if platform == 'darwin':
+    # check the existence of frameworks
+    sdl2_valid = True
+    sdl2_flags = {
+        'extra_link_args': [
+            '-F/Library/Frameworks',
+            '-Xlinker', '-rpath',
+            '-Xlinker', '/Library/Frameworks',
+            '-Xlinker', '-headerpad',
+            '-Xlinker', '190'],
+        'include_dirs': [],
+        'extra_compile_args': ['-F/Library/Frameworks']
+    }
+    f_path = '/Library/Frameworks/{}.framework'.format('SDL2')
+
+    if exists(f_path):
+        sdl2_flags['extra_link_args'] += ['-framework', 'SDL2']
+        sdl2_flags['include_dirs'] += [join(f_path, 'Headers')]
+        print('Found sdl2 frameworks: {}'.format(f_path))
+    else:
+        print('Missing framework {}'.format(f_path))
+        sdl2_valid = False
+
+    if not sdl2_valid:
+        raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
+
+else:
+    # use pkg-config approach instead
+    sdl2_flags = pkgconfig('sdl2')
+    if 'libraries' not in sdl2_flags:
+        raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
 
 
 # -----------------------------------------------------------------------------
@@ -287,7 +254,6 @@ if c_options['use_sdl2'] or (
 
 
 def get_modulename_from_file(filename):
-    print(filename)
     filename = filename.replace(sep, '/')
     pyx = '.'.join(filename.split('.')[:-1])
     pyxl = pyx.split('/')
@@ -364,8 +330,6 @@ def determine_base_flags():
 
 def determine_sdl2():
     flags = {}
-    if not c_options['use_sdl2']:
-        return flags
 
     sdl2_path = environ.get('KIVY_SDL2_PATH', None)
 
@@ -409,8 +373,6 @@ def determine_sdl2():
             can_compile = False
 
     if not can_compile:
-        c_options['use_sdl2'] = False
-        print('Cannot perform mpfmc compilation due to missing SDL2 framework')
         raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
 
     return flags
@@ -423,23 +385,20 @@ gl_flags = {}
 # sources to compile
 sources = {}
 
-if c_options['use_sdl2'] and c_options['use_gstreamer']:
-    sdl2_flags = determine_sdl2()
-    if sdl2_flags:
-        sdl2_depends = {'depends': ['core/audio/sdl2_helper.h', 'core/audio/sdl2.pxi',]}
-        gst_depends = {'depends': ['core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi',]}
-        for source_file in ('core/audio/audio_interface.pyx',):
-            sources[source_file] = merge(
-                base_flags, gst_flags, gst_depends, sdl2_flags, sdl2_depends)
+sdl2_flags = determine_sdl2()
+if sdl2_flags:
+    sdl2_depends = {'depends': ['core/audio/sdl2_helper.h', 'core/audio/sdl2.pxi',]}
+    gst_depends = {'depends': ['core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi',]}
+    for source_file in ('core/audio/audio_interface.pyx',):
+        sources[source_file] = merge(
+            base_flags, gst_flags, gst_depends, sdl2_flags, sdl2_depends)
 
 # -----------------------------------------------------------------------------
 # extension modules
 
 def get_extensions_from_sources(sources):
     ext_modules = []
-    if environ.get('KIVY_FAKE_BUILDEXT'):
-        print('Fake build_ext asked, will generate only .h/.c')
-        return ext_modules
+
     for pyx, flags in sources.items():
         pyx = expand(src_path, pyx)
         depends = [expand(src_path, x) for x in flags.pop('depends', [])]
@@ -489,6 +448,7 @@ else:
 
 install_requires = ['ruamel.yaml>=0.10,<0.11',
                     'mpf>={}'.format(mpf_version),
+                    'kivy>=1.9.1'
                     ]
 
 if platform == 'win32':
@@ -497,7 +457,6 @@ if platform == 'win32':
                          'kivy.deps.sdl2_dev==0.1.17',
                          'kivy.deps.glew==0.1.9',
                          'kivy.deps.gstreamer==0.1.12',
-                         'kivy==1.9.1',
                          ]
 
 # -----------------------------------------------------------------------------

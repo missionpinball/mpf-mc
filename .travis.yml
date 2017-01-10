@@ -18,6 +18,13 @@ matrix:
      language: python
    - os: osx
      language: generic
+     osx_image: xcode8.2  # OS 10.12
+   - os: osx
+     language: generic
+     osx_image: xcode8  # OS 10.11
+   - os: osx
+     language: generic
+     osx_image: xcode6.4  # OS 10.10
 
 services:
   - docker
@@ -30,19 +37,24 @@ before_install:
 
 install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      brew update;
-      brew install python3;
-      brew install sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
-      pip3 install pip --upgrade;
-      pip3 install -I Cython==0.24.1;
+
+      mkdir /tmp/downloads;
+      cd /tmp/downloads;
+      curl -LsS https://www.dropbox.com/s/ohrs8tn0yh2y7oe/mpf_mac_frameworks.zip?dl=1 > mac_frameworks.zip;
+      unzip -q mac_frameworks.zip;
+      sudo cp -r frameworks/*.* /Library/Frameworks;
+
+      curl -sS https://www.python.org/ftp/python/3.5.2/python-3.5.2-macosx10.6.pkg > python-3.5.2-macosx10.6.pkg;
+      sudo installer -pkg python-3.5.2-macosx10.6.pkg -target /;
+
+      cd ${TRAVIS_BUILD_DIR};
+      pip3 install pip setuptools Cython==0.24.1 --upgrade;
       git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
       pip3 install -e _mpf/;
-      USE_OSX_FRAMEWORKS=0 pip3 install kivy;
-      pip3 install wheel setuptools --upgrade;
-      USE_OSX_FRAMEWORKS=0 pip3 install .;
+      pip3 install .;
 
     fi;
-  - pip3 install coveralls
+  - pip3 install coveralls coverage
 
 env:
   global:
@@ -58,12 +70,17 @@ after_success:
       coveralls;
     fi;
 
-  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      USE_OSX_FRAMEWORKS=0 python3 setup.py bdist_wheel;
-      ls;
-      cd dist;
-      python3 ../build_scripts/rename_wheels.py;
-      pip3 install twine;
-      ls;
-      python3 -m twine upload -u brianmadden -p $PYPI_PASS --skip-existing *;
-    fi;
+# commented out because we're not currently building wheels for Mac, but maybe
+# that will change in the future? Reason is because there are no wheels for Kivy,
+# so users need Cython and command line dev tools to build it, so why not just
+# build MPF-MC too?
+
+#  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
+#      python3 setup.py bdist_wheel;
+#      ls;
+#      cd dist;
+#      python3 ../build_scripts/rename_wheels.py;
+#      pip3 install twine;
+#      ls;
+#      python3 -m twine upload -u brianmadden -p $PYPI_PASS --skip-existing *;
+#    fi;
