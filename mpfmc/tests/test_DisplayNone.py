@@ -14,7 +14,7 @@ class TestDisplaySingle(MpfMcTestCase):
         # Make sure a single display is loaded properly:
 
         self.assertIn('default', self.mc.displays)
-        self.assertEqual(self.mc.displays['default'].size, [1, 1])
+        self.assertEqual(self.mc.displays['default'].size, [800, 600])
         self.assertEqual(self.mc.targets['default'].parent.parent.parent,
                          self.mc.displays['default'])
 

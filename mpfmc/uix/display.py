@@ -13,7 +13,7 @@ class Display(Scatter, RelativeLayout):
 
     @staticmethod
     def create_default_display(mc):
-        Display(mc, 'default', width=1, height=1)
+        Display(mc, 'default', width=800, height=600)
 
     def __init__(self, mc, name, **kwargs):
         self.mc = mc
