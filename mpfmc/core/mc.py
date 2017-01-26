@@ -32,6 +32,7 @@ from mpfmc.core.config_collection import create_config_collections
 import mpf
 import mpfmc
 from mpfmc._version import __version__
+from mpf._version import __version__ as __mpfversion__
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
@@ -58,6 +59,19 @@ class MpfMc(App):
 
         self.log = logging.getLogger('mpfmc')
         self.log.info("Mission Pinball Framework Media Controller v%s", __version__)
+        self.log.info("Mission Pinball Framework Game Engine v%s", __mpfversion__)
+
+        if (__version__.split('.')[0] != __mpfversion__.split('.')[0] or
+                __version__.split('.')[1] != __mpfversion__.split('.')[1]):
+
+            self.log.error("MPF MC and MPF Game engines must be same "
+                           "major.minor versions. You have MPF v{} and MPF-MC"
+                           " v{}".format(__mpfversion__, __version__))
+
+            raise ValueError("MPF MC and MPF Game engines must be same "
+                           "major.minor versions. You have MPF v{} and MPF-MC"
+                           " v{}".format(__mpfversion__, __version__))
+
         super().__init__(**kwargs)
 
         self.options = options
