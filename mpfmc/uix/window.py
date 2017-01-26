@@ -49,6 +49,16 @@ class Window(object):
 
         Window.set_source_display(display)
 
+        if (display.width / display.height !=
+                KivyWindow.width / KivyWindow.height):
+            mc.log.warning(
+                "ASPECT RATIO MISMATCH: The on-screen window is not the same "
+                "aspect ratio as the display called '{}'. The logical display "
+                "will be scaled from {}x{} to the window size {}x{}, and a "
+                "black bar will make up the difference".format(
+                    display.name, display.width, display.height,
+                    KivyWindow.width, KivyWindow.height))
+
         if 'keyboard' in mc.machine_config:
             mc.keyboard = Keyboard(mc)
 
