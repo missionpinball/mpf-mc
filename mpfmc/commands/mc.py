@@ -178,6 +178,7 @@ class Command(object):
             time.sleep(.1)
 
         logging.info("All child threads stopped.")
+        logging.shutdown()
 
         if args.pause:
             input('Press ENTER to continue...')
