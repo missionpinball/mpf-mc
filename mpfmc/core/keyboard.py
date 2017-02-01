@@ -20,22 +20,23 @@ class Keyboard(Widget):
         self.toggle_keys = set()
         self.inverted_keys = list()
         self.active_keys = dict()
+        self.debug = False
 
         # todo need to change the parsing logic to make these work
         self.special_keys = {
-            'equals':'=',
-            'minus':'-',
-            'dash':'-',
-            'leftbracket':'[',
-            'rightbracket':']',
-            'backslash':'\\',
-            'apostrophe':"'",
-            'semicolon':';',
-            'colon':':',
-            'comma':',',
-            'period':'.',
-            'slash':'/',
-            'question':'?',
+            'equals': '=',
+            'minus': '-',
+            'dash': '-',
+            'leftbracket': '[',
+            'rightbracket': ']',
+            'backslash': '\\',
+            'apostrophe': "'",
+            'semicolon': ';',
+            'colon': ':',
+            'comma': ',',
+            'period': '.',
+            'slash': '/',
+            'question': '?',
         }
 
         self.keyboard = Window.request_keyboard(callback=None, target=self)
@@ -44,6 +45,11 @@ class Keyboard(Widget):
                            on_key_up=self._on_keyboard_up)
 
         for k, v in self.mc.machine_config['keyboard'].items():
+
+            if k == 'debug' and v:
+                self.debug = True
+                continue
+
             k = str(k)  # k is the value of the key entry in the config
             switch_name = v.get('switch', None)
             # set whether a key is the push on / push off type
@@ -128,6 +134,12 @@ class Keyboard(Widget):
         del keyboard
         del text
         key = keycode[1]
+
+        if self.debug:
+            if modifiers:
+                print("KEYS: {}+{}".format('+'.join(modifiers), key))
+            else:
+                print("KEYS: {}".format(key))
 
         if key in self.active_keys:
             return True
