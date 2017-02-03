@@ -214,6 +214,7 @@ cdef extern from "SDL_mixer.h" nogil:
     int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
     void Mix_CloseAudio()
     const SDL_version *Mix_Linked_Version()
+    int Mix_AllocateChannels(int numchans)
 
     Mix_Chunk *Mix_LoadWAV(char *file)
 

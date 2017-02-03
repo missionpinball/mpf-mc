@@ -124,17 +124,12 @@ cdef class AudioInterface:
         # Initialize the SDL_Mixer library to establish the output audio format and encoding
         # (sample rate, bit depth, buffer size).
         # NOTE: SDL_Mixer is only used to load audio files into memory and not for any output functions.
-        #       In fact, this Mix_OpenAudio function call will setup a global mixer object to enable
-        #       the SDL_Mixer loading/conversion functions to operate.  We will immediately be calling
-        #       Mix_CloseAudio and then opening the audio device using SDL functions.  This trick will
-        #       ensure we are not wasting CPU for the SDL_Mixer callback functions that are not used.
         if Mix_OpenAudio(rate, AUDIO_S16SYS, channels, buffer_samples):
             self.log.error('Mix_OpenAudio error - %s' % SDL_GetError())
             raise AudioException('Unable to open SDL_Mixer library for loading audio files (Mix_OpenAudio failed: %s)' % SDL_GetError())
 
-        # Immediately close the SDL_Mixer audio device (not needed anymore now that the SDL_Mixer static mixer
-        # object has been initialized.  All SDL_Mixer loading functions are still available.
-        Mix_CloseAudio()
+        # We want to use as little resources as possible for SDL_Mixer (since it is just used for loading)
+        Mix_AllocateChannels(0)
 
         # Set the desired audio interface settings to request from SDL
         desired.freq = rate
@@ -397,7 +392,7 @@ cdef class AudioInterface:
         Returns:
             A list of file extensions supported.
         """
-        return ["wav", "ogg", "flac", "m4a", "aiff"]
+        return ["wav", "ogg", "flac",]
 
     def get_master_volume(self):
         return round(self.audio_callback_data.master_volume / SDL_MIX_MAXVOLUME, 2)
@@ -458,6 +453,7 @@ cdef class AudioInterface:
         Shuts down the audio device
         """
         self.disable()
+        Mix_CloseAudio()
         SDL_CloseAudioDevice(self.audio_callback_data.device_id)
         self.audio_callback_data.device_id = 0
 
