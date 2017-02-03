@@ -122,6 +122,7 @@ cdef extern from "SDL.h" nogil:
                                                 Uint32 len, int volume)
     SDL_AudioSpec* SDL_LoadWAV(const char* file, SDL_AudioSpec* spec, Uint8** audio_buf, Uint32* audio_len)
     void SDL_FreeWAV(Uint8* audio_buf)
+    void SDL_free(void *ptr)
 
     Uint32 SDL_GetTicks()
 
@@ -191,4 +192,28 @@ cdef extern from "SDL.h" nogil:
 cdef extern from 'sdl2_helper.h':
     int convert_audio_to_desired_format(SDL_AudioSpec input_spec, SDL_AudioSpec desired_spec,
                                         Uint8* input_buffer, Uint32 input_size, Uint8** output_buffer, Uint32 *output_size)
+
+
+# ---------------------------------------------------------------------------
+#    SDL_Mixer
+# ---------------------------------------------------------------------------
+cdef extern from "SDL_mixer.h" nogil:
+
+    cdef enum MIX_InitFlags:
+        MIX_INIT_FLAC,
+        MIX_INIT_MP3,
+        MIX_INIT_OGG
+
+    struct Mix_Chunk:
+        int allocated
+        Uint8 *abuf
+        Uint32 alen
+        Uint8 volume
+
+    void Mix_Quit()
+    int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
+    void Mix_CloseAudio()
+    const SDL_version *Mix_Linked_Version()
+
+    Mix_Chunk *Mix_LoadWAV(char *file)
 
