@@ -40,9 +40,6 @@ class TestAudio(MpfMcTestCase):
         # Check basic audio interface settings
         settings = interface.get_settings()
         self.assertIsNotNone(settings)
-        self.assertEqual(settings['buffer_samples'], 2048)
-        self.assertEqual(settings['audio_channels'], 2)
-        self.assertEqual(settings['sample_rate'], 44100)
 
         # Check static conversion functions (gain, samples)
         self.assertEqual(interface.string_to_gain('0db'), 1.0)
@@ -89,7 +86,6 @@ class TestAudio(MpfMcTestCase):
         # Mock BCP send method
         self.mc.bcp_processor.send = MagicMock()
         self.mc.bcp_processor.enabled = True
-
 
         # Allow some time for sound assets to load
         self.advance_time(2)

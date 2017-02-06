@@ -59,7 +59,7 @@ sounds:
     events_when_played: synthping_played
 
   198361_sfx-028:
-    volume: 0.15
+    volume: 0.25
 
   263774_music:
     volume: 0.4
