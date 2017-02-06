@@ -121,16 +121,6 @@ cdef class AudioInterface:
             self.log.error('SDL_Init error - %s' % SDL_GetError())
             raise AudioException('Unable to initialize SDL (SDL_Init call failed: %s)' % SDL_GetError())
 
-        # Initialize the SDL_Mixer library to establish the output audio format and encoding
-        # (sample rate, bit depth, buffer size).
-        # NOTE: SDL_Mixer is only used to load audio files into memory and not for any output functions.
-        if Mix_OpenAudio(rate, AUDIO_S16SYS, channels, buffer_samples):
-            self.log.error('Mix_OpenAudio error - %s' % SDL_GetError())
-            raise AudioException('Unable to open SDL_Mixer library for loading audio files (Mix_OpenAudio failed: %s)' % SDL_GetError())
-
-        # We want to use as little resources as possible for SDL_Mixer (since it is just used for loading)
-        Mix_AllocateChannels(0)
-
         # Set the desired audio interface settings to request from SDL
         desired.freq = rate
         desired.format = AUDIO_S16SYS
@@ -144,6 +134,16 @@ cdef class AudioInterface:
         if self.audio_callback_data.device_id == 0:
             self.log.error('SDL_OpenAudioDevice error - %s' % SDL_GetError())
             raise AudioException('Unable to open audio for output (SDL_OpenAudioDevice failed: %s)' % SDL_GetError())
+
+        # Initialize the SDL_Mixer library to establish the output audio format and encoding
+        # (sample rate, bit depth, buffer size).
+        # NOTE: SDL_Mixer is only used to load audio files into memory and not for any output functions. This
+        if Mix_OpenAudio(obtained.freq, obtained.format, obtained.channels, obtained.samples):
+            self.log.error('Mix_OpenAudio error - %s' % SDL_GetError())
+            raise AudioException('Unable to open SDL_Mixer library for loading audio files (Mix_OpenAudio failed: %s)' % SDL_GetError())
+
+        # We want to use as little resources as possible for SDL_Mixer (since it is just used for loading)
+        Mix_AllocateChannels(0)
 
         # Initialize GStreamer
         self._initialize_gstreamer()
