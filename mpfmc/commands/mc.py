@@ -73,6 +73,12 @@ class Command(object):
                                 ".log")),
                             help="The name (and path) of the log file")
 
+        parser.add_argument("-L",
+                            action="store", dest="mc_logfile",
+                            metavar='file_name',
+                            default=None,
+                            help="The name (and path) of the log file")
+
         parser.add_argument("-p",
                             action="store_true", dest="pause", default=False,
                             help="Pause the terminal window on exit. Useful "
@@ -122,6 +128,16 @@ class Command(object):
         except OSError as exception:
             if exception.errno != errno.EEXIST:
                 raise
+
+        if args.mc_logfile:
+            args.logfile = args.mc_logfile
+
+        full_logfile_path = os.path.join(machine_path, args.logfile)
+
+        try:
+            os.remove(full_logfile_path)
+        except OSError:
+            pass
 
         logging.basicConfig(level=args.loglevel,
                             format='%(asctime)s : %(levelname)s : %(name)s : '
