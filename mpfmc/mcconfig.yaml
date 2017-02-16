@@ -36,6 +36,18 @@ mpf-mc:
     allow_invalid_config_sections: true
     fps: 30
 
+logging:
+    console:
+      asset_manager: none
+      placeholder_manager: none  # todo
+      settings_controller: none  # todo
+      event_manager: none
+    file:
+      asset_manager: basic
+      placeholder_manager: basic
+      settings_controller: basic
+      event_manager: basic
+
 bcp:
     debug: false
 
