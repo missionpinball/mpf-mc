@@ -1,0 +1,14 @@
+from kivy.uix.camera import Camera
+from mpfmc.uix.widget import MpfWidget
+
+
+class CameraWidget(MpfWidget, Camera):
+    widget_type_name = "Camera"
+
+    def __init__(self, mc, config, key=None, **kwargs):
+        super().__init__(mc=mc, config=config, key=key)
+
+    def pass_to_kivy_widget_init(self):
+        return dict(resolution=(self.config['width'],
+                                self.config['height']),
+                    index=self.config['camera_index'])

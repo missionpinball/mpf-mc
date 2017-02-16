@@ -17,6 +17,7 @@ from mpfmc.widgets.bezier import Bezier
 from mpfmc.widgets.point import Point
 from mpfmc.widgets.dmd import Dmd, ColorDmd
 from mpfmc.widgets.text_input import MpfTextInput
+from mpfmc.widgets.camera import CameraWidget
 
 
 class Widget(ConfigCollection):
@@ -39,7 +40,8 @@ class Widget(ConfigCollection):
                                    triangle=Triangle,
                                    dmd=Dmd,
                                    color_dmd=ColorDmd,
-                                   text_input=MpfTextInput)
+                                   text_input=MpfTextInput,
+                                   camera=CameraWidget)
 
     def process_config(self, config):
         # config is localized to a specific widget section
