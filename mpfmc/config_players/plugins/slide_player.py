@@ -1,5 +1,6 @@
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.config_validator import ConfigValidator
+from mpf.core.utility_functions import Util
 
 
 class MpfSlidePlayer(PluginPlayer):
