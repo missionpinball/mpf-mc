@@ -98,10 +98,11 @@ class MpfWidget(object):
         del kwargs
         self.size_hint = (None, None)
 
-        super().__init__()
 
         self.config = deepcopy(config)
         # needs to be deepcopy since configs can have nested dicts
+
+        super().__init__(**self.pass_to_kivy_widget_init())
 
         self.mc = mc
 
@@ -182,6 +183,9 @@ class MpfWidget(object):
                 self.mc.machine_config['widget_styles']):
             self._default_style = self.mc.machine_config['widget_styles'][
                 '{}_default'.format(self.widget_type_name.lower())]
+
+    def pass_to_kivy_widget_init(self):
+        return dict()
 
     def merge_asset_config(self, asset):
         for setting in [x for x in self.merge_settings if (
