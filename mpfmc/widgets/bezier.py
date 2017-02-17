@@ -21,3 +21,5 @@ class Bezier(MpfWidget, Widget):
                      joint_precision=self.config['joint_precision'],
                      close=self.config['close'],
                      bezier_precision=self.config['precision'])
+
+widget_classes = [Bezier]

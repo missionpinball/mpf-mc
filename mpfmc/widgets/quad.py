@@ -14,3 +14,5 @@ class Quad(MpfWidget, Widget):
         with self.canvas:
             Color(*self.config['color'])
             KivyQuad(points=self.config['points'])
+
+widget_classes = [Quad]

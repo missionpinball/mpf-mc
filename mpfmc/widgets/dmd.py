@@ -304,3 +304,5 @@ class DmdLook(EffectBase):
 
         '''.format(blur, pixel_radius, new_pixel_size, width, height,
                    *bg_color)
+
+widget_classes = [Dmd, ColorDmd]

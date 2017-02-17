@@ -119,3 +119,5 @@ class ImageWidget(MpfWidget, Image):
 
     def stop(self):
         self._coreimage.anim_reset(False)
+
+widget_classes = [ImageWidget]

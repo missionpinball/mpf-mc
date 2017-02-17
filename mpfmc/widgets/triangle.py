@@ -14,3 +14,5 @@ class Triangle(MpfWidget, Widget):
         with self.canvas:
             Color(*self.config['color'])
             KivyTriangle(points=self.config['points'])
+
+widget_classes = [Triangle]

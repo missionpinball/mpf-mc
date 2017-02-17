@@ -12,6 +12,23 @@ mpf-mc:
         widget: mpfmc.config_collections.widget
         animation: mpfmc.config_collections.animation
         widget_styles: mpfmc.config_collections.widget_styles
+    
+    widgets:
+        slide_frame: mpfmc.uix.slide_frame
+        image: mpfmc.widgets.image
+        text: mpfmc.widgets.text
+        video: mpfmc.widgets.video
+        line: mpfmc.widgets.line
+        triangle: mpfmc.widgets.triangle
+        quad: mpfmc.widgets.quad
+        rectangle: mpfmc.widgets.rectangle
+        ellipse: mpfmc.widgets.ellipse
+        bezier: mpfmc.widgets.bezier
+        point: mpfmc.widgets.point
+        dmd: mpfmc.widgets.dmd
+        color_dmd: mpfmc.widgets.dmd
+        text_input: mpfmc.widgets.text_input
+#        camera: mpfmc.widgets.camera
 
     mpf_transition_modules:
         - push
@@ -35,6 +52,8 @@ mpf-mc:
 
     allow_invalid_config_sections: true
     fps: 30
+
+
 
 logging:
     console:

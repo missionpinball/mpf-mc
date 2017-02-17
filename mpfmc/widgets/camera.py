@@ -12,3 +12,5 @@ class CameraWidget(MpfWidget, Camera):
         return dict(resolution=(self.config['width'],
                                 self.config['height']),
                     index=self.config['camera_index'])
+
+widget_classes = [CameraWidget]

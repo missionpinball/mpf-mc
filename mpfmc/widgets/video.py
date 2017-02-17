@@ -204,3 +204,5 @@ class VideoWidget(MpfWidget, Video):
         self.mc.events.remove_handlers_by_keys(self._control_events)
         self._control_events = list()
         self.stop()
+
+widget_classes = [VideoWidget]

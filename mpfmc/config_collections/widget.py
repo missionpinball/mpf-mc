@@ -1,23 +1,10 @@
 from functools import partial
+from importlib import import_module
 
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.uix.widget import magic_events
-from mpfmc.uix.slide_frame import SlideFrame
-from mpfmc.widgets.image import ImageWidget
-from mpfmc.widgets.text import Text
-from mpfmc.widgets.video import VideoWidget
-from mpfmc.widgets.line import Line
-from mpfmc.widgets.triangle import Triangle
-from mpfmc.widgets.quad import Quad
-from mpfmc.widgets.rectangle import Rectangle
-from mpfmc.widgets.ellipse import Ellipse
-from mpfmc.widgets.bezier import Bezier
-from mpfmc.widgets.point import Point
-from mpfmc.widgets.dmd import Dmd, ColorDmd
-from mpfmc.widgets.text_input import MpfTextInput
-from mpfmc.widgets.camera import CameraWidget
 
 
 class Widget(ConfigCollection):
@@ -26,22 +13,12 @@ class Widget(ConfigCollection):
     collection = 'widgets'
     class_label = 'WidgetConfig'
 
-    type_map = CaseInsensitiveDict(text=Text,
-                                   image=ImageWidget,
-                                   video=VideoWidget,
-                                   slide_frame=SlideFrame,
-                                   bezier=Bezier,
-                                   ellipse=Ellipse,
-                                   line=Line,
-                                   point=Point,
-                                   points=Point,
-                                   quad=Quad,
-                                   rectangle=Rectangle,
-                                   triangle=Triangle,
-                                   dmd=Dmd,
-                                   color_dmd=ColorDmd,
-                                   text_input=MpfTextInput,
-                                   camera=CameraWidget)
+    type_map = CaseInsensitiveDict()
+
+    def _initialize(self):
+        for cls_name, module in self.mc.machine_config['mpf-mc']['widgets'].items():
+            for widget_cls in import_module(module).widget_classes:
+                self.type_map[cls_name] = widget_cls
 
     def process_config(self, config):
         # config is localized to a specific widget section
@@ -61,8 +38,11 @@ class Widget(ConfigCollection):
             widget_cls = Widget.type_map[config['type']]
         except (KeyError, TypeError):
             try:
-                raise ValueError('"{}" is not a valid MPF display widget type'
-                                 .format(config['type']))
+                raise ValueError(
+                    '"{}" is not a valid MPF display widget type. Did you '
+                    'misspell it, or forget to enable it in the "mpf-mc: '
+                    'widgets" section of your machine config?'.format(
+                        config['type']))
             except (KeyError, TypeError):
                 raise ValueError("Invalid widget config: {}".format(config))
 

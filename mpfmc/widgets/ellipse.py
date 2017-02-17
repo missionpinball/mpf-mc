@@ -31,3 +31,5 @@ class Ellipse(MpfWidget, Widget):
                         segments=self.config['segments'],
                         angle_start=self.config['angle_start'],
                         angle_end=self.config['angle_end'])
+
+widget_classes = [Ellipse]

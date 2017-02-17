@@ -196,3 +196,5 @@ class Text(MpfWidget, Label):
             digit_list.insert(i + 1, separator)
 
         return ''.join(digit_list)
+
+widget_classes = [Text]

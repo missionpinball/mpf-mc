@@ -415,3 +415,5 @@ class SlideFrame(MpfWidget, ScreenManager):
         they're playing on, so be sure to create machine-wide unique names
         when you're naming your slides.
         """
+
+widget_classes = [SlideFrame]

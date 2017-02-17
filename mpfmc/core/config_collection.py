@@ -42,6 +42,11 @@ class ConfigCollection(CaseInsensitiveDict):
         self.mc.mode_controller.register_load_method(
             self.create_entries, self.config_section)
 
+        self._initialize()
+
+    def _initialize(self):
+        pass
+
     def create_entries_from_root_config(self, **kwargs):
         del kwargs
         if self.config_section in self.mc.machine_config:

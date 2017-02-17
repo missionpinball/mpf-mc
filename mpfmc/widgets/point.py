@@ -15,3 +15,5 @@ class Point(MpfWidget, Widget):
             Color(*self.config['color'])
             KivyPoint(points=self.config['points'],
                       pointsize=self.config['pointsize'])
+
+widget_classes = [Point]

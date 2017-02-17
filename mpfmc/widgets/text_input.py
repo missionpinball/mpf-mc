@@ -229,3 +229,5 @@ class MpfTextInput(Text):
     def prepare_for_removal(self):
         self.done()
         super().prepare_for_removal()
+
+widget_classes = [MpfTextInput]

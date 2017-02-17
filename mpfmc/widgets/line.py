@@ -20,3 +20,5 @@ class Line(MpfWidget, Widget):
                      cap_precision=self.config['cap_precision'],
                      joint_precision=self.config['joint_precision'],
                      close=self.config['close'])
+
+widget_classes = [Line]
