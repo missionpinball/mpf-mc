@@ -50,7 +50,7 @@ class Text(MpfWidget, Label):
     def _do_get_text_string(self, text_string):
         try:
             return str(self.mc.machine_config['text_strings'][text_string])
-        except (KeyError):
+        except KeyError:
             # if the text string is not found, put the $ back on
             return '${}'.format(text_string)
 
