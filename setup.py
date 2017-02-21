@@ -536,5 +536,6 @@ setup(
 
     [mpf.command]
     mc=mpfmc.commands.mc:get_command
+    imc=mpfmc.commands.imc:get_command
     """,
     setup_requires=['cython>=' + MIN_CYTHON_STRING] if not skip_cython else [])

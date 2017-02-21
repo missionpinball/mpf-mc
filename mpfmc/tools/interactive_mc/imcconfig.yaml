@@ -1,0 +1,30 @@
+#config_version=4
+
+logging:
+    console:
+      bcp: basic
+      bcp_client: basic
+      bcp_interface: basic
+      bcp_server: basic
+      clock: none
+      mode_controller: none
+      event_manager: basic
+      slide_builder: full
+    file:
+      bcp: basic
+      bcp_client: basic
+      bcp_interface: basic
+      bcp_server: basic
+      clock: basic
+      mode_controller: none
+      event_manager: basic
+      slide_builder: full
+
+bcp:
+    connections:
+        local_display:
+            host: localhost
+            port: 5050
+            type: mpf.core.bcp.bcp_socket_client.BCPClientSocket
+            required: True
+            exit_on_close: True
