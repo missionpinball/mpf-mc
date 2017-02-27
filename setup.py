@@ -175,6 +175,35 @@ except ImportError:
 if not have_cython:
     from distutils.command.build_ext import build_ext
 
+
+def _check_and_fix_sdl2_mixer(f_path):
+    print("Check if SDL2_mixer smpeg2 have an @executable_path")
+    rpath_from = "@executable_path/../Frameworks/SDL2.framework/Versions/A/SDL2"
+    rpath_to = "@rpath/../../../../SDL2.framework/Versions/A/SDL2"
+    smpeg2_path = ("{}/Versions/A/Frameworks/smpeg2.framework"
+                   "/Versions/A/smpeg2").format(f_path)
+    output = getoutput(("otool -L '{}'").format(smpeg2_path)).decode('utf-8')
+    if "@executable_path" not in output:
+        return
+
+    print("WARNING: Your SDL2_mixer version is invalid")
+    print("WARNING: The smpeg2 framework embedded in SDL2_mixer contains a")
+    print("WARNING: reference to @executable_path that will fail the")
+    print("WARNING: execution of your application.")
+    print("WARNING: We are going to change:")
+    print("WARNING: from: {}".format(rpath_from))
+    print("WARNING: to: {}".format(rpath_to))
+    getoutput("install_name_tool -change {} {} {}".format(
+        rpath_from, rpath_to, smpeg2_path))
+
+    output = getoutput(("otool -L '{}'").format(smpeg2_path))
+    if b"@executable_path" not in output:
+        print("WARNING: Change successfully applied!")
+        print("WARNING: You'll never see this message again.")
+    else:
+        print("WARNING: Unable to apply the changes, sorry.")
+
+
 # -----------------------------------------------------------------------------
 # Setup classes
 
@@ -229,22 +258,25 @@ if platform == 'darwin':
         'include_dirs': [],
         'extra_compile_args': ['-F/Library/Frameworks']
     }
-    f_path = '/Library/Frameworks/{}.framework'.format('SDL2')
+    for name in ('SDL2', 'SDL2_mixer'):
+        f_path = '/Library/Frameworks/{}.framework'.format(name)
+        if not exists(f_path):
+            print('Missing framework {}'.format(f_path))
+            sdl2_valid = False
+            continue
 
-    if exists(f_path):
-        sdl2_flags['extra_link_args'] += ['-framework', 'SDL2']
+        sdl2_flags['extra_link_args'] += ['-framework', name]
         sdl2_flags['include_dirs'] += [join(f_path, 'Headers')]
         print('Found sdl2 frameworks: {}'.format(f_path))
-    else:
-        print('Missing framework {}'.format(f_path))
-        sdl2_valid = False
+        if name == 'SDL2_mixer':
+            _check_and_fix_sdl2_mixer(f_path)
 
     if not sdl2_valid:
         raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
 
 else:
     # use pkg-config approach instead
-    sdl2_flags = pkgconfig('sdl2')
+    sdl2_flags = pkgconfig('sdl2', 'SDL2_mixer')
     if 'libraries' not in sdl2_flags:
         raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
 
@@ -338,7 +370,7 @@ def determine_sdl2():
 
     # no pkgconfig info, or we want to use a specific sdl2 path, so perform
     # manual configuration
-    flags['libraries'] = ['SDL2',]
+    flags['libraries'] = ['SDL2', 'SDL2_mixer']
     split_chr = ';' if platform == 'win32' else ':'
     sdl2_paths = sdl2_path.split(split_chr) if sdl2_path else []
 
