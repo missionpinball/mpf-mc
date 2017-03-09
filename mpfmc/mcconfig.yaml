@@ -24,7 +24,7 @@ mpf-mc:
         rectangle: mpfmc.widgets.rectangle
         ellipse: mpfmc.widgets.ellipse
         bezier: mpfmc.widgets.bezier
-        point: mpfmc.widgets.point
+        points: mpfmc.widgets.point
         dmd: mpfmc.widgets.dmd
         color_dmd: mpfmc.widgets.dmd
         text_input: mpfmc.widgets.text_input
