@@ -69,7 +69,7 @@ class VideoWidget(MpfWidget, Video):
                 kwargs = {'volume': entry['value']}
 
             elif entry['action'] == 'position':
-                handler = self.set_position
+                handler = self.set_playback_position
                 kwargs = {'position': entry['value']}
 
             else:
@@ -145,7 +145,7 @@ class VideoWidget(MpfWidget, Video):
         del kwargs
         self.volume = volume
 
-    def set_position(self, position, **kwargs):
+    def set_playback_position(self, position, **kwargs):
         del kwargs
         super().seek(position / self.duration)
 
