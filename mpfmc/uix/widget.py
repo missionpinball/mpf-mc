@@ -98,7 +98,6 @@ class MpfWidget(object):
         del kwargs
         self.size_hint = (None, None)
 
-
         self.config = deepcopy(config)
         # needs to be deepcopy since configs can have nested dicts
 
@@ -229,22 +228,7 @@ class MpfWidget(object):
 
     def on_size(self, *args):
         del args
-
-        try:
-            self.pos = set_position(self.parent.width,
-                                    self.parent.height,
-                                    self.width, self.height,
-                                    self.config['x'],
-                                    self.config['y'],
-                                    self.config['anchor_x'],
-                                    self.config['anchor_y'],
-                                    self.config['adjust_top'],
-                                    self.config['adjust_right'],
-                                    self.config['adjust_bottom'],
-                                    self.config['adjust_left'])
-
-        except AttributeError:
-            pass
+        self.set_position()
 
     def on_pos(self, *args):
         del args
@@ -258,6 +242,23 @@ class MpfWidget(object):
                                             height=self.parent.height,
                                             opacity=1,
                                             line_height=1)
+        except AttributeError:
+            pass
+
+    def set_position(self):
+        try:
+            self.pos = set_position(self.parent.width,
+                                    self.parent.height,
+                                    self.width, self.height,
+                                    self.config['x'],
+                                    self.config['y'],
+                                    self.config['anchor_x'],
+                                    self.config['anchor_y'],
+                                    self.config['adjust_top'],
+                                    self.config['adjust_right'],
+                                    self.config['adjust_bottom'],
+                                    self.config['adjust_left'])
+
         except AttributeError:
             pass
 

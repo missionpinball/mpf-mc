@@ -154,18 +154,7 @@ class Slide(Screen):
 
             self.add_widget(top_widget)
 
-            widget_obj.pos = set_position(self.width,
-                                          self.height,
-                                          widget_obj.width,
-                                          widget_obj.height,
-                                          widget_obj.config['x'],
-                                          widget_obj.config['y'],
-                                          widget_obj.config['anchor_x'],
-                                          widget_obj.config['anchor_y'],
-                                          widget_obj.config['adjust_top'],
-                                          widget_obj.config['adjust_right'],
-                                          widget_obj.config['adjust_bottom'],
-                                          widget_obj.config['adjust_left'])
+            widget_obj.set_position()
             widgets_added.append(widget_obj)
 
         return widgets_added
@@ -199,18 +188,7 @@ class Slide(Screen):
 
         self.stencil.add_widget(widget, bisect(self.stencil.children, widget))
 
-        widget.pos = set_position(self.size[0],
-                                  self.size[1],
-                                  widget.width,
-                                  widget.height,
-                                  widget.config['x'],
-                                  widget.config['y'],
-                                  widget.config['anchor_x'],
-                                  widget.config['anchor_y'],
-                                  widget.config['adjust_top'],
-                                  widget.config['adjust_right'],
-                                  widget.config['adjust_bottom'],
-                                  widget.config['adjust_left'])
+        widget.set_position()
 
     def remove_widgets_by_key(self, key):
         for widget in self.get_widgets_by_key(key):

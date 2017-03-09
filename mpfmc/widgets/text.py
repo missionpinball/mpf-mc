@@ -1,6 +1,7 @@
 import re
 from kivy.uix.label import Label
 from mpfmc.uix.widget import MpfWidget
+from mpfmc.core.utils import set_position
 
 
 class Text(MpfWidget, Label):
@@ -31,6 +32,27 @@ class Text(MpfWidget, Label):
     def texture_update(self, *largs):
         super().texture_update(*largs)
         self.size = self.texture_size
+
+    def set_position(self):
+        if self.config['anchor_y'] == 'baseline':
+            try:
+                self.pos = set_position(self.parent.width,
+                                        self.parent.height,
+                                        self.width, self.height,
+                                        self.config['x'],
+                                        self.config['y'],
+                                        self.config['anchor_x'],
+                                        'bottom',  # anchor_y
+                                        self.config['adjust_top'],
+                                        self.config['adjust_right'],
+                                        self._label.get_descent() * -1,  # adjust_bottom
+                                        self.config['adjust_left'])
+
+            except AttributeError:
+                pass
+
+        else:
+            super().set_position()
 
     def update_kwargs(self, **kwargs):
         self.event_replacements.update(kwargs)

@@ -8,8 +8,8 @@ class TestText(MpfMcTestCase):
     def get_config_file(self):
         return 'test_text.yaml'
 
-    def get_widget(self):
-        return self.mc.targets['default'].current_slide.children[0].children[0]
+    def get_widget(self, index=0):
+        return self.mc.targets['default'].current_slide.children[0].children[index]
 
     def test_static_text(self):
         # Very basic test
@@ -325,3 +325,13 @@ class TestText(MpfMcTestCase):
         self.mc.events.post('machine_font')
         self.advance_time()
         self.assertEqual('big_noodle_titling', self.get_widget().font_name)
+
+    def test_baseline(self):
+        self.mc.events.post('baseline')
+        self.advance_time()
+
+        # baseline anchored widgets should be 4px lower
+        self.assertEqual(self.get_widget(0).pos[1], 100)
+        self.assertEqual(self.get_widget(1).pos[1], 96)
+        self.assertEqual(self.get_widget(2).pos[1], 100)
+        self.assertEqual(self.get_widget(3).pos[1], 96)
