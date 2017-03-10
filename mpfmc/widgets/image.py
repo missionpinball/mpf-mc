@@ -10,9 +10,18 @@ class ImageWidget(MpfWidget, Image):
     def __init__(self, mc, config, key=None, **kwargs):
         super().__init__(mc=mc, config=config, key=key)
 
+        self.image = None
+
         try:
             self.image = self.mc.images[self.config['image']]
-        except:
+        except KeyError:
+
+            try:
+                self.image = self.mc.images[kwargs['play_kwargs']['image']]
+            except KeyError:
+                pass
+
+        if not self.image:
             raise ValueError("Cannot add Image widget. Image '{}' is not a "
                              "valid image name.".format(self.config['image']))
 
