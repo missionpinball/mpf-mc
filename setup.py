@@ -481,7 +481,8 @@ else:
 
 install_requires = ['ruamel.yaml>=0.10,<0.11',
                     'mpf>={}'.format(mpf_version),
-                    'kivy>=1.9.1'
+                    'kivy>=1.9.1',
+                    'psutil'
                     ]
 
 if platform == 'win32':
