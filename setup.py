@@ -479,10 +479,11 @@ else:
         version_file,))
 
 
-install_requires = ['ruamel.yaml>=0.10,<0.11',
+install_requires = ['ruamel.yaml>=0.10,<0.11',  # better YAML library
                     'mpf>={}'.format(mpf_version),
                     'kivy>=1.9.1',
                     'psutil'
+                    'pygments',  # YAML syntax formatting for the iMC
                     ]
 
 if platform == 'win32':
