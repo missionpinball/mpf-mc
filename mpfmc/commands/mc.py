@@ -8,6 +8,7 @@ import sys
 import threading
 from datetime import datetime
 import time
+import psutil
 
 import errno
 
@@ -20,7 +21,13 @@ class Command(object):
 
     # pylint: disable-msg=too-many-locals
     def __init__(self, mpf_path, machine_path, args):
-
+        """Run MC."""
+        p = psutil.Process(os.getpid())
+        # increase priority slightly. this will keep MPF responsive when MC lags
+        if sys.platform == "win32":
+            p.nice(psutil.BELOW_NORMAL_PRIORITY_CLASS)
+        else:
+            p.nice(10)
         # undo all of Kivy's built-in logging so we can do it our way
         os.environ['KIVY_NO_FILELOG'] = '1'
         os.environ['KIVY_NO_CONSOLELOG'] = '1'
