@@ -44,6 +44,9 @@ class PhysicalDmdBase(object):
 
             effect_list.append(Gain(gain=self.config['brightness']))
 
+        if self.config['gamma'] != 1.0:
+            effect_list.append(Gamma(gamma=self.config['gamma']))
+
         self.effect_widget.effects = effect_list
         self.effect_widget.size = self.source.size
 
@@ -183,3 +186,21 @@ class FlipVertical(EffectBase):
         return texture2D(texture, vec2(tex_coords.x, 1.0 - tex_coords.y));
         }}
         '''
+
+class Gamma(EffectBase):
+    """GLSL effect to apply a gamma setting to a texture"""
+
+    def __init__(self, gamma=1.0):
+        super().__init__()
+
+        gamma = float(gamma)
+
+        self.glsl = '''
+
+        vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
+
+        {{
+        vec4 outColor = vec4(pow(color.x, {0}), pow(color.y, {0}), pow(color.z, {0}), 1.0);
+        return outColor;
+        }}
+        '''.format(gamma)
