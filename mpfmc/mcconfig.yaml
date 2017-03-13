@@ -12,7 +12,7 @@ mpf-mc:
         widget: mpfmc.config_collections.widget
         animation: mpfmc.config_collections.animation
         widget_styles: mpfmc.config_collections.widget_styles
-    
+
     widgets:
         slide_frame: mpfmc.uix.slide_frame
         image: mpfmc.widgets.image
@@ -144,3 +144,93 @@ widget_styles:
       font_size: 9
       adjust_bottom: 3
       adjust_top: 2
+
+slides:
+  dmd_gamma_test:
+    widgets:
+      - type: text
+        text: DMD GAMMA TEST
+        style: dmd_small
+        y: 4
+        anchor_x: left
+        x: 2
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 000000
+        x: 4
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 1f1f1f
+        x: 12
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 2f2f2f
+        x: 20
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 3f3f3f
+        x: 28
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 4f4f4f
+        x: 36
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 5f5f5f
+        x: 44
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 6f6f6f
+        x: 52
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 7f7f7f
+        x: 60
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 8f8f8f
+        x: 68
+      - type: rectangle
+        width: 8
+        height: 32
+        color: 9f9f9f
+        x: 76
+      - type: rectangle
+        width: 8
+        height: 32
+        color: afafaf
+        x: 84
+      - type: rectangle
+        width: 8
+        height: 32
+        color: bfbfbf
+        x: 92
+      - type: rectangle
+        width: 8
+        height: 32
+        color: cfcfcf
+        x: 100
+      - type: rectangle
+        width: 8
+        height: 32
+        color: dfdfdf
+        x: 108
+      - type: rectangle
+        width: 8
+        height: 32
+        color: efefef
+        x: 116
+      - type: rectangle
+        width: 8
+        height: 32
+        color: ffffff
+        x: 124
