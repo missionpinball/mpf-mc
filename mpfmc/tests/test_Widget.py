@@ -545,6 +545,7 @@ class TestWidget(MpfMcTestCase):
 
         self.assertEqual([1, 0, 0, 1], w8.color)
         self.assertEqual(70, w8.font_size)
+        self.assertEqual(77, w8.x)  # anchor_x: right, x: right-10
 
     def test_widget_removal_from_slide_player(self):
         # tests that we can remove a widget by key that was shown via the
@@ -788,3 +789,24 @@ class TestWidget(MpfMcTestCase):
     def test_slide_frame_widget(self):
         self.mc.events.post("show_info_frame")
         self.advance_time(1)
+
+    def test_properties_from_named_widget(self):
+        self.mc.events.post('add_widget1_to_current')
+        self.mc.events.post('add_widget2_to_current')
+        self.advance_time()
+
+        widget1 = self.mc.targets[
+            'default'].current_slide.children[0].children[0]
+
+        widget2 = self.mc.targets[
+            'default'].current_slide.children[0].children[1]
+
+        self.assertEqual(widget1.text, "widget1")
+        self.assertEqual(widget2.text, "widget2")
+
+        self.assertEqual(widget1.y, 121)
+        self.assertEqual(widget2.y, -9)
+        self.assertEqual(widget1.font_size, 100)
+        self.assertEqual(widget2.font_size, 100)
+        self.assertEqual(widget1.color, [1.0, 1.0, 0.0, 1])
+        self.assertEqual(widget2.color, [1.0, 0.0, 0.0, 1])
