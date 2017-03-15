@@ -52,7 +52,7 @@ install:
       pip3 install .;
 
     fi;
-  - pip3 install coveralls coverage
+  - pip3 install coveralls coverage pip setuptools --upgrade
 
 env:
   global:
