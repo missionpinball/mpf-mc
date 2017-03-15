@@ -30,14 +30,14 @@ the system installation of MPF just contains pointers back to your development f
 Python's site-packages folder.
 
 In this case, you need to run tests from your development folder. To do this, you must run the tests from the root
-repository folder. (e.g. the parent folder called "mpf" which itself has a child folder called "mpf" in it.) Then from
+repository folder. (e.g. the parent folder called "mpf-mc" which itself has a child folder called "mpfmc" in it.) Then from
 there, run:
 
-`python -m unittest discover mpf/mc/tests`
+`python -m unittest discover mpfmc/tests`
 
 If you want to run a single test, you can run it via:
 
-`python -m unittest mpf.tests.test_YamlInterface`
+`python -m unittest mpfmc.tests.test_AudioDefaultSettings`
 
-Even with the single test, it's important that you run it from the root mpf folder (which the tests in the child
-mpf/tests folder.)
+Even with the single test, it's important that you run it from the root mpf-mc folder (which then tests in the child
+mpfmc/tests folder.)
