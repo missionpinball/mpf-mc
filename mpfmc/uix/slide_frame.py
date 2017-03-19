@@ -68,9 +68,18 @@ class SlideFrameParent(MpfWidget, FloatLayout):
 
     def add_widget(self, widget, **kwargs):
         del kwargs
-
-        widget.pos = set_position(self.width, self.height,
-                                  widget.width, widget.height)
+        widget.pos = set_position(self.width,
+                                  self.height,
+                                  widget.width,
+                                  widget.height,
+                                  widget.config['x'],
+                                  widget.config['y'],
+                                  widget.config['anchor_x'],
+                                  widget.config['anchor_y'],
+                                  widget.config.get('adjust_top', 0),
+                                  widget.config.get('adjust_right', 0),
+                                  widget.config.get('adjust_bottom', 0),
+                                  widget.config.get('adjust_left', 0))
 
         self.stencil.add_widget(widget, bisect_left(
             self.stencil.children, widget))

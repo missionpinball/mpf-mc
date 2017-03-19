@@ -19,11 +19,11 @@ widgets:
   top_dmd_widget:
     type: text
     text: "Top Widget"
-    y: 0%
+    y: 100%
   bottom_dmd_widget:
     type: text
     text: "Bottom Widget"
-    y: 100%
+    y: 0%
 slides:
   container_slide:
     - type: dmd
@@ -148,20 +148,13 @@ slide_player:
 widget_player:
   position_widget_right:
     right_dmd_widget:
-      action: add
       target: dmd
   position_widget_left:
     left_dmd_widget:
-      action: add
       target: dmd
   position_widget_top:
     top_dmd_widget:
-      action: add
       target: dmd
   position_widget_bottom:
     bottom_dmd_widget:
-      action: add
       target: dmd
-    #- left_dmd_widget
-    #- bottom_dmd_widget
-    #- top_dmd_widget
