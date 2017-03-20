@@ -62,6 +62,11 @@ class Widget(ConfigCollection):
         else:
             config['animations'] = None
 
+        if 'reset_animations_events' in config:
+            for event_name in config['reset_animations_events']:
+                if event_name not in magic_events:
+                    self.mc.events.add_handler("client_connected", partial(self._register_trigger, event_name))
+
         if config.get('z', 0) < 0:
             raise ValueError(
                 "\nWidget with negative z value in config: {}.\n\nAs of MPF "
