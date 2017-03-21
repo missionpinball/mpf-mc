@@ -97,8 +97,12 @@ class MpfSlidePlayer(PluginPlayer):
 
         config['_default_settings'] = list(config.keys())
 
-        self.machine.config_validator.validate_config('widgets:{}'.format(
-            config['type']).lower(), config, base_spec='widgets:common')
+        try:
+            self.machine.config_validator.validate_config('widgets:{}'.format(
+                config['type']).lower(), config, base_spec='widgets:common')
+        except KeyError:
+            raise KeyError("Slide config validation error. Something is "
+                           "wrong here: {}".format(config))
 
         if 'animations' in config:
             config['animations'] = self.process_animations(
