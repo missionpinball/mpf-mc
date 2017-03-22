@@ -50,12 +50,10 @@ class BcpProcessor(object):
 
     def _client_connected(self, **kwargs):
         del kwargs
-        self.send("monitor_machine_vars")
-        self.send("monitor_player_vars")
-        self.register_trigger("ball_started")
-        self.register_trigger("ball_ended")
-        self.register_trigger("player_add_success")
-        self.register_trigger("player_turn_start")
+        self.send(bcp_command="monitor", category="machine_vars")
+        self.send(bcp_command="monitor", category="player_vars")
+        self.send(bcp_command="monitor", category="modes")
+        self.send(bcp_command="monitor", category="core_events")
         self.register_trigger("master_volume_increase")
         self.register_trigger("master_volume_decrease")
         self.connected = True
@@ -139,7 +137,7 @@ class BcpProcessor(object):
                 self.log.debug("Processing command: %s %s", bcp_command,
                                kwargs)
 
-        # Can't use try/except KeyError here becasue there could be a KeyError
+        # Can't use try/except KeyError here because there could be a KeyError
         # in the callback which we don't want it to swallow.
         if bcp_command in self.bcp_commands:
             self.bcp_commands[bcp_command](**kwargs)
