@@ -50,10 +50,10 @@ class BcpProcessor(object):
 
     def _client_connected(self, **kwargs):
         del kwargs
-        self.send(bcp_command="monitor", category="machine_vars")
-        self.send(bcp_command="monitor", category="player_vars")
-        self.send(bcp_command="monitor", category="modes")
-        self.send(bcp_command="monitor", category="core_events")
+        self.send(bcp_command="monitor_start", category="machine_vars")
+        self.send(bcp_command="monitor_start", category="player_vars")
+        self.send(bcp_command="monitor_start", category="modes")
+        self.send(bcp_command="monitor_start", category="core_events")
         self.register_trigger("master_volume_increase")
         self.register_trigger("master_volume_decrease")
         self.connected = True
@@ -124,7 +124,6 @@ class BcpProcessor(object):
             self._process_command(cmd, **kwargs)
 
     def _process_command(self, bcp_command, **kwargs):
-
         if self.debug_log:
             if 'rawbytes' in kwargs:
                 debug_kwargs = deepcopy(kwargs)

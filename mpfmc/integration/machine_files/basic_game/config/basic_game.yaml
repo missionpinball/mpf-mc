@@ -1,0 +1,18 @@
+#config_version=4
+
+switches:
+  start:
+    number:
+    tags: start
+  drain:
+    number:
+
+coils:
+  drain:
+    number:
+
+ball_devices:
+  bd_drain:
+    eject_coil: drain
+    ball_switches: drain
+    tags: trough, drain, ball_add_live
