@@ -154,6 +154,10 @@ class MpfMc(App):
         self.events.add_handler("client_connected", self._create_physical_dmds)
         self.events.add_handler("player_turn_start", self.player_start_turn)
 
+        self.create_machine_var('mpfmc_ver', __version__)
+        # force setting it here so we have it before MPF connects
+        self.receive_machine_var_update('mpfmc_ver', __version__, 0, True)
+
     def _create_physical_dmds(self, **kwargs):
         self.create_physical_dmds()
         self.create_physical_rgb_dmds()
