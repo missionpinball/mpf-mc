@@ -35,6 +35,8 @@ class BcpProcessor(object):
                              'machine_variable': self._bcp_machine_variable,
                              'mode_start': self._bcp_mode_start,
                              'mode_stop': self._bcp_mode_stop,
+                             'ball_start': self._bcp_ball_start,
+                             'ball_end': self._bcp_ball_end,
                              'player_added': self._bcp_player_add,
                              'player_turn_start': self._bcp_player_turn_start,
                              'player_variable': self._bcp_player_variable,
@@ -189,6 +191,12 @@ class BcpProcessor(object):
 
         if name in self.mc.modes:
             self.mc.modes[name].stop()
+
+    def _bcp_ball_start(self, player_num, ball, **kwargs):
+        del player_num, ball, kwargs
+
+    def _bcp_ball_end(self, **kwargs):
+        del kwargs
 
     def _bcp_settings(self, settings, **kwargs):
         del kwargs
