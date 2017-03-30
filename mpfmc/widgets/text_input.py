@@ -123,6 +123,10 @@ class MpfTextInput(Text):
     def jump(self, char):
         # Unfortunately deque.index() is Python 3.5+, so we have to do it this
         # way.
+
+        if not self.char_list:
+            return
+
         counts_remaining = len(self.char_list)
         while self.char_list[0] != char:
             self.char_list.rotate(1)
