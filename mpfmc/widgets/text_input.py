@@ -166,11 +166,13 @@ class MpfTextInput(Text):
             return
 
         if self.char_list[0] == 'back':
-            # set the text_entry text to whatever the last char was
-            self.jump(self.linked_text_widget.text[-1:])
-            # remove the last char from the associated widget
-            self.linked_text_widget.update_text(
-                self.linked_text_widget.text[:-1])
+
+            if self.linked_text_widget.text:
+                # set the text_entry text to whatever the last char was
+                self.jump(self.linked_text_widget.text[-1:])
+                # remove the last char from the associated widget
+                self.linked_text_widget.update_text(
+                    self.linked_text_widget.text[:-1])
 
         elif self.char_list[0] == 'end':
             self.complete()

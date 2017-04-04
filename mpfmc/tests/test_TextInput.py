@@ -22,6 +22,61 @@ class TestText(MpfMcTestCase):
         self.assertEqual(text_input_widget.text, 'C')
         self.advance_time()
 
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'B')
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'A')
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'END')
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'BACK')
+
+        # should not crash if we go back with no chars
+        self.mc.events.post('sw_start')
+        self.advance_time()
+
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'SPACE')
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, '-')
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, '_')
+
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, '-')
+
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'SPACE')
+
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'BACK')
+
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'END')
+
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'A')
+
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'B')
+
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'C')
+
         self.mc.events.post('sw_right_flipper')
         self.advance_time()
         self.assertEqual(text_input_widget.text, 'D')
@@ -81,8 +136,6 @@ class TestText(MpfMcTestCase):
         self.assertEqual(text_input_widget.text, 'Q')
         self.assertEqual(text_display_widget.text, 'MQ')
 
-        self.mc.events.post('sw_right_flipper')
-        self.advance_time()
         self.mc.events.post('sw_right_flipper')
         self.advance_time()
         self.mc.events.post('sw_right_flipper')
