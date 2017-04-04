@@ -360,6 +360,11 @@ class MpfMc(App):
         internally as part of the MPF-MC reset process.
         '''
         self.events.process_event_queue()
+        self.events.post('mc_reset_complete')
+        '''event: mc_reset_complete
+        desc: Posted on the MPF-MC only (e.g. not in MPF). This event is posted
+        when the MPF-MC reset process is complete.
+        '''
 
     def game_start(self, **kargs):
         self.player = None

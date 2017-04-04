@@ -47,6 +47,7 @@ class BcpProcessor(object):
                              }
 
         self.mc.events.add_handler('client_connected', self._client_connected)
+        self.mc.events.add_handler('mc_reset_complete', self._reset_complete)
 
         Clock.schedule_interval(self._get_from_queue, 0)
 
@@ -266,3 +267,6 @@ class BcpProcessor(object):
     def _bcp_reset(self, **kwargs):
         del kwargs
         self.mc.reset()
+
+    def _reset_complete(self, **kwargs):
+        self.send('reset_complete')
