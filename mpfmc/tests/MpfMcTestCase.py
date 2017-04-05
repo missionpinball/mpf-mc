@@ -196,7 +196,7 @@ class MpfMcTestCase(unittest.TestCase):
         # set the title bar, just for fun. :)
         self.mc.title = str(self._test_name)
 
-        if not self.mc.is_init_done:
+        if not self.mc.is_init_done.is_set():
             if self._test_started + self.max_test_setup_secs < time():
                 self.dump_clock()
                 self.fail("Test setup took more than {} seconds.".format(

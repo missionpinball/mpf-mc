@@ -25,6 +25,11 @@ class TestBcpClient(MockBcpClient):
         self.exit_on_close = False
 
     def send(self, bcp_command, kwargs):
+        if bcp_command == "reset":
+            self.receive("reset_complete")
+            return
+        if bcp_command == "error":
+            raise AssertionError("Got bcp error")
         self.queue.put((bcp_command, kwargs))
 
     def receive(self, bcp_command, callback=None, rawbytes=None, **kwargs):
@@ -112,7 +117,7 @@ class MpfIntegrationTestCase(MpfTestCase):
         self.mc.dispatch('on_start')
         runTouchApp(slave=True)  # change is here
 
-        while not self.mc.is_init_done:
+        while not self.mc.is_init_done.is_set():
             EventLoop.idle()
 
     def _start_mc(self):
@@ -181,6 +186,8 @@ class MpfIntegrationTestCase(MpfTestCase):
         bcp_mc = self.mc.bcp_processor
         bcp_mc.send = client.receive
         self.mc.events.post("client_connected")
+        self.advance_time_and_run()
+        bcp_mc.send("reset_complete")
         self.advance_time_and_run()
         while not client.queue.empty():
             bcp_mc.receive_queue.put(client.queue.get())
