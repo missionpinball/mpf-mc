@@ -223,7 +223,7 @@ class MpfMc(App):
         # print('clearing boot hold', hold, self._boot_holds)
         self.log.debug('Clearing boot hold %s. Holds remaining: %s', hold, self._boot_holds)
         if not self._boot_holds:
-            self.is_init_done.set()
+            self.init_done()
 
     def _register_config_players(self):
         # todo move this to config_player module
