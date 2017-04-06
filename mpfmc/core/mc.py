@@ -322,8 +322,6 @@ class MpfMc(App):
         # no events docstring as this event is also in mpf
         self.events.process_event_queue()
 
-        self.reset()
-
     def build(self):
         self.start_time = time.time()
         self.ticks = 0
