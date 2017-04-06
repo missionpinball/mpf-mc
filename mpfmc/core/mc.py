@@ -28,6 +28,7 @@ from mpfmc.core.config_processor import ConfigProcessor
 from mpfmc.core.mode_controller import ModeController
 from mpfmc.uix.transitions import TransitionManager
 from mpfmc.core.config_collection import create_config_collections
+import asyncio
 
 import mpf
 import mpfmc
@@ -82,6 +83,8 @@ class MpfMc(App):
         # pylint: disable-msg=protected-access
         self.log.info("Starting clock at %sHz", Clock._max_fps)
         self._boot_holds = set()
+        self.is_init_done = asyncio.Event(loop=self.clock)
+        self.is_init_done.clear()
         self.mpf_path = os.path.dirname(mpf.__file__)
         self.modes = CaseInsensitiveDict()
         self.player_list = list()
@@ -112,7 +115,6 @@ class MpfMc(App):
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
-        self.is_init_done = False
 
         if thread_stopper:
             self.thread_stopper = thread_stopper
@@ -210,16 +212,18 @@ class MpfMc(App):
 
     def register_boot_hold(self, hold):
         # print('registering boot hold', hold)
+        if self.is_init_done.is_set():
+            raise AssertionError("Register hold after init_done")
         self._boot_holds.add(hold)
 
     def clear_boot_hold(self, hold):
-        # print('clearing boot hold', hold)
-        if self.is_init_done:
-            self.log.warn("clear boot hold after init done")
-            return
+        if self.is_init_done.is_set():
+            raise AssertionError("Register hold after init_done")
         self._boot_holds.remove(hold)
+        # print('clearing boot hold', hold, self._boot_holds)
+        self.log.debug('Clearing boot hold %s. Holds remaining: %s', hold, self._boot_holds)
         if not self._boot_holds:
-            self.init_done()
+            self.is_init_done.set()
 
     def _register_config_players(self):
         # todo move this to config_player module
@@ -312,13 +316,11 @@ class MpfMc(App):
         self.clear_boot_hold('init')
 
     def init_done(self):
-        self.is_init_done = True
+        self.is_init_done.set()
         ConfigValidator.unload_config_spec()
         self.events.post("init_done")
         # no events docstring as this event is also in mpf
         self.events.process_event_queue()
-
-        self.reset()
 
     def build(self):
         self.start_time = time.time()
@@ -360,6 +362,11 @@ class MpfMc(App):
         internally as part of the MPF-MC reset process.
         '''
         self.events.process_event_queue()
+        self.events.post('mc_reset_complete')
+        '''event: mc_reset_complete
+        desc: Posted on the MPF-MC only (e.g. not in MPF). This event is posted
+        when the MPF-MC reset process is complete.
+        '''
 
     def game_start(self, **kargs):
         self.player = None

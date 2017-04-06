@@ -24,34 +24,30 @@ class TestBcpClient(MockBcpClient):
         self.queue = Queue()
         self.exit_on_close = False
 
-    def send(self, bcp_command, kwargs):
-        self.queue.put((bcp_command, kwargs))
+        self.fps = 30
 
-    def receive(self, bcp_command, callback=None, rawbytes=None, **kwargs):
-        if rawbytes:
-            kwargs['rawbytes'] = rawbytes
-        self.receive_queue.put_nowait((bcp_command, kwargs))
+        self._start_time = time.time()
+        Clock._start_tick = self._start_time
+        Clock._last_tick = self._start_time
+        Clock.time = self._mc_time
+        Clock._events = [[] for i in range(256)]
+        with patch("mpfmc.core.bcp_processor.BCPServer"):
+            self._start_mc()
+        self.mc_task = self.machine.clock.schedule_interval(self._run_mc, 1 / self.fps)
 
-        if callback:
-            callback()
-
-
-class MpfIntegrationTestCase(MpfTestCase):
-
-    fps = 30
-
-    def get_use_bcp(self):
-        return True
+        bcp_mc = self.mc.bcp_processor
+        bcp_mc.send = self.receive
+        self.queue = bcp_mc.receive_queue
+        self.mc.events.post("client_connected")
 
     def getAbsoluteMachinePath(self):
         # creates an absolute path based on machine_path
-        return os.path.abspath(os.path.join(
-            mpfmc.core.__path__[0], os.pardir, self.getMachinePath()))
+        return self.machine.machine_path
 
     def get_options(self):
         return dict(machine_path=self.getAbsoluteMachinePath(),
                     mcconfigfile='mpfmc/mcconfig.yaml',
-                    configfile=Util.string_to_list(self.getConfigFile()),
+                    configfile=self.machine.options['configfile'],
                     bcp=False)
 
     def preprocess_config(self, config):
@@ -112,7 +108,7 @@ class MpfIntegrationTestCase(MpfTestCase):
         self.mc.dispatch('on_start')
         runTouchApp(slave=True)  # change is here
 
-        while not self.mc.is_init_done:
+        while not self.mc.is_init_done.is_set():
             EventLoop.idle()
 
     def _start_mc(self):
@@ -128,7 +124,7 @@ class MpfIntegrationTestCase(MpfTestCase):
         machine_path = self.getAbsoluteMachinePath()
 
         mpf_config = load_machine_config(
-            Util.string_to_list(self.getConfigFile()),
+            self.machine.options['configfile'],
             machine_path,
             mpf_config['mpf-mc']['paths']['config'], mpf_config)
         self.preprocess_config(mpf_config)
@@ -144,13 +140,41 @@ class MpfIntegrationTestCase(MpfTestCase):
         self._start_app_as_slave()
 
     def _mc_time(self):
-        return self._start_time + self.loop._time
+        return self._start_time + self.machine.clock.loop._time
 
     def _run_mc(self, dt):
         del dt
-        if self.unittest_verbosity() > 1:
-            time.sleep(.05)
+        # if self.unittest_verbosity() > 1:
+        #     time.sleep(.05)
         EventLoop.idle()
+
+    def stop(self):
+        self.mc.stop()
+        self.machine.clock.unschedule(self.mc_task)
+
+    def send(self, bcp_command, kwargs):
+        self.queue.put((bcp_command, kwargs))
+
+    def receive(self, bcp_command, callback=None, rawbytes=None, **kwargs):
+        if rawbytes:
+            kwargs['rawbytes'] = rawbytes
+        self.receive_queue.put_nowait((bcp_command, kwargs))
+
+        if callback:
+            callback()
+
+
+class MpfIntegrationTestCase(MpfTestCase):
+
+    fps = 30
+
+    def get_use_bcp(self):
+        return True
+
+    def getAbsoluteMachinePath(self):
+        # creates an absolute path based on machine_path
+        return os.path.abspath(os.path.join(
+            mpfmc.core.__path__[0], os.pardir, self.getMachinePath()))
 
     def get_enable_plugins(self):
         return True
@@ -168,28 +192,12 @@ class MpfIntegrationTestCase(MpfTestCase):
 
     def setUp(self):
         super().setUp()
-        self._start_time = time.time()
-        Clock._start_tick = self._start_time
-        Clock._last_tick = self._start_time
-        Clock.time = self._mc_time
-        Clock._events = [[] for i in range(256)]
-        with patch("mpfmc.core.bcp_processor.BCPServer"):
-            self._start_mc()
-        self.mc_task = self.clock.schedule_interval(self._run_mc, 1 / self.fps)
 
         client = self.machine.bcp.transport.get_named_client("local_display")
-        bcp_mc = self.mc.bcp_processor
-        bcp_mc.send = client.receive
-        self.mc.events.post("client_connected")
-        self.advance_time_and_run()
-        while not client.queue.empty():
-            bcp_mc.receive_queue.put(client.queue.get())
-        client.queue = bcp_mc.receive_queue
+        self.mc = client.mc
         self.advance_time_and_run()
 
     def tearDown(self):
-        self.mc.stop()
-        self.clock.unschedule(self.mc_task)
         super().tearDown()
         EventLoop.close()
 
