@@ -17,12 +17,12 @@ class TestBcpProcessor(MpfMcTestCase):
 
     def test_game_flow(self):
         self.send('hello',
-                  version='1.0',
+                  version='1.1',
                   controller_version=__version__,
                   controller_name='Mission Pinball Framework')
         self.advance_time()
 
-        response = ('hello', None, {'version': '1.0'})
+        response = ('hello', None, {'version': '1.1'})
         self.assertIn(response, self.sent_bcp_commands)
 
         self.send('mode_start',
