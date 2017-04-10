@@ -30,6 +30,9 @@ class TestAssets(MpfMcTestCase):
         # test images from subfolder not listed in assets:images
         self.assertIn('image11', self.mc.images)  # /images/custom1
 
+        # test subfolder under another subfolder listed in assets:images
+        self.assertIn('image14', self.mc.images)  # /images/preload/subfolder
+
         # test images from the images: section that have names configured to be
         # different from their file names
         self.assertIn('image_12_new_name', self.mc.images)  # image12.png
@@ -46,6 +49,8 @@ class TestAssets(MpfMcTestCase):
         # test custom k/v pair from default config based on the folder the
         # asset was in
         self.assertEqual(self.mc.images['image4'].config['test_key'],
+                         'test_value')
+        self.assertEqual(self.mc.images['image14'].config['test_key'],
                          'test_value')
 
         # test custom k/v pair from asset entry in the images: section
