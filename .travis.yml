@@ -38,7 +38,7 @@ install:
 
       mkdir /tmp/downloads;
       cd /tmp/downloads;
-      curl -LsS https://www.dropbox.com/s/ohrs8tn0yh2y7oe/mpf_mac_frameworks.zip?dl=1 > mac_frameworks.zip;
+      curl -LsS https://mpf.kantert.net/mpf_mac_frameworks.zip > mac_frameworks.zip;
       unzip -q mac_frameworks.zip;
       sudo cp -r frameworks/*.* /Library/Frameworks;
 
