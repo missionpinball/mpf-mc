@@ -13,8 +13,7 @@ class TestAssets(MpfMcTestCase):
         # test that the images asset class gets built correctly
         self.assertTrue(self.mc, 'images')
         self.assertTrue(self.mc.asset_manager._asset_classes)
-        self.assertEqual(self.mc.asset_manager._asset_classes[0]
-                         ['path_string'], 'images')
+        self.assertEqual(self.mc.asset_manager._asset_classes[0].path_string, 'images')
 
         # tests that assets are registered as expected with various conditions
 
