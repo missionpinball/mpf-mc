@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from kivy.animation import Animation
-from mpf.core.rgb_color import RGBColor
+from mpf.core.rgba_color import RGBAColor
 from kivy.clock import Clock
 
 from mpfmc.core.utils import set_position, percent_to_float
@@ -122,9 +122,8 @@ class MpfWidget(object):
         self._set_default_style()
         self._apply_style()
 
-        if 'color' in self.config and not isinstance(self.config['color'],
-                                                     RGBColor):
-            self.config['color'] = RGBColor(self.config['color'])
+        if 'color' in self.config and not isinstance(self.config['color'], RGBAColor):
+            self.config['color'] = RGBAColor(self.config['color'])
 
         for k, v in self.config.items():
             if k not in self._dont_send_to_kivy and hasattr(self, k):
