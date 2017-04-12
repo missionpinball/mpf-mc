@@ -111,6 +111,10 @@ class Mode(object):
                                 mode=self,
                                 **item.kwargs))
 
+    def is_game_mode(self) -> bool:
+        """Return false since mc does not have game modes."""
+        return False
+
     def stop(self, callback=None, **kwargs):
         """Stops this mode.
 
