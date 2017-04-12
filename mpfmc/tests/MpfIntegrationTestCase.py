@@ -144,10 +144,7 @@ class TestBcpClient(MockBcpClient):
     def _mc_time(self):
         return self._start_time + self.machine.clock.loop._time
 
-    def _run_mc(self, dt):
-        del dt
-        # if self.unittest_verbosity() > 1:
-        #     time.sleep(.05)
+    def _run_mc(self):
         EventLoop.idle()
 
     def stop(self):
