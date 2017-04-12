@@ -38,6 +38,8 @@ class TestBcpClient(MockBcpClient):
         bcp_mc = self.mc.bcp_processor
         bcp_mc.send = self.receive
         self.queue = bcp_mc.receive_queue
+        self.mc.bcp_processor.enabled = True
+        self.mc.bcp_client_connected = True
         self.mc.events.post("client_connected")
 
     def getAbsoluteMachinePath(self):

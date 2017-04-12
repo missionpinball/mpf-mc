@@ -1,0 +1,15 @@
+# config_version=4
+
+modes:
+  - high_score
+
+switches:
+  s_left_flipper:
+    number:
+    tags: left_flipper
+  s_right_flipper:
+    number:
+    tags: right_flipper
+  s_start:
+    number:
+    tags: start
