@@ -5,9 +5,10 @@ modes:
     - mode2
     - mode3
 
-physical_dmd:
-  shades: 16
-  fps: 24
+physical_dmds:
+  default:
+    shades: 16
+    fps: 24
 
 window:
   width: 600
