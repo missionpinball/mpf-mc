@@ -245,8 +245,8 @@ animations:
     duration: 1s
   - property: x
     value: 0%
-    duration: 100ms
-    timing: after_previous
+    duration: 1s
+    timing: with_previous
     repeat: False
 
   pulse:
