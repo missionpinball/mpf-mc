@@ -1,4 +1,5 @@
 from copy import deepcopy
+from functools import reduce
 
 from kivy.animation import Animation
 from mpf.core.rgba_color import RGBAColor
@@ -279,6 +280,7 @@ class MpfWidget(object):
 
         final_anim = None
         repeat = False
+        animation_sequence_list = []
 
         for settings in animation_list:
             prop_dict = dict()
@@ -303,15 +305,21 @@ class MpfWidget(object):
                              transition=settings['easing'],
                              **prop_dict)
 
-            if not final_anim:
-                final_anim = anim
-            elif settings['timing'] == 'with_previous':
-                final_anim &= anim
-            elif settings['timing'] == 'after_previous':
-                final_anim += anim
+            # Determine if this animation should be performed in sequence or in parallel
+            # with the previous animation.
+            if settings['timing'] == 'with_previous' and animation_sequence_list:
+                # Combine in parallel with previous animation
+                animation_sequence_list[-1] &= anim
+            else:
+                # Add new sequential animation to the list
+                animation_sequence_list.append(anim)
 
             if settings['repeat']:
                 repeat = True
+
+        # Combine all animations that should be performed in sequence into a single
+        # animation object (add them all together)
+        final_anim = reduce(lambda x, y: x + y, animation_sequence_list)
 
         if repeat:
             final_anim.repeat = True
