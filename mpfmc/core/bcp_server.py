@@ -10,7 +10,7 @@ import traceback
 
 import select
 
-import mpf.core.bcp as bcp
+import mpf.core.bcp.bcp_socket_client as bcp
 
 
 class BCPServer(threading.Thread):
@@ -102,6 +102,8 @@ class BCPServer(threading.Thread):
 
                 self.log.info("Received connection from: %s:%s",
                               client_address[0], client_address[1])
+
+                # TODO: events is not thread safe. move this somewhere else!
                 self.mc.events.post('client_connected',
                                     address=client_address[0],
                                     port=client_address[1])

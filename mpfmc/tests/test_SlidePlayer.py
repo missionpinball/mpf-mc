@@ -144,7 +144,7 @@ class TestSlidePlayer(MpfMcTestCase):
                          150)
 
     def test_from_show_via_bcp(self):
-        from mpf.core.bcp import encode_command_string
+        from mpf.core.bcp.bcp_socket_client import encode_command_string
 
         show_slide_section = dict()
         show_slide_section['widgets'] = list()
