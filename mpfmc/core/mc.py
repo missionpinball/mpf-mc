@@ -385,9 +385,11 @@ class MpfMc(App):
             player = Player(self, len(self.player_list))
             self.player_list.append(player)
 
-            self.events.post('player_add_success', player=player,
-                             num=player_num)
+            self.events.post('player_added', player=player, num=player_num)
             # no events docstring as this event is also in mpf
+
+            # Enable player var events and send all initial values
+            player.enable_events(True, True)
 
     def update_player_var(self, name, value, player_num):
         try:
