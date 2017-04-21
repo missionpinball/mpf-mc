@@ -45,6 +45,10 @@ slides:
     opacity: 0
     animations:
       entrance3: fade_in, multi
+      fade_in: fade_in
+      advance_x: advance_x_50
+      advance_y: advance_y_50
+      advance_xy: advance_xy_50
 
   slide4:
     type: text
@@ -257,3 +261,21 @@ animations:
     value: 1
     duration: 100ms
     timing: after_previous
+
+  advance_x_50:
+    property: x
+    value: 50
+    relative: True
+    duration: 1s
+
+  advance_y_50:
+    property: y
+    value: 50
+    relative: True
+    duration: 1s
+
+  advance_xy_50:
+    property: x, y
+    value: 50, 50
+    relative: True
+    duration: 1s
