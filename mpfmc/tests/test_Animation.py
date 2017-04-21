@@ -371,3 +371,52 @@ class TestAnimation(MpfMcTestCase):
         self.mc.events.post('move_off_slide')
         self.advance_time(.6)
         self.assertEqual(widget.pos[0], -100)
+
+    def test_relative_animation(self):
+        self.mc.events.post('show_slide3')
+
+        self.advance_time()
+        self.assertEqual(self.mc.targets['default'].current_slide_name, 'slide3')
+
+        # grab this widget
+        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        self.assertTrue(widget.text == 'text3')
+
+        # make sure it's not animating
+        self.assertIsNone(widget.animation)
+
+        # make sure initial values are set
+        self.assertEqual(widget.opacity, 0)
+        self.assertEqual(widget.x, 177)
+        self.assertEqual(widget.y, 138)
+
+        # post the event to fade it in
+        self.mc.events.post('fade_in')
+        self.advance_time(1.1)
+
+        # post-animation opacity should be 1
+        self.assertEqual(widget.opacity, 1)
+
+        # post the event to advance it +50 in the x direction
+        self.mc.events.post('advance_x')
+        self.advance_time(1.1)
+
+        # check properties
+        self.assertEqual(widget.x, 227)
+        self.assertEqual(widget.y, 138)
+
+        # post the event to advance it +50 in the y direction
+        self.mc.events.post('advance_y')
+        self.advance_time(1.1)
+
+        # check properties
+        self.assertEqual(widget.x, 227)
+        self.assertEqual(widget.y, 188)
+
+        # post the event to advance it +50 in both the x and y directions
+        self.mc.events.post('advance_xy')
+        self.advance_time(1.1)
+
+        # check properties
+        self.assertEqual(widget.x, 277)
+        self.assertEqual(widget.y, 238)
