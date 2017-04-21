@@ -75,7 +75,7 @@ class TestAnimation(MpfMcTestCase):
 
         # Move on to test the named animations section
 
-        self.assertEqual(len(self.mc.animations), 3)
+        self.assertEqual(len(self.mc.animations), 6)
 
         # single animation, dict
         self.assertIs(type(self.mc.animations['fade_in']), list)
@@ -94,11 +94,41 @@ class TestAnimation(MpfMcTestCase):
                          ['y'])
         self.assertEqual(self.mc.animations['multi'][0]['easing'],
                          'linear')
+        self.assertFalse(self.mc.animations['multi'][0]['relative'])
         self.assertIs(type(self.mc.animations['multi'][1]), dict)
         self.assertEqual(self.mc.animations['multi'][1]['property'],
                          ['x'])
         self.assertEqual(self.mc.animations['multi'][1]['easing'],
                          'linear')
+        self.assertFalse(self.mc.animations['multi'][1]['relative'])
+
+        self.assertIs(type(self.mc.animations['advance_x_50']), list)
+        self.assertEqual(len(self.mc.animations['advance_x_50']), 1)
+        self.assertIs(type(self.mc.animations['advance_x_50'][0]), dict)
+        self.assertEqual(self.mc.animations['advance_x_50'][0]['property'],
+                         ['x'])
+        self.assertEqual(self.mc.animations['advance_x_50'][0]['easing'],
+                         'linear')
+        self.assertTrue(self.mc.animations['advance_x_50'][0]['relative'])
+
+        self.assertIs(type(self.mc.animations['advance_y_50']), list)
+        self.assertEqual(len(self.mc.animations['advance_y_50']), 1)
+        self.assertIs(type(self.mc.animations['advance_y_50'][0]), dict)
+        self.assertEqual(self.mc.animations['advance_y_50'][0]['property'],
+                         ['y'])
+        self.assertEqual(self.mc.animations['advance_y_50'][0]['easing'],
+                         'linear')
+        self.assertTrue(self.mc.animations['advance_y_50'][0]['relative'])
+
+        self.assertIs(type(self.mc.animations['advance_xy_50']), list)
+        self.assertEqual(len(self.mc.animations['advance_xy_50']), 1)
+        self.assertIs(type(self.mc.animations['advance_xy_50'][0]), dict)
+        self.assertIs(type(self.mc.animations['advance_xy_50'][0]['property']), list)
+        self.assertIn('x', self.mc.animations['advance_xy_50'][0]['property'])
+        self.assertIn('y', self.mc.animations['advance_xy_50'][0]['property'])
+        self.assertEqual(self.mc.animations['advance_xy_50'][0]['easing'],
+                         'linear')
+        self.assertTrue(self.mc.animations['advance_xy_50'][0]['relative'])
 
     def test_reset_animations_pre_show_slide(self):
         self.mc.events.post('show_slide13')
