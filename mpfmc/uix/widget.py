@@ -3,6 +3,7 @@ from functools import reduce
 
 from kivy.animation import Animation
 from mpf.core.rgb_color import RGBColor
+from mpfmc.uix.relative_animation import RelativeAnimation
 from kivy.clock import Clock
 
 from mpfmc.core.utils import set_position, percent_to_float
@@ -302,9 +303,14 @@ class MpfWidget(object):
                 if prop not in self._pre_animated_settings:
                     self._pre_animated_settings[prop] = getattr(self, prop)
 
-            anim = Animation(duration=settings['duration'],
-                             transition=settings['easing'],
-                             **prop_dict)
+            if settings['relative']:
+                anim = RelativeAnimation(duration=settings['duration'],
+                                         transition=settings['easing'],
+                                         **prop_dict)
+            else:
+                anim = Animation(duration=settings['duration'],
+                                 transition=settings['easing'],
+                                 **prop_dict)
 
             # Determine if this animation should be performed in sequence or in parallel
             # with the previous animation.
