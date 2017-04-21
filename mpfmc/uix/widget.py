@@ -2,6 +2,7 @@ from copy import deepcopy
 from functools import reduce
 
 from kivy.animation import Animation
+from mpfmc.uix.relative_animation import RelativeAnimation
 from mpf.core.rgba_color import RGBAColor
 from kivy.clock import Clock
 
@@ -301,9 +302,14 @@ class MpfWidget(object):
                 if prop not in self._pre_animated_settings:
                     self._pre_animated_settings[prop] = getattr(self, prop)
 
-            anim = Animation(duration=settings['duration'],
-                             transition=settings['easing'],
-                             **prop_dict)
+            if settings['relative']:
+                anim = RelativeAnimation(duration=settings['duration'],
+                                         transition=settings['easing'],
+                                         **prop_dict)
+            else:
+                anim = Animation(duration=settings['duration'],
+                                 transition=settings['easing'],
+                                 **prop_dict)
 
             # Determine if this animation should be performed in sequence or in parallel
             # with the previous animation.
