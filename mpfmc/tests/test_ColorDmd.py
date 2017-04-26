@@ -9,7 +9,7 @@ class TestDmd(MpfMcTestCase):
         return 'test_color_dmd.yaml'
 
     def test_color_dmd(self):
-
+        self.advance_time()
         self.assertIn('dmd', self.mc.targets)
 
         self.mc.events.post('slide1')

@@ -30,10 +30,10 @@ class TestDmd(MpfMcTestCase):
         self.mc.events.post('position_widget_bottom')
         self.advance_time(.1)
 
-        left = self.mc.displays['dmd'].children[0].children[0].children[3]
-        right = self.mc.displays['dmd'].children[0].children[0].children[2]
-        top = self.mc.displays['dmd'].children[0].children[0].children[1]
-        bottom = self.mc.displays['dmd'].children[0].children[0].children[0]
+        left = self.mc.displays['dmd'].current_slide.children[0]
+        right = self.mc.displays['dmd'].current_slide.children[1]
+        top = self.mc.displays['dmd'].current_slide.children[2]
+        bottom = self.mc.displays['dmd'].current_slide.children[3]
 
         self.assertEqual(left.text, 'Left Widget')
         self.assertEqual(right.text, 'Right Widget')
