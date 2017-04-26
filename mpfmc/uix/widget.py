@@ -1,12 +1,17 @@
 from copy import deepcopy
 from functools import reduce
+from typing import List, Union, Optional, TYPE_CHECKING
 
 from kivy.animation import Animation
 from mpfmc.uix.relative_animation import RelativeAnimation
 from mpf.core.rgba_color import RGBAColor
+
 from kivy.clock import Clock
 
 from mpfmc.core.utils import set_position, percent_to_float
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
 
 magic_events = ('add_to_slide',
                 'remove_from_slide',
@@ -14,16 +19,29 @@ magic_events = ('add_to_slide',
                 'show_slide',
                 'pre_slide_leave',
                 'slide_leave',
-                'slide_play',
-                'entrance')
+                'slide_play')
 """Magic Events are events that are used to trigger widget actions that
 are not real MPF events, rather, they're used to trigger animations from
 things the slide is doing."""
 
 
-def create_widget_objects_from_config(mc, config, key=None, play_kwargs=None,
-                                      widget_settings=None):
+def create_widget_objects_from_config(mc: "MpfMc", config: Union[dict, list],
+                                      key: Optional[str]=None,
+                                      play_kwargs: Optional[dict]=None,
+                                      widget_settings: Optional[dict]=None) -> List["MpfWidget"]:
+    """
+    Creates one or more widgets from config settings.
+    
+    Args:
+        mc: 
+        config: 
+        key: 
+        play_kwargs: 
+        widget_settings: 
 
+    Returns:
+        A list of the MpfWidget objects created.
+    """
     if not isinstance(config, list):
         config = [config]
     widgets_added = list()
@@ -32,7 +50,6 @@ def create_widget_objects_from_config(mc, config, key=None, play_kwargs=None,
         play_kwargs = dict()  # todo
 
     for widget in config:
-
         if widget_settings:
             widget_settings = mc.config_validator.validate_config(
                 'widgets:{}'.format(widget['type']), widget_settings,
@@ -58,8 +75,8 @@ def create_widget_objects_from_config(mc, config, key=None, play_kwargs=None,
 
         top_widget = widget_obj
 
-        # some widgets (like slide frames) have parents, so we need to make
-        # sure that we add the parent widget to the slide
+        # some widgets have parents, so we need to make sure that we add
+        # the parent widget to the slide
         while top_widget.parent:
             top_widget = top_widget.parent
 
@@ -68,14 +85,32 @@ def create_widget_objects_from_config(mc, config, key=None, play_kwargs=None,
     return widgets_added
 
 
-def create_widget_objects_from_library(mc, name, key=None,
-        widget_settings=None, play_kwargs=None, **kwargs):
-        if name not in mc.widgets:
-            raise ValueError("Widget %s not found", name)
+def create_widget_objects_from_library(mc: "MpfMc", name: str,
+                                       key: Optional[str]=None,
+                                       widget_settings: Optional[dict]=None,
+                                       play_kwargs: Optional[dict]=None,
+                                       **kwargs) -> List["MpfWidget"]:
+    """
+    
+    Args:
+        mc: 
+        name: 
+        key: 
+        widget_settings: 
+        play_kwargs: 
+        **kwargs: 
 
-        return create_widget_objects_from_config(mc=mc,
-            config=mc.widgets[name], key=key, widget_settings=widget_settings,
-                                                 play_kwargs=play_kwargs)
+    Returns:
+        A list of the MpfWidget objects created.
+    """
+    if name not in mc.widgets:
+        raise ValueError("Widget %s not found", name)
+
+    return create_widget_objects_from_config(mc=mc,
+                                             config=mc.widgets[name],
+                                             key=key,
+                                             widget_settings=widget_settings,
+                                             play_kwargs=play_kwargs)
 
 
 class MpfWidget(object):
@@ -96,7 +131,8 @@ class MpfWidget(object):
 
     merge_settings = tuple()
 
-    def __init__(self, mc, config=None, key=None, **kwargs):
+    def __init__(self, mc: "MpfMc", config: Optional[dict]=None,
+                 key: Optional[str]=None, **kwargs) -> None:
         del kwargs
         self.size_hint = (None, None)
 
@@ -145,15 +181,6 @@ class MpfWidget(object):
                     # aren't set yet
                     Clock.schedule_once(self.on_add_to_slide, -1)
 
-                elif k == 'entrance':
-                    Clock.schedule_once(self.on_add_to_slide, -1)
-                    self.mc.log.warning(
-                        "DEPRECATION WARNING: The 'entrance' animation event "
-                        "name has been changed to 'add_to_slide', "
-                        "'pre_show_slide', and/or 'show_slide' to give more "
-                        "flexibility. See the docs for more details. "
-                        "'entrance' will be removed in 0.32.")
-
                 elif k not in magic_events:
                     self._register_animation_events(k)
         else:
@@ -171,10 +198,10 @@ class MpfWidget(object):
         if self.expire:
             self.schedule_removal(self.expire)
 
-    def __repr__(self):  # pragma: no cover
+    def __repr__(self) -> str:  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         return other.config['z'] < self.config['z']
 
     # todo change to classmethod
@@ -184,7 +211,7 @@ class MpfWidget(object):
             self._default_style = self.mc.machine_config['widget_styles'][
                 '{}_default'.format(self.widget_type_name.lower())]
 
-    def pass_to_kivy_widget_init(self):
+    def pass_to_kivy_widget_init(self) -> dict:
         return dict()
 
     def merge_asset_config(self, asset):
@@ -193,7 +220,7 @@ class MpfWidget(object):
                         x in asset.config)]:
             self.config[setting] = asset.config[setting]
 
-    def _apply_style(self, force_default=False):
+    def _apply_style(self, force_default: bool=False) -> None:
         if not self.config['style'] or force_default:
             if self._default_style:
                 style = self._default_style
@@ -227,11 +254,11 @@ class MpfWidget(object):
         if not found and not force_default:
             self._apply_style(force_default=True)
 
-    def on_size(self, *args):
+    def on_size(self, *args) -> None:
         del args
         self.set_position()
 
-    def on_pos(self, *args):
+    def on_pos(self, *args) -> None:
         del args
 
         # some attributes can be expressed in percentages. This dict holds
@@ -246,7 +273,7 @@ class MpfWidget(object):
         except AttributeError:
             pass
 
-    def set_position(self):
+    def set_position(self) -> None:
         try:
             self.pos = set_position(self.parent.width,
                                     self.parent.height,
@@ -263,7 +290,7 @@ class MpfWidget(object):
         except AttributeError:
             pass
 
-    def build_animation_from_config(self, config_list):
+    def build_animation_from_config(self, config_list: list) -> Animation:
         """Build animation object from config."""
         if not isinstance(config_list, list):
             raise TypeError('build_animation_from_config requires a list')
@@ -303,11 +330,11 @@ class MpfWidget(object):
                     self._pre_animated_settings[prop] = getattr(self, prop)
 
             if settings['relative']:
-                anim = RelativeAnimation(duration=settings['duration'],
+                animation = RelativeAnimation(duration=settings['duration'],
                                          transition=settings['easing'],
                                          **prop_dict)
             else:
-                anim = Animation(duration=settings['duration'],
+                animation = Animation(duration=settings['duration'],
                                  transition=settings['easing'],
                                  **prop_dict)
 
@@ -315,48 +342,48 @@ class MpfWidget(object):
             # with the previous animation.
             if settings['timing'] == 'with_previous' and animation_sequence_list:
                 # Combine in parallel with previous animation
-                animation_sequence_list[-1] &= anim
+                animation_sequence_list[-1] &= animation
             else:
                 # Add new sequential animation to the list
-                animation_sequence_list.append(anim)
+                animation_sequence_list.append(animation)
 
             if settings['repeat']:
                 repeat = True
 
         # Combine all animations that should be performed in sequence into a single
         # animation object (add them all together)
-        final_anim = reduce(lambda x, y: x + y, animation_sequence_list)
+        final_animation = reduce(lambda x, y: x + y, animation_sequence_list)
 
         if repeat:
-            final_anim.repeat = True
+            final_animation.repeat = True
 
-        return final_anim
+        return final_animation
 
-    def stop_animation(self):
+    def stop_animation(self) -> None:
         try:
             self.animation.stop(self)
         except AttributeError:
             pass
 
-    def play_animation(self):
+    def play_animation(self) -> None:
         try:
             self.animation.play(self)
         except AttributeError:
             pass
 
-    def reset_animations(self, **kwargs):
+    def reset_animations(self, **kwargs) -> None:
         del kwargs
         for k, v in self._pre_animated_settings.items():
             setattr(self, k, v)
 
-    def prepare_for_removal(self):
+    def prepare_for_removal(self) -> None:
         self.mc.clock.unschedule(self.remove)
         self._remove_animation_events()
 
-    def schedule_removal(self, secs):
+    def schedule_removal(self, secs: float) -> None:
         self.mc.clock.schedule_once(self.remove, secs)
 
-    def remove(self, *dt):
+    def remove(self, *dt) -> None:
         del dt
 
         try:
@@ -366,12 +393,12 @@ class MpfWidget(object):
 
         self.on_remove_from_slide()
 
-    def _register_animation_events(self, event_name):
+    def _register_animation_events(self, event_name: str) -> None:
         self._animation_event_keys.add(self.mc.events.add_handler(
             event=event_name, handler=self.start_animation_from_event,
             event_name=event_name))
 
-    def start_animation_from_event(self, event_name, **kwargs):
+    def start_animation_from_event(self, event_name: str, **kwargs) -> None:
         del kwargs
 
         if event_name not in self.config['animations']:
@@ -382,14 +409,14 @@ class MpfWidget(object):
             self.config['animations'][event_name])
         self.animation.start(self)
 
-    def _remove_animation_events(self):
+    def _remove_animation_events(self) -> None:
         self.mc.events.remove_handlers_by_keys(self._animation_event_keys)
         self._animation_event_keys = set()
 
-    def update_kwargs(self, **kwargs):
+    def update_kwargs(self, **kwargs) -> None:
         pass
 
-    def on_add_to_slide(self, dt):
+    def on_add_to_slide(self, dt) -> None:
         """Automatically called when this widget is added to a slide.
 
         If you subclass this method, be sure to call super(), as it's needed
@@ -400,10 +427,9 @@ class MpfWidget(object):
         if 'add_to_slide' in self.config['reset_animations_events']:
             self.reset_animations()
 
-        self.start_animation_from_event('entrance')
         self.start_animation_from_event('add_to_slide')
 
-    def on_remove_from_slide(self):
+    def on_remove_from_slide(self) -> None:
         """Automatically called when this widget is removed from a slide.
 
         If you subclass this method, be sure to call super(), as it's needed
@@ -412,7 +438,7 @@ class MpfWidget(object):
         if 'remove_from_slide' in self.config['reset_animations_events']:
             self.reset_animations()
 
-    def on_pre_show_slide(self):
+    def on_pre_show_slide(self) -> None:
         """Automatically called when the slide this widget is part of is about
         to be shown. If there's an entrance transition, this method is called
         before the transition starts.
@@ -426,7 +452,7 @@ class MpfWidget(object):
         if 'pre_show_slide' in self.config['animations']:
             self.start_animation_from_event('pre_show_slide')
 
-    def on_show_slide(self):
+    def on_show_slide(self) -> None:
         """Automatically called when the slide this widget is part of has been
         shown. If there's an entrance transition, this method is called
         after the transition is complete.
@@ -440,7 +466,7 @@ class MpfWidget(object):
         if 'show_slide' in self.config['animations']:
             self.start_animation_from_event('show_slide')
 
-    def on_pre_slide_leave(self):
+    def on_pre_slide_leave(self) -> None:
         """Automatically called when the slide this widget is part of is about
         to leave (e.g. when another slide is going to replace it). If
         there's an exit transition, this method is called before the
@@ -455,7 +481,7 @@ class MpfWidget(object):
         if 'pre_slide_leave' in self.config['animations']:
             self.start_animation_from_event('pre_slide_leave')
 
-    def on_slide_leave(self):
+    def on_slide_leave(self) -> None:
         """Automatically called when the slide this widget is part of is about
         to leave (e.g. when another slide is going to replace it). If there's
         an exit transition, this method is called after the transition is
@@ -470,7 +496,7 @@ class MpfWidget(object):
         if 'slide_leave' in self.config['animations']:
             self.start_animation_from_event('slide_leave')
 
-    def on_slide_play(self):
+    def on_slide_play(self) -> None:
         """Automatically called when the slide this widget is part of is played
         as part of a slide_player play command (either via a standalone slide
         player or as a show step).

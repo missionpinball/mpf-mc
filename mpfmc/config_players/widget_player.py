@@ -68,7 +68,7 @@ class McWidgetPlayer(McConfigPlayer):
 
                 # todo add delayed adding like in slide_player
 
-            target.add_widgets_to_frame(
+            target.add_widgets_to_current_slide(
                 create_widget_objects_from_library(mc=self.machine,
                                                    name=widget,
                                                    play_kwargs=play_kwargs,

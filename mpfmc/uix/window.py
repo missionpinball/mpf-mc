@@ -13,7 +13,7 @@ class Window(object):
         for widget in KivyWindow.children:
             KivyWindow.remove_widget(widget)
 
-        KivyWindow.add_widget(display)
+        KivyWindow.add_widget(display.parent)
 
         KivyWindow.bind(system_size=display.on_window_resize)
         Clock.schedule_once(display.fit_to_window, -1)
@@ -38,9 +38,9 @@ class Window(object):
                 'source_display']]
         except KeyError:
             if 'window' in mc.targets:
-                display = mc.targets['window'].parent
+                display = mc.targets['window']
             else:
-                display = mc.targets['default'].parent
+                display = mc.targets['default']
 
         # We need the window to map to a Display instance, so no matter what
         # we're passed, we keep on moving up until we find the actual display.

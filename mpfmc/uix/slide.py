@@ -1,30 +1,34 @@
 from bisect import bisect
+from typing import List, TypeVar, Optional
 
-from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
+from kivy.graphics import Color
+from kivy.properties import ListProperty
 
 from mpfmc.core.utils import set_position
-from mpfmc.uix.widget import create_widget_objects_from_config
+from mpfmc.uix.widget import create_widget_objects_from_config, MpfWidget
+from mpfmc.core.mc import MpfMc
 
 
-class Slide(Screen):
+class Slide(Screen, StencilView):
     next_id = 0
 
     @classmethod
-    def get_id(cls):
+    def get_next_id(cls) -> int:
         Slide.next_id += 1
         return Slide.next_id
 
     # pylint: disable-msg=too-many-arguments
-    def __init__(self, mc, name, config=None, target='default', key=None,
-                 priority=0, play_kwargs=None):
+    def __init__(self, mc: "MpfMc", name: Optional[str], config: Optional[dict]=None,
+                 target: str='default', key: Optional[str]=None,
+                 priority: int=0, play_kwargs: Optional[dict]=None) -> None:
 
         # config is a dict. widgets will be in a key
         # assumes config, if present, is validated.
 
-        self.creation_order = Slide.get_id()
+        self.creation_order = Slide.get_next_id()
 
         if not name:
             name = 'Anon_{}'.format(self.creation_order)
@@ -41,21 +45,17 @@ class Slide(Screen):
         self.transition_out = config.get('transition_out', None)
         self.expire = config.get('expire', None)
 
-        target = mc.targets[target]
+        target = self.mc.targets[target]
 
         self.size_hint = (None, None)
         super().__init__()
         self.size = target.native_size
         self.orig_w, self.orig_h = self.size
 
-        self.stencil = StencilView(size_hint=(None, None),
-                                   size=self.size)
-        self.stencil.config = dict()
-        self.stencil.config['z'] = 0
-        super().add_widget(self.stencil)
+        self.config = dict()
+        self.config['z'] = 0
 
         if 'widgets' in config:  # don't want try, swallows too much
-
             widgets = create_widget_objects_from_config(
                 mc=self.mc,
                 config=config['widgets'], key=self.key,
@@ -64,13 +64,12 @@ class Slide(Screen):
             self.add_widgets(widgets)
 
         self.mc.active_slides[name] = self
-        target.add_widget(self)
         self.mc.slides[name] = config
 
-        bg = config.get('background_color', [0.0, 0.0, 0.0, 1.0])
-        if bg != [0.0, 0.0, 0.0, 0.0]:
+        self.background_color = config.get('background_color', [0.0, 0.0, 0.0, 1.0])
+        if self.background_color != [0.0, 0.0, 0.0, 0.0]:
             with self.canvas.before:
-                Color(*bg)
+                Color(*self.background_color)
                 Rectangle(size=self.size, pos=(0, 0))
 
         self.opacity = config.get('opacity', 1.0)
@@ -98,10 +97,29 @@ class Slide(Screen):
 
     def __repr__(self):
         return '<Slide name={}, priority={}, id={}>'.format(self.name,
-            self.priority, self.creation_order)
+                                                            self.priority,
+                                                            self.creation_order)
 
-    def add_widgets_from_library(self, name, key=None, widget_settings=None, play_kwargs=None,
-                                 **kwargs):
+    def add_widgets_from_library(self, name: str, key: Optional[str]=None,
+                                 widget_settings: Optional[dict]=None,
+                                 play_kwargs: Optional[dict]=None,
+                                 **kwargs) -> List["MpfWidget"]:
+        """
+        Adds a widget to the slide by name from the library of pre-defined widgets.
+        Args:
+            name: The name of the widget to add.
+            key: An optional key.
+            widget_settings: An optional dictionary of widget settings to override those in
+                the library.
+            play_kwargs: An optional dictionary of play settings to override those in 
+                the library.
+            **kwargs:  Additional arguments. 
+
+        Returns:
+            A list of widgets (MpfWidget objects) added to the slide.
+        """
+        del kwargs
+
         if name not in self.mc.widgets:
             raise ValueError("Widget %s not found", name)
 
@@ -110,8 +128,22 @@ class Slide(Screen):
                                             widget_settings=widget_settings,
                                             play_kwargs=play_kwargs)
 
-    def add_widgets_from_config(self, config, key=None, play_kwargs=None,
-                                widget_settings=None):
+    def add_widgets_from_config(self, config: dict, key: Optional[str]=None,
+                                widget_settings: Optional[dict]=None,
+                                play_kwargs: Optional[dict] = None) -> List["MpfWidget"]:
+        """
+        Adds one or more widgets to the slide from a config dictionary.
+        Args:
+            config: The configuration dictionary for the widgets to be added.
+            key: An optional key.
+            widget_settings: An optional dictionary of widget settings to override those in
+                the config.
+            play_kwargs: An optional dictionary of play settings to override those in 
+                the config.
+
+        Returns:
+            A list of widgets (MpfWidget objects) added to the slide.
+        """
 
         if not isinstance(config, list):
             config = [config]
@@ -121,7 +153,6 @@ class Slide(Screen):
             play_kwargs = dict()  # todo
 
         for widget in config:
-
             if widget_settings:
                 widget_settings = self.mc.config_validator.validate_config(
                     'widgets:{}'.format(widget['type']), widget_settings,
@@ -142,6 +173,7 @@ class Slide(Screen):
             else:
                 this_key = key
 
+            # Create the new widget
             widget_obj = self.mc.widgets.type_map[widget['type']](
                 mc=self.mc, config=widget, slide=self, key=this_key, play_kwargs=play_kwargs)
 
@@ -159,11 +191,12 @@ class Slide(Screen):
 
         return widgets_added
 
-    def add_widgets(self, widgets):
+    def add_widgets(self, widgets: List["MpfWidget"]):
+        """Adds a list of widgets to this slide."""
         for w in widgets:
             self.add_widget(w)
 
-    def add_widget(self, widget, **kwargs):
+    def add_widget(self, widget: "MpfWidget", **kwargs) -> None:
         """Adds a widget to this slide.
 
         Args:
@@ -186,38 +219,42 @@ class Slide(Screen):
             self.add_widget_to_parent_frame(widget)
             return
 
-        self.stencil.add_widget(widget, bisect(self.stencil.children, widget))
+        super().add_widget(widget, bisect(self.children, widget))
 
         widget.set_position()
 
-    def remove_widgets_by_key(self, key):
+    def remove_widgets_by_key(self, key: str) -> None:
+        """Removes all widgets from this slide with the specified key value."""
         for widget in self.get_widgets_by_key(key):
-            self.stencil.remove_widget(widget)
+            self.remove_widget(widget)
 
-    def get_widgets_by_key(self, key):
-        return [x for x in self.stencil.children if x.key == key]
+    def get_widgets_by_key(self, key: str) -> List["MpfWidget"]:
+        """Returns a list of widgets from this slide that have the specified key value."""
+        return [x for x in self.children if x.key == key]
 
-    def remove_widget(self, widget):
-        self.stencil.remove_widget(widget)
+    def remove_widget(self, widget: "MpfWidget") -> None:
+        """Removes the specified widget from this slide."""
+        self.remove_widget(widget)
 
-    def add_widget_to_parent_frame(self, widget):
-        """Adds this widget to this slide's parent frame instead of to this
-        slide.
+    def add_widget_to_parent_frame(self, widget: "MpfWidget"):
+        """Adds this widget to this slide's parent instead of to this slide.
 
         Args:
             widget:
                 The widget object.
 
-        Widgets added to the parent slide_frame stay active and visible even
-        if the slide in the frame changes.
-
+        Notes:
+            Widgets added to the parent slide_frame stay active and visible even
+            if the slide in the frame changes.
         """
-        self.manager.parent.parent.add_widget(widget)
+        self.manager.parent.add_widget(widget)
 
-    def schedule_removal(self, secs):
+    def schedule_removal(self, secs: float) -> None:
+        """Schedules the removal of this slide after the specified number of seconds elapse."""
         self.mc.clock.schedule_once(self.remove, secs)
 
-    def remove(self, dt=None):
+    def remove(self, dt=None) -> None:
+        """Removes the slide from the parent display."""
         del dt
 
         try:
@@ -231,7 +268,8 @@ class Slide(Screen):
             self.prepare_for_removal()
             self.mc.active_slides.pop(self.name, None)
 
-    def prepare_for_removal(self):
+    def prepare_for_removal(self) -> None:
+        """Performs housekeeping chores just prior to a slide being removed."""
         self.mc.clock.unschedule(self.remove)
 
         for widget in self.stencil.children:
@@ -259,24 +297,37 @@ class Slide(Screen):
 
     def on_pre_enter(self, *args):
         del args
-        for widget in self.stencil.children:
+        for widget in self.children:
             widget.on_pre_show_slide()
 
     def on_enter(self, *args):
         del args
-        for widget in self.stencil.children:
+        for widget in self.children:
             widget.on_show_slide()
 
     def on_pre_leave(self, *args):
         del args
-        for widget in self.stencil.children:
+        for widget in self.children:
             widget.on_pre_slide_leave()
 
     def on_leave(self, *args):
         del args
-        for widget in self.stencil.children:
+        for widget in self.children:
             widget.on_slide_leave()
 
     def on_slide_play(self):
-        for widget in self.stencil.children:
+        for widget in self.children:
             widget.on_slide_play()
+
+    #
+    # Properties
+    #
+
+    background_color = ListProperty([0.0, 0.0, 0.0, 1.0])
+    '''The background color of the slide, in the (r, g, b, a)
+    format.
+
+    :attr:`background_color` is a :class:`~kivy.properties.ListProperty` and
+    defaults to [0, 0, 0, 1.0].
+    '''
+
