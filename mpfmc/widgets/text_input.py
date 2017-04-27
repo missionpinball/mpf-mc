@@ -49,21 +49,9 @@ class MpfTextInput(Text):
         del dt
 
         for target in self.mc.targets.values():
-            for w in target.parent.walk():
-                try:
-                    if w.key == self.config['key']:
-                        self.linked_text_widget = w
-                        break
-                except AttributeError:
-                    pass
-            for x in target.screens:
-                for y in x.walk():
-                    try:
-                        if y.key == self.config['key']:
-                            self.linked_text_widget = y
-                            break
-                    except AttributeError:
-                        pass
+            for w in target.find_widgets_by_key(self.key):
+                self.linked_text_widget = w
+                break
 
             if self.linked_text_widget:
                 break

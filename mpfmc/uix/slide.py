@@ -1,11 +1,11 @@
 from bisect import bisect
-from typing import List, TypeVar, Optional
+from typing import List, Optional
 
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
 from kivy.graphics import Color
-from kivy.properties import ListProperty
+from kivy.properties import ListProperty, AliasProperty
 
 from mpfmc.core.utils import set_position
 from mpfmc.uix.widget import create_widget_objects_from_config, MpfWidget
@@ -51,9 +51,7 @@ class Slide(Screen, StencilView):
         super().__init__()
         self.size = target.native_size
         self.orig_w, self.orig_h = self.size
-
-        self.config = dict()
-        self.config['z'] = 0
+        self.z = 0
 
         if 'widgets' in config:  # don't want try, swallows too much
             widgets = create_widget_objects_from_config(
@@ -203,38 +201,39 @@ class Slide(Screen, StencilView):
             widget: An MPF-enhanced widget (which will include details like z
                 order and removal keys.)
 
-        This method respects the z-order of the widget it's adding and inserts
-        it into the proper position in the widget tree. Higher numbered z order
-        values will be inserted after (so they draw on top) of existing ones.
-
-        If the new widget has the same priority of existing widgets, the new
-        one is inserted after the widgets of that priority, meaning the newest
-        widget will be displayed on top of existing ones with the same
-        priority.
+        Notes:
+            Widgets are drawn in order from the end of the children list to the 
+            beginning, meaning the first item in the child list is draw last so
+            it will appear on top of all other items.
+            
+            This method respects the z-order of the widget it's adding and inserts
+            it into the proper position in the widget tree. Higher numbered z order
+            values will be inserted after (so they draw on top) of existing ones.
+    
+            If the new widget has the same priority of existing widgets, the new
+            one is inserted after the widgets of that priority, to maintain the
+            drawing order of the configuration file.
 
         """
         del kwargs
 
-        if widget.config['z'] < 0:
+        if widget.z < 0:
             self.add_widget_to_parent_frame(widget)
             return
 
+        # Insert the widget in the proper position in the z-order
         super().add_widget(widget, bisect(self.children, widget))
 
         widget.set_position()
 
     def remove_widgets_by_key(self, key: str) -> None:
         """Removes all widgets from this slide with the specified key value."""
-        for widget in self.get_widgets_by_key(key):
+        for widget in self.find_widgets_by_key(key):
             self.remove_widget(widget)
 
-    def get_widgets_by_key(self, key: str) -> List["MpfWidget"]:
+    def find_widgets_by_key(self, key: str) -> List["MpfWidget"]:
         """Returns a list of widgets from this slide that have the specified key value."""
         return [x for x in self.children if x.key == key]
-
-    def remove_widget(self, widget: "MpfWidget") -> None:
-        """Removes the specified widget from this slide."""
-        self.remove_widget(widget)
 
     def add_widget_to_parent_frame(self, widget: "MpfWidget"):
         """Adds this widget to this slide's parent instead of to this slide.
@@ -247,7 +246,10 @@ class Slide(Screen, StencilView):
             Widgets added to the parent slide_frame stay active and visible even
             if the slide in the frame changes.
         """
+        # TODO: Determine proper z-order for negative z-order values
         self.manager.parent.add_widget(widget)
+
+        # TODO: Do we need to call widget.set_position() here as well?
 
     def schedule_removal(self, secs: float) -> None:
         """Schedules the removal of this slide after the specified number of seconds elapse."""
@@ -272,7 +274,7 @@ class Slide(Screen, StencilView):
         """Performs housekeeping chores just prior to a slide being removed."""
         self.mc.clock.unschedule(self.remove)
 
-        for widget in self.stencil.children:
+        for widget in self.children:
             if hasattr(widget, 'prepare_for_removal'):  # try swallows too much
                 widget.prepare_for_removal()
 
@@ -319,6 +321,15 @@ class Slide(Screen, StencilView):
         for widget in self.children:
             widget.on_slide_play()
 
+    def find_widgets_by_key(self, key: str) -> List["MpfWidget"]:
+        """Return a list of widgets with the matching key value by searching
+        the tree of children belonging to this slide."""
+        widgets = []
+        for child in self.children:
+            widgets.extend(x for x in child.walk(restrict=True, loopback=False) if x.key == key)
+
+        return widgets
+
     #
     # Properties
     #
@@ -331,3 +342,29 @@ class Slide(Screen, StencilView):
     defaults to [0, 0, 0, 1.0].
     '''
 
+    def _get_parent_widgets(self) -> List["MpfWidget"]:
+        """Return the current list of widgets owned by the slide manager parent."""
+        return [x for x in self.manager.parent.children if x != self.manager]
+
+    parent_widgets = AliasProperty(_get_parent_widgets, None)
+    '''List of all the :class:`MpfWidget` widgets that belong to the slide
+    manager of this slide (read-only).  You should not change this list 
+    manually. Use the :meth:`add_widget <mpfmc.uix.widget.MpfWidget.add_widget>` 
+    method instead.
+
+    Use this property rather than the 'self.manager.parent.children' property in 
+    case the slide architecture changes in the future.
+    '''
+
+    def _get_widgets(self) -> List["MpfWidget"]:
+        """Returns the current list of widget children owned by this slide."""
+        return self.children
+
+    widgets = AliasProperty(_get_widgets, None, bind=('children', ))
+    '''List of all the :class:`MpfWidget` children widgets of this slide (read-only). 
+    You should not change this list manually. Use the
+    :meth:`add_widget <mpfmc.uix.widget.MpfWidget.add_widget>` method instead.
+    
+    Use this property rather than the 'children' property in case the slide
+    architecture changes in the future.
+    '''

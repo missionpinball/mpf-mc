@@ -2,13 +2,14 @@ from copy import deepcopy
 from functools import reduce
 from typing import List, Union, Optional, TYPE_CHECKING
 
-from kivy.animation import Animation
-from mpfmc.uix.relative_animation import RelativeAnimation
-from mpf.core.rgba_color import RGBAColor
-
 from kivy.clock import Clock
+from kivy.animation import Animation
+from kivy.properties import NumericProperty
+from kivy.uix.widget import Widget
 
 from mpfmc.core.utils import set_position, percent_to_float
+from mpfmc.uix.relative_animation import RelativeAnimation
+from mpf.core.rgba_color import RGBAColor
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
@@ -117,6 +118,14 @@ class MpfWidget(object):
     """Mixin class that's used to extend all the Kivy widget base classes with
     a few extra attributes and methods we need for everything to work with MPF.
 
+    Notes:
+        This class MUST be used as a mixin in conjunction with the 
+        kivy.uix.Widget class. There are several methods used in this class
+        that rely upon the kivy.uix.Widget methods and properties.  
+        
+        This class MUST be listed first in the inheritance list when declaring
+        a new class derived from this one. For example:
+        class Point(MpfWidget, Widget).
     """
 
     widget_type_name = ''  # Give this a name in your subclass, e.g. 'Image'
@@ -163,6 +172,7 @@ class MpfWidget(object):
         if 'color' in self.config and not isinstance(self.config['color'], RGBAColor):
             self.config['color'] = RGBAColor(self.config['color'])
 
+        # Set initial attribute values from config
         for k, v in self.config.items():
             if k not in self._dont_send_to_kivy and hasattr(self, k):
                 setattr(self, k, v)
@@ -188,8 +198,7 @@ class MpfWidget(object):
 
         # why is this needed? Why is it not config validated by here? todo
         if 'reset_animations_events' in self.config:
-            for event in [x for x in self.config['reset_animations_events']
-                    if x not in magic_events]:
+            for event in [x for x in self.config['reset_animations_events'] if x not in magic_events]:
                 self._animation_event_keys.add(self.mc.events.add_handler(
                     event=event, handler=self.reset_animations))
 
@@ -201,26 +210,39 @@ class MpfWidget(object):
     def __repr__(self) -> str:  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
-    def __lt__(self, other) -> bool:
-        return other.config['z'] < self.config['z']
+    def __lt__(self, other: "Widget") -> bool:
+        """
+        Less than comparison operator (based on z-order value). Used to 
+        maintain proper z-order when adding widgets to a parent.
+        Args:
+            other: The widget to compare to this one.
+
+        Returns:
+            True if the other widget is less than the current widget (uses
+            z-order to perform the comparison).
+        """
+        return other.z < self.z
 
     # todo change to classmethod
-    def _set_default_style(self):
+    def _set_default_style(self) -> None:
+        """Sets the default widget style."""
         if ('{}_default'.format(self.widget_type_name.lower()) in
                 self.mc.machine_config['widget_styles']):
             self._default_style = self.mc.machine_config['widget_styles'][
                 '{}_default'.format(self.widget_type_name.lower())]
 
     def pass_to_kivy_widget_init(self) -> dict:
+        """Initializes the dictionary of settings to pass to Kivy."""
         return dict()
 
-    def merge_asset_config(self, asset):
+    def merge_asset_config(self, asset) -> None:
         for setting in [x for x in self.merge_settings if (
                         x not in self.config['_default_settings'] and
                         x in asset.config)]:
             self.config[setting] = asset.config[setting]
 
     def _apply_style(self, force_default: bool=False) -> None:
+        """Apply any style to the widget that is specified in the config."""
         if not self.config['style'] or force_default:
             if self._default_style:
                 style = self._default_style
@@ -255,10 +277,12 @@ class MpfWidget(object):
             self._apply_style(force_default=True)
 
     def on_size(self, *args) -> None:
+        """Kivy event handler called when the widget size attribute changes."""
         del args
         self.set_position()
 
     def on_pos(self, *args) -> None:
+        """Kivy event handler called when the widget pos attribute changes."""
         del args
 
         # some attributes can be expressed in percentages. This dict holds
@@ -274,6 +298,7 @@ class MpfWidget(object):
             pass
 
     def set_position(self) -> None:
+        """Set the widget position based on various settings."""
         try:
             self.pos = set_position(self.parent.width,
                                     self.parent.height,
@@ -306,7 +331,6 @@ class MpfWidget(object):
             else:
                 animation_list.append(entry)
 
-        final_anim = None
         repeat = False
         animation_sequence_list = []
 
@@ -360,30 +384,37 @@ class MpfWidget(object):
         return final_animation
 
     def stop_animation(self) -> None:
+        """Stop the current widget animation."""
         try:
             self.animation.stop(self)
         except AttributeError:
             pass
 
     def play_animation(self) -> None:
+        """Play the current widget animation."""
         try:
             self.animation.play(self)
         except AttributeError:
             pass
 
     def reset_animations(self, **kwargs) -> None:
+        """Reset the widget properties back to their pre-animated values."""
         del kwargs
         for k, v in self._pre_animated_settings.items():
             setattr(self, k, v)
 
     def prepare_for_removal(self) -> None:
+        """Prepare the widget to be removed."""
         self.mc.clock.unschedule(self.remove)
         self._remove_animation_events()
 
     def schedule_removal(self, secs: float) -> None:
+        """Schedule the widget to be removed after the specified number
+        of seconds have elapsed."""
         self.mc.clock.schedule_once(self.remove, secs)
 
     def remove(self, *dt) -> None:
+        """Perform the actual removal of the widget."""
         del dt
 
         try:
@@ -394,11 +425,14 @@ class MpfWidget(object):
         self.on_remove_from_slide()
 
     def _register_animation_events(self, event_name: str) -> None:
+        """Register handlers for the various events that trigger animation actions."""
         self._animation_event_keys.add(self.mc.events.add_handler(
             event=event_name, handler=self.start_animation_from_event,
             event_name=event_name))
 
     def start_animation_from_event(self, event_name: str, **kwargs) -> None:
+        """Starts an animation based on an event name that has previously
+        been registered."""
         del kwargs
 
         if event_name not in self.config['animations']:
@@ -410,6 +444,8 @@ class MpfWidget(object):
         self.animation.start(self)
 
     def _remove_animation_events(self) -> None:
+        """Remove previously registered handlers for the various events that 
+        trigger animation actions."""
         self.mc.events.remove_handlers_by_keys(self._animation_event_keys)
         self._animation_event_keys = set()
 
@@ -509,3 +545,17 @@ class MpfWidget(object):
 
         if 'slide_play' in self.config['animations']:
             self.start_animation_from_event('slide_play')
+
+    def find_widgets_by_key(self, key: str) -> List["MpfWidget"]:
+        """Return a list of widgets with the matching key value by searching
+        the tree of children belonging to this widget."""
+        return [w for w in self.walk() if w.key == key]
+
+    #
+    # Properties
+    #
+
+    z = NumericProperty(0)
+    '''Z position (z-order) of the widget (used to determine the drawing order of widgets).
+    '''
+

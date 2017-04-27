@@ -149,22 +149,7 @@ class McWidgetPlayer(McConfigPlayer):
     def _remove_widget_by_key(self, key):
         """Remove widget by key."""
         for target in self.machine.targets.values():
-
             target.remove_widgets_by_key(key)
-
-            for w in target.slide_frame_parent.walk():
-                try:
-                    if w.key == key:
-                        w.parent.remove_widget(w)
-                except AttributeError:
-                    pass
-            for x in target.screens:
-                for y in x.walk():
-                    try:
-                        if y.key == key:
-                            x.remove_widget(y)
-                    except AttributeError:
-                        pass
 
     def _add_widget_to_slide_when_active(self, slide_name, widget, s, play_kwargs, **kwargs):
         del kwargs

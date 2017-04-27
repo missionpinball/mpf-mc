@@ -13,8 +13,9 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
 from kivy.properties import AliasProperty
 from kivy.uix.stencilview import StencilView
 
-from mpfmc.uix.slide import Slide
 from mpfmc.core.mc import MpfMc
+from mpfmc.uix.widget import MpfWidget
+from mpfmc.uix.slide import Slide
 
 transition_map = dict(none=NoTransition,
                       slide=SlideTransition,
@@ -54,8 +55,7 @@ class Display(ScreenManager):
         # to allow widgets with negative z values to remain in the display while slides
         # are changed.
         self._slide_parent = StencilView(size_hint=(None, None), size=self.size)
-        self._slide_parent.config = dict()
-        self._slide_parent.config['z'] = 0
+        self._slide_parent.z = 0
         self._slide_parent.add_widget(self)
 
         Clock.schedule_once(self._display_created, 0)
@@ -63,6 +63,11 @@ class Display(ScreenManager):
     def __repr__(self):
         return '<Display name={}{}, current slide={}, total slides={}>'.format(
             self.name, self.size, self.current_slide_name, len(self.slides))
+
+    @property
+    def parent_widgets(self) -> List["MpfWidget"]:
+        """The list of all widgets owned by the display parent."""
+        return [x for x in self._slide_parent.children if x != self]
 
     def _display_created(self, *args) -> None:
         """Callback after this display is created."""
@@ -238,8 +243,8 @@ class Display(ScreenManager):
     # pylint: disable-msg=too-many-arguments
     def show_slide(self, slide_name: str, transition: Optional[str]=None,
                    key: Optional[str]=None, force: bool=False, priority: int=0,
-                   expire: Optional[float]=None, play_kwargs: Optional[dict]=None,
-                   **kwargs) -> bool:
+                   show: Optional[bool]=True, expire: Optional[float]=None,
+                   play_kwargs: Optional[dict]=None, **kwargs) -> bool:
         """
         Request to show the specified slide. Many of the slide parameters may be overridden 
         using the arguments for this function.
@@ -251,6 +256,7 @@ class Display(ScreenManager):
             force: When true, the slide will be displayed regardless of the priority of the
                 current slide.
             priority: The priority of the slide to show.
+            show: Whether or not to actually show the slide.
             expire: Expiration time (in seconds) after which the slide will be automatically 
                 removed (overrides value stored in the slide).
             play_kwargs: Kwargs related to playing/displaying the slide.
@@ -259,6 +265,8 @@ class Display(ScreenManager):
         Returns:
             True is the slide will be shown, False otherwise.
         """
+
+        # TODO: Is the show parameter really needed?  Why call show_slide and not show the slide?
 
         if not play_kwargs:
             play_kwargs = kwargs
@@ -294,7 +302,7 @@ class Display(ScreenManager):
         elif slide.expire:
             slide.schedule_removal(slide.expire)
 
-        if (slide.priority >= self.current_slide.priority) or force:
+        if (slide.priority >= self.current_slide.priority and show) or force:
             # We need to show this slide
 
             # Have to set a transition even if there's not one because we have
@@ -305,7 +313,8 @@ class Display(ScreenManager):
             self.current = slide.name
             return True
 
-        else:  # Not showing this slide
+        else:
+            # Not showing this slide
             return False
 
     # pylint: disable-msg=too-many-arguments
@@ -353,7 +362,7 @@ class Display(ScreenManager):
                                expire=expire, play_kwargs=play_kwargs)
 
     def remove_slide(self, slide: Union["Slide", str],
-                     transition_config: Optional[dict]) -> None:
+                     transition_config: Optional[dict]=None) -> bool:
         """
         Remove a slide from the display.
         
@@ -361,6 +370,9 @@ class Display(ScreenManager):
             slide: The slide to remove (can be name string or Slide object)
             transition_config: Optional dictionary containing the transition configuration
                 to use while removing the slide (overrides slide setting).
+                
+        Returns:
+            True if the slide is scheduled to be removed, False otherwise
 
         Notes:
             You can't remove the automatically generated blank slide, so if you try it will 
@@ -377,12 +389,11 @@ class Display(ScreenManager):
             slide = self.get_slide(slide)
         except ScreenManagerException:  # no slide by that name
             if not isinstance(slide, Slide):
-                return
+                return False
 
         # Do not allow the blank slide to be removed
         if slide.name == self._blank_slide_name:
-            raise ScreenManagerException('Removal of the automatically generated '
-                                         'blank slide (%s) is not permitted.' % slide.name)
+            return False
 
         slide.prepare_for_removal()
 
@@ -402,12 +413,14 @@ class Display(ScreenManager):
             else:
                 self.transition = NoTransition()
 
-            self.current_slide = new_slide
+            self._set_current_slide(new_slide)
 
         try:
             self.remove_widget(slide)
         except ScreenManagerException:
-            pass
+            return False
+
+        return True
 
     def on_current(self, instance, value: str) -> None:
         """Callback when current slide name parameter changes.
@@ -444,21 +457,6 @@ class Display(ScreenManager):
             self.mc.clock.schedule_once(self._post_active_slide_event, -1)
             self._flag_slide_changed = True
 
-    def _set_current_slide(self, slide: "Slide"):
-        """Sets the current slide to be displayed."""
-        if not slide:
-            return
-
-        if self.current == slide.name:
-            return
-
-        try:
-            self.current = slide.name
-        except ScreenManagerException:
-            self.remove_widget(slide)
-            self.add_widget(slide)
-            self.current = slide.name
-
     def _get_next_highest_priority_slide(self, slide: "Slide") -> "Slide":
         """Return the slide with the next highest priority."""
         # TODO This should be a list comprehension?
@@ -473,7 +471,7 @@ class Display(ScreenManager):
             elif s.priority > new_slide.priority:
                 new_slide = s
             elif (s.priority == new_slide.priority and
-                    s.id > new_slide.id):
+                    s.creation_order > new_slide.creation_order):
                 new_slide = s
 
         return new_slide
@@ -489,15 +487,23 @@ class Display(ScreenManager):
 
     def remove_widgets_by_key(self, key: str) -> None:
         """Removes all widgets with the specified key."""
-        for widget in self.get_widgets_by_key(key):
-            self._slide_parent.remove_widget(widget)
+        for widget in self.find_widgets_by_key(key):
+            widget.parent.remove_widget(widget)
 
-    def get_widgets_by_key(self, key: str) -> List["MpfWidget"]:
+    def find_widgets_by_key(self, key: str) -> List["MpfWidget"]:
         """Retrieves a list of all widgets with the specified key value."""
-        try:
-            return [x for x in self._slide_parent.children if x.key == key]
-        except AttributeError:
-            return []
+        widgets = []
+
+        # First find all matching widgets owned by the slide parent
+        for child in self.parent_widgets:
+                widgets.extend([x for x in child.walk(restrict=True, loopback=False)
+                                if x.key == key])
+
+        # Finally find all matching widgets owned by each slide
+        for slide in self.slides:
+            widgets.extend(slide.find_widgets_by_key(key))
+
+        return widgets
 
     def _post_active_slide_event(self, dt) -> None:
         """Posts an event that a new slide is now active."""
@@ -525,8 +531,23 @@ class Display(ScreenManager):
         """Returns the Slide object of the current slide."""
         return self.current_screen
 
-    current_slide = AliasProperty(_get_current_slide,
-                                  None, bind=('current_screen', ))
+    def _set_current_slide(self, slide: "Slide"):
+        """Sets the current slide to be displayed."""
+        if not slide:
+            return
+
+        if self.current == slide.name:
+            return
+
+        try:
+            self.current = slide.name
+        except ScreenManagerException:
+            self.remove_widget(slide)
+            self.add_widget(slide)
+            self.current = slide.name
+
+    current_slide = AliasProperty(_get_current_slide, _set_current_slide,
+                                  bind=('current_screen', ))
     '''Contains the currently displayed slide object (read-only). You must not
     change this property manually.
     '''
