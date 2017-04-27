@@ -1,5 +1,3 @@
-from mpfmc.uix.display import Display
-from mpfmc.uix.slide_frame import SlideFrame
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
@@ -15,6 +13,6 @@ class TestDisplaySingle(MpfMcTestCase):
 
         self.assertIn('default', self.mc.displays)
         self.assertEqual(self.mc.displays['default'].size, [800, 600])
-        self.assertEqual(self.mc.targets['default'].parent.parent.parent,
+        self.assertEqual(self.mc.targets['default'],
                          self.mc.displays['default'])
 

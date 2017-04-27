@@ -13,10 +13,10 @@ class TestText(MpfMcTestCase):
         self.advance_time()
 
         text_input_widget = (
-            self.mc.targets['default'].current_slide.children[0].children[1])
+            self.mc.targets['default'].current_slide.widgets[1])
 
         text_display_widget = (
-            self.mc.targets['default'].current_slide.children[0].children[2])
+            self.mc.targets['default'].current_slide.widgets[2])
 
         self.assertEqual(text_display_widget.text, '')
         self.assertEqual(text_input_widget.text, 'C')

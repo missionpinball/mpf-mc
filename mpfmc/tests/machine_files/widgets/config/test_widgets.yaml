@@ -117,16 +117,6 @@ widgets:
   widget10:
     type: text
     text: (text)
-  info_frame:
-    - type: slide_frame
-      width: 210
-      height: 28
-      name: infoframe
-      y: 28
-      x: 0
-      anchor_y: top
-      anchor_x: left
-      z: 1000
 
 widget_player:
   add_widget1_to_current: widget1
@@ -136,7 +126,8 @@ widget_player:
       slide: slide1
   add_widget6:
     widget6:
-      target: default
+      widget_settings:
+        z: -1
   remove_widget1_by_key:
     widget1:
       action: remove
@@ -153,7 +144,7 @@ widget_player:
       widget8:
         widget_settings:
           expire: 1s
-        target: default
+          z: -1
   add_widget8_custom_settings:
       widget8:
         widget_settings:
@@ -219,9 +210,8 @@ widget_player:
         color: red
   widget_to_parent:
     box11:
-      target: default
       widget_settings:
-        z: 1
+        z: -1
     box12:
       widget_settings:
         z: 2
@@ -243,8 +233,6 @@ widget_player:
   show_widget10:
     widget10:
       action: add
-  show_info_frame:
-    info_frame: {}
 
 slide_player:
   show_slide_1:

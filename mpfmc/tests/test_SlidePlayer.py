@@ -315,7 +315,7 @@ class TestSlidePlayer(MpfMcTestCase):
 
     def test_slide_show(self):
         # tests the 'show' feature of a slide. This is not a slide show, but
-        # rather a setting which controls whether a slide is show right away
+        # rather a setting which controls whether a slide is shown right away
         # or not
 
         # show a base slide
@@ -342,7 +342,7 @@ class TestSlidePlayer(MpfMcTestCase):
 
         # show a base slide
         self.mc.events.post('show_slide_1')
-        self.advance_time()
+        self.advance_time(0.2)
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_1')
 

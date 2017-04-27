@@ -1,23 +1,24 @@
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
-class TestDmd(MpfMcTestCase):
+class TestFonts(MpfMcTestCase):
     def get_machine_path(self):
         return 'tests/machine_files/fonts'
 
     def get_config_file(self):
         return 'built_in_dmd_fonts.yaml'
 
-    def test_dmd(self):
+    def test_dmd_font_styles(self):
 
         self.mc.events.post('window_slide')
+        self.advance_time(1)
 
         self.mc.events.post('dmd_big')
         self.advance_time(1)
 
         # make sure the adjustments are correct
-        top_widget = self.mc.displays['dmd'].current_slide.stencil.children[0]
-        bottom_widget = self.mc.displays['dmd'].current_slide.stencil.children[1]
+        top_widget = self.mc.displays['dmd'].current_slide.children[0]
+        bottom_widget = self.mc.displays['dmd'].current_slide.children[1]
 
         self.assertEqual(
             self.mc.machine_config['widget_styles']['dmd_big']['adjust_bottom'],
@@ -31,8 +32,8 @@ class TestDmd(MpfMcTestCase):
         self.advance_time(1)
 
         # make sure the adjustments are correct
-        top_widget = self.mc.displays['dmd'].current_slide.stencil.children[0]
-        bottom_widget = self.mc.displays['dmd'].current_slide.stencil.children[1]
+        top_widget = self.mc.displays['dmd'].current_slide.children[0]
+        bottom_widget = self.mc.displays['dmd'].current_slide.children[1]
 
         self.assertEqual(
             self.mc.machine_config['widget_styles']['dmd_med']['adjust_bottom'],
@@ -46,8 +47,8 @@ class TestDmd(MpfMcTestCase):
         self.advance_time(1)
 
         # make sure the adjustments are correct
-        top_widget = self.mc.displays['dmd'].current_slide.stencil.children[0]
-        bottom_widget = self.mc.displays['dmd'].current_slide.stencil.children[1]
+        top_widget = self.mc.displays['dmd'].current_slide.children[0]
+        bottom_widget = self.mc.displays['dmd'].current_slide.children[1]
 
         self.assertEqual(
             self.mc.machine_config['widget_styles']['dmd_small']['adjust_bottom'],

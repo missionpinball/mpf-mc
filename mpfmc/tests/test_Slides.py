@@ -49,13 +49,34 @@ class TestSlides(MpfMcTestCase):
                       priority=0)
 
         widget_tree = list()
-        for s in slide.children[0].walk():
+        for s in slide.children:
             widget_tree.append(s)
 
-        # last widget is drawn last (on top), so the order should be flipped
-        self.assertEqual(widget_tree[1].text, 'SLIDE TEST 1-3')
-        self.assertEqual(widget_tree[2].text, 'SLIDE TEST 1-2')
-        self.assertEqual(widget_tree[3].text, 'SLIDE TEST 1-1')
+        # Widgets are drawn in order from the end of the children list to the beginning
+        # so the order should be the same order as appears in the config file.
+        self.assertEqual(widget_tree[0].text, 'SLIDE TEST 1-1')
+        self.assertEqual(widget_tree[1].text, 'SLIDE TEST 1-2')
+        self.assertEqual(widget_tree[2].text, 'SLIDE TEST 1-3')
+
+    def test_widgets_z_order_from_config(self):
+        slide = Slide(mc=self.mc,
+                      name='slide7',
+                      config=self.mc.slides['slide7'],
+                      key='mode1',
+                      priority=0)
+
+        widget_tree = list()
+        for s in slide.children:
+            widget_tree.append(s)
+
+        # Widgets are drawn in order from the end of the children list to the beginning.
+        # The resulting child widget order should be the from highest z-order value in
+        # the beginning of the list to lowest z-order value.  Ties should be broken by
+        # the order the widgets appear in the config file.
+        self.assertEqual(widget_tree[0].text, 'TEST Z-ORDER 100')
+        self.assertEqual(widget_tree[1].text, 'TEST Z-ORDER 50-1')
+        self.assertEqual(widget_tree[2].text, 'TEST Z-ORDER 50-2')
+        self.assertEqual(widget_tree[3].text, 'TEST Z-ORDER 0')
 
     def test_slides_from_config(self):
         self.assertIn('slide1', self.mc.slides)
@@ -85,3 +106,22 @@ class TestSlides(MpfMcTestCase):
         self.advance_time()
 
         self.assertEqual(0.5, slide.canvas.opacity)
+
+    def test_remove_non_existent_slide(self):
+        self.assertFalse(self.mc.targets['default'].remove_slide('hello'))
+        self.advance_time()
+
+    def test_two_slides_in_one_tick(self):
+        self.mc.events.add_handler('slide_slide2_active', self.slide2_active)
+        self.mock_event('slide_slide1_active')
+        self.mock_event('slide_slide2_active')
+
+        self.mc.targets['default'].show_slide('slide1')
+        self.mc.targets['default'].show_slide('slide2')
+        self.advance_time()
+
+        self.assertEventNotCalled('slide_slide1_active')
+        self.assertEventCalled('slide_slide2_active', 1)
+
+    def slide2_active(self, **kwargs):
+        pass

@@ -23,7 +23,7 @@ class TestImage(MpfMcTestCase):
 
         # Make sure that all the images are showing.
         active_widget_names = [
-            x.image.name for x in self.mc.targets['default'].current_slide.children[0].children]
+            x.image.name for x in self.mc.targets['default'].current_slide.widgets]
 
         for x in range(12):
             self.assertIn('image{}'.format(x+1), active_widget_names)
