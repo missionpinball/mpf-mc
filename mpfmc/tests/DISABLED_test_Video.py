@@ -18,8 +18,8 @@ class TestVideo(MpfMcTestCase):
         self.mc.events.post('show_slide1')
         self.advance_time()
 
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
-        text = self.mc.targets['default'].current_slide.children[0].children[2]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0]
+        text = self.mc.targets['default'].current_slide.widgets[2]
 
         self.assertEqual(video_widget.state, 'play')
         self.assertTrue(video_widget.video.loaded)
@@ -119,8 +119,8 @@ class TestVideo(MpfMcTestCase):
         self.mc.events.post('show_slide2')
         self.advance_time(1)
 
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
-        text = self.mc.targets['default'].current_slide.children[0].children[2]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0]
+        text = self.mc.targets['default'].current_slide.widgets[2]
         text.text = "PLAY"
 
         self.assertEqual('playing', video_widget.video.state)
@@ -174,7 +174,7 @@ class TestVideo(MpfMcTestCase):
     def test_video_settings(self):
         self.mc.events.post('show_slide7')
         self.advance_time(1)
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0]
 
         # make sure it's playing
         self.assertEqual('playing', video_widget.video.state)
@@ -206,7 +206,7 @@ class TestVideo(MpfMcTestCase):
 
         self.mc.events.post('show_slide8')
         self.advance_time(1)
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0]
 
         self.assertEqual('', video_widget.video.state)
         # stopped state is empty string
@@ -256,7 +256,7 @@ class TestVideo(MpfMcTestCase):
         self.advance_time(2)
         self.assertEqual(self.mc.targets['default'].current_slide.name, 'mode1_slide1')
 
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0]
         self.assertTrue(isinstance(video_widget, VideoWidget))
         self.assertEqual(video_widget.state, 'play')
 
