@@ -12,6 +12,7 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     ScreenManagerException)
 from kivy.properties import AliasProperty
 from kivy.uix.stencilview import StencilView
+from kivy.uix.widget import WidgetException
 
 from mpfmc.core.mc import MpfMc
 from mpfmc.uix.widget import MpfWidget
@@ -47,9 +48,14 @@ class Display(ScreenManager):
         self.transition = NoTransition()
 
         self._blank_slide_name = '{}_blank'.format(self.name)
-        self._flag_slide_changed = False
 
         super().__init__()
+
+        # It is possible that the current slide changes more than one time during a single clock
+        # frame. Sending multiple slide active events is not desired in this situation. This can
+        # easily be solved using Kivy clock events. The clock event will only be triggered once
+        # per clock frame no matter how many times it is called.
+        self._current_slide_changed = Clock.create_trigger(self._post_active_slide_event, -1)
 
         # Need to create a widget that will be the parent of the slides.  This is necessary
         # to allow widgets with negative z values to remain in the display while slides
@@ -154,9 +160,7 @@ class Display(ScreenManager):
         # automatically shown, which we don't want. Also we want to ensure that
         # our slide event will be called which only happens when this slide is
         # switched to, rather than automatically added.
-        self.create_and_add_slide(name=self._blank_slide_name)
-        self._set_current_slide_name(self._blank_slide_name)
-        self._flag_slide_changed = False
+        self.create_blank_slide()
 
         self.mc.post_mc_native_event('display_{}_ready'.format(self.name))
         '''event: display_(name)_ready
@@ -193,34 +197,54 @@ class Display(ScreenManager):
         self.pos = (0, 0)
         self.size = self.native_size
 
+    @property
+    def current_slide(self) -> "Slide":
+        """Returns the Slide object of the current slide."""
+        return self.current_screen
+
+    @current_slide.setter
+    def current_slide(self, value: Union[str, "Slide"]):
+        """Set the current slide.
+        You can set it to a Slide object or a string of the slide name.
+        """
+        if isinstance(value, Slide):
+            self._set_current_slide(value)
+        elif isinstance(value, str):
+            self._set_current_slide_name(value)
+
+    @property
+    def current_slide_name(self) -> str:
+        """Returns the string name of the current slide."""
+        return self.current
+
+    @current_slide_name.setter
+    def current_slide_name(self, value: str):
+        """Sets the current slide based on the string name of the slide you
+        want to be shown."""
+        self._set_current_slide_name(value)
+
+    @property
+    def slides(self) -> List["Slide"]:
+        """Return list of slide objects of all the active slides for this slide frame."""
+        return self.screens
+
+    def create_blank_slide(self) -> "Slide":
+        """Creates the blank slide for this display."""
+        return self.add_slide(self._blank_slide_name)
+
     def get_slide(self, name: str) -> "Slide":
         """Return the Slide associated with the name or raise a
         :class:`ScreenManagerException` if not found."""
         return self.get_screen(name)
 
-    def add_slide(self, slide: "Slide") -> "Slide":
-        """
-        Add a slide to the list of slides managed by the display.  This method just adds
-        the slide.  It does not display it.
-        
-        Args:
-            slide: The Slide object to add.
-             
-        """
-        # See if slide already exists.
-        if not self.has_screen(slide.name):
-            self.add_widget(slide)
-
-        return slide
-
     # pylint: disable-msg=too-many-arguments
-    def create_and_add_slide(self, name: str, config: Optional[dict]=None,
-                             priority: int=0, key: Optional[str]=None,
-                             play_kwargs: Optional[dict]=None) -> "Slide":
+    def add_slide(self, name: str, config: Optional[dict]=None, priority: int=0,
+                  key: Optional[str]=None, play_kwargs: Optional[dict]=None) -> "Slide":
         """
-        Creates a new slide and adds it to the list of slides managed by the display. This 
-        method just adds the slide.  It does not display it.
-
+        Add a slide to the list of slides managed by the display (or returns the existing
+        slide with the specified name if it already exists).  This method just adds the 
+        slide.  It does not display it.
+        
         Args:
             name: The slide name. 
             config: The slide config.
@@ -235,10 +259,10 @@ class Display(ScreenManager):
         if self.has_screen(name):
             return self.get_screen(name)
 
-        slide = Slide(mc=self.mc, name=name, target=self.name,
-                      config=config, key=key, priority=priority,
-                      play_kwargs=play_kwargs)
-        return self.add_slide(slide)
+        # Slide() creates a new slide and adds it to this screen manager (display)
+        return Slide(mc=self.mc, name=name, target=self.name,
+                     config=config, key=key, priority=priority,
+                     play_kwargs=play_kwargs)
 
     # pylint: disable-msg=too-many-arguments
     def show_slide(self, slide_name: str, transition: Optional[str]=None,
@@ -273,14 +297,14 @@ class Display(ScreenManager):
         else:
             play_kwargs.update(kwargs)
 
-        try:  # does this slide exist in this screen manager already?
+        if self.has_screen(slide_name):
             slide = self.get_screen(slide_name)
-        except ScreenManagerException:  # create it if not
-            slide = self.create_and_add_slide(name=slide_name,
-                                              config=self.mc.slides[slide_name],
-                                              priority=priority,
-                                              key=key,
-                                              play_kwargs=play_kwargs)
+        else:
+            slide = self.add_slide(name=slide_name,
+                                   config=self.mc.slides[slide_name],
+                                   priority=priority,
+                                   key=key,
+                                   play_kwargs=play_kwargs)
 
         # update the widgets with whatever kwargs came through here
         if play_kwargs:
@@ -310,7 +334,7 @@ class Display(ScreenManager):
             self.transition.stop()
             self.transition = self.mc.transition_manager.get_transition(transition)
 
-            self.current = slide.name
+            self._set_current_slide(slide)
             return True
 
         else:
@@ -346,16 +370,16 @@ class Display(ScreenManager):
             
         """
 
-        # TODO: how can slide_name be optional?
+        # TODO: how can slide_name be optional? Blank slide?
 
         if not play_kwargs:
             play_kwargs = kwargs
         else:
             play_kwargs.update(kwargs)
 
-        slide_obj = self.create_and_add_slide(name=slide_name,
-                                              config=dict(widgets=widgets),
-                                              priority=priority, key=key)
+        slide_obj = self.add_slide(name=slide_name,
+                                   config=dict(widgets=widgets),
+                                   priority=priority, key=key)
 
         return self.show_slide(slide_name=slide_obj.name, transition=transition,
                                priority=priority, force=force,
@@ -422,40 +446,45 @@ class Display(ScreenManager):
 
         return True
 
-    def on_current(self, instance, value: str) -> None:
-        """Callback when current slide name parameter changes.
-        
-        Notes:
-            Do not call the base class implementation as all behavior has been
-            implemented here.
-        """
-        slide = self.get_slide(value)
+    def _set_current_slide(self, slide: "Slide"):
+        # slide frame requires at least one slide, so if you try to set current
+        # to None, it will create a new slide called '<display name>_blank' at
+        # priority 0 and show that one
+
+        # I think there's a bug in Kivy 1.9.1. According to the docs, you
+        # should be able to set self.current to a screen name. But if that
+        # screen is already managed by this screen manager, it will raise
+        # an exception, and the source is way deep in their code and not
+        # easy to fix by subclassing. So this is sort of a hack that looks
+        # for that exception, and if it sees it, it just removes and
+        # re-adds the screen.
         if not slide:
-            return
-        if slide == self.current_slide:
+            slide = self.create_blank_slide()
+
+        if self.current == slide.name:
             return
 
-        self.transition.stop()
-
-        previous_slide = self.current_slide
-        self.current_screen = slide
-        if previous_slide:
-            self.transition.screen_in = slide
-            self.transition.screen_out = previous_slide
-            self.transition.start(self)
-        else:
-            self.real_add_widget(slide)
-            slide.pos = self.pos
-            self.do_layout()
-            slide.dispatch('on_pre_enter')
-            slide.dispatch('on_enter')
+        try:
+            self.current = slide.name
+        except WidgetException:
+            self.remove_widget(slide)
+            self.add_widget(slide)
+            self.current = slide.name
 
         # Post the event via callback at the end of the frame in case more than
         # one slide was set in this frame, so we only want to post the event
-        # for the slide that actually became active.
-        if not self._flag_slide_changed:  # only call this once per frame
-            self.mc.clock.schedule_once(self._post_active_slide_event, -1)
-            self._flag_slide_changed = True
+        # for the slide that actually became active.  The Kivy clock event will
+        # only call the associated callback once per frame when triggered no
+        # matter how many times it is called.
+        self._current_slide_changed()
+
+    def _set_current_slide_name(self, slide_name):
+        try:
+            self._set_current_slide(self.get_screen(slide_name))
+        except ScreenManagerException:
+            raise ValueError('Cannot set current slide to "{}" as there is '
+                             'no slide in this slide_frame with that '
+                             'name'.format(slide_name))
 
     def _get_next_highest_priority_slide(self, slide: "Slide") -> "Slide":
         """Return the slide with the next highest priority."""
@@ -509,8 +538,6 @@ class Display(ScreenManager):
         """Posts an event that a new slide is now active."""
         del dt
 
-        self._flag_slide_changed = False
-
         self.mc.post_mc_native_event('slide_{}_active'.format(self.current_slide_name))
         """event: slide_(name)_active
         desc: A slide called (name) has just become active, meaning that
@@ -522,58 +549,3 @@ class Display(ScreenManager):
         so be sure to create machine-wide unique names when you're naming
         your slides.
         """
-
-    #
-    # Properties
-    #
-
-    def _get_current_slide(self) -> "Slide":
-        """Returns the Slide object of the current slide."""
-        return self.current_screen
-
-    def _set_current_slide(self, slide: "Slide"):
-        """Sets the current slide to be displayed."""
-        if not slide:
-            return
-
-        if self.current == slide.name:
-            return
-
-        try:
-            self.current = slide.name
-        except ScreenManagerException:
-            self.remove_widget(slide)
-            self.add_widget(slide)
-            self.current = slide.name
-
-    current_slide = AliasProperty(_get_current_slide, _set_current_slide,
-                                  bind=('current_screen', ))
-    '''Contains the currently displayed slide object (read-only). You must not
-    change this property manually.
-    '''
-
-    def _get_current_slide_name(self) -> str:
-        """Returns the string name of the current slide."""
-        return self.current
-
-    def _set_current_slide_name(self, value: str) -> None:
-        """Sets the current slide using the slide name."""
-        slide = self.get_slide(value)
-        if slide:
-            self._set_current_slide(slide)
-
-    current_slide_name = AliasProperty(_get_current_slide_name, _set_current_slide_name,
-                                       bind=('current', ))
-    '''Name of the slide currently shown. Can be used to change the currently displayed
-    slide when assigning a new value to this property.
-    '''
-
-    def _get_slides(self) -> List["Slide"]:
-        """Return list of slide objects of all the active slides for this slide frame."""
-        return self.screens
-
-    slides = AliasProperty(_get_slides, None, bind=('screens', ))
-    '''List of all the :class:`Slide` widgets added (read-only). You should not change
-    this list manually. Use the
-    :meth:`add_widget <mpfmc.uix.widget.MpfWidget.add_widget>` method instead.
-    '''

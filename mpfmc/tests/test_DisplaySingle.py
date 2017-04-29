@@ -37,7 +37,6 @@ class TestDisplaySingle(MpfMcTestCase):
                          'window_blank')
 
         slide1 = Slide(mc=self.mc, name='slide1')
-        self.mc.targets['default'].add_slide(slide1)
         self.mc.targets['default'].current_slide_name = 'slide1'
 
         # test display properties
@@ -56,7 +55,6 @@ class TestDisplaySingle(MpfMcTestCase):
         # make sure showing a slide at the same priority replaces the current
         # one.
         slide2 = Slide(mc=self.mc, name='slide2')
-        self.mc.targets['window'].add_slide(slide2)
         self.mc.targets['window'].show_slide('slide2')
 
         self.assertEqual(self.mc.targets['window'].current_slide, slide2)
@@ -85,7 +83,6 @@ class TestDisplaySingle(MpfMcTestCase):
 
         # add another slide so we have 3
         slide3 = Slide(mc=self.mc, name='slide3', config={})
-        self.mc.targets['window'].add_slide(slide3)
         self.assertEqual(len(self.mc.targets['window'].slides), 3)
 
         # also test removing by name
@@ -95,25 +92,21 @@ class TestDisplaySingle(MpfMcTestCase):
     def test_priorities(self):
         # show slide 1, p100
         slide1 = Slide(mc=self.mc, name='slide1', priority=100)
-        self.mc.targets['window'].add_slide(slide1)
         self.mc.targets['window'].show_slide('slide1')
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
 
         # show slide 2, p0, it should not show
         slide2 = Slide(mc=self.mc, name='slide2', priority=0)
-        self.mc.targets['window'].add_slide(slide2)
         self.mc.targets['window'].show_slide('slide2')
         self.assertEqual(self.mc.targets['window'].current_slide, slide1)
 
         # show slide 3, p200, it should show
         slide3 = Slide(mc=self.mc, name='slide3', config={}, priority=200)
-        self.mc.targets['window'].add_slide(slide3)
         self.mc.targets['window'].show_slide('slide3')
         self.assertEqual(self.mc.targets['window'].current_slide, slide3)
 
         # show slide 4, p199, it should not show
         slide4 = Slide(mc=self.mc, name='slide4', config={}, priority=199)
-        self.mc.targets['window'].add_slide(slide4)
         self.mc.targets['window'].show_slide('slide4')
         self.assertLess(slide4.priority,
                         self.mc.targets['window'].current_slide.priority)

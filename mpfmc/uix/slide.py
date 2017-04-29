@@ -61,6 +61,7 @@ class Slide(Screen, StencilView):
 
             self.add_widgets(widgets)
 
+        target.add_widget(self)
         self.mc.active_slides[name] = self
         self.mc.slides[name] = config
 
