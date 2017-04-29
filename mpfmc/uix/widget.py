@@ -549,7 +549,7 @@ class MpfWidget(object):
     def find_widgets_by_key(self, key: str) -> List["MpfWidget"]:
         """Return a list of widgets with the matching key value by searching
         the tree of children belonging to this widget."""
-        return [w for w in self.walk() if w.key == key]
+        return [x for x in self.walk(restrict=True, loopback=False) if x.key == key]
 
     #
     # Properties

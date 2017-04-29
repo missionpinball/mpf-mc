@@ -49,11 +49,12 @@ class MpfTextInput(Text):
         del dt
 
         for target in self.mc.targets.values():
-            for w in target.find_widgets_by_key(self.key):
-                self.linked_text_widget = w
-                break
-
-            if self.linked_text_widget:
+            w = target.find_widgets_by_key(self.config['key'])
+            if w:
+                if w[0] != self:
+                    self.linked_text_widget = w[0]
+                elif len(w) > 1:
+                    self.linked_text_widget = w[1]
                 break
 
         if self.linked_text_widget:

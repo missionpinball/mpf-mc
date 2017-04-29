@@ -233,8 +233,10 @@ class Slide(Screen, StencilView):
             self.remove_widget(widget)
 
     def find_widgets_by_key(self, key: str) -> List["MpfWidget"]:
-        """Returns a list of widgets from this slide that have the specified key value."""
-        return [x for x in self.children if x.key == key]
+        """Return a list of widgets with the matching key value by searching
+        the tree of children belonging to this slide."""
+        return [w for child in self.children
+                for w in child.walk(restrict=True, loopback=False) if w.key == key]
 
     def add_widget_to_parent_frame(self, widget: "MpfWidget"):
         """Adds this widget to this slide's parent instead of to this slide.
@@ -321,15 +323,6 @@ class Slide(Screen, StencilView):
     def on_slide_play(self):
         for widget in self.children:
             widget.on_slide_play()
-
-    def find_widgets_by_key(self, key: str) -> List["MpfWidget"]:
-        """Return a list of widgets with the matching key value by searching
-        the tree of children belonging to this slide."""
-        widgets = []
-        for child in self.children:
-            widgets.extend(x for x in child.walk(restrict=True, loopback=False) if x.key == key)
-
-        return widgets
 
     #
     # Properties
