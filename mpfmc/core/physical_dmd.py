@@ -4,9 +4,11 @@ from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 from kivy.graphics.texture import Texture
-from kivy.uix.effectwidget import EffectWidget, EffectBase
+from kivy.uix.effectwidget import EffectWidget
 
-from mpfmc.widgets.dmd import Gain
+from mpfmc.effects.gain import GainEffect
+from mpfmc.effects.flip_vertical import FlipVerticalEffect
+from mpfmc.effects.gamma import GammaEffect
 
 
 class PhysicalDmdBase(object):
@@ -35,17 +37,17 @@ class PhysicalDmdBase(object):
         self.effect_widget = EffectWidget()
 
         effect_list = list()
-        effect_list.append(FlipVertical())
+        effect_list.append(FlipVerticalEffect())
 
         if self.config['brightness'] != 1.0:
             if not 0.0 <= self.config['brightness'] <= 1.0:
                 raise ValueError("DMD brightness value should be between 0.0 "
                                  "and 1.0. Yours is {}".format(self.config['brightness']))
 
-            effect_list.append(Gain(gain=self.config['brightness']))
+            effect_list.append(GainEffect(gain=self.config['brightness']))
 
         if self.config['gamma'] != 1.0:
-            effect_list.append(Gamma(gamma=self.config['gamma']))
+            effect_list.append(GammaEffect(gamma=self.config['gamma']))
 
         self.effect_widget.effects = effect_list
         self.effect_widget.size = self.source.size
@@ -170,37 +172,3 @@ class PhysicalRgbDmd(PhysicalDmdBase):
     def send(self, data):
         """Send data to DMD via BCP."""
         self.mc.bcp_processor.send('rgb_dmd_frame', rawbytes=data, name=self.name)
-
-
-class FlipVertical(EffectBase):
-    """GLSL effect to veritically flip a texture"""
-
-    def __init__(self):
-        super().__init__()
-
-        self.glsl = '''
-
-        vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
-
-        {{
-        return texture2D(texture, vec2(tex_coords.x, 1.0 - tex_coords.y));
-        }}
-        '''
-
-class Gamma(EffectBase):
-    """GLSL effect to apply a gamma setting to a texture"""
-
-    def __init__(self, gamma=1.0):
-        super().__init__()
-
-        gamma = float(gamma)
-
-        self.glsl = '''
-
-        vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
-
-        {{
-        vec4 outColor = vec4(pow(color.x, {0}), pow(color.y, {0}), pow(color.z, {0}), 1.0);
-        return outColor;
-        }}
-        '''.format(gamma)
