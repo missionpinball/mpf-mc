@@ -27,6 +27,7 @@ from mpfmc.core.bcp_processor import BcpProcessor
 from mpfmc.core.config_processor import ConfigProcessor
 from mpfmc.core.mode_controller import ModeController
 from mpfmc.uix.transitions import TransitionManager
+from mpfmc.uix.effects import EffectsManager
 from mpfmc.core.config_collection import create_config_collections
 import asyncio
 
@@ -130,6 +131,7 @@ class MpfMc(App):
 
         self.config_processor = ConfigProcessor(self)
         self.transition_manager = TransitionManager(self)
+        self.effects_manager = EffectsManager(self)
 
         self._set_machine_path()
 
