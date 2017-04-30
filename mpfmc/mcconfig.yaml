@@ -24,10 +24,18 @@ mpf-mc:
         ellipse: mpfmc.widgets.ellipse
         bezier: mpfmc.widgets.bezier
         points: mpfmc.widgets.point
-        dmd: mpfmc.widgets.dmd
-        color_dmd: mpfmc.widgets.dmd
+        display: mpfmc.widgets.display
         text_input: mpfmc.widgets.text_input
 #        camera: mpfmc.widgets.camera
+
+    mpf_effect_modules:
+        - color_dmd
+        - colorize
+        - dmd
+        - dot_filter
+        - gain
+        - monochrome
+        - reduce
 
     mpf_transition_modules:
         - push
