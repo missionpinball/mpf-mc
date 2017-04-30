@@ -7,7 +7,6 @@ from kivy.uix.stencilview import StencilView
 from kivy.graphics import Color
 from kivy.properties import ListProperty, AliasProperty
 
-from mpfmc.core.utils import set_position
 from mpfmc.uix.widget import create_widget_objects_from_config, MpfWidget
 from mpfmc.core.mc import MpfMc
 

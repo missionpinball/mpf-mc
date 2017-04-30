@@ -10,7 +10,6 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     FadeTransition, WipeTransition,
                                     FallOutTransition, RiseInTransition,
                                     ScreenManagerException)
-from kivy.properties import AliasProperty
 from kivy.uix.stencilview import StencilView
 from kivy.uix.widget import WidgetException
 
