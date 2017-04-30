@@ -3,7 +3,6 @@ from kivy.graphics import RoundedRectangle
 from kivy.graphics.context_instructions import Color
 from kivy.uix.widget import Widget
 
-from mpfmc.core.utils import set_position
 from mpfmc.uix.widget import MpfWidget
 
 
@@ -14,18 +13,18 @@ class Rectangle(MpfWidget, Widget):
     def on_pos(self, *args):
         del args
 
-        self.pos = set_position(self.parent.width,
-                                self.parent.height,
-                                self.width,
-                                self.height,
-                                self.config['x'],
-                                self.config['y'],
-                                self.config['anchor_x'],
-                                self.config['anchor_y'],
-                                self.config['adjust_top'],
-                                self.config['adjust_right'],
-                                self.config['adjust_bottom'],
-                                self.config['adjust_left'])
+        self.pos = self.calculate_position(self.parent.width,
+                                           self.parent.height,
+                                           self.width,
+                                           self.height,
+                                           self.config['x'],
+                                           self.config['y'],
+                                           self.config['anchor_x'],
+                                           self.config['anchor_y'],
+                                           self.config['adjust_top'],
+                                           self.config['adjust_right'],
+                                           self.config['adjust_bottom'],
+                                           self.config['adjust_left'])
 
         with self.canvas:
             Color(*self.config['color'])

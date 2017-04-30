@@ -1,4 +1,5 @@
-from mpfmc.core.utils import set_position, percent_to_float
+from mpfmc.core.utils import percent_to_float
+from mpfmc.uix.widget import MpfWidget
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
@@ -28,87 +29,87 @@ class TestUtils(MpfMcTestCase):
 
         # test with all defaults
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (45, 45))
 
         # test anchors
 
         anchor_x = 'left'
         anchor_y = 'bottom'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (50, 50))
 
         # add adjustments
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 2, 0, 0, 0)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 2, 0, 0, 0)
         self.assertEqual((res_x, res_y), (50, 50))
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 0, 2, 0, 0)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 0, 2, 0, 0)
         self.assertEqual((res_x, res_y), (50, 50))
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 0, 0, 2, 0)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 0, 0, 2, 0)
 
         self.assertEqual((res_x, res_y), (50, 48))
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 0, 0, 0, 2)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 0, 0, 0, 2)
         self.assertEqual((res_x, res_y), (48, 50))
 
         anchor_x = 'middle'
         anchor_y = 'middle'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (45, 45))
 
         # add adjustments
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 2, 0, 0, 0)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 2, 0, 0, 0)
         self.assertEqual((res_x, res_y), (45, 46))
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 0, 2, 0, 0)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 0, 2, 0, 0)
         self.assertEqual((res_x, res_y), (46, 45))
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 0, 0, 2, 0)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 0, 0, 2, 0)
         self.assertEqual((res_x, res_y), (45, 44))
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 0, 0, 0, 2)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 0, 0, 0, 2)
         self.assertEqual((res_x, res_y), (44, 45))
 
         anchor_x = 'center'
         anchor_y = 'center'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (45, 45))
 
         anchor_x = 'right'
         anchor_y = 'top'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (40, 40))
 
         # add adjustments
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 2, 0, 0, 0)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 2, 0, 0, 0)
         self.assertEqual((res_x, res_y), (40, 42))
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 0, 2, 0, 0)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 0, 2, 0, 0)
         self.assertEqual((res_x, res_y), (42, 40))
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 0, 0, 2, 0)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 0, 0, 2, 0)
 
         self.assertEqual((res_x, res_y), (40, 40))
 
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y, 0, 0, 0, 2)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y, 0, 0, 0, 2)
         self.assertEqual((res_x, res_y), (40, 40))
 
         # test positive x, y numbers
@@ -118,26 +119,26 @@ class TestUtils(MpfMcTestCase):
 
         anchor_x = 'left'
         anchor_y = 'bottom'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (10, 10))
 
         anchor_x = 'middle'
         anchor_y = 'middle'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (5, 5))
 
         anchor_x = 'center'
         anchor_y = 'center'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (5, 5))
 
         anchor_x = 'right'
         anchor_y = 'top'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (0, 0))
 
         # test negative x, y numbers
@@ -149,26 +150,26 @@ class TestUtils(MpfMcTestCase):
 
         anchor_x = 'left'
         anchor_y = 'bottom'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-10, -10))
 
         anchor_x = 'middle'
         anchor_y = 'middle'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-15, -15))
 
         anchor_x = 'center'
         anchor_y = 'center'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-15, -15))
 
         anchor_x = 'right'
         anchor_y = 'top'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-20, -20))
 
         # test positive percentages
@@ -178,26 +179,26 @@ class TestUtils(MpfMcTestCase):
 
         anchor_x = 'left'
         anchor_y = 'bottom'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (80, 20))
 
         anchor_x = 'middle'
         anchor_y = 'middle'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (75, 15))
 
         anchor_x = 'center'
         anchor_y = 'center'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (75, 15))
 
         anchor_x = 'right'
         anchor_y = 'top'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (70, 10))
 
         # test negative percentages (dunno how useful these are, but they work)
@@ -207,26 +208,26 @@ class TestUtils(MpfMcTestCase):
 
         anchor_x = 'left'
         anchor_y = 'bottom'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-80, -20))
 
         anchor_x = 'middle'
         anchor_y = 'middle'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-85, -25))
 
         anchor_x = 'center'
         anchor_y = 'center'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-85, -25))
 
         anchor_x = 'right'
         anchor_y = 'top'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-90, -30))
 
         # test positioning strings
@@ -235,32 +236,32 @@ class TestUtils(MpfMcTestCase):
 
         x = 'center'
         y = 'center'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (45, 45))
 
         x = 'center+10'
         y = 'center + 10'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (55, 55))
 
         x = 'middle-10'
         y = 'middle - 10'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (35, 35))
 
         x = 'left'
         y = 'bottom'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (-5, -5))
 
         x = 'right'
         y = 'top'
-        res_x, res_y = set_position(parent_w, parent_h, w, h, x, y,
-                                    anchor_x, anchor_y)
+        res_x, res_y = MpfWidget.calculate_position(parent_w, parent_h, w, h, x, y,
+                                                    anchor_x, anchor_y)
         self.assertEqual((res_x, res_y), (95, 95))
 
     def test_percent_to_float(self):
