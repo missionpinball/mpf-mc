@@ -33,7 +33,9 @@ mpf-mc:
         - colorize
         - dmd
         - dot_filter
+        - flip_vertical
         - gain
+        - gamma
         - monochrome
         - reduce
 
