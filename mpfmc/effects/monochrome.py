@@ -10,12 +10,12 @@ class MonochromeEffect(EffectBase):
 
     """
 
-    luminosity = ListProperty([.299, .587, .114, 0])
+    luminosity = ListProperty([.299, .587, .114])
     '''This defines the luminosity factor for each color channel. The value
     for each channel must be between 0.0 and 1.0.
 
     :attr:`luminosity` is a :class:`ListProperty` defaults to
-    (.299, .587, .114, 0)
+    (.299, .587, .114)
     '''
 
     def __init__(self, *args, **kwargs):

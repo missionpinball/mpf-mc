@@ -1,4 +1,4 @@
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from kivy.properties import NumericProperty, ListProperty
 
@@ -9,17 +9,20 @@ from mpfmc.effects.reduce import ReduceEffect
 from mpfmc.effects.colorize import ColorizeEffect
 from mpfmc.effects.gain import GainEffect
 
+if TYPE_CHECKING:
+    from kivy.uix.effectwidget import EffectBase
+
 
 class DmdEffect(ColorDmdEffect):
 
     """GLSL effect to render an on-screen DMD to look like individual round pixels."""
 
-    luminosity = ListProperty([.299, .587, .114, 0])
+    luminosity = ListProperty([.299, .587, .114])
     '''This defines the luminosity factor for each color channel. The value
     for each channel must be between 0.0 and 1.0.
 
     :attr:`luminosity` is a :class:`ListProperty` defaults to
-    (.299, .587, .114, 0)
+    (.299, .587, .114)
     '''
 
     shades = NumericProperty(16)
@@ -30,14 +33,14 @@ class DmdEffect(ColorDmdEffect):
     defaults to 16.
     '''
 
-    tint_color = ListProperty([1, 0.4, 0, 0])
-    '''This defines the color tint to be used in the effect.
+    dot_color = ListProperty([1, 0.4, 0, 0])
+    '''This defines the dot color to be used in the effect.
 
-    :attr:`tint_color` is a :class:`ListProperty` defaults to
+    :attr:`dot_color` is a :class:`ListProperty` defaults to
     (1, 0.4, 1, 0)
     '''
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
     def get_effects(self) -> List["EffectBase"]:
@@ -56,7 +59,7 @@ class DmdEffect(ColorDmdEffect):
 
         effects.append(MonochromeEffect(luminosity=self.luminosity))
         effects.append(ReduceEffect(shades=self.shades))
-        effects.append(ColorizeEffect(tint_color=self.tint_color))
+        effects.append(ColorizeEffect(tint_color=self.dot_color))
         effects.append(GainEffect(gain=self.gain))
 
         return effects

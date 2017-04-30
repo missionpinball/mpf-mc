@@ -1,8 +1,13 @@
+from typing import TYPE_CHECKING, List
+
 from kivy.properties import NumericProperty, ListProperty, BooleanProperty
 
 from mpfmc.uix.effects import EffectsChain
 from mpfmc.effects.dot_filter import DotFilterEffect
 from mpfmc.effects.gain import GainEffect
+
+if TYPE_CHECKING:
+    from kivy.uix.effectwidget import EffectBase
 
 
 class ColorDmdEffect(EffectsChain):
@@ -90,10 +95,10 @@ class ColorDmdEffect(EffectsChain):
     defaults to 1.0 (which has no effect).
     '''
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
-    def get_effects(self):
+    def get_effects(self) -> List["EffectBase"]:
         effects = []
 
         if self.dot_filter:
