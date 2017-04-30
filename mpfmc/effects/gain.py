@@ -15,7 +15,7 @@ class GainEffect(EffectBase):
     '''
     Sets the gain factor which is multiplied by each color channel.
 
-    shades is a :class:`~kivy.properties.NumericProperty` and
+    gain is a :class:`~kivy.properties.NumericProperty` and
     defaults to 1.0 (which has no effect).
     '''
 

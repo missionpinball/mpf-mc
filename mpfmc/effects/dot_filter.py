@@ -29,7 +29,7 @@ class DotFilterEffect(EffectBase):
     Sets the height in pixels of the display widget on the screen. Typically
     this is larger than the dots_y parameter.
 
-    width is a :class:`~kivy.properties.NumericProperty` and
+    height is a :class:`~kivy.properties.NumericProperty` and
     defaults to 32.
     '''
 

@@ -30,10 +30,10 @@ class DmdEffect(ColorDmdEffect):
     defaults to 16.
     '''
 
-    dot_color = ListProperty([1, 0.4, 0, 0])
+    tint_color = ListProperty([1, 0.4, 0, 0])
     '''This defines the color tint to be used in the effect.
 
-    :attr:`dot_color` is a :class:`ListProperty` defaults to
+    :attr:`tint_color` is a :class:`ListProperty` defaults to
     (1, 0.4, 1, 0)
     '''
 
@@ -56,7 +56,7 @@ class DmdEffect(ColorDmdEffect):
 
         effects.append(MonochromeEffect(luminosity=self.luminosity))
         effects.append(ReduceEffect(shades=self.shades))
-        effects.append(ColorizeEffect(color=self.dot_color))
+        effects.append(ColorizeEffect(tint_color=self.tint_color))
         effects.append(GainEffect(gain=self.gain))
 
         return effects
