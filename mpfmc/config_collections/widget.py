@@ -5,6 +5,7 @@ from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.uix.widget import magic_events
+from mpfmc.widgets.display import DisplayWidget
 
 
 class Widget(ConfigCollection):
@@ -55,6 +56,9 @@ class Widget(ConfigCollection):
         self.mc.config_validator.validate_config('widgets:{}'.format(
             config['type']).lower(), config, base_spec='widgets:common')
 
+        if 'effects' in config and config['type'] == 'display':
+            config['effects'] = self.mc.effects_manager.validate_effects(config['effects'])
+
         if 'animations' in config:
             config['animations'] = (
                 self.process_animations(config['animations']))
@@ -80,7 +84,7 @@ class Widget(ConfigCollection):
 
         return config
 
-    def _register_trigger(self, event_name, **kwargs):
+    def _register_trigger(self, event_name: str, **kwargs) -> None:
         del kwargs
         self.mc.bcp_processor.register_trigger(event=event_name)
 
@@ -112,7 +116,6 @@ class Widget(ConfigCollection):
             config[event_name] = new_list
 
         return config
-
 
 
 collection_cls = Widget

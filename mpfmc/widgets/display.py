@@ -26,10 +26,10 @@ class DisplayWidget(MpfWidget, Widget):
             self._add_effects(self.config['effects'])
 
         try:
-            self.effects.add_widget(self.source)
+            self.effects.add_widget(self.source.parent)
         except WidgetException:
-            self.source.parent = None
-            self.effects.add_widget(self.source)
+            self.source.parent.parent = None
+            self.effects.add_widget(self.source.parent)
 
         self.effects.size = (self.config['width'], self.config['height'])
 
@@ -58,19 +58,24 @@ class DisplayWidget(MpfWidget, Widget):
                     self.size)
 
     def on_pos(self, *args) -> None:
-        self.dmd_frame.pos = self.calculate_position(self.parent.width,
-                                                     self.parent.height,
-                                                     self.width, self.height,
-                                                     self.config['x'],
-                                                     self.config['y'],
-                                                     self.config['anchor_x'],
-                                                     self.config['anchor_y'],
-                                                     self.config['adjust_top'],
-                                                     self.config['adjust_right'],
-                                                     self.config['adjust_bottom'],
-                                                     self.config['adjust_left'])
+        self.pos = self.calculate_position(self.parent.width,
+                                           self.parent.height,
+                                           self.width, self.height,
+                                           self.config['x'],
+                                           self.config['y'],
+                                           self.config['anchor_x'],
+                                           self.config['anchor_y'],
+                                           self.config['adjust_top'],
+                                           self.config['adjust_right'],
+                                           self.config['adjust_bottom'],
+                                           self.config['adjust_left'])
 
-    def _add_effects(self, effects_config: Optional[dict]) -> None:
-        pass
+    def _add_effects(self, config: Optional[list]) -> None:
+        if config:
+            effects_list = list()
+            for effect_config in config:
+                effects_list.extend(self.mc.effects_manager.get_effect(effect_config))
+
+            self.effects.effects = effects_list
 
 widget_classes = [DisplayWidget]
