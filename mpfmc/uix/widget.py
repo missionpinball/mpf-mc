@@ -221,7 +221,10 @@ class MpfWidget(object):
             True if the other widget is less than the current widget (uses
             z-order to perform the comparison).
         """
-        return other.z < self.z
+        if hasattr(other, 'z'):
+            return other.z < self.z
+        else:
+            return 0 < self.z
 
     # todo change to classmethod
     def _set_default_style(self) -> None:
@@ -314,6 +317,176 @@ class MpfWidget(object):
 
         except AttributeError:
             pass
+
+    # pylint: disable-msg=too-many-arguments
+    # pylint: disable-msg=too-many-statements
+    @staticmethod
+    def calculate_position(parent_w: int, parent_h: int,
+                           w: int, h: int,
+                           x: Optional[Union[int, str]]=None,
+                           y: Optional[Union[int, str]]=None,
+                           anchor_x: Optional[str]=None,
+                           anchor_y: Optional[str]=None,
+                           adjust_top: Optional[int]=None,
+                           adjust_right: Optional[int]=None,
+                           adjust_bottom: Optional[int]=None,
+                           adjust_left: Optional[int]=None) -> tuple:
+        """Returns the x,y position for the lower-left corner of a widget
+        within a larger parent frame based on several positioning parameters.
+
+        Args:
+            parent_w: Width of the parent frame.
+            parent_h: Height of the parent frame.
+            w: Width of the element you're placing.
+            h: Height of the element you're placing.
+            x: (Optional) Specifies the x (horizontal) position of the widget from
+                the left edge of the slide. Can be a numeric value which
+                represents the actual x value, or can be a percentage (string with
+                percent sign, like '20%') which is set taking into account the size
+                of the parent width. (e.g. parent width of 800 with x='20%'
+                results in x=160. Can also be negative to position the widget
+                partially off the left of the slide. Default value of None will
+                return the horizontal center (parent width / 2). Can also start
+                with the strings "left", "center", or "right" which can be combined
+                with values. (e.g right-2, left+4, center-1)
+            y: (Optional) Specifies the y (vertical) position of the widget from
+                the bottom edge of the slide. Can be a numeric value which
+                represents the actual y value, or can be a percentage (string with
+                percent sign, like '20%') which is set taking into account the size
+                of the parent height. (e.g. parent height of 600 with y='20%'
+                results in y=120. Can also be negative to position the widget
+                partially off the bottom of the slide. Default value of None will
+                return the vertical center (parent height / 2). Can also start
+                with the strings "top", "middle", or "bottom" which can be combined
+                with values. (e.g top-2, bottom+4, middle-1)
+            anchor_x: (Optional) Which edge of the widget will be used for
+                positioning. ('left', 'center' (or 'middle'), or 'right'. If None,
+                'center' will be used.
+            anchor_y: (Optional) Which edge of the widget will be used for
+                positioning. ('top', 'middle' (or 'center'), or 'bottom'. If None,
+                'center' will be used.
+            adjust_top: (Optional) Moves the "top" of this widget down, meaning any
+                positioning that includes calculations involving the top (anchor_y
+                of 'top' or 'middle') use the alternate top position. Postive
+                values move the top towards the center of the widget, negative
+                values move it away. Negative values can be used to give the
+                widget "space" on the top, and positive values can be used to
+                remove unwanted space from the top of the widget. Note that this
+                setting does not actually crop or cut off the top of the widget,
+                rather, it just adjusts how the positioning is calculated.
+            adjust_right: (Optional) adjusts the position calculations for the
+                right side of the widget. Positive values move the right position
+                towards the center, negative values move it away from the center.
+            adjust_bottom: (Optional) adjusts the position calculations for the
+                bottom of the widget. Positive values move the bottom position
+                towards the center, negative values move it away from the center.
+            adjust_left: (Optional) adjusts the position calculations for the
+                left side of the widget. Positive values move the left position
+                towards the center, negative values move it away from the center.
+
+        Returns: Tuple of x, y coordinates for the lower-left corner of the
+            widget you're placing.
+
+        See the widgets documentation for examples.
+
+        """
+        # Set defaults
+        if x is None:
+            x = 'center'
+        if not anchor_x:
+            anchor_x = 'center'
+        if y is None:
+            y = 'middle'
+        if not anchor_y:
+            anchor_y = 'middle'
+        if not adjust_top:
+            adjust_top = 0
+        if not adjust_right:
+            adjust_right = 0
+        if not adjust_bottom:
+            adjust_bottom = 0
+        if not adjust_left:
+            adjust_left = 0
+
+        # ----------------------
+        # X / width / horizontal
+        # ----------------------
+
+        # Set position
+        if isinstance(x, str):
+
+            x = str(x).replace(' ', '')
+            start_x = 0
+
+            if x.startswith('right'):
+                x = x.strip('right')
+                start_x = parent_w
+
+            elif x.startswith('middle'):
+                x = x.strip('middle')
+                start_x = parent_w / 2
+
+            elif x.startswith('center'):
+                x = x.strip('center')
+                start_x = parent_w / 2
+
+            elif x.startswith('left'):
+                x = x.strip('left')
+
+            if not x:
+                x = '0'
+
+            x = percent_to_float(x, parent_w)
+            x += start_x
+
+        # Adjust for anchor_x & adjust_right/left
+        if anchor_x in ('center', 'middle'):
+            x -= (w - adjust_right + adjust_left) / 2
+        elif anchor_x == 'right':
+            x -= w - adjust_right
+        else:  # left
+            x -= adjust_left
+
+        # --------------------
+        # Y / height / vertical
+        # --------------------
+
+        # Set position
+        if isinstance(y, str):
+
+            y = str(y).replace(' ', '')
+            start_y = 0
+
+            if y.startswith('top'):
+                y = y.strip('top')
+                start_y = parent_h
+
+            elif y.startswith('middle'):
+                y = y.strip('middle')
+                start_y = parent_h / 2
+
+            elif y.startswith('center'):
+                y = y.strip('center')
+                start_y = parent_h / 2
+
+            elif y.startswith('bottom'):
+                y = y.strip('bottom')
+
+            if not y:
+                y = '0'
+
+            y = percent_to_float(y, parent_h)
+            y += start_y
+
+        # Adjust for anchor_y & adjust_top/bottom
+        if anchor_y in ('middle', 'center'):
+            y -= (h - adjust_top + adjust_bottom) / 2
+        elif anchor_y == 'top':
+            y -= h - adjust_top
+        else:  # bottom
+            y -= adjust_bottom
+
+        return x, y
 
     def build_animation_from_config(self, config_list: list) -> Animation:
         """Build animation object from config."""
@@ -551,169 +724,6 @@ class MpfWidget(object):
         the tree of children belonging to this widget."""
         return [x for x in self.walk(restrict=True, loopback=False) if x.key == key]
 
-    # pylint: disable-msg=too-many-arguments
-    # pylint: disable-msg=too-many-statements
-    @staticmethod
-    def calculate_position(parent_w, parent_h, w, h, x=None, y=None,
-                           anchor_x=None, anchor_y=None, adjust_top=None,
-                           adjust_right=None, adjust_bottom=None, adjust_left=None):
-        """Returns the x,y position for the lower-left corner of a widget
-        within a larger parent frame based on several positioning parameters.
-
-        Args:
-            parent_w: Width of the parent frame.
-            parent_h: Height of the parent frame.
-            w: Width of the element you're placing.
-            h: Height of the element you're placing.
-            x: (Optional) Specifies the x (horizontal) position of the widget from
-                the left edge of the slide. Can be a numeric value which
-                represents the actual x value, or can be a percentage (string with
-                percent sign, like '20%') which is set taking into account the size
-                of the parent width. (e.g. parent width of 800 with x='20%'
-                results in x=160. Can also be negative to position the widget
-                partially off the left of the slide. Default value of None will
-                return the horizontal center (parent width / 2). Can also start
-                with the strings "left", "center", or "right" which can be combined
-                with values. (e.g right-2, left+4, center-1)
-            y: (Optional) Specifies the y (vertical) position of the widget from
-                the bottom edge of the slide. Can be a numeric value which
-                represents the actual y value, or can be a percentage (string with
-                percent sign, like '20%') which is set taking into account the size
-                of the parent height. (e.g. parent height of 600 with y='20%'
-                results in y=120. Can also be negative to position the widget
-                partially off the bottom of the slide. Default value of None will
-                return the vertical center (parent height / 2). Can also start
-                with the strings "top", "middle", or "bottom" which can be combined
-                with values. (e.g top-2, bottom+4, middle-1)
-            anchor_x: (Optional) Which edge of the widget will be used for
-                positioning. ('left', 'center' (or 'middle'), or 'right'. If None,
-                'center' will be used.
-            anchor_y: (Optional) Which edge of the widget will be used for
-                positioning. ('top', 'middle' (or 'center'), or 'bottom'. If None,
-                'center' will be used.
-            adjust_top: (Optional) Moves the "top" of this widget down, meaning any
-                positioning that includes calculations involving the top (anchor_y
-                of 'top' or 'middle') use the alternate top position. Postive
-                values move the top towards the center of the widget, negative
-                values move it away. Negative values can be used to give the
-                widget "space" on the top, and positive values can be used to
-                remove unwanted space from the top of the widget. Note that this
-                setting does not actually crop or cut off the top of the widget,
-                rather, it just adjusts how the positioning is calculated.
-            adjust_right: (Optional) ajusts the position calculations for the
-                right side of the widget. Positive values move the right position
-                towards the center, negative values move it away from the center.
-            adjust_bottom: (Optional) ajusts the position calculations for the
-                bottom of the widget. Positive values move the bottom position
-                towards the center, negative values move it away from the center.
-            adjust_left: (Optional) ajusts the position calculations for the
-                left side of the widget. Positive values move the left position
-                towards the center, negative values move it away from the center.
-
-        Returns: Tuple of x, y coordinates for the lower-left corner of the
-            widget you're placing.
-
-        See the widgets documentation for examples.
-
-        """
-        # Set defaults
-        if x is None:
-            x = 'center'
-        if not anchor_x:
-            anchor_x = 'center'
-        if y is None:
-            y = 'middle'
-        if not anchor_y:
-            anchor_y = 'middle'
-        if not adjust_top:
-            adjust_top = 0
-        if not adjust_right:
-            adjust_right = 0
-        if not adjust_bottom:
-            adjust_bottom = 0
-        if not adjust_left:
-            adjust_left = 0
-
-        # ----------------------
-        # X / width / horizontal
-        # ----------------------
-
-        # Set position
-        if isinstance(x, str):
-
-            x = str(x).replace(' ', '')
-            start_x = 0
-
-            if x.startswith('right'):
-                x = x.strip('right')
-                start_x = parent_w
-
-            elif x.startswith('middle'):
-                x = x.strip('middle')
-                start_x = parent_w / 2
-
-            elif x.startswith('center'):
-                x = x.strip('center')
-                start_x = parent_w / 2
-
-            elif x.startswith('left'):
-                x = x.strip('left')
-
-            if not x:
-                x = '0'
-
-            x = percent_to_float(x, parent_w)
-            x += start_x
-
-        # Adjust for anchor_x & adjust_right/left
-        if anchor_x in ('center', 'middle'):
-            x -= (w - adjust_right + adjust_left) / 2
-        elif anchor_x == 'right':
-            x -= w - adjust_right
-        else:  # left
-            x -= adjust_left
-
-        # --------------------
-        # Y / height / vertical
-        # --------------------
-
-        # Set position
-        if isinstance(y, str):
-
-            y = str(y).replace(' ', '')
-            start_y = 0
-
-            if y.startswith('top'):
-                y = y.strip('top')
-                start_y = parent_h
-
-            elif y.startswith('middle'):
-                y = y.strip('middle')
-                start_y = parent_h / 2
-
-            elif y.startswith('center'):
-                y = y.strip('center')
-                start_y = parent_h / 2
-
-            elif y.startswith('bottom'):
-                y = y.strip('bottom')
-
-            if not y:
-                y = '0'
-
-            y = percent_to_float(y, parent_h)
-            y += start_y
-
-        # Adjust for anchor_y & adjust_top/bottom
-        if anchor_y in ('middle', 'center'):
-            y -= (h - adjust_top + adjust_bottom) / 2
-        elif anchor_y == 'top':
-            y -= h - adjust_top
-        else:  # bottom
-            y -= adjust_bottom
-
-        return x, y
-
     #
     # Properties
     #
@@ -721,4 +731,3 @@ class MpfWidget(object):
     z = NumericProperty(0)
     '''Z position (z-order) of the widget (used to determine the drawing order of widgets).
     '''
-
