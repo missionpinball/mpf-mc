@@ -2,6 +2,7 @@ from kivy.graphics import Rectangle as KivyRectangle
 from kivy.graphics import RoundedRectangle
 from kivy.graphics.context_instructions import Color
 from kivy.uix.widget import Widget
+from kivy.properties import NumericProperty, ListProperty
 
 from mpfmc.uix.widget import MpfWidget
 
@@ -13,6 +14,7 @@ class Rectangle(MpfWidget, Widget):
     def on_pos(self, *args):
         del args
 
+        # TODO: refactor positioning to allow animation (don't use config settings)
         self.pos = self.calculate_position(self.parent.width,
                                            self.parent.height,
                                            self.width,
@@ -27,14 +29,35 @@ class Rectangle(MpfWidget, Widget):
                                            self.config['adjust_left'])
 
         with self.canvas:
-            Color(*self.config['color'])
+            Color(*self.color)
 
-            if self.config['corner_radius']:
+            if self.corner_radius > 0:
                 RoundedRectangle(pos=self.pos, size=self.size,
-                                 radius=(self.config['corner_radius'],
-                                         self.config['corner_radius']),
-                                 segments=self.config['corner_segments'])
+                                 radius=(self.corner_radius,
+                                         self.corner_radius),
+                                 segments=self.corner_segments)
             else:
                 KivyRectangle(pos=self.pos, size=self.size)
+
+    #
+    # Properties
+    #
+
+    color = ListProperty([1.0, 1.0, 1.0, 1.0])
+    '''The color of the widget lines, in the (r, g, b, a) format.
+
+    :attr:`color` is a :class:`~kivy.properties.ListProperty` and
+    defaults to [1.0, 1.0, 1.0, 1.0].
+    '''
+
+    corner_radius = NumericProperty(0)
+    '''Specifies the radius of the round corners of the rectangle.
+     Defaults to 0.
+    '''
+
+    corner_segments = NumericProperty(10)
+    '''Defines how many segments will be used for drawing the round
+    corners. The drawing will be smoother if you have many segments.
+    '''
 
 widget_classes = [Rectangle]

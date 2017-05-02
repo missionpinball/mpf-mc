@@ -16,33 +16,9 @@ class Bezier(MpfWidget, Widget):
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 
-        if 'cap' in self.config:
-            self.cap = self.config['cap']
-
-        if 'cap_precision' in self.config:
-            self.cap_precision = self.config['cap_precision']
-
-        if 'close' in self.config:
-            self.close = self.config['close']
-
-        if 'color' in self.config:
-            self.color = self.config['color']
-
-        if 'joint' in self.config:
-            self.joint = self.config['joint']
-
-        if 'joint_precision' in self.config:
-            self.joint_precision = self.config['joint_precision']
-
-        if 'precision' in self.config:
-            self.precision = self.config['precision']
-
-        if 'thickness' in self.config:
-            self.thickness = self.config['thickness']
-
         with self.canvas:
             Color(*self.color)
-            KivyLine(bezier=self.config['points'],
+            KivyLine(bezier=self.points,
                      width=self.thickness,
                      cap=self.cap,
                      joint=self.joint,
@@ -54,6 +30,20 @@ class Bezier(MpfWidget, Widget):
     #
     # Properties
     #
+
+    color = ListProperty([1.0, 1.0, 1.0, 1.0])
+    '''The color of the widget lines, in the (r, g, b, a) format.
+
+    :attr:`color` is a :class:`~kivy.properties.ListProperty` and
+    defaults to [1.0, 1.0, 1.0, 1.0].
+    '''
+
+    points = ListProperty()
+    '''The list of points to use to draw the widget in (x1, y1, x2, y2...)
+    format.
+
+    :attr:`points` is a :class:`~kivy.properties.ListProperty`.
+    '''
 
     cap = OptionProperty("round", options=["none", "square", "round"])
     '''The cap of the line, defaults to 'round'. Can be one of 'none',
@@ -67,13 +57,6 @@ class Bezier(MpfWidget, Widget):
 
     close = BooleanProperty(False)
     '''If True, the line will be closed.
-    '''
-
-    color = ListProperty([1.0, 1.0, 1.0, 1.0])
-    '''The color of the widget lines, in the (r, g, b, a) format.
-
-    :attr:`color` is a :class:`~kivy.properties.ListProperty` and
-    defaults to [1.0, 1.0, 1.0, 1.0].
     '''
 
     joint = OptionProperty("round", options=["none", "round", "bevel", "miter"])
@@ -94,7 +77,7 @@ class Bezier(MpfWidget, Widget):
     thickness = NumericProperty(1.0)
     '''Width of the bezier line.
 
-    :attr:`width` is a :class:`~kivy.properties.NumericProperty` and defaults
+    :attr:`thickness` is a :class:`~kivy.properties.NumericProperty` and defaults
     to 1.0.
     '''
 

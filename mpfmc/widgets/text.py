@@ -35,6 +35,7 @@ class Text(MpfWidget, Label):
     def set_position(self):
         if self.config['anchor_y'] == 'baseline':
             try:
+                # TODO: refactor positioning to allow animation (don't use config settings)
                 self.pos = self.calculate_position(self.parent.width,
                                                    self.parent.height,
                                                    self.width, self.height,
