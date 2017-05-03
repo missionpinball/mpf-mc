@@ -342,7 +342,7 @@ class TestSlidePlayer(MpfMcTestCase):
 
         # show a base slide
         self.mc.events.post('show_slide_1')
-        self.advance_time(0.2)
+        self.advance_time(0.3)
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_1')
 
@@ -355,7 +355,7 @@ class TestSlidePlayer(MpfMcTestCase):
 
         # show another slide
         self.mc.events.post('show_slide_4')
-        self.advance_time(0.2)
+        self.advance_time(0.3)
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_4')
 
@@ -368,7 +368,7 @@ class TestSlidePlayer(MpfMcTestCase):
 
         # make sure base slide comes back
         self.mc.events.post('remove_slide_4')
-        self.advance_time()
+        self.advance_time(0.3)
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'machine_slide_1')
 
