@@ -25,14 +25,6 @@ class DmdEffect(ColorDmdEffect):
     (.299, .587, .114)
     '''
 
-    shades = NumericProperty(16)
-    '''
-    Sets the number of shades per channel to reduce it to.
-
-    shades is a :class:`~kivy.properties.NumericProperty` and
-    defaults to 16.
-    '''
-
     dot_color = ListProperty([1, 0.4, 0, 0])
     '''This defines the dot color to be used in the effect.
 
@@ -46,7 +38,7 @@ class DmdEffect(ColorDmdEffect):
     def get_effects(self) -> List["EffectBase"]:
         effects = []
 
-        if self.dot_filter:
+        if bool(self.dot_filter):
             effects.append(DotFilterEffect(
                 width=self.width,
                 height=self.height,
@@ -58,7 +50,10 @@ class DmdEffect(ColorDmdEffect):
             ))
 
         effects.append(MonochromeEffect(luminosity=self.luminosity))
-        effects.append(ReduceEffect(shades=self.shades))
+
+        if self.shades > 0:
+            effects.append(ReduceEffect(shades=self.shades))
+
         effects.append(ColorizeEffect(tint_color=self.dot_color))
         effects.append(GainEffect(gain=self.gain))
 

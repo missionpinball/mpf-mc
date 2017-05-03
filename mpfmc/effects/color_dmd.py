@@ -5,6 +5,7 @@ from kivy.properties import NumericProperty, ListProperty, BooleanProperty
 from mpfmc.uix.effects import EffectsChain
 from mpfmc.effects.dot_filter import DotFilterEffect
 from mpfmc.effects.gain import GainEffect
+from mpfmc.effects.reduce import ReduceEffect
 
 if TYPE_CHECKING:
     from kivy.uix.effectwidget import EffectBase
@@ -95,13 +96,21 @@ class ColorDmdEffect(EffectsChain):
     defaults to 1.0 (which has no effect).
     '''
 
+    shades = NumericProperty(16)
+    '''
+    Sets the number of shades per channel to reduce it to.
+
+    shades is a :class:`~kivy.properties.NumericProperty` and
+    defaults to 16.
+    '''
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
     def get_effects(self) -> List["EffectBase"]:
         effects = []
 
-        if self.dot_filter:
+        if bool(self.dot_filter):
             effects.append(DotFilterEffect(
                 width=self.width,
                 height=self.height,
@@ -111,6 +120,9 @@ class ColorDmdEffect(EffectsChain):
                 dot_size=self.dot_size,
                 background_color=self.background_color
             ))
+
+        if self.shades > 0:
+            effects.append(ReduceEffect(shades=self.shades))
 
         effects.append(GainEffect(gain=self.gain))
 
