@@ -54,7 +54,7 @@ sound_system:
   master_volume: 0.8
   enabled: true
 
-physical_dmds:
+dmds:
   default:
     shades: 16
     fps: 24

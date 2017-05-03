@@ -5,7 +5,7 @@ modes:
     - mode2
     - mode3
 
-physical_dmds:
+dmds:
   default:
     shades: 16
     fps: 24
