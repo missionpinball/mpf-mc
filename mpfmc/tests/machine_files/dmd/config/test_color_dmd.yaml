@@ -10,13 +10,12 @@ displays:
 
 slides:
   slide1:
-    - type: color_dmd
+    - type: display
       width: 640
       height: 160
-#      color: ffcccc
-#      source_display: dmd
-#      shades: 4
-#      gain: 2
+      source_display: dmd
+      effects:
+        - type: color_dmd
     - type: text
       text: COLOR DMD TEST
       y: 200

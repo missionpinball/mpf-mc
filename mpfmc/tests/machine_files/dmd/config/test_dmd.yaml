@@ -31,7 +31,6 @@ slides:
       height: 160
       source_display: dmd
       effects:
-        - type: scanlines
         - type: dmd
     - type: text
       text: TRADITIONAL DMD TEST
