@@ -31,8 +31,13 @@ class EffectsManager(object):
         if config:
             # The kivy shader transitions can't accept unexpected kwargs
             kwargs = config.copy()
-            kwargs.pop('type')
-            effect_obj = self._effects[config['type']](**kwargs)
+            effect_obj = self._effects[config['type']]()
+
+            # Set effect properties
+            for attr, value in kwargs.items():
+                if hasattr(effect_obj, attr):
+                    setattr(effect_obj, attr, value)
+
             if isinstance(effect_obj, EffectBase):
                 return [effect_obj]
             elif isinstance(effect_obj, EffectsChain):
