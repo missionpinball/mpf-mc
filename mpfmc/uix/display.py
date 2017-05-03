@@ -1,8 +1,5 @@
-"""Contains the Display base class, which is a logical display in the
-mpf-mc.
-
-"""
-from typing import List, Union, Optional
+"""Contains the Display base class, which is a logical display in the mpf-mc."""
+from typing import TYPE_CHECKING, List, Union, Optional
 
 from kivy.clock import Clock
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
@@ -10,12 +7,17 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     FadeTransition, WipeTransition,
                                     FallOutTransition, RiseInTransition,
                                     ScreenManagerException)
-from kivy.uix.stencilview import StencilView
-from kivy.uix.widget import WidgetException
+from kivy.uix.widget import Widget, WidgetException
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.scatter import ScatterPlane
 
-from mpfmc.core.mc import MpfMc
 from mpfmc.uix.widget import MpfWidget
 from mpfmc.uix.slide import Slide
+from kivy.properties import ObjectProperty
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
+
 
 transition_map = dict(none=NoTransition,
                       slide=SlideTransition,
@@ -28,6 +30,8 @@ transition_map = dict(none=NoTransition,
 
 class Display(ScreenManager):
     displays_to_initialize = 0
+
+    texture = ObjectProperty(None, allownone=True)
 
     @staticmethod
     def create_default_display(mc: "MpfMc") -> None:
@@ -56,12 +60,12 @@ class Display(ScreenManager):
         # per clock frame no matter how many times it is called.
         self._current_slide_changed = Clock.create_trigger(self._post_active_slide_event, -1)
 
-        # Need to create a widget that will be the parent of the slides.  This is necessary
-        # to allow widgets with negative z values to remain in the display while slides
-        # are changed.
-        self._slide_parent = StencilView(size_hint=(None, None), size=self.size)
-        self._slide_parent.z = 0
-        self._slide_parent.add_widget(self)
+        # Need to create a widget that will be the parent of the slide manager.  This is
+        # necessary to allow widgets with negative z values to remain in the display while
+        # slides are changed.
+        self._slide_manager_parent = FloatLayout(size_hint=(None, None), size=self.size)
+        self._slide_manager_parent.z = 0
+        self._slide_manager_parent.add_widget(self)
 
         Clock.schedule_once(self._display_created, 0)
 
@@ -72,7 +76,11 @@ class Display(ScreenManager):
     @property
     def parent_widgets(self) -> List["MpfWidget"]:
         """The list of all widgets owned by the display parent."""
-        return [x for x in self._slide_parent.children if x != self]
+        return [x for x in self._slide_manager_parent.children if x != self]
+
+    def has_parent(self) -> bool:
+        """Returns whether or not the display has a parent."""
+        return self._slide_manager_parent.parent is not None
 
     def _display_created(self, *args) -> None:
         """Callback after this display is created."""
@@ -175,26 +183,6 @@ class Display(ScreenManager):
         Note that this event is posted by MPF-MC and will not exist on the MPF
         side. So you can use this event for slide_player, widget_player, etc.,
         but not to start shows or other things controlled by MPF.'''
-
-    def on_window_resize(self, window, size) -> None:
-        """Callback whenever the window is resized."""
-        del window
-        del size
-
-        # TODO: Might be able to remove this function as the display widget will handle
-        # scaling/resizing.
-        self.fit_to_window()
-
-    def fit_to_window(self, *args) -> None:
-        """Scales the display to fit the window."""
-        del args
-        from kivy.core.window import Window
-
-        # TODO: Display probably does not need to be scaled (display widget can handle that)
-        self.scale = min(Window.width / self.native_size[0],
-                         Window.height / self.native_size[1])
-        self.pos = (0, 0)
-        self.size = self.native_size
 
     @property
     def current_slide(self) -> "Slide":
@@ -548,3 +536,36 @@ class Display(ScreenManager):
         so be sure to create machine-wide unique names when you're naming
         your slides.
         """
+
+
+class DisplayOutput(ScatterPlane):
+
+    def __init__(self, parent: "Widget", display: "Display", **kwargs):
+        kwargs.setdefault('size', parent.size)
+        kwargs.setdefault('size_hint', (None, None))
+        kwargs.setdefault('do_scale', False)
+        kwargs.setdefault('do_translation', False)
+        kwargs.setdefault('do_rotation', False)
+
+        super().__init__(**kwargs)
+
+        self.display = display
+        if self.display.has_parent():
+            pass
+            # TODO: Widget already has parent, use framebuffer instead
+        else:
+            self.add_widget(self.display.parent)
+
+        parent.bind(size=self.on_parent_resize)
+        parent.add_widget(self)
+        Clock.schedule_once(self._fit_to_parent, -1)
+
+    def on_parent_resize(self, *args):
+        self._fit_to_parent()
+
+    def _fit_to_parent(self, *args):
+        if self.parent:
+            self.scale = min(self.parent.width / float(self.display.width),
+                             self.parent.height / float(self.display.height))
+            self.center = self.parent.center
+            self.display.center = self.center
