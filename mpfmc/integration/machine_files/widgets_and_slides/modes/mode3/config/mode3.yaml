@@ -23,10 +23,10 @@ slides:
     y: top-3
     font_size: 30
     z: 1
-  - type: slide_frame
-    name: content_frame
+  - type: display
     width: 400
     height: 300
+    source_display: content_frame
     z: 6
     animations:
       move_out:

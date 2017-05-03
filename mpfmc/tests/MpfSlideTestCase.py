@@ -1,45 +1,51 @@
+from typing import TYPE_CHECKING
+
 from mpf.tests.MpfTestCase import MpfTestCase
+from mpfmc.widgets.display import DisplayWidget
+
+if TYPE_CHECKING:
+    from mpfmc.uix.slide import Slide
 
 
 class MpfSlideTestCase(MpfTestCase):
 
-    def assertSlideOnTop(self, slide_name, target="default"):
+    def assertSlideOnTop(self, slide_name: str, target: str="default"):
         if not self.mc.targets[target].current_slide:
             self.fail("There is no slide on target {}".format(target))
         self.assertEqual(slide_name, self.mc.targets[target].current_slide.name)
 
-    def assertTextOnTopSlide(self, text, target="default"):
+    def assertTextOnTopSlide(self, text: str, target: str="default"):
         if not self.mc.targets[target].current_slide:
             self.fail("There is no slide on target {}".format(target))
         self.assertTextInSlide(text, self.mc.targets[target].current_slide.name)
 
-    def assertTextNotOnTopSlide(self, text, target="default"):
+    def assertTextNotOnTopSlide(self, text: str, target: str="default"):
         if not self.mc.targets[target].current_slide:
             return
         self.assertTextNotInSlide(text, self.mc.targets[target].current_slide.name)
 
-    def assertSlideActive(self, slide_name):
+    def assertSlideActive(self, slide_name: str):
         self.assertIn(slide_name, self.mc.active_slides, "Slide {} is not active.".format(slide_name))
 
-    def assertSlideNotActive(self, slide_name):
+    def assertSlideNotActive(self, slide_name: str):
         self.assertNotIn(slide_name, self.mc.active_slides, "Slide {} is active but should not.".format(slide_name))
 
-    def _get_texts_from_slide(self, slide):
+    def _get_texts_from_slide(self, slide: "Slide"):
         texts = []
-        for children in slide.children:
-            if children.children:
-                texts.extend(self._get_texts_from_slide(children))
-            if hasattr(children, "text"):
-                texts.append(children.text)
+        for child in slide.children:
+            if isinstance(child, DisplayWidget) and child.current_slide:
+                texts.extend(self._get_texts_from_slide(child.current_slide))
+            if hasattr(child, "text"):
+                texts.append(child.text)
 
         return texts
 
-    def assertTextInSlide(self, text, slide_name):
+    def assertTextInSlide(self, text: str, slide_name: str):
         self.assertSlideActive(slide_name)
         self.assertIn(text, self._get_texts_from_slide(self.mc.active_slides[slide_name]),
                       "Text {} not found in slide {}.".format(text, slide_name))
 
-    def assertTextNotInSlide(self, text, slide_name):
+    def assertTextNotInSlide(self, text: str, slide_name: str):
         self.assertSlideActive(slide_name)
         self.assertNotIn(text, self._get_texts_from_slide(self.mc.active_slides[slide_name]),
                          "Text {} found in slide {} but should not be there.".format(text, slide_name))
