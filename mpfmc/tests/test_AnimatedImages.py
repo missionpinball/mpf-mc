@@ -30,9 +30,9 @@ class TestAnimatedImages(MpfMcTestCase):
 
         # make sure they're playing as they should
         self.assertEqual(ball.fps, 30)
-        self.assertEqual(ball.loops, 0)
+        self.assertEqual(ball.loops, -1)
         self.assertEqual(stick_figures.fps, 10)
-        self.assertEqual(stick_figures.loops, 0)
+        self.assertEqual(stick_figures.loops, -1)
 
         # test stopping
         stick_figures.stop()

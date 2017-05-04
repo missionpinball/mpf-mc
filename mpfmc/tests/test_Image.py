@@ -27,3 +27,5 @@ class TestImage(MpfMcTestCase):
 
         for x in range(12):
             self.assertIn('image{}'.format(x+1), active_widget_names)
+
+        self.advance_time(4.0)
