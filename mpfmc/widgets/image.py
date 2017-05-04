@@ -1,62 +1,81 @@
-from kivy.uix.image import Image
+from typing import TYPE_CHECKING, Optional
+
+from kivy.uix.scatter import Scatter
+from kivy.properties import ObjectProperty, NumericProperty, AliasProperty
+from kivy.graphics import Rectangle, Color
 
 from mpfmc.uix.widget import MpfWidget
 
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
+    from mpfmc.assets.image import ImageAsset
 
-class ImageWidget(MpfWidget, Image):
+
+class ImageWidget(MpfWidget, Scatter):
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
 
-    def __init__(self, mc, config, key=None, **kwargs):
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
 
-        self.image = None
+        self._image = None  # type: ImageAsset
+        self._current_loop = 0
+        self.rotation = self.config.get('rotation', 0)
+        self.scale = self.config.get('scale', 1.0)
 
+        # Retrieve the specified image asset to display.  This widget simply
+        # draws a rectangle using the texture from the loaded image asset to
+        # display the image. Scaling and rotation is handled by the Scatter
+        # widget.
         try:
-            self.image = self.mc.images[self.config['image']]
+            self._image = self.mc.images[self.config['image']]
         except KeyError:
 
             try:
-                self.image = self.mc.images[kwargs['play_kwargs']['image']]
+                self._image = self.mc.images[kwargs['play_kwargs']['image']]
             except KeyError:
                 pass
 
-        if not self.image:
+        if not self._image:
             raise ValueError("Cannot add Image widget. Image '{}' is not a "
                              "valid image name.".format(self.config['image']))
 
         # Updates the config for this widget to pull in any defaults that were
         # in the asset config
-        self.merge_asset_config(self.image)
+        self.merge_asset_config(self._image)
 
         # If the associated image asset exists, that means it's loaded already.
-        if self.image.image:
+        if self._image.image:
             self._image_loaded()
         else:
             # if the image asset isn't loaded, we set the size to 0,0 so it
             # doesn't show up on the display yet.
             # TODO Add log about loading on demand
             self.size = (0, 0)
-            self.image.load(callback=self._image_loaded)
+            self._image.load(callback=self._image_loaded)
 
-    def __repr__(self):  # pragma: no cover
+    def __repr__(self) -> str:  # pragma: no cover
         try:
-            return '<Image name={}, size={}, pos={}>'.format(self.image.name,
+            return '<Image name={}, size={}, pos={}>'.format(self._image.name,
                                                              self.size,
                                                              self.pos)
         except AttributeError:
             return '<Image (loading...), size={}, pos={}>'.format(self.size,
                                                                   self.pos)
 
-    def _image_loaded(self, *args):
+    def _image_loaded(self, *args) -> None:
+        """Callback when image asset has been loaded and is ready to display."""
         del args
-        self.texture = self.image.image.texture
-        self.size = self.texture_size  # will re-position automatically
 
-        self._coreimage = self.image.image
-        self._coreimage.bind(on_texture=self._on_tex_change)
+        # Setup callback on image 'on_texture' event (called whenever the image
+        # texture changes; used mainly for animated images)
+        self._image.image.bind(on_texture=self._on_texture_change)
+        self._on_texture_change()
 
-        if self._coreimage.anim_available:
+        self._draw_image()
+
+        # Setup animation properties (if applicable)
+        if self._image.image.anim_available:
             self.fps = self.config['fps']
             self.loops = self.config['loops']
             if self.config['auto_play']:
@@ -64,69 +83,104 @@ class ImageWidget(MpfWidget, Image):
             else:
                 self.stop()
 
-    def texture_update(self, *largs):
-        # overrides base method to pull the texture from our ImageClass instead
-        # of from a file
-        del largs
+    def _on_texture_change(self, *args) -> None:
+        """Update texture from image asset (callback when image texture changes)."""
+        del args
 
-        if not self.image.image:
-            return
+        self.texture = self._image.image.texture
+        self.size = self.texture.size
+        self._draw_image()
 
-        self._loops = 0
+        # Handle animation looping (when applicable)
+        ci = self._image.image
+        if ci.anim_available:
+            if self.loops > -1 and ci.anim_index == len(ci.image.textures) - 1:
+                self._current_loop += 1
+                if self._current_loop == self.loops:
+                    ci.anim_reset(False)
+                    self._current_loop = 0
 
-        if self._coreimage is not None:
-            self._coreimage.unbind(on_texture=self._on_tex_change)
+    def _draw_image(self, *args):
+        """Draws the image (draws a rectangle using the image texture)"""
+        del args
 
-        self._coreimage = ci = self.image.image
+        self.canvas.clear()
+        with self.canvas:
+            Color(1, 1, 1, 1)
+            Rectangle(texture=self.texture, size=self.size)
 
-        ci.bind(on_texture=self._on_tex_change)
-        self.texture = ci.texture
+    def play(self, start_frame: Optional[int]=None):
+        """Play the image animation (if images supports it)."""
+        if start_frame:
+            self.current_frame = start_frame
 
-    @property
-    def fps(self):
-        if self._coreimage.anim_available:
-            return 1 / self._coreimage.anim_delay
+        self._image.image.anim_reset(True)
+
+    def stop(self) -> None:
+        """Stop the image animation."""
+        self._image.image.anim_reset(False)
+
+    #
+    # Properties
+    #
+
+    def _get_image(self) -> Optional["ImageAsset"]:
+        return self._image
+
+    image = AliasProperty(_get_image)
+
+    texture = ObjectProperty(None, allownone=True)
+    '''Texture object of the image. The texture represents the original, loaded
+    image texture. 
+
+    Depending of the texture creation, the value will be a
+    :class:`~kivy.graphics.texture.Texture` or a
+    :class:`~kivy.graphics.texture.TextureRegion` object.
+
+    :attr:`texture` is an :class:`~kivy.properties.ObjectProperty` and defaults
+    to None.
+    '''
+
+    loops = NumericProperty(-1)
+    '''Number of loops to play then stop animating. -1 means keep animating.
+    '''
+
+    def _get_fps(self) -> Optional[int]:
+        if self._image.image.anim_available:
+            return int(1 / self._image.image.anim_delay)
         else:
             return None
 
-    @fps.setter
-    def fps(self, value):
-        self._coreimage.anim_delay = 1 / value
+    def _set_fps(self, value: int):
+        if value > 0:
+            self._image.image.anim_delay = 1 / float(value)
+        else:
+            self._image.image.anim_delay = -1
 
-    # for some reason setting the @property here didn't work with the getter,
-    # it simply wasn't called and I have no idea why. So I just setup a classic
-    # style getter/setter below these two methods.
-    def _get_current_frame(self):
-        return self._coreimage._anim_index + 1
+    fps = AliasProperty(_get_fps, _set_fps)
+    '''The frames per second rate for the animation if the image is sequenced 
+    (like an animated gif). If fps is set to 0, the animation will be stopped.
+    '''
 
-    def _set_current_frame(self, value):
-        frame = (int(value) - 1) % len(self._coreimage.image.textures)
-        if frame == self._coreimage._anim_index:
+    def _get_current_frame(self) -> int:
+        return self._image.image.anim_index + 1
+
+    def _set_current_frame(self, value: int):
+        if not self._image.image.anim_available or not hasattr(self._image.image, 'textures'):
+            return
+
+        frame = (int(value) - 1) % len(self._image.image.textures)
+        if frame == self._image.image.anim_index:
             return
         else:
-            self._coreimage._anim_index = frame
-            self._coreimage._texture = (
-                self._coreimage.image.textures[self._coreimage._anim_index])
-            self._coreimage.dispatch('on_texture')
+            self._image.image.anim_index = frame
+            self._image.image.texture = (
+                self._image.image.textures[self._image.image.anim_index])
+            self._image.dispatch('on_texture')
 
-    current_frame = property(_get_current_frame, _set_current_frame)
+    current_frame = AliasProperty(_get_current_frame, _set_current_frame)
+    '''The current frame of the animation.
+    '''
 
-    @property
-    def loops(self):
-        return self._coreimage.anim_loop
-
-    @loops.setter
-    def loops(self, value):
-        self._coreimage.anim_loop = value
-
-    def play(self, start_frame=None):
-
-        if start_frame:
-            self._set_current_frame(start_frame)
-
-        self._coreimage.anim_reset(True)
-
-    def stop(self):
-        self._coreimage.anim_reset(False)
 
 widget_classes = [ImageWidget]
