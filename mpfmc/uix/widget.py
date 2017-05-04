@@ -528,12 +528,12 @@ class MpfWidget(object):
 
             if settings['relative']:
                 animation = RelativeAnimation(duration=settings['duration'],
-                                         transition=settings['easing'],
-                                         **prop_dict)
+                                              transition=settings['easing'],
+                                              **prop_dict)
             else:
                 animation = Animation(duration=settings['duration'],
-                                 transition=settings['easing'],
-                                 **prop_dict)
+                                      transition=settings['easing'],
+                                      **prop_dict)
 
             # Determine if this animation should be performed in sequence or in parallel
             # with the previous animation.
