@@ -63,7 +63,7 @@ class TestWidget(MpfMcTestCase):
 
         target_order = ['4.2', '4.5', '4.1', '4.4', '4.3', '4.6', '4.7']
         for widget, index in zip(
-                self.mc.targets['default'].current_slide.widgets[0].children,
+                self.mc.targets['default'].current_slide.widgets,
                 target_order):
             self.assertEqual(widget.text, 'widget{}'.format(index))
 
@@ -74,7 +74,7 @@ class TestWidget(MpfMcTestCase):
         # should be inserted between 4.5 and 4.1
         target_order = ['4.2', '4.5', '5', '4.1', '4.4', '4.3', '4.6', '4.7']
         for widget, index in zip(
-                self.mc.targets['default'].current_slide.widgets[0].children,
+                self.mc.targets['default'].current_slide.widgets,
                 target_order):
             self.assertEqual(widget.text, 'widget{}'.format(index))
 
@@ -98,7 +98,7 @@ class TestWidget(MpfMcTestCase):
 
         target_order = ['4.2', '4.5', '4.1', '4.4', '4.3', '4.6', '4.7']
         for widget, index in zip(
-                self.mc.targets['default'].current_slide.widgets[0].children,
+                self.mc.targets['default'].current_slide.widgets,
                 target_order):
             self.assertEqual(widget.text, 'widget{}'.format(index))
 
@@ -122,7 +122,7 @@ class TestWidget(MpfMcTestCase):
 
         target_order = ['4.2', '4.5', '4.1', '4.4', '4.3', '4.6', '4.7']
         for widget, index in zip(
-                self.mc.targets['default'].current_slide.widgets[0].children,
+                self.mc.targets['default'].current_slide.widgets,
                 target_order):
             self.assertEqual(widget.text, 'widget{}'.format(index))
 
@@ -162,10 +162,10 @@ class TestWidget(MpfMcTestCase):
         # widget1 should be in slide1, not slide2, not current slide
         self.assertIn('widget2',
                       [x.text for x in
-                       self.mc.active_slides['slide1'].children])
+                       self.mc.active_slides['slide1'].widgets])
         self.assertNotIn('widget2',
                          [x.text for x in
-                          self.mc.active_slides['slide2'].children])
+                          self.mc.active_slides['slide2'].widgets])
         self.assertNotIn('widget2', [x.text for x in self.mc.targets[
             'default'].current_slide.widgets])
 
@@ -541,7 +541,7 @@ class TestWidget(MpfMcTestCase):
 
         self.assertEqual([1, 0, 0, 1], w8.color)
         self.assertEqual(70, w8.font_size)
-        self.assertEqual(77, w8.x)  # anchor_x: right, x: right-10
+        self.assertEqual(477, w8.x)  # anchor_x: right, x: right-10
 
     def test_widget_removal_from_slide_player(self):
         # tests that we can remove a widget by key that was shown via the
@@ -799,7 +799,7 @@ class TestWidget(MpfMcTestCase):
         self.assertEqual(widget1.text, "widget1")
         self.assertEqual(widget2.text, "widget2")
 
-        self.assertEqual(widget1.y, 121)
+        self.assertEqual(widget1.y, 301)
         self.assertEqual(widget2.y, -9)
         self.assertEqual(widget1.font_size, 100)
         self.assertEqual(widget2.font_size, 100)
