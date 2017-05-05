@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING, Union, List
 from functools import partial
 from importlib import import_module
 
@@ -5,10 +6,12 @@ from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.uix.widget import magic_events
-from mpfmc.widgets.display import DisplayWidget
+
+if TYPE_CHECKING:
+    from mpfmc.uix.widget import MpfWidget
 
 
-class Widget(ConfigCollection):
+class WidgetCollection(ConfigCollection):
 
     config_section = 'widgets'
     collection = 'widgets'
@@ -16,12 +19,12 @@ class Widget(ConfigCollection):
 
     type_map = CaseInsensitiveDict()
 
-    def _initialize(self):
+    def _initialize(self) -> None:
         for cls_name, module in self.mc.machine_config['mpf-mc']['widgets'].items():
             for widget_cls in import_module(module).widget_classes:
                 self.type_map[cls_name] = widget_cls
 
-    def process_config(self, config):
+    def process_config(self, config: Union[dict, list]) -> List["MpfWidget"]:
         # config is localized to a specific widget section
         if isinstance(config, dict):
             config = [config]
@@ -33,10 +36,10 @@ class Widget(ConfigCollection):
 
         return widget_list
 
-    def process_widget(self, config):
+    def process_widget(self, config: dict) -> dict:
         # config is localized widget settings
         try:
-            widget_cls = Widget.type_map[config['type']]
+            widget_cls = WidgetCollection.type_map[config['type']]
         except (KeyError, TypeError):
             try:
                 raise ValueError(
@@ -88,7 +91,7 @@ class Widget(ConfigCollection):
         del kwargs
         self.mc.bcp_processor.register_trigger(event=event_name)
 
-    def process_animations(self, config):
+    def process_animations(self, config: dict) -> dict:
         # config is localized to the slide's 'animations' section
 
         for event_name, event_settings in config.items():
@@ -118,4 +121,4 @@ class Widget(ConfigCollection):
         return config
 
 
-collection_cls = Widget
+collection_cls = WidgetCollection

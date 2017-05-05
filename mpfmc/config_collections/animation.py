@@ -1,14 +1,17 @@
+from typing import TYPE_CHECKING, Union, List
 from mpfmc.core.config_collection import ConfigCollection
 
+if TYPE_CHECKING:
+    from mpfmc.uix.widget import MpfWidget
 
-class Animation(ConfigCollection):
+
+class AnimationCollection(ConfigCollection):
 
     config_section = 'animations'
     collection = 'animations'
     class_label = 'Animations'
 
-
-    def process_config(self, config):
+    def process_config(self, config: Union[dict, list]) -> List["MpfWidget"]:
         # processes the 'animations' section of a config file to populate the
         # mc.animation_configs dict.
 
@@ -17,7 +20,6 @@ class Animation(ConfigCollection):
         if isinstance(config, dict):
             config = [config]
 
-
         # iterate and build our final processed list
         new_list = list()
         for animation in config:
@@ -25,7 +27,7 @@ class Animation(ConfigCollection):
 
         return new_list
 
-    def process_animation(self, config):
+    def process_animation(self, config: dict) -> dict:
         # config is localized to a single animation's settings within a list
 
         # str means it's a named animation
@@ -45,34 +47,4 @@ class Animation(ConfigCollection):
         return config
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-collection_cls = Animation
+collection_cls = AnimationCollection
