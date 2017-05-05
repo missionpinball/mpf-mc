@@ -21,7 +21,7 @@ class TestHighScoreMode(MpfIntegrationTestCase, MpfSlideTestCase, MpfFakeGameTes
         self.start_game()
         self.machine.game.player_list[0].score = 10000
         self.machine.game.player_list[0].loops = 100
-        self.machine.game.game_ending()
+        self.machine.game.end_game()
         self.advance_time_and_run()
         self.assertTrue(self.machine.modes.high_score.active)
 
@@ -52,18 +52,12 @@ class TestHighScoreMode(MpfIntegrationTestCase, MpfSlideTestCase, MpfFakeGameTes
         self.assertTextOnTopSlide("JAB")
 
         self.hit_and_release_switch("s_start")
-        self.advance_time_and_run(10)
-
-        self.assertTextOnTopSlide("PLAYER 1")
-        self.assertTextOnTopSlide("LOOP CHAMP")
-
-        self.assertTextOnTopSlide("A")
-        self.hit_and_release_switch("s_start")
-        self.hit_and_release_switch("s_start")
-        self.hit_and_release_switch("s_left_flipper")
-        self.hit_and_release_switch("s_start")
-        self.advance_time_and_run()
-        self.assertTextOnTopSlide("AA")
-
+        self.advance_time_and_run(.5)
+        self.assertTextOnTopSlide("GRAND CHAMPION")
+        self.assertTextOnTopSlide("JAB")
         self.advance_time_and_run(5)
+        self.assertTextOnTopSlide("LOOP CHAMP")
+        self.assertTextOnTopSlide("JAB")
+        self.advance_time_and_run(5)
+
         self.assertFalse(self.machine.modes.high_score.active)
