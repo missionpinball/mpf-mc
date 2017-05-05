@@ -9,8 +9,9 @@ from mpfmc.uix.widget import MpfWidget
 class Ellipse(MpfWidget, Widget):
 
     widget_type_name = 'Ellipse'
+    animation_properties = ('x', 'y', 'color', 'angle_start', 'angle_end', 'opacity')
 
-    def on_pos(self, *args):
+    def on_pos(self, *args) -> None:
         del args
 
         # TODO: refactor positioning to allow animation (don't use config settings)

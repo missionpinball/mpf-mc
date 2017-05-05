@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 class DisplayWidget(MpfWidget, RelativeLayout):
     widget_type_name = 'Display'
+    animation_properties = ('x', 'y')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
                  **kwargs: dict) -> None:

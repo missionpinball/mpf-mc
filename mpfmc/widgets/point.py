@@ -9,8 +9,9 @@ from mpfmc.uix.widget import MpfWidget
 class Point(MpfWidget, Widget):
 
     widget_type_name = 'Point'
+    animation_properties = ('x', 'y', 'pointsize', 'color', 'opacity')
 
-    def on_pos(self, *args):
+    def on_pos(self, *args) -> None:
         del args
 
         with self.canvas:

@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
 from kivy.uix.scatter import Scatter
 from kivy.properties import ObjectProperty, NumericProperty, AliasProperty
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 class ImageWidget(MpfWidget, Scatter):
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
+    animation_properties = ('x', 'y', 'rotation', 'scale', 'fps', 'current_frame', 'opacity')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
@@ -145,13 +146,13 @@ class ImageWidget(MpfWidget, Scatter):
     '''Number of loops to play then stop animating. -1 means keep animating.
     '''
 
-    def _get_fps(self) -> Optional[int]:
+    def _get_fps(self) -> Optional[float]:
         if self._image.image.anim_available:
             return int(1 / self._image.image.anim_delay)
         else:
             return None
 
-    def _set_fps(self, value: int):
+    def _set_fps(self, value: float):
         if value > 0:
             self._image.image.anim_delay = 1 / float(value)
         else:
@@ -165,7 +166,7 @@ class ImageWidget(MpfWidget, Scatter):
     def _get_current_frame(self) -> int:
         return self._image.image.anim_index + 1
 
-    def _set_current_frame(self, value: int):
+    def _set_current_frame(self, value: Union[int, float]):
         if not self._image.image.anim_available or not hasattr(self._image.image, 'textures'):
             return
 

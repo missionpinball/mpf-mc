@@ -1,6 +1,11 @@
 import re
+from typing import TYPE_CHECKING, Optional
+
 from kivy.uix.label import Label
 from mpfmc.uix.widget import MpfWidget
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
 
 
 class Text(MpfWidget, Label):
@@ -12,8 +17,10 @@ class Text(MpfWidget, Label):
                       'shorten', 'mipmap', 'markup', 'line_height',
                       'max_lines', 'strip', 'shorten_from', 'split_str',
                       'unicode_errors', 'color')
+    animation_properties = ('x', 'y', 'font_size', 'color', 'opacity')
 
-    def __init__(self, mc, config, key=None, play_kwargs=None, **kwargs):
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
+                 play_kwargs: Optional[dict]=None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
 
         self.original_text = self._get_text_string(config.get('text', ''))
@@ -25,14 +32,14 @@ class Text(MpfWidget, Label):
             self.event_replacements = kwargs
         self._process_text(self.original_text)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<Text Widget text={}>'.format(self.text)
 
-    def texture_update(self, *largs):
+    def texture_update(self, *largs) -> dict:
         super().texture_update(*largs)
         self.size = self.texture_size
 
-    def set_position(self):
+    def set_position(self) -> None:
         if self.config['anchor_y'] == 'baseline':
             try:
                 # TODO: refactor positioning to allow animation (don't use config settings)
@@ -54,12 +61,12 @@ class Text(MpfWidget, Label):
         else:
             super().set_position()
 
-    def update_kwargs(self, **kwargs):
+    def update_kwargs(self, **kwargs) -> None:
         self.event_replacements.update(kwargs)
 
         self._process_text(self.original_text)
 
-    def _get_text_string(self, text):
+    def _get_text_string(self, text: str) -> str:
         if '$' not in text:
             return text
 
@@ -69,17 +76,17 @@ class Text(MpfWidget, Label):
 
         return text
 
-    def _do_get_text_string(self, text_string):
+    def _do_get_text_string(self, text_string: str) -> str:
         try:
             return str(self.mc.machine_config['text_strings'][text_string])
         except KeyError:
             # if the text string is not found, put the $ back on
             return '${}'.format(text_string)
 
-    def _get_text_vars(self, text):
+    def _get_text_vars(self, text: str):
         return Text.var_finder.findall(text)
 
-    def _process_text(self, text):
+    def _process_text(self, text: str) -> None:
         for var_string in self._get_text_vars(text):
             if var_string in self.event_replacements:
                 text = text.replace('({})'.format(var_string),
@@ -91,7 +98,7 @@ class Text(MpfWidget, Label):
 
         self.update_vars_in_text(text)
 
-    def update_vars_in_text(self, text):
+    def update_vars_in_text(self, text: str) -> None:
         for var_string in self._get_text_vars(text):
             if var_string.startswith('machine|'):
                 try:
@@ -133,7 +140,7 @@ class Text(MpfWidget, Label):
 
         self.update_text(text)
 
-    def update_text(self, text):
+    def update_text(self, text: str) -> None:
         if text:
             if self.config['min_digits']:
                 text = text.zfill(self.config['min_digits'])
@@ -150,16 +157,16 @@ class Text(MpfWidget, Label):
         self.text = text
         self.texture_update()
 
-    def _player_var_change(self, **kwargs):
+    def _player_var_change(self, **kwargs) -> None:
         del kwargs
 
         self.update_vars_in_text(self.original_text)
 
-    def _machine_var_change(self, **kwargs):
+    def _machine_var_change(self, **kwargs) -> None:
         del kwargs
         self.update_vars_in_text(self.original_text)
 
-    def _setup_variable_monitors(self, text):
+    def _setup_variable_monitors(self, text: str) -> None:
         for var_string in self._get_text_vars(text):
             if '|' not in var_string:
                 self.add_player_var_handler(name=var_string)
@@ -176,24 +183,24 @@ class Text(MpfWidget, Label):
                 elif source.lower() == 'machine':
                     self.add_machine_var_handler(name=variable_name)
 
-    def add_player_var_handler(self, name):
+    def add_player_var_handler(self, name: str) -> None:
         self.mc.events.add_handler('player_{}'.format(name),
                                    self._player_var_change)
 
-    def add_current_player_handler(self):
+    def add_current_player_handler(self) -> None:
         self.mc.events.add_handler('player_turn_start',
                                    self._player_var_change)
 
-    def add_machine_var_handler(self, name):
+    def add_machine_var_handler(self, name: str) -> None:
         self.mc.events.add_handler('machine_var_{}'.format(name),
                                    self._machine_var_change)
 
-    def prepare_for_removal(self):
+    def prepare_for_removal(self) -> None:
         self.mc.events.remove_handler(self._player_var_change)
         self.mc.events.remove_handler(self._machine_var_change)
 
     @staticmethod
-    def group_digits(text, separator=',', group_size=3):
+    def group_digits(text: str, separator: str=',', group_size: int=3) -> str:
         """Enables digit grouping (i.e. adds comma separators between
         thousands digits).
 

@@ -10,8 +10,9 @@ from mpfmc.uix.widget import MpfWidget
 class Rectangle(MpfWidget, Widget):
 
     widget_type_name = 'Rectangle'
+    animation_properties = ('x', 'y', 'color', 'opacity', 'corner_radius')
 
-    def on_pos(self, *args):
+    def on_pos(self, *args) -> None:
         del args
 
         # TODO: refactor positioning to allow animation (don't use config settings)

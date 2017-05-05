@@ -10,8 +10,9 @@ from mpfmc.uix.widget import MpfWidget
 class Line(MpfWidget, Widget):
 
     widget_type_name = 'Line'
+    animation_properties = ('x', 'y', 'color', 'opacity')
 
-    def on_pos(self, *args):
+    def on_pos(self, *args) -> None:
         del args
 
         with self.canvas:

@@ -1,16 +1,19 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from kivy.graphics import Line as KivyLine
 from kivy.graphics.context_instructions import Color
 from kivy.properties import (ListProperty, NumericProperty, OptionProperty,
                              BooleanProperty)
 from kivy.uix.widget import Widget
 from mpfmc.uix.widget import MpfWidget
-from mpfmc.core.mc import MpfMc
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
 
 
 class Bezier(MpfWidget, Widget):
 
     widget_type_name = 'Bezier'
+    animation_properties = ('x', 'y', 'color', 'thickness', 'opacity')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         del kwargs

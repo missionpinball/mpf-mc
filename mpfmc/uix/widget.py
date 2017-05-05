@@ -140,6 +140,9 @@ class MpfWidget(object):
 
     merge_settings = tuple()
 
+    animation_properties = list()
+    """List of properties for this widget that may be animated using widget animations."""
+
     def __init__(self, mc: "MpfMc", config: Optional[dict]=None,
                  key: Optional[str]=None, **kwargs) -> None:
         del kwargs
@@ -510,6 +513,12 @@ class MpfWidget(object):
         for settings in animation_list:
             prop_dict = dict()
             for prop, val in zip(settings['property'], settings['value']):
+                if prop not in self.animation_properties:
+                    self.mc.log.warning("%s widgets do not support animation "
+                                        "for the % property (will be ignored)",
+                                        self.widget_type_name, prop)
+                    continue
+
                 try:
                     val = percent_to_float(val, self._percent_prop_dicts[prop])
                 except KeyError:

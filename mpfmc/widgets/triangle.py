@@ -8,8 +8,9 @@ from mpfmc.uix.widget import MpfWidget
 class Triangle(MpfWidget, Widget):
 
     widget_type_name = 'Triangle'
+    animation_properties = ('x', 'y')
 
-    def on_pos(self, *args):
+    def on_pos(self, *args) -> None:
         del args
 
         with self.canvas:

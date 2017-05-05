@@ -1,14 +1,23 @@
+from typing import TYPE_CHECKING, Optional
+
 from kivy.uix.video import Video
 from kivy.core.video import Video as CoreVideo
 
 from mpfmc.uix.widget import MpfWidget, magic_events
 
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
+    from kivy.graphics.texture import Texture
+
 
 class VideoWidget(MpfWidget, Video):
     widget_type_name = 'Video'
     merge_settings = ('height', 'width')
+    animation_properties = ('x', 'y')
 
-    def __init__(self, mc, config, key=None, **kwargs):
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+        del kwargs
+
         super().__init__(mc=mc, config=config, key=key)
 
         try:
@@ -37,7 +46,7 @@ class VideoWidget(MpfWidget, Video):
         else:
             self._do_video_load()
 
-    def __repr__(self):  # pragma: no cover
+    def __repr__(self) -> str:  # pragma: no cover
         try:
             return '<Video name={}, size={}, pos={}>'.format(self.video.name,
                                                              self.size,
@@ -46,7 +55,7 @@ class VideoWidget(MpfWidget, Video):
             return '<Video (loading...), size={}, pos={}>'.format(self.size,
                                                                   self.pos)
 
-    def _setup_control_events(self, event_list):
+    def _setup_control_events(self, event_list: list) -> None:
         for entry in event_list:
 
             kwargs = dict()
@@ -85,71 +94,71 @@ class VideoWidget(MpfWidget, Video):
                     self.mc.events.add_handler(entry['event'], handler,
                                                **kwargs))
 
-    def on_add_to_slide(self, dt):
+    def on_add_to_slide(self, dt) -> None:
         super().on_add_to_slide(dt)
         for handler, kwargs in self._registered_magic_events['add_to_slide']:
             handler(**kwargs)
 
-    def on_remove_from_slide(self):
+    def on_remove_from_slide(self) -> None:
         super().on_remove_from_slide()
         for handler, kwargs in self._registered_magic_events[
                 'remove_from_slide']:
             handler(**kwargs)
 
-    def on_pre_show_slide(self):
+    def on_pre_show_slide(self) -> None:
         super().on_pre_show_slide()
         for handler, kwargs in self._registered_magic_events['pre_show_slide']:
             handler(**kwargs)
 
-    def on_show_slide(self):
+    def on_show_slide(self) -> None:
         super().on_show_slide()
         for handler, kwargs in self._registered_magic_events['show_slide']:
             handler(**kwargs)
 
-    def on_pre_slide_leave(self):
+    def on_pre_slide_leave(self) -> None:
         super().on_pre_slide_leave()
         for handler, kwargs in self._registered_magic_events[
                 'pre_slide_leave']:
             handler(**kwargs)
 
-    def on_slide_leave(self):
+    def on_slide_leave(self) -> None:
         super().on_slide_leave()
         for handler, kwargs in self._registered_magic_events['slide_leave']:
             handler(**kwargs)
 
-    def on_slide_play(self):
+    def on_slide_play(self) -> None:
         super().on_slide_play()
         for handler, kwargs in self._registered_magic_events['slide_play']:
             handler(**kwargs)
 
-    def play(self, **kwargs):
+    def play(self, **kwargs) -> None:
         del kwargs
         self.video.play()
         self.state = 'play'
 
-    def pause(self, **kwargs):
+    def pause(self, **kwargs) -> None:
         del kwargs
         self.video.pause()
         self.state = 'pause'
 
-    def stop(self, **kwargs):
+    def stop(self, **kwargs) -> None:
         del kwargs
         self.video.stop()
         self.state = 'stop'
 
-    def seek(self, percent, **kwargs):
+    def seek(self, percent, **kwargs) -> None:
         del kwargs
         super().seek(percent)
 
-    def set_volume(self, volume, **kwargs):
+    def set_volume(self, volume, **kwargs) -> None:
         del kwargs
         self.volume = volume
 
-    def set_playback_position(self, position, **kwargs):
+    def set_playback_position(self, position: int, **kwargs) -> None:
         del kwargs
         super().seek(position / self.duration)
 
-    def _do_video_load(self, *largs):
+    def _do_video_load(self, *largs) -> None:
         # Overrides a method in the base Kivy Video widget. It's basically
         # copied and pasted from there, with the change that this method pulls
         # the video object from the MPF asset versus loading from a file and
@@ -188,7 +197,7 @@ class VideoWidget(MpfWidget, Video):
 
         self.video.set_end_behavior(self.config['end_behavior'])
 
-    def on_texture(self, instance, value):
+    def on_texture(self, instance, value: "Texture") -> None:
         # Overrides the base method to put the size into self.size instead of
         # self.texture_size
         del instance
@@ -199,7 +208,7 @@ class VideoWidget(MpfWidget, Video):
             else:
                 self.size = list(value.size)
 
-    def prepare_for_removal(self):
+    def prepare_for_removal(self) -> None:
         super().prepare_for_removal()
         self.mc.events.remove_handlers_by_keys(self._control_events)
         self._control_events = list()
