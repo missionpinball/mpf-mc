@@ -112,7 +112,6 @@ class TestSlides(MpfMcTestCase):
         self.advance_time()
 
     def test_two_slides_in_one_tick(self):
-        self.mc.events.add_handler('slide_slide2_active', self.slide2_active)
         self.mock_event('slide_slide1_active')
         self.mock_event('slide_slide2_active')
 
@@ -122,6 +121,3 @@ class TestSlides(MpfMcTestCase):
 
         self.assertEventNotCalled('slide_slide1_active')
         self.assertEventCalled('slide_slide2_active', 1)
-
-    def slide2_active(self, **kwargs):
-        pass
