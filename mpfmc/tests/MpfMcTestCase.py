@@ -1,4 +1,3 @@
-import logging
 import os
 import sys
 import unittest
@@ -6,10 +5,11 @@ import unittest
 os.environ['KIVY_NO_FILELOG'] = '1'
 os.environ['KIVY_NO_CONSOLELOG'] = '1'
 
-from kivy.base import EventLoop, stopTouchApp
-from kivy.clock import Clock
-from kivy.config import Config
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
+from kivy import Config, Logger
+from kivy.base import runTouchApp, stopTouchApp, EventLoop
+from kivy.clock import Clock
+from kivy.uix.widget import Widget
 
 import mpfmc
 from mpf.core.config_processor import ConfigProcessor
@@ -34,6 +34,11 @@ class MpfMcTestCase(unittest.TestCase):
         self._events = dict()
         self._last_event_kwargs = dict()
         self.max_test_setup_secs = 30
+
+        self._fps = 30
+
+    def _mc_time(self):
+        return self._current_time
 
     def get_options(self):
         return dict(machine_path=self.get_machine_path(),
@@ -81,12 +86,19 @@ class MpfMcTestCase(unittest.TestCase):
                     continue
 
     def advance_time(self, secs=.1):
-        start = time()
-        self.mc.events.process_event_queue()
-        while time() < start + secs:
-            sleep(.01)
-            self.mc.events.process_event_queue()
+        start = self._current_time
+        while self._current_time < start + secs:
             EventLoop.idle()
+            self._current_time += 1 / self._fps
+
+    def advance_real_time(self, secs=.1):
+        start = self._current_time
+        while self._current_time < start + secs:
+            EventLoop.idle()
+            sleep(1 / self._fps)
+            self._current_time += 1 / self._fps
+
+        EventLoop.idle()
 
     def get_pixel_color(self, x, y):
         """Returns a binary string of the RGB bytes that make up the slide
@@ -110,12 +122,8 @@ class MpfMcTestCase(unittest.TestCase):
 
         return glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
 
-    def setUp(self):
-        # Most of the setup is done in run(). Explanation is there.
-        Config._named_configs.pop('app', None)
-
     def tearDown(self):
-        stopTouchApp()
+        self.mc.stop()
 
     def patch_bcp(self):
         # used internally
@@ -134,23 +142,20 @@ class MpfMcTestCase(unittest.TestCase):
         self.orig_bcp_send(bcp_command=bcp_command, callback=callback,
                            **kwargs)
 
-    def run(self, name):
-        Clock._events = [[] for i in range(256)]
-        self._test_started = time()
-        self._test_name = self.id()
-        self._test = name
-        # This setup is done in run() because we need to give control to the
-        # kivy event loop which we can only do by returning from the run()
-        # that's called. So we override run() and setup mpf-mc and then call
-        # our own run_test() on a callback. Then we can wait until the
-        # environment is setup (which can take a few frames), then we call
-        # super().run() to get the actual TestCase.run() method to run and
-        # we return the results.
+    def setUp(self):
+        # Most of the setup is done in run(). Explanation is there.
+        Config._named_configs.pop('app', None)
 
-        # We have to do this in run() and not setUp() because run actually
-        # calls setUp(), so since we were overriding it ours doesn't call it
-        # so we just do our setup here since if we manually called setUp() then
-        # it would be called again when we call super().run().
+        self._start_time = time()
+        self._current_time = self._start_time
+        Clock._start_tick = self._start_time
+        Clock._last_tick = self._start_time
+        Clock.time = self._mc_time
+
+        # prevent sleep in clock
+        Clock._max_fps = 0
+        Clock._events = [[] for i in range(256)]
+        self._test_started = self._start_time
 
         from mpf.core.player import Player
         Player.monitor_enabled = False
@@ -177,8 +182,46 @@ class MpfMcTestCase(unittest.TestCase):
         Window.create_window()
         Window.canvas.clear()
 
-        Clock.schedule_once(self.run_test, 0)
-        self.mc.run()
+        self._start_app_as_slave()
+
+    def _start_app_as_slave(self):
+        # from app::run
+        if not self.mc.built:
+            self.mc.load_config()
+            self.mc.load_kv(filename=self.mc.kv_file)
+            root = self.mc.build()
+            if root:
+                self.mc.root = root
+        if self.mc.root:
+            if not isinstance(self.mc.root, Widget):
+                Logger.critical('App.root must be an _instance_ of Widget')
+                raise Exception('Invalid instance in App.root')
+            from kivy.core.window import Window
+            Window.add_widget(self.mc.root)
+
+        # Check if the window is already created
+        from kivy.base import EventLoop
+        window = EventLoop.window
+        if window:
+            self.mc._app_window = window
+            #window.set_title(self.mc.get_application_name() + self._testMethodName)
+            icon = self.mc.get_application_icon()
+            if icon:
+                window.set_icon(icon)
+            self.mc._install_settings_keys(window)
+        else:
+            Logger.critical("Application: No window is created."
+                            " Terminating application run.")
+            return
+
+        self.mc.dispatch('on_start')
+        runTouchApp(slave=True)  # change is here
+
+        while not self.mc.is_init_done.is_set():
+            EventLoop.idle()
+
+        # set a nice title
+        window.set_title(self.__class__.__name__ + "::" + self._testMethodName)
 
     def dump_clock(self):
         print("---------")
@@ -191,20 +234,6 @@ class MpfMcTestCase(unittest.TestCase):
 
         for event in events:
             print(event.get_callback(), event.timeout)
-
-    def run_test(self, dt):
-        # set the title bar, just for fun. :)
-        self.mc.title = str(self._test_name)
-
-        if not self.mc.is_init_done.is_set():
-            if self._test_started + self.max_test_setup_secs < time():
-                self.dump_clock()
-                self.fail("Test setup took more than {} seconds.".format(
-                    self.max_test_setup_secs))
-            Clock.schedule_once(self.run_test, 0)
-            return
-
-        return super().run(self._test)
 
     def _mock_event_handler(self, event_name, **kwargs):
         self._last_event_kwargs[event_name] = kwargs

@@ -25,6 +25,6 @@ class TestAudioDefaultSettings(MpfMcTestCase):
         self.assertIsNotNone(self.mc.sound_system.audio_interface)
         settings = self.mc.sound_system.audio_interface.get_settings()
         self.assertIsNotNone(settings)
-        self.assertEqual(settings['buffer_samples'], 2048)
+        self.assertIn(settings['buffer_samples'], [1024, 2048])
         self.assertEqual(settings['audio_channels'], 1)
         self.assertEqual(settings['sample_rate'], 44100)

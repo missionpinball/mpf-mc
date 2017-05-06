@@ -10,7 +10,7 @@ class TestText(MpfMcTestCase):
 
     def test_text_input(self):
         self.mc.events.post('slide1')
-        self.advance_time()
+        self.advance_time(1)
 
         text_input_widget = (
             self.mc.targets['default'].current_slide.children[0].children[1])
