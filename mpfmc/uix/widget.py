@@ -512,23 +512,52 @@ class MpfWidget(object):
 
         for settings in animation_list:
             prop_dict = dict()
-            for prop, val in zip(settings['property'], settings['value']):
+            values_needed = dict()
+            values = settings['value'].copy()
+
+            # Some properties that can be animated contain more than single values
+            # (such as color). Need to ensure there are the correct number of
+            # values for the properties to animate.
+            values_needed_total = 0
+            for prop in settings['property']:
+                if isinstance(getattr(self, prop), list):
+                    values_needed[prop] = len(getattr(self, prop))
+                    values_needed_total += values_needed[prop]
+                else:
+                    values_needed[prop] = 1
+                    values_needed_total += 1
+
+            if len(settings['value']) != values_needed_total:
+                self.mc.log.warning("There is a mismatch between the number of values "
+                                    "available and the number of values required to animate "
+                                    "the following properties in the %s widget: %s "
+                                    "(animation will be ignored).",
+                                    self.widget_type_name, settings['property'])
+                continue
+
+            for prop in settings['property']:
                 if prop not in self.animation_properties:
                     self.mc.log.warning("%s widgets do not support animation "
-                                        "for the % property (will be ignored)",
+                                        "for the %s property (animation will be ignored)",
                                         self.widget_type_name, prop)
                     continue
 
-                try:
-                    val = percent_to_float(val, self._percent_prop_dicts[prop])
-                except KeyError:
-                    # because widget properties can include a % sign, they are
-                    # all strings, so even ones that aren't on the list to look
-                    # for percent signs have to be converted to numbers.
-                    if '.' in val:
-                        val = float(val)
-                    else:
-                        val = int(val)
+                if values_needed[prop] > 1:
+                    val = [float(x) for x in values[:values_needed[prop]]]
+                    del values[:values_needed[prop]]
+                else:
+                    val = values[0]
+                    del values[0]
+                    try:
+                        val = percent_to_float(val, self._percent_prop_dicts[prop])
+                    except KeyError:
+                        # because widget properties can include a % sign, they are
+                        # all strings, so even ones that aren't on the list to look
+                        # for percent signs have to be converted to numbers.
+                        if '.' in val:
+                            val = float(val)
+                        else:
+                            val = int(val)
 
                 prop_dict[prop] = val
 
