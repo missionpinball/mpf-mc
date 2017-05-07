@@ -116,6 +116,30 @@ widgets:
   widget10:
     type: text
     text: (text)
+  widget_bezier:
+    - type: bezier
+      points: 400, 300, 100, 100, 400, 0
+      color: red
+      thickness: 5
+      animations:
+        add_to_slide:
+          - property: color, points
+            value: 0, 1, 0, 1, 200, 200, 50, 100, 100, 250
+            duration: 2s
+          - property: rotation
+            value: 360
+            duration: 2s
+            timing: with_previous
+          - property: color
+            value: 0, 0, 1, 1
+            duration: 1s
+          - property: color
+            value: 1, 1, 0, 1
+            duration: 1s
+  widget_ellipse:
+    - type: ellipse
+      width: 100
+      height: 50
 
 widget_player:
   add_widget1_to_current: widget1
@@ -232,6 +256,8 @@ widget_player:
   show_widget10:
     widget10:
       action: add
+  show_bezier_widget: widget_bezier
+  show_ellipse_widget: widget_ellipse
 
 slide_player:
   show_slide_1:

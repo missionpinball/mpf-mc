@@ -805,3 +805,12 @@ class TestWidget(MpfMcTestCase):
         self.assertEqual(widget2.font_size, 100)
         self.assertEqual(widget1.color, [1.0, 1.0, 0.0, 1])
         self.assertEqual(widget2.color, [1.0, 0.0, 0.0, 1])
+
+    def test_animation_properties_from_widget_player(self):
+        self.mc.events.post('show_bezier_widget')
+        self.mc.events.post('show_ellipse_widget')
+        self.advance_time(4.1)
+        bezier_widget = self.mc.targets[
+            'default'].current_slide.widgets[0]
+        self.assertEqual(bezier_widget.color, [1, 1, 0, 1])
+        self.advance_time(1)
