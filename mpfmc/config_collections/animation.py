@@ -39,10 +39,11 @@ class AnimationCollection(ConfigCollection):
             self.mc.config_validator.validate_config('widgets:animations',
                                                      config)
 
-            if len(config['property']) != len(config['value']):
-                raise ValueError('Animation "property" list ({}) is not the '
-                                 'same length as the "end" list ({}).'.
-                                 format(config['property'], config['end']))
+            if len(config['property']) > len(config['value']):
+                raise ValueError('Animation must have at least the same number of settings '
+                                 'in its "value" list ({}) as the number settings '
+                                 'in its "property" list ({}).'.
+                                 format(config['value'], config['property']))
 
         return config
 
