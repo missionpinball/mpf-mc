@@ -1,3 +1,5 @@
+import time
+
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
@@ -72,6 +74,7 @@ class TestAssets(MpfMcTestCase):
         # Make sure all the assets are loaded. Wait if not
         while (self.mc.asset_manager.num_assets_to_load <
                    self.mc.asset_manager.num_assets_loaded):
+            time.sleep(.1)
             self.advance_time()
 
         # Need to wait a bit since the loading was a separate thread
@@ -141,8 +144,11 @@ class TestAssets(MpfMcTestCase):
 
         # Give it a second to load. This file is tiny, so it shouldn't take
         # this long
+        time.sleep(.001)
+        self.advance_time(.1)
         for x in range(10):
             if not self.mc.images['image9'].loaded or not self.mc.images['image6'].loaded:
+                time.sleep(.1)
                 self.advance_time(.1)
 
         self.assertTrue(self.mc.images['image9'].loaded)
