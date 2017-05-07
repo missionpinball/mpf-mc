@@ -3,22 +3,29 @@ from kivy.graphics import Line as KivyLine
 from kivy.graphics.context_instructions import Color
 from kivy.properties import (ListProperty, NumericProperty, OptionProperty,
                              BooleanProperty)
-from kivy.uix.widget import Widget
+from kivy.uix.scatter import Scatter
 from mpfmc.uix.widget import MpfWidget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Bezier(MpfWidget, Widget):
+class Bezier(MpfWidget, Scatter):
 
     widget_type_name = 'Bezier'
-    animation_properties = ('x', 'y', 'color', 'thickness', 'opacity')
+    animation_properties = ('x', 'y', 'color', 'thickness', 'opacity', 'points', 'rotation', 'scale')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 
+        self.rotation = config.get('rotation', 0)
+        self.scale = config.get('scale', 1.0)
+
+        self._draw_widget()
+
+    def _draw_widget(self):
+        self.canvas.clear()
         with self.canvas:
             Color(*self.color)
             KivyLine(bezier=self.points,
@@ -29,6 +36,18 @@ class Bezier(MpfWidget, Widget):
                      joint_precision=self.joint_precision,
                      close=self.close,
                      bezier_precision=self.precision)
+
+    def on_thickness(self, *args):
+        del args
+        self._draw_widget()
+
+    def on_color(self, *args):
+        del args
+        self._draw_widget()
+
+    def on_points(self, *args):
+        del args
+        self._draw_widget()
 
     #
     # Properties
