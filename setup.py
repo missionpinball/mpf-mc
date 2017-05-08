@@ -481,7 +481,7 @@ else:
 
 install_requires = ['ruamel.yaml>=0.10,<0.11',  # better YAML library
                     'mpf>={}'.format(mpf_version),
-                    'kivy>=1.9.1',
+                    'kivy>=1.10.0',
                     'psutil',
                     'pygments',  # YAML syntax formatting for the iMC
                     ]
