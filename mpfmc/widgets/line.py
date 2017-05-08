@@ -10,11 +10,13 @@ from mpfmc.uix.widget import MpfWidget
 class Line(MpfWidget, Widget):
 
     widget_type_name = 'Line'
-    animation_properties = ('x', 'y', 'color', 'opacity')
+    animation_properties = ('x', 'y', 'points', 'thickness', 'color', 'opacity')
 
     def on_pos(self, *args) -> None:
         del args
 
+    def _draw_widget(self):
+        self.canvas.clear()
         with self.canvas:
             Color(*self.color)
             KivyLine(points=self.points,
@@ -24,6 +26,29 @@ class Line(MpfWidget, Widget):
                      cap_precision=self.cap_precision,
                      joint_precision=self.joint_precision,
                      close=self.close)
+
+    def on_parent(self, instance, parent):
+        del instance
+        self.pos = self.calculate_position(parent.width,
+                                           parent.height,
+                                           self.width, self.height,
+                                           self.config['x'],
+                                           self.config['y'],
+                                           self.config['anchor_x'],
+                                           self.config['anchor_y'],
+                                           self.config['adjust_top'],
+                                           self.config['adjust_right'],
+                                           self.config['adjust_bottom'],
+                                           self.config['adjust_left'])
+        self._draw_widget()
+
+    def on_points(self, *args):
+        del args
+        self._draw_widget()
+
+    def on_thickness(self, *args):
+        del args
+        self._draw_widget()
 
     #
     # Properties

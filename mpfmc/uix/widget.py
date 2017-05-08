@@ -282,33 +282,22 @@ class MpfWidget(object):
         if not found and not force_default:
             self._apply_style(force_default=True)
 
-    def on_size(self, *args) -> None:
-        """Kivy event handler called when the widget size attribute changes."""
-        del args
-        self.set_position()
-
-    def on_pos(self, *args) -> None:
-        """Kivy event handler called when the widget pos attribute changes."""
-        del args
-
-        # some attributes can be expressed in percentages. This dict holds
-        # those, key is attribute name, val is max value
-        try:
-            self._percent_prop_dicts = dict(x=self.parent.width,
-                                            y=self.parent.height,
-                                            width=self.parent.width,
-                                            height=self.parent.height,
+    def on_parent(self, instance, parent: "Widget") -> None:
+        """Set the widget position based on various settings."""
+        if parent:
+            # some attributes can be expressed in percentages. This dict holds
+            # those, key is attribute name, val is max value
+            self._percent_prop_dicts = dict(x=parent.width,
+                                            y=parent.height,
+                                            width=parent.width,
+                                            height=parent.height,
                                             opacity=1,
                                             line_height=1)
-        except AttributeError:
-            pass
 
-    def set_position(self) -> None:
-        """Set the widget position based on various settings."""
-        try:
-            self.pos = self.calculate_position(self.parent.width,
-                                               self.parent.height,
-                                               self.width, self.height,
+            self.pos = self.calculate_position(parent.width,
+                                               parent.height,
+                                               self.width,
+                                               self.height,
                                                self.config['x'],
                                                self.config['y'],
                                                self.config['anchor_x'],
@@ -318,8 +307,6 @@ class MpfWidget(object):
                                                self.config['adjust_bottom'],
                                                self.config['adjust_left'])
 
-        except AttributeError:
-            pass
 
     # pylint: disable-msg=too-many-arguments
     # pylint: disable-msg=too-many-statements

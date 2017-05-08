@@ -1,33 +1,36 @@
 from typing import TYPE_CHECKING, Optional
 from kivy.graphics import Line as KivyLine
-from kivy.graphics.context_instructions import Color
+from kivy.graphics.context_instructions import Color, Rotate, Scale, PushMatrix, PopMatrix
 from kivy.properties import (ListProperty, NumericProperty, OptionProperty,
                              BooleanProperty)
-from kivy.uix.scatter import Scatter
+from kivy.uix.widget import Widget
 from mpfmc.uix.widget import MpfWidget
+from mpfmc.core.utils import center_of_points_list
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Bezier(MpfWidget, Scatter):
+class Bezier(MpfWidget, Widget):
 
     widget_type_name = 'Bezier'
-    animation_properties = ('x', 'y', 'color', 'thickness', 'opacity', 'points', 'rotation', 'scale')
+    animation_properties = ('color', 'thickness', 'opacity', 'points', 'rotation', 'scale')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
-
-        self.rotation = config.get('rotation', 0)
-        self.scale = config.get('scale', 1.0)
-
         self._draw_widget()
 
-    def _draw_widget(self):
+    def _draw_widget(self) -> None:
+        """Establish the drawing instructions for the widget."""
+        center = center_of_points_list(self.points)
         self.canvas.clear()
+        with self.canvas.before:
+            PushMatrix()
         with self.canvas:
             Color(*self.color)
+            Scale(self.scale, origin=center)
+            Rotate(angle=self.rotation, origin=center)
             KivyLine(bezier=self.points,
                      width=self.thickness,
                      cap=self.cap,
@@ -36,6 +39,8 @@ class Bezier(MpfWidget, Scatter):
                      joint_precision=self.joint_precision,
                      close=self.close,
                      bezier_precision=self.precision)
+        with self.canvas.after:
+            PopMatrix()
 
     def on_thickness(self, *args):
         del args
@@ -46,6 +51,14 @@ class Bezier(MpfWidget, Scatter):
         self._draw_widget()
 
     def on_points(self, *args):
+        del args
+        self._draw_widget()
+
+    def on_rotation(self, *args):
+        del args
+        self._draw_widget()
+
+    def on_scale(self, *args):
         del args
         self._draw_widget()
 
@@ -60,7 +73,7 @@ class Bezier(MpfWidget, Scatter):
     defaults to [1.0, 1.0, 1.0, 1.0].
     '''
 
-    points = ListProperty()
+    points = ListProperty([0, 0])
     '''The list of points to use to draw the widget in (x1, y1, x2, y2...)
     format.
 
@@ -101,6 +114,20 @@ class Bezier(MpfWidget, Scatter):
 
     :attr:`thickness` is a :class:`~kivy.properties.NumericProperty` and defaults
     to 1.0.
+    '''
+
+    rotation = NumericProperty(0)
+    '''Rotation angle value of the widget.
+
+    :attr:`rotation` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    0.
+    '''
+
+    scale = NumericProperty(1.0)
+    '''Scale value of the widget.
+
+    :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    1.0.
     '''
 
 widget_classes = [Bezier]

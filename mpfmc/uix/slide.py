@@ -183,8 +183,6 @@ class Slide(Screen, StencilView):
                 top_widget = top_widget.parent
 
             self.add_widget(top_widget)
-
-            widget_obj.set_position()
             widgets_added.append(widget_obj)
 
         return widgets_added
@@ -224,8 +222,6 @@ class Slide(Screen, StencilView):
         # Insert the widget in the proper position in the z-order
         super().add_widget(widget, bisect(self.children, widget))
 
-        widget.set_position()
-
     def remove_widgets_by_key(self, key: str) -> None:
         """Removes all widgets from this slide with the specified key value."""
         for widget in self.find_widgets_by_key(key):
@@ -250,8 +246,6 @@ class Slide(Screen, StencilView):
         """
         # TODO: Determine proper z-order for negative z-order values
         self.manager.parent.add_widget(widget)
-
-        # TODO: Do we need to call widget.set_position() here as well?
 
     def schedule_removal(self, secs: float) -> None:
         """Schedules the removal of this slide after the specified number of seconds elapse."""
