@@ -22,7 +22,7 @@ class RelativeAnimation(Animation):
             original_value = getattr(widget, key)
             if isinstance(original_value, (tuple, list)):
                 original_value = original_value[:]
-                target_value = map(lambda x, y: x + y, original_value, value)
+                target_value = [x + y for x, y in zip(original_value, value)]
             elif isinstance(original_value, dict):
                 original_value = original_value.copy()
                 target_value = value
