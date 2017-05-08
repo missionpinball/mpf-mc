@@ -51,3 +51,15 @@ def load_machine_config(config_file_list, machine_path,
             ConfigProcessor.load_config_file(config_file, 'machine', ignore_unknown_sections=True))
 
     return machine_config
+
+
+def center_of_points_list(points: list) -> tuple:
+    """Calculates the center (average) of points in a list."""
+
+    # Extract all x coordinates from list of points (odd list positions)
+    coordinates_x = points[::2]
+
+    # Extract all y coordinates from list of points (even list positions)
+    coordinates_y = points[1::2]
+
+    return sum(coordinates_x) / len(coordinates_x), sum(coordinates_y) / len(coordinates_y)
