@@ -42,7 +42,7 @@ class MpfTextInput(Text):
         self.char_list.append('back')
         self.char_list.append('end')
 
-        Clock.schedule_once(self.find_linked_text_widget, .1)
+        Clock.schedule_once(self.find_linked_text_widget)
 
     def __repr__(self) -> str:
         try:
