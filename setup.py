@@ -9,6 +9,7 @@ import os
 from os.path import join, dirname, sep, exists, basename, isdir
 from os import walk, environ
 from distutils.version import LooseVersion
+from distutils.sysconfig import get_python_inc
 from collections import OrderedDict
 from time import sleep
 from setuptools import setup, Extension
@@ -50,7 +51,7 @@ def getoutput(cmd, env=None):
 def pkgconfig(*packages, **kw):
     flag_map = {'-I': 'include_dirs', '-L': 'library_dirs', '-l': 'libraries'}
     lenviron = None
-    pconfig = join(dirname(sys.executable), 'libs', 'pkgconfig')
+    pconfig = join(sys.prefix, 'libs', 'pkgconfig')
 
     if isdir(pconfig):
         lenviron = environ.copy()
@@ -103,6 +104,7 @@ for key in list(c_options.keys()):
 # -----------------------------------------------------------------------------
 # Cython check
 #
+
 cython_unsupported_append = '''
 
   Please note that the following versions of Cython are not supported
@@ -151,26 +153,30 @@ cython_unsupported = '''\
 
 have_cython = False
 skip_cython = False
-try:
-    # check for cython
-    from Cython.Distutils import build_ext
-    have_cython = True
-    import Cython
-    cy_version_str = Cython.__version__
-    cy_ver = LooseVersion(cy_version_str)
-    print('\nDetected Cython version {}'.format(cy_version_str))
-    if cy_ver < MIN_CYTHON_VERSION:
-        print(cython_min)
-        raise ImportError('Incompatible Cython Version')
-    if cy_ver in CYTHON_UNSUPPORTED:
-        print(cython_unsupported)
-        raise ImportError('Incompatible Cython Version')
-    if cy_ver > MAX_CYTHON_VERSION:
-        print(cython_max)
-        sleep(1)
-except ImportError:
-    print('\nCython is missing, its required for compiling mpfmc !\n\n')
-    raise
+if platform in ('ios', 'android'):
+    print('\nCython check avoided.')
+    skip_cython = True
+else:
+    try:
+        # check for cython
+        from Cython.Distutils import build_ext
+        have_cython = True
+        import Cython
+        cy_version_str = Cython.__version__
+        cy_ver = LooseVersion(cy_version_str)
+        print('\nDetected Cython version {}'.format(cy_version_str))
+        if cy_ver < MIN_CYTHON_VERSION:
+            print(cython_min)
+            raise ImportError('Incompatible Cython Version')
+        if cy_ver in CYTHON_UNSUPPORTED:
+            print(cython_unsupported)
+            raise ImportError('Incompatible Cython Version')
+        if cy_ver > MAX_CYTHON_VERSION:
+            print(cython_max)
+            sleep(1)
+    except ImportError:
+        print("\nCython is missing, it's required for compiling kivy !\n\n")
+        raise
 
 if not have_cython:
     from distutils.command.build_ext import build_ext
@@ -357,6 +363,9 @@ def determine_base_flags():
                        'ApplicationServices.framework/Frameworks')
         flags['extra_compile_args'] += ['-F%s' % sysroot]
         flags['extra_link_args'] += ['-F%s' % sysroot]
+    elif platform == 'win32':
+        flags['include_dirs'] += [get_python_inc(prefix=sys.prefix)]
+        flags['library_dirs'] += [join(sys.prefix, "libs")]
     return flags
 
 
@@ -375,21 +384,23 @@ def determine_sdl2():
     sdl2_paths = sdl2_path.split(split_chr) if sdl2_path else []
 
     if not sdl2_paths:
-        sdl_inc = join(dirname(sys.executable), 'include', 'SDL2')
+        sdl_inc = join(sys.prefix, 'include', 'SDL2')
         if isdir(sdl_inc):
             sdl2_paths = [sdl_inc]
         sdl2_paths.extend(['/usr/local/include/SDL2', '/usr/include/SDL2'])
 
     flags['include_dirs'] = sdl2_paths
-
     flags['extra_link_args'] = []
     flags['extra_compile_args'] = []
-    flags['extra_link_args'] += (
-        ['-L' + p for p in sdl2_paths] if sdl2_paths else
-        ['-L/usr/local/lib/'])
+    flags['library_dirs'] = (
+        sdl2_paths if sdl2_paths else
+        ['/usr/local/lib/'])
+
+    if sdl2_flags:
+        flags = merge(flags, sdl2_flags)
 
     # ensure headers for all the SDL2 library is available
-    libs_to_check = ['SDL',]
+    libs_to_check = ['SDL', 'SDL_mixer']
     can_compile = True
     for lib in libs_to_check:
         found = False
