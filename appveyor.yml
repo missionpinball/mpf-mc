@@ -200,6 +200,12 @@ test_script:
     }
 
     if ($env:DO_TEST -eq "True"){
+      echo "Installing MPF-MC..."
+
+      cd $env:APPVEYOR_BUILD_FOLDER
+
+      python -m pip install .
+
       echo "Running tests..."
       $env:KIVY_GL_BACKEND = "angle_sdl2"
       python -m unittest discover -s mpfmc/tests
