@@ -82,6 +82,10 @@ build_script:
 
     Check-Error
 
+    python -m pip install -U gitpython
+
+    Check-Error
+
     cd build_scripts
 
     python calculate_mpf_branch.py
@@ -154,7 +158,7 @@ build_script:
 
     pip install kivy.deps.angle
 
-    Copy-Item "$PYTHON_ROOT\Lib\site-packages\kivy\deps\*" -destination "$env:APPVEYOR_BUILD_FOLDER\kivy\deps" -recurse
+    Copy-Item "$PYTHON_ROOT\Lib\site-packages\kivy\deps\*" -destination "$env:APPVEYOR_BUILD_FOLDER\kivy\deps\" -recurse
 
     Remove-Item "$PYTHON_ROOT\Lib\site-packages\kivy" -Force -Recurse
 
