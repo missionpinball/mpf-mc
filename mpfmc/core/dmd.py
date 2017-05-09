@@ -158,7 +158,7 @@ class Dmd(DmdBase):
 
     def send(self, data: bytes) -> None:
         """Send data to DMD via BCP."""
-        data = self._convert_to_single_bytes(data)
+        data = self._convert_to_single_bytes(data, self.config)
 
         self.mc.bcp_processor.send('dmd_frame', rawbytes=data, name=self.name)
 
