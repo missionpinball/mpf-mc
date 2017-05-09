@@ -158,7 +158,11 @@ build_script:
 
     pip install kivy.deps.angle
 
-    Copy-Item "$PYTHON_ROOT\Lib\site-packages\kivy\deps\*" -destination "$env:APPVEYOR_BUILD_FOLDER\kivy\deps\" -recurse
+    mkdir "$env:APPVEYOR_BUILD_FOLDER\kivy\deps"
+
+    Check-Error
+
+    Copy-Item "$PYTHON_ROOT\Lib\site-packages\kivy\deps\*" -destination "$env:APPVEYOR_BUILD_FOLDER\kivy\deps" -recurse
 
     Remove-Item "$PYTHON_ROOT\Lib\site-packages\kivy" -Force -Recurse
 
@@ -197,3 +201,7 @@ test_script:
       Check-Error
     }
 
+cache:
+  - "C:\\tmp_%PYVER%_%BITTNESS%\\mingwpy -> appveyor.yaml"
+  - "C:\\tmp_%PYVER%_%BITTNESS%\\deps -> appveyor.yaml"
+  - "C:\\tmp_%PYVER%_%BITTNESS%\\gstreamer -> appveyor.yaml"
