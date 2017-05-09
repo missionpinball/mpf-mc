@@ -45,8 +45,7 @@ class TestAnimatedImages(MpfMcTestCase):
 
         # test jumping to a new frame
         stick_figures.current_frame = 5
-        self.advance_time()
-        self.assertEqual(stick_figures.current_frame, 5)
+        self.assertEqual(stick_figures.current_frame, 6)
 
         # test starting
         stick_figures.play()

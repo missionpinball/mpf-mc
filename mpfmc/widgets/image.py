@@ -167,17 +167,15 @@ class ImageWidget(MpfWidget, Scatter):
         return self._image.image.anim_index + 1
 
     def _set_current_frame(self, value: Union[int, float]):
-        if not self._image.image.anim_available or not hasattr(self._image.image, 'textures'):
+        if not self._image.image.anim_available or not hasattr(self._image.image.image, 'textures'):
             return
 
-        frame = (int(value) - 1) % len(self._image.image.textures)
+        frame = (int(value) - 1) % len(self._image.image.image.textures)
         if frame == self._image.image.anim_index:
             return
         else:
-            self._image.image.anim_index = frame
-            self._image.image.texture = (
-                self._image.image.textures[self._image.image.anim_index])
-            self._image.dispatch('on_texture')
+            self._image.image._anim_index = frame
+            self._image.image.anim_reset(True)
 
     current_frame = AliasProperty(_get_current_frame, _set_current_frame)
     '''The current frame of the animation.
