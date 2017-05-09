@@ -336,6 +336,7 @@ def determine_base_flags():
     flags = {
         'libraries': [],
         'include_dirs': [],
+        'library_dirs': [],
         'extra_link_args': [],
         'extra_compile_args': []}
     if platform.startswith('freebsd'):
