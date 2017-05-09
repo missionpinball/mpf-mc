@@ -39,13 +39,13 @@ class Text(MpfWidget, Label):
         super().texture_update(*largs)
         self.size = self.texture_size
 
-    def set_position(self) -> None:
-        if self.config['anchor_y'] == 'baseline':
-            try:
-                # TODO: refactor positioning to allow animation (don't use config settings)
+    def on_parent(self, instance, parent) -> None:
+        if parent:
+            if self.config['anchor_y'] == 'baseline':
                 self.pos = self.calculate_position(self.parent.width,
                                                    self.parent.height,
-                                                   self.width, self.height,
+                                                   self.width,
+                                                   self.height,
                                                    self.config['x'],
                                                    self.config['y'],
                                                    self.config['anchor_x'],
@@ -55,11 +55,8 @@ class Text(MpfWidget, Label):
                                                    self._label.get_descent() * -1,  # adjust_bottom
                                                    self.config['adjust_left'])
 
-            except AttributeError:
-                pass
-
-        else:
-            super().set_position()
+            else:
+                super().on_parent(instance, parent)
 
     def update_kwargs(self, **kwargs) -> None:
         self.event_replacements.update(kwargs)
