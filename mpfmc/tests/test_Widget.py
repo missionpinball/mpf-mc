@@ -816,6 +816,6 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('show_triangle_widget')
         self.advance_time(4.3)
         bezier_widget = self.mc.targets[
-            'default'].current_slide.widgets[0]
+            'default'].current_slide.widgets[1]
         self.assertEqual(bezier_widget.color, [1, 1, 0, 1])
         self.advance_time(1)
