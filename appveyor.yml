@@ -114,7 +114,7 @@ build_script:
 
     Check-Error
 
-    $env:DO_TEST = "True"
+    $env:DO_TEST = "False"
 
     if ($env:APPVEYOR_SCHEDULED_BUILD -eq "True"){
       $env:DO_TEST = "False"
