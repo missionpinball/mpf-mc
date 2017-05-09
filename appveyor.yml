@@ -4,7 +4,6 @@
 
 os: Visual Studio 2015
 environment:
-  MPFMC_BUILD_DIR: C:\mpfmc_build
   USE_SDL2: 1
   USE_GSTREAMER: 1
 
@@ -56,10 +55,6 @@ build_script:
     $PYTHONPATH = "$env:APPVEYOR_BUILD_FOLDER;$PYTHONPATH"
 
     echo "Build folder: $env:APPVEYOR_BUILD_FOLDER."
-
-    mkdir "$env:MPFMC_BUILD_DIR"
-
-    Check-Error
 
 
     C:\Python27\Scripts\pip.exe install pydrive
@@ -178,7 +173,6 @@ build_script:
       cd dist
       python ../build_scripts/rename_wheels.py
 
-      cd \\projects\\mpf-mc\\dist
       python -m twine upload -u %pypi_user% -p %pypi_password% --skip-existing *
     }
 
