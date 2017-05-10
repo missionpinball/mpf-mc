@@ -17,15 +17,19 @@ environment:
   - PYVER: 35
     BITNESS: 86
     COMPILER: msvc
+    PKG_CONFIG_PATH: C:\\Python35\libs\pkgconfig
   - PYVER: 35
     BITNESS: 64
     COMPILER: msvc
+    PKG_CONFIG_PATH: C:\\Python35-x64\libs\pkgconfig
   - PYVER: 36
     BITNESS: 86
     COMPILER: msvc
+    PKG_CONFIG_PATH: C:\\Python36\libs\pkgconfig
   - PYVER: 36
     BITNESS: 64
     COMPILER: msvc
+    PKG_CONFIG_PATH: C:\\Python36-x64\libs\pkgconfig
 
   pypi_user:
     secure: kxNKBuVMdOz6LjJPQb7PMQ==
@@ -145,10 +149,6 @@ build_script:
       Check-Error
       pip install -i https://pypi.anaconda.org/carlkl/simple mingwpy --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\mingwpy
       Check-Error
-    } else {
-      $env:PKG_CONFIG_PATH = "$PYTHON_ROOT\libs\pkgconfig"
-
-      echo "PKG_CONFIG_PATH = $env:PKG_CONFIG_PATH"
     }
 
     echo "Installing prequisite Python packages..."
@@ -168,6 +168,8 @@ build_script:
     Copy-Item "$PYTHON_ROOT\Lib\site-packages\kivy\deps\*" -destination "$env:APPVEYOR_BUILD_FOLDER\kivy\deps" -recurse
 
     Remove-Item "$PYTHON_ROOT\Lib\site-packages\kivy" -Force -Recurse
+
+    Get-ChildItem -Path $env:PKG_CONFIG_PATH
 
     echo "Building MPF-MC..."
 
