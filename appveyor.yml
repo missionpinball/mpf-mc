@@ -147,6 +147,8 @@ build_script:
       Check-Error
     } else {
       $env:PKG_CONFIG_PATH = "$PYTHON_ROOT\libs\pkgconfig"
+
+      echo "PKG_CONFIG_PATH = $env:PKG_CONFIG_PATH"
     }
 
     echo "Installing prequisite Python packages..."
