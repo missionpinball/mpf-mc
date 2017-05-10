@@ -153,9 +153,9 @@ build_script:
 
     echo "Installing prequisite Python packages..."
 
-    pip install cython==0.24.1 pygments docutils nose kivy.deps.glew_dev kivy.deps.glew kivy.deps.gstreamer_dev kivy.deps.sdl2_dev kivy.deps.sdl2 --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
-
     pip install kivy.deps.gstreamer --extra-index-url https://mpf.kantert.net/simple/ --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\gstreamer
+
+    pip install cython==0.24.1 pygments docutils nose kivy.deps.gstreamer_dev kivy.deps.glew kivy.deps.glew_dev kivy.deps.sdl2 kivy.deps.sdl2_dev --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
 
     Check-Error
 
