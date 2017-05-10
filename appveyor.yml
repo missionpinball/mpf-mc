@@ -68,8 +68,6 @@ build_script:
 
     $env:PATH = $PYTHON_ROOT+"\share\glew\bin;"+$PYTHON_ROOT+"\share\sdl2\bin;"+$PYTHON_ROOT+"\share\gstreamer\bin;"+$env:PATH
 
-    echo "PATH = $env:PATH"
-
     $WHEEL_DATE = python -c "from datetime import datetime;print(datetime.utcnow().strftime('%Y%m%d'))"
 
     Check-Error
@@ -183,7 +181,7 @@ build_script:
       python ../build_scripts/rename_wheels.py
 
       echo "Uploding wheels to pypi..."
-      python -m twine upload -u %pypi_user% -p %pypi_password% --skip-existing *
+      python -m twine upload -u $env:pypi_user -p $env:pypi_password --skip-existing *
     }
 
 test_script:
