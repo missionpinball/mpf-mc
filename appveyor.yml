@@ -68,13 +68,11 @@ build_script:
 
     $env:PATH = $PYTHON_ROOT+"\share\glew\bin;"+$PYTHON_ROOT+"\share\sdl2\bin;"+$PYTHON_ROOT+"\share\gstreamer\bin;"+$env:PATH
 
+    echo "PATH = $env:PATH"
+
     $WHEEL_DATE = python -c "from datetime import datetime;print(datetime.utcnow().strftime('%Y%m%d'))"
 
     Check-Error
-
-    $env:KIVY_SDL2_PATH = "$PYTHON_ROOT\libs;$PYTHON_ROOT\include\SDL2;$PYTHON_ROOT\share\SDL2\bin"
-
-    echo "KIVY_SDL2_PATH = $env:KIVY_SDL2_PATH"
 
     echo "Cloning MPF..."
 

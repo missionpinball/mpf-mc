@@ -283,8 +283,6 @@ if platform == 'darwin':
 else:
     # use pkg-config approach instead
     sdl2_flags = pkgconfig('sdl2', 'SDL2_mixer')
-    if 'libraries' not in sdl2_flags:
-        raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
 
 
 # -----------------------------------------------------------------------------
