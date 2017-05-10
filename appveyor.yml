@@ -72,9 +72,9 @@ build_script:
 
     Check-Error
 
-    $env:KIVY_SDL2_PATH = "$PYTHON_ROOT\libs;$PYTHON_ROOT\include\SDL2;$PYTHON_ROOT\share\SDL2\bin
+    $env:KIVY_SDL2_PATH = "$PYTHON_ROOT\libs;$PYTHON_ROOT\include\SDL2;$PYTHON_ROOT\share\SDL2\bin"
 
-    echo "$env:KIVY_SDL2_PATH"
+    echo "KIVY_SDL2_PATH = $env:KIVY_SDL2_PATH"
 
     echo "Cloning MPF..."
 
