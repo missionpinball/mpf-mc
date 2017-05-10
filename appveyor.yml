@@ -145,6 +145,8 @@ build_script:
       Check-Error
       pip install -i https://pypi.anaconda.org/carlkl/simple mingwpy --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\mingwpy
       Check-Error
+    } else {
+      $env:PKG_CONFIG_PATH = "$PYTHON_ROOT\libs\pkgconfig"
     }
 
     echo "Installing prequisite Python packages..."
