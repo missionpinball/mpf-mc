@@ -8,12 +8,12 @@ environment:
   USE_GSTREAMER: 1
 
   matrix:
-  - PYVER: 34
-    BITNESS: 86
-    COMPILER: mingw
-  - PYVER: 34
-    BITNESS: 64
-    COMPILER: mingw
+  # - PYVER: 34
+  #   BITNESS: 86
+  #   COMPILER: mingw
+  # - PYVER: 34
+  #   BITNESS: 64
+  #   COMPILER: mingw
   - PYVER: 35
     BITNESS: 86
     COMPILER: msvc
