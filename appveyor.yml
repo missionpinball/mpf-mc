@@ -17,19 +17,15 @@ environment:
   - PYVER: 35
     BITNESS: 86
     COMPILER: msvc
-    PKG_CONFIG_PATH: C:\\Python35\libs\pkgconfig
   - PYVER: 35
     BITNESS: 64
     COMPILER: msvc
-    PKG_CONFIG_PATH: C:\\Python35-x64\libs\pkgconfig
   - PYVER: 36
     BITNESS: 86
     COMPILER: msvc
-    PKG_CONFIG_PATH: C:\\Python36\libs\pkgconfig
   - PYVER: 36
     BITNESS: 64
     COMPILER: msvc
-    PKG_CONFIG_PATH: C:\\Python36-x64\libs\pkgconfig
 
   pypi_user:
     secure: kxNKBuVMdOz6LjJPQb7PMQ==
@@ -75,6 +71,10 @@ build_script:
     $WHEEL_DATE = python -c "from datetime import datetime;print(datetime.utcnow().strftime('%Y%m%d'))"
 
     Check-Error
+
+    $env:KIVY_SDL2_PATH = "$PYTHON_ROOT\libs;$PYTHON_ROOT\include\SDL2;$PYTHON_ROOT\share\SDL2\bin
+
+    echo "KIVY_SDL2_PATH = $env:KIVY_SDL2_PATH"
 
     echo "Cloning MPF..."
 
@@ -138,7 +138,7 @@ build_script:
 
     echo "Installing required python packages for setup process..."
 
-    python -m pip install pip wheel setuptools mock twine --upgrade
+    python -m pip install pip wheel setuptools twine --upgrade
 
     Check-Error
 
@@ -155,19 +155,13 @@ build_script:
 
     pip install kivy.deps.gstreamer --extra-index-url https://mpf.kantert.net/simple/ --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\gstreamer
 
-    pip install cython==0.24.1 pygments docutils nose kivy.deps.gstreamer_dev kivy.deps.glew kivy.deps.glew_dev kivy.deps.sdl2 kivy.deps.sdl2_dev --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
+    pip install mock cython==0.24.1 pygments docutils kivy.deps.gstreamer_dev kivy.deps.glew kivy.deps.glew_dev kivy.deps.sdl2 kivy.deps.sdl2_dev --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
 
     Check-Error
 
     pip install kivy.deps.angle
 
-    mkdir "$env:APPVEYOR_BUILD_FOLDER\kivy\deps"
-
     Check-Error
-
-    Copy-Item "$PYTHON_ROOT\Lib\site-packages\kivy\deps\*" -destination "$env:APPVEYOR_BUILD_FOLDER\kivy\deps" -recurse
-
-    Remove-Item "$PYTHON_ROOT\Lib\site-packages\kivy" -Force -Recurse
 
     Get-ChildItem -Path $env:PKG_CONFIG_PATH
 
