@@ -4,6 +4,7 @@ import queue
 import logging
 from distutils.version import LooseVersion
 
+import psutil
 from kivy.clock import Clock
 
 import mpf.core.bcp.bcp_socket_client as bcp
@@ -42,6 +43,7 @@ class BcpProcessor(object):
                              'player_variable': self._bcp_player_variable,
                              'reset': self._bcp_reset,
                              'settings': self._bcp_settings,
+                             'status_request': self._bcp_status_request,
                              'switch': self._bcp_switch,
                              'trigger': self._bcp_trigger,
                              }
@@ -146,6 +148,15 @@ class BcpProcessor(object):
         else:
             self.log.warning("Received invalid BCP command: %s", bcp_command[:9])
             # self.send('error',message='invalid command', command=bcp_command)
+
+    def _bcp_status_request(self, **kwargs):
+        """Status request."""
+        del kwargs
+        mc_process = psutil.Process()
+        self.send("status_report",
+                  cpu=mc_process.cpu_percent(),
+                  rss=mc_process.memory_info().rss,
+                  vms=mc_process.memory_info().vms)
 
     def _bcp_hello(self, **kwargs):
         """Processes an incoming BCP 'hello' command."""
