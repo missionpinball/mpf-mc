@@ -37,7 +37,7 @@ install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       mkdir /tmp/downloads;
       cd /tmp/downloads;
-      curl --progress-bar -S https://mpf.kantert.net/mpf_mac_frameworks.zip -o mac_frameworks.zip;
+      wget --retry-connrefused --waitretry=1 -O mac_frameworks.zip https://mpf.kantert.net/mpf_mac_frameworks.zip;
       unzip -q mac_frameworks.zip;
       sudo cp -r frameworks/*.* /Library/Frameworks;
     fi;
