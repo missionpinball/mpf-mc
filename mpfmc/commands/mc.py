@@ -92,6 +92,10 @@ class Command(object):
                             "when launching in a separate window so you can "
                             "see any errors before the window closes.")
 
+        parser.add_argument("-t",
+                            action="store_false", dest='text_ui', default=True,
+                            help="Use the ASCII test-based UI")
+
         parser.add_argument("-v",
                             action="store_const", dest="loglevel", const=logging.DEBUG,
                             default=logging.INFO, help="Enables verbose logging to the"
@@ -153,8 +157,13 @@ class Command(object):
 
         # define a Handler which writes INFO messages or higher to the
         # sys.stderr
-        console = logging.StreamHandler()
-        console.setLevel(args.consoleloglevel)
+
+        if args.text_ui:
+            console = logging.NullHandler()
+            console.setLevel(logging.ERROR)
+        else:
+            console = logging.StreamHandler()
+            console.setLevel(args.consoleloglevel)
 
         # set a format which is simpler for console use
         formatter = logging.Formatter('%(name)s: %(message)s')
