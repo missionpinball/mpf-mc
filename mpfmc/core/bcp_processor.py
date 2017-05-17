@@ -21,6 +21,7 @@ class BcpProcessor(object):
         self.connected = False
         self.receive_queue = queue.Queue()
         self.sending_queue = queue.Queue()
+        self.mc_process = psutil.Process()
 
         if self.mc.options['bcp']:
             self.mc.events.add_handler('init_done', self._start_socket_thread)
@@ -152,11 +153,11 @@ class BcpProcessor(object):
     def _bcp_status_request(self, **kwargs):
         """Status request."""
         del kwargs
-        mc_process = psutil.Process()
+
         self.send("status_report",
-                  cpu=mc_process.cpu_percent(),
-                  rss=mc_process.memory_info().rss,
-                  vms=mc_process.memory_info().vms)
+                  cpu=self.mc_process.cpu_percent(),
+                  rss=self.mc_process.memory_info().rss,
+                  vms=self.mc_process.memory_info().vms)
 
     def _bcp_hello(self, **kwargs):
         """Processes an incoming BCP 'hello' command."""
