@@ -87,7 +87,8 @@ class VideoAsset(Asset):
         self._video.play()
 
     def stop(self):
-        self._video.stop()
+        if self._video:
+            self._video.stop()
 
     def pause(self):
         self._video.pause()
