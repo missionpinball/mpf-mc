@@ -1,16 +1,16 @@
 from typing import TYPE_CHECKING, Optional
 from kivy.graphics.vertex_instructions import Ellipse as KivyEllipse
-from kivy.graphics.context_instructions import Color, Rotate, Scale, PushMatrix, PopMatrix
+from kivy.graphics.context_instructions import Color, PushMatrix, PopMatrix, Rotate, Scale
 from kivy.uix.widget import Widget
-from kivy.properties import NumericProperty, ListProperty
+from kivy.properties import NumericProperty, ListProperty, ReferenceListProperty
 
-from mpfmc.uix.widget import MpfWidget
+from mpfmc.uix.widget_wrapper import WidgetWrapper
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Ellipse(MpfWidget, Widget):
+class Ellipse(WidgetWrapper):
 
     widget_type_name = 'Ellipse'
     animation_properties = ('x', 'y', 'width', 'pos', 'height', 'size', 'color',
@@ -21,53 +21,70 @@ class Ellipse(MpfWidget, Widget):
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 
-        self.rotation = config.get('rotation', 0)
-        self.scale = config.get('scale', 1.0)
-        self._draw_widget()
+    def _create_child_widget(self) -> "Widget":
+        """Create the ellipse widget and set its initial property values."""
+        ellipse = CoreEllipse(width=0, height=0, size_hint=(None, None))
+        ellipse.color = self.config['color']
+        ellipse.segments = self.config['segments']
+        ellipse.angle_start = self.config['angle_start']
+        ellipse.angle_end = self.config['angle_end']
+        ellipse.opacity = self.config['opacity']
+        ellipse.rotation = self.config['rotation']
+        ellipse.scale = self.config['scale']
+        ellipse.width = self.config['width']
+        ellipse.height = self.config['height']
 
-    def _draw_widget(self) -> None:
+        return ellipse
+
+    def _bind_child_widget_properties(self, widget: "Widget"):
+        widget.bind(size=self.on_widget_size)
+
+
+class CoreEllipse(Widget):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.bind(pos=self._draw_widget,
+                  size=self._draw_widget,
+                  color=self._draw_widget,
+                  rotation=self._draw_widget,
+                  scale=self._draw_widget,
+                  segments=self._draw_widget,
+                  angle_start=self._draw_widget,
+                  angle_end=self._draw_widget)
+
+    def _draw_widget(self, *args) -> None:
+        del args
+
+        if self.canvas is None:
+            return
+
+        anchor = (self.x - self.anchor_offset_x, self.y - self.anchor_offset_y)
         self.canvas.clear()
+
         with self.canvas.before:
             PushMatrix()
+
         with self.canvas:
             Color(*self.color)
-            Scale(self.scale, origin=self.center)
-            Rotate(angle=self.rotation, origin=self.center)
+            Rotate(angle=self.rotation, origin=anchor)
+            Scale(self.scale).origin = anchor
             KivyEllipse(pos=self.pos, size=self.size,
                         segments=self.segments,
                         angle_start=self.angle_start,
                         angle_end=self.angle_end)
+
         with self.canvas.after:
             PopMatrix()
 
-    def on_pos(self, *args):
-        del args
-        self._draw_widget()
+    def on_parent(self, instance, parent):
+        del instance
+        parent.bind(pos=self.update_anchor_offset)
 
-    def on_size(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_color(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_angle_start(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_angle_end(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_rotation(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_scale(self, *args):
-        del args
-        self._draw_widget()
-
+    def update_anchor_offset(self, instance, pos):
+        del instance
+        self.anchor_offset = pos
     #
     # Properties
     #
@@ -96,5 +113,11 @@ class Ellipse(MpfWidget, Widget):
 
     rotation = NumericProperty(0)
     scale = NumericProperty(1.0)
+
+    anchor_offset_x = NumericProperty(0)
+    anchor_offset_y = NumericProperty(0)
+
+    anchor_offset = ReferenceListProperty(anchor_offset_x, anchor_offset_y)
+
 
 widget_classes = [Ellipse]
