@@ -12,9 +12,6 @@ __all__ = ('AudioInterface',
            'MixChunkContainer',
            )
 
-__version_info__ = ('0', '33', '0-dev.03')
-__version__ = '.'.join(__version_info__)
-
 from libc.stdio cimport FILE, fopen, fprintf, sprintf
 from libc.stdlib cimport malloc, free, calloc
 from libc.string cimport memset, memcpy
@@ -148,7 +145,7 @@ cdef class AudioInterface:
         # Initialize GStreamer
         self._initialize_gstreamer()
 
-        self.log.info("Initialized %s", AudioInterface.get_version())
+        self.log.info("Initialized")
         self.log.debug("Loaded %s", AudioInterface.get_sdl_version())
         self.log.debug("Loaded %s", AudioInterface.get_sdl_mixer_version())
         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
@@ -339,14 +336,6 @@ cdef class AudioInterface:
         # and then to samples using the current sample rate.
         cdef float seconds = AudioInterface.string_to_secs(samples_string)
         return int(self.audio_callback_data.sample_rate * seconds)
-
-    @classmethod
-    def get_version(cls):
-        """
-        Retrieves the current version of the audio interface library
-        :return: Audio interface library version string
-        """
-        return __version__
 
     @classmethod
     def get_sdl_version(cls):
@@ -1691,6 +1680,10 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].next.sound_has_ducking = False
             self.type_state.sound_players[i].next.ducking_stage = ducking_stage_idle
 
+        self.log.debug("Created Track %d %s with the following settings: "
+                       "simultaneous_sounds = %d, volume = %f",
+                       self.number, self.name, self.max_simultaneous_sounds, self.volume)
+
         SDL_UnlockAudioDevice(self.device_id)
 
     def __dealloc__(self):
@@ -1890,8 +1883,6 @@ cdef class TrackStandard(Track):
                 else:
                     self.log.debug("Discarding expired sound from queue %s", sound_instance)
                     sound_instance.set_expired()  # Notify sound instance it has expired
-
-        return None
 
     def _remove_sound_from_queue(self, sound_instance not None):
         """
