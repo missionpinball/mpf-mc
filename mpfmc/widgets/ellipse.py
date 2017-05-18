@@ -45,6 +45,8 @@ class CoreEllipse(Widget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        # Bind to all properties that when changed need to force
+        # the widget to be redrawn
         self.bind(pos=self._draw_widget,
                   size=self._draw_widget,
                   color=self._draw_widget,
@@ -85,6 +87,7 @@ class CoreEllipse(Widget):
     def update_anchor_offset(self, instance, pos):
         del instance
         self.anchor_offset = pos
+
     #
     # Properties
     #
@@ -116,7 +119,6 @@ class CoreEllipse(Widget):
 
     anchor_offset_x = NumericProperty(0)
     anchor_offset_y = NumericProperty(0)
-
     anchor_offset = ReferenceListProperty(anchor_offset_x, anchor_offset_y)
 
 
