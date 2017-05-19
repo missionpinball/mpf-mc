@@ -1,24 +1,52 @@
+from typing import TYPE_CHECKING, Optional
+
 from kivy.graphics import Line as KivyLine
-from kivy.graphics.context_instructions import Color
-from kivy.uix.widget import Widget
+from kivy.graphics.context_instructions import Color, Scale, Rotate
 from kivy.properties import (ListProperty, NumericProperty, OptionProperty,
                              BooleanProperty)
 
-from mpfmc.uix.widget import MpfWidget
+from mpfmc.uix.widget_container import ContainedWidget
+from mpfmc.core.utils import center_of_points_list
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
 
 
-class Line(MpfWidget, Widget):
+class Line(ContainedWidget):
 
     widget_type_name = 'Line'
-    animation_properties = ('x', 'y', 'points', 'thickness', 'color', 'opacity')
+    animation_properties = ('color', 'thickness', 'opacity', 'points', 'rotation', 'scale')
 
-    def on_pos(self, *args) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+        del kwargs
+        super().__init__(mc=mc, config=config, key=key)
+
+        # The points in this widget are always relative to the bottom left corner
+        self.anchor_pos = ("left", "bottom")
+
+        # Bind to all properties that when changed need to force
+        # the widget to be redrawn
+        self.bind(color=self._draw_widget,
+                  points=self._draw_widget,
+                  thickness=self._draw_widget,
+                  rotation=self._draw_widget,
+                  scale=self._draw_widget)
+
+    def _draw_widget(self, *args) -> None:
+        """Establish the drawing instructions for the widget."""
         del args
 
-    def _draw_widget(self):
+        if self.canvas is None:
+            return
+
+        # TODO: allow user to set rotation/scale origin
+        center = center_of_points_list(self.points)
         self.canvas.clear()
+
         with self.canvas:
             Color(*self.color)
+            Scale(self.scale, origin=center)
+            Rotate(angle=self.rotation, origin=center)
             KivyLine(points=self.points,
                      width=self.thickness,
                      cap=self.cap,
@@ -27,39 +55,9 @@ class Line(MpfWidget, Widget):
                      joint_precision=self.joint_precision,
                      close=self.close)
 
-    def on_parent(self, instance, parent):
-        del instance
-        self.pos = self.calculate_position(parent.width,
-                                           parent.height,
-                                           self.width, self.height,
-                                           self.config['x'],
-                                           self.config['y'],
-                                           self.config['anchor_x'],
-                                           self.config['anchor_y'],
-                                           self.config['adjust_top'],
-                                           self.config['adjust_right'],
-                                           self.config['adjust_bottom'],
-                                           self.config['adjust_left'])
-        self._draw_widget()
-
-    def on_points(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_thickness(self, *args):
-        del args
-        self._draw_widget()
-
     #
     # Properties
     #
-
-    color = ListProperty([1.0, 1.0, 1.0, 1.0])
-    '''The color of the widget lines, in the (r, g, b, a) format.
-
-    :attr:`color` is a :class:`~kivy.properties.ListProperty` and
-    defaults to [1.0, 1.0, 1.0, 1.0].
-    '''
 
     points = ListProperty()
     '''The list of points to use to draw the widget in (x1, y1, x2, y2...)
@@ -97,6 +95,20 @@ class Line(MpfWidget, Widget):
 
     :attr:`thickness` is a :class:`~kivy.properties.NumericProperty` and defaults
     to 1.0.
+    '''
+
+    rotation = NumericProperty(0)
+    '''Rotation angle value of the widget.
+
+    :attr:`rotation` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    0.
+    '''
+
+    scale = NumericProperty(1.0)
+    '''Scale value of the widget.
+
+    :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    1.0.
     '''
 
 widget_classes = [Line]

@@ -1,16 +1,17 @@
 from typing import TYPE_CHECKING, Optional
+
 from kivy.graphics import Point as KivyPoint
-from kivy.graphics.context_instructions import Color, Rotate, Scale, PushMatrix, PopMatrix
-from kivy.uix.widget import Widget
+from kivy.graphics.context_instructions import Color, Rotate, Scale
 from kivy.properties import ListProperty, NumericProperty
-from mpfmc.uix.widget import MpfWidget
+
+from mpfmc.uix.widget_container import ContainedWidget
 from mpfmc.core.utils import center_of_points_list
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Point(MpfWidget, Widget):
+class Point(ContainedWidget):
 
     widget_type_name = 'Point'
     animation_properties = ('points', 'pointsize', 'color', 'opacity', 'rotation', 'scale')
@@ -18,53 +19,39 @@ class Point(MpfWidget, Widget):
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
-        self._draw_widget()
 
-    def _draw_widget(self) -> None:
+        # The points in this widget are always relative to the bottom left corner
+        self.anchor_pos = ("left", "bottom")
+
+        # Bind to all properties that when changed need to force
+        # the widget to be redrawn
+        self.bind(color=self._draw_widget,
+                  points=self._draw_widget,
+                  pointsize=self._draw_widget,
+                  rotation=self._draw_widget,
+                  scale=self._draw_widget)
+
+    def _draw_widget(self, *args) -> None:
         """Establish the drawing instructions for the widget."""
+        del args
+
+        if self.canvas is None:
+            return
+
+        # TODO: allow user to set rotation/scale origin
         center = center_of_points_list(self.points)
         self.canvas.clear()
-        with self.canvas.before:
-            PushMatrix()
+
         with self.canvas:
             Color(*self.color)
             Scale(self.scale, origin=center)
             Rotate(angle=self.rotation, origin=center)
             KivyPoint(points=self.points,
                       pointsize=self.pointsize)
-        with self.canvas.after:
-            PopMatrix()
-
-    def on_color(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_points(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_pointsize(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_rotation(self, *args):
-        del args
-        self._draw_widget()
-
-    def on_scale(self, *args):
-        del args
-        self._draw_widget()
 
     #
     # Properties
     #
-
-    color = ListProperty([1.0, 1.0, 1.0, 1.0])
-    '''The color of the widget lines, in the (r, g, b, a) format.
-
-    :attr:`color` is a :class:`~kivy.properties.ListProperty` and
-    defaults to [1.0, 1.0, 1.0, 1.0].
-    '''
 
     points = ListProperty([100, 100])
     '''The list of points to use to draw the widget in (x1, y1, x2, y2...)

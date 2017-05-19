@@ -561,9 +561,11 @@ class DisplayOutput(ScatterPlane):
         Clock.schedule_once(self._fit_to_parent, -1)
 
     def on_parent_resize(self, *args):
+        del args
         self._fit_to_parent()
 
     def _fit_to_parent(self, *args):
+        del args
         if self.parent:
             self.scale = min(self.parent.width / float(self.display.width),
                              self.parent.height / float(self.display.height))

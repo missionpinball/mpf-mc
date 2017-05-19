@@ -138,27 +138,20 @@ widgets:
             duration: 1s
   widget_ellipse:
     - type: ellipse
-      width: 100
-      height: 50
+      width: 200
+      height: 100
       angle_end: 0
       color: magenta
       animations:
         add_to_slide:
-          - property: x, y
-            value: 50, 50
+          - property: pos
+            value: 100, 100
             relative: true
             duration: 2s
-          - property: rotation, scale
-            value: 360, 2.0
-            duration: 2s
-            timing: with_previous
-          - property: angle_end
+          - property: rotation
             value: 360
             duration: 2s
             timing: with_previous
-          - property: angle_start
-            value: 360
-            duration: 2s
   widget_quad:
     - type: quad
       points: 300, 100, 350, 200, 500, 150, 450, 50
@@ -201,6 +194,16 @@ widgets:
           - property: rotation, scale, corner_radius
             value: 0, 1.0, 0
             duration: 1.5s
+  widget_line:
+    - type: line
+      points: 200, 50, 600, 50
+      thickness: 10
+      color: darkcyan
+      animations:
+        add_to_slide:
+          - property: rotation, scale
+            value: 360, 1.5
+            duration: 3s
   widget_triangle:
     - type: triangle
       points: 100, 450, 100, 550, 200, 450
@@ -348,6 +351,7 @@ widget_player:
   show_ellipse_widget: widget_ellipse
   show_quad_widget: widget_quad
   show_rectangle_widget: widget_rectangle
+  show_line_widget: widget_line
   show_triangle_widget: widget_triangle
   show_points_widget: widget_points
   show_text_widget: widget_text

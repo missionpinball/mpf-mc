@@ -1,10 +1,8 @@
 from typing import Optional, TYPE_CHECKING
 
-from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.effectwidget import EffectWidget
-from kivy.clock import Clock
 
-from mpfmc.uix.widget import MpfWidget
+from mpfmc.uix.widget_container import ContainedWidget
 from mpfmc.uix.display import DisplayOutput
 
 if TYPE_CHECKING:
@@ -12,17 +10,17 @@ if TYPE_CHECKING:
     from mpfmc.uix.slide import Slide
 
 
-class DisplayWidget(MpfWidget, RelativeLayout):
+class DisplayWidget(ContainedWidget):
     widget_type_name = 'Display'
     animation_properties = ('x', 'y')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
-                 **kwargs: dict) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         del kwargs
-
         super().__init__(mc=mc, config=config, key=key)
 
-        self.size = (self.config['width'], self.config['height'])
+        # The points in this widget are always relative to the bottom left corner
+        self.anchor_pos = ("left", "bottom")
+
         self.display = self.mc.displays[self.config['source_display']]
         self.effects = EffectWidget(size=self.size)
 
@@ -32,7 +30,6 @@ class DisplayWidget(MpfWidget, RelativeLayout):
         # Establish link between display and this display widget
         self.add_widget(self.effects)
         self.display_output = DisplayOutput(self.effects, self.display)
-        Clock.schedule_once(self._set_initial_position, -1)
 
     def __repr__(self) -> str:  # pragma: no cover
         try:
@@ -41,23 +38,6 @@ class DisplayWidget(MpfWidget, RelativeLayout):
         except AttributeError:
             return '<DisplayWidget size={}, source=(none)>'.format(
                     self.size)
-
-    def _set_initial_position(self, dt) -> None:
-        del dt
-        try:
-            self.pos = self.calculate_position(self.parent.width, self.parent.height,
-                                               self.width, self.height,
-                                               self.config['x'],
-                                               self.config['y'],
-                                               self.config['anchor_x'],
-                                               self.config['anchor_y'],
-                                               self.config['adjust_top'],
-                                               self.config['adjust_right'],
-                                               self.config['adjust_bottom'],
-                                               self.config['adjust_left'])
-
-        except AttributeError:
-                pass
 
     def _add_effects(self, config: Optional[list]) -> None:
         """Adds any effects specified in the config for this display widget."""

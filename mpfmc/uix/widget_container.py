@@ -1,30 +1,16 @@
-'''
-WidgetWrapper
-=============
-
-:class:`WidgetWrapper` is a class designed to wrap widgets for use in MPF-MC.
-
-The WidgetWrapper uses a kivy.uix.relativelayout.RelativeLayout to provide a 
-transformed coordinate system so that MPF-MC widgets can be interacted with 
-using their designated anchor point rather than the lower-left corner. This 
-has the benefit of being able to animate the positional properties directly 
-using the anchor point. The actual widget is a child of the WidgetWrapper 
-class.
-
-'''
-
+from typing import TYPE_CHECKING, Union, Optional, List
 from copy import deepcopy
 from functools import reduce
-from typing import List, Union, Optional, TYPE_CHECKING
 
 from kivy.clock import Clock
 from kivy.animation import Animation
-from kivy.properties import NumericProperty, StringProperty, AliasProperty
-from kivy.uix.widget import Widget
 from kivy.uix.relativelayout import RelativeLayout
+from kivy.uix.widget import Widget
+from kivy.properties import (NumericProperty, ReferenceListProperty,
+                             StringProperty, AliasProperty, ListProperty)
 
-from mpfmc.core.utils import percent_to_float
 from mpfmc.uix.relative_animation import RelativeAnimation
+from mpfmc.core.utils import percent_to_float
 from mpf.core.rgba_color import RGBAColor
 
 if TYPE_CHECKING:
@@ -42,7 +28,7 @@ are not real MPF events, rather, they're used to trigger animations from
 things the slide is doing."""
 
 
-class WidgetWrapper(RelativeLayout):
+class ContainedWidget(Widget):
 
     widget_type_name = ''  # Give this a name in your subclass, e.g. 'Image'
 
@@ -52,39 +38,31 @@ class WidgetWrapper(RelativeLayout):
     # our configs. However we use some config keys that Kivy also uses,
     # and we use them for different purposes, so there are some keys that we
     # use that we never want to set on widget base classes.
-    _dont_send_to_kivy = ('anchor_x', 'anchor_y', 'x', 'y', 'scale', 'rotation')
+    _dont_send_to_kivy = ('x', 'y')
 
     merge_settings = tuple()
 
     animation_properties = list()
-    """List of properties for this widget that may be animated using widget animations.
-    The wrapped/managed child widget must support these properties."""
+    """List of properties for this widget that may be animated using widget animations."""
 
     def __init__(self, mc: "MpfMc", config: Optional[dict]=None,
                  key: Optional[str]=None, **kwargs) -> None:
         del kwargs
-        self.size_hint = (1, 1)
-        super().__init__()
+        self.size_hint = (None, None)
 
-        # Deepcopy config since configs can have nested dicts
+        # Needs to be deepcopy since configs can have nested dicts
         self.config = deepcopy(config)
+
+        super().__init__(**self.pass_to_kivy_widget_init())
 
         self.mc = mc
 
-        # self._widget contains the widget that is wrapped/managed by this WidgetWrapper class
-        self._widget = self._create_child_widget()
-        self._bind_child_widget_properties(self._widget)
-        self.add_widget(self._widget)
-        self.pos = self.calculate_anchor_offset(self._widget.width, self._widget.height,
-                                                self.config['anchor_x'],
-                                                self.config['anchor_y'],
-                                                self.config['adjust_top'],
-                                                self.config['adjust_right'],
-                                                self.config['adjust_bottom'],
-                                                self.config['adjust_left'])
-
-        # Set wrapper widget attribute values
-        self.z = self.config.get('z', 0)
+        # Create a container widget as this widget's parent.  The container will adjust
+        # the coordinate system for this widget so that all positional properties are
+        # based on the widget's anchor rather than the lower left corner.
+        self._container = WidgetContainer()
+        self._container.add_widget(self)
+        self._container.fbind('parent', self.on_container_parent)
 
         self.animation = None
         self._animation_event_keys = set()
@@ -104,6 +82,11 @@ class WidgetWrapper(RelativeLayout):
 
         if 'color' in self.config and not isinstance(self.config['color'], RGBAColor):
             self.config['color'] = RGBAColor(self.config['color'])
+
+        # Set initial attribute values from config
+        for k, v in self.config.items():
+            if k not in self._dont_send_to_kivy and hasattr(self, k):
+                setattr(self, k, v)
 
         # Has to be after we set the attributes since it could be in the config
         self.key = key
@@ -127,47 +110,30 @@ class WidgetWrapper(RelativeLayout):
                 self._animation_event_keys.add(self.mc.events.add_handler(
                     event=event, handler=self.reset_animations))
 
-        self.expire = self.config['expire']
+        # Set widget expiration (if configured)
+        self.expire = config.get('expire', None)
         if self.expire:
-            self.schedule_removal(float(self.expire))
+            self.schedule_removal(self.expire)
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<{} WidgetWrapper id={}>'.format(self.widget_type_name, self.id)
+        return '<{} Widget id={}, key={}>'.format(self.widget_type_name, self.id, self.key)
 
-    def __lt__(self, other: "Widget") -> bool:
-        """
-        Less than comparison operator (based on z-order value). Used to 
-        maintain proper z-order when adding widgets to a parent.
-        Args:
-            other: The widget to compare to this one.
+    def pass_to_kivy_widget_init(self) -> dict:
+        """Initializes the dictionary of settings to pass to Kivy."""
+        return dict()
 
-        Returns:
-            True if the other widget is less than the current widget (uses
-            z-order to perform the comparison).
-        """
-        if hasattr(other, 'z'):
-            return other.z < self.z
-        else:
-            return 0 < self.z
+    def on_anchor_offset_pos(self, instance, pos):
+        """Called whenever the anchor_offset_pos property value changes."""
+        del instance
+        if self.parent:
+            self.parent.pos = pos
 
-    def _create_child_widget(self) -> "Widget":
-        raise NotImplementedError('_create_child_widget must be overriden in derived class')
-
-    def _bind_child_widget_properties(self, widget: "Widget"):
-        raise NotImplementedError('_bind_child_widget_properties must be overriden in derived class')
-
-    def find_widgets_by_key(self, key: str) -> List["WidgetWrapper"]:
-        """Return a list of widgets with the matching key value by searching
-        the tree of children belonging to this widget."""
-        return [x for x in self.walk(restrict=True, loopback=False) if hasattr(x, 'key') and x.key == key]
-
-    def on_parent(self, instance, parent: "Widget") -> None:
-        """Set the widget position based on various settings."""
+    def on_container_parent(self, instance, parent):
         del instance
         if parent:
-            self.size = parent.size
             # some attributes can be expressed in percentages. This dict holds
             # those, key is attribute name, val is max value
+
             self._percent_prop_dicts = dict(x=parent.width,
                                             y=parent.height,
                                             width=parent.width,
@@ -175,10 +141,10 @@ class WidgetWrapper(RelativeLayout):
                                             opacity=1,
                                             line_height=1)
 
-            self.widget.pos = self.calculate_initial_position(parent.width,
-                                                              parent.height,
-                                                              self.config['x'],
-                                                              self.config['y'])
+            self.pos = self.calculate_initial_position(parent.width,
+                                                       parent.height,
+                                                       self.config['x'],
+                                                       self.config['y'])
 
     # pylint: disable-msg=too-many-arguments
     # pylint: disable-msg=too-many-statements
@@ -186,8 +152,10 @@ class WidgetWrapper(RelativeLayout):
     def calculate_initial_position(parent_w: int, parent_h: int,
                                    x: Optional[Union[int, str]] = None,
                                    y: Optional[Union[int, str]] = None) -> tuple:
-        """Returns the x,y position for the anchor of a widget within a larger 
-        parent frame based on several positioning parameters.
+        """Returns the initial x,y position for the widget within a larger 
+        parent frame based on several positioning parameters. This position will
+        be combined with the widget anchor position to determine its actual 
+        position on the screen.
 
         Args:
             parent_w: Width of the parent frame.
@@ -289,107 +257,6 @@ class WidgetWrapper(RelativeLayout):
 
         return x, y
 
-    # pylint: disable-msg=too-many-arguments
-    # pylint: disable-msg=too-many-statements
-    @staticmethod
-    def calculate_anchor_offset(width: int,
-                                height: int,
-                                anchor_x: Optional[str] = None,
-                                anchor_y: Optional[str] = None,
-                                adjust_top: Optional[int] = None,
-                                adjust_right: Optional[int] = None,
-                                adjust_bottom: Optional[int] = None,
-                                adjust_left: Optional[int] = None) -> tuple:
-        """Returns the x,y position for the lower-left corner of a widget
-        within a larger parent frame based on several positioning parameters.
-
-        Args:
-            width: Width of the element you're placing.
-            height: Height of the element you're placing.
-            anchor_x: (Optional) Which edge of the widget will be used for
-                positioning. ('left', 'center' (or 'middle'), or 'right'. If None,
-                'center' will be used.
-            anchor_y: (Optional) Which edge of the widget will be used for
-                positioning. ('top', 'middle' (or 'center'), or 'bottom'. If None,
-                'center' will be used.
-            adjust_top: (Optional) Moves the "top" of this widget down, meaning any
-                positioning that includes calculations involving the top (anchor_y
-                of 'top' or 'middle') use the alternate top position. Positive
-                values move the top towards the center of the widget, negative
-                values move it away. Negative values can be used to give the
-                widget "space" on the top, and positive values can be used to
-                remove unwanted space from the top of the widget. Note that this
-                setting does not actually crop or cut off the top of the widget,
-                rather, it just adjusts how the positioning is calculated.
-            adjust_right: (Optional) adjusts the position calculations for the
-                right side of the widget. Positive values move the right position
-                towards the center, negative values move it away from the center.
-            adjust_bottom: (Optional) adjusts the position calculations for the
-                bottom of the widget. Positive values move the bottom position
-                towards the center, negative values move it away from the center.
-            adjust_left: (Optional) adjusts the position calculations for the
-                left side of the widget. Positive values move the left position
-                towards the center, negative values move it away from the center.
-
-        Returns: Tuple of x, y coordinates for the lower-left corner of the
-            widget you're placing.
-
-        See the widgets documentation for examples.
-
-        """
-        # Set defaults
-        offset_x = 0
-        offset_y = 0
-        if not anchor_x:
-            anchor_x = 'center'
-        if not anchor_y:
-            anchor_y = 'middle'
-        if not adjust_top:
-            adjust_top = 0
-        if not adjust_right:
-            adjust_right = 0
-        if not adjust_bottom:
-            adjust_bottom = 0
-        if not adjust_left:
-            adjust_left = 0
-
-        # ----------------------
-        # X / width / horizontal
-        # ----------------------
-
-        # Adjust for anchor_x & adjust_right/left
-        if anchor_x in ('center', 'middle'):
-            offset_x -= (width - adjust_right + adjust_left) / 2
-        elif anchor_x == 'right':
-            offset_x -= width - adjust_right
-        else:  # left
-            offset_x -= adjust_left
-
-        # --------------------
-        # Y / height / vertical
-        # --------------------
-
-        # Adjust for anchor_y & adjust_top/bottom
-        if anchor_y in ('middle', 'center'):
-            offset_y -= (height - adjust_top + adjust_bottom) / 2
-        elif anchor_y == 'top':
-            offset_y -= height - adjust_top
-        else:  # bottom
-            offset_y -= adjust_bottom
-
-        return offset_x, offset_y
-
-    def on_widget_size(self, instance, size):
-        del instance
-
-        self.pos = self.calculate_anchor_offset(size[0], size[1],
-                                                self.config['anchor_x'],
-                                                self.config['anchor_y'],
-                                                self.config['adjust_top'],
-                                                self.config['adjust_right'],
-                                                self.config['adjust_bottom'],
-                                                self.config['adjust_left'])
-
     def _set_default_style(self) -> None:
         """Sets the default widget style name."""
         if ('{}_default'.format(self.widget_type_name.lower()) in
@@ -447,19 +314,41 @@ class WidgetWrapper(RelativeLayout):
         del dt
 
         try:
-            self.parent.remove_widget(self)
+            # This widget has a container parent that must be removed
+            self.parent.parent.remove_widget(self.parent)
         except AttributeError:
             pass
 
         self.on_remove_from_slide()
 
+    def _convert_animation_value_to_float(self, prop: str,
+                                          val: Union[str, int, float]) -> Union[float, int]:
+        """
+        Convert an animation property value to a numeric value.
+        Args:
+            prop: The name of the property to animate
+            val: The animation target value (may be a string that contains a % sign)
+
+        Returns:
+            Numeric value (float or int).
+        """
+        try:
+            val = percent_to_float(val, self._percent_prop_dicts[prop])
+        except KeyError:
+            # because widget properties can include a % sign, they are
+            # all strings, so even ones that aren't on the list to look
+            # for percent signs have to be converted to numbers.
+            if '.' in val:
+                val = float(val)
+            else:
+                val = int(val)
+
+        return val
+
     def build_animation_from_config(self, config_list: list) -> Animation:
         """Build animation object from config."""
         if not isinstance(config_list, list):
             raise TypeError('build_animation_from_config requires a list')
-
-        if self._widget is None:
-            raise RuntimeError('build_animation_from_config must have a widget to animate')
 
         # find any named animations and replace them with the real ones
         animation_list = list()
@@ -486,8 +375,8 @@ class WidgetWrapper(RelativeLayout):
             values_needed_total = 0
 
             for prop in settings['property']:
-                if isinstance(getattr(self._widget, prop), list):
-                    values_needed[prop] = len(getattr(self._widget, prop))
+                if isinstance(getattr(self, prop), list):
+                    values_needed[prop] = len(getattr(self, prop))
                     values_needed_total += values_needed[prop]
                 else:
                     values_needed[prop] = 1
@@ -501,35 +390,37 @@ class WidgetWrapper(RelativeLayout):
                                     self.widget_type_name, settings['property'])
                 continue
 
+            # Create a dictionary of properties to animate along with their target values
             for prop in settings['property']:
+
+                # Make sure target widget property can be animated
                 if prop not in self.animation_properties:
                     self.mc.log.warning("%s widgets do not support animation "
                                         "for the %s property (animation will be ignored)",
                                         self.widget_type_name, prop)
                     continue
 
+                # Convert target value(s) to numeric types
                 if values_needed[prop] > 1:
-                    val = [float(x) for x in values[:values_needed[prop]]]
+                    val = [self._convert_animation_value_to_float(prop, x)
+                           for x in values[:values_needed[prop]]]
                     del values[:values_needed[prop]]
                 else:
-                    val = values[0]
+                    val = self._convert_animation_value_to_float(prop, values[0])
                     del values[0]
-                    try:
-                        val = percent_to_float(val, self._percent_prop_dicts[prop])
-                    except KeyError:
-                        # because widget properties can include a % sign, they are
-                        # all strings, so even ones that aren't on the list to look
-                        # for percent signs have to be converted to numbers.
-                        if '.' in val:
-                            val = float(val)
-                        else:
-                            val = int(val)
 
                 prop_dict[prop] = val
 
+                # Save the pre-animated property value so it can later be restored
                 if prop not in self._pre_animated_settings:
-                    self._pre_animated_settings[prop] = getattr(self._widget, prop)
+                    self._pre_animated_settings[prop] = getattr(self, prop)
 
+            # TODO: Support custom easing functions
+            # This can be done by replacing transition string with a function reference
+            # when the string does not exist in the Kivy AnimationTransition class as
+            # a method.
+
+            # Create the animation object
             if settings['relative']:
                 animation = RelativeAnimation(duration=settings['duration'],
                                               transition=settings['easing'],
@@ -563,7 +454,7 @@ class WidgetWrapper(RelativeLayout):
     def stop_animation(self) -> None:
         """Stop the current widget animation."""
         try:
-            self.animation.stop(self._widget)
+            self.animation.stop(self)
         except AttributeError:
             pass
 
@@ -571,7 +462,7 @@ class WidgetWrapper(RelativeLayout):
         """Reset the widget properties back to their pre-animated values."""
         del kwargs
         for k, v in self._pre_animated_settings.items():
-            setattr(self._widget, k, v)
+            setattr(self, k, v)
 
     def _register_animation_events(self, event_name: str) -> None:
         """Register handlers for the various events that trigger animation actions."""
@@ -590,7 +481,7 @@ class WidgetWrapper(RelativeLayout):
         self.stop_animation()
         self.animation = self.build_animation_from_config(
             self.config['animations'][event_name])
-        self.animation.start(self._widget)
+        self.animation.start(self)
 
     def _remove_animation_events(self) -> None:
         """Remove previously registered handlers for the various events that 
@@ -692,6 +583,236 @@ class WidgetWrapper(RelativeLayout):
         if 'slide_play' in self.config['animations']:
             self.start_animation_from_event('slide_play')
 
+    def find_widgets_by_key(self, key: str) -> List["Widget"]:
+        """Return a list of widgets with the matching key value by searching
+        the tree of children belonging to this widget."""
+        return [x for x in self.walk(restrict=True, loopback=False) if hasattr(x, 'key') and x.key == key]
+
+    #
+    # Properties
+    #
+
+    key = StringProperty(None, allownone=True)
+    '''Widget keys are used to uniquely identify instances of widgets which you can later 
+    use to update or remove the widget.
+    '''
+
+    color = ListProperty([1.0, 1.0, 1.0, 1.0])
+    '''The color of the widget, in the (r, g, b, a) format.
+
+    :attr:`color` is a :class:`~kivy.properties.ListProperty` and
+    defaults to [1.0, 1.0, 1.0, 1.0].
+    '''
+
+    anchor_x = StringProperty(None, allownone=True)
+    '''Which edge of the widget will be used for positioning. ('left', 'center' 
+    (or 'middle'), or 'right'. If None, 'center' will be used.
+    '''
+
+    anchor_y = StringProperty(None, allownone=True)
+    '''Which edge of the widget will be used for positioning. ('top', 'middle' 
+    (or 'center'), or 'bottom'. If None, 'center' will be used.
+    '''
+
+    anchor_pos = ReferenceListProperty(anchor_x, anchor_y)
+    '''Which point of the widget will be used for positioning.
+
+    :attr:`anchor_pos` is a :class:`~kivy.properties.ReferenceListProperty`
+    of (:attr:`anchor_x`, :attr:`anchor_y`) properties.
+    '''
+
+    adjust_top = NumericProperty(0)
+    '''Moves the "top" of this widget's anchor position down, meaning any
+    positioning that includes calculations involving the top (anchor_y of 'top' 
+    or 'middle') use the alternate top position. Positive values move the top 
+    towards the center of the widget, negative values move it away. Negative 
+    values can be used to give the widget "space" on the top, and positive 
+    values can be used to remove unwanted space from the top of the widget. 
+    Note that this setting does not actually crop or cut off the top of the 
+    widget, rather, it just adjusts how the positioning is calculated.
+    '''
+
+    adjust_right = NumericProperty(0)
+    '''Adjusts the anchor position calculations for the right side of the widget. 
+    Positive values move the right position  towards the center, negative values 
+    move it away from the center.
+    '''
+
+    adjust_bottom = NumericProperty(0)
+    '''Adjusts the anchor position calculations for the bottom of the widget. 
+    Positive values move the bottom position towards the center, negative values 
+    move it away from the center.
+    '''
+
+    adjust_left = NumericProperty(0)
+    '''Adjusts the anchor position calculations for the left side of the widget. 
+    Positive values move the left position towards the center, negative values 
+    move it away from the center.
+    '''
+
+    def _get_anchor_offset_pos(self):
+        """Calculates the anchor offset position relative to the lower-left corner 
+        of a widget based on several positioning parameters.
+        """
+        # Set defaults
+        offset_x = 0
+        offset_y = 0
+        anchor_x = self.anchor_x
+        anchor_y = self.anchor_y
+        if not anchor_x:
+            anchor_x = 'center'
+        if not self.anchor_y:
+            anchor_y = 'middle'
+
+        # ----------------------
+        # X / width / horizontal
+        # ----------------------
+
+        # Adjust for anchor_x & adjust_right/left
+        if anchor_x in ('center', 'middle'):
+            offset_x -= (self.width - self.adjust_right + self.adjust_left) / 2
+        elif anchor_x == 'right':
+            offset_x -= self.width - self.adjust_right
+        else:  # left
+            offset_x -= self.adjust_left
+
+        # --------------------
+        # Y / height / vertical
+        # --------------------
+
+        # Adjust for anchor_y & adjust_top/bottom
+        if anchor_y in ('middle', 'center'):
+            offset_y -= (self.height - self.adjust_top + self.adjust_bottom) / 2
+        elif anchor_y == 'top':
+            offset_y -= self.height - self.adjust_top
+        else:  # bottom
+            offset_y -= self.adjust_bottom
+
+        return offset_x, offset_y
+
+    anchor_offset_pos = AliasProperty(_get_anchor_offset_pos, None, bind=('size',), cache=True)
+    '''The anchor position of the widget (relative to the widget's lower left corner).
+
+    :attr:`anchor_offset_pos` is a :class:`~kivy.properties.ReferenceListProperty`
+    of (:attr:`anchor_offset_x`, :attr:`anchor_offset_y`) properties.
+    '''
+
+
+def create_widget_objects_from_config(mc: "MpfMc", config: Union[dict, list],
+                                      key: Optional[str] = None,
+                                      play_kwargs: Optional[dict] = None,
+                                      widget_settings: Optional[dict] = None) -> List["MpfWidget"]:
+    """
+    Creates one or more widgets from config settings.
+
+    Args:
+        mc: 
+        config: 
+        key: 
+        play_kwargs: 
+        widget_settings: 
+
+    Returns:
+        A list of the MpfWidget objects created.
+    """
+    if not isinstance(config, list):
+        config = [config]
+    widgets_added = list()
+
+    if not play_kwargs:
+        play_kwargs = dict()  # todo
+
+    for widget in config:
+        if widget_settings:
+            widget_settings = mc.config_validator.validate_config(
+                'widgets:{}'.format(widget['type']), widget_settings,
+                base_spec='widgets:common', add_missing_keys=False)
+
+            widget.update(widget_settings)
+
+        configured_key = widget.get('key', None)
+
+        if configured_key and key and "." not in key and configured_key != key:
+            raise KeyError("Widget has incoming key '{}' which does not "
+                           "match the key in the widget's config "
+                           "'{}'.".format(key, configured_key))
+
+        if configured_key:
+            this_key = configured_key
+        else:
+            this_key = key
+
+        widget_obj = mc.widgets.type_map[widget['type']](
+            mc=mc, config=widget, key=this_key, play_kwargs=play_kwargs)
+
+        top_widget = widget_obj
+
+        # some widgets have parents, so we need to make sure that we add
+        # the parent widget to the slide
+        while top_widget.parent:
+            top_widget = top_widget.parent
+
+        widgets_added.append(top_widget)
+
+    return widgets_added
+
+
+def create_widget_objects_from_library(mc: "MpfMc", name: str,
+                                       key: Optional[str] = None,
+                                       widget_settings: Optional[dict] = None,
+                                       play_kwargs: Optional[dict] = None,
+                                       **kwargs) -> List["ContainedWidget"]:
+    """
+
+    Args:
+        mc: 
+        name: 
+        key: 
+        widget_settings: 
+        play_kwargs: 
+        **kwargs: 
+
+    Returns:
+        A list of the MpfWidget objects created.
+    """
+    if name not in mc.widgets:
+        raise ValueError("Widget %s not found", name)
+
+    return create_widget_objects_from_config(mc=mc,
+                                             config=mc.widgets[name],
+                                             key=key,
+                                             widget_settings=widget_settings,
+                                             play_kwargs=play_kwargs)
+
+
+class WidgetContainer(RelativeLayout):
+
+    def __init__(self, key: Optional[str]=None, z: int=0, **kwargs) -> None:
+        del kwargs
+        super().__init__(size_hint=(1, 1))
+
+        self.key = key
+        self.z = z
+
+    def __repr__(self) -> str:  # pragma: no cover
+        return '<WidgetContainer id={} z={}>'.format(self.id, self.z)
+
+    def __lt__(self, other: "Widget") -> bool:
+        """
+        Less than comparison operator (based on z-order value). Used to 
+        maintain proper z-order when adding widgets to a parent.
+        Args:
+            other: The widget to compare to this one.
+
+        Returns:
+            True if the other widget is less than the current widget (uses
+            z-order to perform the comparison).
+        """
+        if hasattr(other, 'z'):
+            return other.z < self.z
+        else:
+            return 0 < self.z
+
     #
     # Properties
     #
@@ -705,9 +826,4 @@ class WidgetWrapper(RelativeLayout):
     '''Z position (z-order) of the widget (used to determine the drawing order of widgets).
     '''
 
-    def _get_widget(self):
-        return self._widget
 
-    widget = AliasProperty(_get_widget, None)
-    '''Widget contains the widget that is wrapped/managed by this wrapper object.
-    '''
