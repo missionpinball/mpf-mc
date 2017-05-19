@@ -60,7 +60,7 @@ class ContainedWidget(Widget):
         # Create a container widget as this widget's parent.  The container will adjust
         # the coordinate system for this widget so that all positional properties are
         # based on the widget's anchor rather than the lower left corner.
-        self._container = WidgetContainer()
+        self._container = WidgetContainer(self, z=self.config['z'])
         self._container.add_widget(self)
         self._container.fbind('parent', self.on_container_parent)
 
@@ -121,6 +121,12 @@ class ContainedWidget(Widget):
     def pass_to_kivy_widget_init(self) -> dict:
         """Initializes the dictionary of settings to pass to Kivy."""
         return dict()
+
+    def merge_asset_config(self, asset) -> None:
+        for setting in [x for x in self.merge_settings if (
+                        x not in self.config['_default_settings'] and
+                        x in asset.config)]:
+            self.config[setting] = asset.config[setting]
 
     def on_anchor_offset_pos(self, instance, pos):
         """Called whenever the anchor_offset_pos property value changes."""
@@ -787,12 +793,14 @@ def create_widget_objects_from_library(mc: "MpfMc", name: str,
 
 class WidgetContainer(RelativeLayout):
 
-    def __init__(self, key: Optional[str]=None, z: int=0, **kwargs) -> None:
+    def __init__(self, widget: "ContainedWidget",
+                 key: Optional[str]=None, z: int=0, **kwargs) -> None:
         del kwargs
         super().__init__(size_hint=(1, 1))
 
         self.key = key
         self.z = z
+        self._widget = widget
 
     def __repr__(self) -> str:  # pragma: no cover
         return '<WidgetContainer id={} z={}>'.format(self.id, self.z)
@@ -813,6 +821,26 @@ class WidgetContainer(RelativeLayout):
         else:
             return 0 < self.z
 
+    def on_pre_show_slide(self) -> None:
+        if self._widget:
+            self._widget.on_pre_show_slide()
+
+    def on_show_slide(self) -> None:
+        if self._widget:
+            self._widget.on_show_slide()
+
+    def on_pre_slide_leave(self) -> None:
+        if self._widget:
+            self._widget.on_pre_slide_leave()
+
+    def on_slide_leave(self) -> None:
+        if self._widget:
+            self._widget.on_slide_leave()
+
+    def on_slide_play(self) -> None:
+        if self._widget:
+            self._widget.on_slide_play()
+
     #
     # Properties
     #
@@ -826,4 +854,8 @@ class WidgetContainer(RelativeLayout):
     '''Z position (z-order) of the widget (used to determine the drawing order of widgets).
     '''
 
+    def _get_widget(self):
+        return self._widget
+
+    widget = AliasProperty(_get_widget, None)
 
