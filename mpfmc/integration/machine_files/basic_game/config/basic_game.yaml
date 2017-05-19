@@ -11,8 +11,12 @@ coils:
   drain:
     number:
 
+playfields:
+  playfield:
+    default_source_device: bd_drain
+
 ball_devices:
   bd_drain:
     eject_coil: drain
     ball_switches: drain
-    tags: trough, drain, ball_add_live
+    tags: trough, drain

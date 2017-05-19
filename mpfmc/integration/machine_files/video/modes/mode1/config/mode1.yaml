@@ -1,0 +1,18 @@
+#config_version=4
+
+mode:
+  priority: 100
+  start_events: start_mode1
+  stop_events: stop_mode1
+  game_mode: false
+
+
+slide_player:
+  mode_mode1_started:
+    mode1_slide1:
+      widgets:
+      - type: video
+        video: mpf_video_small_test2
+      - type: text
+        text: Video from Mode
+        y: bottom+20%
