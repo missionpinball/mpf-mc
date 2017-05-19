@@ -1,28 +1,25 @@
 from typing import TYPE_CHECKING, Optional, Union
 
-from kivy.uix.scatter import Scatter
 from kivy.properties import ObjectProperty, NumericProperty, AliasProperty
-from kivy.graphics import Rectangle, Color
+from kivy.graphics import Rectangle, Color, Rotate, Scale
 
-from mpfmc.uix.widget import MpfWidget
+from mpfmc.uix.widget_container import ContainedWidget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
     from mpfmc.assets.image import ImageAsset
 
 
-class ImageWidget(MpfWidget, Scatter):
+class ImageWidget(ContainedWidget):
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
-    animation_properties = ('x', 'y', 'rotation', 'scale', 'fps', 'current_frame', 'opacity')
+    animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'opacity')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
 
         self._image = None  # type: ImageAsset
         self._current_loop = 0
-        self.rotation = self.config.get('rotation', 0)
-        self.scale = self.config.get('scale', 1.0)
 
         # Retrieve the specified image asset to display.  This widget simply
         # draws a rectangle using the texture from the loaded image asset to
@@ -55,6 +52,13 @@ class ImageWidget(MpfWidget, Scatter):
             self.size = (0, 0)
             self._image.load(callback=self._image_loaded)
 
+        # Bind to all properties that when changed need to force
+        # the widget to be redrawn
+        self.bind(pos=self._draw_widget,
+                  color=self._draw_widget,
+                  rotation=self._draw_widget,
+                  scale=self._draw_widget)
+
     def __repr__(self) -> str:  # pragma: no cover
         try:
             return '<Image name={}, size={}, pos={}>'.format(self._image.name,
@@ -73,7 +77,7 @@ class ImageWidget(MpfWidget, Scatter):
         self._image.image.bind(on_texture=self._on_texture_change)
         self._on_texture_change()
 
-        self._draw_image()
+        self._draw_widget()
 
         # Setup animation properties (if applicable)
         if self._image.image.anim_available:
@@ -90,7 +94,7 @@ class ImageWidget(MpfWidget, Scatter):
 
         self.texture = self._image.image.texture
         self.size = self.texture.size
-        self._draw_image()
+        self._draw_widget()
 
         # Handle animation looping (when applicable)
         ci = self._image.image
@@ -101,14 +105,18 @@ class ImageWidget(MpfWidget, Scatter):
                     ci.anim_reset(False)
                     self._current_loop = 0
 
-    def _draw_image(self, *args):
+    def _draw_widget(self, *args):
         """Draws the image (draws a rectangle using the image texture)"""
         del args
 
+        anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
         self.canvas.clear()
+
         with self.canvas:
-            Color(1, 1, 1, 1)
-            Rectangle(texture=self.texture, size=self.size)
+            Color(*self.color)
+            Rotate(angle=self.rotation, origin=anchor)
+            Scale(self.scale).origin = anchor
+            Rectangle(pos=self.pos, size=self.size, texture=self.texture)
 
     def play(self, start_frame: Optional[int]=None):
         """Play the image animation (if images supports it)."""
@@ -181,5 +189,18 @@ class ImageWidget(MpfWidget, Scatter):
     '''The current frame of the animation.
     '''
 
+    rotation = NumericProperty(0)
+    '''Rotation angle value of the widget.
+
+    :attr:`rotation` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    0.
+    '''
+
+    scale = NumericProperty(1.0)
+    '''Scale value of the widget.
+
+    :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    1.0.
+    '''
 
 widget_classes = [ImageWidget]
