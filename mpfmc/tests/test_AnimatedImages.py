@@ -23,8 +23,8 @@ class TestAnimatedImages(MpfMcTestCase):
         self.mc.events.post('slide1')
         self.advance_time()
 
-        ball = self.mc.targets['default'].current_slide.widgets[0]
-        stick_figures = self.mc.targets['default'].current_slide.widgets[1]
+        ball = self.mc.targets['default'].current_slide.widgets[0].widget
+        stick_figures = self.mc.targets['default'].current_slide.widgets[1].widget
 
         self.advance_time()
 
