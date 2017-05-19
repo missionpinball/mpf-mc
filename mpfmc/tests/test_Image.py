@@ -12,9 +12,6 @@ class TestImage(MpfMcTestCase):
         return 'test_image.yaml'
 
     def test_image(self):
-        # This test doesn't run on travis for some reason, but it works fine
-        # locally, so I'm just skipping it but appending an underscore to the
-        # test name.
         self.mc.events.post('show_slide1')
 
         # This tests includes images that preload and that load on demand, so
@@ -23,9 +20,9 @@ class TestImage(MpfMcTestCase):
 
         # Make sure that all the images are showing.
         active_widget_names = [
-            x.image.name for x in self.mc.targets['default'].current_slide.widgets]
+            x.widget.image.name for x in self.mc.targets['default'].current_slide.widgets]
 
         for x in range(12):
             self.assertIn('image{}'.format(x+1), active_widget_names)
 
-        self.advance_time(4.0)
+        self.advance_real_time(4.0)
