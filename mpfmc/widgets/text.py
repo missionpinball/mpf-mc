@@ -2,13 +2,16 @@ import re
 from typing import TYPE_CHECKING, Optional
 
 from kivy.uix.label import Label
-from mpfmc.uix.widget import MpfWidget
+from kivy.properties import ObjectProperty, NumericProperty, AliasProperty
+from kivy.graphics import Rectangle, Color, Rotate, Scale
+
+from mpfmc.uix.widget_container import ContainedWidget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Text(MpfWidget, Label):
+class Text(ContainedWidget):
     widget_type_name = 'Text'
     var_finder = re.compile("(?<=\()[a-zA-Z_0-9|]+(?=\))")
     string_finder = re.compile("(?<=\$)[a-zA-Z_0-9]+")
@@ -17,50 +20,71 @@ class Text(MpfWidget, Label):
                       'shorten', 'mipmap', 'markup', 'line_height',
                       'max_lines', 'strip', 'shorten_from', 'split_str',
                       'unicode_errors', 'color')
-    animation_properties = ('x', 'y', 'font_size', 'color', 'opacity')
+    animation_properties = ('x', 'y', 'font_size', 'color', 'opacity', 'rotation', 'scale')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
-                 play_kwargs: Optional[dict]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: Optional[dict]=None,
+                 key: Optional[str]=None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
+
+        self._label = Label()
+        self._label.fbind('texture', self.on_label_texture)
+
+        # Set label attribute values from config
+        for k, v in self.config.items():
+            if k in Text.merge_settings:
+                setattr(self._label, k, v)
+
+        # Special handling for baseline anchor
+        if self.config['anchor_y'] == 'baseline':
+            self.anchor_y = 'bottom'
+            self.adjust_bottom = self._label._label.get_descent() * -1
 
         self.original_text = self._get_text_string(config.get('text', ''))
 
         self.text_variables = dict()
-        if play_kwargs:
-            self.event_replacements = play_kwargs
+        if 'play_kwargs' in kwargs:
+            self.event_replacements = kwargs['play_kwargs']
         else:
             self.event_replacements = kwargs
         self._process_text(self.original_text)
 
+        # Bind to all properties that when changed need to force
+        # the widget to be redrawn
+        self.bind(pos=self._draw_widget,
+                  size=self._draw_widget,
+                  color=self._draw_widget,
+                  rotation=self._draw_widget,
+                  scale=self._draw_widget)
+
     def __repr__(self) -> str:
-        return '<Text Widget text={}>'.format(self.text)
+        if hasattr(self, '_label') and self._label:
+            return '<Text Widget text={}>'.format(self._label.text)
+        else:
+            return '<Text Widget text=None>'
 
-    def texture_update(self, *largs) -> dict:
-        super().texture_update(*largs)
-        self.size = self.texture_size
+    def _draw_widget(self, *args):
+        """Draws the image (draws a rectangle using the image texture)"""
+        del args
 
-    def on_parent(self, instance, parent) -> None:
-        if parent:
+        anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
+        self.canvas.clear()
+
+        with self.canvas:
+            Color(*self.color)
+            Rotate(angle=self.rotation, origin=anchor)
+            Scale(self.scale).origin = anchor
+            Rectangle(pos=self.pos, size=self.size, texture=self._label.texture)
+
+    def on_label_texture(self, instance, texture):
+        del instance
+        if texture:
+            self.size = texture.size
+
             if self.config['anchor_y'] == 'baseline':
-                self.pos = self.calculate_position(self.parent.width,
-                                                   self.parent.height,
-                                                   self.width,
-                                                   self.height,
-                                                   self.config['x'],
-                                                   self.config['y'],
-                                                   self.config['anchor_x'],
-                                                   'bottom',  # anchor_y
-                                                   self.config['adjust_top'],
-                                                   self.config['adjust_right'],
-                                                   self._label.get_descent() * -1,  # adjust_bottom
-                                                   self.config['adjust_left'])
-
-            else:
-                super().on_parent(instance, parent)
+                self.adjust_bottom = self._label._label.get_descent() * -1
 
     def update_kwargs(self, **kwargs) -> None:
         self.event_replacements.update(kwargs)
-
         self._process_text(self.original_text)
 
     def _get_text_string(self, text: str) -> str:
@@ -151,8 +175,8 @@ class Text(MpfWidget, Label):
                 for item in number_list:
                     grouped_item = Text.group_digits(item)
                     text = text.replace(str(item), grouped_item)
-        self.text = text
-        self.texture_update()
+        self._label.text = text
+        self._label.texture_update()
 
     def _player_var_change(self, **kwargs) -> None:
         del kwargs
@@ -222,5 +246,36 @@ class Text(MpfWidget, Label):
             digit_list.insert(i + 1, separator)
 
         return ''.join(digit_list)
+
+    #
+    # Properties
+    #
+
+    def _get_label(self):
+        return self._label
+
+    label = AliasProperty(_get_label, None)
+
+    def _get_text(self):
+        if self._label:
+            return self._label.text
+        else:
+            return None
+
+    text = AliasProperty(_get_text, None)
+
+    rotation = NumericProperty(0)
+    '''Rotation angle value of the widget.
+
+    :attr:`rotation` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    0.
+    '''
+
+    scale = NumericProperty(1.0)
+    '''Scale value of the widget.
+
+    :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    1.0.
+    '''
 
 widget_classes = [Text]
