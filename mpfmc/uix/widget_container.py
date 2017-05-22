@@ -823,6 +823,10 @@ class WidgetContainer(RelativeLayout):
         else:
             return 0 < self.z
 
+    def prepare_for_removal(self) -> None:
+        if self._widget:
+            self._widget.prepare_for_removal()
+
     def on_pre_show_slide(self) -> None:
         if self._widget:
             self._widget.on_pre_show_slide()

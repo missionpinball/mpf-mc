@@ -17,6 +17,7 @@ class ImageWidget(ContainedWidget):
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
+        self.size = (0, 0)
 
         self._image = None  # type: ImageAsset
         self._current_loop = 0

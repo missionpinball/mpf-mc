@@ -2,15 +2,17 @@ from typing import TYPE_CHECKING, Optional
 
 from kivy.uix.video import Video
 from kivy.core.video import Video as CoreVideo
+from kivy.graphics import Rectangle, Color, Rotate, Scale
+from kivy.properties import NumericProperty
 
-from mpfmc.uix.widget import MpfWidget, magic_events
+from mpfmc.uix.widget_container import ContainedWidget, magic_events
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
     from kivy.graphics.texture import Texture
 
 
-class VideoWidget(MpfWidget, Video):
+class VideoWidget(ContainedWidget, Video):
     widget_type_name = 'Video'
     merge_settings = ('height', 'width')
     animation_properties = ('x', 'y')
@@ -34,12 +36,17 @@ class VideoWidget(MpfWidget, Video):
 
         self.merge_asset_config(self.video)
 
-        # Set it to (0, 0) while it's loading so we don't see a white
-        # box on the slide
-        self.size = (0, 0)
-
         if self.config['control_events']:
             self._setup_control_events(self.config['control_events'])
+
+        # Bind to all properties that when changed need to force
+        # the widget to be redrawn
+        self.bind(pos=self._draw_widget,
+                  size=self._draw_widget,
+                  color=self._draw_widget,
+                  texture=self._draw_widget,
+                  rotation=self._draw_widget,
+                  scale=self._draw_widget)
 
         if not self.video.video:
             self.video.load(callback=self._do_video_load)
@@ -54,6 +61,20 @@ class VideoWidget(MpfWidget, Video):
         except AttributeError:
             return '<Video (loading...), size={}, pos={}>'.format(self.size,
                                                                   self.pos)
+
+    def _draw_widget(self, *args):
+        """Draws the image (draws a rectangle using the image texture)"""
+        del args
+
+        anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
+        self.canvas.clear()
+
+        if self.state in ('play', 'pause'):
+            with self.canvas:
+                Color(*self.color)
+                Rotate(angle=self.rotation, origin=anchor)
+                Scale(self.scale).origin = anchor
+                Rectangle(pos=self.pos, size=self.size, texture=self.texture)
 
     def _setup_control_events(self, event_list: list) -> None:
         for entry in event_list:
@@ -213,5 +234,24 @@ class VideoWidget(MpfWidget, Video):
         self.mc.events.remove_handlers_by_keys(self._control_events)
         self._control_events = list()
         self.stop()
+
+    #
+    # Properties
+    #
+
+    rotation = NumericProperty(0)
+    '''Rotation angle value of the widget.
+
+    :attr:`rotation` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    0.
+    '''
+
+    scale = NumericProperty(1.0)
+    '''Scale value of the widget.
+
+    :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    1.0.
+    '''
+
 
 widget_classes = [VideoWidget]
