@@ -83,19 +83,6 @@ class VideoAsset(Asset):
             self._video.unload()
             self._video = None
 
-    def play(self):
-        self._video.play()
-
-    def stop(self):
-        if self._video:
-            self._video.stop()
-
-    def pause(self):
-        self._video.pause()
-
-    def seek(self, percent):
-        self._video.seek(percent)
-
     def set_end_behavior(self, eos='stop'):
         assert eos in ('loop', 'pause', 'stop')
         self._video.eos = eos
@@ -111,7 +98,7 @@ class VideoAsset(Asset):
 
     def _check_duration(self, instance):
         del instance
-        if self._video.duration <= 0:
+        if self._video and self._video.duration <= 0:
             raise ValueError(
                 "Video file {} was loaded, but seems to have no content. Check"
                 " to make sure you have the proper Gstreamer plugins for the "

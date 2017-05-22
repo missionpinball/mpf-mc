@@ -9,6 +9,7 @@ class VideoWidget(MpfWidget, Video):
     merge_settings = ('height', 'width')
 
     def __init__(self, mc, config, key=None, **kwargs):
+        del kwargs
         super().__init__(mc=mc, config=config, key=key)
 
         try:
@@ -124,29 +125,38 @@ class VideoWidget(MpfWidget, Video):
 
     def play(self, **kwargs):
         del kwargs
-        self.video.play()
+        if not self.video.loaded:
+            return
         self.state = 'play'
 
     def pause(self, **kwargs):
         del kwargs
-        self.video.pause()
+        if not self.video.loaded:
+            return
         self.state = 'pause'
 
     def stop(self, **kwargs):
         del kwargs
-        self.video.stop()
+        if not self.video.loaded:
+            return
         self.state = 'stop'
 
     def seek(self, percent, **kwargs):
         del kwargs
+        if not self.video.loaded:
+            return
         super().seek(percent)
 
     def set_volume(self, volume, **kwargs):
         del kwargs
+        if not self.video.loaded:
+            return
         self.volume = volume
 
     def set_playback_position(self, position, **kwargs):
         del kwargs
+        if not self.video.loaded:
+            return
         super().seek(position / self.duration)
 
     def _do_video_load(self, *largs):
@@ -173,18 +183,18 @@ class VideoWidget(MpfWidget, Video):
         # pylint doesn't see it.
         if self._video:
             self._video.stop()
-        elif self.video.video:
-            self._video = self.video.video
-            self._video.volume = self.volume
-            self._video.bind(on_load=self._on_load,
-                             on_frame=self._on_video_frame,
-                             on_eos=self._on_eos)
-            # This is also flagged as an error by pylint, but it's okay because
-            # self.state is defined in the base class.
 
-            if self.state == 'play':
-                self._video.play()
-            self.duration = 1.
+        self._video = self.video.video
+        self._video.volume = self.volume
+        self._video.bind(on_load=self._on_load,
+                         on_frame=self._on_video_frame,
+                         on_eos=self._on_eos)
+        # This is also flagged as an error by pylint, but it's okay because
+        # self.state is defined in the base class.
+
+        if self.state == 'play':
+            self._video.play()
+        self.duration = 1.
 
         self.video.set_end_behavior(self.config['end_behavior'])
 
