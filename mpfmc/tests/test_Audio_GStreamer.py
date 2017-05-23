@@ -48,7 +48,7 @@ class TestAudioGStreamer(MpfMcTestCase):
         self.mc.events.post('show_slide1')
         self.advance_time()
 
-        video_widget = self.mc.targets['default'].current_slide.widgets[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
 
         self.assertEqual(video_widget.state, 'play')
         self.assertTrue(video_widget.video.loaded)

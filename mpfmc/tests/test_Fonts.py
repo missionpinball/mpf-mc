@@ -17,8 +17,8 @@ class TestFonts(MpfMcTestCase):
         self.advance_time(1)
 
         # make sure the adjustments are correct
-        top_widget = self.mc.displays['dmd'].current_slide.widgets[0]
-        bottom_widget = self.mc.displays['dmd'].current_slide.widgets[1]
+        top_widget = self.mc.displays['dmd'].current_slide.widgets[0].widget
+        bottom_widget = self.mc.displays['dmd'].current_slide.widgets[1].widget
 
         self.assertEqual(
             self.mc.machine_config['widget_styles']['dmd_big']['adjust_bottom'],
@@ -32,8 +32,8 @@ class TestFonts(MpfMcTestCase):
         self.advance_time(1)
 
         # make sure the adjustments are correct
-        top_widget = self.mc.displays['dmd'].current_slide.widgets[0]
-        bottom_widget = self.mc.displays['dmd'].current_slide.widgets[1]
+        top_widget = self.mc.displays['dmd'].current_slide.widgets[0].widget
+        bottom_widget = self.mc.displays['dmd'].current_slide.widgets[1].widget
 
         self.assertEqual(
             self.mc.machine_config['widget_styles']['dmd_med']['adjust_bottom'],
@@ -47,8 +47,8 @@ class TestFonts(MpfMcTestCase):
         self.advance_time(1)
 
         # make sure the adjustments are correct
-        top_widget = self.mc.displays['dmd'].current_slide.widgets[0]
-        bottom_widget = self.mc.displays['dmd'].current_slide.widgets[1]
+        top_widget = self.mc.displays['dmd'].current_slide.widgets[0].widget
+        bottom_widget = self.mc.displays['dmd'].current_slide.widgets[1].widget
 
         self.assertEqual(
             self.mc.machine_config['widget_styles']['dmd_small']['adjust_bottom'],

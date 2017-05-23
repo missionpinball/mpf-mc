@@ -50,7 +50,7 @@ class TestSlides(MpfMcTestCase):
 
         widget_tree = list()
         for s in slide.children:
-            widget_tree.append(s)
+            widget_tree.append(s.widget)
 
         # Widgets are drawn in order from the end of the children list to the beginning
         # so the order should be the same order as appears in the config file.
@@ -67,7 +67,7 @@ class TestSlides(MpfMcTestCase):
 
         widget_tree = list()
         for s in slide.children:
-            widget_tree.append(s)
+            widget_tree.append(s.widget)
 
         # Widgets are drawn in order from the end of the children list to the beginning.
         # The resulting child widget order should be the from highest z-order value in
