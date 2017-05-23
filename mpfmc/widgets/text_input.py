@@ -10,6 +10,8 @@ that's been entered so far.
 from collections import deque
 from typing import TYPE_CHECKING, Optional
 from kivy.clock import Clock
+
+from mpfmc.uix.widget_container import WidgetContainer
 from mpfmc.widgets.text import Text
 
 if TYPE_CHECKING:
@@ -56,9 +58,9 @@ class MpfTextInput(Text):
         for target in self.mc.targets.values():
             w = target.find_widgets_by_key(self.config['key'])
             if w:
-                if w[0] != self:
+                if w[0] != self and isinstance(w[0], Text):
                     self.linked_text_widget = w[0]
-                elif len(w) > 1:
+                elif len(w) > 1 and isinstance(w[1], Text):
                     self.linked_text_widget = w[1]
                 break
 
