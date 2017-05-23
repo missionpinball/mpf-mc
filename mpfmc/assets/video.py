@@ -1,4 +1,6 @@
 from kivy.core.video import Video
+from kivy.core.video.video_null import VideoNull
+
 from mpf.core.assets import Asset, AssetPool
 
 
@@ -87,7 +89,8 @@ class VideoAsset(Asset):
         self._video.play()
 
     def stop(self):
-        self._video.stop()
+        if self._video:
+            self._video.stop()
 
     def pause(self):
         self._video.pause()
@@ -105,6 +108,9 @@ class VideoAsset(Asset):
         self.unloading = False
         self._video = Video(filename=self.file)
         self._video.bind(on_load=self._check_duration)
+
+        if isinstance(self._video, VideoNull):
+            raise AssertionError("Kivy cannot load video {} because there is no provider.".format(self.file))
 
         self._call_callbacks()
 
