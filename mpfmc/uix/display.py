@@ -12,6 +12,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatter import ScatterPlane
 
 from mpfmc.uix.widget import MpfWidget
+from mpfmc.uix.widget_container import ContainedWidget
 from mpfmc.uix.slide import Slide
 from kivy.properties import ObjectProperty
 
@@ -504,7 +505,10 @@ class Display(ScreenManager):
     def remove_widgets_by_key(self, key: str) -> None:
         """Removes all widgets with the specified key."""
         for widget in self.find_widgets_by_key(key):
-            widget.parent.remove_widget(widget)
+            if isinstance(widget, ContainedWidget):
+                widget.container.parent.remove_widget(widget.container)
+            else:
+                widget.parent.remove_widget(widget)
 
     def find_widgets_by_key(self, key: str) -> List["MpfWidget"]:
         """Retrieves a list of all widgets with the specified key value."""

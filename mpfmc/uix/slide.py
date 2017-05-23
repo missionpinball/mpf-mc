@@ -4,10 +4,12 @@ from typing import List, Optional
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
+from kivy.uix.widget import Widget
 from kivy.graphics import Color
 from kivy.properties import ListProperty, AliasProperty
 
 from mpfmc.uix.widget import create_widget_objects_from_config, MpfWidget
+from mpfmc.uix.widget_container import ContainedWidget
 from mpfmc.core.mc import MpfMc
 
 
@@ -225,15 +227,18 @@ class Slide(Screen, StencilView):
     def remove_widgets_by_key(self, key: str) -> None:
         """Removes all widgets from this slide with the specified key value."""
         for widget in self.find_widgets_by_key(key):
-            self.remove_widget(widget)
+            if isinstance(widget, ContainedWidget):
+                self.remove_widget(widget.container)
+            else:
+                self.remove_widget(widget)
 
-    def find_widgets_by_key(self, key: str) -> List["MpfWidget"]:
+    def find_widgets_by_key(self, key: str) -> List["Widget"]:
         """Return a list of widgets with the matching key value by searching
         the tree of children belonging to this slide."""
         return [w for child in self.children
                 for w in child.walk(restrict=True, loopback=False) if w.key == key]
 
-    def add_widget_to_parent_frame(self, widget: "MpfWidget"):
+    def add_widget_to_parent_frame(self, widget: "Widget"):
         """Adds this widget to this slide's parent instead of to this slide.
 
         Args:

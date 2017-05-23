@@ -38,7 +38,7 @@ class ContainedWidget(Widget):
     # our configs. However we use some config keys that Kivy also uses,
     # and we use them for different purposes, so there are some keys that we
     # use that we never want to set on widget base classes.
-    _dont_send_to_kivy = ('x', 'y')
+    _dont_send_to_kivy = ('x', 'y', 'key')
 
     merge_settings = tuple()
 
@@ -117,7 +117,7 @@ class ContainedWidget(Widget):
             self.schedule_removal(self.expire)
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<{} Widget id={} key={}>'.format(self.widget_type_name, self.id, self.key)
+        return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
     def pass_to_kivy_widget_init(self) -> dict:
         """Initializes the dictionary of settings to pass to Kivy."""
@@ -322,7 +322,7 @@ class ContainedWidget(Widget):
 
         try:
             # This widget has a container parent that must be removed
-            self.parent.parent.remove_widget(self.parent)
+            self._container.parent.remove_widget(self._container)
         except AttributeError:
             pass
 
@@ -599,20 +599,16 @@ class ContainedWidget(Widget):
     # Properties
     #
 
-    def _get_key(self) -> Optional[str]:
-        if self._container:
-            return self._container.key
-        else:
-            return None
+    def _get_container(self) -> Widget:
+        return self._container
 
-    def _set_key(self, key: Optional[str]):
-        if self._container:
-            self._container.key = key
+    container = AliasProperty(_get_container, None)
+    '''The widget container is a special container/parent widget that manages this widget.
+    It has no graphical representation.'''
 
-    key = AliasProperty(_get_key, _set_key)
+    key = StringProperty(None, allownone=True)
     '''Widget keys are used to uniquely identify instances of widgets which you can later 
-    use to update or remove the widget. This widget's container widget actually stores the
-    key value.
+    use to update or remove the widget.
     '''
 
     color = ListProperty([1.0, 1.0, 1.0, 1.0])
@@ -863,11 +859,6 @@ class WidgetContainer(RelativeLayout):
     #
     # Properties
     #
-
-    key = StringProperty(None, allownone=True)
-    '''Widget keys are used to uniquely identify instances of widgets which you can later 
-    use to update or remove the widget.
-    '''
 
     z = NumericProperty(0)
     '''Z position (z-order) of the widget (used to determine the drawing order of widgets).
