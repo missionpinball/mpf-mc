@@ -48,6 +48,7 @@ class ContainedWidget(Widget):
     def __init__(self, mc: "MpfMc", config: Optional[dict]=None,
                  key: Optional[str]=None, **kwargs) -> None:
         del kwargs
+        self._container = None
         self.size_hint = (None, None)
 
         # Needs to be deepcopy since configs can have nested dicts
@@ -116,7 +117,7 @@ class ContainedWidget(Widget):
             self.schedule_removal(self.expire)
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<{} Widget id={}, key={}>'.format(self.widget_type_name, self.id, self.key)
+        return '<{} Widget id={} key={}>'.format(self.widget_type_name, self.id, self.key)
 
     def pass_to_kivy_widget_init(self) -> dict:
         """Initializes the dictionary of settings to pass to Kivy."""
@@ -598,9 +599,20 @@ class ContainedWidget(Widget):
     # Properties
     #
 
-    key = StringProperty(None, allownone=True)
+    def _get_key(self) -> Optional[str]:
+        if self._container:
+            return self._container.key
+        else:
+            return None
+
+    def _set_key(self, key: Optional[str]):
+        if self._container:
+            self._container.key = key
+
+    key = AliasProperty(_get_key, _set_key)
     '''Widget keys are used to uniquely identify instances of widgets which you can later 
-    use to update or remove the widget.
+    use to update or remove the widget. This widget's container widget actually stores the
+    key value.
     '''
 
     color = ListProperty([1.0, 1.0, 1.0, 1.0])
@@ -798,6 +810,7 @@ class WidgetContainer(RelativeLayout):
     def __init__(self, widget: "ContainedWidget",
                  key: Optional[str]=None, z: int=0, **kwargs) -> None:
         del kwargs
+        self.key = None
         super().__init__(size_hint=(1, 1))
 
         self.key = key
@@ -805,7 +818,7 @@ class WidgetContainer(RelativeLayout):
         self._widget = widget
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<WidgetContainer id={} z={}>'.format(self.id, self.z)
+        return '<WidgetContainer id={} z={} key={}>'.format(self.id, self.z, self.key)
 
     def __lt__(self, other: "Widget") -> bool:
         """
