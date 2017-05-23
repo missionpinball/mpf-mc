@@ -134,13 +134,14 @@ class TestAnimation(MpfMcTestCase):
         self.mc.events.post('show_slide13')
         self.advance_time(.1)
 
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
 
-        self.assertAlmostEqual(-130, widget.x, delta=20)
+        self.assertAlmostEqual(-140, widget.anchor_offset_pos[0], delta=20)
+        self.assertEqual(100, widget.x)
         self.advance_time(.5)
-        self.assertAlmostEqual(-8, widget.x, delta=20)
+        self.assertAlmostEqual(150, widget.x, delta=20)
         self.advance_time(.5)
-        self.assertEqual(100.0, widget.x)
+        self.assertEqual(200.0, widget.x)
 
         self.mc.events.post('show_base_slide')
         self.advance_time()
@@ -148,23 +149,25 @@ class TestAnimation(MpfMcTestCase):
         # animations should start from orig position
         self.mc.events.post('show_slide13')
         self.advance_time(.1)
-        self.assertAlmostEqual(-130, widget.x, delta=20)
+        self.assertAlmostEqual(-140, widget.anchor_offset_pos[0], delta=20)
+        self.assertEqual(100, widget.x)
         self.advance_time(.5)
-        self.assertAlmostEqual(-8, widget.x, delta=20)
+        self.assertAlmostEqual(150, widget.x, delta=20)
         self.advance_time(.5)
-        self.assertEqual(100.0, widget.x)
+        self.assertEqual(200.0, widget.x)
 
     def test_reset_animations_slide_play(self):
         self.mc.events.post('show_slide14')
         self.advance_time(.1)
 
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
 
-        self.assertAlmostEqual(-108, widget.x, delta=20)
+        self.assertAlmostEqual(-120, widget.anchor_offset_pos[0], delta=20)
+        self.assertEqual(100, widget.x)
         self.advance_time(.5)
-        self.assertAlmostEqual(-8, widget.x, delta=30)
+        self.assertAlmostEqual(150, widget.x, delta=20)
         self.advance_time(.5)
-        self.assertEqual(100.0, widget.x)
+        self.assertEqual(200.0, widget.x)
 
         self.mc.events.post('show_base_slide')
         self.advance_time()
@@ -172,43 +175,44 @@ class TestAnimation(MpfMcTestCase):
         # animations should start from orig position
         self.mc.events.post('show_slide14')
         self.advance_time(.1)
-        self.assertAlmostEqual(-108, widget.x, delta=20)
+        self.assertAlmostEqual(-120, widget.anchor_offset_pos[0], delta=20)
+        self.assertEqual(100, widget.x)
         self.advance_time(.5)
-        self.assertAlmostEqual(-8, widget.x, delta=20)
+        self.assertAlmostEqual(150, widget.x, delta=20)
         self.advance_time(.5)
-        self.assertEqual(100.0, widget.x)
+        self.assertEqual(200.0, widget.x)
 
     def test_reset_animations_standard_event(self):
         self.mc.events.post('show_slide15')
         self.advance_time(.1)
 
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
 
-        self.assertAlmostEqual(-132, widget.x, delta=20)
+        self.assertAlmostEqual(-130, widget.anchor_offset_pos[0], delta=20)
+        self.assertEqual(100, widget.x)
         self.advance_time(.5)
-        self.assertAlmostEqual(-8, widget.x, delta=20)
+        self.assertAlmostEqual(150, widget.x, delta=20)
         self.advance_time(.5)
-        self.assertEqual(100.0, widget.x)
+        self.assertEqual(200.0, widget.x)
 
         self.mc.events.post('event1')
         self.advance_time()
-        self.assertAlmostEqual(-132, widget.x, delta=20)
+        self.assertEqual(100, widget.x)
 
     def test_animation_show_slide(self):
         self.mc.events.post('show_slide7')
         self.advance_time()
-        self.assertEqual(self.mc.targets['default'].current_slide_name,
-                         'slide7')
+        self.assertEqual(self.mc.targets['default'].current_slide_name, 'slide7')
 
         # grab this widget
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertTrue(widget.text == 'TEST ANIMATION ON show_slide')
 
         # make sure it's animating as we expect
         self.assertTrue(widget.animation)
         self.assertEqual(widget.animation.duration, 0.5)
         self.assertTrue(widget.animation.have_properties_to_animate(widget))
-        self.assertEqual(widget.animation.animated_properties, {'x': 400})
+        self.assertEqual(widget.animation.animated_properties, {'x': 500})
 
         # wait for it to finish and make sure it stopped
         self.advance_time(.5)
@@ -222,7 +226,7 @@ class TestAnimation(MpfMcTestCase):
         self.advance_time()
 
         # transition is 1 sec, so animation should not start until that's done
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertTrue(widget.text == 'ANIMATION show_slide')
         self.assertFalse(widget.animation)
 
@@ -232,7 +236,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertTrue(widget.animation)
         self.assertEqual(widget.animation.duration, 0.5)
         self.assertTrue(widget.animation.have_properties_to_animate(widget))
-        self.assertEqual(widget.animation.animated_properties, {'x': 400})
+        self.assertEqual(widget.animation.animated_properties, {'x': 500})
 
     def test_animation_pre_show_slide(self):
         self.mc.events.post('show_base_slide')
@@ -242,19 +246,19 @@ class TestAnimation(MpfMcTestCase):
         self.advance_time()
 
         # transition is 1 sec, but animation should run at the same time
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertTrue(widget.text == 'ANIMATION pre_show_slide')
 
         self.assertTrue(widget.animation)
         self.assertEqual(widget.animation.duration, 0.5)
         self.assertTrue(widget.animation.have_properties_to_animate(widget))
-        self.assertEqual(widget.animation.animated_properties, {'x': 400})
+        self.assertEqual(widget.animation.animated_properties, {'x': 500})
 
     def test_animation_pre_slide_leave(self):
         self.mc.events.post('show_slide11')
         self.advance_time()
 
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertTrue(widget.text == 'ANIMATION pre_slide_leave')
 
         self.mc.events.post('show_base_slide_with_transition')
@@ -273,7 +277,7 @@ class TestAnimation(MpfMcTestCase):
         self.mc.events.post('show_slide12')
         self.advance_time()
 
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertTrue(widget.text == 'ANIMATION slide_leave')
         self.assertFalse(widget.animation)
 
@@ -298,7 +302,7 @@ class TestAnimation(MpfMcTestCase):
                          'slide2')
 
         # grab this widget
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertTrue(widget.text == 'ANIMATION TEST')
 
         # make sure it's not animating
@@ -314,18 +318,17 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(widget.animation.animated_properties,
                          {'x': 0, 'y': 0})
         self.advance_time(.5)
-        self.assertLess(widget.x, 100)
-        self.assertLess(widget.y, 200)
+        self.assertAlmostEqual(190, widget.x, delta=30)
+        self.assertAlmostEqual(145, widget.y, delta=30)
 
     def test_named_animation(self):
         self.mc.events.post('show_slide3')
 
         self.advance_time()
-        self.assertEqual(self.mc.targets['default'].current_slide_name,
-                         'slide3')
+        self.assertEqual(self.mc.targets['default'].current_slide_name, 'slide3')
 
         # grab this widget
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertTrue(widget.text == 'text3')
 
         # make sure it's not animating
@@ -333,8 +336,8 @@ class TestAnimation(MpfMcTestCase):
 
         # make sure initial values are set
         self.assertEqual(widget.opacity, 0)
-        self.assertEqual(widget.x, 177)
-        self.assertEqual(widget.y, 138)
+        self.assertEqual(widget.x, 200)
+        self.assertEqual(widget.y, 150)
 
         # post the event to animate it
         self.mc.events.post('entrance3')
@@ -355,7 +358,7 @@ class TestAnimation(MpfMcTestCase):
         self.advance_time()
 
         # grab this widget
-        widget = self.mc.targets['default'].current_slide.children[1]
+        widget = self.mc.targets['default'].current_slide.children[1].widget
         self.assertTrue(widget.text == 'widget2')
 
         # make sure it's not animating
@@ -363,8 +366,8 @@ class TestAnimation(MpfMcTestCase):
 
         # make sure initial values are set
         self.assertEqual(widget.opacity, 0)
-        self.assertEqual(widget.x, 164.5)
-        self.assertEqual(widget.y, 138)
+        self.assertEqual(widget.x, 200)
+        self.assertEqual(widget.y, 150)
 
         # post the event to animate it
         self.mc.events.post('animate_widget2')
@@ -390,9 +393,9 @@ class TestAnimation(MpfMcTestCase):
         self.mc.events.post('show_widget1')
         self.advance_time()
 
-        widget = self.mc.targets['default'].current_slide.children[1]
+        widget = self.mc.targets['default'].current_slide.children[1].widget
         self.assertEqual('WIDGET 1', widget.text)
-        self.assertEqual(widget.pos[0], -144.5)
+        self.assertEqual(widget.pos[0], -100)
 
         self.mc.events.post('move_on_slide')
         self.advance_time(.6)
@@ -409,7 +412,7 @@ class TestAnimation(MpfMcTestCase):
         self.assertEqual(self.mc.targets['default'].current_slide_name, 'slide3')
 
         # grab this widget
-        widget = self.mc.targets['default'].current_slide.widgets[0]
+        widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertTrue(widget.text == 'text3')
 
         # make sure it's not animating
@@ -417,8 +420,8 @@ class TestAnimation(MpfMcTestCase):
 
         # make sure initial values are set
         self.assertEqual(widget.opacity, 0)
-        self.assertEqual(widget.x, 177)
-        self.assertEqual(widget.y, 138)
+        self.assertEqual(widget.x, 200)
+        self.assertEqual(widget.y, 150)
 
         # post the event to fade it in
         self.mc.events.post('fade_in')
@@ -432,21 +435,21 @@ class TestAnimation(MpfMcTestCase):
         self.advance_time(1.1)
 
         # check properties
-        self.assertEqual(widget.x, 227)
-        self.assertEqual(widget.y, 138)
+        self.assertEqual(widget.x, 250)
+        self.assertEqual(widget.y, 150)
 
         # post the event to advance it +50 in the y direction
         self.mc.events.post('advance_y')
         self.advance_time(1.1)
 
         # check properties
-        self.assertEqual(widget.x, 227)
-        self.assertEqual(widget.y, 188)
+        self.assertEqual(widget.x, 250)
+        self.assertEqual(widget.y, 200)
 
         # post the event to advance it +50 in both the x and y directions
         self.mc.events.post('advance_xy')
         self.advance_time(1.1)
 
         # check properties
-        self.assertEqual(widget.x, 277)
-        self.assertEqual(widget.y, 238)
+        self.assertEqual(widget.x, 300)
+        self.assertEqual(widget.y, 250)
