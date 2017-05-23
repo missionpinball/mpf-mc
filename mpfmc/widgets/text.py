@@ -17,6 +17,11 @@ class Text(ContainedWidget):
     widget_type_name = 'Text'
     var_finder = re.compile("(?<=\()[a-zA-Z_0-9|]+(?=\))")
     string_finder = re.compile("(?<=\$)[a-zA-Z_0-9]+")
+    merge_settings = ('font_name', 'font_size', 'bold', 'italic', 'halign',
+                      'valign', 'padding_x', 'padding_y', 'text_size',
+                      'shorten', 'mipmap', 'markup', 'line_height',
+                      'max_lines', 'strip', 'shorten_from', 'split_str',
+                      'unicode_errors', 'color')
     animation_properties = ('x', 'y', 'font_size', 'color', 'opacity', 'rotation', 'scale')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
