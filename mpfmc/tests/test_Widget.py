@@ -637,7 +637,6 @@ class TestWidget(MpfMcTestCase):
 
         self.mc.events.post('widget_4up_red')
         self.advance_time()
-        self.advance_real_time(4)
 
     def test_widget_with_key(self):
         self.mc.targets['default'].add_slide(name='slide1')
