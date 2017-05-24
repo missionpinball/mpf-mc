@@ -1,5 +1,5 @@
 """Test widgets."""
-from mpfmc.uix.widget_container import WidgetContainer, ContainedWidget
+from mpfmc.uix.widget import WidgetContainer, ContainedWidget
 from mpfmc.widgets.rectangle import Rectangle
 from mpfmc.widgets.text import Text
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase

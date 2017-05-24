@@ -3,7 +3,7 @@
 from copy import deepcopy
 from mpf.core.events import EventHandlerKey
 from mpfmc.core.mc_config_player import McConfigPlayer
-from mpfmc.uix.widget_container import create_widget_objects_from_library
+from mpfmc.uix.widget import create_widget_objects_from_library
 
 
 class SlideNotActiveError(Exception):

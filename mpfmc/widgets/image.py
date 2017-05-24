@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Optional, Union
 from kivy.properties import ObjectProperty, NumericProperty, AliasProperty
 from kivy.graphics import Rectangle, Color, Rotate, Scale
 
-from mpfmc.uix.widget_container import ContainedWidget
+from mpfmc.uix.widget import ContainedWidget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc

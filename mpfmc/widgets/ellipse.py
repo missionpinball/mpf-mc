@@ -3,7 +3,7 @@ from kivy.graphics.vertex_instructions import Ellipse as KivyEllipse
 from kivy.graphics.context_instructions import Color, Rotate, Scale
 from kivy.properties import NumericProperty
 
-from mpfmc.uix.widget_container import ContainedWidget
+from mpfmc.uix.widget import ContainedWidget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc

@@ -7,7 +7,7 @@ from kivy.properties import AliasProperty, StringProperty, OptionProperty, \
     ListProperty, ObjectProperty, DictProperty
 from kivy.graphics import Rectangle, Color, Rotate, Scale
 
-from mpfmc.uix.widget_container import ContainedWidget
+from mpfmc.uix.widget import ContainedWidget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc

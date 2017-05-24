@@ -11,7 +11,7 @@ from kivy.uix.widget import Widget, WidgetException
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatter import ScatterPlane
 
-from mpfmc.uix.widget_container import WidgetContainer, ContainedWidget
+from mpfmc.uix.widget import WidgetContainer, ContainedWidget
 from mpfmc.uix.slide import Slide
 from kivy.properties import ObjectProperty
 

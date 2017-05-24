@@ -5,7 +5,7 @@ from kivy.core.video import Video as CoreVideo
 from kivy.graphics import Rectangle, Color, Rotate, Scale
 from kivy.properties import NumericProperty
 
-from mpfmc.uix.widget_container import ContainedWidget, magic_events
+from mpfmc.uix.widget import ContainedWidget, magic_events
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc

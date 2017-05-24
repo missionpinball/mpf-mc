@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Union, List
 from mpfmc.core.config_collection import ConfigCollection
 
 if TYPE_CHECKING:
-    from mpfmc.uix.widget_container import ContainedWidget
+    from mpfmc.uix.widget import ContainedWidget
 
 
 class AnimationCollection(ConfigCollection):

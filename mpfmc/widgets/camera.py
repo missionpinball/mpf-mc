@@ -1,5 +1,5 @@
 from kivy.uix.camera import Camera
-from mpfmc.uix.widget_container import ContainedWidget
+from mpfmc.uix.widget import ContainedWidget
 
 
 class CameraWidget(ContainedWidget, Camera):

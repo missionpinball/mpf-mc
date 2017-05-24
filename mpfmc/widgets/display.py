@@ -2,7 +2,7 @@ from typing import Optional, TYPE_CHECKING
 
 from kivy.uix.effectwidget import EffectWidget
 
-from mpfmc.uix.widget_container import ContainedWidget
+from mpfmc.uix.widget import ContainedWidget
 from mpfmc.uix.display import DisplayOutput
 
 if TYPE_CHECKING:

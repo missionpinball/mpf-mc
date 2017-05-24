@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from mpf.tests.MpfTestCase import MpfTestCase
 from mpfmc.widgets.display import DisplayWidget
-from mpfmc.uix.widget_container import WidgetContainer
+from mpfmc.uix.widget import WidgetContainer
 
 if TYPE_CHECKING:
     from mpfmc.uix.slide import Slide

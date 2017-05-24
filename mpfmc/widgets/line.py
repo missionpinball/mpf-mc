@@ -5,7 +5,7 @@ from kivy.graphics.context_instructions import Color, Scale, Rotate
 from kivy.properties import (ListProperty, NumericProperty, OptionProperty,
                              BooleanProperty)
 
-from mpfmc.uix.widget_container import ContainedWidget
+from mpfmc.uix.widget import ContainedWidget
 from mpfmc.core.utils import center_of_points_list
 
 if TYPE_CHECKING:

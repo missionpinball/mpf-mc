@@ -8,8 +8,8 @@ from kivy.uix.widget import Widget
 from kivy.graphics import Color
 from kivy.properties import ListProperty, AliasProperty
 
-from mpfmc.uix.widget_container import (WidgetContainer, ContainedWidget,
-                                        create_widget_objects_from_config)
+from mpfmc.uix.widget import (WidgetContainer, ContainedWidget,
+                              create_widget_objects_from_config)
 from mpfmc.core.mc import MpfMc
 
 
