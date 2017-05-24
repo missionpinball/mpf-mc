@@ -706,7 +706,8 @@ class ContainedWidget(Widget):
 
     anchor_offset_pos = AliasProperty(_get_anchor_offset_pos, None,
                                       bind=('size', 'anchor_x', 'anchor_y', 'adjust_top',
-                                            'adjust_right', 'adjust_bottom', 'adjust_left'), cache=True)
+                                            'adjust_right', 'adjust_bottom', 'adjust_left'),
+                                      cache=True)
     '''The anchor position of the widget (relative to the widget's lower left corner).
 
     :attr:`anchor_offset_pos` is a :class:`~kivy.properties.ReferenceListProperty`

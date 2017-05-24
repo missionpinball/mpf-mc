@@ -8,8 +8,8 @@ from kivy.uix.widget import Widget
 from kivy.graphics import Color
 from kivy.properties import ListProperty, AliasProperty
 
-from mpfmc.uix.widget import create_widget_objects_from_config, MpfWidget
-from mpfmc.uix.widget_container import ContainedWidget
+from mpfmc.uix.widget_container import (WidgetContainer, ContainedWidget,
+                                        create_widget_objects_from_config)
 from mpfmc.core.mc import MpfMc
 
 
@@ -103,7 +103,7 @@ class Slide(Screen, StencilView):
     def add_widgets_from_library(self, name: str, key: Optional[str]=None,
                                  widget_settings: Optional[dict]=None,
                                  play_kwargs: Optional[dict]=None,
-                                 **kwargs) -> List["MpfWidget"]:
+                                 **kwargs) -> List["ContainedWidget"]:
         """
         Adds a widget to the slide by name from the library of pre-defined widgets.
         Args:
@@ -130,7 +130,7 @@ class Slide(Screen, StencilView):
 
     def add_widgets_from_config(self, config: dict, key: Optional[str]=None,
                                 widget_settings: Optional[dict]=None,
-                                play_kwargs: Optional[dict] = None) -> List["MpfWidget"]:
+                                play_kwargs: Optional[dict] = None) -> List["ContainedWidget"]:
         """
         Adds one or more widgets to the slide from a config dictionary.
         Args:
@@ -189,12 +189,12 @@ class Slide(Screen, StencilView):
 
         return widgets_added
 
-    def add_widgets(self, widgets: List["MpfWidget"]):
+    def add_widgets(self, widgets: List["ContainedWidget"]):
         """Adds a list of widgets to this slide."""
         for w in widgets:
             self.add_widget(w)
 
-    def add_widget(self, widget: "MpfWidget", **kwargs) -> None:
+    def add_widget(self, widget: "ContainedWidget", **kwargs) -> None:
         """Adds a widget to this slide.
 
         Args:
@@ -232,7 +232,7 @@ class Slide(Screen, StencilView):
             else:
                 self.remove_widget(widget)
 
-    def find_widgets_by_key(self, key: str) -> List["Widget"]:
+    def find_widgets_by_key(self, key: str) -> List["ContainedWidget"]:
         """Return a list of widgets with the matching key value by searching
         the tree of children belonging to this slide."""
         return [w for child in self.children
@@ -334,7 +334,7 @@ class Slide(Screen, StencilView):
     defaults to [0, 0, 0, 1.0].
     '''
 
-    def _get_parent_widgets(self) -> List["MpfWidget"]:
+    def _get_parent_widgets(self) -> List["WidgetContainer"]:
         """Return the current list of widgets owned by the slide manager parent."""
         return [x for x in self.manager.parent.children if x != self.manager]
 
@@ -348,7 +348,7 @@ class Slide(Screen, StencilView):
     case the slide architecture changes in the future.
     '''
 
-    def _get_widgets(self) -> List["MpfWidget"]:
+    def _get_widgets(self) -> List["WidgetContainer"]:
         """Returns the current list of widget children owned by this slide."""
         return self.children
 
