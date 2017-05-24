@@ -8,10 +8,9 @@ import time
 from kivy import Config, Logger
 from kivy.base import runTouchApp, EventLoop
 from kivy.clock import Clock
-from kivy.uix.widget import Widget
+from kivy.uix.widget import Widget as KivyWidget
 
 import mpfmc
-from mpf.core.utility_functions import Util
 from mpf.tests.MpfBcpTestCase import MockBcpClient
 from mpf.tests.MpfTestCase import MpfTestCase, patch
 from mpfmc.core.config_processor import ConfigProcessor
@@ -86,8 +85,8 @@ class TestBcpClient(MockBcpClient):
             if root:
                 self.mc.root = root
         if self.mc.root:
-            if not isinstance(self.mc.root, Widget):
-                Logger.critical('App.root must be an _instance_ of Widget')
+            if not isinstance(self.mc.root, KivyWidget):
+                Logger.critical('App.root must be an _instance_ of Kivy Widget')
                 raise Exception('Invalid instance in App.root')
             from kivy.core.window import Window
             Window.add_widget(self.mc.root)

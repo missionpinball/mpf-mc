@@ -4,7 +4,7 @@ from typing import List, Optional
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
-from kivy.uix.widget import Widget
+from kivy.uix.widget import Widget as KivyWidget
 from kivy.graphics import Color
 from kivy.properties import ListProperty, AliasProperty
 
@@ -238,7 +238,7 @@ class Slide(Screen, StencilView):
         return [w for child in self.children
                 for w in child.walk(restrict=True, loopback=False) if w.key == key]
 
-    def add_widget_to_parent_frame(self, widget: "Widget"):
+    def add_widget_to_parent_frame(self, widget: "KivyWidget"):
         """Adds this widget to this slide's parent instead of to this slide.
 
         Args:

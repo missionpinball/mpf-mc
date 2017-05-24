@@ -2,10 +2,10 @@
 import logging
 
 from kivy.core.window import Window
-from kivy.uix.widget import Widget
+from kivy.uix.widget import Widget as KivyWidget
 
 
-class Keyboard(Widget):
+class Keyboard(KivyWidget):
 
     """Handles key strokes in the media manager."""
 

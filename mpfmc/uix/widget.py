@@ -5,7 +5,7 @@ from functools import reduce
 from kivy.clock import Clock
 from kivy.animation import Animation
 from kivy.uix.relativelayout import RelativeLayout
-from kivy.uix.widget import Widget
+from kivy.uix.widget import Widget as KivyWidget
 from kivy.properties import (NumericProperty, ReferenceListProperty,
                              StringProperty, AliasProperty, ListProperty)
 
@@ -28,7 +28,7 @@ are not real MPF events, rather, they're used to trigger animations from
 things the slide is doing."""
 
 
-class ContainedWidget(Widget):
+class ContainedWidget(KivyWidget):
 
     widget_type_name = ''  # Give this a name in your subclass, e.g. 'Image'
 
@@ -590,7 +590,7 @@ class ContainedWidget(Widget):
         if 'slide_play' in self.config['animations']:
             self.start_animation_from_event('slide_play')
 
-    def find_widgets_by_key(self, key: str) -> List["Widget"]:
+    def find_widgets_by_key(self, key: str) -> List["KivyWidget"]:
         """Return a list of widgets with the matching key value by searching
         the tree of children belonging to this widget."""
         return [x for x in self.walk(restrict=True, loopback=False) if hasattr(x, 'key') and x.key == key]
@@ -599,7 +599,7 @@ class ContainedWidget(Widget):
     # Properties
     #
 
-    def _get_container(self) -> Widget:
+    def _get_container(self) -> KivyWidget:
         return self._container
 
     container = AliasProperty(_get_container, None)
@@ -718,7 +718,7 @@ class ContainedWidget(Widget):
 def create_widget_objects_from_config(mc: "MpfMc", config: Union[dict, list],
                                       key: Optional[str] = None,
                                       play_kwargs: Optional[dict] = None,
-                                      widget_settings: Optional[dict] = None) -> List["MpfWidget"]:
+                                      widget_settings: Optional[dict] = None) -> List["WidgetContainer"]:
     """
     Creates one or more widgets from config settings.
 
@@ -730,7 +730,7 @@ def create_widget_objects_from_config(mc: "MpfMc", config: Union[dict, list],
         widget_settings: 
 
     Returns:
-        A list of the MpfWidget objects created.
+        A list of the WidgetContainer objects created.
     """
     if not isinstance(config, list):
         config = [config]
@@ -778,7 +778,7 @@ def create_widget_objects_from_library(mc: "MpfMc", name: str,
                                        key: Optional[str] = None,
                                        widget_settings: Optional[dict] = None,
                                        play_kwargs: Optional[dict] = None,
-                                       **kwargs) -> List["ContainedWidget"]:
+                                       **kwargs) -> List["WidgetContainer"]:
     """
 
     Args:
@@ -817,7 +817,7 @@ class WidgetContainer(RelativeLayout):
     def __repr__(self) -> str:  # pragma: no cover
         return '<WidgetContainer id={} z={} key={}>'.format(self.id, self.z, self.key)
 
-    def __lt__(self, other: "Widget") -> bool:
+    def __lt__(self, other: "KivyWidget") -> bool:
         """
         Less than comparison operator (based on z-order value). Used to 
         maintain proper z-order when adding widgets to a parent.

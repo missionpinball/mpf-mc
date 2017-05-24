@@ -7,7 +7,7 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     FadeTransition, WipeTransition,
                                     FallOutTransition, RiseInTransition,
                                     ScreenManagerException)
-from kivy.uix.widget import Widget, WidgetException
+from kivy.uix.widget import Widget as KivyWidget, WidgetException as KivyWidgetException
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatter import ScatterPlane
 
@@ -453,7 +453,7 @@ class Display(ScreenManager):
 
         try:
             self.current = slide.name
-        except WidgetException:
+        except KivyWidgetException:
             self.remove_widget(slide)
             self.add_widget(slide)
             self.current = slide.name
@@ -492,11 +492,11 @@ class Display(ScreenManager):
 
         return new_slide
 
-    def add_widget_to_current_slide(self, widget: "Widget"):
+    def add_widget_to_current_slide(self, widget: "KivyWidget"):
         """Adds the widget to the current slide."""
         self.current_slide.add_widget(widget)
 
-    def add_widgets_to_current_slide(self, widgets: List["Widget"]):
+    def add_widgets_to_current_slide(self, widgets: List["KivyWidget"]):
         """Adds a list of widgets to the current slide."""
         for w in widgets:
             self.add_widget_to_current_slide(w)
@@ -509,7 +509,7 @@ class Display(ScreenManager):
             else:
                 widget.parent.remove_widget(widget)
 
-    def find_widgets_by_key(self, key: str) -> List["Widget"]:
+    def find_widgets_by_key(self, key: str) -> List["KivyWidget"]:
         """Retrieves a list of all widgets with the specified key value."""
         widgets = []
 
@@ -543,7 +543,7 @@ class Display(ScreenManager):
 
 class DisplayOutput(ScatterPlane):
 
-    def __init__(self, parent: "Widget", display: "Display", **kwargs):
+    def __init__(self, parent: "KivyWidget", display: "Display", **kwargs):
         kwargs.setdefault('size', parent.size)
         kwargs.setdefault('size_hint', (None, None))
         kwargs.setdefault('do_scale', False)

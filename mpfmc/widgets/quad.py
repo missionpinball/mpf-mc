@@ -2,7 +2,6 @@ from typing import TYPE_CHECKING, Optional
 
 from kivy.graphics import Quad as KivyQuad
 from kivy.graphics.context_instructions import Color, Rotate, Scale
-from kivy.uix.widget import Widget
 from kivy.properties import ListProperty, NumericProperty
 
 from mpfmc.uix.widget import ContainedWidget
