@@ -1,0 +1,11 @@
+#config_version=4
+
+assets:
+  bitmap_fonts:
+    default:
+      load: preload
+
+bitmap_fonts:
+  test_font:
+    file: F1fuv.png
+    descriptor: [ ' !"#$%&,()*+`-./', '0123456789:;<=>?', '@ABCDEFGHIJKLMNO', 'PQRSTUVWXYZ[\]^_', '''abcdefghijklmno', 'pqrstuvwxyz{|}~ ']

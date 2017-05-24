@@ -13,7 +13,7 @@ class TestAssets(MpfMcTestCase):
     def test_machine_wide_asset_loading(self):
 
         # test that the images asset class gets built correctly
-        self.assertTrue(self.mc, 'images')
+        self.assertTrue(hasattr(self.mc, 'images'))
         self.assertTrue(self.mc.asset_manager._asset_classes)
         self.assertEqual(self.mc.asset_manager._asset_classes[0].path_string, 'images')
 
