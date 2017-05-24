@@ -5,7 +5,7 @@ from importlib import import_module
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
 from mpfmc.core.config_collection import ConfigCollection
-from mpfmc.uix.widget import magic_events
+from mpfmc.uix.widget_container import magic_events
 
 if TYPE_CHECKING:
     from mpfmc.uix.widget_container import ContainedWidget
