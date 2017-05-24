@@ -1,6 +1,6 @@
 """Test widgets."""
-from mpfmc.uix.widget import MpfWidget
-from mpfmc.uix.widget_container import WidgetContainer
+from mpfmc.uix.widget_container import WidgetContainer, ContainedWidget
+from mpfmc.widgets.rectangle import Rectangle
 from mpfmc.widgets.text import Text
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
@@ -11,6 +11,217 @@ class TestWidget(MpfMcTestCase):
 
     def get_config_file(self):
         return 'test_widgets.yaml'
+
+    def test_anchor_offset_position(self):
+        # For all these tests, the widget is 10x10
+
+        # No anchor set, widget should be centered in the parent. Parent is
+        # 100x100, widget is 10x10, so center of the parent is 50, 50, and
+        # lower left corner of the widget is 45, 45
+
+        # test with all defaults
+        config = {"width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.size, [10, 10])
+        self.assertEqual(widget.anchor_offset_pos, (-5, -5))
+
+        # test anchors
+        
+        # bottom left
+        config = {"anchor_x": "left", "anchor_y": "bottom",
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (0, 0))
+
+        # add adjustments
+        config = {"anchor_x": "left", "anchor_y": "bottom", "adjust_top": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (0, 0))
+
+        config = {"anchor_x": "left", "anchor_y": "bottom", "adjust_right": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (0, 0))
+
+        config = {"anchor_x": "left", "anchor_y": "bottom", "adjust_bottom": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (0, -2))
+
+        config = {"anchor_x": "left", "anchor_y": "bottom", "adjust_left": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-2, 0))
+
+        # middle middle
+        config = {"anchor_x": "middle", "anchor_y": "middle",
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-5, -5))
+
+        # add adjustments
+        config = {"anchor_x": "middle", "anchor_y": "middle", "adjust_top": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-5, -4))
+
+        config = {"anchor_x": "middle", "anchor_y": "middle", "adjust_right": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-4, -5))
+
+        config = {"anchor_x": "middle", "anchor_y": "middle", "adjust_bottom": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-5, -6))
+
+        config = {"anchor_x": "middle", "anchor_y": "middle", "adjust_left": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-6, -5))
+
+        # center center
+        config = {"anchor_x": "center", "anchor_y": "center",
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-5, -5))
+
+        # add adjustments
+        config = {"anchor_x": "center", "anchor_y": "center", "adjust_top": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-5, -4))
+
+        config = {"anchor_x": "center", "anchor_y": "center", "adjust_right": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-4, -5))
+
+        config = {"anchor_x": "center", "anchor_y": "center", "adjust_bottom": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-5, -6))
+
+        config = {"anchor_x": "center", "anchor_y": "center", "adjust_left": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-6, -5))
+
+        # top right
+        config = {"anchor_x": "right", "anchor_y": "top",
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-10, -10))
+
+        # add adjustments
+        config = {"anchor_x": "right", "anchor_y": "top", "adjust_top": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-10, -8))
+
+        config = {"anchor_x": "right", "anchor_y": "top", "adjust_right": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-8, -10))
+
+        config = {"anchor_x": "right", "anchor_y": "top", "adjust_bottom": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-10, -10))
+
+        config = {"anchor_x": "right", "anchor_y": "top", "adjust_left": 2,
+                  "width": 10, "height": 10, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        self.assertEqual(widget.anchor_offset_pos, (-10, -10))
+
+    def test_calculate_initial_position(self):
+        # Parent is
+        # 100x100, so center of the parent is 50, 50
+
+        # test with all defaults
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x=None, y=None)
+        self.assertEqual((res_x, res_y), (50, 50))
+
+        # test positive x, y numbers
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x=10, y=10)
+        self.assertEqual((res_x, res_y), (10, 10))
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x=33, y=66)
+        self.assertEqual((res_x, res_y), (33, 66))
+
+        # test negative x, y numbers
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x=-10, y=-10)
+        self.assertEqual((res_x, res_y), (-10, -10))
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x=-33, y=-66)
+        self.assertEqual((res_x, res_y), (-33, -66))
+
+        # test positive percentages
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x="80%", y="20%")
+        self.assertEqual((res_x, res_y), (80, 20))
+
+        # test negative percentages (dunno how useful these are, but they work)
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x="-80%", y="-20%")
+        self.assertEqual((res_x, res_y), (-80, -20))
+
+        # test positioning strings
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x="center", y="center")
+        self.assertEqual((res_x, res_y), (50, 50))
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x="center+10", y="center + 10")
+        self.assertEqual((res_x, res_y), (60, 60))
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x="middle-10", y="middle - 10")
+        self.assertEqual((res_x, res_y), (40, 40))
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x="left", y="bottom")
+        self.assertEqual((res_x, res_y), (0, 0))
+
+        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                                  x="right", y="top")
+        self.assertEqual((res_x, res_y), (100, 100))
 
     def test_widget_loading_from_config(self):
         # check that all were loaded. First is a dict
