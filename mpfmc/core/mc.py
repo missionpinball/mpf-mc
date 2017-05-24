@@ -40,6 +40,7 @@ from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
 from mpf.core.player import Player
 from mpfmc.assets.image import ImageAsset
+from mpfmc.assets.bitmap_font import BitmapFontAsset
 from mpfmc.core.dmd import Dmd, RgbDmd
 
 try:
@@ -150,6 +151,7 @@ class MpfMc(App):
         # Asset classes
         ImageAsset.initialize(self)
         VideoAsset.initialize(self)
+        BitmapFontAsset.initialize(self)
 
         self._initialise_sound_system()
 

@@ -105,6 +105,9 @@ assets:
             load: on_demand
         mode_start:
             load: mode_start
+    bitmap_fonts:
+        default:
+            load: preload
 
 mpf:
   allow_invalid_config_sections: false
