@@ -4,14 +4,14 @@ from kivy.graphics.context_instructions import Color, Rotate, Scale
 from kivy.properties import (ListProperty, NumericProperty, OptionProperty,
                              BooleanProperty)
 
-from mpfmc.uix.widget import ContainedWidget
+from mpfmc.uix.widget import Widget
 from mpfmc.core.utils import center_of_points_list
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Bezier(ContainedWidget):
+class Bezier(Widget):
 
     widget_type_name = 'Bezier'
     animation_properties = ('color', 'thickness', 'opacity', 'points', 'rotation', 'scale')

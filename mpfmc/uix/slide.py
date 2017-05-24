@@ -8,7 +8,7 @@ from kivy.uix.widget import Widget as KivyWidget
 from kivy.graphics import Color
 from kivy.properties import ListProperty, AliasProperty
 
-from mpfmc.uix.widget import (WidgetContainer, ContainedWidget,
+from mpfmc.uix.widget import (WidgetContainer, Widget,
                               create_widget_objects_from_config)
 from mpfmc.core.mc import MpfMc
 
@@ -103,7 +103,7 @@ class Slide(Screen, StencilView):
     def add_widgets_from_library(self, name: str, key: Optional[str]=None,
                                  widget_settings: Optional[dict]=None,
                                  play_kwargs: Optional[dict]=None,
-                                 **kwargs) -> List["ContainedWidget"]:
+                                 **kwargs) -> List["Widget"]:
         """
         Adds a widget to the slide by name from the library of pre-defined widgets.
         Args:
@@ -130,7 +130,7 @@ class Slide(Screen, StencilView):
 
     def add_widgets_from_config(self, config: dict, key: Optional[str]=None,
                                 widget_settings: Optional[dict]=None,
-                                play_kwargs: Optional[dict] = None) -> List["ContainedWidget"]:
+                                play_kwargs: Optional[dict] = None) -> List["Widget"]:
         """
         Adds one or more widgets to the slide from a config dictionary.
         Args:
@@ -189,12 +189,12 @@ class Slide(Screen, StencilView):
 
         return widgets_added
 
-    def add_widgets(self, widgets: List["ContainedWidget"]):
+    def add_widgets(self, widgets: List["Widget"]):
         """Adds a list of widgets to this slide."""
         for w in widgets:
             self.add_widget(w)
 
-    def add_widget(self, widget: "ContainedWidget", **kwargs) -> None:
+    def add_widget(self, widget: "Widget", **kwargs) -> None:
         """Adds a widget to this slide.
 
         Args:
@@ -227,12 +227,12 @@ class Slide(Screen, StencilView):
     def remove_widgets_by_key(self, key: str) -> None:
         """Removes all widgets from this slide with the specified key value."""
         for widget in self.find_widgets_by_key(key):
-            if isinstance(widget, ContainedWidget):
+            if isinstance(widget, Widget):
                 self.remove_widget(widget.container)
             else:
                 self.remove_widget(widget)
 
-    def find_widgets_by_key(self, key: str) -> List["ContainedWidget"]:
+    def find_widgets_by_key(self, key: str) -> List["Widget"]:
         """Return a list of widgets with the matching key value by searching
         the tree of children belonging to this slide."""
         return [w for child in self.children

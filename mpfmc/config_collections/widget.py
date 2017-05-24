@@ -8,7 +8,7 @@ from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.uix.widget import magic_events
 
 if TYPE_CHECKING:
-    from mpfmc.uix.widget import ContainedWidget
+    from mpfmc.uix.widget import Widget
 
 
 class WidgetCollection(ConfigCollection):
@@ -24,7 +24,7 @@ class WidgetCollection(ConfigCollection):
             for widget_cls in import_module(module).widget_classes:
                 self.type_map[cls_name] = widget_cls
 
-    def process_config(self, config: Union[dict, list]) -> List["ContainedWidget"]:
+    def process_config(self, config: Union[dict, list]) -> List["Widget"]:
         # config is localized to a specific widget section
         if isinstance(config, dict):
             config = [config]

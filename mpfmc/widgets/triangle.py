@@ -4,14 +4,14 @@ from kivy.graphics import Triangle as KivyTriangle
 from kivy.graphics.context_instructions import Color, Rotate, Scale
 from kivy.properties import ListProperty, NumericProperty
 
-from mpfmc.uix.widget import ContainedWidget
+from mpfmc.uix.widget import Widget
 from mpfmc.core.utils import center_of_points_list
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Triangle(ContainedWidget):
+class Triangle(Widget):
 
     widget_type_name = 'Triangle'
     animation_properties = ('points', 'color', 'opacity', 'rotation', 'scale')

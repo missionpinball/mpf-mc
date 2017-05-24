@@ -28,7 +28,7 @@ are not real MPF events, rather, they're used to trigger animations from
 things the slide is doing."""
 
 
-class ContainedWidget(KivyWidget):
+class Widget(KivyWidget):
 
     widget_type_name = ''  # Give this a name in your subclass, e.g. 'Image'
 
@@ -804,7 +804,7 @@ def create_widget_objects_from_library(mc: "MpfMc", name: str,
 
 class WidgetContainer(RelativeLayout):
 
-    def __init__(self, widget: "ContainedWidget",
+    def __init__(self, widget: "Widget",
                  key: Optional[str]=None, z: int=0, **kwargs) -> None:
         del kwargs
         self.key = None

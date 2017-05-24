@@ -3,13 +3,13 @@ from kivy.graphics.vertex_instructions import Ellipse as KivyEllipse
 from kivy.graphics.context_instructions import Color, Rotate, Scale
 from kivy.properties import NumericProperty
 
-from mpfmc.uix.widget import ContainedWidget
+from mpfmc.uix.widget import Widget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Ellipse(ContainedWidget):
+class Ellipse(Widget):
 
     widget_type_name = 'Ellipse'
     animation_properties = ('x', 'y', 'width', 'pos', 'height', 'size', 'color',

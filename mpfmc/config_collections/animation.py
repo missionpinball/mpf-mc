@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING, Union, List
 from mpfmc.core.config_collection import ConfigCollection
 
 if TYPE_CHECKING:
-    from mpfmc.uix.widget import ContainedWidget
+    from mpfmc.uix.widget import Widget
 
 
 class AnimationCollection(ConfigCollection):
@@ -11,7 +11,7 @@ class AnimationCollection(ConfigCollection):
     collection = 'animations'
     class_label = 'Animations'
 
-    def process_config(self, config: Union[dict, list]) -> List["ContainedWidget"]:
+    def process_config(self, config: Union[dict, list]) -> List["Widget"]:
         # processes the 'animations' section of a config file to populate the
         # mc.animation_configs dict.
 

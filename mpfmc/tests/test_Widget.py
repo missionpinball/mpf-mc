@@ -1,5 +1,5 @@
 """Test widgets."""
-from mpfmc.uix.widget import WidgetContainer, ContainedWidget
+from mpfmc.uix.widget import WidgetContainer, Widget
 from mpfmc.widgets.rectangle import Rectangle
 from mpfmc.widgets.text import Text
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
@@ -165,62 +165,62 @@ class TestWidget(MpfMcTestCase):
 
         # test with all defaults
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x=None, y=None)
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x=None, y=None)
         self.assertEqual((res_x, res_y), (50, 50))
 
         # test positive x, y numbers
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x=10, y=10)
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x=10, y=10)
         self.assertEqual((res_x, res_y), (10, 10))
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x=33, y=66)
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x=33, y=66)
         self.assertEqual((res_x, res_y), (33, 66))
 
         # test negative x, y numbers
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x=-10, y=-10)
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x=-10, y=-10)
         self.assertEqual((res_x, res_y), (-10, -10))
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x=-33, y=-66)
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x=-33, y=-66)
         self.assertEqual((res_x, res_y), (-33, -66))
 
         # test positive percentages
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x="80%", y="20%")
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x="80%", y="20%")
         self.assertEqual((res_x, res_y), (80, 20))
 
         # test negative percentages (dunno how useful these are, but they work)
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x="-80%", y="-20%")
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x="-80%", y="-20%")
         self.assertEqual((res_x, res_y), (-80, -20))
 
         # test positioning strings
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x="center", y="center")
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x="center", y="center")
         self.assertEqual((res_x, res_y), (50, 50))
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x="center+10", y="center + 10")
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x="center+10", y="center + 10")
         self.assertEqual((res_x, res_y), (60, 60))
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x="middle-10", y="middle - 10")
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x="middle-10", y="middle - 10")
         self.assertEqual((res_x, res_y), (40, 40))
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x="left", y="bottom")
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x="left", y="bottom")
         self.assertEqual((res_x, res_y), (0, 0))
 
-        res_x, res_y = ContainedWidget.calculate_initial_position(parent_h=100, parent_w=100,
-                                                                  x="right", y="top")
+        res_x, res_y = Widget.calculate_initial_position(parent_h=100, parent_w=100,
+                                                         x="right", y="top")
         self.assertEqual((res_x, res_y), (100, 100))
 
     def test_widget_loading_from_config(self):

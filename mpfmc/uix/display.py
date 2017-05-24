@@ -11,7 +11,7 @@ from kivy.uix.widget import Widget as KivyWidget, WidgetException as KivyWidgetE
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatter import ScatterPlane
 
-from mpfmc.uix.widget import WidgetContainer, ContainedWidget
+from mpfmc.uix.widget import WidgetContainer, Widget
 from mpfmc.uix.slide import Slide
 from kivy.properties import ObjectProperty
 
@@ -504,7 +504,7 @@ class Display(ScreenManager):
     def remove_widgets_by_key(self, key: str) -> None:
         """Removes all widgets with the specified key."""
         for widget in self.find_widgets_by_key(key):
-            if isinstance(widget, ContainedWidget):
+            if isinstance(widget, Widget):
                 widget.container.parent.remove_widget(widget.container)
             else:
                 widget.parent.remove_widget(widget)

@@ -2,7 +2,7 @@ from typing import Optional, TYPE_CHECKING
 
 from kivy.uix.effectwidget import EffectWidget
 
-from mpfmc.uix.widget import ContainedWidget
+from mpfmc.uix.widget import Widget
 from mpfmc.uix.display import DisplayOutput
 
 if TYPE_CHECKING:
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from mpfmc.uix.slide import Slide
 
 
-class DisplayWidget(ContainedWidget):
+class DisplayWidget(Widget):
     widget_type_name = 'Display'
     animation_properties = ('x', 'y')
 

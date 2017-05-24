@@ -3,14 +3,14 @@ from typing import TYPE_CHECKING, Optional, Union
 from kivy.properties import ObjectProperty, NumericProperty, AliasProperty
 from kivy.graphics import Rectangle, Color, Rotate, Scale
 
-from mpfmc.uix.widget import ContainedWidget
+from mpfmc.uix.widget import Widget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
     from mpfmc.assets.image import ImageAsset
 
 
-class ImageWidget(ContainedWidget):
+class ImageWidget(Widget):
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
     animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'opacity')

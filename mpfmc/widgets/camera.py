@@ -1,8 +1,8 @@
 from kivy.uix.camera import Camera
-from mpfmc.uix.widget import ContainedWidget
+from mpfmc.uix.widget import Widget
 
 
-class CameraWidget(ContainedWidget, Camera):
+class CameraWidget(Widget, Camera):
     widget_type_name = "Camera"
 
     def __init__(self, mc, config, key=None, **kwargs):

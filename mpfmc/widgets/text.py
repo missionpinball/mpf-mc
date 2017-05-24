@@ -7,13 +7,13 @@ from kivy.properties import AliasProperty, StringProperty, OptionProperty, \
     ListProperty, ObjectProperty, DictProperty
 from kivy.graphics import Rectangle, Color, Rotate, Scale
 
-from mpfmc.uix.widget import ContainedWidget
+from mpfmc.uix.widget import Widget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Text(ContainedWidget):
+class Text(Widget):
     widget_type_name = 'Text'
     var_finder = re.compile("(?<=\()[a-zA-Z_0-9|]+(?=\))")
     string_finder = re.compile("(?<=\$)[a-zA-Z_0-9]+")

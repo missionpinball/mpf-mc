@@ -3,13 +3,13 @@ from kivy.graphics import Rectangle as KivyRectangle, RoundedRectangle
 from kivy.graphics.context_instructions import Color, Rotate, Scale
 from kivy.properties import NumericProperty
 
-from mpfmc.uix.widget import ContainedWidget
+from mpfmc.uix.widget import Widget
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class Rectangle(ContainedWidget):
+class Rectangle(Widget):
 
     widget_type_name = 'Rectangle'
     animation_properties = ('x', 'y', 'width', 'height', 'color', 'opacity', 'corner_radius',

@@ -5,14 +5,14 @@ from kivy.core.video import Video as CoreVideo
 from kivy.graphics import Rectangle, Color, Rotate, Scale
 from kivy.properties import NumericProperty
 
-from mpfmc.uix.widget import ContainedWidget, magic_events
+from mpfmc.uix.widget import Widget, magic_events
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
     from kivy.graphics.texture import Texture
 
 
-class VideoWidget(ContainedWidget, Video):
+class VideoWidget(Widget, Video):
     widget_type_name = 'Video'
     merge_settings = ('height', 'width')
     animation_properties = ('x', 'y')
