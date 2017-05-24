@@ -226,7 +226,7 @@ class MpfTextInput(Text):
         self._deregister_events()
         self.active = False
         self.text = ''
-        self.parent.remove_widget(self)
+        self._container.parent.remove_widget(self)
 
     def prepare_for_removal(self) -> None:
         self.done()

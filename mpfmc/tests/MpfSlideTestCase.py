@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from mpf.tests.MpfTestCase import MpfTestCase
 from mpfmc.widgets.display import DisplayWidget
+from mpfmc.uix.widget_container import WidgetContainer
 
 if TYPE_CHECKING:
     from mpfmc.uix.slide import Slide
@@ -33,10 +34,11 @@ class MpfSlideTestCase(MpfTestCase):
     def _get_texts_from_slide(self, slide: "Slide"):
         texts = []
         for child in slide.children:
-            if isinstance(child, DisplayWidget) and child.current_slide:
-                texts.extend(self._get_texts_from_slide(child.current_slide))
-            if hasattr(child, "text"):
-                texts.append(child.text)
+            if isinstance(child, WidgetContainer) and child.widget and \
+                    isinstance(child.widget, DisplayWidget) and child.widget.current_slide:
+                texts.extend(self._get_texts_from_slide(child.widget.current_slide))
+            if isinstance(child, WidgetContainer) and child.widget and hasattr(child.widget, "text"):
+                texts.append(child.widget.text)
 
         return texts
 
