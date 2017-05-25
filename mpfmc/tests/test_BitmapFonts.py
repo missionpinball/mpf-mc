@@ -40,4 +40,14 @@ class TestBitmapFonts(MpfMcTestCase):
         self.assertEqual(test_font._characters['z'].x, 500)
         self.assertEqual(test_font._characters['z'].y, 250)
 
+        # Test the extent calculations
+        self.assertEqual(test_font.get_extents("testing"), (350, 50))
+        self.assertEqual(test_font.get_extents("more testing"), (600, 50))
+        self.assertEqual(test_font.get_ascent(), 50)
+        self.assertEqual(test_font.get_descent(), 0)
+
+    def test_bitmap_font_text(self):
+        # Very basic test
+        self.mc.events.post('static_text')
+        self.advance_real_time(5)
 

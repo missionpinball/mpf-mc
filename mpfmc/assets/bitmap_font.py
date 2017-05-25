@@ -1,7 +1,10 @@
-from typing import Dict
+from typing import TYPE_CHECKING, Dict, Optional
 from os import path
 
 from kivy.core.image import Image
+from kivy.graphics.context_instructions import Color
+from kivy.graphics import Rectangle, Ellipse
+
 from mpf.core.assets import Asset
 
 
@@ -35,6 +38,7 @@ class BitmapFontCharacter:
         self.yoffset = 0
         self.xadvance = 0
         self.chnl = 15
+        self.texture_region = None
 
 
 class BitmapFontAsset(Asset):
@@ -111,6 +115,9 @@ class BitmapFontAsset(Asset):
                 character.width = char_width
                 character.xadvance = char_width
 
+                character.texture_region = self._image.texture.get_region(character.x, character.y,
+                                                                          character.width, character.height)
+
                 self._characters[char] = character
                 x += char_width
 
@@ -120,3 +127,56 @@ class BitmapFontAsset(Asset):
         self._image = None
         self._characters.clear()
 
+    def get_extents(self, text: str) -> tuple:
+        """
+        Calculates the rendered text extents (width, height).
+        
+        Args:
+            text: The text to render 
+        """
+        if not self.loaded:
+            return 0, 0
+
+        width = 0
+        height = self._common.line_height
+
+        for char in text:
+            if char in self._characters:
+                width += self._characters[char].xadvance
+
+        # TODO: Add kerning calculations here
+
+        return width, height
+
+    def get_descent(self) -> int:
+        """ Return the offset from the font baseline to the bottom of the font.
+        This is a negative value, relative to the baseline.
+        """
+        if not self.loaded:
+            return 0
+
+        return self._common.base - self._common.line_height
+
+    def get_ascent(self) -> int:
+        """ Return the offset from the font baseline to the top of the font.
+        This is a positive value, relative to the baseline.
+        """
+        if not self.loaded:
+            return 0
+
+        return self._common.base
+
+    def render_text(self, text, fbo, x, y, color):
+        cursor_x = x
+        cursor_y = y
+
+        for char in text:
+            char_info = self._characters[char]
+            with fbo:
+                Color(color)
+                Ellipse(pos=(cursor_x, cursor_y),
+                        size=char_info.texture_region.size,
+                        texture=char_info.texture_region)
+
+            cursor_x += char_info.xadvance
+            # TODO: Add offsets and kerning

@@ -1,11 +1,27 @@
 #config_version=4
 
-assets:
-  bitmap_fonts:
-    default:
-      load: preload
+displays:
+  default:
+    width: 400
+    height: 300
+
+slides:
+  static_text:
+    - type: text
+      text: TEST
+      color: red
+      font_name: test_font
+      bitmap_font: True
+    - type: text
+      text: STATIC TEXT
+      font_name: test_font
+      bitmap_font: True
+      y: 200
 
 bitmap_fonts:
   test_font:
-    file: F1fuv.png
+    file: F1fuv.bmp
     descriptor: [ ' !"#$%&,()*+`-./', '0123456789:;<=>?', '@ABCDEFGHIJKLMNO', 'PQRSTUVWXYZ[\]^_', '''abcdefghijklmno', 'pqrstuvwxyz{|}~ ']
+
+slide_player:
+  static_text: static_text

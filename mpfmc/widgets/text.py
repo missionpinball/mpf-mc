@@ -8,9 +8,34 @@ from kivy.properties import AliasProperty, StringProperty, OptionProperty, \
 from kivy.graphics import Rectangle, Color, Rotate, Scale
 
 from mpfmc.uix.widget import Widget
+from mpfmc.uix.label_bitmap_font import LabelBitmapFont
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
+
+
+class CustomizedLabel(Label):
+
+    def __init__(self, mc: "MpfMc", **kwargs):
+
+        self.mc = mc
+
+        if 'bitmap_font' in kwargs:
+            self.bitmap_font = kwargs['bitmap_font']
+
+        super().__init__(**kwargs)
+
+    def _create_label(self):
+        if self.bitmap_font:
+            d = Label._font_properties
+            dkw = dict(list(zip(d, [getattr(self, x) for x in d])))
+            self._label = LabelBitmapFont(self.mc, **dkw)
+        else:
+            super()._create_label()
+
+    bitmap_font = BooleanProperty(False)
+    '''Flag indicating whether or not the font_name attribute refers to a 
+    bitmap font.'''
 
 
 class Text(Widget):
@@ -26,7 +51,7 @@ class Text(Widget):
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
                  play_kwargs: Optional[dict]=None, **kwargs) -> None:
-        self._label = Label()
+        self._label = CustomizedLabel(mc, bitmap_font=config['bitmap_font'], font_name=config['font_name'])
         self._label.fbind('texture', self.on_label_texture)
 
         super().__init__(mc=mc, config=config, key=key)
@@ -248,7 +273,6 @@ class Text(Widget):
     # Properties
     #
 
-
     disabled_color = ListProperty([1, 1, 1, .3])
     '''The color of the text when the widget is disabled, in the (r, g, b, a)
     format.
@@ -349,6 +373,10 @@ class Text(Widget):
 
     def _set_line_height(self, line_height: float) -> None:
         self._label.line_height = line_height
+
+    bitmap_font = BooleanProperty(False)
+    '''Flag indicating whether or not the font_name attribute refers to a 
+    bitmap font.'''
 
     line_height = AliasProperty(_get_line_height, _set_line_height)
     '''Line Height for the text. e.g. line_height = 2 will cause the spacing
