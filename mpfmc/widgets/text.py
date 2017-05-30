@@ -13,14 +13,19 @@ if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
 
 
-class CustomizedLabel(Label):
+class CustomLabel(Label):
 
-    def __init__(self, mc: "MpfMc", **kwargs):
+    def __init__(self, mc: "MpfMc", config: dict, **kwargs):
 
         self.mc = mc
 
-        if 'bitmap_font' in kwargs:
-            self.bitmap_font = kwargs['bitmap_font']
+        if 'bitmap_font' in config:
+            self.bitmap_font = config['bitmap_font']
+
+        if self.bitmap_font:
+            if 'font_name' not in config:
+                raise ValueError("Text widget: font_name is required when bitmap_font is True.")
+            kwargs['font_name'] = config['font_name']
 
         super().__init__(**kwargs)
 
@@ -50,7 +55,7 @@ class Text(Widget):
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
                  play_kwargs: Optional[dict]=None, **kwargs) -> None:
-        self._label = CustomizedLabel(mc, bitmap_font=config['bitmap_font'], font_name=config['font_name'])
+        self._label = CustomLabel(mc, config)
         self._label.fbind('texture', self.on_label_texture)
 
         super().__init__(mc=mc, config=config, key=key)
