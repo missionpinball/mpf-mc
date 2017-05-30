@@ -22,22 +22,22 @@ class BitmapFontAsset(Asset):
         super().__init__(mc, name, file, config)
 
         self._bitmap_font = None  # holds the actual image and font info in memory
+        self._descriptor_file = None
 
-        # Validate the descriptor setting (it can contain either a list, or None).
-        # None indicates that a descriptor file will be used with the same name
-        # as the font image asset file, but with a .fnt extension.
-        if self.config['descriptor']:
-            if isinstance(self.config['descriptor'], list):
-                self._descriptor_list = self.config['descriptor']
-            else:
-                raise ValueError('')
-        else:
-            # Check if descriptor file exists
-            self._descriptor_file = path.splitext(self.config['file'])[0] + '.fnt'
-            if path.isfile(self._descriptor_file):
-                self._load_descriptor_file()
-            else:
-                raise FileNotFoundError('')
+        # Validate the descriptor setting (it can contain either a list, or a
+        # descriptor file name).  If the descriptor setting is omitted, a file
+        # will be used with the same name as the font image asset file, but with a
+        # .fnt extension.
+        if 'descriptor' not in self.config:
+            self.config['descriptor'] = path.splitext(self.config['file'])[0] + '.fnt'
+
+        if isinstance(self.config['descriptor'], str):
+            if not path.isfile(self.config['descriptor']):
+                raise FileNotFoundError('Could not locate the bitmap font descriptor file ' +
+                                        self._descriptor_file)
+
+        elif not isinstance(self.config['descriptor'], list):
+            raise ValueError('Bitmap font descriptor must contain either a list or file name.')
 
     @property
     def bitmap_font(self):
