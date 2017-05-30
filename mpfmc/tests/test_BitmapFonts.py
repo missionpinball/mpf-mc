@@ -49,5 +49,5 @@ class TestBitmapFonts(MpfMcTestCase):
     def test_bitmap_font_text(self):
         # Very basic test
         self.mc.events.post('static_text')
-        self.advance_real_time(5)
+        self.advance_real_time(3)
 
