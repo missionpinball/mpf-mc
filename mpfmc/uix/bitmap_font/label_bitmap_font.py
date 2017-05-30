@@ -1,10 +1,7 @@
-from typing import TYPE_CHECKING
-
 from kivy.core.text import LabelBase
-from kivy.graphics.fbo import Fbo
-from kivy.core.image import ImageData
 
 from mpfmc.assets.bitmap_font import BitmapFontAsset
+from mpfmc.uix.bitmap_font.bitmap_font import _SurfaceContainer
 from mpfmc.core.mc import MpfMc
 
 
@@ -15,7 +12,8 @@ class LabelBitmapFont(LabelBase):
         self.mc = mc
         super().__init__(text=text, font_name=font_name, color=color)
 
-    def _get_font(self) -> BitmapFontAsset:
+    def get_font_asset(self) -> BitmapFontAsset:
+        """Return the bitmap font asset used for this label."""
         return self.mc.bitmap_fonts[self.options['font_name_r']]
 
     def resolve_font_name(self):
@@ -29,28 +27,22 @@ class LabelBitmapFont(LabelBase):
             raise ValueError('LabelBitmapFont: font_name %s not found in bitmap_fonts.' % fontname)
 
     def get_extents(self, text):
-        bitmap_font = self._get_font()
+        bitmap_font = self.get_font_asset()
         return bitmap_font.get_extents(text)
 
     def get_descent(self):
-        bitmap_font = self._get_font()
+        bitmap_font = self.get_font_asset()
         return bitmap_font.get_descent()
 
     def get_ascent(self):
-        bitmap_font = self._get_font()
+        bitmap_font = self.get_font_asset()
         return bitmap_font.get_ascent()
 
     def _render_begin(self):
-        self._fbo = Fbo(size=self.size)
-        self._fbo.clear()
+        self._surface = _SurfaceContainer(self.size[0], self.size[1])
 
     def _render_text(self, text, x, y):
-        bitmap_font = self._get_font()
-        color = self.options['color']
-        bitmap_font.render_text(text, self._fbo, x, y, color)
+        self._surface.render(self, text, x, y)
 
     def _render_end(self):
-        self._fbo.draw()
-        data = ImageData(self._size[0], self._size[1], 'rgba', self._fbo.pixels)
-        del self._fbo
-        return data
+        return self._surface.get_data()

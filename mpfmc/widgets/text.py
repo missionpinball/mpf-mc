@@ -2,13 +2,12 @@ import re
 from typing import TYPE_CHECKING, Optional
 
 from kivy.uix.label import Label
-from kivy.properties import AliasProperty, StringProperty, OptionProperty, \
-    NumericProperty, BooleanProperty, ReferenceListProperty, \
-    ListProperty, ObjectProperty, DictProperty
+from kivy.properties import AliasProperty, NumericProperty, BooleanProperty, \
+    ReferenceListProperty, ListProperty
 from kivy.graphics import Rectangle, Color, Rotate, Scale
 
 from mpfmc.uix.widget import Widget
-from mpfmc.uix.label_bitmap_font import LabelBitmapFont
+from mpfmc.uix.bitmap_font.label_bitmap_font import LabelBitmapFont
 
 if TYPE_CHECKING:
     from mpfmc.core.mc import MpfMc
