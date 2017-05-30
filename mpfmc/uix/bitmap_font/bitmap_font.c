@@ -516,8 +516,8 @@ struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter {
  * 
  * 
  * cdef class BitmapFont:             # <<<<<<<<<<<<<<
- *     cdef str face
- *     cdef bint bold
+ *     cdef public str face
+ *     cdef public bint bold
  */
 struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont {
   PyObject_HEAD
@@ -959,6 +959,27 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
 static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_16get_descent(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_18get_ascent(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_20get_extents(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_text); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_4__del__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer___cinit__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer *__pyx_v_self, PyObject *__pyx_v_w, PyObject *__pyx_v_h); /* proto */
 static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_2__init__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer *__pyx_v_self, PyObject *__pyx_v_w, PyObject *__pyx_v_h); /* proto */
 static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_4__dealloc__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer *__pyx_v_self); /* proto */
@@ -2929,6 +2950,795 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
   return __pyx_r;
 }
 
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":41
+ * 
+ * cdef class BitmapFont:
+ *     cdef public str face             # <<<<<<<<<<<<<<
+ *     cdef public bint bold
+ *     cdef public bint italic
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_self->face);
+  __pyx_r = __pyx_v_self->face;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  if (!(likely(PyUnicode_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(0, 41, __pyx_L1_error)
+  __pyx_t_1 = __pyx_v_value;
+  __Pyx_INCREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->face);
+  __Pyx_DECREF(__pyx_v_self->face);
+  __pyx_v_self->face = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.face.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_5__del__(PyObject *__pyx_v_self); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_5__del__(PyObject *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_4__del__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_4__del__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__", 0);
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF(__pyx_v_self->face);
+  __Pyx_DECREF(__pyx_v_self->face);
+  __pyx_v_self->face = ((PyObject*)Py_None);
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":42
+ * cdef class BitmapFont:
+ *     cdef public str face
+ *     cdef public bint bold             # <<<<<<<<<<<<<<
+ *     cdef public bint italic
+ *     cdef public int padding
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->bold); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 42, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.bold.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 42, __pyx_L1_error)
+  __pyx_v_self->bold = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.bold.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":43
+ *     cdef public str face
+ *     cdef public bint bold
+ *     cdef public bint italic             # <<<<<<<<<<<<<<
+ *     cdef public int padding
+ *     cdef public int spacing
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->italic); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 43, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.italic.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 43, __pyx_L1_error)
+  __pyx_v_self->italic = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.italic.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":44
+ *     cdef public bint bold
+ *     cdef public bint italic
+ *     cdef public int padding             # <<<<<<<<<<<<<<
+ *     cdef public int spacing
+ *     cdef public int outline
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->padding); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.padding.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_v_self->padding = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.padding.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":45
+ *     cdef public bint italic
+ *     cdef public int padding
+ *     cdef public int spacing             # <<<<<<<<<<<<<<
+ *     cdef public int outline
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->spacing); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.spacing.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_v_self->spacing = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.spacing.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":46
+ *     cdef public int padding
+ *     cdef public int spacing
+ *     cdef public int outline             # <<<<<<<<<<<<<<
+ * 
+ *     cdef public int line_height
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->outline); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.outline.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_v_self->outline = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.outline.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":48
+ *     cdef public int outline
+ * 
+ *     cdef public int line_height             # <<<<<<<<<<<<<<
+ *     cdef public int base
+ *     cdef public int scale_w
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->line_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.line_height.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L1_error)
+  __pyx_v_self->line_height = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.line_height.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":49
+ * 
+ *     cdef public int line_height
+ *     cdef public int base             # <<<<<<<<<<<<<<
+ *     cdef public int scale_w
+ *     cdef public int scale_h
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.base.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_v_self->base = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.base.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":50
+ *     cdef public int line_height
+ *     cdef public int base
+ *     cdef public int scale_w             # <<<<<<<<<<<<<<
+ *     cdef public int scale_h
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->scale_w); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.scale_w.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 50, __pyx_L1_error)
+  __pyx_v_self->scale_w = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.scale_w.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":51
+ *     cdef public int base
+ *     cdef public int scale_w
+ *     cdef public int scale_h             # <<<<<<<<<<<<<<
+ * 
+ *     cdef dict characters
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h___get__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h___get__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->scale_h); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_r = __pyx_t_1;
+  __pyx_t_1 = 0;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.scale_h.__get__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = NULL;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h_2__set__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h_2__set__(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_v_self->scale_h = __pyx_t_1;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.scale_h.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
 /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":160
  *     cdef int w, h
  * 
@@ -4616,6 +5426,145 @@ static int __pyx_tp_clear_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont(PyO
   return 0;
 }
 
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_face(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_face(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_3__set__(o, v);
+  }
+  else {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_5__del__(o);
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_bold(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_bold(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_italic(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_italic(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_padding(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_padding(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7padding_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_spacing(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_spacing(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacing_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_outline(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_outline(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outline_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_line_height(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_line_height(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_height_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_base(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_base(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_scale_w(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_scale_w(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_w_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_scale_h(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_scale_h(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_h_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
 static PyMethodDef __pyx_methods_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont[] = {
   {"get_image", (PyCFunction)__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7get_image, METH_NOARGS, __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6get_image},
   {"get_characters", (PyCFunction)__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_9get_characters, METH_NOARGS, __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_8get_characters},
@@ -4626,6 +5575,20 @@ static PyMethodDef __pyx_methods_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapF
   {"get_ascent", (PyCFunction)__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_19get_ascent, METH_NOARGS, __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_18get_ascent},
   {"get_extents", (PyCFunction)__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_21get_extents, METH_O, __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_20get_extents},
   {0, 0, 0, 0}
+};
+
+static struct PyGetSetDef __pyx_getsets_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont[] = {
+  {(char *)"face", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_face, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_face, (char *)"face: unicode", 0},
+  {(char *)"bold", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_bold, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_bold, (char *)"bold: 'bool'", 0},
+  {(char *)"italic", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_italic, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_italic, (char *)"italic: 'bool'", 0},
+  {(char *)"padding", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_padding, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_padding, (char *)"padding: 'int'", 0},
+  {(char *)"spacing", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_spacing, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_spacing, (char *)"spacing: 'int'", 0},
+  {(char *)"outline", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_outline, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_outline, (char *)"outline: 'int'", 0},
+  {(char *)"line_height", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_line_height, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_line_height, (char *)"line_height: 'int'", 0},
+  {(char *)"base", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_base, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_base, (char *)"base: 'int'", 0},
+  {(char *)"scale_w", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_scale_w, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_scale_w, (char *)"scale_w: 'int'", 0},
+  {(char *)"scale_h", __pyx_getprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_scale_h, __pyx_setprop_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_scale_h, (char *)"scale_h: 'int'", 0},
+  {0, 0, 0, 0, 0}
 };
 
 static PyTypeObject __pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont = {
@@ -4663,7 +5626,7 @@ static PyTypeObject __pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFon
   0, /*tp_iternext*/
   __pyx_methods_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont, /*tp_methods*/
   0, /*tp_members*/
-  0, /*tp_getset*/
+  __pyx_getsets_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont, /*tp_getset*/
   0, /*tp_base*/
   0, /*tp_dict*/
   0, /*tp_descr_get*/

@@ -38,17 +38,17 @@ cdef class BitmapFontCharacter:
 
 
 cdef class BitmapFont:
-    cdef str face
-    cdef bint bold
-    cdef bint italic
-    cdef int padding
-    cdef int spacing
-    cdef int outline
+    cdef public str face
+    cdef public bint bold
+    cdef public bint italic
+    cdef public int padding
+    cdef public int spacing
+    cdef public int outline
 
-    cdef int line_height
-    cdef int base
-    cdef int scale_w
-    cdef int scale_h
+    cdef public int line_height
+    cdef public int base
+    cdef public int scale_w
+    cdef public int scale_h
 
     cdef dict characters
     cdef dict kerning
