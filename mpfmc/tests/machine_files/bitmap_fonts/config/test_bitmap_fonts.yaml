@@ -2,25 +2,31 @@
 
 displays:
   default:
-    width: 400
-    height: 300
+    width: 800
+    height: 600
 
 slides:
   static_text:
     - type: text
       text: TEST
-      color: red
-      font_name: test_font
+      font_name: f1fuv
       bitmap_font: True
+      animations:
+        add_to_slide:
+          - property: rotation
+            value: 360
+            duration: 2s
+          - property: scale
+            value: 0.01
+            duration: 1s
     - type: text
       text: STATIC TEXT
-      font_name: test_font
+      font_name: f1fuv
       bitmap_font: True
       y: 200
 
 bitmap_fonts:
-  test_font:
-    file: F1fuv.bmp
+  F1fuv:
     descriptor: [ ' !"#$%&,()*+`-./', '0123456789:;<=>?', '@ABCDEFGHIJKLMNO', 'PQRSTUVWXYZ[\]^_', '''abcdefghijklmno', 'pqrstuvwxyz{|}~ ']
 
 slide_player:
