@@ -264,7 +264,7 @@ if platform == 'darwin':
         'include_dirs': [],
         'extra_compile_args': ['-F/Library/Frameworks']
     }
-    for name in ('SDL2', 'SDL2_mixer'):
+    for name in ('SDL2', 'SDL2_mixer', 'SDL2_image'):
         f_path = '/Library/Frameworks/{}.framework'.format(name)
         if not exists(f_path):
             print('Missing framework {}'.format(f_path))
@@ -282,7 +282,7 @@ if platform == 'darwin':
 
 else:
     # use pkg-config approach instead
-    sdl2_flags = pkgconfig('sdl2', 'SDL2_mixer')
+    sdl2_flags = pkgconfig('sdl2', 'SDL2_mixer', 'SDL2_image')
 
 
 # -----------------------------------------------------------------------------
@@ -378,7 +378,7 @@ def determine_sdl2():
 
     # no pkgconfig info, or we want to use a specific sdl2 path, so perform
     # manual configuration
-    flags['libraries'] = ['SDL2', 'SDL2_mixer']
+    flags['libraries'] = ['SDL2', 'SDL2_mixer', 'SDL2_image']
     split_chr = ';' if platform == 'win32' else ':'
     sdl2_paths = sdl2_path.split(split_chr) if sdl2_path else []
 
@@ -399,7 +399,7 @@ def determine_sdl2():
         flags = merge(flags, sdl2_flags)
 
     # ensure headers for all the SDL2 library is available
-    libs_to_check = ['SDL', 'SDL_mixer']
+    libs_to_check = ['SDL', 'SDL_mixer', 'SDL_image']
     can_compile = True
     for lib in libs_to_check:
         found = False
@@ -425,15 +425,18 @@ gl_flags = {}
 
 # -----------------------------------------------------------------------------
 # sources to compile
-sources = {}
+sources = {
+    'core/audio/audio_interface.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/sdl2.pxi',
+                    'core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi']},
+    'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
+}
 
 sdl2_flags = determine_sdl2()
 if sdl2_flags:
-    sdl2_depends = {'depends': ['core/audio/sdl2_helper.h', 'core/audio/sdl2.pxi',]}
-    gst_depends = {'depends': ['core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi',]}
-    for source_file in ('core/audio/audio_interface.pyx',):
+    for source_file, depends in sources.items():
         sources[source_file] = merge(
-            base_flags, gst_flags, gst_depends, sdl2_flags, sdl2_depends)
+            base_flags, gst_flags, sdl2_flags, depends)
 
 
 # -----------------------------------------------------------------------------
