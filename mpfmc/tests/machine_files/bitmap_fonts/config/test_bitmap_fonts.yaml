@@ -21,7 +21,7 @@ slides:
             duration: 1s
     - type: text
       text: STATIC TEXT
-      font_name: f1fuv
+      font_name: test_font
       bitmap_font: True
       y: 200
 
