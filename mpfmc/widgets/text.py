@@ -25,7 +25,8 @@ class CustomLabel(Label):
         if self.bitmap_font:
             if 'font_name' not in config:
                 raise ValueError("Text widget: font_name is required when bitmap_font is True.")
-            kwargs['font_name'] = config['font_name']
+            kwargs.setdefault('font_name', config['font_name'])
+            kwargs.setdefault('font_kerning', True)
 
         super().__init__(**kwargs)
 

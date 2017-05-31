@@ -10,6 +10,8 @@ include 'bitmap_font.pxi'
 
 cimport cpython.pycapsule as pycapsule
 
+from os import path
+from xml.etree.ElementTree import ElementTree, ParseError, tostring
 from libc.string cimport memset
 from kivy.core.image import ImageData
 
@@ -51,7 +53,7 @@ cdef class BitmapFont:
     cdef public int scale_h
 
     cdef dict characters
-    cdef dict kerning
+    cdef dict kernings
 
     cdef SDL_Surface *image
 
@@ -69,7 +71,7 @@ cdef class BitmapFont:
         self.scale_h = 0
 
         self.characters = dict()
-        self.kerning = dict()
+        self.kernings = dict()
 
         self.image = NULL
 
@@ -87,9 +89,9 @@ cdef class BitmapFont:
         self.scale_h = self.image.h
 
         if isinstance(descriptor, list):
-            self._load_descriptor_list(<list>descriptor)
+            self._load_descriptor_list(descriptor)
         elif isinstance(descriptor, str):
-            self._load_descriptor_file(<str>descriptor)
+            self._load_descriptor_file(descriptor)
         else:
             raise BitmapFontException("Illegal value in bitmap font descriptor")
 
@@ -105,8 +107,8 @@ cdef class BitmapFont:
     def get_characters(self):
         return self.characters
 
-    def get_kerning(self):
-        return self.kerning
+    def get_kernings(self):
+        return self.kernings
 
     def _load_descriptor_list(self, list descriptor_list):
         cdef int x = 0
@@ -128,13 +130,72 @@ cdef class BitmapFont:
                 character.rect.h = row_height
                 character.xadvance = char_width
 
-                self.characters[text_char] = character
+                self.characters[character.id] = character
                 x += char_width
 
             y += row_height
 
     def _load_descriptor_file(self, str descriptor_file):
-        pass
+        if not path.isfile(descriptor_file):
+            raise BitmapFontException('Could not locate the bitmap font descriptor file ' +
+                                      descriptor_file)
+
+        try:
+            xml_tree = ElementTree(file=descriptor_file)
+            self._load_descriptor_xml(xml_tree)
+        except ParseError:
+            pass
+
+    def _load_descriptor_xml(self, xml_tree: ElementTree):
+        cdef int first = 0
+        cdef int second = 0
+        root = xml_tree.getroot()
+        if root is None:
+            raise BitmapFontException("Bitmap font descriptor file invalid XML format")
+
+        # info
+        info = root.find('info')
+        if info is None:
+            raise BitmapFontException("Bitmap font descriptor file invalid XML format")
+
+        # common
+        common = root.find('common')
+        if common is None:
+            raise BitmapFontException("Bitmap font descriptor file invalid XML format")
+
+        self.line_height = int(common.attrib["lineHeight"])
+        self.base = int(common.attrib["base"])
+
+        # characters
+        chars = root.find('chars')
+        if chars is None:
+            raise BitmapFontException("Bitmap font descriptor file invalid XML format")
+
+        for text_char in chars.findall('char'):
+            character = BitmapFontCharacter()
+            character.id = int(text_char.attrib["id"])
+            character.rect.x = int(text_char.attrib["x"])
+            character.rect.y = int(text_char.attrib["y"])
+            character.rect.w = int(text_char.attrib["width"])
+            character.rect.h = int(text_char.attrib["height"])
+            character.xadvance = int(text_char.attrib["xadvance"])
+            character.xoffset = int(text_char.attrib["xoffset"])
+            character.yoffset = int(text_char.attrib["yoffset"])
+
+            self.characters[character.id] = character
+
+        # kerning
+        kernings = root.find('kernings')
+        if kernings is not None:
+            for kerning in kernings.findall('kerning'):
+                first = int(kerning.attrib["first"])
+                second = int(kerning.attrib["second"])
+
+                if first not in self.kernings:
+                    self.kernings[first] = {}
+
+                self.kernings[first][second] = int(kerning.attrib["amount"])
+
 
     def get_descent(self):
         return self.base - self.line_height
@@ -142,13 +203,22 @@ cdef class BitmapFont:
     def get_ascent(self):
         return self.base
 
-    def get_extents(self, str text):
+    def get_extents(self, str text, font_kerning=True):
         cdef int width = 0
+        cdef int previous_char = -1
+        cdef int current_char
+        cdef bint use_kerning = font_kerning
 
         for text_char in text:
-            char_info = self.characters[text_char]
-            if char_info:
+            current_char = ord(text_char)
+            if current_char in self.characters:
+                char_info = self.characters[current_char]
                 width += char_info.xadvance
+
+                if use_kerning and previous_char in self.kernings and current_char in self.kernings[previous_char]:
+                    width += self.kernings[previous_char][current_char]
+
+            previous_char = current_char
 
         return width, self.line_height
 
@@ -179,7 +249,13 @@ cdef class _SurfaceContainer:
         """Render the text at the specified location."""
         cdef SDL_Rect cursor_rect
         cdef SDL_Rect source_rect
+        cdef SDL_Rect dest_rect
         cdef SDL_Surface *source_image
+        cdef dict characters = dict()
+        cdef dict kernings = dict()
+        cdef bint use_kerning = True
+        cdef int previous_char = -1
+        cdef int current_char
 
         asset = container.get_font_asset()
         if asset is None:
@@ -193,20 +269,28 @@ cdef class _SurfaceContainer:
         if source_image == NULL:
             return
 
-        if container.options['font_kerning']:
-            # TODO: Enable kerning
-            pass
-
         cursor_rect.x = x
         cursor_rect.y = y
 
+        characters = font.get_characters()
+        kernings = font.get_kernings()
+        use_kerning = container.options['font_kerning']
+
         for text_char in text:
-            char_info = font.get_characters()[text_char]
-            if char_info:
+            current_char = ord(text_char)
+            if current_char in characters:
+                char_info = characters[current_char]
+
+                if use_kerning and previous_char in kernings and current_char in kernings[previous_char]:
+                    cursor_rect.x += kernings[previous_char][current_char]
+
                 source_rect = char_info.rect
-                SDL_BlitSurface(source_image, &source_rect, self.surface, &cursor_rect)
+                dest_rect.x = cursor_rect.x + char_info.xoffset
+                dest_rect.y = cursor_rect.y + char_info.yoffset
+                SDL_BlitSurface(source_image, &source_rect, self.surface, &dest_rect)
                 cursor_rect.x += char_info.xadvance
 
+            previous_char = current_char
 
     def get_data(self):
         """Return the bitmap font surface as ImageData (pixels)."""
@@ -214,5 +298,3 @@ cdef class _SurfaceContainer:
         cdef bytes pixels = (<char *>self.surface.pixels)[:datalen]
         data = ImageData(self.w, self.h, 'rgba', pixels)
         return data
-
-

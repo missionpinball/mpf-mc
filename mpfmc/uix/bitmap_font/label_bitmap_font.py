@@ -7,10 +7,10 @@ from mpfmc.core.mc import MpfMc
 
 class LabelBitmapFont(LabelBase):
 
-    def __init__(self, mc: MpfMc, font_name, text='', **kwargs):
+    def __init__(self, mc: MpfMc, font_name, text='', font_kerning=True, **kwargs):
         del kwargs
         self.mc = mc
-        super().__init__(text=text, font_name=font_name)
+        super().__init__(text=text, font_name=font_name, font_kerning=font_kerning)
 
     def get_font_asset(self) -> BitmapFontAsset:
         """Return the bitmap font asset used for this label."""
@@ -27,8 +27,9 @@ class LabelBitmapFont(LabelBase):
             raise ValueError('LabelBitmapFont: font_name %s not found in bitmap_fonts.' % fontname)
 
     def get_extents(self, text):
+        options = self.options
         bitmap_font = self.get_font_asset()
-        return bitmap_font.get_extents(text)
+        return bitmap_font.get_extents(text, options['font_kerning'])
 
     def get_descent(self):
         bitmap_font = self.get_font_asset()

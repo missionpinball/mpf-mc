@@ -1,8 +1,6 @@
 from typing import TYPE_CHECKING, Dict, Optional
 from os import path
-
-from kivy.core.image import Image
-from kivy.core.image import ImageData
+from xml.etree.ElementTree import ElementTree, ParseError
 
 from mpf.core.assets import Asset
 from mpfmc.uix.bitmap_font.bitmap_font import BitmapFont
@@ -22,13 +20,12 @@ class BitmapFontAsset(Asset):
         super().__init__(mc, name, file, config)
 
         self._bitmap_font = None  # holds the actual image and font info in memory
-        self._descriptor_file = None
 
         # Validate the descriptor setting (it can contain either a list, or a
         # descriptor file name).  If the descriptor setting is omitted, a file
         # will be used with the same name as the font image asset file, but with a
         # .fnt extension.
-        if 'descriptor' not in self.config:
+        if 'descriptor' not in self.config or not self.config['descriptor']:
             self.config['descriptor'] = path.splitext(self.config['file'])[0] + '.fnt'
 
         if isinstance(self.config['descriptor'], str):
@@ -43,9 +40,9 @@ class BitmapFontAsset(Asset):
     def bitmap_font(self):
         return self._bitmap_font
 
-    def get_extents(self, text):
+    def get_extents(self, text, font_kerning=True):
         if self._bitmap_font:
-            return self.bitmap_font.get_extents(text)
+            return self.bitmap_font.get_extents(text, font_kerning)
         else:
             return 0, 0
 
@@ -67,20 +64,3 @@ class BitmapFontAsset(Asset):
 
     def _do_unload(self):
         self._bitmap_font = None
-
-    def render_text(self, text, texture, x, y, color):
-        cursor_x = x
-        cursor_y = y
-        previous_char = None
-
-        for char in text:
-            cursor_x += self.get_kerning(previous_char, char)
-            char_info = self._characters[char]
-            texture.blit_buffer(size=char_info.texture_region.size,
-                                colorfmt=self.colorfmt,
-                                pos=(cursor_x, cursor_y),
-                                pbuffer=char_info.texture_region.pixels)
-
-            # TODO: Add offsets
-            cursor_x += char_info.xadvance
-            previous_char = char
