@@ -2,6 +2,7 @@ from typing import Optional, TYPE_CHECKING
 
 from kivy.uix.effectwidget import EffectWidget
 from kivy.uix.relativelayout import RelativeLayout
+from kivy.properties import NumericProperty
 
 from mpfmc.uix.widget import Widget
 from mpfmc.uix.display import DisplayOutput
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 
 class DisplayWidget(Widget, RelativeLayout):
     widget_type_name = 'Display'
-    animation_properties = ('x', 'y')
+    animation_properties = ('x', 'y', 'pos')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         del kwargs
