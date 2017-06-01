@@ -9,7 +9,9 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     ScreenManagerException)
 from kivy.uix.widget import Widget as KivyWidget, WidgetException as KivyWidgetException
 from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.scatter import ScatterPlane
+from kivy.uix.scatter import Scatter
+from kivy.graphics.context_instructions import Color
+from kivy.graphics import Rectangle
 
 from mpfmc.uix.widget import WidgetContainer, Widget
 from mpfmc.uix.slide import Slide
@@ -541,27 +543,35 @@ class Display(ScreenManager):
         """
 
 
-class DisplayOutput(ScatterPlane):
+class DisplayOutput(Scatter):
 
     def __init__(self, parent: "KivyWidget", display: "Display", **kwargs):
         kwargs.setdefault('size', parent.size)
-        kwargs.setdefault('size_hint', (None, None))
+        kwargs.setdefault('size_hint', (1, 1))
         kwargs.setdefault('do_scale', False)
         kwargs.setdefault('do_translation', False)
         kwargs.setdefault('do_rotation', False)
 
         super().__init__(**kwargs)
 
+        # Rather than adding the display as a child of this widget, we will simply
+        # add the display's canvas to this widget's canvas.  This allows the display
+        # to essentially have multiple parents. The canvas contains all the
+        # instructions needed to draw the widgets.
         self.display = display
-        if self.display.has_parent():
-            pass
-            # TODO: Widget already has parent, use framebuffer instead
-        else:
-            self.add_widget(self.display.parent)
+        self.canvas.add(self.display.parent.canvas)
 
         parent.bind(size=self.on_parent_resize)
         parent.add_widget(self)
         Clock.schedule_once(self._fit_to_parent, -1)
+
+    def __repr__(self) -> str:  # pragma: no cover
+        try:
+            return '<DisplayOutput size={}, pos={}, source={}>'.format(
+                    self.size, self.pos, self.display.name)
+        except AttributeError:
+            return '<DisplayOutput size={}, source=(none)>'.format(
+                    self.size)
 
     def on_parent_resize(self, *args):
         del args
@@ -570,7 +580,7 @@ class DisplayOutput(ScatterPlane):
     def _fit_to_parent(self, *args):
         del args
         if self.parent:
+            self.size = self.parent.size
             self.scale = min(self.parent.width / float(self.display.width),
                              self.parent.height / float(self.display.height))
-            self.center = self.parent.center
-            self.display.center = self.center
+            self.pos = (0, 0)

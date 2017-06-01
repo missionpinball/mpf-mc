@@ -1,6 +1,7 @@
 from typing import Optional, TYPE_CHECKING
 
 from kivy.uix.effectwidget import EffectWidget
+from kivy.uix.relativelayout import RelativeLayout
 
 from mpfmc.uix.widget import Widget
 from mpfmc.uix.display import DisplayOutput
@@ -10,19 +11,18 @@ if TYPE_CHECKING:
     from mpfmc.uix.slide import Slide
 
 
-class DisplayWidget(Widget):
+class DisplayWidget(Widget, RelativeLayout):
     widget_type_name = 'Display'
     animation_properties = ('x', 'y')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         del kwargs
+        self.display = None
+
         super().__init__(mc=mc, config=config, key=key)
 
-        # The points in this widget are always relative to the bottom left corner
-        self.anchor_pos = ("left", "bottom")
-
         self.display = self.mc.displays[self.config['source_display']]
-        self.effects = EffectWidget(size=self.size)
+        self.effects = EffectWidget(pos=self.pos, size_hint=(1, 1))
 
         if 'effects' in self.config:
             self._add_effects(self.config['effects'])
@@ -33,11 +33,15 @@ class DisplayWidget(Widget):
 
     def __repr__(self) -> str:  # pragma: no cover
         try:
-            return '<DisplayWidget size={}, source={}>'.format(
-                    self.size, self.display.name)
+            return '<DisplayWidget size={}, pos={}, source={}>'.format(
+                    self.size, self.pos, self.display.name)
         except AttributeError:
             return '<DisplayWidget size={}, source=(none)>'.format(
                     self.size)
+
+    def on_pos(self, instance, pos):
+        del instance
+        self.effects.pos = pos
 
     def _add_effects(self, config: Optional[list]) -> None:
         """Adds any effects specified in the config for this display widget."""
