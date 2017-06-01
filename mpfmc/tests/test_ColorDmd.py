@@ -22,4 +22,4 @@ class TestDmd(MpfMcTestCase):
 
         self.mc.events.post('slide2')
         self.mc.events.post('dmd_slide')
-        self.advance_real_time(4)
+        self.advance_time(4)
