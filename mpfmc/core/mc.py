@@ -466,8 +466,8 @@ class MpfMc(App):
 
                 self.scriptlets.append(scriptlet_obj)
 
-    def _check_crash_queue(self, time):
-        del time
+    def _check_crash_queue(self, dt):
+        del dt
         try:
             crash = self.crash_queue.get(block=False)
         except queue.Empty:
@@ -475,7 +475,8 @@ class MpfMc(App):
         else:
             self.log.info("Shutting down due to child thread crash")
             self.log.info("Crash details: %s", crash)
-            self.stop()
+            self.thread_stopper.set()
+            raise Exception(crash)
 
     def register_monitor(self, monitor_class, monitor):
         """Registers a monitor.
