@@ -217,8 +217,9 @@ class MpfMcTestCase(unittest.TestCase):
         self.mc.dispatch('on_start')
         runTouchApp(slave=True)  # change is here
 
-        while not self.mc.is_init_done.is_set():
-            EventLoop.idle()
+        # Perform init process
+        while not self.mc.is_init_done.is_set() and not self.mc.thread_stopper.is_set():
+            self.advance_time()
 
         # set a nice title
         window.set_title(self.__class__.__name__ + "::" + self._testMethodName)
