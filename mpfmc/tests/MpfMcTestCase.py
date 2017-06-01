@@ -2,8 +2,11 @@ import os
 import sys
 import unittest
 
-os.environ['KIVY_NO_FILELOG'] = '1'
-os.environ['KIVY_NO_CONSOLELOG'] = '1'
+verbose = sys.argv and "-v" in sys.argv
+
+if not verbose:
+    os.environ['KIVY_NO_FILELOG'] = '1'
+    os.environ['KIVY_NO_CONSOLELOG'] = '1'
 
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 from kivy import Config, Logger
@@ -16,9 +19,9 @@ from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
 from mpfmc.core.utils import load_machine_config
 
-Config.set('kivy', 'log_enable', '0')
-Config.set('kivy', 'log_level', 'warning')
-
+if not verbose:
+    Config.set('kivy', 'log_enable', '0')
+    Config.set('kivy', 'log_level', 'warning')
 
 from mpfmc.core.mc import MpfMc
 from time import time, sleep
