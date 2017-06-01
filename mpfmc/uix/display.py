@@ -564,6 +564,7 @@ class DisplayOutput(Scatter):
         parent.bind(size=self.on_parent_resize)
         parent.add_widget(self)
         Clock.schedule_once(self._fit_to_parent, -1)
+        Clock.schedule_interval(self._redraw, 0)
 
     def __repr__(self) -> str:  # pragma: no cover
         try:
@@ -572,6 +573,13 @@ class DisplayOutput(Scatter):
         except AttributeError:
             return '<DisplayOutput size={}, source=(none)>'.format(
                     self.size)
+
+    def _redraw(self, *args):
+        del args
+        # TODO: Add more intelligence to canvas update process
+        # Probably only need to update the canvas when there are multiple display
+        # objects connected to the same source display (rare)
+        self.canvas.ask_update()
 
     def on_parent_resize(self, *args):
         del args
