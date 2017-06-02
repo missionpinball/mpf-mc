@@ -495,7 +495,7 @@ struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter;
 struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont;
 struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer;
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":24
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":25
  * 
  * 
  * cdef class BitmapFontCharacter:             # <<<<<<<<<<<<<<
@@ -512,7 +512,7 @@ struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter {
 };
 
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":42
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":43
  * 
  * 
  * cdef class BitmapFont:             # <<<<<<<<<<<<<<
@@ -537,7 +537,7 @@ struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont {
 };
 
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":226
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":324
  * 
  * 
  * cdef class _SurfaceContainer:             # <<<<<<<<<<<<<<
@@ -711,6 +711,12 @@ static CYTHON_INLINE Py_UCS4 __Pyx_PyUnicode_AsPy_UCS4(PyObject*);
 #endif
 static long __Pyx__PyObject_Ord(PyObject* c);
 
+/* PyDictContains.proto */
+static CYTHON_INLINE int __Pyx_PyDict_ContainsTF(PyObject* item, PyObject* dict, int eq) {
+    int result = PyDict_Contains(dict, item);
+    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
+}
+
 /* SaveResetException.proto */
 #if CYTHON_COMPILING_IN_CPYTHON
 #define __Pyx_ExceptionSave(type, value, tb)  __Pyx__ExceptionSave(__pyx_tstate, type, value, tb)
@@ -730,18 +736,38 @@ static CYTHON_INLINE int __Pyx_PyErr_ExceptionMatchesInState(PyThreadState* tsta
 #define __Pyx_PyErr_ExceptionMatches(err)  PyErr_ExceptionMatches(err)
 #endif
 
+/* PyObjectLookupSpecial.proto */
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x02070000
+static CYTHON_INLINE PyObject* __Pyx_PyObject_LookupSpecial(PyObject* obj, PyObject* attr_name) {
+    PyObject *res;
+    PyTypeObject *tp = Py_TYPE(obj);
+#if PY_MAJOR_VERSION < 3
+    if (unlikely(PyInstance_Check(obj)))
+        return __Pyx_PyObject_GetAttrStr(obj, attr_name);
+#endif
+    res = _PyType_Lookup(tp, attr_name);
+    if (likely(res)) {
+        descrgetfunc f = Py_TYPE(res)->tp_descr_get;
+        if (!f) {
+            Py_INCREF(res);
+        } else {
+            res = f(res, obj, (PyObject *)tp);
+        }
+    } else {
+        PyErr_SetObject(PyExc_AttributeError, attr_name);
+    }
+    return res;
+}
+#else
+#define __Pyx_PyObject_LookupSpecial(o,n) __Pyx_PyObject_GetAttrStr(o,n)
+#endif
+
 /* PyObjectCallNoArg.proto */
 #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
 #else
 #define __Pyx_PyObject_CallNoArg(func) __Pyx_PyObject_Call(func, __pyx_empty_tuple, NULL)
 #endif
-
-/* PyDictContains.proto */
-static CYTHON_INLINE int __Pyx_PyDict_ContainsTF(PyObject* item, PyObject* dict, int eq) {
-    int result = PyDict_Contains(dict, item);
-    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
-}
 
 /* DictGetItem.proto */
 #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
@@ -764,6 +790,12 @@ static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key) {
     #define __Pyx_PyDict_GetItem(d, key) PyObject_GetItem(d, key)
 #endif
 
+/* PySequenceContains.proto */
+static CYTHON_INLINE int __Pyx_PySequence_ContainsTF(PyObject* item, PyObject* seq, int eq) {
+    int result = PySequence_Contains(seq, item);
+    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
+}
+
 /* SetItemInt.proto */
 #define __Pyx_SetItemInt(o, i, v, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
     (__Pyx_fits_Py_ssize_t(i, type, is_signed) ?\
@@ -774,15 +806,17 @@ static CYTHON_INLINE int __Pyx_SetItemInt_Generic(PyObject *o, PyObject *j, PyOb
 static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObject *v,
                                                int is_list, int wraparound, int boundscheck);
 
+/* GetException.proto */
+#if CYTHON_COMPILING_IN_CPYTHON
+#define __Pyx_GetException(type, value, tb)  __Pyx__GetException(__pyx_tstate, type, value, tb)
+static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
+#else
+static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
+#endif
+
 /* unicode_iter.proto */
 static CYTHON_INLINE int __Pyx_init_unicode_iteration(
     PyObject* ustring, Py_ssize_t *length, void** data, int *kind);
-
-/* PySequenceContains.proto */
-static CYTHON_INLINE int __Pyx_PySequence_ContainsTF(PyObject* item, PyObject* seq, int eq) {
-    int result = PySequence_Contains(seq, item);
-    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
-}
 
 /* GetItemInt.proto */
 #define __Pyx_GetItemInt(o, i, type, is_signed, to_py_func, is_list, wraparound, boundscheck)\
@@ -805,14 +839,6 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Tuple_Fast(PyObject *o, Py_ssize
 static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j);
 static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i,
                                                      int is_list, int wraparound, int boundscheck);
-
-/* GetException.proto */
-#if CYTHON_COMPILING_IN_CPYTHON
-#define __Pyx_GetException(type, value, tb)  __Pyx__GetException(__pyx_tstate, type, value, tb)
-static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb);
-#else
-static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb);
-#endif
 
 /* Import.proto */
 static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level);
@@ -885,6 +911,7 @@ int __pyx_module_is_main_mpfmc__uix__bitmap_font__bitmap_font = 0;
 
 /* Implementation of 'mpfmc.uix.bitmap_font.bitmap_font' */
 static PyObject *__pyx_builtin_Exception;
+static PyObject *__pyx_builtin_open;
 static PyObject *__pyx_builtin_TypeError;
 static PyObject *__pyx_builtin_KeyError;
 static PyObject *__pyx_builtin_ValueError;
@@ -895,21 +922,27 @@ static const char __pyx_k_x[] = "x";
 static const char __pyx_k_y[] = "y";
 static const char __pyx_k_id[] = "id";
 static const char __pyx_k_os[] = "os";
+static const char __pyx_k_re[] = "re";
 static const char __pyx_k_all[] = "__all__";
 static const char __pyx_k_doc[] = "__doc__";
 static const char __pyx_k_base[] = "base";
 static const char __pyx_k_char[] = "char";
+static const char __pyx_k_exit[] = "__exit__";
 static const char __pyx_k_file[] = "file";
 static const char __pyx_k_find[] = "find";
 static const char __pyx_k_info[] = "info";
 static const char __pyx_k_main[] = "__main__";
+static const char __pyx_k_open[] = "open";
 static const char __pyx_k_path[] = "path";
 static const char __pyx_k_rect[] = "rect";
 static const char __pyx_k_rgba[] = "rgba";
 static const char __pyx_k_test[] = "__test__";
 static const char __pyx_k_text[] = "text";
 static const char __pyx_k_chars[] = "chars";
+static const char __pyx_k_enter[] = "__enter__";
 static const char __pyx_k_first[] = "first";
+static const char __pyx_k_flags[] = "flags";
+static const char __pyx_k_group[] = "group";
 static const char __pyx_k_width[] = "width";
 static const char __pyx_k_amount[] = "amount";
 static const char __pyx_k_attrib[] = "attrib";
@@ -918,6 +951,7 @@ static const char __pyx_k_height[] = "height";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_isfile[] = "isfile";
 static const char __pyx_k_module[] = "__module__";
+static const char __pyx_k_search[] = "search";
 static const char __pyx_k_second[] = "second";
 static const char __pyx_k_findall[] = "findall";
 static const char __pyx_k_getroot[] = "getroot";
@@ -929,7 +963,6 @@ static const char __pyx_k_yoffset[] = "yoffset";
 static const char __pyx_k_KeyError[] = "KeyError";
 static const char __pyx_k_kernings[] = "kernings";
 static const char __pyx_k_qualname[] = "__qualname__";
-static const char __pyx_k_tostring[] = "tostring";
 static const char __pyx_k_xadvance[] = "xadvance";
 static const char __pyx_k_Exception[] = "Exception";
 static const char __pyx_k_ImageData[] = "ImageData";
@@ -938,31 +971,38 @@ static const char __pyx_k_container[] = "container";
 static const char __pyx_k_get_image[] = "get_image";
 static const char __pyx_k_metaclass[] = "__metaclass__";
 static const char __pyx_k_BitmapFont[] = "BitmapFont";
+static const char __pyx_k_IGNORECASE[] = "IGNORECASE";
 static const char __pyx_k_ParseError[] = "ParseError";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_descriptor[] = "descriptor";
 static const char __pyx_k_image_file[] = "image_file";
 static const char __pyx_k_lineHeight[] = "lineHeight";
+static const char __pyx_k_startswith[] = "startswith";
 static const char __pyx_k_ElementTree[] = "ElementTree";
 static const char __pyx_k_bitmap_font[] = "bitmap_font";
+static const char __pyx_k_base_0_9_1_5[] = "base=([0-9]{1,5})";
 static const char __pyx_k_font_kerning[] = "font_kerning";
 static const char __pyx_k_get_kernings[] = "get_kernings";
 static const char __pyx_k_get_characters[] = "get_characters";
 static const char __pyx_k_get_font_asset[] = "get_font_asset";
 static const char __pyx_k_kivy_core_image[] = "kivy.core.image";
 static const char __pyx_k_SurfaceContainer[] = "_SurfaceContainer";
+static const char __pyx_k_lineHeight_0_9_1_5[] = "lineHeight=([0-9]{1,5})";
 static const char __pyx_k_BitmapFontException[] = "BitmapFontException";
 static const char __pyx_k_load_descriptor_xml[] = "_load_descriptor_xml";
 static const char __pyx_k_load_descriptor_file[] = "_load_descriptor_file";
 static const char __pyx_k_load_descriptor_list[] = "_load_descriptor_list";
 static const char __pyx_k_xml_etree_ElementTree[] = "xml.etree.ElementTree";
-static const char __pyx_k_Bitmap_font_descriptor_file_inva[] = "Bitmap font descriptor file invalid XML format";
+static const char __pyx_k_kerning_s_first_P_first_0_9_1_3[] = "kerning\\s+first=(?P<first>[0-9]{1,3})\\s+second=(?P<second>[0-9]{1,3})\\s+amount=(?P<amount>-?[0-9]{1,3})";
+static const char __pyx_k_Bitmap_font_descriptor_file_inva[] = "Bitmap font descriptor file invalid format";
 static const char __pyx_k_Could_not_load_bitmap_font_image[] = "Could not load bitmap font image file";
 static const char __pyx_k_Could_not_locate_the_bitmap_font[] = "Could not locate the bitmap font descriptor file ";
 static const char __pyx_k_Exception_returned_by_the_bitmap[] = "Exception returned by the bitmap font module";
 static const char __pyx_k_Illegal_value_in_bitmap_font_des[] = "Illegal value in bitmap font descriptor";
 static const char __pyx_k_No_value_specified_for_struct_at[] = "No value specified for struct attribute 'x'";
+static const char __pyx_k_char_s_id_P_id_0_9_1_4_s_x_P_x_0[] = "char\\s+id=(?P<id>[0-9]{1,4})\\s+x=(?P<x>[0-9]{1,4})\\s+y=(?P<y>[0-9]{1,4})\\s+width=(?P<width>[0-9]{1,3})\\s+height=(?P<height>[0-9]{1,3})\\s+xoffset=(?P<xoffset>-?[0-9]{1,3})\\s+yoffset=(?P<yoffset>-?[0-9]{1,3})\\s+xadvance=(?P<xadvance>[0-9]{1,3})\\s+page=(?P<page>[0-9]{1,2})\\s+chnl=(?P<chnl>[0-9]{1,3})";
 static const char __pyx_k_mpfmc_uix_bitmap_font_bitmap_fon[] = "mpfmc.uix.bitmap_font.bitmap_font";
+static const char __pyx_k_Bitmap_font_descriptor_file_inva_2[] = "Bitmap font descriptor file invalid XML format";
 static const char __pyx_k_No_value_specified_for_struct_at_2[] = "No value specified for struct attribute 'y'";
 static const char __pyx_k_No_value_specified_for_struct_at_3[] = "No value specified for struct attribute 'w'";
 static const char __pyx_k_No_value_specified_for_struct_at_4[] = "No value specified for struct attribute 'h'";
@@ -971,11 +1011,13 @@ static PyObject *__pyx_n_u_BitmapFont;
 static PyObject *__pyx_n_s_BitmapFontException;
 static PyObject *__pyx_n_u_BitmapFontException;
 static PyObject *__pyx_kp_u_Bitmap_font_descriptor_file_inva;
+static PyObject *__pyx_kp_u_Bitmap_font_descriptor_file_inva_2;
 static PyObject *__pyx_kp_u_Could_not_load_bitmap_font_image;
 static PyObject *__pyx_kp_u_Could_not_locate_the_bitmap_font;
 static PyObject *__pyx_n_s_ElementTree;
 static PyObject *__pyx_n_s_Exception;
 static PyObject *__pyx_kp_s_Exception_returned_by_the_bitmap;
+static PyObject *__pyx_n_s_IGNORECASE;
 static PyObject *__pyx_kp_u_Illegal_value_in_bitmap_font_des;
 static PyObject *__pyx_n_s_ImageData;
 static PyObject *__pyx_n_s_KeyError;
@@ -991,17 +1033,22 @@ static PyObject *__pyx_n_s_all;
 static PyObject *__pyx_n_u_amount;
 static PyObject *__pyx_n_s_attrib;
 static PyObject *__pyx_n_u_base;
+static PyObject *__pyx_kp_u_base_0_9_1_5;
 static PyObject *__pyx_n_s_bitmap_font;
 static PyObject *__pyx_n_u_char;
+static PyObject *__pyx_kp_u_char_s_id_P_id_0_9_1_4_s_x_P_x_0;
 static PyObject *__pyx_n_u_chars;
 static PyObject *__pyx_n_u_common;
 static PyObject *__pyx_n_s_container;
 static PyObject *__pyx_n_s_descriptor;
 static PyObject *__pyx_n_s_doc;
+static PyObject *__pyx_n_s_enter;
+static PyObject *__pyx_n_s_exit;
 static PyObject *__pyx_n_s_file;
 static PyObject *__pyx_n_s_find;
 static PyObject *__pyx_n_s_findall;
 static PyObject *__pyx_n_u_first;
+static PyObject *__pyx_n_s_flags;
 static PyObject *__pyx_n_s_font_kerning;
 static PyObject *__pyx_n_u_font_kerning;
 static PyObject *__pyx_n_s_get_characters;
@@ -1009,6 +1056,7 @@ static PyObject *__pyx_n_s_get_font_asset;
 static PyObject *__pyx_n_s_get_image;
 static PyObject *__pyx_n_s_get_kernings;
 static PyObject *__pyx_n_s_getroot;
+static PyObject *__pyx_n_s_group;
 static PyObject *__pyx_n_s_h;
 static PyObject *__pyx_n_u_height;
 static PyObject *__pyx_n_u_id;
@@ -1017,9 +1065,11 @@ static PyObject *__pyx_n_s_import;
 static PyObject *__pyx_n_u_info;
 static PyObject *__pyx_n_s_isfile;
 static PyObject *__pyx_n_u_kerning;
+static PyObject *__pyx_kp_u_kerning_s_first_P_first_0_9_1_3;
 static PyObject *__pyx_n_u_kernings;
 static PyObject *__pyx_n_s_kivy_core_image;
 static PyObject *__pyx_n_u_lineHeight;
+static PyObject *__pyx_kp_u_lineHeight_0_9_1_5;
 static PyObject *__pyx_n_s_load_descriptor_file;
 static PyObject *__pyx_n_s_load_descriptor_list;
 static PyObject *__pyx_n_s_load_descriptor_xml;
@@ -1027,17 +1077,20 @@ static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_metaclass;
 static PyObject *__pyx_n_s_module;
 static PyObject *__pyx_n_s_mpfmc_uix_bitmap_font_bitmap_fon;
+static PyObject *__pyx_n_s_open;
 static PyObject *__pyx_n_s_options;
 static PyObject *__pyx_n_s_os;
 static PyObject *__pyx_n_s_path;
 static PyObject *__pyx_n_s_prepare;
 static PyObject *__pyx_n_s_qualname;
+static PyObject *__pyx_n_s_re;
 static PyObject *__pyx_n_s_rect;
 static PyObject *__pyx_n_u_rgba;
+static PyObject *__pyx_n_s_search;
 static PyObject *__pyx_n_u_second;
+static PyObject *__pyx_n_s_startswith;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_text;
-static PyObject *__pyx_n_s_tostring;
 static PyObject *__pyx_n_s_w;
 static PyObject *__pyx_n_u_width;
 static PyObject *__pyx_n_s_x;
@@ -1103,6 +1156,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
 static PyObject *__pyx_tp_new_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_tp_new_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static PyObject *__pyx_int_1;
 static PyObject *__pyx_int_4;
 static PyObject *__pyx_tuple__2;
 static PyObject *__pyx_tuple__3;
@@ -1121,8 +1175,32 @@ static PyObject *__pyx_tuple__15;
 static PyObject *__pyx_tuple__16;
 static PyObject *__pyx_tuple__17;
 static PyObject *__pyx_tuple__18;
+static PyObject *__pyx_tuple__19;
+static PyObject *__pyx_tuple__20;
+static PyObject *__pyx_tuple__21;
+static PyObject *__pyx_tuple__22;
+static PyObject *__pyx_tuple__23;
+static PyObject *__pyx_tuple__24;
+static PyObject *__pyx_tuple__25;
+static PyObject *__pyx_tuple__26;
+static PyObject *__pyx_tuple__27;
+static PyObject *__pyx_tuple__28;
+static PyObject *__pyx_tuple__29;
+static PyObject *__pyx_tuple__30;
+static PyObject *__pyx_tuple__31;
+static PyObject *__pyx_tuple__32;
+static PyObject *__pyx_tuple__33;
+static PyObject *__pyx_tuple__34;
+static PyObject *__pyx_tuple__35;
+static PyObject *__pyx_tuple__36;
+static PyObject *__pyx_tuple__37;
+static PyObject *__pyx_tuple__38;
+static PyObject *__pyx_tuple__39;
+static PyObject *__pyx_tuple__40;
+static PyObject *__pyx_tuple__41;
+static PyObject *__pyx_tuple__42;
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":31
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":32
  *     cdef public int xadvance
  * 
  *     def __cinit__(self, *args, **kw):             # <<<<<<<<<<<<<<
@@ -1155,7 +1233,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":32
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":33
  * 
  *     def __cinit__(self, *args, **kw):
  *         self.id = 0             # <<<<<<<<<<<<<<
@@ -1164,7 +1242,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
  */
   __pyx_v_self->id = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":33
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":34
  *     def __cinit__(self, *args, **kw):
  *         self.id = 0
  *         self.rect.x = 0             # <<<<<<<<<<<<<<
@@ -1173,7 +1251,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
  */
   __pyx_v_self->rect.x = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":34
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":35
  *         self.id = 0
  *         self.rect.x = 0
  *         self.rect.y = 0             # <<<<<<<<<<<<<<
@@ -1182,7 +1260,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
  */
   __pyx_v_self->rect.y = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":35
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":36
  *         self.rect.x = 0
  *         self.rect.y = 0
  *         self.rect.w = 0             # <<<<<<<<<<<<<<
@@ -1191,7 +1269,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
  */
   __pyx_v_self->rect.w = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":36
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":37
  *         self.rect.y = 0
  *         self.rect.w = 0
  *         self.rect.h = 0             # <<<<<<<<<<<<<<
@@ -1200,7 +1278,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
  */
   __pyx_v_self->rect.h = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":37
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":38
  *         self.rect.w = 0
  *         self.rect.h = 0
  *         self.xoffset = 0             # <<<<<<<<<<<<<<
@@ -1209,7 +1287,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
  */
   __pyx_v_self->xoffset = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":38
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":39
  *         self.rect.h = 0
  *         self.xoffset = 0
  *         self.yoffset = 0             # <<<<<<<<<<<<<<
@@ -1218,7 +1296,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
  */
   __pyx_v_self->yoffset = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":39
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":40
  *         self.xoffset = 0
  *         self.yoffset = 0
  *         self.xadvance = 0             # <<<<<<<<<<<<<<
@@ -1227,7 +1305,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
  */
   __pyx_v_self->xadvance = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":31
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":32
  *     cdef public int xadvance
  * 
  *     def __cinit__(self, *args, **kw):             # <<<<<<<<<<<<<<
@@ -1241,7 +1319,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":25
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":26
  * 
  * cdef class BitmapFontCharacter:
  *     cdef public int id             # <<<<<<<<<<<<<<
@@ -1268,7 +1346,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCh
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->id); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->id); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1303,7 +1381,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 25, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 26, __pyx_L1_error)
   __pyx_v_self->id = __pyx_t_1;
 
   /* function exit code */
@@ -1317,7 +1395,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":26
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":27
  * cdef class BitmapFontCharacter:
  *     cdef public int id
  *     cdef public SDL_Rect rect             # <<<<<<<<<<<<<<
@@ -1344,7 +1422,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCh
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert__to_py_struct__SDL_Rect(__pyx_v_self->rect); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert__to_py_struct__SDL_Rect(__pyx_v_self->rect); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1379,7 +1457,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   __Pyx_RefNannyDeclarations
   struct SDL_Rect __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __pyx_convert__from_py_struct__SDL_Rect(__pyx_v_value); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 26, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert__from_py_struct__SDL_Rect(__pyx_v_value); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 27, __pyx_L1_error)
   __pyx_v_self->rect = __pyx_t_1;
 
   /* function exit code */
@@ -1393,7 +1471,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":27
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":28
  *     cdef public int id
  *     cdef public SDL_Rect rect
  *     cdef public int xoffset             # <<<<<<<<<<<<<<
@@ -1420,7 +1498,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCh
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->xoffset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->xoffset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1455,7 +1533,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 28, __pyx_L1_error)
   __pyx_v_self->xoffset = __pyx_t_1;
 
   /* function exit code */
@@ -1469,7 +1547,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":28
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":29
  *     cdef public SDL_Rect rect
  *     cdef public int xoffset
  *     cdef public int yoffset             # <<<<<<<<<<<<<<
@@ -1496,7 +1574,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCh
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->yoffset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->yoffset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1531,7 +1609,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 28, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 29, __pyx_L1_error)
   __pyx_v_self->yoffset = __pyx_t_1;
 
   /* function exit code */
@@ -1545,7 +1623,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":29
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":30
  *     cdef public int xoffset
  *     cdef public int yoffset
  *     cdef public int xadvance             # <<<<<<<<<<<<<<
@@ -1572,7 +1650,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCh
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->xadvance); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->xadvance); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 30, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1607,7 +1685,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 29, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 30, __pyx_L1_error)
   __pyx_v_self->xadvance = __pyx_t_1;
 
   /* function exit code */
@@ -1621,7 +1699,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_19BitmapFontCharacte
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":60
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":61
  *     cdef SDL_Surface *image
  * 
  *     def __cinit__(self, *args, **kw):             # <<<<<<<<<<<<<<
@@ -1655,7 +1733,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":61
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":62
  * 
  *     def __cinit__(self, *args, **kw):
  *         self.face = ""             # <<<<<<<<<<<<<<
@@ -1668,7 +1746,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
   __Pyx_DECREF(__pyx_v_self->face);
   __pyx_v_self->face = __pyx_kp_u_;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":62
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":63
  *     def __cinit__(self, *args, **kw):
  *         self.face = ""
  *         self.bold = False             # <<<<<<<<<<<<<<
@@ -1677,7 +1755,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->bold = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":63
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":64
  *         self.face = ""
  *         self.bold = False
  *         self.italic = False             # <<<<<<<<<<<<<<
@@ -1686,7 +1764,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->italic = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":64
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":65
  *         self.bold = False
  *         self.italic = False
  *         self.padding = 0             # <<<<<<<<<<<<<<
@@ -1695,7 +1773,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->padding = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":65
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":66
  *         self.italic = False
  *         self.padding = 0
  *         self.spacing = 0             # <<<<<<<<<<<<<<
@@ -1704,7 +1782,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->spacing = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":66
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":67
  *         self.padding = 0
  *         self.spacing = 0
  *         self.outline = 0             # <<<<<<<<<<<<<<
@@ -1713,7 +1791,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->outline = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":68
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":69
  *         self.outline = 0
  * 
  *         self.line_height = 0             # <<<<<<<<<<<<<<
@@ -1722,7 +1800,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->line_height = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":69
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":70
  * 
  *         self.line_height = 0
  *         self.base = 0             # <<<<<<<<<<<<<<
@@ -1731,7 +1809,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->base = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":70
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":71
  *         self.line_height = 0
  *         self.base = 0
  *         self.scale_w = 0             # <<<<<<<<<<<<<<
@@ -1740,7 +1818,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->scale_w = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":71
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":72
  *         self.base = 0
  *         self.scale_w = 0
  *         self.scale_h = 0             # <<<<<<<<<<<<<<
@@ -1749,14 +1827,14 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->scale_h = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":73
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":74
  *         self.scale_h = 0
  * 
  *         self.characters = dict()             # <<<<<<<<<<<<<<
  *         self.kernings = dict()
  * 
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 73, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->characters);
@@ -1764,14 +1842,14 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
   __pyx_v_self->characters = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":74
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":75
  * 
  *         self.characters = dict()
  *         self.kernings = dict()             # <<<<<<<<<<<<<<
  * 
  *         self.image = NULL
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 74, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->kernings);
@@ -1779,7 +1857,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
   __pyx_v_self->kernings = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":76
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":77
  *         self.kernings = dict()
  * 
  *         self.image = NULL             # <<<<<<<<<<<<<<
@@ -1788,7 +1866,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
  */
   __pyx_v_self->image = NULL;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":60
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":61
  *     cdef SDL_Surface *image
  * 
  *     def __cinit__(self, *args, **kw):             # <<<<<<<<<<<<<<
@@ -1808,7 +1886,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont___cinit
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":78
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":79
  *         self.image = NULL
  * 
  *     def __init__(self, str image_file, object descriptor):             # <<<<<<<<<<<<<<
@@ -1844,11 +1922,11 @@ static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_3__init
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_descriptor)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 78, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 79, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 78, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 79, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -1861,13 +1939,13 @@ static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_3__init
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 78, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 79, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_file), (&PyUnicode_Type), 1, "image_file", 1))) __PYX_ERR(0, 78, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_image_file), (&PyUnicode_Type), 1, "image_file", 1))) __PYX_ERR(0, 79, __pyx_L1_error)
   __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init__(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), __pyx_v_image_file, __pyx_v_descriptor);
 
   /* function exit code */
@@ -1894,7 +1972,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":81
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":82
  * 
  *         # Load the image file
  *         cdef bytes c_filename = image_file.encode('utf-8')             # <<<<<<<<<<<<<<
@@ -1903,25 +1981,25 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
  */
   if (unlikely(__pyx_v_image_file == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "encode");
-    __PYX_ERR(0, 81, __pyx_L1_error)
+    __PYX_ERR(0, 82, __pyx_L1_error)
   }
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_image_file); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 81, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_image_file); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 82, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(PyBytes_CheckExact(__pyx_t_1))||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 81, __pyx_L1_error)
+  if (!(likely(PyBytes_CheckExact(__pyx_t_1))||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "bytes", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 82, __pyx_L1_error)
   __pyx_v_c_filename = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":82
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":83
  *         # Load the image file
  *         cdef bytes c_filename = image_file.encode('utf-8')
  *         cdef SDL_Surface *image = IMG_Load(c_filename)             # <<<<<<<<<<<<<<
  * 
  *         if image == NULL:
  */
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_c_filename); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_v_c_filename); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L1_error)
   __pyx_v_image = IMG_Load(__pyx_t_2);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":84
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":85
  *         cdef SDL_Surface *image = IMG_Load(c_filename)
  * 
  *         if image == NULL:             # <<<<<<<<<<<<<<
@@ -1931,23 +2009,23 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
   __pyx_t_3 = ((__pyx_v_image == NULL) != 0);
   if (__pyx_t_3) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":85
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":86
  * 
  *         if image == NULL:
  *             raise BitmapFontException("Could not load bitmap font image file")             # <<<<<<<<<<<<<<
  * 
  *         self.image = image
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 85, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 86, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 85, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 86, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_4, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __PYX_ERR(0, 85, __pyx_L1_error)
+    __PYX_ERR(0, 86, __pyx_L1_error)
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":84
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":85
  *         cdef SDL_Surface *image = IMG_Load(c_filename)
  * 
  *         if image == NULL:             # <<<<<<<<<<<<<<
@@ -1956,7 +2034,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":87
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":88
  *             raise BitmapFontException("Could not load bitmap font image file")
  * 
  *         self.image = image             # <<<<<<<<<<<<<<
@@ -1965,7 +2043,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
  */
   __pyx_v_self->image = __pyx_v_image;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":88
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":89
  * 
  *         self.image = image
  *         self.scale_w = self.image.w             # <<<<<<<<<<<<<<
@@ -1975,7 +2053,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
   __pyx_t_5 = __pyx_v_self->image->w;
   __pyx_v_self->scale_w = __pyx_t_5;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":89
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":90
  *         self.image = image
  *         self.scale_w = self.image.w
  *         self.scale_h = self.image.h             # <<<<<<<<<<<<<<
@@ -1985,7 +2063,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
   __pyx_t_5 = __pyx_v_self->image->h;
   __pyx_v_self->scale_h = __pyx_t_5;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":91
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":92
  *         self.scale_h = self.image.h
  * 
  *         if isinstance(descriptor, list):             # <<<<<<<<<<<<<<
@@ -1996,14 +2074,14 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
   __pyx_t_6 = (__pyx_t_3 != 0);
   if (__pyx_t_6) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":92
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":93
  * 
  *         if isinstance(descriptor, list):
  *             self._load_descriptor_list(descriptor)             # <<<<<<<<<<<<<<
  *         elif isinstance(descriptor, str):
  *             self._load_descriptor_file(descriptor)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_descriptor_list); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 92, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_descriptor_list); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 93, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_7 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_1))) {
@@ -2016,23 +2094,23 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
       }
     }
     if (!__pyx_t_7) {
-      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_descriptor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 92, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_descriptor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
     } else {
-      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 92, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
       __Pyx_INCREF(__pyx_v_descriptor);
       __Pyx_GIVEREF(__pyx_v_descriptor);
       PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_v_descriptor);
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 92, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 93, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":91
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":92
  *         self.scale_h = self.image.h
  * 
  *         if isinstance(descriptor, list):             # <<<<<<<<<<<<<<
@@ -2042,7 +2120,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
     goto __pyx_L4;
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":93
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":94
  *         if isinstance(descriptor, list):
  *             self._load_descriptor_list(descriptor)
  *         elif isinstance(descriptor, str):             # <<<<<<<<<<<<<<
@@ -2053,14 +2131,14 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
   __pyx_t_3 = (__pyx_t_6 != 0);
   if (__pyx_t_3) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":94
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":95
  *             self._load_descriptor_list(descriptor)
  *         elif isinstance(descriptor, str):
  *             self._load_descriptor_file(descriptor)             # <<<<<<<<<<<<<<
  *         else:
  *             raise BitmapFontException("Illegal value in bitmap font descriptor")
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_descriptor_file); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 94, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_descriptor_file); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 95, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_8 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_1))) {
@@ -2073,23 +2151,23 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
       }
     }
     if (!__pyx_t_8) {
-      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_descriptor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 94, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_descriptor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 95, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 94, __pyx_L1_error)
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 95, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_8); __pyx_t_8 = NULL;
       __Pyx_INCREF(__pyx_v_descriptor);
       __Pyx_GIVEREF(__pyx_v_descriptor);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_v_descriptor);
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 94, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_t_7, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 95, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":93
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":94
  *         if isinstance(descriptor, list):
  *             self._load_descriptor_list(descriptor)
  *         elif isinstance(descriptor, str):             # <<<<<<<<<<<<<<
@@ -2099,7 +2177,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
     goto __pyx_L4;
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":96
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":97
  *             self._load_descriptor_file(descriptor)
  *         else:
  *             raise BitmapFontException("Illegal value in bitmap font descriptor")             # <<<<<<<<<<<<<<
@@ -2107,18 +2185,18 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
  *     def __dealloc__(self):
  */
   /*else*/ {
-    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 96, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 97, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 96, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 97, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 96, __pyx_L1_error)
+    __PYX_ERR(0, 97, __pyx_L1_error)
   }
   __pyx_L4:;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":78
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":79
  *         self.image = NULL
  * 
  *     def __init__(self, str image_file, object descriptor):             # <<<<<<<<<<<<<<
@@ -2142,7 +2220,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2__init
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":98
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":99
  *             raise BitmapFontException("Illegal value in bitmap font descriptor")
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2166,7 +2244,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4__dea
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":99
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":100
  * 
  *     def __dealloc__(self):
  *         if self.image != NULL:             # <<<<<<<<<<<<<<
@@ -2176,7 +2254,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4__dea
   __pyx_t_1 = ((__pyx_v_self->image != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":100
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":101
  *     def __dealloc__(self):
  *         if self.image != NULL:
  *             SDL_FreeSurface(self.image)             # <<<<<<<<<<<<<<
@@ -2185,7 +2263,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4__dea
  */
     SDL_FreeSurface(__pyx_v_self->image);
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":101
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":102
  *         if self.image != NULL:
  *             SDL_FreeSurface(self.image)
  *             self.image = NULL             # <<<<<<<<<<<<<<
@@ -2194,7 +2272,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4__dea
  */
     __pyx_v_self->image = NULL;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":99
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":100
  * 
  *     def __dealloc__(self):
  *         if self.image != NULL:             # <<<<<<<<<<<<<<
@@ -2203,7 +2281,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4__dea
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":98
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":99
  *             raise BitmapFontException("Illegal value in bitmap font descriptor")
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2215,7 +2293,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4__dea
   __Pyx_RefNannyFinishContext();
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":103
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":104
  *             self.image = NULL
  * 
  *     def get_image(self):             # <<<<<<<<<<<<<<
@@ -2244,19 +2322,19 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_image", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":104
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":105
  * 
  *     def get_image(self):
  *         image_capsule = pycapsule.PyCapsule_New(self.image, NULL, NULL)             # <<<<<<<<<<<<<<
  *         return image_capsule
  * 
  */
-  __pyx_t_1 = PyCapsule_New(__pyx_v_self->image, NULL, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 104, __pyx_L1_error)
+  __pyx_t_1 = PyCapsule_New(__pyx_v_self->image, NULL, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_image_capsule = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":105
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":106
  *     def get_image(self):
  *         image_capsule = pycapsule.PyCapsule_New(self.image, NULL, NULL)
  *         return image_capsule             # <<<<<<<<<<<<<<
@@ -2268,7 +2346,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6
   __pyx_r = __pyx_v_image_capsule;
   goto __pyx_L0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":103
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":104
  *             self.image = NULL
  * 
  *     def get_image(self):             # <<<<<<<<<<<<<<
@@ -2288,7 +2366,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":107
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":108
  *         return image_capsule
  * 
  *     def get_characters(self):             # <<<<<<<<<<<<<<
@@ -2315,7 +2393,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_8
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_characters", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":108
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":109
  * 
  *     def get_characters(self):
  *         return self.characters             # <<<<<<<<<<<<<<
@@ -2327,7 +2405,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_8
   __pyx_r = __pyx_v_self->characters;
   goto __pyx_L0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":107
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":108
  *         return image_capsule
  * 
  *     def get_characters(self):             # <<<<<<<<<<<<<<
@@ -2342,7 +2420,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_8
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":110
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":111
  *         return self.characters
  * 
  *     def get_kernings(self):             # <<<<<<<<<<<<<<
@@ -2369,7 +2447,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_kernings", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":111
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":112
  * 
  *     def get_kernings(self):
  *         return self.kernings             # <<<<<<<<<<<<<<
@@ -2381,7 +2459,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   __pyx_r = __pyx_v_self->kernings;
   goto __pyx_L0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":110
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":111
  *         return self.characters
  * 
  *     def get_kernings(self):             # <<<<<<<<<<<<<<
@@ -2396,22 +2474,22 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":113
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":114
  *         return self.kernings
  * 
  *     def _load_descriptor_list(self, list descriptor_list):             # <<<<<<<<<<<<<<
+ *         """Load the descriptor from the supplied list."""
  *         cdef int x = 0
- *         cdef int y = 0
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_13_load_descriptor_list(PyObject *__pyx_v_self, PyObject *__pyx_v_descriptor_list); /*proto*/
-static char __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_12_load_descriptor_list[] = "BitmapFont._load_descriptor_list(self, list descriptor_list)";
+static char __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_12_load_descriptor_list[] = "BitmapFont._load_descriptor_list(self, list descriptor_list)\nLoad the descriptor from the supplied list.";
 static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_13_load_descriptor_list(PyObject *__pyx_v_self, PyObject *__pyx_v_descriptor_list) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_load_descriptor_list (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_descriptor_list), (&PyList_Type), 1, "descriptor_list", 1))) __PYX_ERR(0, 113, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_descriptor_list), (&PyList_Type), 1, "descriptor_list", 1))) __PYX_ERR(0, 114, __pyx_L1_error)
   __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_12_load_descriptor_list(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject*)__pyx_v_descriptor_list));
 
   /* function exit code */
@@ -2428,6 +2506,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   int __pyx_v_y;
   int __pyx_v_row_height;
   int __pyx_v_char_width;
+  int __pyx_v_char_id;
   PyObject *__pyx_v_row = NULL;
   PyObject *__pyx_v_text_char = NULL;
   struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter *__pyx_v_character = NULL;
@@ -2440,19 +2519,21 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   PyObject *(*__pyx_t_5)(PyObject *);
   PyObject *__pyx_t_6 = NULL;
   long __pyx_t_7;
+  int __pyx_t_8;
+  int __pyx_t_9;
   __Pyx_RefNannySetupContext("_load_descriptor_list", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":114
- * 
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":116
  *     def _load_descriptor_list(self, list descriptor_list):
+ *         """Load the descriptor from the supplied list."""
  *         cdef int x = 0             # <<<<<<<<<<<<<<
  *         cdef int y = 0
  *         cdef int row_height = int(self.scale_h / len(descriptor_list))
  */
   __pyx_v_x = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":115
- *     def _load_descriptor_list(self, list descriptor_list):
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":117
+ *         """Load the descriptor from the supplied list."""
  *         cdef int x = 0
  *         cdef int y = 0             # <<<<<<<<<<<<<<
  *         cdef int row_height = int(self.scale_h / len(descriptor_list))
@@ -2460,119 +2541,119 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
   __pyx_v_y = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":116
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":118
  *         cdef int x = 0
  *         cdef int y = 0
  *         cdef int row_height = int(self.scale_h / len(descriptor_list))             # <<<<<<<<<<<<<<
  *         cdef int char_width
- *         self.line_height = row_height
+ *         cdef int char_id
  */
   if (unlikely(__pyx_v_descriptor_list == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 116, __pyx_L1_error)
+    __PYX_ERR(0, 118, __pyx_L1_error)
   }
-  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_descriptor_list); if (unlikely(__pyx_t_1 == -1)) __PYX_ERR(0, 116, __pyx_L1_error)
+  __pyx_t_1 = PyList_GET_SIZE(__pyx_v_descriptor_list); if (unlikely(__pyx_t_1 == -1)) __PYX_ERR(0, 118, __pyx_L1_error)
   if (unlikely(__pyx_t_1 == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 116, __pyx_L1_error)
+    __PYX_ERR(0, 118, __pyx_L1_error)
   }
   __pyx_v_row_height = ((int)(((double)__pyx_v_self->scale_h) / ((double)__pyx_t_1)));
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":118
- *         cdef int row_height = int(self.scale_h / len(descriptor_list))
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":121
  *         cdef int char_width
+ *         cdef int char_id
  *         self.line_height = row_height             # <<<<<<<<<<<<<<
  *         self.base = row_height
  * 
  */
   __pyx_v_self->line_height = __pyx_v_row_height;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":119
- *         cdef int char_width
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":122
+ *         cdef int char_id
  *         self.line_height = row_height
  *         self.base = row_height             # <<<<<<<<<<<<<<
  * 
- *         for row in descriptor_list:
+ *         # Loop over all the rows in the descriptor list
  */
   __pyx_v_self->base = __pyx_v_row_height;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":121
- *         self.base = row_height
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":125
  * 
+ *         # Loop over all the rows in the descriptor list
  *         for row in descriptor_list:             # <<<<<<<<<<<<<<
  *             char_width = int(self.scale_w / len(row))
  *             x = 0
  */
   if (unlikely(__pyx_v_descriptor_list == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 121, __pyx_L1_error)
+    __PYX_ERR(0, 125, __pyx_L1_error)
   }
   __pyx_t_2 = __pyx_v_descriptor_list; __Pyx_INCREF(__pyx_t_2); __pyx_t_1 = 0;
   for (;;) {
     if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_2)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_3); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_1); __Pyx_INCREF(__pyx_t_3); __pyx_t_1++; if (unlikely(0 < 0)) __PYX_ERR(0, 125, __pyx_L1_error)
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_2, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 125, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
     __Pyx_XDECREF_SET(__pyx_v_row, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":122
- * 
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":126
+ *         # Loop over all the rows in the descriptor list
  *         for row in descriptor_list:
  *             char_width = int(self.scale_w / len(row))             # <<<<<<<<<<<<<<
  *             x = 0
- *             for text_char in row:
+ * 
  */
-    __pyx_t_4 = PyObject_Length(__pyx_v_row); if (unlikely(__pyx_t_4 == -1)) __PYX_ERR(0, 122, __pyx_L1_error)
+    __pyx_t_4 = PyObject_Length(__pyx_v_row); if (unlikely(__pyx_t_4 == -1)) __PYX_ERR(0, 126, __pyx_L1_error)
     if (unlikely(__pyx_t_4 == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 122, __pyx_L1_error)
+      __PYX_ERR(0, 126, __pyx_L1_error)
     }
     __pyx_v_char_width = ((int)(((double)__pyx_v_self->scale_w) / ((double)__pyx_t_4)));
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":123
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":127
  *         for row in descriptor_list:
  *             char_width = int(self.scale_w / len(row))
  *             x = 0             # <<<<<<<<<<<<<<
- *             for text_char in row:
- *                 character = BitmapFontCharacter()
+ * 
+ *             # Loop over all characters in the row
  */
     __pyx_v_x = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":124
- *             char_width = int(self.scale_w / len(row))
- *             x = 0
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":130
+ * 
+ *             # Loop over all characters in the row
  *             for text_char in row:             # <<<<<<<<<<<<<<
- *                 character = BitmapFontCharacter()
- *                 character.id = ord(text_char)
+ *                 char_id = ord(text_char)
+ * 
  */
     if (likely(PyList_CheckExact(__pyx_v_row)) || PyTuple_CheckExact(__pyx_v_row)) {
       __pyx_t_3 = __pyx_v_row; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
       __pyx_t_5 = NULL;
     } else {
-      __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_row); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_row); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 124, __pyx_L1_error)
+      __pyx_t_5 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 130, __pyx_L1_error)
     }
     for (;;) {
       if (likely(!__pyx_t_5)) {
         if (likely(PyList_CheckExact(__pyx_t_3))) {
           if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 124, __pyx_L1_error)
+          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 130, __pyx_L1_error)
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 124, __pyx_L1_error)
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 130, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           #endif
         } else {
           if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 124, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_6); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 130, __pyx_L1_error)
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 124, __pyx_L1_error)
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 130, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           #endif
         }
@@ -2582,7 +2663,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 124, __pyx_L1_error)
+            else __PYX_ERR(0, 130, __pyx_L1_error)
           }
           break;
         }
@@ -2591,110 +2672,146 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
       __Pyx_XDECREF_SET(__pyx_v_text_char, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":125
- *             x = 0
- *             for text_char in row:
- *                 character = BitmapFontCharacter()             # <<<<<<<<<<<<<<
- *                 character.id = ord(text_char)
- *                 character.rect.x = x
- */
-      __pyx_t_6 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 125, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      __Pyx_XDECREF_SET(__pyx_v_character, ((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter *)__pyx_t_6));
-      __pyx_t_6 = 0;
-
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":126
- *             for text_char in row:
- *                 character = BitmapFontCharacter()
- *                 character.id = ord(text_char)             # <<<<<<<<<<<<<<
- *                 character.rect.x = x
- *                 character.rect.y = y
- */
-      __pyx_t_7 = __Pyx_PyObject_Ord(__pyx_v_text_char); if (unlikely(__pyx_t_7 == (long)(Py_UCS4)-1)) __PYX_ERR(0, 126, __pyx_L1_error)
-      __pyx_v_character->id = __pyx_t_7;
-
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":127
- *                 character = BitmapFontCharacter()
- *                 character.id = ord(text_char)
- *                 character.rect.x = x             # <<<<<<<<<<<<<<
- *                 character.rect.y = y
- *                 character.rect.w = char_width
- */
-      __pyx_v_character->rect.x = __pyx_v_x;
-
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":128
- *                 character.id = ord(text_char)
- *                 character.rect.x = x
- *                 character.rect.y = y             # <<<<<<<<<<<<<<
- *                 character.rect.w = char_width
- *                 character.rect.h = row_height
- */
-      __pyx_v_character->rect.y = __pyx_v_y;
-
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":129
- *                 character.rect.x = x
- *                 character.rect.y = y
- *                 character.rect.w = char_width             # <<<<<<<<<<<<<<
- *                 character.rect.h = row_height
- *                 character.xadvance = char_width
- */
-      __pyx_v_character->rect.w = __pyx_v_char_width;
-
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":130
- *                 character.rect.y = y
- *                 character.rect.w = char_width
- *                 character.rect.h = row_height             # <<<<<<<<<<<<<<
- *                 character.xadvance = char_width
- * 
- */
-      __pyx_v_character->rect.h = __pyx_v_row_height;
-
       /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":131
- *                 character.rect.w = char_width
- *                 character.rect.h = row_height
- *                 character.xadvance = char_width             # <<<<<<<<<<<<<<
+ *             # Loop over all characters in the row
+ *             for text_char in row:
+ *                 char_id = ord(text_char)             # <<<<<<<<<<<<<<
  * 
- *                 self.characters[character.id] = character
+ *                 # Do not add duplicate character definitions (only use the first instance)
  */
-      __pyx_v_character->xadvance = __pyx_v_char_width;
-
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":133
- *                 character.xadvance = char_width
- * 
- *                 self.characters[character.id] = character             # <<<<<<<<<<<<<<
- *                 x += char_width
- * 
- */
-      if (unlikely(__pyx_v_self->characters == Py_None)) {
-        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 133, __pyx_L1_error)
-      }
-      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_character->id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 133, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_6);
-      if (unlikely(PyDict_SetItem(__pyx_v_self->characters, __pyx_t_6, ((PyObject *)__pyx_v_character)) < 0)) __PYX_ERR(0, 133, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __pyx_t_7 = __Pyx_PyObject_Ord(__pyx_v_text_char); if (unlikely(__pyx_t_7 == (long)(Py_UCS4)-1)) __PYX_ERR(0, 131, __pyx_L1_error)
+      __pyx_v_char_id = __pyx_t_7;
 
       /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":134
  * 
- *                 self.characters[character.id] = character
- *                 x += char_width             # <<<<<<<<<<<<<<
+ *                 # Do not add duplicate character definitions (only use the first instance)
+ *                 if char_id not in self.characters:             # <<<<<<<<<<<<<<
+ * 
+ *                     # Create character definition
+ */
+      __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_char_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_6);
+      if (unlikely(__pyx_v_self->characters == Py_None)) {
+        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+        __PYX_ERR(0, 134, __pyx_L1_error)
+      }
+      __pyx_t_8 = (__Pyx_PyDict_ContainsTF(__pyx_t_6, __pyx_v_self->characters, Py_NE)); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 134, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+      __pyx_t_9 = (__pyx_t_8 != 0);
+      if (__pyx_t_9) {
+
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":137
+ * 
+ *                     # Create character definition
+ *                     character = BitmapFontCharacter()             # <<<<<<<<<<<<<<
+ *                     character.id = char_id
+ *                     character.rect.x = x
+ */
+        __pyx_t_6 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 137, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        __Pyx_XDECREF_SET(__pyx_v_character, ((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter *)__pyx_t_6));
+        __pyx_t_6 = 0;
+
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":138
+ *                     # Create character definition
+ *                     character = BitmapFontCharacter()
+ *                     character.id = char_id             # <<<<<<<<<<<<<<
+ *                     character.rect.x = x
+ *                     character.rect.y = y
+ */
+        __pyx_v_character->id = __pyx_v_char_id;
+
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":139
+ *                     character = BitmapFontCharacter()
+ *                     character.id = char_id
+ *                     character.rect.x = x             # <<<<<<<<<<<<<<
+ *                     character.rect.y = y
+ *                     character.rect.w = char_width
+ */
+        __pyx_v_character->rect.x = __pyx_v_x;
+
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":140
+ *                     character.id = char_id
+ *                     character.rect.x = x
+ *                     character.rect.y = y             # <<<<<<<<<<<<<<
+ *                     character.rect.w = char_width
+ *                     character.rect.h = row_height
+ */
+        __pyx_v_character->rect.y = __pyx_v_y;
+
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":141
+ *                     character.rect.x = x
+ *                     character.rect.y = y
+ *                     character.rect.w = char_width             # <<<<<<<<<<<<<<
+ *                     character.rect.h = row_height
+ *                     character.xadvance = char_width
+ */
+        __pyx_v_character->rect.w = __pyx_v_char_width;
+
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":142
+ *                     character.rect.y = y
+ *                     character.rect.w = char_width
+ *                     character.rect.h = row_height             # <<<<<<<<<<<<<<
+ *                     character.xadvance = char_width
+ * 
+ */
+        __pyx_v_character->rect.h = __pyx_v_row_height;
+
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":143
+ *                     character.rect.w = char_width
+ *                     character.rect.h = row_height
+ *                     character.xadvance = char_width             # <<<<<<<<<<<<<<
+ * 
+ *                     self.characters[character.id] = character
+ */
+        __pyx_v_character->xadvance = __pyx_v_char_width;
+
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":145
+ *                     character.xadvance = char_width
+ * 
+ *                     self.characters[character.id] = character             # <<<<<<<<<<<<<<
+ *                     x += char_width
+ * 
+ */
+        if (unlikely(__pyx_v_self->characters == Py_None)) {
+          PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+          __PYX_ERR(0, 145, __pyx_L1_error)
+        }
+        __pyx_t_6 = __Pyx_PyInt_From_int(__pyx_v_character->id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 145, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_6);
+        if (unlikely(PyDict_SetItem(__pyx_v_self->characters, __pyx_t_6, ((PyObject *)__pyx_v_character)) < 0)) __PYX_ERR(0, 145, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":146
+ * 
+ *                     self.characters[character.id] = character
+ *                     x += char_width             # <<<<<<<<<<<<<<
  * 
  *             y += row_height
  */
-      __pyx_v_x = (__pyx_v_x + __pyx_v_char_width);
+        __pyx_v_x = (__pyx_v_x + __pyx_v_char_width);
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":124
- *             char_width = int(self.scale_w / len(row))
- *             x = 0
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":134
+ * 
+ *                 # Do not add duplicate character definitions (only use the first instance)
+ *                 if char_id not in self.characters:             # <<<<<<<<<<<<<<
+ * 
+ *                     # Create character definition
+ */
+      }
+
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":130
+ * 
+ *             # Loop over all characters in the row
  *             for text_char in row:             # <<<<<<<<<<<<<<
- *                 character = BitmapFontCharacter()
- *                 character.id = ord(text_char)
+ *                 char_id = ord(text_char)
+ * 
  */
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":136
- *                 x += char_width
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":148
+ *                     x += char_width
  * 
  *             y += row_height             # <<<<<<<<<<<<<<
  * 
@@ -2702,9 +2819,9 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
     __pyx_v_y = (__pyx_v_y + __pyx_v_row_height);
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":121
- *         self.base = row_height
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":125
  * 
+ *         # Loop over all the rows in the descriptor list
  *         for row in descriptor_list:             # <<<<<<<<<<<<<<
  *             char_width = int(self.scale_w / len(row))
  *             x = 0
@@ -2712,12 +2829,12 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":113
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":114
  *         return self.kernings
  * 
  *     def _load_descriptor_list(self, list descriptor_list):             # <<<<<<<<<<<<<<
+ *         """Load the descriptor from the supplied list."""
  *         cdef int x = 0
- *         cdef int y = 0
  */
 
   /* function exit code */
@@ -2738,22 +2855,22 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":138
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":150
  *             y += row_height
  * 
  *     def _load_descriptor_file(self, str descriptor_file):             # <<<<<<<<<<<<<<
- *         if not path.isfile(descriptor_file):
- *             raise BitmapFontException('Could not locate the bitmap font descriptor file ' +
+ *         """Load the descriptor from the specified file.  Both XML and text
+ *         formats are supported (not binary currently).
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_15_load_descriptor_file(PyObject *__pyx_v_self, PyObject *__pyx_v_descriptor_file); /*proto*/
-static char __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_14_load_descriptor_file[] = "BitmapFont._load_descriptor_file(self, unicode descriptor_file)";
+static char __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_14_load_descriptor_file[] = "BitmapFont._load_descriptor_file(self, unicode descriptor_file)\nLoad the descriptor from the specified file.  Both XML and text\n        formats are supported (not binary currently).\n\n        The standard bitmap font descriptor file format can be found at:\n        http://www.angelcode.com/products/bmfont/doc/file_format.html\n        ";
 static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_15_load_descriptor_file(PyObject *__pyx_v_self, PyObject *__pyx_v_descriptor_file) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("_load_descriptor_file (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_descriptor_file), (&PyUnicode_Type), 1, "descriptor_file", 1))) __PYX_ERR(0, 138, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_descriptor_file), (&PyUnicode_Type), 1, "descriptor_file", 1))) __PYX_ERR(0, 150, __pyx_L1_error)
   __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_14_load_descriptor_file(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), ((PyObject*)__pyx_v_descriptor_file));
 
   /* function exit code */
@@ -2766,7 +2883,14 @@ static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
 }
 
 static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_14_load_descriptor_file(struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *__pyx_v_self, PyObject *__pyx_v_descriptor_file) {
+  int __pyx_v_char_id;
+  int __pyx_v_first;
+  int __pyx_v_second;
   PyObject *__pyx_v_xml_tree = NULL;
+  PyObject *__pyx_v_text_file = NULL;
+  PyObject *__pyx_v_line = NULL;
+  PyObject *__pyx_v_m = NULL;
+  struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter *__pyx_v_character = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -2780,18 +2904,23 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   PyObject *__pyx_t_9 = NULL;
   PyObject *__pyx_t_10 = NULL;
   int __pyx_t_11;
+  PyObject *__pyx_t_12 = NULL;
+  Py_ssize_t __pyx_t_13;
+  PyObject *(*__pyx_t_14)(PyObject *);
+  PyObject *__pyx_t_15 = NULL;
+  PyObject *__pyx_t_16 = NULL;
   __Pyx_RefNannySetupContext("_load_descriptor_file", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":139
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":161
+ *         cdef int second
  * 
- *     def _load_descriptor_file(self, str descriptor_file):
  *         if not path.isfile(descriptor_file):             # <<<<<<<<<<<<<<
  *             raise BitmapFontException('Could not locate the bitmap font descriptor file ' +
  *                                       descriptor_file)
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_path); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_path); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_isfile); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_isfile); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_2 = NULL;
@@ -2805,43 +2934,43 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
     }
   }
   if (!__pyx_t_2) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_descriptor_file); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_descriptor_file); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 139, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2); __pyx_t_2 = NULL;
     __Pyx_INCREF(__pyx_v_descriptor_file);
     __Pyx_GIVEREF(__pyx_v_descriptor_file);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_descriptor_file);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_6 = ((!__pyx_t_5) != 0);
   if (__pyx_t_6) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":140
- *     def _load_descriptor_file(self, str descriptor_file):
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":162
+ * 
  *         if not path.isfile(descriptor_file):
  *             raise BitmapFontException('Could not locate the bitmap font descriptor file ' +             # <<<<<<<<<<<<<<
  *                                       descriptor_file)
  * 
  */
-    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 140, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 162, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":141
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":163
  *         if not path.isfile(descriptor_file):
  *             raise BitmapFontException('Could not locate the bitmap font descriptor file ' +
  *                                       descriptor_file)             # <<<<<<<<<<<<<<
  * 
- *         try:
+ *         # Attempt to parse the file as an XML file
  */
-    __pyx_t_4 = __Pyx_PyUnicode_ConcatSafe(__pyx_kp_u_Could_not_locate_the_bitmap_font, __pyx_v_descriptor_file); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 140, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyUnicode_ConcatSafe(__pyx_kp_u_Could_not_locate_the_bitmap_font, __pyx_v_descriptor_file); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 162, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_2 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -2854,37 +2983,37 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
       }
     }
     if (!__pyx_t_2) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 162, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 140, __pyx_L1_error)
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 162, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2); __pyx_t_2 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 140, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 162, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 140, __pyx_L1_error)
+    __PYX_ERR(0, 162, __pyx_L1_error)
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":139
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":161
+ *         cdef int second
  * 
- *     def _load_descriptor_file(self, str descriptor_file):
  *         if not path.isfile(descriptor_file):             # <<<<<<<<<<<<<<
  *             raise BitmapFontException('Could not locate the bitmap font descriptor file ' +
  *                                       descriptor_file)
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":143
- *                                       descriptor_file)
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":166
  * 
+ *         # Attempt to parse the file as an XML file
  *         try:             # <<<<<<<<<<<<<<
  *             xml_tree = ElementTree(file=descriptor_file)
  *             self._load_descriptor_xml(xml_tree)
@@ -2898,33 +3027,33 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
     __Pyx_XGOTREF(__pyx_t_10);
     /*try:*/ {
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":144
- * 
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":167
+ *         # Attempt to parse the file as an XML file
  *         try:
  *             xml_tree = ElementTree(file=descriptor_file)             # <<<<<<<<<<<<<<
  *             self._load_descriptor_xml(xml_tree)
  *         except ParseError:
  */
-      __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_ElementTree); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L4_error)
+      __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_ElementTree); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L4_error)
+      __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 167, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_3);
-      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_file, __pyx_v_descriptor_file) < 0) __PYX_ERR(0, 144, __pyx_L4_error)
-      __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 144, __pyx_L4_error)
+      if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_file, __pyx_v_descriptor_file) < 0) __PYX_ERR(0, 167, __pyx_L4_error)
+      __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_empty_tuple, __pyx_t_3); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 167, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_xml_tree = __pyx_t_7;
       __pyx_t_7 = 0;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":145
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":168
  *         try:
  *             xml_tree = ElementTree(file=descriptor_file)
  *             self._load_descriptor_xml(xml_tree)             # <<<<<<<<<<<<<<
  *         except ParseError:
  *             pass
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_descriptor_xml); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 145, __pyx_L4_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_descriptor_xml); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 168, __pyx_L4_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_1 = NULL;
       if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
@@ -2937,25 +3066,25 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
         }
       }
       if (!__pyx_t_1) {
-        __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_xml_tree); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 145, __pyx_L4_error)
+        __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_xml_tree); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 168, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_7);
       } else {
-        __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 145, __pyx_L4_error)
+        __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 168, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_GIVEREF(__pyx_t_1); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_1); __pyx_t_1 = NULL;
         __Pyx_INCREF(__pyx_v_xml_tree);
         __Pyx_GIVEREF(__pyx_v_xml_tree);
         PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_xml_tree);
-        __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 145, __pyx_L4_error)
+        __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 168, __pyx_L4_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":143
- *                                       descriptor_file)
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":166
  * 
+ *         # Attempt to parse the file as an XML file
  *         try:             # <<<<<<<<<<<<<<
  *             xml_tree = ElementTree(file=descriptor_file)
  *             self._load_descriptor_xml(xml_tree)
@@ -2973,14 +3102,14 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":146
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":169
  *             xml_tree = ElementTree(file=descriptor_file)
  *             self._load_descriptor_xml(xml_tree)
  *         except ParseError:             # <<<<<<<<<<<<<<
  *             pass
  * 
  */
-    __pyx_t_7 = __Pyx_GetModuleGlobalName(__pyx_n_s_ParseError); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 146, __pyx_L6_except_error)
+    __pyx_t_7 = __Pyx_GetModuleGlobalName(__pyx_n_s_ParseError); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 169, __pyx_L6_except_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -2991,9 +3120,9 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
     goto __pyx_L6_except_error;
     __pyx_L6_except_error:;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":143
- *                                       descriptor_file)
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":166
  * 
+ *         # Attempt to parse the file as an XML file
  *         try:             # <<<<<<<<<<<<<<
  *             xml_tree = ElementTree(file=descriptor_file)
  *             self._load_descriptor_xml(xml_tree)
@@ -3013,12 +3142,1100 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
     __pyx_L11_try_end:;
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":138
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":175
+ * 
+ *         # Open the descriptor file
+ *         with open(descriptor_file) as text_file:             # <<<<<<<<<<<<<<
+ * 
+ *             # Loop over all the rows in the descriptor file
+ */
+  /*with:*/ {
+    __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_INCREF(__pyx_v_descriptor_file);
+    __Pyx_GIVEREF(__pyx_v_descriptor_file);
+    PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v_descriptor_file);
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+    __pyx_t_10 = __Pyx_PyObject_LookupSpecial(__pyx_t_3, __pyx_n_s_exit); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_10);
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_3, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 175, __pyx_L12_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __pyx_t_1 = NULL;
+    if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
+      __pyx_t_1 = PyMethod_GET_SELF(__pyx_t_4);
+      if (likely(__pyx_t_1)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+        __Pyx_INCREF(__pyx_t_1);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_4, function);
+      }
+    }
+    if (__pyx_t_1) {
+      __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 175, __pyx_L12_error)
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+    } else {
+      __pyx_t_7 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 175, __pyx_L12_error)
+    }
+    __Pyx_GOTREF(__pyx_t_7);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_t_4 = __pyx_t_7;
+    __pyx_t_7 = 0;
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    /*try:*/ {
+      {
+        __Pyx_PyThreadState_declare
+        __Pyx_PyThreadState_assign
+        __Pyx_ExceptionSave(&__pyx_t_9, &__pyx_t_8, &__pyx_t_12);
+        __Pyx_XGOTREF(__pyx_t_9);
+        __Pyx_XGOTREF(__pyx_t_8);
+        __Pyx_XGOTREF(__pyx_t_12);
+        /*try:*/ {
+          __pyx_v_text_file = __pyx_t_4;
+          __pyx_t_4 = 0;
+
+          /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":178
+ * 
+ *             # Loop over all the rows in the descriptor file
+ *             for line in text_file:             # <<<<<<<<<<<<<<
+ *                 if line.startswith("info"):
+ *                     pass
+ */
+          if (likely(PyList_CheckExact(__pyx_v_text_file)) || PyTuple_CheckExact(__pyx_v_text_file)) {
+            __pyx_t_4 = __pyx_v_text_file; __Pyx_INCREF(__pyx_t_4); __pyx_t_13 = 0;
+            __pyx_t_14 = NULL;
+          } else {
+            __pyx_t_13 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_v_text_file); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 178, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_4);
+            __pyx_t_14 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_14)) __PYX_ERR(0, 178, __pyx_L16_error)
+          }
+          for (;;) {
+            if (likely(!__pyx_t_14)) {
+              if (likely(PyList_CheckExact(__pyx_t_4))) {
+                if (__pyx_t_13 >= PyList_GET_SIZE(__pyx_t_4)) break;
+                #if CYTHON_COMPILING_IN_CPYTHON
+                __pyx_t_3 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 178, __pyx_L16_error)
+                #else
+                __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                #endif
+              } else {
+                if (__pyx_t_13 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
+                #if CYTHON_COMPILING_IN_CPYTHON
+                __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_13); __Pyx_INCREF(__pyx_t_3); __pyx_t_13++; if (unlikely(0 < 0)) __PYX_ERR(0, 178, __pyx_L16_error)
+                #else
+                __pyx_t_3 = PySequence_ITEM(__pyx_t_4, __pyx_t_13); __pyx_t_13++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                #endif
+              }
+            } else {
+              __pyx_t_3 = __pyx_t_14(__pyx_t_4);
+              if (unlikely(!__pyx_t_3)) {
+                PyObject* exc_type = PyErr_Occurred();
+                if (exc_type) {
+                  if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+                  else __PYX_ERR(0, 178, __pyx_L16_error)
+                }
+                break;
+              }
+              __Pyx_GOTREF(__pyx_t_3);
+            }
+            __Pyx_XDECREF_SET(__pyx_v_line, __pyx_t_3);
+            __pyx_t_3 = 0;
+
+            /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":179
+ *             # Loop over all the rows in the descriptor file
+ *             for line in text_file:
+ *                 if line.startswith("info"):             # <<<<<<<<<<<<<<
+ *                     pass
+ * 
+ */
+            __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_line, __pyx_n_s_startswith); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 179, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_3);
+            __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 179, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_7);
+            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+            __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 179, __pyx_L16_error)
+            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            if (__pyx_t_6) {
+              goto __pyx_L26;
+            }
+
+            /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":182
+ *                     pass
+ * 
+ *                 elif line.startswith("common"):             # <<<<<<<<<<<<<<
+ *                     m = re.search(r"lineHeight=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:
+ */
+            __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_line, __pyx_n_s_startswith); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 182, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_7);
+            __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_3);
+            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 182, __pyx_L16_error)
+            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+            if (__pyx_t_6) {
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":183
+ * 
+ *                 elif line.startswith("common"):
+ *                     m = re.search(r"lineHeight=([0-9]{1,5})", line, flags=re.IGNORECASE)             # <<<<<<<<<<<<<<
+ *                     if m:
+ *                         self.line_height = int(m.group(1))
+ */
+              __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_re); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_search); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 183, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_INCREF(__pyx_kp_u_lineHeight_0_9_1_5);
+              __Pyx_GIVEREF(__pyx_kp_u_lineHeight_0_9_1_5);
+              PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_kp_u_lineHeight_0_9_1_5);
+              __Pyx_INCREF(__pyx_v_line);
+              __Pyx_GIVEREF(__pyx_v_line);
+              PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_line);
+              __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_re); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 183, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_2);
+              __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_IGNORECASE); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 183, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+              if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_flags, __pyx_t_15) < 0) __PYX_ERR(0, 183, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+              __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 183, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_m, __pyx_t_15);
+              __pyx_t_15 = 0;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":184
+ *                 elif line.startswith("common"):
+ *                     m = re.search(r"lineHeight=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:             # <<<<<<<<<<<<<<
+ *                         self.line_height = int(m.group(1))
+ *                     else:
+ */
+              __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_m); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 184, __pyx_L16_error)
+              if (__pyx_t_6) {
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":185
+ *                     m = re.search(r"lineHeight=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:
+ *                         self.line_height = int(m.group(1))             # <<<<<<<<<<<<<<
+ *                     else:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ */
+                __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 185, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_15);
+                __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+                __pyx_t_15 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 185, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_15);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_15); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 185, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+                __pyx_v_self->line_height = __pyx_t_11;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":184
+ *                 elif line.startswith("common"):
+ *                     m = re.search(r"lineHeight=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:             # <<<<<<<<<<<<<<
+ *                         self.line_height = int(m.group(1))
+ *                     else:
+ */
+                goto __pyx_L27;
+              }
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":187
+ *                         self.line_height = int(m.group(1))
+ *                     else:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")             # <<<<<<<<<<<<<<
+ * 
+ *                     m = re.search(r"base=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ */
+              /*else*/ {
+                __pyx_t_15 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 187, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_15);
+                __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+                __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __PYX_ERR(0, 187, __pyx_L16_error)
+              }
+              __pyx_L27:;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":189
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ *                     m = re.search(r"base=([0-9]{1,5})", line, flags=re.IGNORECASE)             # <<<<<<<<<<<<<<
+ *                     if m:
+ *                         self.base = int(m.group(1))
+ */
+              __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_re); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_search); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 189, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 189, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_INCREF(__pyx_kp_u_base_0_9_1_5);
+              __Pyx_GIVEREF(__pyx_kp_u_base_0_9_1_5);
+              PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_base_0_9_1_5);
+              __Pyx_INCREF(__pyx_v_line);
+              __Pyx_GIVEREF(__pyx_v_line);
+              PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_line);
+              __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 189, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_7 = __Pyx_GetModuleGlobalName(__pyx_n_s_re); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 189, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_IGNORECASE); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 189, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_2);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_flags, __pyx_t_2) < 0) __PYX_ERR(0, 189, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+              __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 189, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_2);
+              __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __Pyx_DECREF_SET(__pyx_v_m, __pyx_t_2);
+              __pyx_t_2 = 0;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":190
+ * 
+ *                     m = re.search(r"base=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:             # <<<<<<<<<<<<<<
+ *                         self.base = int(m.group(1))
+ *                     else:
+ */
+              __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_m); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 190, __pyx_L16_error)
+              if (__pyx_t_6) {
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":191
+ *                     m = re.search(r"base=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:
+ *                         self.base = int(m.group(1))             # <<<<<<<<<<<<<<
+ *                     else:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ */
+                __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_2);
+                __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 191, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_2);
+                __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+                __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 191, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __pyx_v_self->base = __pyx_t_11;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":190
+ * 
+ *                     m = re.search(r"base=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:             # <<<<<<<<<<<<<<
+ *                         self.base = int(m.group(1))
+ *                     else:
+ */
+                goto __pyx_L28;
+              }
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":193
+ *                         self.base = int(m.group(1))
+ *                     else:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")             # <<<<<<<<<<<<<<
+ * 
+ *                 elif line.startswith("chars"):
+ */
+              /*else*/ {
+                __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 193, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_2);
+                __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 193, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+                __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+                __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+                __PYX_ERR(0, 193, __pyx_L16_error)
+              }
+              __pyx_L28:;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":182
+ *                     pass
+ * 
+ *                 elif line.startswith("common"):             # <<<<<<<<<<<<<<
+ *                     m = re.search(r"lineHeight=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:
+ */
+              goto __pyx_L26;
+            }
+
+            /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":195
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ *                 elif line.startswith("chars"):             # <<<<<<<<<<<<<<
+ *                     pass
+ * 
+ */
+            __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_line, __pyx_n_s_startswith); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 195, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_3);
+            __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 195, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_2);
+            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+            __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 195, __pyx_L16_error)
+            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+            if (__pyx_t_6) {
+              goto __pyx_L26;
+            }
+
+            /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":198
+ *                     pass
+ * 
+ *                 elif line.startswith("char"):             # <<<<<<<<<<<<<<
+ *                     m = re.search(r"char\s+id=(?P<id>[0-9]{1,4})\s+x=(?P<x>[0-9]{1,4})\s+y=(?P<y>[0-9]{1,4})"
+ *                                   r"\s+width=(?P<width>[0-9]{1,3})\s+height=(?P<height>[0-9]{1,3})"
+ */
+            __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_line, __pyx_n_s_startswith); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 198, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_2);
+            __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 198, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_3);
+            __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+            __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 198, __pyx_L16_error)
+            __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+            if (__pyx_t_6) {
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":199
+ * 
+ *                 elif line.startswith("char"):
+ *                     m = re.search(r"char\s+id=(?P<id>[0-9]{1,4})\s+x=(?P<x>[0-9]{1,4})\s+y=(?P<y>[0-9]{1,4})"             # <<<<<<<<<<<<<<
+ *                                   r"\s+width=(?P<width>[0-9]{1,3})\s+height=(?P<height>[0-9]{1,3})"
+ *                                   r"\s+xoffset=(?P<xoffset>-?[0-9]{1,3})\s+yoffset=(?P<yoffset>-?[0-9]{1,3})"
+ */
+              __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_re); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_search); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 199, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_2);
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":203
+ *                                   r"\s+xoffset=(?P<xoffset>-?[0-9]{1,3})\s+yoffset=(?P<yoffset>-?[0-9]{1,3})"
+ *                                   r"\s+xadvance=(?P<xadvance>[0-9]{1,3})\s+page=(?P<page>[0-9]{1,2})"
+ *                                   r"\s+chnl=(?P<chnl>[0-9]{1,3})", line, flags=re.IGNORECASE)             # <<<<<<<<<<<<<<
+ *                     if not m:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ */
+              __pyx_t_3 = PyTuple_New(2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_INCREF(__pyx_kp_u_char_s_id_P_id_0_9_1_4_s_x_P_x_0);
+              __Pyx_GIVEREF(__pyx_kp_u_char_s_id_P_id_0_9_1_4_s_x_P_x_0);
+              PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_kp_u_char_s_id_P_id_0_9_1_4_s_x_P_x_0);
+              __Pyx_INCREF(__pyx_v_line);
+              __Pyx_GIVEREF(__pyx_v_line);
+              PyTuple_SET_ITEM(__pyx_t_3, 1, __pyx_v_line);
+              __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_15 = __Pyx_GetModuleGlobalName(__pyx_n_s_re); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 203, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_15, __pyx_n_s_IGNORECASE); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 203, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+              if (PyDict_SetItem(__pyx_t_1, __pyx_n_s_flags, __pyx_t_7) < 0) __PYX_ERR(0, 203, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":199
+ * 
+ *                 elif line.startswith("char"):
+ *                     m = re.search(r"char\s+id=(?P<id>[0-9]{1,4})\s+x=(?P<x>[0-9]{1,4})\s+y=(?P<y>[0-9]{1,4})"             # <<<<<<<<<<<<<<
+ *                                   r"\s+width=(?P<width>[0-9]{1,3})\s+height=(?P<height>[0-9]{1,3})"
+ *                                   r"\s+xoffset=(?P<xoffset>-?[0-9]{1,3})\s+yoffset=(?P<yoffset>-?[0-9]{1,3})"
+ */
+              __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, __pyx_t_1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 199, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_m, __pyx_t_7);
+              __pyx_t_7 = 0;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":204
+ *                                   r"\s+xadvance=(?P<xadvance>[0-9]{1,3})\s+page=(?P<page>[0-9]{1,2})"
+ *                                   r"\s+chnl=(?P<chnl>[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:             # <<<<<<<<<<<<<<
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ */
+              __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_m); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 204, __pyx_L16_error)
+              __pyx_t_5 = ((!__pyx_t_6) != 0);
+              if (__pyx_t_5) {
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":205
+ *                                   r"\s+chnl=(?P<chnl>[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")             # <<<<<<<<<<<<<<
+ * 
+ *                     char_id = int(m.group("id"))
+ */
+                __pyx_t_7 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 205, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 205, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __PYX_ERR(0, 205, __pyx_L16_error)
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":204
+ *                                   r"\s+xadvance=(?P<xadvance>[0-9]{1,3})\s+page=(?P<page>[0-9]{1,2})"
+ *                                   r"\s+chnl=(?P<chnl>[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:             # <<<<<<<<<<<<<<
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ */
+              }
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":207
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ *                     char_id = int(m.group("id"))             # <<<<<<<<<<<<<<
+ *                     if char_id > 256:
+ *                         continue
+ */
+              __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 207, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 207, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 207, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_v_char_id = __pyx_t_11;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":208
+ * 
+ *                     char_id = int(m.group("id"))
+ *                     if char_id > 256:             # <<<<<<<<<<<<<<
+ *                         continue
+ * 
+ */
+              __pyx_t_5 = ((__pyx_v_char_id > 0x100) != 0);
+              if (__pyx_t_5) {
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":209
+ *                     char_id = int(m.group("id"))
+ *                     if char_id > 256:
+ *                         continue             # <<<<<<<<<<<<<<
+ * 
+ *                     # Do not add duplicate character definitions (only use the first instance)
+ */
+                goto __pyx_L24_continue;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":208
+ * 
+ *                     char_id = int(m.group("id"))
+ *                     if char_id > 256:             # <<<<<<<<<<<<<<
+ *                         continue
+ * 
+ */
+              }
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":212
+ * 
+ *                     # Do not add duplicate character definitions (only use the first instance)
+ *                     if char_id not in self.characters:             # <<<<<<<<<<<<<<
+ * 
+ *                         # Create character definition
+ */
+              __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_char_id); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              if (unlikely(__pyx_v_self->characters == Py_None)) {
+                PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+                __PYX_ERR(0, 212, __pyx_L16_error)
+              }
+              __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_t_1, __pyx_v_self->characters, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 212, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_t_6 = (__pyx_t_5 != 0);
+              if (__pyx_t_6) {
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":215
+ * 
+ *                         # Create character definition
+ *                         character = BitmapFontCharacter()             # <<<<<<<<<<<<<<
+ *                         character.id = char_id
+ *                         character.rect.x = int(m.group("x"))
+ */
+                __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_XDECREF_SET(__pyx_v_character, ((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter *)__pyx_t_1));
+                __pyx_t_1 = 0;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":216
+ *                         # Create character definition
+ *                         character = BitmapFontCharacter()
+ *                         character.id = char_id             # <<<<<<<<<<<<<<
+ *                         character.rect.x = int(m.group("x"))
+ *                         character.rect.y = int(m.group("y"))
+ */
+                __pyx_v_character->id = __pyx_v_char_id;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":217
+ *                         character = BitmapFontCharacter()
+ *                         character.id = char_id
+ *                         character.rect.x = int(m.group("x"))             # <<<<<<<<<<<<<<
+ *                         character.rect.y = int(m.group("y"))
+ *                         character.rect.w = int(m.group("width"))
+ */
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 217, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 217, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 217, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_v_character->rect.x = __pyx_t_11;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":218
+ *                         character.id = char_id
+ *                         character.rect.x = int(m.group("x"))
+ *                         character.rect.y = int(m.group("y"))             # <<<<<<<<<<<<<<
+ *                         character.rect.w = int(m.group("width"))
+ *                         character.rect.h = int(m.group("height"))
+ */
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 218, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 218, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_v_character->rect.y = __pyx_t_11;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":219
+ *                         character.rect.x = int(m.group("x"))
+ *                         character.rect.y = int(m.group("y"))
+ *                         character.rect.w = int(m.group("width"))             # <<<<<<<<<<<<<<
+ *                         character.rect.h = int(m.group("height"))
+ *                         character.xoffset = int(m.group("xoffset"))
+ */
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 219, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 219, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 219, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_v_character->rect.w = __pyx_t_11;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":220
+ *                         character.rect.y = int(m.group("y"))
+ *                         character.rect.w = int(m.group("width"))
+ *                         character.rect.h = int(m.group("height"))             # <<<<<<<<<<<<<<
+ *                         character.xoffset = int(m.group("xoffset"))
+ *                         character.yoffset = int(m.group("yoffset"))
+ */
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 220, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 220, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 220, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_v_character->rect.h = __pyx_t_11;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":221
+ *                         character.rect.w = int(m.group("width"))
+ *                         character.rect.h = int(m.group("height"))
+ *                         character.xoffset = int(m.group("xoffset"))             # <<<<<<<<<<<<<<
+ *                         character.yoffset = int(m.group("yoffset"))
+ *                         character.xadvance = int(m.group("xadvance"))
+ */
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 221, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 221, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 221, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_v_character->xoffset = __pyx_t_11;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":222
+ *                         character.rect.h = int(m.group("height"))
+ *                         character.xoffset = int(m.group("xoffset"))
+ *                         character.yoffset = int(m.group("yoffset"))             # <<<<<<<<<<<<<<
+ *                         character.xadvance = int(m.group("xadvance"))
+ * 
+ */
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 222, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 222, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 222, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_v_character->yoffset = __pyx_t_11;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":223
+ *                         character.xoffset = int(m.group("xoffset"))
+ *                         character.yoffset = int(m.group("yoffset"))
+ *                         character.xadvance = int(m.group("xadvance"))             # <<<<<<<<<<<<<<
+ * 
+ *                         self.characters[character.id] = character
+ */
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 223, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 223, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_7);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 223, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+                __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 223, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_v_character->xadvance = __pyx_t_11;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":225
+ *                         character.xadvance = int(m.group("xadvance"))
+ * 
+ *                         self.characters[character.id] = character             # <<<<<<<<<<<<<<
+ * 
+ *                 elif line.startswith("kernings"):
+ */
+                if (unlikely(__pyx_v_self->characters == Py_None)) {
+                  PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+                  __PYX_ERR(0, 225, __pyx_L16_error)
+                }
+                __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_character->id); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 225, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                if (unlikely(PyDict_SetItem(__pyx_v_self->characters, __pyx_t_1, ((PyObject *)__pyx_v_character)) < 0)) __PYX_ERR(0, 225, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":212
+ * 
+ *                     # Do not add duplicate character definitions (only use the first instance)
+ *                     if char_id not in self.characters:             # <<<<<<<<<<<<<<
+ * 
+ *                         # Create character definition
+ */
+              }
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":198
+ *                     pass
+ * 
+ *                 elif line.startswith("char"):             # <<<<<<<<<<<<<<
+ *                     m = re.search(r"char\s+id=(?P<id>[0-9]{1,4})\s+x=(?P<x>[0-9]{1,4})\s+y=(?P<y>[0-9]{1,4})"
+ *                                   r"\s+width=(?P<width>[0-9]{1,3})\s+height=(?P<height>[0-9]{1,3})"
+ */
+              goto __pyx_L26;
+            }
+
+            /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":227
+ *                         self.characters[character.id] = character
+ * 
+ *                 elif line.startswith("kernings"):             # <<<<<<<<<<<<<<
+ *                     pass
+ * 
+ */
+            __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_line, __pyx_n_s_startswith); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 227, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 227, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_7);
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 227, __pyx_L16_error)
+            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            if (__pyx_t_6) {
+              goto __pyx_L26;
+            }
+
+            /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":230
+ *                     pass
+ * 
+ *                 elif line.startswith("kerning"):             # <<<<<<<<<<<<<<
+ *                     m = re.search(r"kerning\s+first=(?P<first>[0-9]{1,3})\s+second=(?P<second>[0-9]{1,3})"
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+ */
+            __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_line, __pyx_n_s_startswith); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 230, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_7);
+            __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 230, __pyx_L16_error)
+            __Pyx_GOTREF(__pyx_t_1);
+            __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+            __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 230, __pyx_L16_error)
+            __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+            if (__pyx_t_6) {
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":231
+ * 
+ *                 elif line.startswith("kerning"):
+ *                     m = re.search(r"kerning\s+first=(?P<first>[0-9]{1,3})\s+second=(?P<second>[0-9]{1,3})"             # <<<<<<<<<<<<<<
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:
+ */
+              __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_re); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 231, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_search); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 231, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_7);
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":232
+ *                 elif line.startswith("kerning"):
+ *                     m = re.search(r"kerning\s+first=(?P<first>[0-9]{1,3})\s+second=(?P<second>[0-9]{1,3})"
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)             # <<<<<<<<<<<<<<
+ *                     if not m:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ */
+              __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 231, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_INCREF(__pyx_kp_u_kerning_s_first_P_first_0_9_1_3);
+              __Pyx_GIVEREF(__pyx_kp_u_kerning_s_first_P_first_0_9_1_3);
+              PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_kp_u_kerning_s_first_P_first_0_9_1_3);
+              __Pyx_INCREF(__pyx_v_line);
+              __Pyx_GIVEREF(__pyx_v_line);
+              PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_v_line);
+              __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 232, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_re); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 232, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_2);
+              __pyx_t_15 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_IGNORECASE); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 232, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+              if (PyDict_SetItem(__pyx_t_3, __pyx_n_s_flags, __pyx_t_15) < 0) __PYX_ERR(0, 232, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":231
+ * 
+ *                 elif line.startswith("kerning"):
+ *                     m = re.search(r"kerning\s+first=(?P<first>[0-9]{1,3})\s+second=(?P<second>[0-9]{1,3})"             # <<<<<<<<<<<<<<
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:
+ */
+              __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 231, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __Pyx_XDECREF_SET(__pyx_v_m, __pyx_t_15);
+              __pyx_t_15 = 0;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":233
+ *                     m = re.search(r"kerning\s+first=(?P<first>[0-9]{1,3})\s+second=(?P<second>[0-9]{1,3})"
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:             # <<<<<<<<<<<<<<
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ */
+              __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_m); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 233, __pyx_L16_error)
+              __pyx_t_5 = ((!__pyx_t_6) != 0);
+              if (__pyx_t_5) {
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":234
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")             # <<<<<<<<<<<<<<
+ * 
+ *                     first = int(m.group("first"))
+ */
+                __pyx_t_15 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 234, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_15);
+                __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_15, __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 234, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+                __Pyx_Raise(__pyx_t_3, 0, 0, 0);
+                __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+                __PYX_ERR(0, 234, __pyx_L16_error)
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":233
+ *                     m = re.search(r"kerning\s+first=(?P<first>[0-9]{1,3})\s+second=(?P<second>[0-9]{1,3})"
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:             # <<<<<<<<<<<<<<
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ */
+              }
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":236
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ *                     first = int(m.group("first"))             # <<<<<<<<<<<<<<
+ *                     second = int(m.group("second"))
+ * 
+ */
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 236, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+              __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 236, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __pyx_v_first = __pyx_t_11;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":237
+ * 
+ *                     first = int(m.group("first"))
+ *                     second = int(m.group("second"))             # <<<<<<<<<<<<<<
+ * 
+ *                     if first not in self.kernings:
+ */
+              __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __pyx_t_15 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 237, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __pyx_t_3 = __Pyx_PyNumber_Int(__pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+              __pyx_t_11 = __Pyx_PyInt_As_int(__pyx_t_3); if (unlikely((__pyx_t_11 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 237, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __pyx_v_second = __pyx_t_11;
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":239
+ *                     second = int(m.group("second"))
+ * 
+ *                     if first not in self.kernings:             # <<<<<<<<<<<<<<
+ *                         self.kernings[first] = {}
+ * 
+ */
+              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              if (unlikely(__pyx_v_self->kernings == Py_None)) {
+                PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+                __PYX_ERR(0, 239, __pyx_L16_error)
+              }
+              __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_t_3, __pyx_v_self->kernings, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 239, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __pyx_t_6 = (__pyx_t_5 != 0);
+              if (__pyx_t_6) {
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":240
+ * 
+ *                     if first not in self.kernings:
+ *                         self.kernings[first] = {}             # <<<<<<<<<<<<<<
+ * 
+ *                     if second not in self.kernings[first]:
+ */
+                __pyx_t_3 = PyDict_New(); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 240, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                if (unlikely(__pyx_v_self->kernings == Py_None)) {
+                  PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+                  __PYX_ERR(0, 240, __pyx_L16_error)
+                }
+                __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 240, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_15);
+                if (unlikely(PyDict_SetItem(__pyx_v_self->kernings, __pyx_t_15, __pyx_t_3) < 0)) __PYX_ERR(0, 240, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+                __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":239
+ *                     second = int(m.group("second"))
+ * 
+ *                     if first not in self.kernings:             # <<<<<<<<<<<<<<
+ *                         self.kernings[first] = {}
+ * 
+ */
+              }
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":242
+ *                         self.kernings[first] = {}
+ * 
+ *                     if second not in self.kernings[first]:             # <<<<<<<<<<<<<<
+ *                         self.kernings[first][second] = int(m.group("amount"))
+ * 
+ */
+              __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_second); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 242, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              if (unlikely(__pyx_v_self->kernings == Py_None)) {
+                PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+                __PYX_ERR(0, 242, __pyx_L16_error)
+              }
+              __pyx_t_15 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 242, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_15);
+              __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_self->kernings, __pyx_t_15); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 242, __pyx_L16_error)
+              __Pyx_GOTREF(__pyx_t_1);
+              __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+              __pyx_t_6 = (__Pyx_PySequence_ContainsTF(__pyx_t_3, __pyx_t_1, Py_NE)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 242, __pyx_L16_error)
+              __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+              __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+              __pyx_t_5 = (__pyx_t_6 != 0);
+              if (__pyx_t_5) {
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":243
+ * 
+ *                     if second not in self.kernings[first]:
+ *                         self.kernings[first][second] = int(m.group("amount"))             # <<<<<<<<<<<<<<
+ * 
+ *     def _load_descriptor_xml(self, xml_tree: ElementTree):
+ */
+                __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_group); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 243, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 243, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+                __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 243, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_1);
+                __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+                if (unlikely(__pyx_v_self->kernings == Py_None)) {
+                  PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+                  __PYX_ERR(0, 243, __pyx_L16_error)
+                }
+                __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 243, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_3);
+                __pyx_t_15 = __Pyx_PyDict_GetItem(__pyx_v_self->kernings, __pyx_t_3); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 243, __pyx_L16_error)
+                __Pyx_GOTREF(__pyx_t_15);
+                __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+                if (unlikely(__Pyx_SetItemInt(__pyx_t_15, __pyx_v_second, __pyx_t_1, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 243, __pyx_L16_error)
+                __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+                __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+                /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":242
+ *                         self.kernings[first] = {}
+ * 
+ *                     if second not in self.kernings[first]:             # <<<<<<<<<<<<<<
+ *                         self.kernings[first][second] = int(m.group("amount"))
+ * 
+ */
+              }
+
+              /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":230
+ *                     pass
+ * 
+ *                 elif line.startswith("kerning"):             # <<<<<<<<<<<<<<
+ *                     m = re.search(r"kerning\s+first=(?P<first>[0-9]{1,3})\s+second=(?P<second>[0-9]{1,3})"
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+ */
+            }
+            __pyx_L26:;
+
+            /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":178
+ * 
+ *             # Loop over all the rows in the descriptor file
+ *             for line in text_file:             # <<<<<<<<<<<<<<
+ *                 if line.startswith("info"):
+ *                     pass
+ */
+            __pyx_L24_continue:;
+          }
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+
+          /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":175
+ * 
+ *         # Open the descriptor file
+ *         with open(descriptor_file) as text_file:             # <<<<<<<<<<<<<<
+ * 
+ *             # Loop over all the rows in the descriptor file
+ */
+        }
+        __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+        __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
+        __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
+        goto __pyx_L23_try_end;
+        __pyx_L16_error:;
+        __Pyx_PyThreadState_assign
+        __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
+        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+        __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
+        __Pyx_XDECREF(__pyx_t_15); __pyx_t_15 = 0;
+        __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
+        __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+        /*except:*/ {
+          __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont._load_descriptor_file", __pyx_clineno, __pyx_lineno, __pyx_filename);
+          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_1, &__pyx_t_15) < 0) __PYX_ERR(0, 175, __pyx_L18_except_error)
+          __Pyx_GOTREF(__pyx_t_4);
+          __Pyx_GOTREF(__pyx_t_1);
+          __Pyx_GOTREF(__pyx_t_15);
+          __pyx_t_3 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_1, __pyx_t_15); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L18_except_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __pyx_t_16 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_3, NULL);
+          __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+          if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 175, __pyx_L18_except_error)
+          __Pyx_GOTREF(__pyx_t_16);
+          __pyx_t_5 = __Pyx_PyObject_IsTrue(__pyx_t_16);
+          __Pyx_DECREF(__pyx_t_16); __pyx_t_16 = 0;
+          if (__pyx_t_5 < 0) __PYX_ERR(0, 175, __pyx_L18_except_error)
+          __pyx_t_6 = ((!(__pyx_t_5 != 0)) != 0);
+          if (__pyx_t_6) {
+            __Pyx_GIVEREF(__pyx_t_4);
+            __Pyx_GIVEREF(__pyx_t_1);
+            __Pyx_XGIVEREF(__pyx_t_15);
+            __Pyx_ErrRestoreWithState(__pyx_t_4, __pyx_t_1, __pyx_t_15);
+            __pyx_t_4 = 0; __pyx_t_1 = 0; __pyx_t_15 = 0; 
+            __PYX_ERR(0, 175, __pyx_L18_except_error)
+          }
+          __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+          __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+          __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
+          goto __pyx_L17_exception_handled;
+        }
+        __pyx_L18_except_error:;
+        __Pyx_PyThreadState_assign
+        __Pyx_XGIVEREF(__pyx_t_9);
+        __Pyx_XGIVEREF(__pyx_t_8);
+        __Pyx_XGIVEREF(__pyx_t_12);
+        __Pyx_ExceptionReset(__pyx_t_9, __pyx_t_8, __pyx_t_12);
+        goto __pyx_L1_error;
+        __pyx_L17_exception_handled:;
+        __Pyx_PyThreadState_assign
+        __Pyx_XGIVEREF(__pyx_t_9);
+        __Pyx_XGIVEREF(__pyx_t_8);
+        __Pyx_XGIVEREF(__pyx_t_12);
+        __Pyx_ExceptionReset(__pyx_t_9, __pyx_t_8, __pyx_t_12);
+        __pyx_L23_try_end:;
+      }
+    }
+    /*finally:*/ {
+      /*normal exit:*/{
+        if (__pyx_t_10) {
+          __pyx_t_12 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_tuple__27, NULL);
+          __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+          if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 175, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_12);
+          __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
+        }
+        goto __pyx_L15;
+      }
+      __pyx_L15:;
+    }
+    goto __pyx_L38;
+    __pyx_L12_error:;
+    __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+    goto __pyx_L1_error;
+    __pyx_L38:;
+  }
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":150
  *             y += row_height
  * 
  *     def _load_descriptor_file(self, str descriptor_file):             # <<<<<<<<<<<<<<
- *         if not path.isfile(descriptor_file):
- *             raise BitmapFontException('Could not locate the bitmap font descriptor file ' +
+ *         """Load the descriptor from the specified file.  Both XML and text
+ *         formats are supported (not binary currently).
  */
 
   /* function exit code */
@@ -3030,26 +4247,31 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
   __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_15);
   __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont._load_descriptor_file", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XDECREF(__pyx_v_xml_tree);
+  __Pyx_XDECREF(__pyx_v_text_file);
+  __Pyx_XDECREF(__pyx_v_line);
+  __Pyx_XDECREF(__pyx_v_m);
+  __Pyx_XDECREF((PyObject *)__pyx_v_character);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":149
- *             pass
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":245
+ *                         self.kernings[first][second] = int(m.group("amount"))
  * 
  *     def _load_descriptor_xml(self, xml_tree: ElementTree):             # <<<<<<<<<<<<<<
- *         cdef int first = 0
- *         cdef int second = 0
+ *         """Loads the descriptor information from the XML tree."""
+ * 
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_17_load_descriptor_xml(PyObject *__pyx_v_self, PyObject *__pyx_v_xml_tree); /*proto*/
-static char __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_16_load_descriptor_xml[] = "BitmapFont._load_descriptor_xml(self, xml_tree)";
+static char __pyx_doc_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_16_load_descriptor_xml[] = "BitmapFont._load_descriptor_xml(self, xml_tree)\nLoads the descriptor information from the XML tree.";
 static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_17_load_descriptor_xml(PyObject *__pyx_v_self, PyObject *__pyx_v_xml_tree) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
@@ -3085,17 +4307,17 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   PyObject *__pyx_t_9 = NULL;
   __Pyx_RefNannySetupContext("_load_descriptor_xml", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":150
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":248
+ *         """Loads the descriptor information from the XML tree."""
  * 
- *     def _load_descriptor_xml(self, xml_tree: ElementTree):
  *         cdef int first = 0             # <<<<<<<<<<<<<<
  *         cdef int second = 0
  *         root = xml_tree.getroot()
  */
   __pyx_v_first = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":151
- *     def _load_descriptor_xml(self, xml_tree: ElementTree):
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":249
+ * 
  *         cdef int first = 0
  *         cdef int second = 0             # <<<<<<<<<<<<<<
  *         root = xml_tree.getroot()
@@ -3103,14 +4325,14 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
   __pyx_v_second = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":152
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":250
  *         cdef int first = 0
  *         cdef int second = 0
  *         root = xml_tree.getroot()             # <<<<<<<<<<<<<<
  *         if root is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_xml_tree, __pyx_n_s_getroot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 152, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_xml_tree, __pyx_n_s_getroot); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 250, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3123,17 +4345,17 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 250, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_root = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":153
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":251
  *         cdef int second = 0
  *         root = xml_tree.getroot()
  *         if root is None:             # <<<<<<<<<<<<<<
@@ -3144,23 +4366,23 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (__pyx_t_5) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":154
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":252
  *         root = xml_tree.getroot()
  *         if root is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")             # <<<<<<<<<<<<<<
  * 
  *         # info
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 252, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__28, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 252, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 154, __pyx_L1_error)
+    __PYX_ERR(0, 252, __pyx_L1_error)
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":153
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":251
  *         cdef int second = 0
  *         root = xml_tree.getroot()
  *         if root is None:             # <<<<<<<<<<<<<<
@@ -3169,22 +4391,22 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":157
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":255
  * 
  *         # info
  *         info = root.find('info')             # <<<<<<<<<<<<<<
  *         if info is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_root, __pyx_n_s_find); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_root, __pyx_n_s_find); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 157, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__29, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 255, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_info = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":158
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":256
  *         # info
  *         info = root.find('info')
  *         if info is None:             # <<<<<<<<<<<<<<
@@ -3195,23 +4417,23 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   __pyx_t_4 = (__pyx_t_5 != 0);
   if (__pyx_t_4) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":159
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":257
  *         info = root.find('info')
  *         if info is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")             # <<<<<<<<<<<<<<
  * 
  *         # common
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__30, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 257, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 159, __pyx_L1_error)
+    __PYX_ERR(0, 257, __pyx_L1_error)
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":158
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":256
  *         # info
  *         info = root.find('info')
  *         if info is None:             # <<<<<<<<<<<<<<
@@ -3220,22 +4442,22 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":162
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":260
  * 
  *         # common
  *         common = root.find('common')             # <<<<<<<<<<<<<<
  *         if common is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_root, __pyx_n_s_find); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_root, __pyx_n_s_find); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 162, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__31, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_common = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":163
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":261
  *         # common
  *         common = root.find('common')
  *         if common is None:             # <<<<<<<<<<<<<<
@@ -3246,23 +4468,23 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (__pyx_t_5) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":164
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":262
  *         common = root.find('common')
  *         if common is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")             # <<<<<<<<<<<<<<
  * 
  *         self.line_height = int(common.attrib["lineHeight"])
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 262, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__32, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 262, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 164, __pyx_L1_error)
+    __PYX_ERR(0, 262, __pyx_L1_error)
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":163
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":261
  *         # common
  *         common = root.find('common')
  *         if common is None:             # <<<<<<<<<<<<<<
@@ -3271,60 +4493,60 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":166
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":264
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  * 
  *         self.line_height = int(common.attrib["lineHeight"])             # <<<<<<<<<<<<<<
  *         self.base = int(common.attrib["base"])
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_common, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_common, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_lineHeight); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __pyx_t_1 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_lineHeight); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 166, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 166, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 264, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_self->line_height = __pyx_t_6;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":167
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":265
  * 
  *         self.line_height = int(common.attrib["lineHeight"])
  *         self.base = int(common.attrib["base"])             # <<<<<<<<<<<<<<
  * 
  *         # characters
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_common, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_common, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_t_1 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 167, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 265, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_self->base = __pyx_t_6;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":170
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":268
  * 
  *         # characters
  *         chars = root.find('chars')             # <<<<<<<<<<<<<<
  *         if chars is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_root, __pyx_n_s_find); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_root, __pyx_n_s_find); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 170, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__33, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_chars = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":171
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":269
  *         # characters
  *         chars = root.find('chars')
  *         if chars is None:             # <<<<<<<<<<<<<<
@@ -3335,23 +4557,23 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   __pyx_t_4 = (__pyx_t_5 != 0);
   if (__pyx_t_4) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":172
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":270
  *         chars = root.find('chars')
  *         if chars is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")             # <<<<<<<<<<<<<<
  * 
  *         for text_char in chars.findall('char'):
  */
-    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 172, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_BitmapFontException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 270, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__34, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 270, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 172, __pyx_L1_error)
+    __PYX_ERR(0, 270, __pyx_L1_error)
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":171
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":269
  *         # characters
  *         chars = root.find('chars')
  *         if chars is None:             # <<<<<<<<<<<<<<
@@ -3360,25 +4582,25 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":174
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":272
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  * 
  *         for text_char in chars.findall('char'):             # <<<<<<<<<<<<<<
  *             character = BitmapFontCharacter()
  *             character.id = int(text_char.attrib["id"])
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_chars, __pyx_n_s_findall); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_chars, __pyx_n_s_findall); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__35, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (likely(PyList_CheckExact(__pyx_t_1)) || PyTuple_CheckExact(__pyx_t_1)) {
     __pyx_t_2 = __pyx_t_1; __Pyx_INCREF(__pyx_t_2); __pyx_t_7 = 0;
     __pyx_t_8 = NULL;
   } else {
-    __pyx_t_7 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 174, __pyx_L1_error)
+    __pyx_t_7 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 272, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 174, __pyx_L1_error)
+    __pyx_t_8 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 272, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   for (;;) {
@@ -3386,17 +4608,17 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_1); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 174, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_1); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 272, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_1); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 174, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_7); __Pyx_INCREF(__pyx_t_1); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 272, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 272, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -3406,7 +4628,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 174, __pyx_L1_error)
+          else __PYX_ERR(0, 272, __pyx_L1_error)
         }
         break;
       }
@@ -3415,171 +4637,171 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
     __Pyx_XDECREF_SET(__pyx_v_text_char, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":175
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":273
  * 
  *         for text_char in chars.findall('char'):
  *             character = BitmapFontCharacter()             # <<<<<<<<<<<<<<
  *             character.id = int(text_char.attrib["id"])
  *             character.rect.x = int(text_char.attrib["x"])
  */
-    __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_ptype_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 273, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_XDECREF_SET(__pyx_v_character, ((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter *)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":176
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":274
  *         for text_char in chars.findall('char'):
  *             character = BitmapFontCharacter()
  *             character.id = int(text_char.attrib["id"])             # <<<<<<<<<<<<<<
  *             character.rect.x = int(text_char.attrib["x"])
  *             character.rect.y = int(text_char.attrib["y"])
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 176, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 274, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 274, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 176, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 274, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_character->id = __pyx_t_6;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":177
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":275
  *             character = BitmapFontCharacter()
  *             character.id = int(text_char.attrib["id"])
  *             character.rect.x = int(text_char.attrib["x"])             # <<<<<<<<<<<<<<
  *             character.rect.y = int(text_char.attrib["y"])
  *             character.rect.w = int(text_char.attrib["width"])
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_x); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 275, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 275, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_character->rect.x = __pyx_t_6;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":178
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":276
  *             character.id = int(text_char.attrib["id"])
  *             character.rect.x = int(text_char.attrib["x"])
  *             character.rect.y = int(text_char.attrib["y"])             # <<<<<<<<<<<<<<
  *             character.rect.w = int(text_char.attrib["width"])
  *             character.rect.h = int(text_char.attrib["height"])
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_y); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 178, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 276, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_character->rect.y = __pyx_t_6;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":179
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":277
  *             character.rect.x = int(text_char.attrib["x"])
  *             character.rect.y = int(text_char.attrib["y"])
  *             character.rect.w = int(text_char.attrib["width"])             # <<<<<<<<<<<<<<
  *             character.rect.h = int(text_char.attrib["height"])
  *             character.xadvance = int(text_char.attrib["xadvance"])
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_width); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 179, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 277, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_character->rect.w = __pyx_t_6;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":180
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":278
  *             character.rect.y = int(text_char.attrib["y"])
  *             character.rect.w = int(text_char.attrib["width"])
  *             character.rect.h = int(text_char.attrib["height"])             # <<<<<<<<<<<<<<
  *             character.xadvance = int(text_char.attrib["xadvance"])
  *             character.xoffset = int(text_char.attrib["xoffset"])
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_height); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_height); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 180, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_character->rect.h = __pyx_t_6;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":181
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":279
  *             character.rect.w = int(text_char.attrib["width"])
  *             character.rect.h = int(text_char.attrib["height"])
  *             character.xadvance = int(text_char.attrib["xadvance"])             # <<<<<<<<<<<<<<
  *             character.xoffset = int(text_char.attrib["xoffset"])
  *             character.yoffset = int(text_char.attrib["yoffset"])
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_xadvance); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 181, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_xadvance); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 279, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 181, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 279, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_character->xadvance = __pyx_t_6;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":182
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":280
  *             character.rect.h = int(text_char.attrib["height"])
  *             character.xadvance = int(text_char.attrib["xadvance"])
  *             character.xoffset = int(text_char.attrib["xoffset"])             # <<<<<<<<<<<<<<
  *             character.yoffset = int(text_char.attrib["yoffset"])
  * 
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 280, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_xoffset); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_xoffset); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 280, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 280, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 182, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 280, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_character->xoffset = __pyx_t_6;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":183
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":281
  *             character.xadvance = int(text_char.attrib["xadvance"])
  *             character.xoffset = int(text_char.attrib["xoffset"])
  *             character.yoffset = int(text_char.attrib["yoffset"])             # <<<<<<<<<<<<<<
  * 
  *             self.characters[character.id] = character
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_text_char, __pyx_n_s_attrib); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 281, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_yoffset); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_3 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_yoffset); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 281, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 281, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 183, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 281, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_v_character->yoffset = __pyx_t_6;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":185
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":283
  *             character.yoffset = int(text_char.attrib["yoffset"])
  * 
  *             self.characters[character.id] = character             # <<<<<<<<<<<<<<
@@ -3588,14 +4810,14 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
     if (unlikely(__pyx_v_self->characters == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 185, __pyx_L1_error)
+      __PYX_ERR(0, 283, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_character->id); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_character->id); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    if (unlikely(PyDict_SetItem(__pyx_v_self->characters, __pyx_t_1, ((PyObject *)__pyx_v_character)) < 0)) __PYX_ERR(0, 185, __pyx_L1_error)
+    if (unlikely(PyDict_SetItem(__pyx_v_self->characters, __pyx_t_1, ((PyObject *)__pyx_v_character)) < 0)) __PYX_ERR(0, 283, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":174
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":272
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  * 
  *         for text_char in chars.findall('char'):             # <<<<<<<<<<<<<<
@@ -3605,22 +4827,22 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":188
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":286
  * 
  *         # kerning
  *         kernings = root.find('kernings')             # <<<<<<<<<<<<<<
  *         if kernings is not None:
  *             for kerning in kernings.findall('kerning'):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_root, __pyx_n_s_find); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_root, __pyx_n_s_find); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__36, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 286, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_kernings = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":189
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":287
  *         # kerning
  *         kernings = root.find('kernings')
  *         if kernings is not None:             # <<<<<<<<<<<<<<
@@ -3631,25 +4853,25 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (__pyx_t_5) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":190
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":288
  *         kernings = root.find('kernings')
  *         if kernings is not None:
  *             for kerning in kernings.findall('kerning'):             # <<<<<<<<<<<<<<
  *                 first = int(kerning.attrib["first"])
  *                 second = int(kerning.attrib["second"])
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_kernings, __pyx_n_s_findall); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_kernings, __pyx_n_s_findall); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 288, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__37, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 288, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
       __pyx_t_1 = __pyx_t_2; __Pyx_INCREF(__pyx_t_1); __pyx_t_7 = 0;
       __pyx_t_8 = NULL;
     } else {
-      __pyx_t_7 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 190, __pyx_L1_error)
+      __pyx_t_7 = -1; __pyx_t_1 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 288, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 190, __pyx_L1_error)
+      __pyx_t_8 = Py_TYPE(__pyx_t_1)->tp_iternext; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 288, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     for (;;) {
@@ -3657,17 +4879,17 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
         if (likely(PyList_CheckExact(__pyx_t_1))) {
           if (__pyx_t_7 >= PyList_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 190, __pyx_L1_error)
+          __pyx_t_2 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 288, __pyx_L1_error)
           #else
-          __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
+          __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 288, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           #endif
         } else {
           if (__pyx_t_7 >= PyTuple_GET_SIZE(__pyx_t_1)) break;
           #if CYTHON_COMPILING_IN_CPYTHON
-          __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 190, __pyx_L1_error)
+          __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_1, __pyx_t_7); __Pyx_INCREF(__pyx_t_2); __pyx_t_7++; if (unlikely(0 < 0)) __PYX_ERR(0, 288, __pyx_L1_error)
           #else
-          __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 190, __pyx_L1_error)
+          __pyx_t_2 = PySequence_ITEM(__pyx_t_1, __pyx_t_7); __pyx_t_7++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 288, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           #endif
         }
@@ -3677,7 +4899,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 190, __pyx_L1_error)
+            else __PYX_ERR(0, 288, __pyx_L1_error)
           }
           break;
         }
@@ -3686,82 +4908,82 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
       __Pyx_XDECREF_SET(__pyx_v_kerning, __pyx_t_2);
       __pyx_t_2 = 0;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":191
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":289
  *         if kernings is not None:
  *             for kerning in kernings.findall('kerning'):
  *                 first = int(kerning.attrib["first"])             # <<<<<<<<<<<<<<
  *                 second = int(kerning.attrib["second"])
  * 
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_kerning, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_kerning, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_first); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_3 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_first); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 289, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 191, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 289, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_first = __pyx_t_6;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":192
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":290
  *             for kerning in kernings.findall('kerning'):
  *                 first = int(kerning.attrib["first"])
  *                 second = int(kerning.attrib["second"])             # <<<<<<<<<<<<<<
  * 
  *                 if first not in self.kernings:
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_kerning, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 192, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_kerning, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_second); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 192, __pyx_L1_error)
+      __pyx_t_3 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_second); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 290, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 192, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 192, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 290, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_v_second = __pyx_t_6;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":194
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":292
  *                 second = int(kerning.attrib["second"])
  * 
  *                 if first not in self.kernings:             # <<<<<<<<<<<<<<
  *                     self.kernings[first] = {}
  * 
  */
-      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 194, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 292, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       if (unlikely(__pyx_v_self->kernings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        __PYX_ERR(0, 194, __pyx_L1_error)
+        __PYX_ERR(0, 292, __pyx_L1_error)
       }
-      __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_t_2, __pyx_v_self->kernings, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 194, __pyx_L1_error)
+      __pyx_t_5 = (__Pyx_PyDict_ContainsTF(__pyx_t_2, __pyx_v_self->kernings, Py_NE)); if (unlikely(__pyx_t_5 < 0)) __PYX_ERR(0, 292, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       __pyx_t_4 = (__pyx_t_5 != 0);
       if (__pyx_t_4) {
 
-        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":195
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":293
  * 
  *                 if first not in self.kernings:
  *                     self.kernings[first] = {}             # <<<<<<<<<<<<<<
  * 
  *                 self.kernings[first][second] = int(kerning.attrib["amount"])
  */
-        __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 195, __pyx_L1_error)
+        __pyx_t_2 = PyDict_New(); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 293, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         if (unlikely(__pyx_v_self->kernings == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 195, __pyx_L1_error)
+          __PYX_ERR(0, 293, __pyx_L1_error)
         }
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 195, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 293, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        if (unlikely(PyDict_SetItem(__pyx_v_self->kernings, __pyx_t_3, __pyx_t_2) < 0)) __PYX_ERR(0, 195, __pyx_L1_error)
+        if (unlikely(PyDict_SetItem(__pyx_v_self->kernings, __pyx_t_3, __pyx_t_2) < 0)) __PYX_ERR(0, 293, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":194
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":292
  *                 second = int(kerning.attrib["second"])
  * 
  *                 if first not in self.kernings:             # <<<<<<<<<<<<<<
@@ -3770,35 +4992,35 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
       }
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":197
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":295
  *                     self.kernings[first] = {}
  * 
  *                 self.kernings[first][second] = int(kerning.attrib["amount"])             # <<<<<<<<<<<<<<
  * 
  * 
  */
-      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_kerning, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_kerning, __pyx_n_s_attrib); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 295, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_amount); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __pyx_t_3 = PyObject_GetItem(__pyx_t_2, __pyx_n_u_amount); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 295, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyNumber_Int(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 295, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       if (unlikely(__pyx_v_self->kernings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 197, __pyx_L1_error)
+        __PYX_ERR(0, 295, __pyx_L1_error)
       }
-      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_first); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 295, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->kernings, __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 197, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->kernings, __pyx_t_3); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 295, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      if (unlikely(__Pyx_SetItemInt(__pyx_t_9, __pyx_v_second, __pyx_t_2, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 197, __pyx_L1_error)
+      if (unlikely(__Pyx_SetItemInt(__pyx_t_9, __pyx_v_second, __pyx_t_2, int, 1, __Pyx_PyInt_From_int, 0, 1, 1) < 0)) __PYX_ERR(0, 295, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":190
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":288
  *         kernings = root.find('kernings')
  *         if kernings is not None:
  *             for kerning in kernings.findall('kerning'):             # <<<<<<<<<<<<<<
@@ -3808,7 +5030,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
     }
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":189
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":287
  *         # kerning
  *         kernings = root.find('kernings')
  *         if kernings is not None:             # <<<<<<<<<<<<<<
@@ -3817,12 +5039,12 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":149
- *             pass
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":245
+ *                         self.kernings[first][second] = int(m.group("amount"))
  * 
  *     def _load_descriptor_xml(self, xml_tree: ElementTree):             # <<<<<<<<<<<<<<
- *         cdef int first = 0
- *         cdef int second = 0
+ *         """Loads the descriptor information from the XML tree."""
+ * 
  */
 
   /* function exit code */
@@ -3849,7 +5071,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":200
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":298
  * 
  * 
  *     def get_descent(self):             # <<<<<<<<<<<<<<
@@ -3877,7 +5099,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_descent", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":201
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":299
  * 
  *     def get_descent(self):
  *         return self.base - self.line_height             # <<<<<<<<<<<<<<
@@ -3885,13 +5107,13 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
  *     def get_ascent(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_self->base - __pyx_v_self->line_height)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 201, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int((__pyx_v_self->base - __pyx_v_self->line_height)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":200
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":298
  * 
  * 
  *     def get_descent(self):             # <<<<<<<<<<<<<<
@@ -3910,7 +5132,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":203
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":301
  *         return self.base - self.line_height
  * 
  *     def get_ascent(self):             # <<<<<<<<<<<<<<
@@ -3938,7 +5160,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_ascent", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":204
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":302
  * 
  *     def get_ascent(self):
  *         return self.base             # <<<<<<<<<<<<<<
@@ -3946,13 +5168,13 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
  *     def get_extents(self, str text, font_kerning=True):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":203
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":301
  *         return self.base - self.line_height
  * 
  *     def get_ascent(self):             # <<<<<<<<<<<<<<
@@ -3971,7 +5193,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":206
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":304
  *         return self.base
  * 
  *     def get_extents(self, str text, font_kerning=True):             # <<<<<<<<<<<<<<
@@ -4013,7 +5235,7 @@ static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_extents") < 0)) __PYX_ERR(0, 206, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "get_extents") < 0)) __PYX_ERR(0, 304, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4028,13 +5250,13 @@ static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("get_extents", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 206, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("get_extents", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 304, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font.BitmapFont.get_extents", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_text), (&PyUnicode_Type), 1, "text", 1))) __PYX_ERR(0, 206, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_text), (&PyUnicode_Type), 1, "text", 1))) __PYX_ERR(0, 304, __pyx_L1_error)
   __pyx_r = __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_22get_extents(((struct __pyx_obj_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont *)__pyx_v_self), __pyx_v_text, __pyx_v_font_kerning);
 
   /* function exit code */
@@ -4070,7 +5292,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
   int __pyx_t_13;
   __Pyx_RefNannySetupContext("get_extents", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":207
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":305
  * 
  *     def get_extents(self, str text, font_kerning=True):
  *         cdef int width = 0             # <<<<<<<<<<<<<<
@@ -4079,7 +5301,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
  */
   __pyx_v_width = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":208
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":306
  *     def get_extents(self, str text, font_kerning=True):
  *         cdef int width = 0
  *         cdef int previous_char = -1             # <<<<<<<<<<<<<<
@@ -4088,17 +5310,17 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
  */
   __pyx_v_previous_char = -1;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":210
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":308
  *         cdef int previous_char = -1
  *         cdef int current_char
  *         cdef bint use_kerning = font_kerning             # <<<<<<<<<<<<<<
  * 
  *         for text_char in text:
  */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_font_kerning); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 210, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_font_kerning); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 308, __pyx_L1_error)
   __pyx_v_use_kerning = __pyx_t_1;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":212
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":310
  *         cdef bint use_kerning = font_kerning
  * 
  *         for text_char in text:             # <<<<<<<<<<<<<<
@@ -4107,16 +5329,16 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
  */
   if (unlikely(__pyx_v_text == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' is not iterable");
-    __PYX_ERR(0, 212, __pyx_L1_error)
+    __PYX_ERR(0, 310, __pyx_L1_error)
   }
   __Pyx_INCREF(__pyx_v_text);
   __pyx_t_2 = __pyx_v_text;
-  __pyx_t_7 = __Pyx_init_unicode_iteration(__pyx_t_2, (&__pyx_t_4), (&__pyx_t_5), (&__pyx_t_6)); if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 212, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_init_unicode_iteration(__pyx_t_2, (&__pyx_t_4), (&__pyx_t_5), (&__pyx_t_6)); if (unlikely(__pyx_t_7 == -1)) __PYX_ERR(0, 310, __pyx_L1_error)
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_4; __pyx_t_8++) {
     __pyx_t_3 = __pyx_t_8;
     __pyx_v_text_char = __Pyx_PyUnicode_READ(__pyx_t_6, __pyx_t_5, __pyx_t_3);
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":213
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":311
  * 
  *         for text_char in text:
  *             current_char = ord(text_char)             # <<<<<<<<<<<<<<
@@ -4125,25 +5347,25 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
  */
     __pyx_v_current_char = ((long)__pyx_v_text_char);
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":214
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":312
  *         for text_char in text:
  *             current_char = ord(text_char)
  *             if current_char in self.characters:             # <<<<<<<<<<<<<<
  *                 char_info = self.characters[current_char]
  *                 width += char_info.xadvance
  */
-    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 312, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
     if (unlikely(__pyx_v_self->characters == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 214, __pyx_L1_error)
+      __PYX_ERR(0, 312, __pyx_L1_error)
     }
-    __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_t_9, __pyx_v_self->characters, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 214, __pyx_L1_error)
+    __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_t_9, __pyx_v_self->characters, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 312, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     __pyx_t_10 = (__pyx_t_1 != 0);
     if (__pyx_t_10) {
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":215
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":313
  *             current_char = ord(text_char)
  *             if current_char in self.characters:
  *                 char_info = self.characters[current_char]             # <<<<<<<<<<<<<<
@@ -4152,36 +5374,36 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
  */
       if (unlikely(__pyx_v_self->characters == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 215, __pyx_L1_error)
+        __PYX_ERR(0, 313, __pyx_L1_error)
       }
-      __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 215, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 313, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->characters, __pyx_t_9); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 215, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->characters, __pyx_t_9); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 313, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_XDECREF_SET(__pyx_v_char_info, __pyx_t_11);
       __pyx_t_11 = 0;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":216
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":314
  *             if current_char in self.characters:
  *                 char_info = self.characters[current_char]
  *                 width += char_info.xadvance             # <<<<<<<<<<<<<<
  * 
  *                 if use_kerning and previous_char in self.kernings and current_char in self.kernings[previous_char]:
  */
-      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_width); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 216, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_width); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 314, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
-      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_xadvance); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 216, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_xadvance); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 314, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_12 = PyNumber_InPlaceAdd(__pyx_t_11, __pyx_t_9); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 216, __pyx_L1_error)
+      __pyx_t_12 = PyNumber_InPlaceAdd(__pyx_t_11, __pyx_t_9); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 314, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_12); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 216, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_12); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 314, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_v_width = __pyx_t_7;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":218
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":316
  *                 width += char_info.xadvance
  * 
  *                 if use_kerning and previous_char in self.kernings and current_char in self.kernings[previous_char]:             # <<<<<<<<<<<<<<
@@ -4194,13 +5416,13 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
         __pyx_t_10 = __pyx_t_1;
         goto __pyx_L7_bool_binop_done;
       }
-      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 218, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 316, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       if (unlikely(__pyx_v_self->kernings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        __PYX_ERR(0, 218, __pyx_L1_error)
+        __PYX_ERR(0, 316, __pyx_L1_error)
       }
-      __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_t_12, __pyx_v_self->kernings, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 218, __pyx_L1_error)
+      __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_t_12, __pyx_v_self->kernings, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 316, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_t_13 = (__pyx_t_1 != 0);
       if (__pyx_t_13) {
@@ -4208,18 +5430,18 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
         __pyx_t_10 = __pyx_t_13;
         goto __pyx_L7_bool_binop_done;
       }
-      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 218, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 316, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       if (unlikely(__pyx_v_self->kernings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 218, __pyx_L1_error)
+        __PYX_ERR(0, 316, __pyx_L1_error)
       }
-      __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 218, __pyx_L1_error)
+      __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 316, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
-      __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->kernings, __pyx_t_9); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 218, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyDict_GetItem(__pyx_v_self->kernings, __pyx_t_9); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 316, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-      __pyx_t_13 = (__Pyx_PySequence_ContainsTF(__pyx_t_12, __pyx_t_11, Py_EQ)); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 218, __pyx_L1_error)
+      __pyx_t_13 = (__Pyx_PySequence_ContainsTF(__pyx_t_12, __pyx_t_11, Py_EQ)); if (unlikely(__pyx_t_13 < 0)) __PYX_ERR(0, 316, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
       __pyx_t_1 = (__pyx_t_13 != 0);
@@ -4227,36 +5449,36 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
       __pyx_L7_bool_binop_done:;
       if (__pyx_t_10) {
 
-        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":219
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":317
  * 
  *                 if use_kerning and previous_char in self.kernings and current_char in self.kernings[previous_char]:
  *                     width += self.kernings[previous_char][current_char]             # <<<<<<<<<<<<<<
  * 
  *             previous_char = current_char
  */
-        __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_width); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 219, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyInt_From_int(__pyx_v_width); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 317, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_11);
         if (unlikely(__pyx_v_self->kernings == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 219, __pyx_L1_error)
+          __PYX_ERR(0, 317, __pyx_L1_error)
         }
-        __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 219, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 317, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->kernings, __pyx_t_12); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 219, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyDict_GetItem(__pyx_v_self->kernings, __pyx_t_12); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 317, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_12 = __Pyx_GetItemInt(__pyx_t_9, __pyx_v_current_char, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 219, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_GetItemInt(__pyx_t_9, __pyx_v_current_char, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 317, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
-        __pyx_t_9 = PyNumber_InPlaceAdd(__pyx_t_11, __pyx_t_12); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 219, __pyx_L1_error)
+        __pyx_t_9 = PyNumber_InPlaceAdd(__pyx_t_11, __pyx_t_12); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 317, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_9); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 219, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_9); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 317, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         __pyx_v_width = __pyx_t_7;
 
-        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":218
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":316
  *                 width += char_info.xadvance
  * 
  *                 if use_kerning and previous_char in self.kernings and current_char in self.kernings[previous_char]:             # <<<<<<<<<<<<<<
@@ -4265,7 +5487,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
  */
       }
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":214
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":312
  *         for text_char in text:
  *             current_char = ord(text_char)
  *             if current_char in self.characters:             # <<<<<<<<<<<<<<
@@ -4274,7 +5496,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
  */
     }
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":221
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":319
  *                     width += self.kernings[previous_char][current_char]
  * 
  *             previous_char = current_char             # <<<<<<<<<<<<<<
@@ -4285,7 +5507,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":223
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":321
  *             previous_char = current_char
  * 
  *         return width, self.line_height             # <<<<<<<<<<<<<<
@@ -4293,11 +5515,11 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_width); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_width); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 321, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
-  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_self->line_height); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_self->line_height); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 321, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 321, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_11);
   __Pyx_GIVEREF(__pyx_t_9);
   PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9);
@@ -4309,7 +5531,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
   __pyx_t_11 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":206
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":304
  *         return self.base
  * 
  *     def get_extents(self, str text, font_kerning=True):             # <<<<<<<<<<<<<<
@@ -4332,7 +5554,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_2
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":43
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":44
  * 
  * cdef class BitmapFont:
  *     cdef public str face             # <<<<<<<<<<<<<<
@@ -4387,7 +5609,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_2
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__set__", 0);
-  if (!(likely(PyUnicode_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(0, 43, __pyx_L1_error)
+  if (!(likely(PyUnicode_CheckExact(__pyx_v_value))||((__pyx_v_value) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_value)->tp_name), 0))) __PYX_ERR(0, 44, __pyx_L1_error)
   __pyx_t_1 = __pyx_v_value;
   __Pyx_INCREF(__pyx_t_1);
   __Pyx_GIVEREF(__pyx_t_1);
@@ -4437,7 +5659,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4face_4
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":44
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":45
  * cdef class BitmapFont:
  *     cdef public str face
  *     cdef public bint bold             # <<<<<<<<<<<<<<
@@ -4464,7 +5686,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->bold); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->bold); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4499,7 +5721,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_2
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 45, __pyx_L1_error)
   __pyx_v_self->bold = __pyx_t_1;
 
   /* function exit code */
@@ -4513,7 +5735,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4bold_2
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":45
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":46
  *     cdef public str face
  *     cdef public bint bold
  *     cdef public bint italic             # <<<<<<<<<<<<<<
@@ -4540,7 +5762,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->italic); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->italic); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4575,7 +5797,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 45, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 46, __pyx_L1_error)
   __pyx_v_self->italic = __pyx_t_1;
 
   /* function exit code */
@@ -4589,7 +5811,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_6italic
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":46
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":47
  *     cdef public bint bold
  *     cdef public bint italic
  *     cdef public int padding             # <<<<<<<<<<<<<<
@@ -4616,7 +5838,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->padding); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->padding); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 47, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4651,7 +5873,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7paddin
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 46, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L1_error)
   __pyx_v_self->padding = __pyx_t_1;
 
   /* function exit code */
@@ -4665,7 +5887,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7paddin
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":47
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":48
  *     cdef public bint italic
  *     cdef public int padding
  *     cdef public int spacing             # <<<<<<<<<<<<<<
@@ -4692,7 +5914,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->spacing); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->spacing); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 48, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4727,7 +5949,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacin
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 47, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L1_error)
   __pyx_v_self->spacing = __pyx_t_1;
 
   /* function exit code */
@@ -4741,7 +5963,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7spacin
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":48
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":49
  *     cdef public int padding
  *     cdef public int spacing
  *     cdef public int outline             # <<<<<<<<<<<<<<
@@ -4768,7 +5990,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->outline); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 48, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->outline); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4803,7 +6025,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outlin
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 49, __pyx_L1_error)
   __pyx_v_self->outline = __pyx_t_1;
 
   /* function exit code */
@@ -4817,7 +6039,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7outlin
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":50
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":51
  *     cdef public int outline
  * 
  *     cdef public int line_height             # <<<<<<<<<<<<<<
@@ -4844,7 +6066,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_1
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->line_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->line_height); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4879,7 +6101,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 50, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 51, __pyx_L1_error)
   __pyx_v_self->line_height = __pyx_t_1;
 
   /* function exit code */
@@ -4893,7 +6115,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_11line_
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":51
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":52
  * 
  *     cdef public int line_height
  *     cdef public int base             # <<<<<<<<<<<<<<
@@ -4920,7 +6142,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->base); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4955,7 +6177,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_2
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 51, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
   __pyx_v_self->base = __pyx_t_1;
 
   /* function exit code */
@@ -4969,7 +6191,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_4base_2
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":52
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":53
  *     cdef public int line_height
  *     cdef public int base
  *     cdef public int scale_w             # <<<<<<<<<<<<<<
@@ -4996,7 +6218,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->scale_w); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->scale_w); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5031,7 +6253,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L1_error)
   __pyx_v_self->scale_w = __pyx_t_1;
 
   /* function exit code */
@@ -5045,7 +6267,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":53
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":54
  *     cdef public int base
  *     cdef public int scale_w
  *     cdef public int scale_h             # <<<<<<<<<<<<<<
@@ -5072,7 +6294,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->scale_h); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_self->scale_h); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5107,7 +6329,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__set__", 0);
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 53, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_value); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 54, __pyx_L1_error)
   __pyx_v_self->scale_h = __pyx_t_1;
 
   /* function exit code */
@@ -5121,7 +6343,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_10BitmapFont_7scale_
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":230
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":328
  *     cdef int w, h
  * 
  *     def __cinit__(self, w, h):             # <<<<<<<<<<<<<<
@@ -5157,11 +6379,11 @@ static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_h)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, 1); __PYX_ERR(0, 230, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, 1); __PYX_ERR(0, 328, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 230, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__cinit__") < 0)) __PYX_ERR(0, 328, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -5174,7 +6396,7 @@ static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 230, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__cinit__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 328, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font._SurfaceContainer.__cinit__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5193,7 +6415,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":231
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":329
  * 
  *     def __cinit__(self, w, h):
  *         self.surface = NULL             # <<<<<<<<<<<<<<
@@ -5202,27 +6424,27 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
  */
   __pyx_v_self->surface = NULL;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":232
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":330
  *     def __cinit__(self, w, h):
  *         self.surface = NULL
  *         self.w = w             # <<<<<<<<<<<<<<
  *         self.h = h
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_w); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 232, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_w); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 330, __pyx_L1_error)
   __pyx_v_self->w = __pyx_t_1;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":233
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":331
  *         self.surface = NULL
  *         self.w = w
  *         self.h = h             # <<<<<<<<<<<<<<
  * 
  *     def __init__(self, w, h):
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_h); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 233, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_h); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 331, __pyx_L1_error)
   __pyx_v_self->h = __pyx_t_1;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":230
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":328
  *     cdef int w, h
  * 
  *     def __cinit__(self, w, h):             # <<<<<<<<<<<<<<
@@ -5241,7 +6463,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":235
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":333
  *         self.h = h
  * 
  *     def __init__(self, w, h):             # <<<<<<<<<<<<<<
@@ -5277,11 +6499,11 @@ static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_h)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 235, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 333, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 235, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 333, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -5294,7 +6516,7 @@ static int __pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 235, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 333, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font._SurfaceContainer.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5317,17 +6539,17 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
   size_t __pyx_t_5;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":239
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":337
  *         # here.
  *         self.surface = SDL_CreateRGBSurface(0,
  *             w, h, 32,             # <<<<<<<<<<<<<<
  *             0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
  *         memset(self.surface.pixels, 0, w * h * 4)
  */
-  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_w); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 239, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_h); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_As_int(__pyx_v_w); if (unlikely((__pyx_t_1 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 337, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_As_int(__pyx_v_h); if (unlikely((__pyx_t_2 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 337, __pyx_L1_error)
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":238
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":336
  *         # XXX check on OSX to see if little endian/big endian make a difference
  *         # here.
  *         self.surface = SDL_CreateRGBSurface(0,             # <<<<<<<<<<<<<<
@@ -5336,23 +6558,23 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
  */
   __pyx_v_self->surface = SDL_CreateRGBSurface(0, __pyx_t_1, __pyx_t_2, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":241
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":339
  *             w, h, 32,
  *             0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
  *         memset(self.surface.pixels, 0, w * h * 4)             # <<<<<<<<<<<<<<
  * 
  *     def __dealloc__(self):
  */
-  __pyx_t_3 = PyNumber_Multiply(__pyx_v_w, __pyx_v_h); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_v_w, __pyx_v_h); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 339, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = PyNumber_Multiply(__pyx_t_3, __pyx_int_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_4 = PyNumber_Multiply(__pyx_t_3, __pyx_int_4); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 339, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyInt_As_size_t(__pyx_t_4); if (unlikely((__pyx_t_5 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 241, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_As_size_t(__pyx_t_4); if (unlikely((__pyx_t_5 == (size_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 339, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   memset(__pyx_v_self->surface->pixels, 0, __pyx_t_5);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":235
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":333
  *         self.h = h
  * 
  *     def __init__(self, w, h):             # <<<<<<<<<<<<<<
@@ -5373,7 +6595,7 @@ static int __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer_
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":243
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":341
  *         memset(self.surface.pixels, 0, w * h * 4)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -5397,7 +6619,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":244
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":342
  * 
  *     def __dealloc__(self):
  *         if self.surface != NULL:             # <<<<<<<<<<<<<<
@@ -5407,7 +6629,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer
   __pyx_t_1 = ((__pyx_v_self->surface != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":245
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":343
  *     def __dealloc__(self):
  *         if self.surface != NULL:
  *             SDL_FreeSurface(self.surface)             # <<<<<<<<<<<<<<
@@ -5416,7 +6638,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer
  */
     SDL_FreeSurface(__pyx_v_self->surface);
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":246
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":344
  *         if self.surface != NULL:
  *             SDL_FreeSurface(self.surface)
  *             self.surface = NULL             # <<<<<<<<<<<<<<
@@ -5425,7 +6647,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer
  */
     __pyx_v_self->surface = NULL;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":244
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":342
  * 
  *     def __dealloc__(self):
  *         if self.surface != NULL:             # <<<<<<<<<<<<<<
@@ -5434,7 +6656,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":243
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":341
  *         memset(self.surface.pixels, 0, w * h * 4)
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -5446,7 +6668,7 @@ static void __pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceContainer
   __Pyx_RefNannyFinishContext();
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":248
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":346
  *             self.surface = NULL
  * 
  *     def render(self, container, text, x, y):             # <<<<<<<<<<<<<<
@@ -5487,21 +6709,21 @@ static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_text)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("render", 1, 4, 4, 1); __PYX_ERR(0, 248, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("render", 1, 4, 4, 1); __PYX_ERR(0, 346, __pyx_L3_error)
         }
         case  2:
         if (likely((values[2] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_x)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("render", 1, 4, 4, 2); __PYX_ERR(0, 248, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("render", 1, 4, 4, 2); __PYX_ERR(0, 346, __pyx_L3_error)
         }
         case  3:
         if (likely((values[3] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("render", 1, 4, 4, 3); __PYX_ERR(0, 248, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("render", 1, 4, 4, 3); __PYX_ERR(0, 346, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "render") < 0)) __PYX_ERR(0, 248, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "render") < 0)) __PYX_ERR(0, 346, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 4) {
       goto __pyx_L5_argtuple_error;
@@ -5518,7 +6740,7 @@ static PyObject *__pyx_pw_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("render", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 248, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("render", 1, 4, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 346, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.uix.bitmap_font.bitmap_font._SurfaceContainer.render", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -5562,31 +6784,31 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   struct SDL_Rect __pyx_t_13;
   __Pyx_RefNannySetupContext("render", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":254
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":352
  *         cdef SDL_Rect dest_rect
  *         cdef SDL_Surface *source_image
  *         cdef dict characters = dict()             # <<<<<<<<<<<<<<
  *         cdef dict kernings = dict()
  *         cdef bint use_kerning = True
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 254, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_characters = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":255
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":353
  *         cdef SDL_Surface *source_image
  *         cdef dict characters = dict()
  *         cdef dict kernings = dict()             # <<<<<<<<<<<<<<
  *         cdef bint use_kerning = True
  *         cdef int previous_char = -1
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 353, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_kernings = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":256
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":354
  *         cdef dict characters = dict()
  *         cdef dict kernings = dict()
  *         cdef bint use_kerning = True             # <<<<<<<<<<<<<<
@@ -5595,7 +6817,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
   __pyx_v_use_kerning = 1;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":257
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":355
  *         cdef dict kernings = dict()
  *         cdef bint use_kerning = True
  *         cdef int previous_char = -1             # <<<<<<<<<<<<<<
@@ -5604,14 +6826,14 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
   __pyx_v_previous_char = -1;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":260
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":358
  *         cdef int current_char
  * 
  *         asset = container.get_font_asset()             # <<<<<<<<<<<<<<
  *         if asset is None:
  *             return
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_container, __pyx_n_s_get_font_asset); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_container, __pyx_n_s_get_font_asset); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 358, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5624,17 +6846,17 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 358, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 260, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 358, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_asset = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":261
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":359
  * 
  *         asset = container.get_font_asset()
  *         if asset is None:             # <<<<<<<<<<<<<<
@@ -5645,7 +6867,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   __pyx_t_5 = (__pyx_t_4 != 0);
   if (__pyx_t_5) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":262
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":360
  *         asset = container.get_font_asset()
  *         if asset is None:
  *             return             # <<<<<<<<<<<<<<
@@ -5656,7 +6878,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":261
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":359
  * 
  *         asset = container.get_font_asset()
  *         if asset is None:             # <<<<<<<<<<<<<<
@@ -5665,19 +6887,19 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":264
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":362
  *             return
  * 
  *         font = asset.bitmap_font             # <<<<<<<<<<<<<<
  *         if font is None:
  *             return
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_asset, __pyx_n_s_bitmap_font); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 264, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_asset, __pyx_n_s_bitmap_font); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 362, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_font = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":265
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":363
  * 
  *         font = asset.bitmap_font
  *         if font is None:             # <<<<<<<<<<<<<<
@@ -5688,7 +6910,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   __pyx_t_4 = (__pyx_t_5 != 0);
   if (__pyx_t_4) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":266
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":364
  *         font = asset.bitmap_font
  *         if font is None:
  *             return             # <<<<<<<<<<<<<<
@@ -5699,7 +6921,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":265
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":363
  * 
  *         font = asset.bitmap_font
  *         if font is None:             # <<<<<<<<<<<<<<
@@ -5708,14 +6930,14 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":268
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":366
  *             return
  * 
  *         source_image = <SDL_Surface*>pycapsule.PyCapsule_GetPointer(font.get_image(), NULL)             # <<<<<<<<<<<<<<
  *         if source_image == NULL:
  *             return
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_font, __pyx_n_s_get_image); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_font, __pyx_n_s_get_image); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 366, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5728,18 +6950,18 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 366, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 366, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_6 = PyCapsule_GetPointer(__pyx_t_1, NULL); if (unlikely(__pyx_t_6 == NULL && PyErr_Occurred())) __PYX_ERR(0, 268, __pyx_L1_error)
+  __pyx_t_6 = PyCapsule_GetPointer(__pyx_t_1, NULL); if (unlikely(__pyx_t_6 == NULL && PyErr_Occurred())) __PYX_ERR(0, 366, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_source_image = ((struct SDL_Surface *)__pyx_t_6);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":269
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":367
  * 
  *         source_image = <SDL_Surface*>pycapsule.PyCapsule_GetPointer(font.get_image(), NULL)
  *         if source_image == NULL:             # <<<<<<<<<<<<<<
@@ -5749,7 +6971,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   __pyx_t_4 = ((__pyx_v_source_image == NULL) != 0);
   if (__pyx_t_4) {
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":270
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":368
  *         source_image = <SDL_Surface*>pycapsule.PyCapsule_GetPointer(font.get_image(), NULL)
  *         if source_image == NULL:
  *             return             # <<<<<<<<<<<<<<
@@ -5760,7 +6982,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":269
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":367
  * 
  *         source_image = <SDL_Surface*>pycapsule.PyCapsule_GetPointer(font.get_image(), NULL)
  *         if source_image == NULL:             # <<<<<<<<<<<<<<
@@ -5769,34 +6991,34 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
   }
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":272
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":370
  *             return
  * 
  *         cursor_rect.x = x             # <<<<<<<<<<<<<<
  *         cursor_rect.y = y
  * 
  */
-  __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_v_x); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 272, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_v_x); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 370, __pyx_L1_error)
   __pyx_v_cursor_rect.x = __pyx_t_7;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":273
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":371
  * 
  *         cursor_rect.x = x
  *         cursor_rect.y = y             # <<<<<<<<<<<<<<
  * 
  *         characters = font.get_characters()
  */
-  __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_v_y); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 273, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_v_y); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 371, __pyx_L1_error)
   __pyx_v_cursor_rect.y = __pyx_t_7;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":275
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":373
  *         cursor_rect.y = y
  * 
  *         characters = font.get_characters()             # <<<<<<<<<<<<<<
  *         kernings = font.get_kernings()
  *         use_kerning = container.options['font_kerning']
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_font, __pyx_n_s_get_characters); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 275, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_font, __pyx_n_s_get_characters); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5809,25 +7031,25 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 373, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 275, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 373, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(PyDict_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "dict", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 275, __pyx_L1_error)
+  if (!(likely(PyDict_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "dict", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 373, __pyx_L1_error)
   __Pyx_DECREF_SET(__pyx_v_characters, ((PyObject*)__pyx_t_1));
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":276
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":374
  * 
  *         characters = font.get_characters()
  *         kernings = font.get_kernings()             # <<<<<<<<<<<<<<
  *         use_kerning = container.options['font_kerning']
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_font, __pyx_n_s_get_kernings); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_font, __pyx_n_s_get_kernings); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 374, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -5840,36 +7062,36 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 374, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 276, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 374, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (!(likely(PyDict_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "dict", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 276, __pyx_L1_error)
+  if (!(likely(PyDict_CheckExact(__pyx_t_1))||((__pyx_t_1) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "dict", Py_TYPE(__pyx_t_1)->tp_name), 0))) __PYX_ERR(0, 374, __pyx_L1_error)
   __Pyx_DECREF_SET(__pyx_v_kernings, ((PyObject*)__pyx_t_1));
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":277
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":375
  *         characters = font.get_characters()
  *         kernings = font.get_kernings()
  *         use_kerning = container.options['font_kerning']             # <<<<<<<<<<<<<<
  * 
- *         for text_char in text:
+ *         # Copy each character in the text string from the bitmap font atlas to
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_container, __pyx_n_s_options); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_container, __pyx_n_s_options); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 375, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_font_kerning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_2 = PyObject_GetItem(__pyx_t_1, __pyx_n_u_font_kerning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 375, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_use_kerning = __pyx_t_4;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":279
- *         use_kerning = container.options['font_kerning']
- * 
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":379
+ *         # Copy each character in the text string from the bitmap font atlas to
+ *         # the output texture/surface
  *         for text_char in text:             # <<<<<<<<<<<<<<
  *             current_char = ord(text_char)
  *             if current_char in characters:
@@ -5878,26 +7100,26 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
     __pyx_t_2 = __pyx_v_text; __Pyx_INCREF(__pyx_t_2); __pyx_t_8 = 0;
     __pyx_t_9 = NULL;
   } else {
-    __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_text); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 279, __pyx_L1_error)
+    __pyx_t_8 = -1; __pyx_t_2 = PyObject_GetIter(__pyx_v_text); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 379, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_9 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 279, __pyx_L1_error)
+    __pyx_t_9 = Py_TYPE(__pyx_t_2)->tp_iternext; if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 379, __pyx_L1_error)
   }
   for (;;) {
     if (likely(!__pyx_t_9)) {
       if (likely(PyList_CheckExact(__pyx_t_2))) {
         if (__pyx_t_8 >= PyList_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_8); __Pyx_INCREF(__pyx_t_1); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 279, __pyx_L1_error)
+        __pyx_t_1 = PyList_GET_ITEM(__pyx_t_2, __pyx_t_8); __Pyx_INCREF(__pyx_t_1); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 379, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       } else {
         if (__pyx_t_8 >= PyTuple_GET_SIZE(__pyx_t_2)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_8); __Pyx_INCREF(__pyx_t_1); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 279, __pyx_L1_error)
+        __pyx_t_1 = PyTuple_GET_ITEM(__pyx_t_2, __pyx_t_8); __Pyx_INCREF(__pyx_t_1); __pyx_t_8++; if (unlikely(0 < 0)) __PYX_ERR(0, 379, __pyx_L1_error)
         #else
-        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 279, __pyx_L1_error)
+        __pyx_t_1 = PySequence_ITEM(__pyx_t_2, __pyx_t_8); __pyx_t_8++; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 379, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         #endif
       }
@@ -5907,7 +7129,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 279, __pyx_L1_error)
+          else __PYX_ERR(0, 379, __pyx_L1_error)
         }
         break;
       }
@@ -5916,35 +7138,35 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
     __Pyx_XDECREF_SET(__pyx_v_text_char, __pyx_t_1);
     __pyx_t_1 = 0;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":280
- * 
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":380
+ *         # the output texture/surface
  *         for text_char in text:
  *             current_char = ord(text_char)             # <<<<<<<<<<<<<<
  *             if current_char in characters:
  *                 char_info = characters[current_char]
  */
-    __pyx_t_10 = __Pyx_PyObject_Ord(__pyx_v_text_char); if (unlikely(__pyx_t_10 == (long)(Py_UCS4)-1)) __PYX_ERR(0, 280, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyObject_Ord(__pyx_v_text_char); if (unlikely(__pyx_t_10 == (long)(Py_UCS4)-1)) __PYX_ERR(0, 380, __pyx_L1_error)
     __pyx_v_current_char = __pyx_t_10;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":281
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":381
  *         for text_char in text:
  *             current_char = ord(text_char)
  *             if current_char in characters:             # <<<<<<<<<<<<<<
  *                 char_info = characters[current_char]
  * 
  */
-    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 281, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 381, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     if (unlikely(__pyx_v_characters == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 281, __pyx_L1_error)
+      __PYX_ERR(0, 381, __pyx_L1_error)
     }
-    __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_t_1, __pyx_v_characters, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 281, __pyx_L1_error)
+    __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_t_1, __pyx_v_characters, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 381, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __pyx_t_5 = (__pyx_t_4 != 0);
     if (__pyx_t_5) {
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":282
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":382
  *             current_char = ord(text_char)
  *             if current_char in characters:
  *                 char_info = characters[current_char]             # <<<<<<<<<<<<<<
@@ -5953,17 +7175,17 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
       if (unlikely(__pyx_v_characters == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 282, __pyx_L1_error)
+        __PYX_ERR(0, 382, __pyx_L1_error)
       }
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 282, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 382, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_characters, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 282, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_characters, __pyx_t_1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 382, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_XDECREF_SET(__pyx_v_char_info, __pyx_t_3);
       __pyx_t_3 = 0;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":284
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":384
  *                 char_info = characters[current_char]
  * 
  *                 if use_kerning and previous_char in kernings and current_char in kernings[previous_char]:             # <<<<<<<<<<<<<<
@@ -5976,13 +7198,13 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
         __pyx_t_5 = __pyx_t_4;
         goto __pyx_L10_bool_binop_done;
       }
-      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 384, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       if (unlikely(__pyx_v_kernings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-        __PYX_ERR(0, 284, __pyx_L1_error)
+        __PYX_ERR(0, 384, __pyx_L1_error)
       }
-      __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_t_3, __pyx_v_kernings, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_t_3, __pyx_v_kernings, Py_EQ)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_t_11 = (__pyx_t_4 != 0);
       if (__pyx_t_11) {
@@ -5990,18 +7212,18 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
         __pyx_t_5 = __pyx_t_11;
         goto __pyx_L10_bool_binop_done;
       }
-      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_current_char); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 384, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       if (unlikely(__pyx_v_kernings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 284, __pyx_L1_error)
+        __PYX_ERR(0, 384, __pyx_L1_error)
       }
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 384, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_12 = __Pyx_PyDict_GetItem(__pyx_v_kernings, __pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyDict_GetItem(__pyx_v_kernings, __pyx_t_1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 384, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __pyx_t_11 = (__Pyx_PySequence_ContainsTF(__pyx_t_3, __pyx_t_12, Py_EQ)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 284, __pyx_L1_error)
+      __pyx_t_11 = (__Pyx_PySequence_ContainsTF(__pyx_t_3, __pyx_t_12, Py_EQ)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 384, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_t_4 = (__pyx_t_11 != 0);
@@ -6009,36 +7231,36 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
       __pyx_L10_bool_binop_done:;
       if (__pyx_t_5) {
 
-        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":285
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":385
  * 
  *                 if use_kerning and previous_char in kernings and current_char in kernings[previous_char]:
  *                     cursor_rect.x += kernings[previous_char][current_char]             # <<<<<<<<<<<<<<
  * 
  *                 source_rect = char_info.rect
  */
-        __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cursor_rect.x); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cursor_rect.x); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 385, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
         if (unlikely(__pyx_v_kernings == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 285, __pyx_L1_error)
+          __PYX_ERR(0, 385, __pyx_L1_error)
         }
-        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_previous_char); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_kernings, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_kernings, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 385, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_current_char, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_GetItemInt(__pyx_t_1, __pyx_v_current_char, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-        __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_t_12, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_1 = PyNumber_InPlaceAdd(__pyx_t_12, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 385, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 285, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 385, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_cursor_rect.x = __pyx_t_7;
 
-        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":284
+        /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":384
  *                 char_info = characters[current_char]
  * 
  *                 if use_kerning and previous_char in kernings and current_char in kernings[previous_char]:             # <<<<<<<<<<<<<<
@@ -6047,58 +7269,58 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
       }
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":287
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":387
  *                     cursor_rect.x += kernings[previous_char][current_char]
  * 
  *                 source_rect = char_info.rect             # <<<<<<<<<<<<<<
  *                 dest_rect.x = cursor_rect.x + char_info.xoffset
  *                 dest_rect.y = cursor_rect.y + char_info.yoffset
  */
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_rect); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_rect); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 387, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_13 = __pyx_convert__from_py_struct__SDL_Rect(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 287, __pyx_L1_error)
+      __pyx_t_13 = __pyx_convert__from_py_struct__SDL_Rect(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 387, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_source_rect = __pyx_t_13;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":288
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":388
  * 
  *                 source_rect = char_info.rect
  *                 dest_rect.x = cursor_rect.x + char_info.xoffset             # <<<<<<<<<<<<<<
  *                 dest_rect.y = cursor_rect.y + char_info.yoffset
  *                 SDL_BlitSurface(source_image, &source_rect, self.surface, &dest_rect)
  */
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_cursor_rect.x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 288, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_cursor_rect.x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_xoffset); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 288, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_xoffset); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_12 = PyNumber_Add(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 288, __pyx_L1_error)
+      __pyx_t_12 = PyNumber_Add(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_12); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 288, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_12); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_v_dest_rect.x = __pyx_t_7;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":289
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":389
  *                 source_rect = char_info.rect
  *                 dest_rect.x = cursor_rect.x + char_info.xoffset
  *                 dest_rect.y = cursor_rect.y + char_info.yoffset             # <<<<<<<<<<<<<<
  *                 SDL_BlitSurface(source_image, &source_rect, self.surface, &dest_rect)
  *                 cursor_rect.x += char_info.xadvance
  */
-      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cursor_rect.y); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 289, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyInt_From_int(__pyx_v_cursor_rect.y); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 389, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_yoffset); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 289, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_yoffset); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 389, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = PyNumber_Add(__pyx_t_12, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 289, __pyx_L1_error)
+      __pyx_t_1 = PyNumber_Add(__pyx_t_12, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 389, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 289, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_1); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 389, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_v_dest_rect.y = __pyx_t_7;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":290
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":390
  *                 dest_rect.x = cursor_rect.x + char_info.xoffset
  *                 dest_rect.y = cursor_rect.y + char_info.yoffset
  *                 SDL_BlitSurface(source_image, &source_rect, self.surface, &dest_rect)             # <<<<<<<<<<<<<<
@@ -6107,26 +7329,26 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
       SDL_BlitSurface(__pyx_v_source_image, (&__pyx_v_source_rect), __pyx_v_self->surface, (&__pyx_v_dest_rect));
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":291
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":391
  *                 dest_rect.y = cursor_rect.y + char_info.yoffset
  *                 SDL_BlitSurface(source_image, &source_rect, self.surface, &dest_rect)
  *                 cursor_rect.x += char_info.xadvance             # <<<<<<<<<<<<<<
  * 
  *             previous_char = current_char
  */
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_cursor_rect.x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_cursor_rect.x); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 391, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_xadvance); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_char_info, __pyx_n_s_xadvance); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 391, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_12 = PyNumber_InPlaceAdd(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 291, __pyx_L1_error)
+      __pyx_t_12 = PyNumber_InPlaceAdd(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 391, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_12); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 291, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyInt_As_int(__pyx_t_12); if (unlikely((__pyx_t_7 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 391, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
       __pyx_v_cursor_rect.x = __pyx_t_7;
 
-      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":281
+      /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":381
  *         for text_char in text:
  *             current_char = ord(text_char)
  *             if current_char in characters:             # <<<<<<<<<<<<<<
@@ -6135,7 +7357,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
     }
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":293
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":393
  *                 cursor_rect.x += char_info.xadvance
  * 
  *             previous_char = current_char             # <<<<<<<<<<<<<<
@@ -6144,9 +7366,9 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
     __pyx_v_previous_char = __pyx_v_current_char;
 
-    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":279
- *         use_kerning = container.options['font_kerning']
- * 
+    /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":379
+ *         # Copy each character in the text string from the bitmap font atlas to
+ *         # the output texture/surface
  *         for text_char in text:             # <<<<<<<<<<<<<<
  *             current_char = ord(text_char)
  *             if current_char in characters:
@@ -6154,7 +7376,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":248
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":346
  *             self.surface = NULL
  * 
  *     def render(self, container, text, x, y):             # <<<<<<<<<<<<<<
@@ -6184,7 +7406,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   return __pyx_r;
 }
 
-/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":295
+/* "mpfmc/uix/bitmap_font/bitmap_font.pyx":395
  *             previous_char = current_char
  * 
  *     def get_data(self):             # <<<<<<<<<<<<<<
@@ -6221,7 +7443,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("get_data", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":297
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":397
  *     def get_data(self):
  *         """Return the bitmap font surface as ImageData (pixels)."""
  *         cdef int datalen = self.surface.w * self.surface.h * 4             # <<<<<<<<<<<<<<
@@ -6230,29 +7452,29 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
  */
   __pyx_v_datalen = ((__pyx_v_self->surface->w * __pyx_v_self->surface->h) * 4);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":298
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":398
  *         """Return the bitmap font surface as ImageData (pixels)."""
  *         cdef int datalen = self.surface.w * self.surface.h * 4
  *         cdef bytes pixels = (<char *>self.surface.pixels)[:datalen]             # <<<<<<<<<<<<<<
  *         data = ImageData(self.w, self.h, 'rgba', pixels)
  *         return data
  */
-  __pyx_t_1 = __Pyx_PyBytes_FromStringAndSize(((char *)__pyx_v_self->surface->pixels) + 0, __pyx_v_datalen - 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBytes_FromStringAndSize(((char *)__pyx_v_self->surface->pixels) + 0, __pyx_v_datalen - 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 398, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_pixels = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":299
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":399
  *         cdef int datalen = self.surface.w * self.surface.h * 4
  *         cdef bytes pixels = (<char *>self.surface.pixels)[:datalen]
  *         data = ImageData(self.w, self.h, 'rgba', pixels)             # <<<<<<<<<<<<<<
  *         return data
  */
-  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_ImageData); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_ImageData); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->w); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_self->w); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_self->h); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_self->h); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -6266,7 +7488,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
       __pyx_t_6 = 1;
     }
   }
-  __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(4+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   if (__pyx_t_5) {
     __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -6283,14 +7505,14 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   PyTuple_SET_ITEM(__pyx_t_7, 3+__pyx_t_6, __pyx_v_pixels);
   __pyx_t_3 = 0;
   __pyx_t_4 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 299, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_data = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":300
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":400
  *         cdef bytes pixels = (<char *>self.surface.pixels)[:datalen]
  *         data = ImageData(self.w, self.h, 'rgba', pixels)
  *         return data             # <<<<<<<<<<<<<<
@@ -6300,7 +7522,7 @@ static PyObject *__pyx_pf_5mpfmc_3uix_11bitmap_font_11bitmap_font_17_SurfaceCont
   __pyx_r = __pyx_v_data;
   goto __pyx_L0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":295
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":395
  *             previous_char = current_char
  * 
  *     def get_data(self):             # <<<<<<<<<<<<<<
@@ -6446,7 +7668,7 @@ static struct SDL_Rect __pyx_convert__from_py_struct__SDL_Rect(PyObject *__pyx_v
  *     result.x = value
  *     try:
  */
-      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 19, __pyx_L6_except_error)
+      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__38, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 19, __pyx_L6_except_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_Raise(__pyx_t_9, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -6550,7 +7772,7 @@ static struct SDL_Rect __pyx_convert__from_py_struct__SDL_Rect(PyObject *__pyx_v
  *     result.y = value
  *     try:
  */
-      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 24, __pyx_L16_except_error)
+      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__39, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 24, __pyx_L16_except_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_Raise(__pyx_t_9, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -6654,7 +7876,7 @@ static struct SDL_Rect __pyx_convert__from_py_struct__SDL_Rect(PyObject *__pyx_v
  *     result.w = value
  *     try:
  */
-      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 29, __pyx_L26_except_error)
+      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__40, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 29, __pyx_L26_except_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_Raise(__pyx_t_9, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -6758,7 +7980,7 @@ static struct SDL_Rect __pyx_convert__from_py_struct__SDL_Rect(PyObject *__pyx_v
  *     result.h = value
  *     return result
  */
-      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 34, __pyx_L36_except_error)
+      __pyx_t_9 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__41, NULL); if (unlikely(!__pyx_t_9)) __PYX_ERR(1, 34, __pyx_L36_except_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_Raise(__pyx_t_9, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -7400,11 +8622,13 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_BitmapFontException, __pyx_k_BitmapFontException, sizeof(__pyx_k_BitmapFontException), 0, 0, 1, 1},
   {&__pyx_n_u_BitmapFontException, __pyx_k_BitmapFontException, sizeof(__pyx_k_BitmapFontException), 0, 1, 0, 1},
   {&__pyx_kp_u_Bitmap_font_descriptor_file_inva, __pyx_k_Bitmap_font_descriptor_file_inva, sizeof(__pyx_k_Bitmap_font_descriptor_file_inva), 0, 1, 0, 0},
+  {&__pyx_kp_u_Bitmap_font_descriptor_file_inva_2, __pyx_k_Bitmap_font_descriptor_file_inva_2, sizeof(__pyx_k_Bitmap_font_descriptor_file_inva_2), 0, 1, 0, 0},
   {&__pyx_kp_u_Could_not_load_bitmap_font_image, __pyx_k_Could_not_load_bitmap_font_image, sizeof(__pyx_k_Could_not_load_bitmap_font_image), 0, 1, 0, 0},
   {&__pyx_kp_u_Could_not_locate_the_bitmap_font, __pyx_k_Could_not_locate_the_bitmap_font, sizeof(__pyx_k_Could_not_locate_the_bitmap_font), 0, 1, 0, 0},
   {&__pyx_n_s_ElementTree, __pyx_k_ElementTree, sizeof(__pyx_k_ElementTree), 0, 0, 1, 1},
   {&__pyx_n_s_Exception, __pyx_k_Exception, sizeof(__pyx_k_Exception), 0, 0, 1, 1},
   {&__pyx_kp_s_Exception_returned_by_the_bitmap, __pyx_k_Exception_returned_by_the_bitmap, sizeof(__pyx_k_Exception_returned_by_the_bitmap), 0, 0, 1, 0},
+  {&__pyx_n_s_IGNORECASE, __pyx_k_IGNORECASE, sizeof(__pyx_k_IGNORECASE), 0, 0, 1, 1},
   {&__pyx_kp_u_Illegal_value_in_bitmap_font_des, __pyx_k_Illegal_value_in_bitmap_font_des, sizeof(__pyx_k_Illegal_value_in_bitmap_font_des), 0, 1, 0, 0},
   {&__pyx_n_s_ImageData, __pyx_k_ImageData, sizeof(__pyx_k_ImageData), 0, 0, 1, 1},
   {&__pyx_n_s_KeyError, __pyx_k_KeyError, sizeof(__pyx_k_KeyError), 0, 0, 1, 1},
@@ -7420,17 +8644,22 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_u_amount, __pyx_k_amount, sizeof(__pyx_k_amount), 0, 1, 0, 1},
   {&__pyx_n_s_attrib, __pyx_k_attrib, sizeof(__pyx_k_attrib), 0, 0, 1, 1},
   {&__pyx_n_u_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 1, 0, 1},
+  {&__pyx_kp_u_base_0_9_1_5, __pyx_k_base_0_9_1_5, sizeof(__pyx_k_base_0_9_1_5), 0, 1, 0, 0},
   {&__pyx_n_s_bitmap_font, __pyx_k_bitmap_font, sizeof(__pyx_k_bitmap_font), 0, 0, 1, 1},
   {&__pyx_n_u_char, __pyx_k_char, sizeof(__pyx_k_char), 0, 1, 0, 1},
+  {&__pyx_kp_u_char_s_id_P_id_0_9_1_4_s_x_P_x_0, __pyx_k_char_s_id_P_id_0_9_1_4_s_x_P_x_0, sizeof(__pyx_k_char_s_id_P_id_0_9_1_4_s_x_P_x_0), 0, 1, 0, 0},
   {&__pyx_n_u_chars, __pyx_k_chars, sizeof(__pyx_k_chars), 0, 1, 0, 1},
   {&__pyx_n_u_common, __pyx_k_common, sizeof(__pyx_k_common), 0, 1, 0, 1},
   {&__pyx_n_s_container, __pyx_k_container, sizeof(__pyx_k_container), 0, 0, 1, 1},
   {&__pyx_n_s_descriptor, __pyx_k_descriptor, sizeof(__pyx_k_descriptor), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
+  {&__pyx_n_s_enter, __pyx_k_enter, sizeof(__pyx_k_enter), 0, 0, 1, 1},
+  {&__pyx_n_s_exit, __pyx_k_exit, sizeof(__pyx_k_exit), 0, 0, 1, 1},
   {&__pyx_n_s_file, __pyx_k_file, sizeof(__pyx_k_file), 0, 0, 1, 1},
   {&__pyx_n_s_find, __pyx_k_find, sizeof(__pyx_k_find), 0, 0, 1, 1},
   {&__pyx_n_s_findall, __pyx_k_findall, sizeof(__pyx_k_findall), 0, 0, 1, 1},
   {&__pyx_n_u_first, __pyx_k_first, sizeof(__pyx_k_first), 0, 1, 0, 1},
+  {&__pyx_n_s_flags, __pyx_k_flags, sizeof(__pyx_k_flags), 0, 0, 1, 1},
   {&__pyx_n_s_font_kerning, __pyx_k_font_kerning, sizeof(__pyx_k_font_kerning), 0, 0, 1, 1},
   {&__pyx_n_u_font_kerning, __pyx_k_font_kerning, sizeof(__pyx_k_font_kerning), 0, 1, 0, 1},
   {&__pyx_n_s_get_characters, __pyx_k_get_characters, sizeof(__pyx_k_get_characters), 0, 0, 1, 1},
@@ -7438,6 +8667,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_get_image, __pyx_k_get_image, sizeof(__pyx_k_get_image), 0, 0, 1, 1},
   {&__pyx_n_s_get_kernings, __pyx_k_get_kernings, sizeof(__pyx_k_get_kernings), 0, 0, 1, 1},
   {&__pyx_n_s_getroot, __pyx_k_getroot, sizeof(__pyx_k_getroot), 0, 0, 1, 1},
+  {&__pyx_n_s_group, __pyx_k_group, sizeof(__pyx_k_group), 0, 0, 1, 1},
   {&__pyx_n_s_h, __pyx_k_h, sizeof(__pyx_k_h), 0, 0, 1, 1},
   {&__pyx_n_u_height, __pyx_k_height, sizeof(__pyx_k_height), 0, 1, 0, 1},
   {&__pyx_n_u_id, __pyx_k_id, sizeof(__pyx_k_id), 0, 1, 0, 1},
@@ -7446,9 +8676,11 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_u_info, __pyx_k_info, sizeof(__pyx_k_info), 0, 1, 0, 1},
   {&__pyx_n_s_isfile, __pyx_k_isfile, sizeof(__pyx_k_isfile), 0, 0, 1, 1},
   {&__pyx_n_u_kerning, __pyx_k_kerning, sizeof(__pyx_k_kerning), 0, 1, 0, 1},
+  {&__pyx_kp_u_kerning_s_first_P_first_0_9_1_3, __pyx_k_kerning_s_first_P_first_0_9_1_3, sizeof(__pyx_k_kerning_s_first_P_first_0_9_1_3), 0, 1, 0, 0},
   {&__pyx_n_u_kernings, __pyx_k_kernings, sizeof(__pyx_k_kernings), 0, 1, 0, 1},
   {&__pyx_n_s_kivy_core_image, __pyx_k_kivy_core_image, sizeof(__pyx_k_kivy_core_image), 0, 0, 1, 1},
   {&__pyx_n_u_lineHeight, __pyx_k_lineHeight, sizeof(__pyx_k_lineHeight), 0, 1, 0, 1},
+  {&__pyx_kp_u_lineHeight_0_9_1_5, __pyx_k_lineHeight_0_9_1_5, sizeof(__pyx_k_lineHeight_0_9_1_5), 0, 1, 0, 0},
   {&__pyx_n_s_load_descriptor_file, __pyx_k_load_descriptor_file, sizeof(__pyx_k_load_descriptor_file), 0, 0, 1, 1},
   {&__pyx_n_s_load_descriptor_list, __pyx_k_load_descriptor_list, sizeof(__pyx_k_load_descriptor_list), 0, 0, 1, 1},
   {&__pyx_n_s_load_descriptor_xml, __pyx_k_load_descriptor_xml, sizeof(__pyx_k_load_descriptor_xml), 0, 0, 1, 1},
@@ -7456,17 +8688,20 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_metaclass, __pyx_k_metaclass, sizeof(__pyx_k_metaclass), 0, 0, 1, 1},
   {&__pyx_n_s_module, __pyx_k_module, sizeof(__pyx_k_module), 0, 0, 1, 1},
   {&__pyx_n_s_mpfmc_uix_bitmap_font_bitmap_fon, __pyx_k_mpfmc_uix_bitmap_font_bitmap_fon, sizeof(__pyx_k_mpfmc_uix_bitmap_font_bitmap_fon), 0, 0, 1, 1},
+  {&__pyx_n_s_open, __pyx_k_open, sizeof(__pyx_k_open), 0, 0, 1, 1},
   {&__pyx_n_s_options, __pyx_k_options, sizeof(__pyx_k_options), 0, 0, 1, 1},
   {&__pyx_n_s_os, __pyx_k_os, sizeof(__pyx_k_os), 0, 0, 1, 1},
   {&__pyx_n_s_path, __pyx_k_path, sizeof(__pyx_k_path), 0, 0, 1, 1},
   {&__pyx_n_s_prepare, __pyx_k_prepare, sizeof(__pyx_k_prepare), 0, 0, 1, 1},
   {&__pyx_n_s_qualname, __pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 0, 1, 1},
+  {&__pyx_n_s_re, __pyx_k_re, sizeof(__pyx_k_re), 0, 0, 1, 1},
   {&__pyx_n_s_rect, __pyx_k_rect, sizeof(__pyx_k_rect), 0, 0, 1, 1},
   {&__pyx_n_u_rgba, __pyx_k_rgba, sizeof(__pyx_k_rgba), 0, 1, 0, 1},
+  {&__pyx_n_s_search, __pyx_k_search, sizeof(__pyx_k_search), 0, 0, 1, 1},
   {&__pyx_n_u_second, __pyx_k_second, sizeof(__pyx_k_second), 0, 1, 0, 1},
+  {&__pyx_n_s_startswith, __pyx_k_startswith, sizeof(__pyx_k_startswith), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_text, __pyx_k_text, sizeof(__pyx_k_text), 0, 0, 1, 1},
-  {&__pyx_n_s_tostring, __pyx_k_tostring, sizeof(__pyx_k_tostring), 0, 0, 1, 1},
   {&__pyx_n_s_w, __pyx_k_w, sizeof(__pyx_k_w), 0, 0, 1, 1},
   {&__pyx_n_u_width, __pyx_k_width, sizeof(__pyx_k_width), 0, 1, 0, 1},
   {&__pyx_n_s_x, __pyx_k_x, sizeof(__pyx_k_x), 0, 0, 1, 1},
@@ -7483,7 +8718,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_Exception = __Pyx_GetBuiltinName(__pyx_n_s_Exception); if (!__pyx_builtin_Exception) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_builtin_Exception = __Pyx_GetBuiltinName(__pyx_n_s_Exception); if (!__pyx_builtin_Exception) __PYX_ERR(0, 20, __pyx_L1_error)
+  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) __PYX_ERR(0, 175, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 14, __pyx_L1_error)
   __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) __PYX_ERR(1, 18, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(1, 19, __pyx_L1_error)
@@ -7496,137 +8732,401 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":85
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":86
  * 
  *         if image == NULL:
  *             raise BitmapFontException("Could not load bitmap font image file")             # <<<<<<<<<<<<<<
  * 
  *         self.image = image
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_Could_not_load_bitmap_font_image); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_Could_not_load_bitmap_font_image); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 86, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":96
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":97
  *             self._load_descriptor_file(descriptor)
  *         else:
  *             raise BitmapFontException("Illegal value in bitmap font descriptor")             # <<<<<<<<<<<<<<
  * 
  *     def __dealloc__(self):
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_Illegal_value_in_bitmap_font_des); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 96, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_Illegal_value_in_bitmap_font_des); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 97, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":154
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":179
+ *             # Loop over all the rows in the descriptor file
+ *             for line in text_file:
+ *                 if line.startswith("info"):             # <<<<<<<<<<<<<<
+ *                     pass
+ * 
+ */
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_n_u_info); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 179, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__4);
+  __Pyx_GIVEREF(__pyx_tuple__4);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":182
+ *                     pass
+ * 
+ *                 elif line.startswith("common"):             # <<<<<<<<<<<<<<
+ *                     m = re.search(r"lineHeight=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:
+ */
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_n_u_common); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 182, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__5);
+  __Pyx_GIVEREF(__pyx_tuple__5);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":185
+ *                     m = re.search(r"lineHeight=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:
+ *                         self.line_height = int(m.group(1))             # <<<<<<<<<<<<<<
+ *                     else:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ */
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_int_1); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 185, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__6);
+  __Pyx_GIVEREF(__pyx_tuple__6);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":187
+ *                         self.line_height = int(m.group(1))
+ *                     else:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")             # <<<<<<<<<<<<<<
+ * 
+ *                     m = re.search(r"base=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ */
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 187, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__7);
+  __Pyx_GIVEREF(__pyx_tuple__7);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":191
+ *                     m = re.search(r"base=([0-9]{1,5})", line, flags=re.IGNORECASE)
+ *                     if m:
+ *                         self.base = int(m.group(1))             # <<<<<<<<<<<<<<
+ *                     else:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ */
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_int_1); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__8);
+  __Pyx_GIVEREF(__pyx_tuple__8);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":193
+ *                         self.base = int(m.group(1))
+ *                     else:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")             # <<<<<<<<<<<<<<
+ * 
+ *                 elif line.startswith("chars"):
+ */
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__9);
+  __Pyx_GIVEREF(__pyx_tuple__9);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":195
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ *                 elif line.startswith("chars"):             # <<<<<<<<<<<<<<
+ *                     pass
+ * 
+ */
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_n_u_chars); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 195, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":198
+ *                     pass
+ * 
+ *                 elif line.startswith("char"):             # <<<<<<<<<<<<<<
+ *                     m = re.search(r"char\s+id=(?P<id>[0-9]{1,4})\s+x=(?P<x>[0-9]{1,4})\s+y=(?P<y>[0-9]{1,4})"
+ *                                   r"\s+width=(?P<width>[0-9]{1,3})\s+height=(?P<height>[0-9]{1,3})"
+ */
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_n_u_char); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 198, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__11);
+  __Pyx_GIVEREF(__pyx_tuple__11);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":205
+ *                                   r"\s+chnl=(?P<chnl>[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")             # <<<<<<<<<<<<<<
+ * 
+ *                     char_id = int(m.group("id"))
+ */
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__12);
+  __Pyx_GIVEREF(__pyx_tuple__12);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":207
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ *                     char_id = int(m.group("id"))             # <<<<<<<<<<<<<<
+ *                     if char_id > 256:
+ *                         continue
+ */
+  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_n_u_id); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 207, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__13);
+  __Pyx_GIVEREF(__pyx_tuple__13);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":217
+ *                         character = BitmapFontCharacter()
+ *                         character.id = char_id
+ *                         character.rect.x = int(m.group("x"))             # <<<<<<<<<<<<<<
+ *                         character.rect.y = int(m.group("y"))
+ *                         character.rect.w = int(m.group("width"))
+ */
+  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_n_u_x); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 217, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__14);
+  __Pyx_GIVEREF(__pyx_tuple__14);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":218
+ *                         character.id = char_id
+ *                         character.rect.x = int(m.group("x"))
+ *                         character.rect.y = int(m.group("y"))             # <<<<<<<<<<<<<<
+ *                         character.rect.w = int(m.group("width"))
+ *                         character.rect.h = int(m.group("height"))
+ */
+  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_n_u_y); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 218, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__15);
+  __Pyx_GIVEREF(__pyx_tuple__15);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":219
+ *                         character.rect.x = int(m.group("x"))
+ *                         character.rect.y = int(m.group("y"))
+ *                         character.rect.w = int(m.group("width"))             # <<<<<<<<<<<<<<
+ *                         character.rect.h = int(m.group("height"))
+ *                         character.xoffset = int(m.group("xoffset"))
+ */
+  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_n_u_width); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 219, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":220
+ *                         character.rect.y = int(m.group("y"))
+ *                         character.rect.w = int(m.group("width"))
+ *                         character.rect.h = int(m.group("height"))             # <<<<<<<<<<<<<<
+ *                         character.xoffset = int(m.group("xoffset"))
+ *                         character.yoffset = int(m.group("yoffset"))
+ */
+  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_n_u_height); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 220, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__17);
+  __Pyx_GIVEREF(__pyx_tuple__17);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":221
+ *                         character.rect.w = int(m.group("width"))
+ *                         character.rect.h = int(m.group("height"))
+ *                         character.xoffset = int(m.group("xoffset"))             # <<<<<<<<<<<<<<
+ *                         character.yoffset = int(m.group("yoffset"))
+ *                         character.xadvance = int(m.group("xadvance"))
+ */
+  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_n_u_xoffset); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 221, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__18);
+  __Pyx_GIVEREF(__pyx_tuple__18);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":222
+ *                         character.rect.h = int(m.group("height"))
+ *                         character.xoffset = int(m.group("xoffset"))
+ *                         character.yoffset = int(m.group("yoffset"))             # <<<<<<<<<<<<<<
+ *                         character.xadvance = int(m.group("xadvance"))
+ * 
+ */
+  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_n_u_yoffset); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(0, 222, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__19);
+  __Pyx_GIVEREF(__pyx_tuple__19);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":223
+ *                         character.xoffset = int(m.group("xoffset"))
+ *                         character.yoffset = int(m.group("yoffset"))
+ *                         character.xadvance = int(m.group("xadvance"))             # <<<<<<<<<<<<<<
+ * 
+ *                         self.characters[character.id] = character
+ */
+  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_n_u_xadvance); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(0, 223, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":227
+ *                         self.characters[character.id] = character
+ * 
+ *                 elif line.startswith("kernings"):             # <<<<<<<<<<<<<<
+ *                     pass
+ * 
+ */
+  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_n_u_kernings); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__21);
+  __Pyx_GIVEREF(__pyx_tuple__21);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":230
+ *                     pass
+ * 
+ *                 elif line.startswith("kerning"):             # <<<<<<<<<<<<<<
+ *                     m = re.search(r"kerning\s+first=(?P<first>[0-9]{1,3})\s+second=(?P<second>[0-9]{1,3})"
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+ */
+  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_n_u_kerning); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(0, 230, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__22);
+  __Pyx_GIVEREF(__pyx_tuple__22);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":234
+ *                                   r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+ *                     if not m:
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")             # <<<<<<<<<<<<<<
+ * 
+ *                     first = int(m.group("first"))
+ */
+  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 234, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":236
+ *                         raise BitmapFontException("Bitmap font descriptor file invalid format")
+ * 
+ *                     first = int(m.group("first"))             # <<<<<<<<<<<<<<
+ *                     second = int(m.group("second"))
+ * 
+ */
+  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_n_u_first); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(0, 236, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__24);
+  __Pyx_GIVEREF(__pyx_tuple__24);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":237
+ * 
+ *                     first = int(m.group("first"))
+ *                     second = int(m.group("second"))             # <<<<<<<<<<<<<<
+ * 
+ *                     if first not in self.kernings:
+ */
+  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_n_u_second); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(0, 237, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__25);
+  __Pyx_GIVEREF(__pyx_tuple__25);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":243
+ * 
+ *                     if second not in self.kernings[first]:
+ *                         self.kernings[first][second] = int(m.group("amount"))             # <<<<<<<<<<<<<<
+ * 
+ *     def _load_descriptor_xml(self, xml_tree: ElementTree):
+ */
+  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_n_u_amount); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 243, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__26);
+  __Pyx_GIVEREF(__pyx_tuple__26);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":175
+ * 
+ *         # Open the descriptor file
+ *         with open(descriptor_file) as text_file:             # <<<<<<<<<<<<<<
+ * 
+ *             # Loop over all the rows in the descriptor file
+ */
+  __pyx_tuple__27 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(0, 175, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__27);
+  __Pyx_GIVEREF(__pyx_tuple__27);
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":252
  *         root = xml_tree.getroot()
  *         if root is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")             # <<<<<<<<<<<<<<
  * 
  *         # info
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 154, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__4);
-  __Pyx_GIVEREF(__pyx_tuple__4);
+  __pyx_tuple__28 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva_2); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 252, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__28);
+  __Pyx_GIVEREF(__pyx_tuple__28);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":157
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":255
  * 
  *         # info
  *         info = root.find('info')             # <<<<<<<<<<<<<<
  *         if info is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_n_u_info); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 157, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__5);
-  __Pyx_GIVEREF(__pyx_tuple__5);
+  __pyx_tuple__29 = PyTuple_Pack(1, __pyx_n_u_info); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(0, 255, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__29);
+  __Pyx_GIVEREF(__pyx_tuple__29);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":159
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":257
  *         info = root.find('info')
  *         if info is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")             # <<<<<<<<<<<<<<
  * 
  *         # common
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 159, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__6);
-  __Pyx_GIVEREF(__pyx_tuple__6);
+  __pyx_tuple__30 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva_2); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 257, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__30);
+  __Pyx_GIVEREF(__pyx_tuple__30);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":162
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":260
  * 
  *         # common
  *         common = root.find('common')             # <<<<<<<<<<<<<<
  *         if common is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_n_u_common); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 162, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__7);
-  __Pyx_GIVEREF(__pyx_tuple__7);
+  __pyx_tuple__31 = PyTuple_Pack(1, __pyx_n_u_common); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 260, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__31);
+  __Pyx_GIVEREF(__pyx_tuple__31);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":164
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":262
  *         common = root.find('common')
  *         if common is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")             # <<<<<<<<<<<<<<
  * 
  *         self.line_height = int(common.attrib["lineHeight"])
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 164, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_tuple__32 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva_2); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 262, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__32);
+  __Pyx_GIVEREF(__pyx_tuple__32);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":170
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":268
  * 
  *         # characters
  *         chars = root.find('chars')             # <<<<<<<<<<<<<<
  *         if chars is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_n_u_chars); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 170, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__9);
-  __Pyx_GIVEREF(__pyx_tuple__9);
+  __pyx_tuple__33 = PyTuple_Pack(1, __pyx_n_u_chars); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 268, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__33);
+  __Pyx_GIVEREF(__pyx_tuple__33);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":172
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":270
  *         chars = root.find('chars')
  *         if chars is None:
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")             # <<<<<<<<<<<<<<
  * 
  *         for text_char in chars.findall('char'):
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 172, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__10);
-  __Pyx_GIVEREF(__pyx_tuple__10);
+  __pyx_tuple__34 = PyTuple_Pack(1, __pyx_kp_u_Bitmap_font_descriptor_file_inva_2); if (unlikely(!__pyx_tuple__34)) __PYX_ERR(0, 270, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__34);
+  __Pyx_GIVEREF(__pyx_tuple__34);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":174
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":272
  *             raise BitmapFontException("Bitmap font descriptor file invalid XML format")
  * 
  *         for text_char in chars.findall('char'):             # <<<<<<<<<<<<<<
  *             character = BitmapFontCharacter()
  *             character.id = int(text_char.attrib["id"])
  */
-  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_n_u_char); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 174, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__11);
-  __Pyx_GIVEREF(__pyx_tuple__11);
+  __pyx_tuple__35 = PyTuple_Pack(1, __pyx_n_u_char); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 272, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__35);
+  __Pyx_GIVEREF(__pyx_tuple__35);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":188
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":286
  * 
  *         # kerning
  *         kernings = root.find('kernings')             # <<<<<<<<<<<<<<
  *         if kernings is not None:
  *             for kerning in kernings.findall('kerning'):
  */
-  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_n_u_kernings); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 188, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__12);
-  __Pyx_GIVEREF(__pyx_tuple__12);
+  __pyx_tuple__36 = PyTuple_Pack(1, __pyx_n_u_kernings); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(0, 286, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__36);
+  __Pyx_GIVEREF(__pyx_tuple__36);
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":190
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":288
  *         kernings = root.find('kernings')
  *         if kernings is not None:
  *             for kerning in kernings.findall('kerning'):             # <<<<<<<<<<<<<<
  *                 first = int(kerning.attrib["first"])
  *                 second = int(kerning.attrib["second"])
  */
-  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_n_u_kerning); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 190, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__13);
-  __Pyx_GIVEREF(__pyx_tuple__13);
+  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_n_u_kerning); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 288, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__37);
+  __Pyx_GIVEREF(__pyx_tuple__37);
 
   /* "FromPyStructUtility":19
  *         value = obj['x']
@@ -7635,9 +9135,9 @@ static int __Pyx_InitCachedConstants(void) {
  *     result.x = value
  *     try:
  */
-  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_s_No_value_specified_for_struct_at); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(1, 19, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__14);
-  __Pyx_GIVEREF(__pyx_tuple__14);
+  __pyx_tuple__38 = PyTuple_Pack(1, __pyx_kp_s_No_value_specified_for_struct_at); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(1, 19, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__38);
+  __Pyx_GIVEREF(__pyx_tuple__38);
 
   /* "FromPyStructUtility":24
  *         value = obj['y']
@@ -7646,9 +9146,9 @@ static int __Pyx_InitCachedConstants(void) {
  *     result.y = value
  *     try:
  */
-  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_s_No_value_specified_for_struct_at_2); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(1, 24, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__15);
-  __Pyx_GIVEREF(__pyx_tuple__15);
+  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_kp_s_No_value_specified_for_struct_at_2); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(1, 24, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__39);
+  __Pyx_GIVEREF(__pyx_tuple__39);
 
   /* "FromPyStructUtility":29
  *         value = obj['w']
@@ -7657,9 +9157,9 @@ static int __Pyx_InitCachedConstants(void) {
  *     result.w = value
  *     try:
  */
-  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_s_No_value_specified_for_struct_at_3); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(1, 29, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__16);
-  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_tuple__40 = PyTuple_Pack(1, __pyx_kp_s_No_value_specified_for_struct_at_3); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(1, 29, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__40);
+  __Pyx_GIVEREF(__pyx_tuple__40);
 
   /* "FromPyStructUtility":34
  *         value = obj['h']
@@ -7668,9 +9168,9 @@ static int __Pyx_InitCachedConstants(void) {
  *     result.h = value
  *     return result
  */
-  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_s_No_value_specified_for_struct_at_4); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(1, 34, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__17);
-  __Pyx_GIVEREF(__pyx_tuple__17);
+  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_kp_s_No_value_specified_for_struct_at_4); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(1, 34, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__41);
+  __Pyx_GIVEREF(__pyx_tuple__41);
 
   /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":4
  * #cython: embedsignature=True, language_level=3
@@ -7679,9 +9179,9 @@ static int __Pyx_InitCachedConstants(void) {
  *            'BitmapFontException',
  *            '_SurfaceContainer',
  */
-  __pyx_tuple__18 = PyTuple_Pack(3, __pyx_n_u_BitmapFont, __pyx_n_u_BitmapFontException, __pyx_n_u_SurfaceContainer); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 4, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__18);
-  __Pyx_GIVEREF(__pyx_tuple__18);
+  __pyx_tuple__42 = PyTuple_Pack(3, __pyx_n_u_BitmapFont, __pyx_n_u_BitmapFontException, __pyx_n_u_SurfaceContainer); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 4, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__42);
+  __Pyx_GIVEREF(__pyx_tuple__42);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -7691,6 +9191,7 @@ static int __Pyx_InitCachedConstants(void) {
 
 static int __Pyx_InitGlobals(void) {
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  __pyx_int_1 = PyInt_FromLong(1); if (unlikely(!__pyx_int_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_4 = PyInt_FromLong(4); if (unlikely(!__pyx_int_4)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -7784,17 +9285,17 @@ PyMODINIT_FUNC PyInit_bitmap_font(void)
   /*--- Variable export code ---*/
   /*--- Function export code ---*/
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter) < 0) __PYX_ERR(0, 24, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
   __pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "BitmapFontCharacter", (PyObject *)&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter) < 0) __PYX_ERR(0, 24, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "BitmapFontCharacter", (PyObject *)&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter) < 0) __PYX_ERR(0, 25, __pyx_L1_error)
   __pyx_ptype_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter = &__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFontCharacter;
-  if (PyType_Ready(&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
   __pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "BitmapFont", (PyObject *)&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont) < 0) __PYX_ERR(0, 42, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "BitmapFont", (PyObject *)&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont) < 0) __PYX_ERR(0, 43, __pyx_L1_error)
   __pyx_ptype_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont = &__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font_BitmapFont;
-  if (PyType_Ready(&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer) < 0) __PYX_ERR(0, 226, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer) < 0) __PYX_ERR(0, 324, __pyx_L1_error)
   __pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "_SurfaceContainer", (PyObject *)&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer) < 0) __PYX_ERR(0, 226, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "_SurfaceContainer", (PyObject *)&__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer) < 0) __PYX_ERR(0, 324, __pyx_L1_error)
   __pyx_ptype_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer = &__pyx_type_5mpfmc_3uix_11bitmap_font_11bitmap_font__SurfaceContainer;
   /*--- Type import code ---*/
   /*--- Variable import code ---*/
@@ -7811,37 +9312,49 @@ PyMODINIT_FUNC PyInit_bitmap_font(void)
  *            'BitmapFontException',
  *            '_SurfaceContainer',
  */
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_all, __pyx_tuple__18) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_all, __pyx_tuple__42) < 0) __PYX_ERR(0, 4, __pyx_L1_error)
 
   /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":13
  * cimport cpython.pycapsule as pycapsule
  * 
+ * import re             # <<<<<<<<<<<<<<
+ * from os import path
+ * from xml.etree.ElementTree import ElementTree, ParseError
+ */
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_re, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_re, __pyx_t_1) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":14
+ * 
+ * import re
  * from os import path             # <<<<<<<<<<<<<<
- * from xml.etree.ElementTree import ElementTree, ParseError, tostring
+ * from xml.etree.ElementTree import ElementTree, ParseError
  * from libc.string cimport memset
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_path);
   __Pyx_GIVEREF(__pyx_n_s_path);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_path);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_os, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_os, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 13, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_path); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_path, __pyx_t_1) < 0) __PYX_ERR(0, 13, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_path, __pyx_t_1) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":14
- * 
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":15
+ * import re
  * from os import path
- * from xml.etree.ElementTree import ElementTree, ParseError, tostring             # <<<<<<<<<<<<<<
+ * from xml.etree.ElementTree import ElementTree, ParseError             # <<<<<<<<<<<<<<
  * from libc.string cimport memset
  * from kivy.core.image import ImageData
  */
-  __pyx_t_2 = PyList_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_n_s_ElementTree);
   __Pyx_GIVEREF(__pyx_n_s_ElementTree);
@@ -7849,66 +9362,59 @@ PyMODINIT_FUNC PyInit_bitmap_font(void)
   __Pyx_INCREF(__pyx_n_s_ParseError);
   __Pyx_GIVEREF(__pyx_n_s_ParseError);
   PyList_SET_ITEM(__pyx_t_2, 1, __pyx_n_s_ParseError);
-  __Pyx_INCREF(__pyx_n_s_tostring);
-  __Pyx_GIVEREF(__pyx_n_s_tostring);
-  PyList_SET_ITEM(__pyx_t_2, 2, __pyx_n_s_tostring);
-  __pyx_t_1 = __Pyx_Import(__pyx_n_s_xml_etree_ElementTree, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Import(__pyx_n_s_xml_etree_ElementTree, __pyx_t_2, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_ElementTree); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_ElementTree); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ElementTree, __pyx_t_2) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ElementTree, __pyx_t_2) < 0) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_ParseError); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_ParseError); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ParseError, __pyx_t_2) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_ImportFrom(__pyx_t_1, __pyx_n_s_tostring); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 14, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_tostring, __pyx_t_2) < 0) __PYX_ERR(0, 14, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ParseError, __pyx_t_2) < 0) __PYX_ERR(0, 15, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":16
- * from xml.etree.ElementTree import ElementTree, ParseError, tostring
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":17
+ * from xml.etree.ElementTree import ElementTree, ParseError
  * from libc.string cimport memset
  * from kivy.core.image import ImageData             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_INCREF(__pyx_n_s_ImageData);
   __Pyx_GIVEREF(__pyx_n_s_ImageData);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_ImageData);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_kivy_core_image, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_kivy_core_image, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_ImageData); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 16, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_ImageData); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ImageData, __pyx_t_1) < 0) __PYX_ERR(0, 16, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ImageData, __pyx_t_1) < 0) __PYX_ERR(0, 17, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":19
+  /* "mpfmc/uix/bitmap_font/bitmap_font.pyx":20
  * 
  * 
  * class BitmapFontException(Exception):             # <<<<<<<<<<<<<<
  *     """Exception returned by the bitmap font module"""
  *     pass
  */
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(__pyx_builtin_Exception);
   __Pyx_GIVEREF(__pyx_builtin_Exception);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_builtin_Exception);
-  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_CalculateMetaclass(NULL, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_BitmapFontException, __pyx_n_s_BitmapFontException, (PyObject *) NULL, __pyx_n_s_mpfmc_uix_bitmap_font_bitmap_fon, __pyx_kp_s_Exception_returned_by_the_bitmap); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_Py3MetaclassPrepare(__pyx_t_1, __pyx_t_2, __pyx_n_s_BitmapFontException, __pyx_n_s_BitmapFontException, (PyObject *) NULL, __pyx_n_s_mpfmc_uix_bitmap_font_bitmap_fon, __pyx_kp_s_Exception_returned_by_the_bitmap); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_BitmapFontException, __pyx_t_2, __pyx_t_3, NULL, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_1, __pyx_n_s_BitmapFontException, __pyx_t_2, __pyx_t_3, NULL, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_BitmapFontException, __pyx_t_4) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_BitmapFontException, __pyx_t_4) < 0) __PYX_ERR(0, 20, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -8636,8 +10142,69 @@ static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObje
     return __Pyx_SetItemInt_Generic(o, PyInt_FromSsize_t(i), v);
 }
 
+/* GetException */
+          #if CYTHON_COMPILING_IN_CPYTHON
+static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
+#else
+static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb) {
+#endif
+    PyObject *local_type, *local_value, *local_tb;
+#if CYTHON_COMPILING_IN_CPYTHON
+    PyObject *tmp_type, *tmp_value, *tmp_tb;
+    local_type = tstate->curexc_type;
+    local_value = tstate->curexc_value;
+    local_tb = tstate->curexc_traceback;
+    tstate->curexc_type = 0;
+    tstate->curexc_value = 0;
+    tstate->curexc_traceback = 0;
+#else
+    PyErr_Fetch(&local_type, &local_value, &local_tb);
+#endif
+    PyErr_NormalizeException(&local_type, &local_value, &local_tb);
+#if CYTHON_COMPILING_IN_CPYTHON
+    if (unlikely(tstate->curexc_type))
+#else
+    if (unlikely(PyErr_Occurred()))
+#endif
+        goto bad;
+    #if PY_MAJOR_VERSION >= 3
+    if (local_tb) {
+        if (unlikely(PyException_SetTraceback(local_value, local_tb) < 0))
+            goto bad;
+    }
+    #endif
+    Py_XINCREF(local_tb);
+    Py_XINCREF(local_type);
+    Py_XINCREF(local_value);
+    *type = local_type;
+    *value = local_value;
+    *tb = local_tb;
+#if CYTHON_COMPILING_IN_CPYTHON
+    tmp_type = tstate->exc_type;
+    tmp_value = tstate->exc_value;
+    tmp_tb = tstate->exc_traceback;
+    tstate->exc_type = local_type;
+    tstate->exc_value = local_value;
+    tstate->exc_traceback = local_tb;
+    Py_XDECREF(tmp_type);
+    Py_XDECREF(tmp_value);
+    Py_XDECREF(tmp_tb);
+#else
+    PyErr_SetExcInfo(local_type, local_value, local_tb);
+#endif
+    return 0;
+bad:
+    *type = 0;
+    *value = 0;
+    *tb = 0;
+    Py_XDECREF(local_type);
+    Py_XDECREF(local_value);
+    Py_XDECREF(local_tb);
+    return -1;
+}
+
 /* unicode_iter */
-          static CYTHON_INLINE int __Pyx_init_unicode_iteration(
+            static CYTHON_INLINE int __Pyx_init_unicode_iteration(
     PyObject* ustring, Py_ssize_t *length, void** data, int *kind) {
 #if CYTHON_PEP393_ENABLED
     if (unlikely(__Pyx_PyUnicode_READY(ustring) < 0)) return -1;
@@ -8653,7 +10220,7 @@ static CYTHON_INLINE int __Pyx_SetItemInt_Fast(PyObject *o, Py_ssize_t i, PyObje
 }
 
 /* GetItemInt */
-          static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
+            static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Generic(PyObject *o, PyObject* j) {
     PyObject *r;
     if (!j) return NULL;
     r = PyObject_GetItem(o, j);
@@ -8731,67 +10298,6 @@ static CYTHON_INLINE PyObject *__Pyx_GetItemInt_Fast(PyObject *o, Py_ssize_t i, 
     }
 #endif
     return __Pyx_GetItemInt_Generic(o, PyInt_FromSsize_t(i));
-}
-
-/* GetException */
-          #if CYTHON_COMPILING_IN_CPYTHON
-static int __Pyx__GetException(PyThreadState *tstate, PyObject **type, PyObject **value, PyObject **tb) {
-#else
-static int __Pyx_GetException(PyObject **type, PyObject **value, PyObject **tb) {
-#endif
-    PyObject *local_type, *local_value, *local_tb;
-#if CYTHON_COMPILING_IN_CPYTHON
-    PyObject *tmp_type, *tmp_value, *tmp_tb;
-    local_type = tstate->curexc_type;
-    local_value = tstate->curexc_value;
-    local_tb = tstate->curexc_traceback;
-    tstate->curexc_type = 0;
-    tstate->curexc_value = 0;
-    tstate->curexc_traceback = 0;
-#else
-    PyErr_Fetch(&local_type, &local_value, &local_tb);
-#endif
-    PyErr_NormalizeException(&local_type, &local_value, &local_tb);
-#if CYTHON_COMPILING_IN_CPYTHON
-    if (unlikely(tstate->curexc_type))
-#else
-    if (unlikely(PyErr_Occurred()))
-#endif
-        goto bad;
-    #if PY_MAJOR_VERSION >= 3
-    if (local_tb) {
-        if (unlikely(PyException_SetTraceback(local_value, local_tb) < 0))
-            goto bad;
-    }
-    #endif
-    Py_XINCREF(local_tb);
-    Py_XINCREF(local_type);
-    Py_XINCREF(local_value);
-    *type = local_type;
-    *value = local_value;
-    *tb = local_tb;
-#if CYTHON_COMPILING_IN_CPYTHON
-    tmp_type = tstate->exc_type;
-    tmp_value = tstate->exc_value;
-    tmp_tb = tstate->exc_traceback;
-    tstate->exc_type = local_type;
-    tstate->exc_value = local_value;
-    tstate->exc_traceback = local_tb;
-    Py_XDECREF(tmp_type);
-    Py_XDECREF(tmp_value);
-    Py_XDECREF(tmp_tb);
-#else
-    PyErr_SetExcInfo(local_type, local_value, local_tb);
-#endif
-    return 0;
-bad:
-    *type = 0;
-    *value = 0;
-    *tb = 0;
-    Py_XDECREF(local_type);
-    Py_XDECREF(local_value);
-    Py_XDECREF(local_tb);
-    return -1;
 }
 
 /* Import */

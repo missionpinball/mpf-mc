@@ -10,8 +10,9 @@ include 'bitmap_font.pxi'
 
 cimport cpython.pycapsule as pycapsule
 
+import re
 from os import path
-from xml.etree.ElementTree import ElementTree, ParseError, tostring
+from xml.etree.ElementTree import ElementTree, ParseError
 from libc.string cimport memset
 from kivy.core.image import ImageData
 
@@ -111,42 +112,139 @@ cdef class BitmapFont:
         return self.kernings
 
     def _load_descriptor_list(self, list descriptor_list):
+        """Load the descriptor from the supplied list."""
         cdef int x = 0
         cdef int y = 0
         cdef int row_height = int(self.scale_h / len(descriptor_list))
         cdef int char_width
+        cdef int char_id
         self.line_height = row_height
         self.base = row_height
 
+        # Loop over all the rows in the descriptor list
         for row in descriptor_list:
             char_width = int(self.scale_w / len(row))
             x = 0
-            for text_char in row:
-                character = BitmapFontCharacter()
-                character.id = ord(text_char)
-                character.rect.x = x
-                character.rect.y = y
-                character.rect.w = char_width
-                character.rect.h = row_height
-                character.xadvance = char_width
 
-                self.characters[character.id] = character
-                x += char_width
+            # Loop over all characters in the row
+            for text_char in row:
+                char_id = ord(text_char)
+
+                # Do not add duplicate character definitions (only use the first instance)
+                if char_id not in self.characters:
+
+                    # Create character definition
+                    character = BitmapFontCharacter()
+                    character.id = char_id
+                    character.rect.x = x
+                    character.rect.y = y
+                    character.rect.w = char_width
+                    character.rect.h = row_height
+                    character.xadvance = char_width
+
+                    self.characters[character.id] = character
+                    x += char_width
 
             y += row_height
 
     def _load_descriptor_file(self, str descriptor_file):
+        """Load the descriptor from the specified file.  Both XML and text
+        formats are supported (not binary currently).
+
+        The standard bitmap font descriptor file format can be found at:
+        http://www.angelcode.com/products/bmfont/doc/file_format.html
+        """
+        cdef int char_id
+        cdef int first
+        cdef int second
+
         if not path.isfile(descriptor_file):
             raise BitmapFontException('Could not locate the bitmap font descriptor file ' +
                                       descriptor_file)
 
+        # Attempt to parse the file as an XML file
         try:
             xml_tree = ElementTree(file=descriptor_file)
             self._load_descriptor_xml(xml_tree)
         except ParseError:
             pass
 
+        # Assume since the XML parser threw an exception that this is a text file
+
+        # Open the descriptor file
+        with open(descriptor_file) as text_file:
+
+            # Loop over all the rows in the descriptor file
+            for line in text_file:
+                if line.startswith("info"):
+                    pass
+
+                elif line.startswith("common"):
+                    m = re.search(r"lineHeight=([0-9]{1,5})", line, flags=re.IGNORECASE)
+                    if m:
+                        self.line_height = int(m.group(1))
+                    else:
+                        raise BitmapFontException("Bitmap font descriptor file invalid format")
+
+                    m = re.search(r"base=([0-9]{1,5})", line, flags=re.IGNORECASE)
+                    if m:
+                        self.base = int(m.group(1))
+                    else:
+                        raise BitmapFontException("Bitmap font descriptor file invalid format")
+
+                elif line.startswith("chars"):
+                    pass
+
+                elif line.startswith("char"):
+                    m = re.search(r"char\s+id=(?P<id>[0-9]{1,4})\s+x=(?P<x>[0-9]{1,4})\s+y=(?P<y>[0-9]{1,4})"
+                                  r"\s+width=(?P<width>[0-9]{1,3})\s+height=(?P<height>[0-9]{1,3})"
+                                  r"\s+xoffset=(?P<xoffset>-?[0-9]{1,3})\s+yoffset=(?P<yoffset>-?[0-9]{1,3})"
+                                  r"\s+xadvance=(?P<xadvance>[0-9]{1,3})\s+page=(?P<page>[0-9]{1,2})"
+                                  r"\s+chnl=(?P<chnl>[0-9]{1,3})", line, flags=re.IGNORECASE)
+                    if not m:
+                        raise BitmapFontException("Bitmap font descriptor file invalid format")
+
+                    char_id = int(m.group("id"))
+                    if char_id > 256:
+                        continue
+
+                    # Do not add duplicate character definitions (only use the first instance)
+                    if char_id not in self.characters:
+
+                        # Create character definition
+                        character = BitmapFontCharacter()
+                        character.id = char_id
+                        character.rect.x = int(m.group("x"))
+                        character.rect.y = int(m.group("y"))
+                        character.rect.w = int(m.group("width"))
+                        character.rect.h = int(m.group("height"))
+                        character.xoffset = int(m.group("xoffset"))
+                        character.yoffset = int(m.group("yoffset"))
+                        character.xadvance = int(m.group("xadvance"))
+
+                        self.characters[character.id] = character
+
+                elif line.startswith("kernings"):
+                    pass
+
+                elif line.startswith("kerning"):
+                    m = re.search(r"kerning\s+first=(?P<first>[0-9]{1,3})\s+second=(?P<second>[0-9]{1,3})"
+                                  r"\s+amount=(?P<amount>-?[0-9]{1,3})", line, flags=re.IGNORECASE)
+                    if not m:
+                        raise BitmapFontException("Bitmap font descriptor file invalid format")
+
+                    first = int(m.group("first"))
+                    second = int(m.group("second"))
+
+                    if first not in self.kernings:
+                        self.kernings[first] = {}
+
+                    if second not in self.kernings[first]:
+                        self.kernings[first][second] = int(m.group("amount"))
+
     def _load_descriptor_xml(self, xml_tree: ElementTree):
+        """Loads the descriptor information from the XML tree."""
+
         cdef int first = 0
         cdef int second = 0
         root = xml_tree.getroot()
@@ -276,6 +374,8 @@ cdef class _SurfaceContainer:
         kernings = font.get_kernings()
         use_kerning = container.options['font_kerning']
 
+        # Copy each character in the text string from the bitmap font atlas to
+        # the output texture/surface
         for text_char in text:
             current_char = ord(text_char)
             if current_char in characters:
