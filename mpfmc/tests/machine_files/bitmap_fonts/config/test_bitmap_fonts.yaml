@@ -24,6 +24,11 @@ slides:
       font_name: test_font
       bitmap_font: True
       y: 200
+    - type: text
+      text: Bitmap Font Test @!$
+      font_name: test_font_2
+      bitmap_font: True
+      y: top - 100
 
 bitmap_fonts:
   F1fuv:
