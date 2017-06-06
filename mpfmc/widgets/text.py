@@ -96,11 +96,12 @@ class Text(Widget):
         anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
         self.canvas.clear()
 
-        with self.canvas:
-            Color(*self.color)
-            Rotate(angle=self.rotation, origin=anchor)
-            Scale(self.scale).origin = anchor
-            Rectangle(pos=self.pos, size=self.size, texture=self._label.texture)
+        if len(self._label.text) > 0:
+            with self.canvas:
+                Color(*self.color)
+                Rotate(angle=self.rotation, origin=anchor)
+                Scale(self.scale).origin = anchor
+                Rectangle(pos=self.pos, size=self.size, texture=self._label.texture)
 
     def on_label_texture(self, instance, texture):
         del instance
