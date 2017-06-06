@@ -1,5 +1,3 @@
-import time
-
 from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 
 
@@ -19,9 +17,11 @@ class TestVideo(MpfIntegrationTestCase):
         self.assertEqual(self.mc.targets['default'].current_slide.name, 'mode1_slide1')
         video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertEqual(video_widget.state, 'play')
+        self.assertTrue(video_widget.video.loaded)
 
         # stop mode 1, should unload the slide
         self.post_event("stop_mode1")
         self.advance_time_and_run()
         self.assertEqual(self.mc.targets['default'].current_slide.name, 'default_blank')
-        self.assertEqual(video_widget.state, 'stop')
+        # check that the video is unloaded (because the widget will not be stopped)
+        self.assertFalse(video_widget.video.loaded)
