@@ -29,6 +29,12 @@ slides:
       font_name: test_font_2
       bitmap_font: True
       y: top - 100
+      opacity: 0
+      animations:
+        add_to_slide:
+          - property: opacity
+            value: 1.0
+            duration: 1s
 
 bitmap_fonts:
   F1fuv:
