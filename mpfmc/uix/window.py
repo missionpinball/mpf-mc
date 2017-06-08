@@ -66,6 +66,9 @@ class Window(object):
         config = mc.config_validator.validate_config('widgets:{}'.format(
             DisplayWidget.widget_type_name.lower()), config, base_spec='widgets:common')
 
+        if 'effects' in mc.machine_config['window']:
+            config['effects'] = mc.effects_manager.validate_effects(mc.machine_config['window']['effects'])
+
         display_widget = DisplayWidget(mc, config=config)
         Window.set_source_display(display_widget)
 
