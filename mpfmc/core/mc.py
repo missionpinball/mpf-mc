@@ -467,8 +467,8 @@ class MpfMc(App):
         except queue.Empty:
             pass
         else:
-            self.log.info("Shutting down due to child thread crash")
-            self.log.info("Crash details: %s", crash)
+            self.log.critical("Shutting down due to child thread crash")
+            self.log.critical("Crash details: %s", crash)
             self.stop()
 
     def register_monitor(self, monitor_class, monitor):

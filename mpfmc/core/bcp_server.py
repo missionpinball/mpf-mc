@@ -98,11 +98,9 @@ class BCPServer(threading.Thread):
                         not self.mc.thread_stopper.is_set()):
                     try:
                         self.connection, client_address = self.socket.accept()
-                    except socket.timeout:
+                    except (socket.timeout, OSError):
                         if self.mc.thread_stopper.is_set():
                             self.log.info("Stopping BCP listener thread")
-                            self.socket.shutdown(socket.SHUT_RDWR)
-                            self.socket.close()
                             return
 
                 self.log.info("Received connection from: %s:%s",
@@ -136,30 +134,33 @@ class BCPServer(threading.Thread):
                     # with BCP, we should probably change this to be smarter
                     # and to check for complete messages before processing them
 
-                    try:
-                        ready = select.select([self.connection], [], [], 1)
-                        if ready[0]:
+                    ready = select.select([self.connection], [], [], 1)
+                    if ready[0]:
+                        try:
                             data_read = self.connection.recv(8192)
-                            if data_read:
-                                socket_chars += data_read
-                                commands = socket_chars.split(b"\n")
+                        except socket.timeout:
+                            pass
 
-                                # keep last incomplete command
-                                socket_chars = commands.pop()
+                        if data_read:
+                            socket_chars += data_read
+                            commands = socket_chars.split(b"\n")
 
-                                # process all complete commands
-                                for cmd in commands:
-                                    if cmd:
-                                        self.process_received_message(cmd.decode())
-                            else:
-                                # no bytes -> socket closed
-                                break
+                            # keep last incomplete command
+                            socket_chars = commands.pop()
 
-                    except socket.timeout:
-                        pass
+                            # process all complete commands
+                            for cmd in commands:
+                                if cmd:
+                                    try:
+                                        decoded_cmd = cmd.strip().decode()
+                                    except UnicodeDecodeError:
+                                        self.log.warning("Failed to decode BCP message: {}".format(cmd.strip()))
+                                        continue
 
-                    except OSError:
-                        break
+                                    self.process_received_message(decoded_cmd)
+                        else:
+                            # no bytes -> socket closed
+                            break
 
                 # close connection. while loop will not exit if this is not intended.
                 self.connection.close()
