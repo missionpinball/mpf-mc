@@ -23,16 +23,16 @@ class TestAnimatedImages(MpfMcTestCase):
         self.mc.events.post('slide1')
         self.advance_time()
 
-        ball = self.mc.targets['default'].children[0].children[0].children[0]
-        stick_figures = self.mc.targets['default'].children[0].children[0].children[1]
+        ball = self.mc.targets['default'].current_slide.widgets[0].widget
+        stick_figures = self.mc.targets['default'].current_slide.widgets[1].widget
 
         self.advance_time()
 
         # make sure they're playing as they should
         self.assertEqual(ball.fps, 30)
-        self.assertEqual(ball.loops, 0)
+        self.assertEqual(ball.loops, -1)
         self.assertEqual(stick_figures.fps, 10)
-        self.assertEqual(stick_figures.loops, 0)
+        self.assertEqual(stick_figures.loops, -1)
 
         # test stopping
         stick_figures.stop()
@@ -45,8 +45,7 @@ class TestAnimatedImages(MpfMcTestCase):
 
         # test jumping to a new frame
         stick_figures.current_frame = 5
-        self.advance_time()
-        self.assertEqual(stick_figures.current_frame, 5)
+        self.assertEqual(stick_figures.current_frame, 6)
 
         # test starting
         stick_figures.play()

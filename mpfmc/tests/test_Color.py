@@ -9,7 +9,7 @@ class TestColor(MpfMcTestCase):
         return 'test_color.yaml'
 
     def get_widget(self, index=0):
-        return self.mc.targets['default'].current_slide.children[0].children[index]
+        return self.mc.targets['default'].current_slide.children[index].widget
 
     def test_colors(self):
         self.mc.events.post('slide1')

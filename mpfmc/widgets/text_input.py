@@ -8,14 +8,21 @@ that's been entered so far.
 
 """
 from collections import deque
+from typing import TYPE_CHECKING, Optional
 from kivy.clock import Clock
+
+from mpfmc.uix.widget import WidgetContainer
 from mpfmc.widgets.text import Text
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
 
 
 class MpfTextInput(Text):
     widget_type_name = 'text_input'
+    animation_properties = list()
 
-    def __init__(self, mc, config, key=None, **kwargs):
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
         """
 
@@ -39,33 +46,22 @@ class MpfTextInput(Text):
 
         Clock.schedule_once(self.find_linked_text_widget)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         try:
             return '<TextInput Widget key={}>'.format(self.key)
         except AttributeError:
             return '<TextInput Widget>'
 
-    def find_linked_text_widget(self, dt):
+    def find_linked_text_widget(self, dt) -> None:
         del dt
 
         for target in self.mc.targets.values():
-            for w in target.parent.walk():
-                try:
-                    if w.key == self.config['key']:
-                        self.linked_text_widget = w
-                        break
-                except AttributeError:
-                    pass
-            for x in target.screens:
-                for y in x.walk():
-                    try:
-                        if y.key == self.config['key']:
-                            self.linked_text_widget = y
-                            break
-                    except AttributeError:
-                        pass
-
-            if self.linked_text_widget:
+            w = target.find_widgets_by_key(self.config['key'])
+            if w:
+                if w[0] != self and isinstance(w[0], Text):
+                    self.linked_text_widget = w[0]
+                elif len(w) > 1 and isinstance(w[1], Text):
+                    self.linked_text_widget = w[1]
                 break
 
         if self.linked_text_widget:
@@ -80,7 +76,7 @@ class MpfTextInput(Text):
 
                 self.jump(self.config['initial_char'])
 
-    def _register_events(self):
+    def _register_events(self) -> None:
         if not self.config['shift_left_event']:
             self.config['shift_left_event'] = (
                 'text_input_{}_shift_left'.format(self.key))
@@ -117,10 +113,10 @@ class MpfTextInput(Text):
             self.config['force_complete_event'], self.complete))
         self.mc.bcp_processor.register_trigger(self.config['force_complete_event'])
 
-    def _deregister_events(self):
+    def _deregister_events(self) -> None:
         self.mc.events.remove_handlers_by_keys(self.registered_event_handlers)
 
-    def jump(self, char):
+    def jump(self, char: str) -> None:
         # Unfortunately deque.index() is Python 3.5+, so we have to do it this
         # way.
 
@@ -139,7 +135,7 @@ class MpfTextInput(Text):
 
         self.shift(0, True)
 
-    def shift(self, places=1, force=False, **kwargs):
+    def shift(self, places: int=1, force: bool=False, **kwargs) -> None:
         del kwargs
         if self.active or force:
             self.char_list.rotate(-places)
@@ -160,7 +156,7 @@ class MpfTextInput(Text):
             if self.config['dynamic_x'] and self.linked_text_widget:
                 self.set_relative_position()
 
-    def select(self, **kwargs):
+    def select(self, **kwargs) -> None:
         del kwargs
         if not self.active:
             return
@@ -184,7 +180,7 @@ class MpfTextInput(Text):
             if len(self.linked_text_widget.text) == self.config['max_chars']:
                 self.complete()
 
-    def set_relative_position(self, *args):
+    def set_relative_position(self, *args) -> None:
         del args
 
         new_right_edge = (self.linked_text_widget.width +
@@ -198,7 +194,7 @@ class MpfTextInput(Text):
             self.x += (self.linked_text_widget_right_edge +
                        self.config['dynamic_x_pad'] - self.x)
 
-    def complete(self, **kwargs):
+    def complete(self, **kwargs) -> None:
         del kwargs
         self.done()
         self.mc.post_mc_native_event('text_input_{}_complete'.format(self.key),
@@ -212,7 +208,7 @@ class MpfTextInput(Text):
             text: A string of the final characters that were entered.
         """
 
-    def abort(self, **kwargs):
+    def abort(self, **kwargs) -> None:
         del kwargs
         self.done()
         self.mc.post_mc_native_event('text_input_{}_abort'.format(self.key),
@@ -226,13 +222,13 @@ class MpfTextInput(Text):
             text: A string of the characters that were entered so far.
         """
 
-    def done(self):
+    def done(self) -> None:
         self._deregister_events()
         self.active = False
         self.text = ''
-        self.parent.remove_widget(self)
+        self._container.parent.remove_widget(self)
 
-    def prepare_for_removal(self):
+    def prepare_for_removal(self) -> None:
         self.done()
         super().prepare_for_removal()
 

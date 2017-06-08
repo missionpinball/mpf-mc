@@ -5,7 +5,7 @@ modes:
     - mode2
     - mode3
 
-physical_dmds:
+dmds:
   default:
     shades: 16
     fps: 24
@@ -21,20 +21,28 @@ window:
 
 displays:
   window:
-    height: 200
     width: 600
+    height: 200
   dmd:
     width: 128
     height: 32
     default: true
+  frame_mode2:
+    width: 800
+    height: 600
+  content_frame:
+    width: 400
+    height: 300
 
 slides:
   window_slide_1:
-  - type: dmd
+  - type: display
     width: 512
     height: 128
-    pixel_color: ff5500
-    dark_color: 220000
+    effects:
+      - type: dmd
+        dot_color: ff5500
+        background_color: 220000
     z: 3
   - type: text
     text: MISSION PINBALL FRAMEWORK

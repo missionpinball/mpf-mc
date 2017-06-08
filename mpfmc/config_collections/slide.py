@@ -1,13 +1,14 @@
+from typing import Union
 from mpfmc.core.config_collection import ConfigCollection
 
 
-class Slide(ConfigCollection):
+class SlideCollection(ConfigCollection):
 
     config_section = 'slides'
     collection = 'slides'
     class_label = 'SlideConfig'
 
-    def process_config(self, config):
+    def process_config(self, config: Union[dict, list]) -> dict:
         # config is localized to an single slide name entry
 
         if isinstance(config, list):
@@ -34,4 +35,4 @@ class Slide(ConfigCollection):
         return config
 
 
-collection_cls = Slide
+collection_cls = SlideCollection

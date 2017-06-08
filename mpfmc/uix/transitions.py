@@ -3,8 +3,10 @@ import importlib
 from kivy.animation import AnimationTransition
 from kivy.properties import StringProperty
 from kivy.uix.screenmanager import TransitionBase
-from kivy.uix.screenmanager import WipeTransition, SwapTransition, \
-    FadeTransition, FallOutTransition, RiseInTransition, NoTransition
+from kivy.uix.screenmanager import (WipeTransition, SwapTransition,
+                                    FadeTransition, FallOutTransition,
+                                    RiseInTransition, CardTransition,
+                                    NoTransition)
 
 
 class TransitionManager(object):
@@ -42,6 +44,7 @@ class TransitionManager(object):
         self.register_transition('fade', FadeTransition)
         self.register_transition('fade_back', FallOutTransition)
         self.register_transition('rise_in', RiseInTransition)
+        self.register_transition('card', CardTransition)
         self.register_transition('none', NoTransition)
 
     def validate_transitions(self, config):

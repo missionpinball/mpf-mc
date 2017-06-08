@@ -22,7 +22,7 @@ slides:
   - type: text
     text: Slide Mode2
   slide_mode2_frame:
-  - type: slide_frame
-    name: frame_mode2
+  - type: display
     width: 800
     height: 600
+    source_display: frame_mode2

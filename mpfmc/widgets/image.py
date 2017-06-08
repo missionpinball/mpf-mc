@@ -1,62 +1,87 @@
-from kivy.uix.image import Image
+from typing import TYPE_CHECKING, Optional, Union
 
-from mpfmc.uix.widget import MpfWidget
+from kivy.properties import ObjectProperty, NumericProperty, AliasProperty
+from kivy.graphics import Rectangle, Color, Rotate, Scale
+
+from mpfmc.uix.widget import Widget
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
+    from mpfmc.assets.image import ImageAsset
 
 
-class ImageWidget(MpfWidget, Image):
+class ImageWidget(Widget):
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
+    animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'opacity')
 
-    def __init__(self, mc, config, key=None, **kwargs):
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
+        self.size = (0, 0)
 
-        self.image = None
+        self._image = None  # type: ImageAsset
+        self._current_loop = 0
 
+        # Retrieve the specified image asset to display.  This widget simply
+        # draws a rectangle using the texture from the loaded image asset to
+        # display the image. Scaling and rotation is handled by the Scatter
+        # widget.
         try:
-            self.image = self.mc.images[self.config['image']]
+            self._image = self.mc.images[self.config['image']]
         except KeyError:
 
             try:
-                self.image = self.mc.images[kwargs['play_kwargs']['image']]
+                self._image = self.mc.images[kwargs['play_kwargs']['image']]
             except KeyError:
                 pass
 
-        if not self.image:
+        if not self._image:
             raise ValueError("Cannot add Image widget. Image '{}' is not a "
                              "valid image name.".format(self.config['image']))
 
         # Updates the config for this widget to pull in any defaults that were
         # in the asset config
-        self.merge_asset_config(self.image)
+        self.merge_asset_config(self._image)
 
         # If the associated image asset exists, that means it's loaded already.
-        if self.image.image:
+        if self._image.image:
             self._image_loaded()
         else:
             # if the image asset isn't loaded, we set the size to 0,0 so it
             # doesn't show up on the display yet.
             # TODO Add log about loading on demand
             self.size = (0, 0)
-            self.image.load(callback=self._image_loaded)
+            self._image.load(callback=self._image_loaded)
 
-    def __repr__(self):  # pragma: no cover
+        # Bind to all properties that when changed need to force
+        # the widget to be redrawn
+        self.bind(pos=self._draw_widget,
+                  color=self._draw_widget,
+                  rotation=self._draw_widget,
+                  scale=self._draw_widget)
+
+    def __repr__(self) -> str:  # pragma: no cover
         try:
-            return '<Image name={}, size={}, pos={}>'.format(self.image.name,
+            return '<Image name={}, size={}, pos={}>'.format(self._image.name,
                                                              self.size,
                                                              self.pos)
         except AttributeError:
             return '<Image (loading...), size={}, pos={}>'.format(self.size,
                                                                   self.pos)
 
-    def _image_loaded(self, *args):
+    def _image_loaded(self, *args) -> None:
+        """Callback when image asset has been loaded and is ready to display."""
         del args
-        self.texture = self.image.image.texture
-        self.size = self.texture_size  # will re-position automatically
 
-        self._coreimage = self.image.image
-        self._coreimage.bind(on_texture=self._on_tex_change)
+        # Setup callback on image 'on_texture' event (called whenever the image
+        # texture changes; used mainly for animated images)
+        self._image.image.bind(on_texture=self._on_texture_change)
+        self._on_texture_change()
 
-        if self._coreimage.anim_available:
+        self._draw_widget()
+
+        # Setup animation properties (if applicable)
+        if self._image.image.anim_available:
             self.fps = self.config['fps']
             self.loops = self.config['loops']
             if self.config['auto_play']:
@@ -64,69 +89,119 @@ class ImageWidget(MpfWidget, Image):
             else:
                 self.stop()
 
-    def texture_update(self, *largs):
-        # overrides base method to pull the texture from our ImageClass instead
-        # of from a file
-        del largs
+    def _on_texture_change(self, *args) -> None:
+        """Update texture from image asset (callback when image texture changes)."""
+        del args
 
-        if not self.image.image:
-            return
+        self.texture = self._image.image.texture
+        self.size = self.texture.size
+        self._draw_widget()
 
-        self._loops = 0
+        # Handle animation looping (when applicable)
+        ci = self._image.image
+        if ci.anim_available:
+            if self.loops > -1 and ci.anim_index == len(ci.image.textures) - 1:
+                self._current_loop += 1
+                if self._current_loop == self.loops:
+                    ci.anim_reset(False)
+                    self._current_loop = 0
 
-        if self._coreimage is not None:
-            self._coreimage.unbind(on_texture=self._on_tex_change)
+    def _draw_widget(self, *args):
+        """Draws the image (draws a rectangle using the image texture)"""
+        del args
 
-        self._coreimage = ci = self.image.image
+        anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
+        self.canvas.clear()
 
-        ci.bind(on_texture=self._on_tex_change)
-        self.texture = ci.texture
+        with self.canvas:
+            Color(*self.color)
+            Rotate(angle=self.rotation, origin=anchor)
+            Scale(self.scale).origin = anchor
+            Rectangle(pos=self.pos, size=self.size, texture=self.texture)
 
-    @property
-    def fps(self):
-        if self._coreimage.anim_available:
-            return 1 / self._coreimage.anim_delay
+    def play(self, start_frame: Optional[int]=None):
+        """Play the image animation (if images supports it)."""
+        if start_frame:
+            self.current_frame = start_frame
+
+        self._image.image.anim_reset(True)
+
+    def stop(self) -> None:
+        """Stop the image animation."""
+        self._image.image.anim_reset(False)
+
+    #
+    # Properties
+    #
+
+    def _get_image(self) -> Optional["ImageAsset"]:
+        return self._image
+
+    image = AliasProperty(_get_image)
+
+    texture = ObjectProperty(None, allownone=True)
+    '''Texture object of the image. The texture represents the original, loaded
+    image texture. 
+
+    Depending of the texture creation, the value will be a
+    :class:`~kivy.graphics.texture.Texture` or a
+    :class:`~kivy.graphics.texture.TextureRegion` object.
+
+    :attr:`texture` is an :class:`~kivy.properties.ObjectProperty` and defaults
+    to None.
+    '''
+
+    loops = NumericProperty(-1)
+    '''Number of loops to play then stop animating. -1 means keep animating.
+    '''
+
+    def _get_fps(self) -> Optional[float]:
+        if self._image.image.anim_available:
+            return int(1 / self._image.image.anim_delay)
         else:
             return None
 
-    @fps.setter
-    def fps(self, value):
-        self._coreimage.anim_delay = 1 / value
+    def _set_fps(self, value: float):
+        if value > 0:
+            self._image.image.anim_delay = 1 / float(value)
+        else:
+            self._image.image.anim_delay = -1
 
-    # for some reason setting the @property here didn't work with the getter,
-    # it simply wasn't called and I have no idea why. So I just setup a classic
-    # style getter/setter below these two methods.
-    def _get_current_frame(self):
-        return self._coreimage._anim_index + 1
+    fps = AliasProperty(_get_fps, _set_fps)
+    '''The frames per second rate for the animation if the image is sequenced 
+    (like an animated gif). If fps is set to 0, the animation will be stopped.
+    '''
 
-    def _set_current_frame(self, value):
-        frame = (int(value) - 1) % len(self._coreimage.image.textures)
-        if frame == self._coreimage._anim_index:
+    def _get_current_frame(self) -> int:
+        return self._image.image.anim_index + 1
+
+    def _set_current_frame(self, value: Union[int, float]):
+        if not self._image.image.anim_available or not hasattr(self._image.image.image, 'textures'):
+            return
+
+        frame = (int(value) - 1) % len(self._image.image.image.textures)
+        if frame == self._image.image.anim_index:
             return
         else:
-            self._coreimage._anim_index = frame
-            self._coreimage._texture = (
-                self._coreimage.image.textures[self._coreimage._anim_index])
-            self._coreimage.dispatch('on_texture')
+            self._image.image._anim_index = frame
+            self._image.image.anim_reset(True)
 
-    current_frame = property(_get_current_frame, _set_current_frame)
+    current_frame = AliasProperty(_get_current_frame, _set_current_frame)
+    '''The current frame of the animation.
+    '''
 
-    @property
-    def loops(self):
-        return self._coreimage.anim_loop
+    rotation = NumericProperty(0)
+    '''Rotation angle value of the widget.
 
-    @loops.setter
-    def loops(self, value):
-        self._coreimage.anim_loop = value
+    :attr:`rotation` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    0.
+    '''
 
-    def play(self, start_frame=None):
+    scale = NumericProperty(1.0)
+    '''Scale value of the widget.
 
-        if start_frame:
-            self._set_current_frame(start_frame)
-
-        self._coreimage.anim_reset(True)
-
-    def stop(self):
-        self._coreimage.anim_reset(False)
+    :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
+    1.0.
+    '''
 
 widget_classes = [ImageWidget]

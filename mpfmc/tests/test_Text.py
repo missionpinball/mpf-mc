@@ -9,7 +9,7 @@ class TestText(MpfMcTestCase):
         return 'test_text.yaml'
 
     def get_widget(self, index=0):
-        return self.mc.targets['default'].current_slide.children[0].children[index]
+        return self.mc.targets['default'].current_slide.widgets[index].widget
 
     def test_static_text(self):
         # Very basic test
@@ -330,8 +330,20 @@ class TestText(MpfMcTestCase):
         self.mc.events.post('baseline')
         self.advance_time()
 
-        # baseline anchored widgets should be 4px lower
+        # Baseline anchored widgets should all have the same local coordinates
         self.assertEqual(self.get_widget(0).pos[1], 100)
-        self.assertEqual(self.get_widget(1).pos[1], 96)
+        self.assertEqual(self.get_widget(1).pos[1], 100)
         self.assertEqual(self.get_widget(2).pos[1], 100)
-        self.assertEqual(self.get_widget(3).pos[1], 96)
+        self.assertEqual(self.get_widget(3).pos[1], 100)
+
+        # Now convert the widget coordinates to parent coordinates for comparison
+        widget0 = self.get_widget(0).parent.to_parent(0, self.get_widget(0).pos[1])
+        widget1 = self.get_widget(1).parent.to_parent(0, self.get_widget(1).pos[1])
+        widget2 = self.get_widget(2).parent.to_parent(0, self.get_widget(2).pos[1])
+        widget3 = self.get_widget(3).parent.to_parent(0, self.get_widget(3).pos[1])
+
+        # Baseline anchored widgets should be 4px lower
+        self.assertEqual(widget0[1], 100)
+        self.assertEqual(widget1[1], 96)
+        self.assertEqual(widget2[1], 100)
+        self.assertEqual(widget3[1], 96)

@@ -2,23 +2,26 @@ import os
 import sys
 import unittest
 
-os.environ['KIVY_NO_FILELOG'] = '1'
-os.environ['KIVY_NO_CONSOLELOG'] = '1'
+verbose = sys.argv and "-v" in sys.argv
+
+if not verbose:
+    os.environ['KIVY_NO_FILELOG'] = '1'
+    os.environ['KIVY_NO_CONSOLELOG'] = '1'
 
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 from kivy import Config, Logger
 from kivy.base import runTouchApp, stopTouchApp, EventLoop
 from kivy.clock import Clock
-from kivy.uix.widget import Widget
+from kivy.uix.widget import Widget as KivyWidget
 
 import mpfmc
 from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
 from mpfmc.core.utils import load_machine_config
 
-Config.set('kivy', 'log_enable', '0')
-Config.set('kivy', 'log_level', 'warning')
-
+if not verbose:
+    Config.set('kivy', 'log_enable', '0')
+    Config.set('kivy', 'log_level', 'warning')
 
 from mpfmc.core.mc import MpfMc
 from time import time, sleep
@@ -193,8 +196,8 @@ class MpfMcTestCase(unittest.TestCase):
             if root:
                 self.mc.root = root
         if self.mc.root:
-            if not isinstance(self.mc.root, Widget):
-                Logger.critical('App.root must be an _instance_ of Widget')
+            if not isinstance(self.mc.root, KivyWidget):
+                Logger.critical('App.root must be an _instance_ of Kivy Widget')
                 raise Exception('Invalid instance in App.root')
             from kivy.core.window import Window
             Window.add_widget(self.mc.root)
@@ -217,8 +220,9 @@ class MpfMcTestCase(unittest.TestCase):
         self.mc.dispatch('on_start')
         runTouchApp(slave=True)  # change is here
 
-        while not self.mc.is_init_done.is_set():
-            EventLoop.idle()
+        # Perform init process
+        while not self.mc.is_init_done.is_set() and not self.mc.thread_stopper.is_set():
+            self.advance_time()
 
         # set a nice title
         window.set_title(self.__class__.__name__ + "::" + self._testMethodName)

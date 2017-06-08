@@ -1,5 +1,6 @@
 from kivy.core.video import Video
 from kivy.core.video.video_null import VideoNull
+from kivy.properties import AliasProperty
 
 from mpf.core.assets import Asset, AssetPool
 
@@ -25,54 +26,12 @@ class VideoAsset(Asset):
     asset_group_class = VideoPool
 
     def __init__(self, mc, name, file, config):
-        super().__init__(mc, name, file, config)
-
         self._video = None
+        super().__init__(mc, name, file, config)
 
     @property
     def video(self):
         return self._video
-
-    @property
-    def position(self):
-        try:
-            return self._video.position
-        except AttributeError:
-            return 0
-
-    @position.setter
-    def position(self, pos):
-        # position in secs
-        try:
-            self._video.position = pos
-        except AttributeError:
-            pass
-
-    @property
-    def duration(self):
-        try:
-            return self._video.duration
-        except AttributeError:
-            return 0
-
-    @property
-    def volume(self):
-        try:
-            return self._video.volume
-        except AttributeError:
-            return 0
-
-    @volume.setter
-    def volume(self, volume):
-        # float 0.0 - 1.0
-        try:
-            self._video.volume = volume
-        except AttributeError:
-            pass
-
-    @property
-    def state(self):
-        return self._video.state
 
     def do_load(self):
         # For videos, we need them to load in the main thread, so we do not
@@ -108,3 +67,70 @@ class VideoAsset(Asset):
                 "Video file {} was loaded, but seems to have no content. Check"
                 " to make sure you have the proper Gstreamer plugins for the "
                 "codec this video needs".format(self.file))
+
+    #
+    # Properties
+    #
+
+    def _get_position(self):
+        try:
+            return self._video.position
+        except AttributeError:
+            return 0
+
+    def _set_position(self, pos):
+        # position in secs
+        try:
+            self._video.position = pos
+        except AttributeError:
+            pass
+
+    position = AliasProperty(_get_position, _set_position)
+    '''Position of the video between 0 and :attr:`duration`. The position
+    defaults to -1 and is set to a real position when the video is loaded.
+
+    :attr:`position` is a :class:`~kivy.properties.NumericProperty` and
+    defaults to -1.
+    '''
+
+    def _get_duration(self):
+        try:
+            return self._video.duration
+        except AttributeError:
+            return 0
+
+    duration = AliasProperty(_get_duration, None)
+    '''Duration of the video. The duration defaults to -1, and is set to a real
+    duration when the video is loaded.
+
+    :attr:`duration` is a :class:`~kivy.properties.NumericProperty` and
+    defaults to -1.
+    '''
+
+    def _get_volume(self):
+        try:
+            return self._video.volume
+        except AttributeError:
+            return 0
+
+    def _set_volume(self, volume):
+        # float 0.0 - 1.0
+        try:
+            self._video.volume = volume
+        except AttributeError:
+            pass
+
+    volume = AliasProperty(_get_volume, _set_volume)
+    '''Volume of the video, in the range 0-1. 1 means full volume, 0
+    means mute.
+
+    :attr:`volume` is a :class:`~kivy.properties.NumericProperty` and defaults
+    to 1.
+    '''
+
+    def _get_state(self):
+        return self._video.state
+
+    state = AliasProperty(_get_state, None)
+    '''String, indicates whether to play, pause, or stop the video::
+    '''

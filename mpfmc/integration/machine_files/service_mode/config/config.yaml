@@ -54,7 +54,7 @@ sound_system:
   master_volume: 0.8
   enabled: true
 
-physical_dmds:
+dmds:
   default:
     shades: 16
     fps: 24
@@ -79,11 +79,14 @@ displays:
 
 slides:
   window_slide_1:
-  - type: dmd
+  - type: display
     width: 512
     height: 128
-    pixel_color: ff5500
-    dark_color: 220000
+    source_display: dmd
+    effects:
+      - type: dmd
+        dot_color: ff5500
+        background_color: 220000
     z: 3
   - type: text
     text: MISSION PINBALL FRAMEWORK

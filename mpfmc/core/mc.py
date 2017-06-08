@@ -27,6 +27,7 @@ from mpfmc.core.bcp_processor import BcpProcessor
 from mpfmc.core.config_processor import ConfigProcessor
 from mpfmc.core.mode_controller import ModeController
 from mpfmc.uix.transitions import TransitionManager
+from mpfmc.uix.effects import EffectsManager
 from mpfmc.core.config_collection import create_config_collections
 import asyncio
 
@@ -39,7 +40,8 @@ from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
 from mpf.core.player import Player
 from mpfmc.assets.image import ImageAsset
-from mpfmc.core.physical_dmd import PhysicalDmd, PhysicalRgbDmd
+from mpfmc.assets.bitmap_font import BitmapFontAsset
+from mpfmc.core.dmd import Dmd, RgbDmd
 
 try:
     from mpfmc.core.audio import SoundSystem
@@ -110,8 +112,8 @@ class MpfMc(App):
         """
 
         self.keyboard = None
-        self.physical_dmds = []
-        self.physical_rgb_dmds = []
+        self.dmds = []
+        self.rgb_dmds = []
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
@@ -130,6 +132,7 @@ class MpfMc(App):
 
         self.config_processor = ConfigProcessor(self)
         self.transition_manager = TransitionManager(self)
+        self.effects_manager = EffectsManager(self)
 
         self._set_machine_path()
 
@@ -148,21 +151,22 @@ class MpfMc(App):
         # Asset classes
         ImageAsset.initialize(self)
         VideoAsset.initialize(self)
+        BitmapFontAsset.initialize(self)
 
         self._initialise_sound_system()
 
         self.clock.schedule_interval(self._check_crash_queue, 1)
 
-        self.events.add_handler("client_connected", self._create_physical_dmds)
+        self.events.add_handler("client_connected", self._create_dmds)
         self.events.add_handler("player_turn_start", self.player_start_turn)
 
         self.create_machine_var('mpfmc_ver', __version__)
         # force setting it here so we have it before MPF connects
         self.receive_machine_var_update('mpfmc_ver', __version__, 0, True)
 
-    def _create_physical_dmds(self, **kwargs):
-        self.create_physical_dmds()
-        self.create_physical_rgb_dmds()
+    def _create_dmds(self, **kwargs):
+        self.create_dmds()
+        self.create_rgb_dmds()
 
     def _load_font_paths(self):
         # Add local machine fonts path
@@ -260,19 +264,19 @@ class MpfMc(App):
         self.events.process_event_queue()
         self._init()
 
-    def create_physical_dmds(self):
-        """Create physical DMDs."""
-        if 'physical_dmds' in self.machine_config:
-            for name, config in self.machine_config['physical_dmds'].items():
-                dmd = PhysicalDmd(self, name, config)
-                self.physical_dmds.append(dmd)
+    def create_dmds(self):
+        """Create DMDs."""
+        if 'dmds' in self.machine_config:
+            for name, config in self.machine_config['dmds'].items():
+                dmd = Dmd(self, name, config)
+                self.dmds.append(dmd)
 
-    def create_physical_rgb_dmds(self):
-        """Create physical RBG DMDs."""
-        if 'physical_rgb_dmds' in self.machine_config:
-            for name, config in self.machine_config['physical_rgb_dmds'].items():
-                dmd = PhysicalRgbDmd(self, name, config)
-                self.physical_rgb_dmds.append(dmd)
+    def create_rgb_dmds(self):
+        """Create RBG DMDs."""
+        if 'rgb_dmds' in self.machine_config:
+            for name, config in self.machine_config['rgb_dmds'].items():
+                dmd = RgbDmd(self, name, config)
+                self.rgb_dmds.append(dmd)
 
     def _init(self):
         # Since the window is so critical in Kivy, we can't continue the
@@ -462,8 +466,8 @@ class MpfMc(App):
 
                 self.scriptlets.append(scriptlet_obj)
 
-    def _check_crash_queue(self, time):
-        del time
+    def _check_crash_queue(self, dt):
+        del dt
         try:
             crash = self.crash_queue.get(block=False)
         except queue.Empty:

@@ -1,25 +1,34 @@
+from typing import TYPE_CHECKING
+
 from kivy.core.window import Window as KivyWindow
-from kivy.clock import Clock
 from mpfmc.core.keyboard import Keyboard
 from mpfmc.uix.display import Display
+from mpfmc.widgets.display import DisplayWidget
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
 
 
 class Window(object):
 
     @staticmethod
-    def set_source_display(display):
+    def set_source_display(display: "DisplayWidget") -> None:
+        """Set the source display for the main window."""
+
+        # Clean up any existing objects in the window
         KivyWindow.clear()
 
         for widget in KivyWindow.children:
             KivyWindow.remove_widget(widget)
 
+        # Add the new display to the window
         KivyWindow.add_widget(display)
 
-        KivyWindow.bind(system_size=display.on_window_resize)
-        Clock.schedule_once(display.fit_to_window, -1)
+        # Make sure the display is re-sized whenever the window changes size
+        KivyWindow.bind(system_size=Window.on_size)
 
     @staticmethod
-    def initialize(mc):
+    def initialize(mc: "MpfMc") -> None:
         try:
             mc.icon = mc.machine_config['window']['icon']
         except KeyError:
@@ -38,16 +47,27 @@ class Window(object):
                 'source_display']]
         except KeyError:
             if 'window' in mc.targets:
-                display = mc.targets['window'].parent
+                display = mc.targets['window']
             else:
-                display = mc.targets['default'].parent
+                display = mc.targets['default']
 
         # We need the window to map to a Display instance, so no matter what
         # we're passed, we keep on moving up until we find the actual display.
         while not isinstance(display, Display):
             display = display.parent
 
-        Window.set_source_display(display)
+        config = {
+            'type': DisplayWidget.widget_type_name.lower(),
+            'source_display': display.name,
+            'width': KivyWindow.width,
+            'height': KivyWindow.height,
+        }
+
+        config = mc.config_validator.validate_config('widgets:{}'.format(
+            DisplayWidget.widget_type_name.lower()), config, base_spec='widgets:common')
+
+        display_widget = DisplayWidget(mc, config=config)
+        Window.set_source_display(display_widget)
 
         if (display.width / display.height !=
                 KivyWindow.width / KivyWindow.height):
@@ -61,4 +81,11 @@ class Window(object):
 
         if 'keyboard' in mc.machine_config:
             mc.keyboard = Keyboard(mc)
+
+    @staticmethod
+    def on_size(instance, value):
+        del instance
+
+        for widget in KivyWindow.children:
+            widget.size = value
 

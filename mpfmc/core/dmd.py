@@ -1,27 +1,32 @@
-"""Physical DMD."""
+"""DMD (hardware device)."""
 import struct
+from typing import TYPE_CHECKING
 from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 from kivy.graphics.texture import Texture
-from kivy.uix.effectwidget import EffectWidget, EffectBase
+from kivy.uix.effectwidget import EffectWidget
 
-from mpfmc.widgets.dmd import Gain
+from mpfmc.effects.gain import GainEffect
+from mpfmc.effects.flip_vertical import FlipVerticalEffect
+from mpfmc.effects.gamma import GammaEffect
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
 
 
-class PhysicalDmdBase(object):
-
+class DmdBase(object):
     """Base class for DMD devices."""
 
-    dmd_name_string = 'Physical DMD'
+    dmd_name_string = 'DMD'
 
-    def __init__(self, mc, name, config):
+    def __init__(self, mc: "MpfMc", name: str, config: dict) -> None:
         """Initialise DMD."""
 
         self.mc = mc
         self.name = name
 
-        self.mc.log.info('Initializing Physical DMD')
+        self.mc.log.info('Initializing DMD')
 
         self.config = self._get_validated_config(config)
 
@@ -35,17 +40,17 @@ class PhysicalDmdBase(object):
         self.effect_widget = EffectWidget()
 
         effect_list = list()
-        effect_list.append(FlipVertical())
+        effect_list.append(FlipVerticalEffect())
 
         if self.config['brightness'] != 1.0:
             if not 0.0 <= self.config['brightness'] <= 1.0:
                 raise ValueError("DMD brightness value should be between 0.0 "
                                  "and 1.0. Yours is {}".format(self.config['brightness']))
 
-            effect_list.append(Gain(gain=self.config['brightness']))
+            effect_list.append(GainEffect(gain=self.config['brightness']))
 
         if self.config['gamma'] != 1.0:
-            effect_list.append(Gamma(gamma=self.config['gamma']))
+            effect_list.append(GammaEffect(gamma=self.config['gamma']))
 
         self.effect_widget.effects = effect_list
         self.effect_widget.size = self.source.size
@@ -54,10 +59,10 @@ class PhysicalDmdBase(object):
 
         self._set_dmd_fps()
 
-    def _get_validated_config(self, config):
+    def _get_validated_config(self, config: dict) -> dict:
         raise NotImplementedError
 
-    def _set_dmd_fps(self):
+    def _set_dmd_fps(self) -> None:
         # fps is the rate that the connected client requested. We'll use the
         # lower of the two
 
@@ -71,7 +76,7 @@ class PhysicalDmdBase(object):
         if mc_fps > Clock._max_fps:
             self.mc.log.warning("%s fps is higher than mpf-mc fps. "
                                 "Will use mpf-mc fps setting for the DMD.",
-                                PhysicalDmdBase.dmd_name_string)
+                                DmdBase.dmd_name_string)
             # pylint: disable-msg=protected-access
             fps = Clock._max_fps
             update = 0
@@ -86,9 +91,9 @@ class PhysicalDmdBase(object):
 
         Clock.schedule_interval(self.tick, update)
         self.mc.log.info("Setting %s to %sfps",
-                         PhysicalDmdBase.dmd_name_string, fps)
+                         DmdBase.dmd_name_string, fps)
 
-    def tick(self, dt):
+    def tick(self, dt) -> None:
         """Draw image for DMD and send it."""
         del dt
         widget = self.source
@@ -122,27 +127,28 @@ class PhysicalDmdBase(object):
             self.prev_data = data
             self.send(data)
 
-    def send(self, data):
+    def send(self, data: bytes) -> None:
         """Send data to DMD via BCP."""
         raise NotImplementedError
 
 
-class PhysicalDmd(PhysicalDmdBase):
+class Dmd(DmdBase):
+    """Monochrome DMD."""
 
-    """Physical monochrome DMD."""
-
-    def _get_validated_config(self, config):
-        return self.mc.config_validator.validate_config('physical_dmds', config)
+    def _get_validated_config(self, config: dict) -> dict:
+        return self.mc.config_validator.validate_config('dmds', config)
 
     @classmethod
-    def _convert_to_single_bytes(cls, data):
+    def _convert_to_single_bytes(cls, data, config: dict) -> bytes:
         new_data = bytearray()
         loops = 0
+        config.setdefault('luminosity', (.299, .587, .114))
+        luminosity = config['luminosity']
 
         for r, g, b in struct.iter_unpack('BBB', data):
             loops += 1
             try:
-                pixel_weight = ((r * .299) + (g * .587) + (b * .114)) / 255.
+                pixel_weight = ((r * luminosity[0]) + (g * luminosity[1]) + (b * luminosity[2])) / 255.
                 new_data.append(int(round(pixel_weight * 15)))
 
             except ValueError:
@@ -150,57 +156,21 @@ class PhysicalDmd(PhysicalDmdBase):
 
         return bytes(new_data)
 
-    def send(self, data):
+    def send(self, data: bytes) -> None:
         """Send data to DMD via BCP."""
-        data = self._convert_to_single_bytes(data)
+        data = self._convert_to_single_bytes(data, self.config)
 
         self.mc.bcp_processor.send('dmd_frame', rawbytes=data, name=self.name)
 
 
-class PhysicalRgbDmd(PhysicalDmdBase):
+class RgbDmd(DmdBase):
+    """RGB DMD."""
 
-    """Physical RGB DMD."""
+    dmd_name_string = 'RGB DMD'
 
-    dmd_name_string = 'Physical RGB DMD'
+    def _get_validated_config(self, config: dict) -> dict:
+        return self.mc.config_validator.validate_config('rgb_dmds', config)
 
-    def _get_validated_config(self, config):
-        return self.mc.config_validator.validate_config('physical_rgb_dmds',
-                                                        config)
-
-    def send(self, data):
-        """Send data to DMD via BCP."""
+    def send(self, data: bytes) -> None:
+        """Send data to RGB DMD via BCP."""
         self.mc.bcp_processor.send('rgb_dmd_frame', rawbytes=data, name=self.name)
-
-
-class FlipVertical(EffectBase):
-    """GLSL effect to veritically flip a texture"""
-
-    def __init__(self):
-        super().__init__()
-
-        self.glsl = '''
-
-        vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
-
-        {{
-        return texture2D(texture, vec2(tex_coords.x, 1.0 - tex_coords.y));
-        }}
-        '''
-
-class Gamma(EffectBase):
-    """GLSL effect to apply a gamma setting to a texture"""
-
-    def __init__(self, gamma=1.0):
-        super().__init__()
-
-        gamma = float(gamma)
-
-        self.glsl = '''
-
-        vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
-
-        {{
-        vec4 outColor = vec4(pow(color.x, {0}), pow(color.y, {0}), pow(color.z, {0}), 1.0);
-        return outColor;
-        }}
-        '''.format(gamma)

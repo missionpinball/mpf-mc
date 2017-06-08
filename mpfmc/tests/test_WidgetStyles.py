@@ -9,7 +9,7 @@ class TestWidgetStyles(MpfMcTestCase):
         return 'test_widget_styles.yaml'
 
     def get_widget(self, index=0):
-        return self.mc.targets['default'].current_slide.children[0].children[index]
+        return self.mc.targets['default'].current_slide.widgets[index].widget
 
     def test_style_loading(self):
         self.assertIn('text_default', self.mc.machine_config['widget_styles'])

@@ -15,7 +15,7 @@ class TestVideo(MpfIntegrationTestCase):
         self.advance_time_and_run()
 
         self.assertEqual(self.mc.targets['default'].current_slide.name, 'mode1_slide1')
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertEqual(video_widget.state, 'play')
         self.assertTrue(video_widget.video.loaded)
 

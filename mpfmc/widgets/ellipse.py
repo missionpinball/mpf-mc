@@ -1,35 +1,74 @@
+from typing import TYPE_CHECKING, Optional
 from kivy.graphics.vertex_instructions import Ellipse as KivyEllipse
-from kivy.graphics.context_instructions import Color
-from kivy.uix.widget import Widget
+from kivy.graphics.context_instructions import Color, Rotate, Scale
+from kivy.properties import NumericProperty
 
-from mpfmc.core.utils import set_position
-from mpfmc.uix.widget import MpfWidget
+from mpfmc.uix.widget import Widget
+
+if TYPE_CHECKING:
+    from mpfmc.core.mc import MpfMc
 
 
-class Ellipse(MpfWidget, Widget):
+class Ellipse(Widget):
 
     widget_type_name = 'Ellipse'
+    animation_properties = ('x', 'y', 'width', 'pos', 'height', 'size', 'color',
+                            'angle_start', 'angle_end', 'opacity', 'rotation', 'scale')
+    merge_settings = ('width', 'height')
 
-    def on_pos(self, *args):
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+        del kwargs
+        super().__init__(mc=mc, config=config, key=key)
+
+        # Bind to all properties that when changed need to force
+        # the widget to be redrawn
+        self.bind(pos=self._draw_widget,
+                  size=self._draw_widget,
+                  color=self._draw_widget,
+                  rotation=self._draw_widget,
+                  scale=self._draw_widget,
+                  segments=self._draw_widget,
+                  angle_start=self._draw_widget,
+                  angle_end=self._draw_widget)
+
+    def _draw_widget(self, *args) -> None:
         del args
 
-        self.pos = set_position(self.parent.width,
-                                self.parent.height,
-                                self.width, self.height,
-                                self.config['x'],
-                                self.config['y'],
-                                self.config['anchor_x'],
-                                self.config['anchor_y'],
-                                self.config['adjust_top'],
-                                self.config['adjust_right'],
-                                self.config['adjust_bottom'],
-                                self.config['adjust_left'])
+        if self.canvas is None:
+            return
+
+        anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
+        self.canvas.clear()
 
         with self.canvas:
-            Color(*self.config['color'])
+            Color(*self.color)
+            Rotate(angle=self.rotation, origin=anchor)
+            Scale(self.scale).origin = anchor
             KivyEllipse(pos=self.pos, size=self.size,
-                        segments=self.config['segments'],
-                        angle_start=self.config['angle_start'],
-                        angle_end=self.config['angle_end'])
+                        segments=self.segments,
+                        angle_start=self.angle_start,
+                        angle_end=self.angle_end)
+
+    #
+    # Properties
+    #
+
+    segments = NumericProperty(180)
+    '''Defines how many segments will be used for drawing the ellipse. The 
+    drawing will be smoother if you have many segments.
+    '''
+
+    angle_start = NumericProperty(0)
+    '''Specifies the starting angle, in degrees, of the disk portion of
+    the ellipse.
+    '''
+
+    angle_end = NumericProperty(360)
+    '''Specifies the ending angle, in degrees, of the disk portion of
+    the ellipse.
+    '''
+
+    rotation = NumericProperty(0)
+    scale = NumericProperty(1.0)
 
 widget_classes = [Ellipse]

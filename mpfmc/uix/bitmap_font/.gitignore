@@ -1,0 +1,4 @@
+# Bitmap font build files
+bitmap_font.def
+bitmap_font.o
+bitmap_font.pyd

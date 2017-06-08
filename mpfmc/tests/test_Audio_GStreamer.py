@@ -48,21 +48,21 @@ class TestAudioGStreamer(MpfMcTestCase):
         self.mc.events.post('show_slide1')
         self.advance_time()
 
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
 
         self.assertEqual(video_widget.state, 'play')
         self.assertTrue(video_widget.video.loaded)
 
         self.mc.events.post('play_sound_sfx_028')
-        self.advance_time(1)
+        self.advance_real_time(1)
         self.mc.events.post('play_city_loop')
 
-        self.advance_time(1)
+        self.advance_real_time(1)
 
         self.mc.events.post('play_sound_text')
-        self.advance_time(0.35)
+        self.advance_real_time(0.35)
         self.mc.events.post('play_sound_text')
-        self.advance_time(4)
+        self.advance_real_time(4)
 
         self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_played')
 

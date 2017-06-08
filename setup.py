@@ -9,6 +9,7 @@ import os
 from os.path import join, dirname, sep, exists, basename, isdir
 from os import walk, environ
 from distutils.version import LooseVersion
+from distutils.sysconfig import get_python_inc
 from collections import OrderedDict
 from time import sleep
 from setuptools import setup, Extension
@@ -50,7 +51,7 @@ def getoutput(cmd, env=None):
 def pkgconfig(*packages, **kw):
     flag_map = {'-I': 'include_dirs', '-L': 'library_dirs', '-l': 'libraries'}
     lenviron = None
-    pconfig = join(dirname(sys.executable), 'libs', 'pkgconfig')
+    pconfig = join(sys.prefix, 'libs', 'pkgconfig')
 
     if isdir(pconfig):
         lenviron = environ.copy()
@@ -103,6 +104,7 @@ for key in list(c_options.keys()):
 # -----------------------------------------------------------------------------
 # Cython check
 #
+
 cython_unsupported_append = '''
 
   Please note that the following versions of Cython are not supported
@@ -151,26 +153,30 @@ cython_unsupported = '''\
 
 have_cython = False
 skip_cython = False
-try:
-    # check for cython
-    from Cython.Distutils import build_ext
-    have_cython = True
-    import Cython
-    cy_version_str = Cython.__version__
-    cy_ver = LooseVersion(cy_version_str)
-    print('\nDetected Cython version {}'.format(cy_version_str))
-    if cy_ver < MIN_CYTHON_VERSION:
-        print(cython_min)
-        raise ImportError('Incompatible Cython Version')
-    if cy_ver in CYTHON_UNSUPPORTED:
-        print(cython_unsupported)
-        raise ImportError('Incompatible Cython Version')
-    if cy_ver > MAX_CYTHON_VERSION:
-        print(cython_max)
-        sleep(1)
-except ImportError:
-    print('\nCython is missing, its required for compiling mpfmc !\n\n')
-    raise
+if platform in ('ios', 'android'):
+    print('\nCython check avoided.')
+    skip_cython = True
+else:
+    try:
+        # check for cython
+        from Cython.Distutils import build_ext
+        have_cython = True
+        import Cython
+        cy_version_str = Cython.__version__
+        cy_ver = LooseVersion(cy_version_str)
+        print('\nDetected Cython version {}'.format(cy_version_str))
+        if cy_ver < MIN_CYTHON_VERSION:
+            print(cython_min)
+            raise ImportError('Incompatible Cython Version')
+        if cy_ver in CYTHON_UNSUPPORTED:
+            print(cython_unsupported)
+            raise ImportError('Incompatible Cython Version')
+        if cy_ver > MAX_CYTHON_VERSION:
+            print(cython_max)
+            sleep(1)
+    except ImportError:
+        print("\nCython is missing, it's required for compiling kivy !\n\n")
+        raise
 
 if not have_cython:
     from distutils.command.build_ext import build_ext
@@ -258,7 +264,7 @@ if platform == 'darwin':
         'include_dirs': [],
         'extra_compile_args': ['-F/Library/Frameworks']
     }
-    for name in ('SDL2', 'SDL2_mixer'):
+    for name in ('SDL2', 'SDL2_mixer', 'SDL2_image'):
         f_path = '/Library/Frameworks/{}.framework'.format(name)
         if not exists(f_path):
             print('Missing framework {}'.format(f_path))
@@ -276,9 +282,7 @@ if platform == 'darwin':
 
 else:
     # use pkg-config approach instead
-    sdl2_flags = pkgconfig('sdl2', 'SDL2_mixer')
-    if 'libraries' not in sdl2_flags:
-        raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
+    sdl2_flags = pkgconfig('sdl2', 'SDL2_mixer', 'SDL2_image')
 
 
 # -----------------------------------------------------------------------------
@@ -330,6 +334,7 @@ def determine_base_flags():
     flags = {
         'libraries': [],
         'include_dirs': [],
+        'library_dirs': [],
         'extra_link_args': [],
         'extra_compile_args': []}
     if platform.startswith('freebsd'):
@@ -357,6 +362,9 @@ def determine_base_flags():
                        'ApplicationServices.framework/Frameworks')
         flags['extra_compile_args'] += ['-F%s' % sysroot]
         flags['extra_link_args'] += ['-F%s' % sysroot]
+    elif platform == 'win32':
+        flags['include_dirs'] += [get_python_inc(prefix=sys.prefix)]
+        flags['library_dirs'] += [join(sys.prefix, "libs")]
     return flags
 
 
@@ -370,26 +378,28 @@ def determine_sdl2():
 
     # no pkgconfig info, or we want to use a specific sdl2 path, so perform
     # manual configuration
-    flags['libraries'] = ['SDL2', 'SDL2_mixer']
+    flags['libraries'] = ['SDL2', 'SDL2_mixer', 'SDL2_image']
     split_chr = ';' if platform == 'win32' else ':'
     sdl2_paths = sdl2_path.split(split_chr) if sdl2_path else []
 
     if not sdl2_paths:
-        sdl_inc = join(dirname(sys.executable), 'include', 'SDL2')
+        sdl_inc = join(sys.prefix, 'include', 'SDL2')
         if isdir(sdl_inc):
             sdl2_paths = [sdl_inc]
         sdl2_paths.extend(['/usr/local/include/SDL2', '/usr/include/SDL2'])
 
     flags['include_dirs'] = sdl2_paths
-
     flags['extra_link_args'] = []
     flags['extra_compile_args'] = []
-    flags['extra_link_args'] += (
-        ['-L' + p for p in sdl2_paths] if sdl2_paths else
-        ['-L/usr/local/lib/'])
+    flags['library_dirs'] = (
+        sdl2_paths if sdl2_paths else
+        ['/usr/local/lib/'])
+
+    if sdl2_flags:
+        flags = merge(flags, sdl2_flags)
 
     # ensure headers for all the SDL2 library is available
-    libs_to_check = ['SDL',]
+    libs_to_check = ['SDL', 'SDL_mixer', 'SDL_image']
     can_compile = True
     for lib in libs_to_check:
         found = False
@@ -415,15 +425,18 @@ gl_flags = {}
 
 # -----------------------------------------------------------------------------
 # sources to compile
-sources = {}
+sources = {
+    'core/audio/audio_interface.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/sdl2.pxi',
+                    'core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi']},
+    'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
+}
 
 sdl2_flags = determine_sdl2()
 if sdl2_flags:
-    sdl2_depends = {'depends': ['core/audio/sdl2_helper.h', 'core/audio/sdl2.pxi',]}
-    gst_depends = {'depends': ['core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi',]}
-    for source_file in ('core/audio/audio_interface.pyx',):
+    for source_file, depends in sources.items():
         sources[source_file] = merge(
-            base_flags, gst_flags, gst_depends, sdl2_flags, sdl2_depends)
+            base_flags, gst_flags, sdl2_flags, depends)
 
 
 # -----------------------------------------------------------------------------
@@ -481,7 +494,7 @@ else:
 
 install_requires = ['ruamel.yaml>=0.10,<0.11',  # better YAML library
                     'mpf>={}'.format(mpf_version),
-                    'kivy>=1.9.1',
+                    'kivy>=1.10.0',
                     'psutil',
                     'pygments',  # YAML syntax formatting for the iMC
                     ]

@@ -18,8 +18,8 @@ class TestVideo(MpfMcTestCase):
         self.mc.events.post('show_slide1')
         self.advance_time()
 
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
-        text = self.mc.targets['default'].current_slide.children[0].children[2]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0]
+        text = self.mc.targets['default'].current_slide.widgets[2]
 
         self.assertEqual(video_widget.state, 'play')
         self.assertTrue(video_widget.video.loaded)
@@ -117,10 +117,10 @@ class TestVideo(MpfMcTestCase):
 
     def test_control_events(self):
         self.mc.events.post('show_slide2')
-        self.advance_time(1)
+        self.advance_real_time(1)
 
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
-        text = self.mc.targets['default'].current_slide.children[0].children[2]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
+        text = self.mc.targets['default'].current_slide.widgets[2].widget
         text.text = "PLAY"
 
         self.assertEqual('playing', video_widget.video.state)
@@ -128,34 +128,34 @@ class TestVideo(MpfMcTestCase):
 
         self.mc.events.post('stop1')
         text.text = 'STOP'
-        self.advance_time()
+        self.advance_real_time()
         self.assertEqual(0.0, video_widget.video.position)
 
         self.mc.events.post('play1')
         text.text = 'PLAY'
-        self.advance_time(1)
+        self.advance_real_time(1)
         self.assertGreater(video_widget.video.position, 0)
 
         self.mc.events.post('pause1')
         text.text = 'PAUSE'
-        self.advance_time()
+        self.advance_real_time()
         pos = video_widget.video.position
-        self.advance_time()
+        self.advance_real_time()
         self.assertEqual(video_widget.video.position, pos)
 
         self.mc.events.post('seek1')
         text.text = 'SEEK'
-        self.advance_time()
-        self.assertAlmostEqual(video_widget.video.position, 4.0, delta=.5)
+        self.advance_real_time()
+        self.assertAlmostEqual(video_widget.video.position, 3.5, delta=.5)
 
         self.mc.events.post('mute')
         text.text = 'VOLUME (MUTE)'
-        self.advance_time()
+        self.advance_real_time()
         self.assertEqual(0, video_widget.video.volume)
 
         self.mc.events.post('position1')
         text.text = "JUMP TO POSITION 4s"
-        self.advance_time()
+        self.advance_real_time()
         self.assertAlmostEqual(video_widget.video.position, 4.0, delta=.1)
 
         # remove widget and verify control events are removed
@@ -174,7 +174,7 @@ class TestVideo(MpfMcTestCase):
     def test_video_settings(self):
         self.mc.events.post('show_slide7')
         self.advance_time(1)
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0]
 
         # make sure it's playing
         self.assertEqual('playing', video_widget.video.state)
@@ -206,7 +206,7 @@ class TestVideo(MpfMcTestCase):
 
         self.mc.events.post('show_slide8')
         self.advance_time(1)
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0]
 
         self.assertEqual('', video_widget.video.state)
         # stopped state is empty string
@@ -256,7 +256,7 @@ class TestVideo(MpfMcTestCase):
         self.advance_time(2)
         self.assertEqual(self.mc.targets['default'].current_slide.name, 'mode1_slide1')
 
-        video_widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0]
         self.assertTrue(isinstance(video_widget, VideoWidget))
         self.assertEqual(video_widget.state, 'play')
 
