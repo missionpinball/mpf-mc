@@ -29,6 +29,24 @@ things the slide is doing."""
 
 
 class Widget(KivyWidget):
+    """MPF-MC Widget class.
+
+    The :class:`Widget` class is the base class required for creating Widgets
+    for use in the media controller.  It is based on the Kivy
+    kivy.uix.widget.Widget class, but has some custom behavior for use in
+    the MC.
+
+    The most important detail is every widget is contained inside another
+    specialized widget class (mpfmc.uix.widget.WidgetContainer).  This
+    container class is always the parent of a MC Widget and provides the
+    coordinate translations to allow MC widgets to use their anchor point
+    coordinates instead of the bottom-left corner for all coordinate settings
+    (x, y, pos).  The WidgetContainer is automatically created when a widget
+    is created and should not be manipulated directly.  It is important to
+    remember when walking the widget tree the WidgetContainer is the Widget's
+    parent.
+
+    """
 
     widget_type_name = ''  # Give this a name in your subclass, e.g. 'Image'
 
@@ -869,4 +887,5 @@ class WidgetContainer(RelativeLayout):
         return self._widget
 
     widget = AliasProperty(_get_widget, None)
+    '''The MC Widget child of this container widget.'''
 
