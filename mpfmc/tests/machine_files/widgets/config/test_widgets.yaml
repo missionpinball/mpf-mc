@@ -127,7 +127,7 @@ widgets:
             value: 0, 1, 0, 1, 200, 200, 50, 100, 100, 250
             duration: 2s
           - property: rotation
-            value: -360
+            value: -300
             duration: 2s
             timing: with_previous
           - property: color
@@ -142,6 +142,7 @@ widgets:
       height: 100
       angle_end: 0
       color: magenta
+      opacity: 0.5
       animations:
         add_to_slide:
           - property: pos
@@ -231,6 +232,16 @@ widgets:
       font_size: 50
       bold: true
       color: lightyellow
+      animations:
+        add_to_slide:
+          - property: rotation, scale
+            value: 45, 1.5
+            duration: 2s
+            easing: in_quint
+          - property: scale
+            value: 0.75
+            duration: 1s
+            easing: out_quint
 
 widget_player:
   add_widget1_to_current: widget1
