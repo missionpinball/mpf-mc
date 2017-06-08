@@ -554,6 +554,8 @@ class DisplayOutput(Scatter):
 
         super().__init__(**kwargs)
 
+        self.key = None
+
         # Rather than adding the display as a child of this widget, we will simply
         # add the display's canvas to this widget's canvas.  This allows the display
         # to essentially have multiple parents. The canvas contains all the

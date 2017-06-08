@@ -24,6 +24,7 @@ class DisplayWidget(Widget, RelativeLayout):
 
         self.display = self.mc.displays[self.config['source_display']]
         self.effects = EffectWidget(pos=self.pos, size_hint=(1, 1))
+        self.effects.key = None
 
         if 'effects' in self.config:
             self._add_effects(self.config['effects'])
