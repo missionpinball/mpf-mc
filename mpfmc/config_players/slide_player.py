@@ -99,8 +99,7 @@ class McSlidePlayer(McConfigPlayer):
     show_section = 'slides'
     machine_collection_name = 'slides'
 
-    def _add_slide_to_target_when_active(self, target_name, key, slide_name, s,
-                                         instance_dict, **kwargs):
+    def _add_slide_to_target(self, target_name, key, slide_name, s, instance_dict, **kwargs):
         del kwargs
         target = self.machine.targets[target_name]
         if 'widgets' in s:
@@ -108,21 +107,21 @@ class McSlidePlayer(McConfigPlayer):
         else:
             target.show_slide(slide_name=slide_name, key=key, **s)
 
-        if slide_name not in instance_dict[target_name]:
-            instance_dict[target_name][slide_name] = False
+        self.machine.events.remove_handler_by_key(instance_dict[target_name][slide_name])
+        instance_dict[target_name][slide_name] = False
 
-    def _delayed_actions(self, target_name, s, slide, instance_dict,
-                         full_context):
+    def _add_slide_to_target_when_active(self, target_name, s, slide, instance_dict, full_context):
+
         if target_name not in instance_dict:
             instance_dict[target_name] = {}
-        if (slide in instance_dict[target_name] and
+        elif (slide in instance_dict[target_name] and
                 instance_dict[target_name][slide]):
             self.machine.events.remove_handler_by_key(
                 instance_dict[target_name][slide])
         if s['action'] == "play":
             handler = self.machine.events.add_handler(
                 "display_{}_ready".format(target_name),
-                self._add_slide_to_target_when_active,
+                self._add_slide_to_target,
                 key=full_context, slide_name=slide, s=s,
                 target_name=target_name, instance_dict=instance_dict)
             instance_dict[target_name][slide] = handler
@@ -131,6 +130,8 @@ class McSlidePlayer(McConfigPlayer):
         instance_dict = self._get_instance_dict(context)
         full_context = self._get_full_context(context)
         settings = deepcopy(settings)
+
+        self.machine.log.info("SlidePlayer: Play called with settings=%s", settings)
 
         if 'slides' in settings:
             settings = settings['slides']
@@ -148,25 +149,28 @@ class McSlidePlayer(McConfigPlayer):
 
             if s['target']:
                 target_name = s['target']
-                try:
-                    target = self.machine.targets[target_name]
-                except KeyError:
-                    # target does not exist yet. perform action when it appears
-                    self._delayed_actions(target_name, s, slide, instance_dict,
-                                          full_context)
-                    return
             else:
-                target = self.machine.targets['default']
-                target_name = "default"
+                target_name = 'default'
 
-            self._delayed_actions(target_name, s, slide, instance_dict,
-                                  full_context)
+            if target_name not in self.machine.targets or not self.machine.targets[target_name].ready:
+                # Target does not exist yet or is not ready. Perform action when it is ready
+                self._add_slide_to_target_when_active(target_name, s, slide, instance_dict, full_context)
+                return
+            else:
+                target = self.machine.targets[target_name]
 
             # remove target
             s.pop("target")
 
+            if target_name not in instance_dict:
+                instance_dict[target_name] = {}
+
             if s['action'] == 'play':
                 # is this a named slide, or a new slide?
+                self.machine.log.debug("SlidePlayer: Playing slide '%s' on target '%s' (Args=%s)",
+                                       slide,
+                                       target.name,
+                                       s)
                 if 'widgets' in s:
                     target.add_and_show_slide(key=full_context,
                                               slide_name=slide, **s)
