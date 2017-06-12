@@ -200,7 +200,7 @@ class MpfMc(App):
             return
 
         if section not in self.machine_config:
-            self.config[section] = dict()
+            self.machine_config[section] = dict()
 
         self.machine_config[section] = self.config_validator.validate_config(
             section, self.machine_config[section], section)
@@ -240,6 +240,7 @@ class MpfMc(App):
 
     def displays_initialized(self, *args):
         del args
+        self.validate_machine_config_section('window')
         from mpfmc.uix.window import Window
         Window.initialize(self)
         self.events.post('displays_initialized')

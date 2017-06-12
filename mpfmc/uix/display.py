@@ -43,6 +43,7 @@ class Display(ScreenManager):
         self.mc = mc
         self.name = name
         self.config = kwargs
+        self._ready = False
 
         Display.displays_to_initialize += 1
 
@@ -74,6 +75,10 @@ class Display(ScreenManager):
     def __repr__(self):
         return '<Display name={}{}, current slide={}, total slides={}>'.format(
             self.name, self.size, self.current_slide_name, len(self.slides))
+
+    @property
+    def ready(self):
+        return self._ready
 
     @property
     def parent_widgets(self) -> List["WidgetContainer"]:
@@ -126,7 +131,9 @@ class Display(ScreenManager):
 
         Display.displays_to_initialize -= 1
 
-        self.mc.events.add_handler('displays_initialized', self._ready, priority=10000)
+        # Callback function to set this display to ready state once all displays
+        # have been initialized
+        self.mc.events.add_handler('displays_initialized', self._finalize_setup, priority=10000)
 
         if not Display.displays_to_initialize:
             Clock.schedule_once(self._displays_initialized)
@@ -142,17 +149,19 @@ class Display(ScreenManager):
 
         elif 'default' not in self.mc.targets:
             for target in ('window', 'dmd'):
-                if target in self.mc.targets:
-                    self.mc.targets['default'] = self.mc.targets[target]
+                if target in self.mc.displays:
+                    self.mc.targets['default'] = self.mc.displays[target]
                     break
 
             if 'default' not in self.mc.targets:
                 self.mc.targets['default'] = self.mc.displays[
                     (sorted(self.mc.displays.keys()))[0]]
 
+        self.mc.log.info("Display: Setting '%s' as default display", self.mc.targets['default'].name)
+
         self.mc.displays_initialized()
 
-    def _ready(self, **kwargs) -> None:
+    def _finalize_setup(self, **kwargs) -> None:
         """Callback function after all displays have been initialized.  This
         method finalizes the display setup and gets it ready to use as a
         target. The 'display_{}_ready' event is posted once it is ready.
@@ -170,6 +179,8 @@ class Display(ScreenManager):
         # our slide event will be called which only happens when this slide is
         # switched to, rather than automatically added.
         self.create_blank_slide()
+
+        self._ready = True
 
         self.mc.post_mc_native_event('display_{}_ready'.format(self.name))
         '''event: display_(name)_ready
@@ -555,6 +566,10 @@ class DisplayOutput(Scatter):
         super().__init__(**kwargs)
 
         self.key = None
+
+        # It is important that the content of this display output does not contain any
+        # circular references to the same display (cannot do a recursive
+        # picture-in-picture or Kivy will crash).  Detect and prevent that situation.
 
         # Rather than adding the display as a child of this widget, we will simply
         # add the display's canvas to this widget's canvas.  This allows the display

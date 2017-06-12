@@ -29,22 +29,14 @@ class Window(object):
 
     @staticmethod
     def initialize(mc: "MpfMc") -> None:
-        try:
-            mc.icon = mc.machine_config['window']['icon']
-        except KeyError:
-            mc.icon = 'mc/icons/256x256.png'
-
-        try:
-            mc.title = mc.machine_config['window']['title']
-        except KeyError:
-            mc.title = "Mission Pinball Framework"
+        mc.icon = mc.machine_config['window']['icon']
+        mc.title = mc.machine_config['window']['title']
 
         # Set the source based on the window: source_display: setting.
         # If that's not valid, and there's a display called "window", use it
         # Otherwise use the default.
         try:
-            display = mc.displays[mc.machine_config['window'][
-                'source_display']]
+            display = mc.displays[mc.machine_config['window']['source_display']]
         except KeyError:
             if 'window' in mc.targets:
                 display = mc.targets['window']
