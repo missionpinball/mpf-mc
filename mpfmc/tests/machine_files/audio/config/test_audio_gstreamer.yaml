@@ -94,3 +94,5 @@ videos:
   mpf_video_small_test:
     width: 100
     height: 70
+    events_when_played: test_video_played
+    events_when_stopped: test_video_stopped

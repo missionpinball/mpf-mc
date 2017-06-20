@@ -62,9 +62,11 @@ class TestAudioGStreamer(MpfMcTestCase):
         self.mc.events.post('play_sound_text')
         self.advance_time(0.35)
         self.mc.events.post('play_sound_text')
-        self.advance_time(4)
+        self.advance_time(6)
 
         self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='test_video_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='test_video_stopped')
 
 
 
