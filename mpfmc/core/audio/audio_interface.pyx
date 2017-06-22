@@ -77,17 +77,17 @@ cdef class AudioInterface:
     The AudioInterface class provides a management wrapper around the SDL2 and SDL_Mixer
     libraries.
     """
-    cdef int supported_formats
     cdef list tracks
     cdef object mc
     cdef object log
+    cdef bint use_sdl_mixer_loader
 
     cdef AudioCallbackData audio_callback_data
 
     def __cinit__(self, *args, **kw):
-        self.supported_formats = 0
+        self.use_sdl_mixer_loader = True
 
-    def __init__(self, rate=44100, channels=2, buffer_samples=4096):
+    def __init__(self, rate=44100, channels=2, buffer_samples=4096, use_sdl_mixer_loader=True):
         """
         Initializes the AudioInterface.
         Args:
@@ -98,6 +98,8 @@ cdef class AudioInterface:
         cdef SDL_AudioSpec desired
         cdef SDL_AudioSpec obtained
         self.log = logging.getLogger("AudioInterface")
+
+        self.use_sdl_mixer_loader = use_sdl_mixer_loader
 
         # Initialize threading in the extension library and acquire the Python global interpreter lock
         PyEval_InitThreads()
@@ -132,22 +134,26 @@ cdef class AudioInterface:
             self.log.error('SDL_OpenAudioDevice error - %s' % SDL_GetError())
             raise AudioException('Unable to open audio for output (SDL_OpenAudioDevice failed: %s)' % SDL_GetError())
 
-        # Initialize the SDL_Mixer library to establish the output audio format and encoding
-        # (sample rate, bit depth, buffer size).
-        # NOTE: SDL_Mixer is only used to load audio files into memory and not for any output functions. This
-        if Mix_OpenAudio(obtained.freq, obtained.format, obtained.channels, obtained.samples):
-            self.log.error('Mix_OpenAudio error - %s' % SDL_GetError())
-            raise AudioException('Unable to open SDL_Mixer library for loading audio files (Mix_OpenAudio failed: %s)' % SDL_GetError())
+        if self.use_sdl_mixer_loader:
+            # Initialize the SDL_Mixer library to establish the output audio format and encoding
+            # (sample rate, bit depth, buffer size).
+            # NOTE: SDL_Mixer is only used to load audio files into memory and not for any output functions.
+            if Mix_OpenAudio(obtained.freq, obtained.format, obtained.channels, obtained.samples):
+                self.log.error('Mix_OpenAudio error - %s' % SDL_GetError())
+                raise AudioException('Unable to open SDL_Mixer library for loading audio files (Mix_OpenAudio failed: %s)' % SDL_GetError())
 
-        # We want to use as little resources as possible for SDL_Mixer (since it is just used for loading)
-        Mix_AllocateChannels(0)
+            # We want to use as little resources as possible for SDL_Mixer (since it is just used for loading)
+            Mix_AllocateChannels(0)
 
         # Initialize GStreamer
         self._initialize_gstreamer()
 
         self.log.info("Initialized")
         self.log.debug("Loaded %s", AudioInterface.get_sdl_version())
-        self.log.debug("Loaded %s", AudioInterface.get_sdl_mixer_version())
+
+        if self.use_sdl_mixer_loader:
+            self.log.debug("Loaded %s", AudioInterface.get_sdl_mixer_version())
+
         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
         self.log.debug("Loaded %s", AudioInterface.get_glib_version())
 
@@ -197,7 +203,8 @@ cdef class AudioInterface:
         PyMem_Free(self.audio_callback_data.tracks)
 
         # SDL and SDL_Mixer no longer needed
-        Mix_Quit()
+        if self.use_sdl_mixer_loader:
+            Mix_Quit()
         SDL_Quit()
 
     def _initialize_gstreamer(self):
@@ -381,7 +388,10 @@ cdef class AudioInterface:
         Returns:
             A list of file extensions supported.
         """
-        return ["wav", "ogg", "flac",]
+        if self.use_sdl_mixer_loader:
+            return ["wav", "ogg", "flac",]
+        else:
+            return ["wav",]
 
     def get_master_volume(self):
         return round(self.audio_callback_data.master_volume / SDL_MIX_MAXVOLUME, 2)
@@ -546,7 +556,9 @@ cdef class AudioInterface:
             A SoundMemoryFile wrapper object containing a pointer to the sound sample
             data in memory.  An exception is thrown if the sound is unable to be loaded.
         """
-        return SoundMemoryFile(file_name, pycapsule.PyCapsule_New(&self.audio_callback_data, NULL, NULL))
+        return SoundMemoryFile(file_name,
+                               pycapsule.PyCapsule_New(&self.audio_callback_data, NULL, NULL),
+                               self.use_sdl_mixer_loader)
 
     def load_sound_file_for_streaming(self, str file_name):
         """
@@ -2558,11 +2570,12 @@ cdef class SoundFile:
 cdef class SoundMemoryFile(SoundFile):
     """SoundMemoryFile is a wrapper class to manage sound sample data stored
     in memory."""
-    cdef bint _loaded_using_sdl
+    cdef bint _use_sdl_mixer_loader
 
-    def __init__(self, str file_name, object audio_callback_data):
+    def __init__(self, str file_name, object audio_callback_data, bint use_sdl_mixer_loader=True):
         # IMPORTANT: Call super class init function
         super().__init__(file_name, audio_callback_data)
+        self._use_sdl_mixer_loader = use_sdl_mixer_loader
         self.log = logging.getLogger("SoundMemoryFile")
         self.sample.type = sound_type_memory
         self.sample.data.memory = <SampleMemory*>PyMem_Malloc(sizeof(SampleMemory))
@@ -2583,6 +2596,15 @@ cdef class SoundMemoryFile(SoundFile):
             return "<SoundMemoryFile({}, Loaded=False)>".format(self.file_name)
 
     def load(self):
+        if self._use_sdl_mixer_loader:
+            self._load_using_sdl_mixer()
+        else:
+            self._load_using_sdl()
+
+        self.log.debug('Loaded file: %s Sample duration: %s',
+                       self.file_name, self.sample.duration)
+
+    def _load_using_sdl_mixer(self):
         """Loads the sound into memory using the most appropriate library for the format."""
         cdef Mix_Chunk *chunk
 
@@ -2611,8 +2633,48 @@ cdef class SoundMemoryFile(SoundFile):
         # sample memory must be freed later when this object is deallocated.
         SDL_free(chunk)
 
-        self.log.debug('Loaded file: %s Sample duration: %s',
-                       self.file_name, self.sample.duration)
+    def _load_using_sdl(self):
+        """Loads the sound into memory using SDL2 (only supports WAV files)."""
+        cdef SDL_AudioSpec wave_spec
+        cdef SDL_AudioSpec desired_spec
+        cdef SDL_AudioSpec *loaded
+        cdef SDL_AudioCVT wavecvt
+        cdef Uint8 *temp_sample_data = NULL
+        cdef Uint32 temp_sample_size = 0
+        cdef Uint8* converted_sample_data = NULL
+        cdef Uint32 converted_sample_size = 0
+
+        # Load the WAV file into memory (memory is allocated during the load)
+        loaded = SDL_LoadWAV(self.file_name.encode('utf-8'), &wave_spec, &temp_sample_data, &temp_sample_size)
+        if loaded == NULL:
+            msg = "Could not load sound file {} due to an error: {}".format(self.file_name, SDL_GetError())
+            raise AudioException(msg)
+
+        # Setup desired format for sample data
+        desired_spec.freq = self.callback_data.sample_rate
+        desired_spec.format = self.callback_data.format
+        desired_spec.channels = self.callback_data.channels
+
+        if wave_spec.freq != self.callback_data.sample_rate or wave_spec.format != self.callback_data.format or wave_spec.channels != self.callback_data.channels:
+
+            # Now we need to check if the audio format must be converted to match the audio interface output format
+            if convert_audio_to_desired_format(wave_spec, desired_spec, temp_sample_data, temp_sample_size, &converted_sample_data, &converted_sample_size) < 0:
+                SDL_FreeWAV(temp_sample_data)
+                msg = "Could not convert sound file {} to required format".format(self.file_name)
+                raise AudioException(msg)
+
+            else:
+                # Reallocate sample buffer as it is very possible it shrank during the conversion process
+                self.sample.data.memory.size = <gsize>converted_sample_size
+                self.sample.data.memory.data = <gpointer>converted_sample_data
+                SDL_FreeWAV(temp_sample_data)
+
+        else:
+            self.sample.data.memory.size = <gsize>temp_sample_size
+            self.sample.data.memory.data = <gpointer>temp_sample_data
+
+        # Set the sample duration (in seconds)
+        self.sample.duration = self.sample.data.memory.size / self.callback_data.seconds_to_bytes_factor
 
     def unload(self):
         """Unloads the sample data from memory"""
