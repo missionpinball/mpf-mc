@@ -82,12 +82,16 @@ class SoundSystem(object):
         if 'master_volume' not in self.config:
             self.config['master_volume'] = DEFAULT_MASTER_VOLUME
 
+        if 'use_sdl_mixer_loader' not in self.config:
+            self.config['use_sdl_mixer_loader'] = True
+
         # Initialize audio interface library (get audio output)
         try:
             self.audio_interface = AudioInterface(
                 rate=self.config['frequency'],
                 channels=self.config['channels'],
-                buffer_samples=self.config['buffer'])
+                buffer_samples=self.config['buffer'],
+                use_sdl_mixer_loader=self.config['use_sdl_mixer_loader'])
         except AudioException:
             self.log.error("Could not initialize the audio interface. "
                            "Audio features will not be available.")
