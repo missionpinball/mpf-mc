@@ -205,10 +205,9 @@ ctypedef struct AudioCallbackData:
     # A pointer to this struct is passed to the main audio callback function and
     # is the only way data is made available to the main audio thread.  Must not
     # contain any Python objects.
-    SDL_AudioDeviceID device_id
     SDL_AudioFormat format
-    Uint16 sample_rate
-    Uint8 channels
+    int sample_rate
+    int channels
     Uint16 buffer_samples
     Uint32 buffer_size
     Uint16 bytes_per_control_point

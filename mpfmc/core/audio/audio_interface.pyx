@@ -3,14 +3,9 @@
 """
 Audio Library
 
-This library requires both the SDL2 and SDL_Mixer libraries.
+This library requires the SDL2, SDL_Mixer, and Gstreamer libraries.
 """
 
-__all__ = ('AudioInterface',
-           'AudioException',
-           'Track',
-           'MixChunkContainer',
-           )
 
 from libc.stdio cimport FILE, fopen, fprintf, sprintf
 from libc.stdlib cimport malloc, free, calloc
@@ -77,7 +72,6 @@ cdef class AudioInterface:
     The AudioInterface class provides a management wrapper around the SDL2 and SDL_Mixer
     libraries.
     """
-    cdef int supported_formats
     cdef list tracks
     cdef object mc
     cdef object log
@@ -85,7 +79,7 @@ cdef class AudioInterface:
     cdef AudioCallbackData audio_callback_data
 
     def __cinit__(self, *args, **kw):
-        self.supported_formats = 0
+        pass
 
     def __init__(self, rate=44100, channels=2, buffer_samples=4096):
         """
@@ -95,8 +89,6 @@ cdef class AudioInterface:
             channels: The number of channels to use (1=mono, 2=stereo)
             buffer_samples: The audio buffer size to use (in number of samples, must be power of two)
         """
-        cdef SDL_AudioSpec desired
-        cdef SDL_AudioSpec obtained
         self.log = logging.getLogger("AudioInterface")
 
         # Initialize threading in the extension library and acquire the Python global interpreter lock
@@ -118,28 +110,14 @@ cdef class AudioInterface:
             self.log.error('SDL_Init error - %s' % SDL_GetError())
             raise AudioException('Unable to initialize SDL (SDL_Init call failed: %s)' % SDL_GetError())
 
-        # Set the desired audio interface settings to request from SDL
-        desired.freq = rate
-        desired.format = AUDIO_S16SYS
-        desired.channels = channels
-        desired.samples = buffer_samples
-        desired.callback = AudioInterface.audio_callback
-        desired.userdata = &self.audio_callback_data
-
-        # Open the audio device using the desired settings
-        self.audio_callback_data.device_id = SDL_OpenAudioDevice(NULL, 0, &desired, &obtained, SDL_AUDIO_ALLOW_FREQUENCY_CHANGE | SDL_AUDIO_ALLOW_CHANNELS_CHANGE)
-        if self.audio_callback_data.device_id == 0:
-            self.log.error('SDL_OpenAudioDevice error - %s' % SDL_GetError())
-            raise AudioException('Unable to open audio for output (SDL_OpenAudioDevice failed: %s)' % SDL_GetError())
-
         # Initialize the SDL_Mixer library to establish the output audio format and encoding
-        # (sample rate, bit depth, buffer size).
-        # NOTE: SDL_Mixer is only used to load audio files into memory and not for any output functions. This
-        if Mix_OpenAudio(obtained.freq, obtained.format, obtained.channels, obtained.samples):
+        # (sample rate, bit depth, buffer size)
+        if Mix_OpenAudio(rate, AUDIO_S16SYS, channels, buffer_samples):
             self.log.error('Mix_OpenAudio error - %s' % SDL_GetError())
-            raise AudioException('Unable to open SDL_Mixer library for loading audio files (Mix_OpenAudio failed: %s)' % SDL_GetError())
+            raise AudioException('Unable to open audio for output (Mix_OpenAudio failed: %s)' % SDL_GetError())
 
-        # We want to use as little resources as possible for SDL_Mixer (since it is just used for loading)
+        # We want to use as little resources as possible for SDL_Mixer as we will just be using the custom
+        # music player hook to play audio (no mixer channels needed).
         Mix_AllocateChannels(0)
 
         # Initialize GStreamer
@@ -151,17 +129,22 @@ cdef class AudioInterface:
         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
         self.log.debug("Loaded %s", AudioInterface.get_glib_version())
 
-        # Store the actual audio format in use by the opened audio device.  This may or may not match
-        # the requested values used to initialize the audio interface.  A pointer to the audio_callback_data
+        # Lock SDL from calling the audio callback functions while we set things up
+        SDL_LockAudio()
+
+        # Determine the actual audio format in use by the opened audio device.  This may or may not match
+        # the parameters used to initialize the audio interface.
+        self.audio_callback_data.buffer_samples = buffer_samples
+        Mix_QuerySpec(&self.audio_callback_data.sample_rate,
+                      &self.audio_callback_data.format,
+                      &self.audio_callback_data.channels)
+
+        # The requested values used to initialize the audio interface.  A pointer to the audio_callback_data
         # structure is passed to the SDL audio callback function and is the source of all audio state
         # and mixing data needed to generate the output signal.
-        self.audio_callback_data.sample_rate = obtained.freq
-        self.audio_callback_data.channels = obtained.channels
-        self.audio_callback_data.format = obtained.format
-        self.audio_callback_data.buffer_samples = obtained.samples
-        self.audio_callback_data.buffer_size = obtained.size
-        self.audio_callback_data.bytes_per_control_point = obtained.size // CONTROL_POINTS_PER_BUFFER
-        self.audio_callback_data.bytes_per_sample = SDL_AUDIO_BITSIZE(obtained.format) // 8
+        self.audio_callback_data.bytes_per_sample = SDL_AUDIO_BITSIZE(self.audio_callback_data.format) // 8
+        self.audio_callback_data.buffer_size = self.audio_callback_data.buffer_samples * self.audio_callback_data.bytes_per_sample * self.audio_callback_data.channels
+        self.audio_callback_data.bytes_per_control_point = self.audio_callback_data.buffer_size // CONTROL_POINTS_PER_BUFFER
         self.audio_callback_data.seconds_to_bytes_factor = self.audio_callback_data.sample_rate * self.audio_callback_data.channels * self.audio_callback_data.bytes_per_sample
         self.audio_callback_data.master_volume = SDL_MIX_MAXVOLUME // 2
         self.audio_callback_data.quick_fade_steps = (<int>(QUICK_FADE_DURATION_SECS *
@@ -169,7 +152,7 @@ cdef class AudioInterface:
                                                      self.audio_callback_data.channels *
                                                      self.audio_callback_data.bytes_per_sample
                                                            )) // self.audio_callback_data.bytes_per_control_point
-        self.audio_callback_data.silence = obtained.silence
+        self.audio_callback_data.silence = 0
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <TrackState**> PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
         self.audio_callback_data.c_log_file = NULL
@@ -181,6 +164,9 @@ cdef class AudioInterface:
                        self.audio_callback_data.sample_rate, self.audio_callback_data.channels,
                        self.audio_callback_data.buffer_samples, self.audio_callback_data.buffer_size,
                        self.audio_callback_data.bytes_per_sample)
+
+        # Unlock the SDL audio callback functions
+        SDL_UnlockAudio()
 
         self.tracks = list()
 
@@ -387,9 +373,9 @@ cdef class AudioInterface:
         return round(self.audio_callback_data.master_volume / SDL_MIX_MAXVOLUME, 2)
 
     def set_master_volume(self, float volume):
-        SDL_LockAudioDevice(self.audio_callback_data.device_id)
+        SDL_LockAudio()
         self.audio_callback_data.master_volume = <Uint8>min(max(volume * SDL_MIX_MAXVOLUME, 0), SDL_MIX_MAXVOLUME)
-        SDL_UnlockAudioDevice(self.audio_callback_data.device_id)
+        SDL_UnlockAudio()
 
     def get_settings(self):
         """
@@ -419,15 +405,14 @@ cdef class AudioInterface:
 
     @property
     def enabled(self):
-        return SDL_GetAudioDeviceStatus(self.audio_callback_data.device_id) == SDL_AUDIO_PLAYING
+        return SDL_GetAudioStatus() == SDL_AUDIO_PLAYING and Mix_GetMusicHookData() != NULL
 
     def enable(self):
         """
         Enables audio playback (begins audio processing)
         """
         self.log.debug("Enabling audio playback")
-
-        SDL_PauseAudioDevice(self.audio_callback_data.device_id, 0)
+        Mix_HookMusic(self.audio_callback, &self.audio_callback_data)
 
     def disable(self):
         """
@@ -435,7 +420,7 @@ cdef class AudioInterface:
         """
         self.log.debug("Disabling audio playback")
         self.stop_all_sounds()
-        SDL_PauseAudioDevice(self.audio_callback_data.device_id, 1)
+        Mix_HookMusic(NULL, NULL)
 
     def shutdown(self):
         """
@@ -443,8 +428,6 @@ cdef class AudioInterface:
         """
         self.disable()
         Mix_CloseAudio()
-        SDL_CloseAudioDevice(self.audio_callback_data.device_id)
-        self.audio_callback_data.device_id = 0
 
     @staticmethod
     def get_max_tracks():
@@ -512,7 +495,7 @@ cdef class AudioInterface:
                 return None
 
         # Make sure audio callback function cannot be called while we are changing the track data
-        SDL_LockAudioDevice(self.audio_callback_data.device_id)
+        SDL_LockAudio()
 
         # Create the new standard track
         new_track = TrackStandard(mc,
@@ -529,7 +512,7 @@ cdef class AudioInterface:
         self.audio_callback_data.tracks[track_num] = new_track.state
 
         # Allow audio callback function to be called again
-        SDL_UnlockAudioDevice(self.audio_callback_data.device_id)
+        SDL_UnlockAudio()
 
         self.log.debug("The '%s' standard track has successfully been created.", name)
 
@@ -596,7 +579,7 @@ cdef class AudioInterface:
     @staticmethod
     cdef void audio_callback(void* data, Uint8 *output_buffer, int length) nogil:
         """
-        Main audio callback function (called from SDL2).
+        Main audio callback function (called from SDL_mixer).
         Args:
             data: A pointer to the AudioCallbackData class for the channel (contains all audio
                 processing-related settings and state, ex: interface settings, tracks, sound
@@ -1343,7 +1326,6 @@ cdef class Track:
         # (see https://docs.python.org/3.4/c-api/capsule.html).  This basically wraps the
         # pointer in a Python object. It can be extracted using PyCapsule_GetPointer.
         self.state.callback_data = <AudioCallbackData*>pycapsule.PyCapsule_GetPointer(audio_callback_data, NULL)
-        self.device_id = self.state.callback_data.device_id
 
         self.state.status = track_status_playing
         self.state.fade_steps = 0
@@ -1375,9 +1357,9 @@ cdef class Track:
         """Return the track number"""
         cdef int number = -1
         if self.state != NULL:
-            SDL_LockAudioDevice(self.device_id)
+            SDL_LockAudio()
             number = self.state.number
-            SDL_UnlockAudioDevice(self.device_id)
+            SDL_UnlockAudio()
         return number
 
     @property
@@ -1425,15 +1407,15 @@ cdef class Track:
         """Return whether or not the track is currently fading"""
         cdef bint fading = False
         if self.state != NULL:
-            SDL_LockAudioDevice(self.device_id)
+            SDL_LockAudio()
             fading = self.state.fade_steps_remaining > 0
-            SDL_UnlockAudioDevice(self.device_id)
+            SDL_UnlockAudio()
         return fading
 
     def set_volume(self, float volume, float fade_seconds = 0.0):
         """Sets the current track volume with an optional fade time"""
         cdef Uint8 new_volume = <Uint8>min(max(volume * SDL_MIX_MAXVOLUME, 0), SDL_MIX_MAXVOLUME)
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         # Fades require special logic
         if fade_seconds > 0:
@@ -1462,7 +1444,7 @@ cdef class Track:
             self.state.fade_volume_start = new_volume
             self.state.fade_volume_target = new_volume
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def play(self, float fade_in_seconds = 0.0):
         """
@@ -1473,7 +1455,7 @@ cdef class Track:
         """
         self.log.debug("play - Begin sound processing on track")
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         # Play is only supported when a track is paused, stopped, or is in the process of stopping
         if self.state.status == track_status_paused or \
@@ -1504,7 +1486,7 @@ cdef class Track:
             self.log.warning("play - Action may only be used when a track is stopped or is in the process "
                              "of stopping; action will be ignored.")
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def stop(self, float fade_out_seconds = 0.0):
         """
@@ -1515,7 +1497,7 @@ cdef class Track:
         """
         self.log.debug("stop - Stop sound processing on track and clear state")
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         # Stop is only supported when a track is playing
         if self.state.status in [track_status_playing, track_status_stopping, track_status_pausing]:
@@ -1543,7 +1525,7 @@ cdef class Track:
             self.log.warning("stop - Action may only be used when a track is playing; action "
                              "will be ignored.")
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def pause(self, float fade_out_seconds = 0.0):
         """
@@ -1554,7 +1536,7 @@ cdef class Track:
         """
         self.log.debug("pause - Pause sound processing on track")
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         # Stop is only supported when a track is playing
         if self.state.status in [track_status_playing, track_status_stopping, track_status_pausing]:
@@ -1580,7 +1562,7 @@ cdef class Track:
             self.log.warning("pause - Action may only be used when a track is playing; action "
                              "will be ignored.")
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def process(self):
         """Processes the track queue each tick."""
@@ -1624,7 +1606,7 @@ cdef class TrackStandard(Track):
 
         self.log = logging.getLogger("Track." + str(track_num) + ".TrackStandard." + name)
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         self._sound_queue = list()
 
@@ -1684,12 +1666,12 @@ cdef class TrackStandard(Track):
                        "simultaneous_sounds = %d, volume = %f",
                        self.number, self.name, self.max_simultaneous_sounds, self.volume)
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def __dealloc__(self):
         """Destructor"""
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         # Free the specific track type state and other allocated memory
         if self.state != NULL:
@@ -1697,7 +1679,7 @@ cdef class TrackStandard(Track):
             PyMem_Free(self.type_state)
             self.state = NULL
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def __repr__(self):
         return '<Track.{}.Standard.{}>'.format(self.number, self.name)
@@ -1722,14 +1704,14 @@ cdef class TrackStandard(Track):
         Returns the index of the first idle sound player on the track.  If all
         players are currently busy playing, -1 is returned.
         """
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         for index in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[index].status == player_idle:
-                SDL_UnlockAudioDevice(self.device_id)
+                SDL_UnlockAudio()
                 return index
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
         return -1
 
     def process(self):
@@ -1741,7 +1723,7 @@ cdef class TrackStandard(Track):
 
         # Lock the mutex to ensure no audio data is changed during the playback processing
         # (multi-threaded protection)
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         while keep_checking:
             # See if there are now any idle sound players
@@ -1771,7 +1753,7 @@ cdef class TrackStandard(Track):
             self.state.notification_messages = NULL
 
         # Unlock the mutex since we are done accessing the audio data
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     cdef process_notification_message(self, NotificationMessageContainer *notification_message):
         """Process a notification message to this track"""
@@ -1779,7 +1761,7 @@ cdef class TrackStandard(Track):
         if notification_message == NULL:
             return
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         # Check for track notification messages first (they do not need sound instance information)
         if notification_message.message in (notification_track_stopped, notification_track_paused):
@@ -1797,7 +1779,7 @@ cdef class TrackStandard(Track):
                         self.mc.post_mc_native_event(event)
                 pass
 
-            SDL_UnlockAudioDevice(self.device_id)
+            SDL_UnlockAudio()
             return
 
         self.log.debug("Processing notification message %d for sound instance (id: %d)",
@@ -1833,7 +1815,7 @@ cdef class TrackStandard(Track):
         else:
             raise AudioException("Unknown notification message received on %s track", self.name)
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def _get_next_sound(self):
         """
@@ -1915,7 +1897,7 @@ cdef class TrackStandard(Track):
         """
         self.log.debug("play_sound - Processing sound '%s' for playback.", sound_instance.name)
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         # Sound instance cannot be played if the track is stopped or paused
         if self.state.status == track_status_stopped or self.state.status == track_status_paused:
@@ -1923,7 +1905,7 @@ cdef class TrackStandard(Track):
                            "therefore the request to play sound %s will be canceled",
                            self.name, sound_instance.name)
             sound_instance.set_canceled()
-            SDL_UnlockAudioDevice(self.device_id)
+            SDL_UnlockAudio()
             return
 
         if sound_instance.max_queue_time is None:
@@ -1988,7 +1970,7 @@ cdef class TrackStandard(Track):
                                    "for playback.", sound_instance.priority, lowest_priority)
                     self._queue_sound(sound_instance)
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def replace_sound(self, old_instance not None, sound_instance not None):
         """
@@ -2001,7 +1983,7 @@ cdef class TrackStandard(Track):
         self.log.debug("replace_sound - Preparing to replace existing sound with a new sound instance")
 
         # Find which player is currently playing the specified sound instance to replace
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
         player = self._get_player_playing_sound_instance(old_instance)
 
         if player >= 0:
@@ -2010,7 +1992,7 @@ cdef class TrackStandard(Track):
             self.log.debug("replace_sound - Could not locate specified sound instance to replace")
             sound_instance.set_canceled()
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def _queue_sound(self, sound_instance not None):
         """Adds a sound to the queue to be played when a sound player becomes available.
@@ -2037,7 +2019,7 @@ cdef class TrackStandard(Track):
         """
         cdef SoundPlayer *player
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         self.log.debug("Stopping sound %s and removing any pending instances from queue", sound_instance.name)
 
@@ -2072,7 +2054,7 @@ cdef class TrackStandard(Track):
         if self.sound_instance_is_in_queue(sound_instance):
             self._remove_sound_from_queue(sound_instance)
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def stop_sound_looping(self, sound_instance not None):
         """
@@ -2082,7 +2064,7 @@ cdef class TrackStandard(Track):
             sound_instance: The Sound to stop
         """
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle and self.type_state.sound_players[
@@ -2094,11 +2076,11 @@ cdef class TrackStandard(Track):
         if self.sound_instance_is_in_queue(sound_instance):
             self._remove_sound_from_queue(sound_instance)
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def _reset_state(self):
         """Resets the track state (stops all sounds immediately and clears the queue)"""
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         self.log.debug("Resetting track state (sounds will be stopped and queue cleared")
 
@@ -2114,7 +2096,7 @@ cdef class TrackStandard(Track):
         # Remove all sounds that are pending in the sound queue.
         self._remove_all_sounds_from_queue()
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     def stop_all_sounds(self, float fade_out_seconds = 0.0):
         """
@@ -2122,7 +2104,7 @@ cdef class TrackStandard(Track):
         Args:
             fade_out_seconds: The number of seconds to fade out the sounds before stopping
         """
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         self.log.debug("Stopping all sounds and removing any pending sounds from queue")
 
@@ -2155,7 +2137,7 @@ cdef class TrackStandard(Track):
         # Remove all sounds that are pending in the sound queue.
         self._remove_all_sounds_from_queue()
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
     cdef tuple _get_sound_player_with_lowest_priority(self):
         """
@@ -2166,7 +2148,7 @@ cdef class TrackStandard(Track):
             the sound playing on that player (or None if the player is idle).
 
         """
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         cdef int lowest_priority = 2147483647
         cdef int sound_player = -1
@@ -2174,13 +2156,13 @@ cdef class TrackStandard(Track):
 
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status == player_idle:
-                SDL_UnlockAudioDevice(self.device_id)
+                SDL_UnlockAudio()
                 return i, None
             elif self.type_state.sound_players[i].current.sound_priority < lowest_priority:
                 lowest_priority = self.type_state.sound_players[i].current.sound_priority
                 sound_player = i
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
         return sound_player, lowest_priority
 
     cdef bint _play_sound_on_sound_player(self, sound_instance, int player, bint force=False):
@@ -2198,7 +2180,7 @@ cdef class TrackStandard(Track):
         """
         self.log.debug("_play_sound_on_sound_player: %s, %s, %s", str(sound_instance), str(player), str(force))
 
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         # The sound cannot be played if the track is stopped or paused
         if self.state.status == track_status_stopped or self.state.status == track_status_paused:
@@ -2206,13 +2188,13 @@ cdef class TrackStandard(Track):
                            "therefore the request to play sound %s will be canceled",
                            self.name, sound_instance.name)
             sound_instance.set_canceled()
-            SDL_UnlockAudioDevice(self.device_id)
+            SDL_UnlockAudio()
             return False
 
         if not sound_instance.sound.loaded:
             self.log.debug("Specified sound is not loaded, could not "
                            "play sound %s", sound_instance.name)
-            SDL_UnlockAudioDevice(self.device_id)
+            SDL_UnlockAudio()
             return False
 
         # Make sure the player in range
@@ -2222,7 +2204,7 @@ cdef class TrackStandard(Track):
             if self.type_state.sound_players[player].status != player_idle and not force:
                 self.log.debug("All sound players are currently in use, "
                                "could not play sound %s", sound_instance.name)
-                SDL_UnlockAudioDevice(self.device_id)
+                SDL_UnlockAudio()
                 return False
 
             # Add sound to the dictionary of active sound instances
@@ -2240,10 +2222,10 @@ cdef class TrackStandard(Track):
             self.log.debug("Sound %s is set to begin playback on playlist track (loops=%d)",
                            sound_instance.name, sound_instance.loops)
 
-            SDL_UnlockAudioDevice(self.device_id)
+            SDL_UnlockAudio()
             return True
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
         return False
 
     cdef _set_player_sound_settings(self, SoundSettings *sound_settings, object sound_instance):
@@ -2362,15 +2344,15 @@ cdef class TrackStandard(Track):
             The sound player number currently playing the specified sound instance or -1 if the
             sound instance is not currently playing.
         """
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
 
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle and \
                             self.type_state.sound_players[i].current.sound_instance_id == sound_instance.id:
-                SDL_UnlockAudioDevice(self.device_id)
+                SDL_UnlockAudio()
                 return i
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
         return -1
 
     def get_status(self):
@@ -2381,7 +2363,7 @@ cdef class TrackStandard(Track):
             A list of status dictionaries containing the current settings for each
             sound player.
         """
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
         status = []
         for player in range(self.type_state.sound_player_count):
             status.append({
@@ -2408,7 +2390,7 @@ cdef class TrackStandard(Track):
                            self.type_state.sound_players[player].current.loops_remaining,
                            self.type_state.sound_players[player].current.sample_pos)
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
 
         return status
 
@@ -2428,35 +2410,35 @@ cdef class TrackStandard(Track):
             Integer number of sound players currently in use on the track.
         """
         players_in_use_count = 0
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle:
                 players_in_use_count += 1
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
         return players_in_use_count
 
     def sound_is_playing(self, sound not None):
         """Returns whether or not the specified sound is currently playing on the track"""
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle and \
                             self.type_state.sound_players[i].current.sound_id == sound.id:
-                SDL_UnlockAudioDevice(self.device_id)
+                SDL_UnlockAudio()
                 return True
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
         return False
 
     def sound_instance_is_playing(self, sound_instance not None):
         """Returns whether or not the specified sound instance is currently playing on the track"""
-        SDL_LockAudioDevice(self.device_id)
+        SDL_LockAudio()
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle and \
                             self.type_state.sound_players[i].current.sound_instance_id == sound_instance.id:
-                SDL_UnlockAudioDevice(self.device_id)
+                SDL_UnlockAudio()
                 return True
 
-        SDL_UnlockAudioDevice(self.device_id)
+        SDL_UnlockAudio()
         return False
 
     def sound_is_in_queue(self, sound not None):
