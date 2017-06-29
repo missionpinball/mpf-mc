@@ -427,8 +427,7 @@ gl_flags = {}
 # sources to compile
 sources = {
     'core/audio/audio_interface.pyx': {
-        'depends': ['core/audio/sdl2_helper.h', 'core/audio/sdl2.pxi',
-                    'core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi']},
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h', 'core/audio/inline.pxi']},
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
 }
 
