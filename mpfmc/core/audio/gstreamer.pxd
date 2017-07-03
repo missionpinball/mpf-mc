@@ -177,6 +177,14 @@ cdef extern from 'glib.h':
     void g_slice_free1(gsize block_size, gpointer mem_block) nogil
     gpointer g_slice_copy(gsize block_size, gconstpointer mem_block) nogil
 
+    # Array
+    ctypedef struct GArray:
+        gchar *data
+        guint len
+    GArray *g_array_new(gboolean zero_terminated, gboolean clear_, guint element_size) nogil
+    GArray *g_array_sized_new(gboolean zero_terminated, gboolean clear_, guint element_size, guint reserved_size) nogil
+    GArray *g_array_set_size(GArray *array, guint length) nogil
+    gchar *g_array_free(GArray *array, gboolean free_segment) nogil
 
 # ---------------------------------------------------------------------------
 #    GStreamer helper functions defined in gstreamer_helper.h
@@ -193,4 +201,5 @@ cdef extern from 'gstreamer_helper.h':
             buscallback_t callback, void *userdata)
     void c_signal_disconnect(GstElement *appsink, gulong handler_id)
 
-
+    void g_array_insert_val_uint(GArray *array, guint index, guint value) nogil
+    guint g_array_index_uint(GArray* array, guint index) nogil

@@ -37,3 +37,13 @@ static void c_signal_disconnect(GstElement *element, gulong handler_id)
 	g_signal_handler_disconnect(element, handler_id);
 }
 
+static void g_array_insert_val_uint(GArray *array, guint index, guint value)
+{
+    g_array_insert_val(array, index, value);
+}
+
+static guint g_array_index_uint(GArray *array, guint index)
+{
+    return g_array_index(array, guint, index);
+}
+

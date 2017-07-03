@@ -1,5 +1,8 @@
 from mpfmc.core.audio.sdl2 cimport *
 
+# ---------------------------------------------------------------------------
+#    Inline functions
+# ---------------------------------------------------------------------------
 
 cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:
     """

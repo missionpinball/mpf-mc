@@ -157,7 +157,7 @@ ctypedef struct SoundSettings:
     Uint32 fade_out_steps
     Uint32 fade_steps_remaining
     Uint8 marker_count
-    Uint32 markers[MAX_MARKERS]
+    GArray *markers
     Uint32 almost_finished_marker
     bint sound_has_ducking
     DuckingSettings ducking_settings
@@ -242,7 +242,7 @@ ctypedef struct RequestMessageDataPlaySound:
     Uint32 fade_in_duration
     Uint32 fade_out_duration
     int marker_count
-    Uint32 markers[MAX_MARKERS]
+    GArray *markers
     bint sound_has_ducking
     DuckingSettings ducking_settings
 

@@ -23,8 +23,9 @@ import os
 
 from mpfmc.core.audio.sdl2 cimport *
 from mpfmc.core.audio.gstreamer cimport *
+from mpfmc.core.audio.inline cimport lerpU8, in_out_quad
+
 include "audio_interface.pxi"
-include "inline.pxi"
 
 # ---------------------------------------------------------------------------
 #    Various audio engine setting values
@@ -780,7 +781,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
             # Note: the current sample position has already been incremented when the sample data was received so
             # we need to look backwards from the current position to determine if marker falls in chunk window.
             for marker_id in range(player.current.marker_count):
-                if player.current.sample_pos - current_chunk_bytes <= player.current.markers[marker_id] < player.current.sample_pos:
+                if player.current.sample_pos - current_chunk_bytes <= g_array_index_uint(player.current.markers, marker_id) < player.current.sample_pos:
                     # Marker is in window, send notification
                     send_sound_marker_notification(player_num,
                                                    player.current.sound_id,
@@ -788,7 +789,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                                                    track,
                                                    marker_id)
                 # Special check if buffer wraps back around to the beginning of the sample
-                if not end_of_sound and player.current.sample_pos - current_chunk_bytes < 0 and player.current.markers[marker_id] < player.current.sample_pos:
+                if not end_of_sound and player.current.sample_pos - current_chunk_bytes < 0 and g_array_index_uint(player.current.markers, marker_id) < player.current.sample_pos:
                     # Marker is in window, send notification
                     send_sound_marker_notification(player_num,
                                                    player.current.sound_id,
@@ -819,10 +820,13 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                     player.current.fade_out_steps = player.next.fade_out_steps
                     player.current.fade_steps_remaining = player.next.fade_steps_remaining
                     player.current.fading_status = player.next.fading_status
-                    player.current.marker_count = player.next.marker_count
 
+                    player.current.marker_count = player.next.marker_count
+                    g_array_set_size(player.current.markers, player.current.marker_count)
                     for marker_id in range(player.next.marker_count):
-                        player.current.markers[marker_id] = player.next.markers[marker_id]
+                        g_array_insert_val_uint(player.current.markers,
+                                                marker_id,
+                                                g_array_index_uint(player.next.markers, marker_id))
 
                     if player.next.sound_has_ducking:
                         player.current.sound_has_ducking = True
@@ -1621,6 +1625,8 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].current.almost_finished_marker = 0
             self.type_state.sound_players[i].current.sound_has_ducking = False
             self.type_state.sound_players[i].current.ducking_stage = ducking_stage_idle
+            self.type_state.sound_players[i].current.marker_count = 0
+            self.type_state.sound_players[i].current.markers = g_array_new(False, False, sizeof(guint))
             self.type_state.sound_players[i].next.sample = NULL
             self.type_state.sound_players[i].next.loops_remaining = 0
             self.type_state.sound_players[i].next.current_loop = 0
@@ -1633,6 +1639,8 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].next.almost_finished_marker = 0
             self.type_state.sound_players[i].next.sound_has_ducking = False
             self.type_state.sound_players[i].next.ducking_stage = ducking_stage_idle
+            self.type_state.sound_players[i].next.marker_count = 0
+            self.type_state.sound_players[i].next.markers = g_array_new(False, False, sizeof(guint))
 
         self.log.debug("Created Track %d %s with the following settings: "
                        "simultaneous_sounds = %d, volume = %f",
@@ -1647,6 +1655,10 @@ cdef class TrackStandard(Track):
 
         # Free the specific track type state and other allocated memory
         if self.state != NULL:
+            for i in range(self.type_state.sound_player_count):
+                g_array_free(self.type_state.sound_players[i].current.markers, True)
+                g_array_free(self.type_state.sound_players[i].next.markers, True)
+
             PyMem_Free(self.type_state.sound_players)
             PyMem_Free(self.type_state)
             self.state = NULL
@@ -2234,9 +2246,11 @@ cdef class TrackStandard(Track):
 
         # Markers
         sound_settings.marker_count = sound_instance.marker_count
-        if sound_instance.marker_count > 0:
-            for index in range(sound_instance.marker_count):
-                sound_settings.markers[index] = <Uint32>(sound_instance.markers[index]['time'] * self.state.callback_data.seconds_to_bytes_factor)
+        g_array_set_size(sound_settings.markers, sound_settings.marker_count)
+        for index in range(sound_instance.marker_count):
+            g_array_insert_val_uint(sound_settings.markers,
+                                    index,
+                                    <guint>(sound_instance.markers[index]['time'] * self.state.callback_data.seconds_to_bytes_factor))
 
         # If the sound has ducking settings, apply them
         if sound_instance.ducking is not None and sound_instance.ducking.track_bit_mask != 0:
