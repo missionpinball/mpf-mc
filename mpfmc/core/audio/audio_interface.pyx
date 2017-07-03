@@ -33,6 +33,13 @@ include "audio_interface.pxi"
 DEF MAX_TRACKS = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
 DEF MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
+
+# The maximum number of markers that can be specified for a single sound
+DEF MAX_MARKERS = 8
+
+# The number of control points per audio buffer (sets control rate for ducking)
+DEF CONTROL_POINTS_PER_BUFFER = 8
+
 DEF QUICK_FADE_DURATION_SECS = 0.05
 
 
@@ -616,7 +623,7 @@ cdef class AudioInterface:
 
             callback_data.tracks[track_num].ducking_is_active = False
             for control_point in range(CONTROL_POINTS_PER_BUFFER):
-                callback_data.tracks[track_num].ducking_control_points[control_point] = SDL_MIX_MAXVOLUME
+                g_array_set_val_uint8(callback_data.tracks[track_num].ducking_control_points, control_point, SDL_MIX_MAXVOLUME)
 
         # Loop over tracks, mixing the playing sounds into the track's audio buffer
         for track_num in range(callback_data.track_count):
@@ -739,39 +746,57 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
                 # Determine control point ducking stage and calculate control point (test stages in reverse order)
                 if player.current.sample_pos >= player.current.ducking_settings.release_start_pos + player.current.ducking_settings.release_duration:
                     # Ducking finished
-                    player.current.ducking_control_points[control_point] = SDL_MIX_MAXVOLUME
+                    g_array_set_val_uint8(player.current.ducking_control_points, control_point, SDL_MIX_MAXVOLUME)
 
                 elif player.current.sample_pos >= player.current.ducking_settings.release_start_pos:
                     # Ducking release stage
                     ducking_is_active = True
                     progress = (player.current.sample_pos - player.current.ducking_settings.release_start_pos) / player.current.ducking_settings.release_duration
-                    player.current.ducking_control_points[control_point] = \
-                        lerpU8(in_out_quad(progress), player.current.ducking_settings.attenuation_volume, SDL_MIX_MAXVOLUME)
+                    g_array_set_val_uint8(player.current.ducking_control_points,
+                                          control_point,
+                                          lerpU8(in_out_quad(progress),
+                                                 player.current.ducking_settings.attenuation_volume,
+                                                 SDL_MIX_MAXVOLUME
+                                                 )
+                                          )
 
                 elif player.current.sample_pos >= player.current.ducking_settings.attack_start_pos + player.current.ducking_settings.attack_duration:
                     # Ducking hold state
                     ducking_is_active = True
-                    player.current.ducking_control_points[control_point] = player.current.ducking_settings.attenuation_volume
+                    g_array_set_val_uint8(player.current.ducking_control_points, control_point, player.current.ducking_settings.attenuation_volume)
 
                 elif player.current.sample_pos >= player.current.ducking_settings.attack_start_pos:
                     # Ducking attack stage
                     ducking_is_active = True
                     progress = (player.current.sample_pos - player.current.ducking_settings.attack_start_pos) / player.current.ducking_settings.attack_duration
-                    player.current.ducking_control_points[control_point] = \
-                        lerpU8(in_out_quad(progress), SDL_MIX_MAXVOLUME, player.current.ducking_settings.attenuation_volume)
+                    g_array_set_val_uint8(player.current.ducking_control_points,
+                                          control_point,
+                                          lerpU8(in_out_quad(progress),
+                                                 SDL_MIX_MAXVOLUME,
+                                                 player.current.ducking_settings.attenuation_volume
+                                                 )
+                                          )
 
                 else:
                     # Ducking delay stage
-                    player.current.ducking_control_points[control_point] = SDL_MIX_MAXVOLUME
+                    g_array_set_val_uint8(player.current.ducking_control_points,
+                                          control_point,
+                                          SDL_MIX_MAXVOLUME)
 
                 # Apply ducking to target track(s) (when applicable)
                 if ducking_is_active:
                     for track_num in range(callback_data.track_count):
                         if (1 << track_num) & player.current.ducking_settings.track_bit_mask:
                             callback_data.tracks[track_num].ducking_is_active = True
-                            callback_data.tracks[track_num].ducking_control_points[control_point] = min(
-                                callback_data.tracks[track_num].ducking_control_points[control_point],
-                                player.current.ducking_control_points[control_point])
+                            g_array_set_val_uint8(callback_data.tracks[track_num].ducking_control_points,
+                                                  control_point,
+                                                  min(
+                                                      g_array_index_uint8(
+                                                          callback_data.tracks[track_num].ducking_control_points,
+                                                          control_point),
+                                                      g_array_index_uint8(player.current.ducking_control_points,
+                                                                          control_point)
+                                                  ))
 
                 # TODO: Hold sound processing until ducking has finished
                 # It is possible to have the ducking release finish after the sound has stopped.  In that
@@ -1205,7 +1230,7 @@ cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_dat
 
         # Apply any ducking to the track
         if track.ducking_is_active and control_point < CONTROL_POINTS_PER_BUFFER:
-            ducking_volume = track.ducking_control_points[control_point]
+            ducking_volume = g_array_index_uint8(track.ducking_control_points, control_point)
         else:
             ducking_volume = SDL_MIX_MAXVOLUME
 
@@ -1296,6 +1321,7 @@ cdef class Track:
         self.state.number = track_num
         self.state.buffer = <Uint8 *>PyMem_Malloc(buffer_size)
         self.state.buffer_size = buffer_size
+        self.state.ducking_control_points = g_array_sized_new(False, True, sizeof(guint8), CONTROL_POINTS_PER_BUFFER)
         self.log.debug("Allocated track audio buffer (%d bytes)", buffer_size)
 
         # The easiest way to pass a C pointer in a constructor is to wrap it in a PyCapsule
@@ -1313,6 +1339,12 @@ cdef class Track:
         self.state.fade_volume_target = new_volume
 
         self.state.notification_messages = NULL
+
+    def __dealloc__(self):
+        """Destructor"""
+        SDL_LockAudio()
+        g_array_free(self.state.ducking_control_points, True)
+        SDL_UnlockAudio()
 
     def __repr__(self):
         return '<Track.{}.{}>'.format(self.number, self.name)
@@ -1625,6 +1657,7 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].current.almost_finished_marker = 0
             self.type_state.sound_players[i].current.sound_has_ducking = False
             self.type_state.sound_players[i].current.ducking_stage = ducking_stage_idle
+            self.type_state.sound_players[i].current.ducking_control_points = g_array_sized_new(False, False, sizeof(guint8), CONTROL_POINTS_PER_BUFFER)
             self.type_state.sound_players[i].current.marker_count = 0
             self.type_state.sound_players[i].current.markers = g_array_new(False, False, sizeof(guint))
             self.type_state.sound_players[i].next.sample = NULL
@@ -1639,6 +1672,7 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].next.almost_finished_marker = 0
             self.type_state.sound_players[i].next.sound_has_ducking = False
             self.type_state.sound_players[i].next.ducking_stage = ducking_stage_idle
+            self.type_state.sound_players[i].next.ducking_control_points = g_array_sized_new(False, False, sizeof(guint8), CONTROL_POINTS_PER_BUFFER)
             self.type_state.sound_players[i].next.marker_count = 0
             self.type_state.sound_players[i].next.markers = g_array_new(False, False, sizeof(guint))
 
@@ -1656,6 +1690,8 @@ cdef class TrackStandard(Track):
         # Free the specific track type state and other allocated memory
         if self.state != NULL:
             for i in range(self.type_state.sound_player_count):
+                g_array_free(self.type_state.sound_players[i].current.ducking_control_points, True)
+                g_array_free(self.type_state.sound_players[i].next.ducking_control_points, True)
                 g_array_free(self.type_state.sound_players[i].current.markers, True)
                 g_array_free(self.type_state.sound_players[i].next.markers, True)
 

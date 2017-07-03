@@ -202,4 +202,8 @@ cdef extern from 'gstreamer_helper.h':
     void c_signal_disconnect(GstElement *appsink, gulong handler_id)
 
     void g_array_insert_val_uint(GArray *array, guint index, guint value) nogil
+    void g_array_insert_val_uint8(GArray *array, guint index, guint8 value) nogil
     guint g_array_index_uint(GArray* array, guint index) nogil
+    guint8 g_array_index_uint8(GArray* array, guint index) nogil
+    void g_array_set_val_uint(GArray *array, guint index, guint value) nogil
+    void g_array_set_val_uint8(GArray *array, guint index, guint8 value) nogil

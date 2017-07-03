@@ -39,12 +39,6 @@ ctypedef struct SampleStream:
 #    Settings
 # ---------------------------------------------------------------------------
 
-# The number of control points per audio buffer (sets control rate for ducking)
-DEF CONTROL_POINTS_PER_BUFFER = 8
-
-# The maximum number of markers that can be specified for a single sound
-DEF MAX_MARKERS = 8
-
 # The maximum number of consecutive null buffers to receive while streaming before
 # terminating the sound (will cause drop outs)
 DEF CONSECUTIVE_NULL_STREAMING_BUFFER_LIMIT = 2
@@ -86,7 +80,7 @@ ctypedef struct TrackState:
     Uint8 *buffer
     GSList *notification_messages
     bint ducking_is_active
-    Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
+    GArray* ducking_control_points
 
 
 # ---------------------------------------------------------------------------
@@ -162,7 +156,7 @@ ctypedef struct SoundSettings:
     bint sound_has_ducking
     DuckingSettings ducking_settings
     DuckingStage ducking_stage
-    Uint8 ducking_control_points[CONTROL_POINTS_PER_BUFFER]
+    GArray *ducking_control_points
 
 ctypedef struct SoundPlayer:
     # The SoundPlayer keeps track of the current sample position in the source audio

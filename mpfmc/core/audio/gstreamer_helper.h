@@ -42,8 +42,27 @@ static void g_array_insert_val_uint(GArray *array, guint index, guint value)
     g_array_insert_val(array, index, value);
 }
 
+static void g_array_insert_val_uint8(GArray *array, guint index, guint8 value)
+{
+    g_array_insert_val(array, index, value);
+}
+
 static guint g_array_index_uint(GArray *array, guint index)
 {
     return g_array_index(array, guint, index);
 }
 
+static guint8 g_array_index_uint8(GArray *array, guint index)
+{
+    return g_array_index(array, guint8, index);
+}
+
+static void g_array_set_val_uint(GArray *array, guint index, guint value)
+{
+    g_array_index(array, guint, index) = value;
+}
+
+static void g_array_set_val_uint8(GArray *array, guint index, guint8 value)
+{
+    g_array_index(array, guint8, index) = value;
+}
