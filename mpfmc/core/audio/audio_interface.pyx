@@ -86,6 +86,11 @@ cdef class AudioInterface:
         # Initialize threading in the extension library and acquire the Python global interpreter lock
         PyEval_InitThreads()
 
+        if channels not in (1, 2):
+            self.log.error('Channels is required to be either 1 (mono) or 2 (stereo)')
+            raise AudioException("Unable to initialize Audio Interface: "
+                                 "Channels is required to be either 1 (mono) or 2 (stereo)")
+
         # Make sure buffer samples is a power of two (required by SDL2)
         if not AudioInterface.power_of_two(buffer_samples):
             self.log.error('Buffer samples is required to be a power of two')
