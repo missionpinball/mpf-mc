@@ -6,7 +6,7 @@ cimport cpython.pycapsule as pycapsule
 import logging
 import os
 
-from mpfmc.core.audio.audio_interface import AudioException
+from mpfmc.core.audio.audio_exception import AudioException
 from mpfmc.core.audio.sdl2 cimport *
 from mpfmc.core.audio.gstreamer cimport *
 from mpfmc.core.audio.sound_file cimport *

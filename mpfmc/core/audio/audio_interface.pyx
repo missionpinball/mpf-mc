@@ -20,27 +20,18 @@ from mpfmc.core.audio.gstreamer cimport *
 from mpfmc.core.audio.track cimport *
 from mpfmc.core.audio.track_standard cimport *
 from mpfmc.core.audio.sound_file cimport *
+from mpfmc.core.audio.audio_exception import AudioException
 
 
 # ---------------------------------------------------------------------------
 #    Various audio engine setting values
 # ---------------------------------------------------------------------------
 DEF MAX_TRACKS = 8
-DEF MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
-DEF MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
 
 # The maximum number of markers that can be specified for a single sound
 DEF MAX_MARKERS = 8
 
 DEF QUICK_FADE_DURATION_SECS = 0.05
-
-
-# ---------------------------------------------------------------------------
-#    AudioException class
-# ---------------------------------------------------------------------------
-class AudioException(Exception):
-    """Exception returned by the audio module"""
-    pass
 
 
 # ---------------------------------------------------------------------------

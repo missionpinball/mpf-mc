@@ -10,6 +10,13 @@ from mpfmc.core.audio.gstreamer cimport *
 cdef enum:
     CONTROL_POINTS_PER_BUFFER = 8
 
+cdef enum:
+    MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
+
+cdef enum:
+    MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
+
+
 cdef enum TrackType:
     # Enumeration of the possible track types
     track_type_none = 0

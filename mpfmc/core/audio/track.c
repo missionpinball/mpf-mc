@@ -614,6 +614,28 @@ enum  {
 /* "mpfmc/core/audio/track.pxd":13
  *     CONTROL_POINTS_PER_BUFFER = 8
  * 
+ * cdef enum:             # <<<<<<<<<<<<<<
+ *     MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
+ * 
+ */
+enum  {
+  __pyx_e_5mpfmc_4core_5audio_5track_MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
+};
+
+/* "mpfmc/core/audio/track.pxd":16
+ *     MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
+ * 
+ * cdef enum:             # <<<<<<<<<<<<<<
+ *     MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
+ * 
+ */
+enum  {
+  __pyx_e_5mpfmc_4core_5audio_5track_MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
+};
+
+/* "mpfmc/core/audio/track.pxd":20
+ * 
+ * 
  * cdef enum TrackType:             # <<<<<<<<<<<<<<
  *     # Enumeration of the possible track types
  *     track_type_none = 0
@@ -625,7 +647,7 @@ enum __pyx_t_5mpfmc_4core_5audio_5track_TrackType {
   __pyx_e_5mpfmc_4core_5audio_5track_track_type_live_loop = 3
 };
 
-/* "mpfmc/core/audio/track.pxd":20
+/* "mpfmc/core/audio/track.pxd":27
  *     track_type_live_loop = 3
  * 
  * cdef enum TrackStatus:             # <<<<<<<<<<<<<<
@@ -640,7 +662,7 @@ enum __pyx_t_5mpfmc_4core_5audio_5track_TrackStatus {
   __pyx_e_5mpfmc_4core_5audio_5track_track_status_paused = 4
 };
 
-/* "mpfmc/core/audio/track.pxd":27
+/* "mpfmc/core/audio/track.pxd":34
  *     track_status_paused = 4
  * 
  * ctypedef struct TrackState:             # <<<<<<<<<<<<<<

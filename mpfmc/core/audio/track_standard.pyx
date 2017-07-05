@@ -14,9 +14,7 @@ from mpfmc.core.audio.track cimport *
 from mpfmc.core.audio.inline cimport lerpU8, in_out_quad
 from mpfmc.core.audio.notification_message cimport *
 from mpfmc.core.audio.track_standard cimport *
-from mpfmc.core.audio.audio_interface import (AudioException,
-                                              MAX_SIMULTANEOUS_SOUNDS_DEFAULT,
-                                              MAX_SIMULTANEOUS_SOUNDS_LIMIT)
+from mpfmc.core.audio.audio_exception import AudioException
 
 
 # ---------------------------------------------------------------------------

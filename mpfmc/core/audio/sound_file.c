@@ -920,7 +920,7 @@ static const char __pyx_k_Must_be_implemented_in_derived_c[] = "Must be implemen
 static const char __pyx_k_Unable_to_create_a_GStreamer_pip[] = "Unable to create a GStreamer pipeline: code={} message={}";
 static const char __pyx_k_Unable_to_get_bus_from_the_pipel[] = "Unable to get bus from the pipeline";
 static const char __pyx_k_Unable_to_initialize_gstreamer_c[] = "Unable to initialize gstreamer: code={} message={}";
-static const char __pyx_k_mpfmc_core_audio_audio_interface[] = "mpfmc.core.audio.audio_interface";
+static const char __pyx_k_mpfmc_core_audio_audio_exception[] = "mpfmc.core.audio.audio_exception";
 static const char __pyx_k_uridecodebin_uri_audioconvert_au[] = "uridecodebin uri=\"{}\" ! audioconvert ! audioresample ! appsink name=sink caps=\"audio/x-raw,rate={},channels={},format={},layout=interleaved\" sync=true blocksize={}";
 static PyObject *__pyx_n_s_AudioException;
 static PyObject *__pyx_kp_u_Could_not_load_sound_file_due_to;
@@ -960,7 +960,7 @@ static PyObject *__pyx_n_s_load;
 static PyObject *__pyx_n_s_loaded;
 static PyObject *__pyx_n_s_logging;
 static PyObject *__pyx_n_s_main;
-static PyObject *__pyx_n_s_mpfmc_core_audio_audio_interface;
+static PyObject *__pyx_n_s_mpfmc_core_audio_audio_exception;
 static PyObject *__pyx_n_s_os;
 static PyObject *__pyx_n_s_path;
 static PyObject *__pyx_n_s_super;
@@ -4801,7 +4801,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_loaded, __pyx_k_loaded, sizeof(__pyx_k_loaded), 0, 0, 1, 1},
   {&__pyx_n_s_logging, __pyx_k_logging, sizeof(__pyx_k_logging), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
-  {&__pyx_n_s_mpfmc_core_audio_audio_interface, __pyx_k_mpfmc_core_audio_audio_interface, sizeof(__pyx_k_mpfmc_core_audio_audio_interface), 0, 0, 1, 1},
+  {&__pyx_n_s_mpfmc_core_audio_audio_exception, __pyx_k_mpfmc_core_audio_audio_exception, sizeof(__pyx_k_mpfmc_core_audio_audio_exception), 0, 0, 1, 1},
   {&__pyx_n_s_os, __pyx_k_os, sizeof(__pyx_k_os), 0, 0, 1, 1},
   {&__pyx_n_s_path, __pyx_k_path, sizeof(__pyx_k_path), 0, 0, 1, 1},
   {&__pyx_n_s_super, __pyx_k_super, sizeof(__pyx_k_super), 0, 0, 1, 1},
@@ -5037,7 +5037,7 @@ PyMODINIT_FUNC PyInit_sound_file(void)
  * import logging
  * import os             # <<<<<<<<<<<<<<
  * 
- * from mpfmc.core.audio.audio_interface import AudioException
+ * from mpfmc.core.audio.audio_exception import AudioException
  */
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_os, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -5047,7 +5047,7 @@ PyMODINIT_FUNC PyInit_sound_file(void)
   /* "mpfmc/core/audio/sound_file.pyx":9
  * import os
  * 
- * from mpfmc.core.audio.audio_interface import AudioException             # <<<<<<<<<<<<<<
+ * from mpfmc.core.audio.audio_exception import AudioException             # <<<<<<<<<<<<<<
  * from mpfmc.core.audio.sdl2 cimport *
  * from mpfmc.core.audio.gstreamer cimport *
  */
@@ -5056,7 +5056,7 @@ PyMODINIT_FUNC PyInit_sound_file(void)
   __Pyx_INCREF(__pyx_n_s_AudioException);
   __Pyx_GIVEREF(__pyx_n_s_AudioException);
   PyList_SET_ITEM(__pyx_t_1, 0, __pyx_n_s_AudioException);
-  __pyx_t_2 = __Pyx_Import(__pyx_n_s_mpfmc_core_audio_audio_interface, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_Import(__pyx_n_s_mpfmc_core_audio_audio_exception, __pyx_t_1, 0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 9, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = __Pyx_ImportFrom(__pyx_t_2, __pyx_n_s_AudioException); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 9, __pyx_L1_error)
