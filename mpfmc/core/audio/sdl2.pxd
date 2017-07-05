@@ -111,6 +111,7 @@ cdef extern from "SDL.h" nogil:
     int SDL_PushEvent(SDL_Event *event)
     void SDL_Delay(int)
     int SDL_Init(int)
+    int SDL_InitSubSystem(Uint32 flags)
     void SDL_Quit()
     void SDL_LockAudio()
     void SDL_UnlockAudio()

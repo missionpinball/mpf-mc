@@ -47,7 +47,7 @@ cdef class Track:
 
         # Allocate memory for the track state (common among all track types)
         self.state = <TrackState*> PyMem_Malloc(sizeof(TrackState))
-        self.state.type = track_type_none
+        self.state.mix_callback_function = NULL
         self.state.type_state = NULL
         self.state.number = track_num
         self.state.buffer = <Uint8 *>PyMem_Malloc(buffer_size)
@@ -75,6 +75,7 @@ cdef class Track:
         """Destructor"""
         SDL_LockAudio()
         g_array_free(self.state.ducking_control_points, True)
+        PyMem_Free(self.state)
         SDL_UnlockAudio()
 
     def __repr__(self):

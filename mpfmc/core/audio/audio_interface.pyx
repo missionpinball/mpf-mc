@@ -98,9 +98,9 @@ cdef class AudioInterface:
                              'when you set your buffer at 1024 or smaller.')
 
         # Initialize the SDL audio system
-        if SDL_Init(SDL_INIT_AUDIO) < 0:
-            self.log.error('SDL_Init error - %s' % SDL_GetError())
-            raise AudioException('Unable to initialize SDL (SDL_Init call failed: %s)' % SDL_GetError())
+        if SDL_InitSubSystem(SDL_INIT_AUDIO) < 0:
+            self.log.error('SDL_InitSubSystem error - %s' % SDL_GetError())
+            raise AudioException('Unable to initialize SDL (SDL_InitSubSystem call failed: %s)' % SDL_GetError())
 
         # Initialize the SDL_Mixer library to establish the output audio format and encoding
         # (sample rate, bit depth, buffer size)
@@ -169,10 +169,12 @@ cdef class AudioInterface:
         # Stop audio processing (will stop all SDL callbacks)
         self.shutdown()
 
+        self.audio_callback_data.track_count = 0
+        PyMem_Free(self.audio_callback_data.tracks)
+        self.audio_callback_data.tracks = NULL
+
         # Remove tracks
         self.tracks.clear()
-
-        PyMem_Free(self.audio_callback_data.tracks)
 
         # SDL and SDL_Mixer no longer needed
         Mix_Quit()
@@ -617,24 +619,16 @@ cdef class AudioInterface:
             if track.status == track_status_stopped or track.status == track_status_paused:
                 continue
 
-            # Call the track's mix function (based on track type)
-            if track.type == track_type_standard:
-                standard_track_mix_playing_sounds(track, buffer_length, callback_data)
-            elif track.type == track_type_playlist:
-                # TODO: Implement track mix function call
-                pass
-            elif track.type == track_type_live_loop:
-                # TODO: Implement track mix function call
-                pass
+            # Call the track's mix callback function (generates audio into track buffer)
+            if track.mix_callback_function != NULL:
+                track.mix_callback_function(track, buffer_length, callback_data)
 
         # Loop over tracks again, applying ducking and mixing down tracks to the master output buffer
         for track_num in range(callback_data.track_count):
             track = <TrackState*>callback_data.tracks[track_num]
 
-            # Only mix the track to the master output if it is active
+            # Only mix the track to the master output and apply ducking if it is active
             if track.active:
-
-                # Apply track ducking and volume and mix to output buffer
                 mix_track_to_output(track,
                                     callback_data,
                                     output_buffer,

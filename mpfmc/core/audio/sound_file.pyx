@@ -63,6 +63,7 @@ cdef class SoundMemoryFile(SoundFile):
         self.unload()
         if self.sample.data.memory != NULL:
             PyMem_Free(self.sample.data.memory)
+            self.sample.data.memory = NULL
 
     def __repr__(self):
         if self.loaded:
@@ -148,6 +149,7 @@ cdef class SoundStreamingFile(SoundFile):
     def __dealloc__(self):
         if self.sample.data.stream != NULL:
             PyMem_Free(self.sample.data.stream)
+            self.sample.data.stream = NULL
 
     def __repr__(self):
         if self.loaded:

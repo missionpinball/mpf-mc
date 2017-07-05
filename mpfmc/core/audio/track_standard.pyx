@@ -59,7 +59,7 @@ cdef class TrackStandard(Track):
         self._sound_queue = list()
 
         # Set track type specific settings
-        self.state.type = track_type_standard
+        self.state.mix_callback_function = standard_track_mix_playing_sounds
 
         # Allocate memory for the specific track type state struct (TrackStandardState)
         self.type_state = <TrackStandardState*> PyMem_Malloc(sizeof(TrackStandardState))
@@ -128,7 +128,7 @@ cdef class TrackStandard(Track):
         SDL_LockAudio()
 
         # Free the specific track type state and other allocated memory
-        if self.state != NULL:
+        if self.type_state != NULL:
             for i in range(self.type_state.sound_player_count):
                 g_array_free(self.type_state.sound_players[i].current.ducking_control_points, True)
                 g_array_free(self.type_state.sound_players[i].next.ducking_control_points, True)
@@ -137,7 +137,9 @@ cdef class TrackStandard(Track):
 
             PyMem_Free(self.type_state.sound_players)
             PyMem_Free(self.type_state)
-            self.state = NULL
+            self.type_state = NULL
+            if self.state != NULL:
+                self.state.type_state = NULL
 
         SDL_UnlockAudio()
 
@@ -992,7 +994,7 @@ cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_len
     cdef bint end_of_sound
     cdef bint ducking_is_active
 
-    if track == NULL or track.type != track_type_standard:
+    if track == NULL or track.type_state == NULL:
         return
 
     standard_track = <TrackStandardState*>track.type_state

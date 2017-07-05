@@ -34,7 +34,7 @@ cdef enum TrackStatus:
 ctypedef struct TrackState:
     # Common track state variables (for all track types)
     AudioCallbackData *callback_data
-    TrackType type
+    void (*mix_callback_function)(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil
     void* type_state
     TrackStatus status
     bint active
