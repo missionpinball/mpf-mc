@@ -426,8 +426,14 @@ gl_flags = {}
 # -----------------------------------------------------------------------------
 # sources to compile
 sources = {
+    'core/audio/sound_file.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
+    'core/audio/track.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
+    'core/audio/track_standard.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/audio_interface.pyx': {
-        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h', 'core/audio/inline.pxi']},
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
 }
 

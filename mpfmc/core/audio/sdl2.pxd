@@ -219,3 +219,27 @@ cdef extern from "SDL_mixer.h" nogil:
     void Mix_HookMusic(void (*mix_func)(void *udata, Uint8 *stream, int len), void *arg)
     void *Mix_GetMusicHookData()
     Mix_Chunk *Mix_LoadWAV(char *file)
+
+
+# ---------------------------------------------------------------------------
+#    Audio Callback Data type
+# ---------------------------------------------------------------------------
+
+ctypedef struct AudioCallbackData:
+    # A pointer to this struct is passed to the main audio callback function and
+    # is the only way data is made available to the main audio thread.  Must not
+    # contain any Python objects.
+    SDL_AudioFormat format
+    int sample_rate
+    int channels
+    Uint16 buffer_samples
+    Uint32 buffer_size
+    Uint16 bytes_per_control_point
+    Uint8 bytes_per_sample
+    double seconds_to_bytes_factor
+    Uint8 quick_fade_steps
+    Uint8 master_volume
+    Uint8 silence
+    Uint8 track_count
+    void **tracks
+    FILE *c_log_file
