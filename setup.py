@@ -432,6 +432,8 @@ sources = {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/track_standard.pyx': {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
+    'core/audio/track_sound_loop.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/audio_interface.pyx': {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}

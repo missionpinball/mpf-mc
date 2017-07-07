@@ -199,7 +199,7 @@ class SoundSystem(object):
         if 'type' not in config:
             config['type'] = 'standard'
 
-        if config['type'] not in ['standard', 'playlist', 'live_loop']:
+        if config['type'] not in ['standard', 'playlist', 'sound_loop']:
             raise AudioException("Could not create '{}' track - an illegal value for "
                                  "'type' was found".format(name))
 
@@ -217,9 +217,14 @@ class SoundSystem(object):
             # TODO: Implement playlist track create
             raise NotImplementedError('Playlist track not yet implemented')
 
-        elif config['type'] == 'live_loop':
-            raise NotImplementedError('LiveLoop track not yet implemented')
-            # track = self.audio_interface.create_live_loop_track(self.mc, name, config['volume'])
+        elif config['type'] == 'sound_loop':
+            if 'max_layers' not in config:
+                config['max_layers'] = 8
+
+            track = self.audio_interface.create_sound_loop_track(self.mc,
+                                                                 name,
+                                                                 config['max_layers'],
+                                                                 config['volume'])
 
         if track is None:
             raise AudioException("Could not create '{}' track due to an error".format(name))

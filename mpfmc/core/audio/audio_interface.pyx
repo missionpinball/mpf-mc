@@ -19,6 +19,7 @@ from mpfmc.core.audio.sdl2 cimport *
 from mpfmc.core.audio.gstreamer cimport *
 from mpfmc.core.audio.track cimport *
 from mpfmc.core.audio.track_standard cimport *
+from mpfmc.core.audio.track_sound_loop cimport *
 from mpfmc.core.audio.sound_file cimport *
 from mpfmc.core.audio.audio_exception import AudioException
 
@@ -31,6 +32,8 @@ DEF MAX_TRACKS = 8
 # The maximum number of markers that can be specified for a single sound
 DEF MAX_MARKERS = 8
 
+# The number of seconds over which to perform a quick fade to avoid pops and
+# clicks
 DEF QUICK_FADE_DURATION_SECS = 0.05
 
 
@@ -439,8 +442,12 @@ cdef class AudioInterface:
         return MAX_MARKERS
 
     def get_track_count(self):
-        """ Returns the number of tracks that have been created. """
+        """Returns the number of tracks that have been created."""
         return len(self.tracks)
+
+    def get_track_names(self):
+        """Return the list of names of tracks that have been created."""
+        return [track.name for track in self.tracks]
 
     def get_track(self, int track_num):
         """
@@ -451,6 +458,18 @@ cdef class AudioInterface:
         try:
             return self.tracks[track_num]
         except IndexError:
+            return None
+
+    def get_track_type(self, str name not None):
+        """
+        Returns the type of the track with the specified name.
+        Args:
+            name: The name of the track
+        """
+        track = self.get_track_by_name(name)
+        if track:
+            return track.type
+        else:
             return None
 
     def get_track_by_name(self, str name not None):
@@ -514,6 +533,57 @@ cdef class AudioInterface:
         SDL_UnlockAudio()
 
         self.log.debug("The '%s' standard track has successfully been created.", name)
+
+        return new_track
+
+    def create_sound_loop_track(self, object mc, str name not None,
+                                int max_layers=8,
+                                float volume=1.0):
+        """
+        Creates a new sound loop track in the audio interface
+        Args:
+            mc: The media controller app
+            name: The name of the new track
+            max_layers: The maximum number of sounds that may be played at one time on the track
+            volume: The track volume (0.0 to 1.0)
+
+        Returns:
+            A Track object for the newly created track
+        """
+        cdef int track_num = len(self.tracks)
+        if track_num == MAX_TRACKS:
+            self.log.error("Add track failed - the maximum number of tracks "
+                           "(%d) has been reached.", MAX_TRACKS)
+            return None
+
+        # Make sure track name does not already exist (no duplicates allowed)
+        name = name.lower()
+        for track in self.tracks:
+            if name == track.name:
+                self.log.error("Add track failed - the track name '%s' already exists.", name)
+                return None
+
+        # Make sure audio callback function cannot be called while we are changing the track data
+        SDL_LockAudio()
+
+        # Create the new live loop track
+        new_track = TrackSoundLoop(mc,
+                                   pycapsule.PyCapsule_New(&self.audio_callback_data, NULL, NULL),
+                                   name,
+                                   track_num,
+                                   self.audio_callback_data.buffer_size,
+                                   max_layers,
+                                   volume)
+        self.tracks.append(new_track)
+
+        # Update audio callback data with new track
+        self.audio_callback_data.track_count = len(self.tracks)
+        self.audio_callback_data.tracks[track_num] = new_track.state
+
+        # Allow audio callback function to be called again
+        SDL_UnlockAudio()
+
+        self.log.debug("The '%s' live loop track has successfully been created.", name)
 
         return new_track
 
@@ -634,10 +704,10 @@ cdef class AudioInterface:
 
             # Only mix the track to the master output and apply ducking if it is active
             if track.active:
-                mix_track_to_output(track,
-                                    callback_data,
-                                    output_buffer,
-                                    buffer_length)
+                Track.mix_track_to_output(track,
+                                          callback_data,
+                                          output_buffer,
+                                          buffer_length)
 
         # Apply master volume to output buffer
         SDL_MixAudioFormat(output_buffer, output_buffer, callback_data.format, buffer_length, callback_data.master_volume)
