@@ -1,0 +1,74 @@
+#config_version=4
+sound_system:
+  buffer: 2048
+  frequency: 44100
+  channels: 2
+  master_volume: 0.9
+  tracks:
+    loops:
+      type: sound_loop
+      volume: 0.6
+      maximum_layers: 4
+    music:
+      volume: 0.5
+      simultaneous_sounds: 1
+    sfx:
+      volume: 0.4
+      simultaneous_sounds: 8
+      preload: yes
+    voice:
+      volume: 0.6
+      simultaneous_sounds: 1
+      preload: yes
+
+assets:
+  sounds:
+    default:
+      load: preload
+    loops:
+      load: preload
+      track: loops
+    voice:
+      load: preload
+      track: voice
+    sfx:
+      load: preload
+      track: sfx
+    music:
+      load: on_demand
+      track: music
+
+sound_loop_sets:
+  basic_beat:
+    track: loops
+    layers:
+      - sound: kick
+        volume: 0.5
+      - sound: hihat
+        volume: 0.7
+        initial_state: stop
+      - sound: snare
+        volume: 0.6
+        initial_state: stop
+      - sound: clap
+        volume: 0.45
+        initial_state: stop
+
+sound_loop_player:
+  play_basic_beat:
+    action: play
+    track: loops
+    sound_loop_set: basic_beat
+  add_hi_hats:
+    action: queue_layer
+    track: loops
+    layer: 2
+  add_snare:
+    action: play_layer
+    track: loops
+    fade_in: 2s
+    layer: 3
+  add_claps:
+    action: queue_layer
+    track: loops
+    layer: 4

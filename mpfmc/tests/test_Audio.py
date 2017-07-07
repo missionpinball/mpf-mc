@@ -81,7 +81,7 @@ class TestAudio(MpfMcTestCase):
         self.assertAlmostEqual(track_music.volume, 0.5, 1)
         self.assertEqual(track_music.max_simultaneous_sounds, 1)
 
-        self.assertTrue(self.mc, 'sounds')
+        self.assertTrue(hasattr(self.mc, 'sounds'))
 
         # Mock BCP send method
         self.mc.bcp_processor.send = MagicMock()
