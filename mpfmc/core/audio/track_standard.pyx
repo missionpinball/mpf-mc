@@ -59,7 +59,7 @@ cdef class TrackStandard(Track):
         self._sound_queue = list()
 
         # Set track type specific settings
-        self.state.mix_callback_function = standard_track_mix_playing_sounds
+        self.state.mix_callback_function = TrackStandard.mix_playing_sounds
 
         # Allocate memory for the specific track type state struct (TrackStandardState)
         self.type_state = <TrackStandardState*> PyMem_Malloc(sizeof(TrackStandardState))
@@ -145,6 +145,10 @@ cdef class TrackStandard(Track):
 
     def __repr__(self):
         return '<Track.{}.Standard.{}>'.format(self.number, self.name)
+
+    @property
+    def type(self):
+        return "standard"
 
     @property
     def supports_in_memory_sounds(self):
@@ -975,216 +979,217 @@ cdef class TrackStandard(Track):
 #    callback function.
 # ---------------------------------------------------------------------------
 
-cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil:
-    """
-    Mixes any sounds that are playing on the specified standard track into the specified audio buffer.
-    Args:
-        track: A pointer to the TrackState data structure for the track
-        buffer_length: The length of the output buffer (in bytes)
-        callback_data: The audio callback data structure
-    Notes:
-        Notification messages are generated.
-    """
-    cdef TrackState *target_track
-    cdef TrackStandardState *standard_track
-    cdef SoundPlayer *player
-    cdef int player_num
-    cdef int track_num
-    cdef int marker_id
-    cdef bint end_of_sound
-    cdef bint ducking_is_active
+    @staticmethod
+    cdef void mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil:
+        """
+        Mixes any sounds that are playing on the specified standard track into the specified audio buffer.
+        Args:
+            track: A pointer to the TrackState data structure for the track
+            buffer_length: The length of the output buffer (in bytes)
+            callback_data: The audio callback data structure
+        Notes:
+            Notification messages are generated.
+        """
+        cdef TrackState *target_track
+        cdef TrackStandardState *standard_track
+        cdef SoundPlayer *player
+        cdef int player_num
+        cdef int track_num
+        cdef int marker_id
+        cdef bint end_of_sound
+        cdef bint ducking_is_active
 
-    if track == NULL or track.type_state == NULL:
-        return
+        if track == NULL or track.type_state == NULL:
+            return
 
-    standard_track = <TrackStandardState*>track.type_state
+        standard_track = <TrackStandardState*>track.type_state
 
-    # Setup local variables
-    cdef Uint32 buffer_bytes_remaining
-    cdef Uint32 current_chunk_bytes
-    cdef Uint32 track_buffer_pos
-    cdef Uint8 control_point
-    cdef float progress
+        # Setup local variables
+        cdef Uint32 buffer_bytes_remaining
+        cdef Uint32 current_chunk_bytes
+        cdef Uint32 track_buffer_pos
+        cdef Uint8 control_point
+        cdef float progress
 
-    # Loop over track sound players
-    for player_num in range(standard_track.sound_player_count):
+        # Loop over track sound players
+        for player_num in range(standard_track.sound_player_count):
 
-        player = cython.address(standard_track.sound_players[player_num])
+            player = cython.address(standard_track.sound_players[player_num])
 
-        # If the player is idle, there is nothing to do so move on to the next player
-        if player == NULL or player.status == player_idle:
-            continue
+            # If the player is idle, there is nothing to do so move on to the next player
+            if player == NULL or player.status == player_idle:
+                continue
 
-        # Set flag indicating there is at least some activity on the track (it is active)
-        track.active = True
+            # Set flag indicating there is at least some activity on the track (it is active)
+            track.active = True
 
-        end_of_sound = False
-        track_buffer_pos = 0
-        control_point = 0
-        buffer_bytes_remaining = buffer_length
+            end_of_sound = False
+            track_buffer_pos = 0
+            control_point = 0
+            buffer_bytes_remaining = buffer_length
 
-        # Loop over output buffer at control rate
-        while buffer_bytes_remaining > 0:
+            # Loop over output buffer at control rate
+            while buffer_bytes_remaining > 0:
 
-            # Determine the number of bytes to process in the current chunk
-            current_chunk_bytes = min(buffer_bytes_remaining, callback_data.bytes_per_control_point)
+                # Determine the number of bytes to process in the current chunk
+                current_chunk_bytes = min(buffer_bytes_remaining, callback_data.bytes_per_control_point)
 
-            # Calculate volume of chunk (handle fading)
-            if player.current.fading_status == fading_status_fading_in:
-                volume = <Uint8> (in_out_quad((player.current.fade_in_steps - player.current.fade_steps_remaining) / player.current.fade_in_steps) * player.current.volume)
-                player.current.fade_steps_remaining -= 1
-                if player.current.fade_steps_remaining == 0:
-                    player.current.fading_status = fading_status_not_fading
-            elif player.current.fading_status == fading_status_fading_out:
-                volume = <Uint8> (in_out_quad(player.current.fade_steps_remaining / player.current.fade_out_steps) * player.current.volume)
-                player.current.fade_steps_remaining -= 1
-            else:
-                volume = player.current.volume
-
-            # Copy samples for chunk to output buffer and apply volume
-            if player.current.sample.type == sound_type_memory:
-                end_of_sound = get_memory_sound_samples(cython.address(player.current), current_chunk_bytes, track.buffer + track_buffer_pos, volume, track, player_num)
-            elif player.current.sample.type == sound_type_streaming:
-                end_of_sound = get_streaming_sound_samples(cython.address(player.current), current_chunk_bytes, track.buffer + track_buffer_pos, volume, track, player_num)
-
-            # Process sound ducking (if applicable)
-            if player.current.sound_has_ducking:
-                ducking_is_active = False
-
-                # Determine control point ducking stage and calculate control point (test stages in reverse order)
-                if player.current.sample_pos >= player.current.ducking_settings.release_start_pos + player.current.ducking_settings.release_duration:
-                    # Ducking finished
-                    g_array_set_val_uint8(player.current.ducking_control_points, control_point, SDL_MIX_MAXVOLUME)
-
-                elif player.current.sample_pos >= player.current.ducking_settings.release_start_pos:
-                    # Ducking release stage
-                    ducking_is_active = True
-                    progress = (player.current.sample_pos - player.current.ducking_settings.release_start_pos) / player.current.ducking_settings.release_duration
-                    g_array_set_val_uint8(player.current.ducking_control_points,
-                                          control_point,
-                                          lerpU8(in_out_quad(progress),
-                                                 player.current.ducking_settings.attenuation_volume,
-                                                 SDL_MIX_MAXVOLUME
-                                                 )
-                                          )
-
-                elif player.current.sample_pos >= player.current.ducking_settings.attack_start_pos + player.current.ducking_settings.attack_duration:
-                    # Ducking hold state
-                    ducking_is_active = True
-                    g_array_set_val_uint8(player.current.ducking_control_points, control_point, player.current.ducking_settings.attenuation_volume)
-
-                elif player.current.sample_pos >= player.current.ducking_settings.attack_start_pos:
-                    # Ducking attack stage
-                    ducking_is_active = True
-                    progress = (player.current.sample_pos - player.current.ducking_settings.attack_start_pos) / player.current.ducking_settings.attack_duration
-                    g_array_set_val_uint8(player.current.ducking_control_points,
-                                          control_point,
-                                          lerpU8(in_out_quad(progress),
-                                                 SDL_MIX_MAXVOLUME,
-                                                 player.current.ducking_settings.attenuation_volume
-                                                 )
-                                          )
-
+                # Calculate volume of chunk (handle fading)
+                if player.current.fading_status == fading_status_fading_in:
+                    volume = <Uint8> (in_out_quad((player.current.fade_in_steps - player.current.fade_steps_remaining) / player.current.fade_in_steps) * player.current.volume)
+                    player.current.fade_steps_remaining -= 1
+                    if player.current.fade_steps_remaining == 0:
+                        player.current.fading_status = fading_status_not_fading
+                elif player.current.fading_status == fading_status_fading_out:
+                    volume = <Uint8> (in_out_quad(player.current.fade_steps_remaining / player.current.fade_out_steps) * player.current.volume)
+                    player.current.fade_steps_remaining -= 1
                 else:
-                    # Ducking delay stage
-                    g_array_set_val_uint8(player.current.ducking_control_points,
-                                          control_point,
-                                          SDL_MIX_MAXVOLUME)
+                    volume = player.current.volume
 
-                # Apply ducking to target track(s) (when applicable)
-                if ducking_is_active:
-                    for track_num in range(callback_data.track_count):
-                        target_track = <TrackState*>callback_data.tracks[track_num]
-                        if (1 << track_num) & player.current.ducking_settings.track_bit_mask:
-                            target_track.ducking_is_active = True
-                            g_array_set_val_uint8(target_track.ducking_control_points,
-                                                  control_point,
-                                                  min(
-                                                      g_array_index_uint8(
-                                                          target_track.ducking_control_points,
-                                                          control_point),
-                                                      g_array_index_uint8(player.current.ducking_control_points,
-                                                                          control_point)
-                                                  ))
+                # Copy samples for chunk to output buffer and apply volume
+                if player.current.sample.type == sound_type_memory:
+                    end_of_sound = get_memory_sound_samples(cython.address(player.current), current_chunk_bytes, track.buffer + track_buffer_pos, volume, track, player_num)
+                elif player.current.sample.type == sound_type_streaming:
+                    end_of_sound = get_streaming_sound_samples(cython.address(player.current), current_chunk_bytes, track.buffer + track_buffer_pos, volume, track, player_num)
 
-                # TODO: Hold sound processing until ducking has finished
-                # It is possible to have the ducking release finish after the sound has stopped.  In that
-                # case, silence should be generated until the ducking is done.
+                # Process sound ducking (if applicable)
+                if player.current.sound_has_ducking:
+                    ducking_is_active = False
 
-            # Process markers (do any markers fall in the current chunk?)
-            # Note: the current sample position has already been incremented when the sample data was received so
-            # we need to look backwards from the current position to determine if marker falls in chunk window.
-            for marker_id in range(player.current.marker_count):
-                if player.current.sample_pos - current_chunk_bytes <= g_array_index_uint(player.current.markers, marker_id) < player.current.sample_pos:
-                    # Marker is in window, send notification
-                    send_sound_marker_notification(player_num,
-                                                   player.current.sound_id,
-                                                   player.current.sound_instance_id,
-                                                   track,
-                                                   marker_id)
-                # Special check if buffer wraps back around to the beginning of the sample
-                if not end_of_sound and player.current.sample_pos - current_chunk_bytes < 0 and g_array_index_uint(player.current.markers, marker_id) < player.current.sample_pos:
-                    # Marker is in window, send notification
-                    send_sound_marker_notification(player_num,
-                                                   player.current.sound_id,
-                                                   player.current.sound_instance_id,
-                                                   track,
-                                                   marker_id)
+                    # Determine control point ducking stage and calculate control point (test stages in reverse order)
+                    if player.current.sample_pos >= player.current.ducking_settings.release_start_pos + player.current.ducking_settings.release_duration:
+                        # Ducking finished
+                        g_array_set_val_uint8(player.current.ducking_control_points, control_point, SDL_MIX_MAXVOLUME)
 
-            # Check if sound is finished due to a fade out completing
-            if player.current.fading_status == fading_status_fading_out and player.current.fade_steps_remaining == 0:
-                end_of_sound = True
+                    elif player.current.sample_pos >= player.current.ducking_settings.release_start_pos:
+                        # Ducking release stage
+                        ducking_is_active = True
+                        progress = (player.current.sample_pos - player.current.ducking_settings.release_start_pos) / player.current.ducking_settings.release_duration
+                        g_array_set_val_uint8(player.current.ducking_control_points,
+                                              control_point,
+                                              lerpU8(in_out_quad(progress),
+                                                     player.current.ducking_settings.attenuation_volume,
+                                                     SDL_MIX_MAXVOLUME
+                                                     )
+                                              )
 
-            # Sound finished processing
-            if end_of_sound:
-                send_sound_stopped_notification(player_num, player.current.sound_id, player.current.sound_instance_id, track)
+                    elif player.current.sample_pos >= player.current.ducking_settings.attack_start_pos + player.current.ducking_settings.attack_duration:
+                        # Ducking hold state
+                        ducking_is_active = True
+                        g_array_set_val_uint8(player.current.ducking_control_points, control_point, player.current.ducking_settings.attenuation_volume)
 
-                # End of sound behavior depends upon player status
-                if player.status == player_replacing:
-                    # Replacing the current sound with a new one: copy sound player settings from next sound to current
-                    player.current.sample = player.next.sample
-                    player.current.sample_pos = player.next.sample_pos
-                    player.current.current_loop = player.next.current_loop
-                    player.current.sound_id = player.next.sound_id
-                    player.current.sound_instance_id = player.next.sound_instance_id
-                    player.current.volume = player.next.volume
-                    player.current.loops_remaining = player.next.loops_remaining
-                    player.current.sound_priority = player.next.sound_priority
-                    player.current.fade_in_steps = player.next.fade_in_steps
-                    player.current.fade_out_steps = player.next.fade_out_steps
-                    player.current.fade_steps_remaining = player.next.fade_steps_remaining
-                    player.current.fading_status = player.next.fading_status
+                    elif player.current.sample_pos >= player.current.ducking_settings.attack_start_pos:
+                        # Ducking attack stage
+                        ducking_is_active = True
+                        progress = (player.current.sample_pos - player.current.ducking_settings.attack_start_pos) / player.current.ducking_settings.attack_duration
+                        g_array_set_val_uint8(player.current.ducking_control_points,
+                                              control_point,
+                                              lerpU8(in_out_quad(progress),
+                                                     SDL_MIX_MAXVOLUME,
+                                                     player.current.ducking_settings.attenuation_volume
+                                                     )
+                                              )
 
-                    player.current.marker_count = player.next.marker_count
-                    g_array_set_size(player.current.markers, player.current.marker_count)
-                    for marker_id in range(player.next.marker_count):
-                        g_array_insert_val_uint(player.current.markers,
-                                                marker_id,
-                                                g_array_index_uint(player.next.markers, marker_id))
-
-                    if player.next.sound_has_ducking:
-                        player.current.sound_has_ducking = True
-                        player.current.ducking_settings.track_bit_mask = player.next.ducking_settings.track_bit_mask
-                        player.current.ducking_settings.attack_start_pos = player.next.ducking_settings.attack_start_pos
-                        player.current.ducking_settings.attack_duration = player.next.ducking_settings.attack_duration
-                        player.current.ducking_settings.attenuation_volume = player.next.ducking_settings.attenuation_volume
-                        player.current.ducking_settings.release_start_pos = player.next.ducking_settings.release_start_pos
-                        player.current.ducking_settings.release_duration = player.next.ducking_settings.release_duration
                     else:
-                        player.current.sound_has_ducking = False
+                        # Ducking delay stage
+                        g_array_set_val_uint8(player.current.ducking_control_points,
+                                              control_point,
+                                              SDL_MIX_MAXVOLUME)
 
-                    # Send sound started notification
-                    send_sound_started_notification(player_num, player.current.sound_id, player.current.sound_instance_id, track)
-                    player.status = player_playing
-                    sound_finished = False
-                else:
-                    player.status = player_idle
-                    break
+                    # Apply ducking to target track(s) (when applicable)
+                    if ducking_is_active:
+                        for track_num in range(callback_data.track_count):
+                            target_track = <TrackState*>callback_data.tracks[track_num]
+                            if (1 << track_num) & player.current.ducking_settings.track_bit_mask:
+                                target_track.ducking_is_active = True
+                                g_array_set_val_uint8(target_track.ducking_control_points,
+                                                      control_point,
+                                                      min(
+                                                          g_array_index_uint8(
+                                                              target_track.ducking_control_points,
+                                                              control_point),
+                                                          g_array_index_uint8(player.current.ducking_control_points,
+                                                                              control_point)
+                                                      ))
 
-            # Move to next chunk
-            buffer_bytes_remaining -= current_chunk_bytes
-            track_buffer_pos += current_chunk_bytes
-            control_point += 1
+                    # TODO: Hold sound processing until ducking has finished
+                    # It is possible to have the ducking release finish after the sound has stopped.  In that
+                    # case, silence should be generated until the ducking is done.
+
+                # Process markers (do any markers fall in the current chunk?)
+                # Note: the current sample position has already been incremented when the sample data was received so
+                # we need to look backwards from the current position to determine if marker falls in chunk window.
+                for marker_id in range(player.current.marker_count):
+                    if player.current.sample_pos - current_chunk_bytes <= g_array_index_uint(player.current.markers, marker_id) < player.current.sample_pos:
+                        # Marker is in window, send notification
+                        send_sound_marker_notification(player_num,
+                                                       player.current.sound_id,
+                                                       player.current.sound_instance_id,
+                                                       track,
+                                                       marker_id)
+                    # Special check if buffer wraps back around to the beginning of the sample
+                    if not end_of_sound and player.current.sample_pos - current_chunk_bytes < 0 and g_array_index_uint(player.current.markers, marker_id) < player.current.sample_pos:
+                        # Marker is in window, send notification
+                        send_sound_marker_notification(player_num,
+                                                       player.current.sound_id,
+                                                       player.current.sound_instance_id,
+                                                       track,
+                                                       marker_id)
+
+                # Check if sound is finished due to a fade out completing
+                if player.current.fading_status == fading_status_fading_out and player.current.fade_steps_remaining == 0:
+                    end_of_sound = True
+
+                # Sound finished processing
+                if end_of_sound:
+                    send_sound_stopped_notification(player_num, player.current.sound_id, player.current.sound_instance_id, track)
+
+                    # End of sound behavior depends upon player status
+                    if player.status == player_replacing:
+                        # Replacing the current sound with a new one: copy sound player settings from next sound to current
+                        player.current.sample = player.next.sample
+                        player.current.sample_pos = player.next.sample_pos
+                        player.current.current_loop = player.next.current_loop
+                        player.current.sound_id = player.next.sound_id
+                        player.current.sound_instance_id = player.next.sound_instance_id
+                        player.current.volume = player.next.volume
+                        player.current.loops_remaining = player.next.loops_remaining
+                        player.current.sound_priority = player.next.sound_priority
+                        player.current.fade_in_steps = player.next.fade_in_steps
+                        player.current.fade_out_steps = player.next.fade_out_steps
+                        player.current.fade_steps_remaining = player.next.fade_steps_remaining
+                        player.current.fading_status = player.next.fading_status
+
+                        player.current.marker_count = player.next.marker_count
+                        g_array_set_size(player.current.markers, player.current.marker_count)
+                        for marker_id in range(player.next.marker_count):
+                            g_array_insert_val_uint(player.current.markers,
+                                                    marker_id,
+                                                    g_array_index_uint(player.next.markers, marker_id))
+
+                        if player.next.sound_has_ducking:
+                            player.current.sound_has_ducking = True
+                            player.current.ducking_settings.track_bit_mask = player.next.ducking_settings.track_bit_mask
+                            player.current.ducking_settings.attack_start_pos = player.next.ducking_settings.attack_start_pos
+                            player.current.ducking_settings.attack_duration = player.next.ducking_settings.attack_duration
+                            player.current.ducking_settings.attenuation_volume = player.next.ducking_settings.attenuation_volume
+                            player.current.ducking_settings.release_start_pos = player.next.ducking_settings.release_start_pos
+                            player.current.ducking_settings.release_duration = player.next.ducking_settings.release_duration
+                        else:
+                            player.current.sound_has_ducking = False
+
+                        # Send sound started notification
+                        send_sound_started_notification(player_num, player.current.sound_id, player.current.sound_instance_id, track)
+                        player.status = player_playing
+                        sound_finished = False
+                    else:
+                        player.status = player_idle
+                        break
+
+                # Move to next chunk
+                buffer_bytes_remaining -= current_chunk_bytes
+                track_buffer_pos += current_chunk_bytes
+                control_point += 1
 
 cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
                                    TrackState *track, int player_num) nogil:
@@ -1373,34 +1378,3 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
     # The sound has not finished playing, but the output buffer has been filled
     return False
 
-cdef inline void end_of_sound_processing(SoundPlayer* player,
-                                         TrackState *track) nogil:
-    """
-    Determines the action to take at the end of the sound (loop or stop) based on
-    the current settings.  This function should be called when a sound processing
-    loop has reached the end of the source buffer.
-    Args:
-        player: SoundPlayer pointer
-        track: TrackState pointer for the current track
-    """
-    # Check if we are at the end of the source sample buffer (loop if applicable)
-    if player.current.loops_remaining > 0:
-        # At the end and still loops remaining, loop back to the beginning
-        player.current.loops_remaining -= 1
-        player.current.sample_pos = 0
-        player.current.current_loop += 1
-        send_sound_looping_notification(player.number,
-                                 player.current.sound_id, player.current.sound_instance_id,
-                                 track)
-
-    elif player.current.loops_remaining == 0:
-        # At the end and not looping, the sample has finished playing
-        player.status = player_finished
-
-    else:
-        # Looping infinitely, loop back to the beginning
-        player.current.sample_pos = 0
-        player.current.current_loop += 1
-        send_sound_looping_notification(player.number,
-                                 player.current.sound_id, player.current.sound_instance_id,
-                                 track)

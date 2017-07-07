@@ -17,13 +17,6 @@ cdef enum:
     MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
 
 
-cdef enum TrackType:
-    # Enumeration of the possible track types
-    track_type_none = 0
-    track_type_standard = 1
-    track_type_playlist = 2
-    track_type_live_loop = 3
-
 cdef enum TrackStatus:
     track_status_stopped = 0
     track_status_stopping = 1
@@ -73,9 +66,10 @@ cdef class Track:
 
     cdef TrackState *get_state(self)
 
-# ---------------------------------------------------------------------------
-#    Global C functions designed to be called from the static audio callback
-#    function (these functions do not use the GIL).
-# ---------------------------------------------------------------------------
-cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_data,
-                              Uint8 *output_buffer, Uint32 buffer_length) nogil
+    # ---------------------------------------------------------------------------
+    #    Static C functions designed to be called from the static audio callback
+    #    function (these functions do not use the GIL).
+    # ---------------------------------------------------------------------------
+    @staticmethod
+    cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_data,
+                                  Uint8 *output_buffer, Uint32 buffer_length) nogil

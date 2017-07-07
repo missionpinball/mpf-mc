@@ -82,10 +82,7 @@ ctypedef struct SoundPlayer:
 #    TrackStandard class
 # ---------------------------------------------------------------------------
 cdef class TrackStandard(Track):
-    """
-    Track class
-    """
-    # The name of the track
+
     cdef list _sound_queue
     cdef int _max_simultaneous_sounds
 
@@ -104,16 +101,46 @@ cdef class TrackStandard(Track):
     cdef _set_player_replacing(self, SoundPlayer *player, object sound_instance)
     cdef int _get_player_playing_sound_instance(self, sound_instance)
 
+    @staticmethod
+    cdef void mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil
 
 # ---------------------------------------------------------------------------
 #    Global C functions designed to be called from the static audio callback
 #    function (these functions do not use the GIL).
 # ---------------------------------------------------------------------------
 
-cdef void standard_track_mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil
 cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
                                    TrackState *track, int player_num) nogil
 cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
                                       TrackState *track, int player_num) nogil
 cdef inline void end_of_sound_processing(SoundPlayer* player,
-                                         TrackState *track) nogil
+                                         TrackState *track) nogil:
+    """
+    Determines the action to take at the end of the sound (loop or stop) based on
+    the current settings.  This function should be called when a sound processing
+    loop has reached the end of the source buffer.
+    Args:
+        player: SoundPlayer pointer
+        track: TrackState pointer for the current track
+    """
+    # Check if we are at the end of the source sample buffer (loop if applicable)
+    if player.current.loops_remaining > 0:
+        # At the end and still loops remaining, loop back to the beginning
+        player.current.loops_remaining -= 1
+        player.current.sample_pos = 0
+        player.current.current_loop += 1
+        send_sound_looping_notification(player.number,
+                                 player.current.sound_id, player.current.sound_instance_id,
+                                 track)
+
+    elif player.current.loops_remaining == 0:
+        # At the end and not looping, the sample has finished playing
+        player.status = player_finished
+
+    else:
+        # Looping infinitely, loop back to the beginning
+        player.current.sample_pos = 0
+        player.current.current_loop += 1
+        send_sound_looping_notification(player.number,
+                                 player.current.sound_id, player.current.sound_instance_id,
+                                 track)

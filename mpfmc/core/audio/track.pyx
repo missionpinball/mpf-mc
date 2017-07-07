@@ -93,6 +93,10 @@ cdef class Track:
             return round(self.state.volume / SDL_MIX_MAXVOLUME, 2)
 
     @property
+    def type(self):
+        raise NotImplementedError('Must be overridden in derived class')
+
+    @property
     def number(self):
         """Return the track number"""
         cdef int number = -1
@@ -304,79 +308,88 @@ cdef class Track:
 
         SDL_UnlockAudio()
 
+    def stop_all_sounds(self, float fade_out_seconds = 0.0):
+        """
+        Stops all playing sounds immediately on the track.
+        Args:
+            fade_out_seconds: The number of seconds to fade out the sounds before stopping
+        """
+        raise NotImplementedError('Must be overridden in derived class')
+
     def process(self):
         """Processes the track queue each tick."""
         raise NotImplementedError('Must be overridden in derived class')
 
 
-# ---------------------------------------------------------------------------
-#    Global C functions designed to be called from the static audio callback
-#    function (these functions do not use the GIL).
-#
-#    Note: Because these functions are only called from the audio callback
-#    function, we do not need to lock and unlock the mutex in these functions
-#    (locking/unlocking of the mutex is already performed in the audio
-#    callback function.
-# ---------------------------------------------------------------------------
+    # ---------------------------------------------------------------------------
+    #    Global C functions designed to be called from the static audio callback
+    #    function (these functions do not use the GIL).
+    #
+    #    Note: Because these functions are only called from the audio callback
+    #    function, we do not need to lock and unlock the mutex in these functions
+    #    (locking/unlocking of the mutex is already performed in the audio
+    #    callback function.
+    # ---------------------------------------------------------------------------
 
-cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_data,
-                              Uint8 *output_buffer, Uint32 buffer_length) nogil:
-    """
-    Applies ducking and mixes a track buffer into the master audio output buffer.
-    Args:
-        track: The track's state structure
-        callback_data: The audio callback data structure
-        output_buffer: The master audio output buffer.
-        buffer_length: The audio buffer size to process.
+    @staticmethod
+    cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_data,
+                                  Uint8 *output_buffer, Uint32 buffer_length) nogil:
+        """
+        Applies ducking and mixes a track buffer into the master audio output buffer.
+        Args:
+            track: The track's state structure
+            callback_data: The audio callback data structure
+            output_buffer: The master audio output buffer.
+            buffer_length: The audio buffer size to process.
+    
+        """
 
-    """
+        cdef Uint8 *track_buffer
+        cdef Uint32 output_buffer_bytes_remaining = buffer_length
+        cdef Uint32 current_chunk_bytes
+        cdef Uint32 buffer_pos = 0
+        cdef Uint8 control_point = 0
+        cdef Uint8 ducking_volume
+        cdef Uint8 track_volume
 
-    cdef Uint8 *track_buffer
-    cdef Uint32 output_buffer_bytes_remaining = buffer_length
-    cdef Uint32 current_chunk_bytes
-    cdef Uint32 buffer_pos = 0
-    cdef Uint8 control_point = 0
-    cdef Uint8 ducking_volume
-    cdef Uint8 track_volume
+        if track == NULL or track.status == track_status_stopped or track.status == track_status_paused:
+            return
 
-    if track == NULL or track.status == track_status_stopped or track.status == track_status_paused:
-        return
+        track_buffer = <Uint8*>track.buffer
 
-    track_buffer = <Uint8*>track.buffer
+        # Loop over output buffer at control rate
+        while output_buffer_bytes_remaining > 0:
 
-    # Loop over output buffer at control rate
-    while output_buffer_bytes_remaining > 0:
+            # Determine the number of bytes to process in the current chunk
+            current_chunk_bytes = min(output_buffer_bytes_remaining, callback_data.bytes_per_control_point)
 
-        # Determine the number of bytes to process in the current chunk
-        current_chunk_bytes = min(output_buffer_bytes_remaining, callback_data.bytes_per_control_point)
+            # Apply any ducking to the track
+            if track.ducking_is_active and control_point < CONTROL_POINTS_PER_BUFFER:
+                ducking_volume = g_array_index_uint8(track.ducking_control_points, control_point)
+            else:
+                ducking_volume = SDL_MIX_MAXVOLUME
 
-        # Apply any ducking to the track
-        if track.ducking_is_active and control_point < CONTROL_POINTS_PER_BUFFER:
-            ducking_volume = g_array_index_uint8(track.ducking_control_points, control_point)
-        else:
-            ducking_volume = SDL_MIX_MAXVOLUME
+            # Calculate track volume (handle track fading)
+            if track.fade_steps_remaining > 0:
+                # Note: if the volume interpolation function below appears to be backwards, it is
+                # because the fraction is going from 1 to 0 over the fade and not from a more
+                # traditional 0 to 1.  This saves a few calculation cycles and is for efficiency.
+                track.fade_volume_current = <Uint8> (lerpU8(in_out_quad(track.fade_steps_remaining / track.fade_steps),
+                                                            track.fade_volume_target, track.fade_volume_start))
+                track.fade_steps_remaining -= 1
+            else:
+                track.fade_volume_current = track.fade_volume_target
+                if track.status == track_status_stopping:
+                    track.status = track_status_stopped
+                    send_track_stopped_notification(track)
+                elif track.status == track_status_pausing:
+                    track.status = track_status_paused
+                    send_track_paused_notification(track)
 
-        # Calculate track volume (handle track fading)
-        if track.fade_steps_remaining > 0:
-            # Note: if the volume interpolation function below appears to be backwards, it is
-            # because the fraction is going from 1 to 0 over the fade and not from a more
-            # traditional 0 to 1.  This saves a few calculation cycles and is for efficiency.
-            track.fade_volume_current = <Uint8> (lerpU8(in_out_quad(track.fade_steps_remaining / track.fade_steps),
-                                                        track.fade_volume_target, track.fade_volume_start))
-            track.fade_steps_remaining -= 1
-        else:
-            track.fade_volume_current = track.fade_volume_target
-            if track.status == track_status_stopping:
-                track.status = track_status_stopped
-                send_track_stopped_notification(track)
-            elif track.status == track_status_pausing:
-                track.status = track_status_paused
-                send_track_paused_notification(track)
+            track_volume = ducking_volume * track.fade_volume_current // SDL_MIX_MAXVOLUME
 
-        track_volume = ducking_volume * track.fade_volume_current // SDL_MIX_MAXVOLUME
+            SDL_MixAudioFormat(output_buffer + buffer_pos, track_buffer + buffer_pos, callback_data.format, current_chunk_bytes, track_volume)
 
-        SDL_MixAudioFormat(output_buffer + buffer_pos, track_buffer + buffer_pos, callback_data.format, current_chunk_bytes, track_volume)
-
-        output_buffer_bytes_remaining -= current_chunk_bytes
-        buffer_pos += current_chunk_bytes
-        control_point += 1
+            output_buffer_bytes_remaining -= current_chunk_bytes
+            buffer_pos += current_chunk_bytes
+            control_point += 1
