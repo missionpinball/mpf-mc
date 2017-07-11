@@ -1,7 +1,7 @@
-__version__ = '0.50.0-dev.4'
+__version__ = '0.50.0-dev.5'
 __short_version__ = '0.50'
 __bcp_version__ = '1.1'
-__config_version__ = '4'
+__config_version__ = '5'
 __mpf_version_required__ = '0.50.0-dev.10'
 
 version = "MPF-MC v{} (config_version={}, BCP v{}, Requires MPF v{})".format(
