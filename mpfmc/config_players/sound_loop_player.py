@@ -69,29 +69,23 @@ Here are several various examples:
         track = self.machine.sound_system.audio_interface.get_track_by_name(settings['track'])
 
         # Determine action to perform
-        if settings['action'].lower() == 'queue':
-            if settings['sound_loop_set'] not in self.machine.sound_loop_set:
+        if settings['action'].lower() == 'play':
+            if settings['sound_loop_set'] not in self.machine.sound_loop_sets:
                 self.machine.log.error("SoundLoopPlayer: The specified sound loop set "
                                        "does not exist ('{}').".format(settings['sound_loop_set']))
                 return
-
-            track.queue_sound_loop_set(self.machine.sound_loop_set[settings['sound_loop_set']], settings)
-
-        elif settings['action'].lower() == 'play':
-            if settings['sound_loop_set'] not in self.machine.sound_loop_set:
-                self.machine.log.error("SoundLoopPlayer: The specified sound loop set "
-                                       "does not exist ('{}').".format(settings['sound_loop_set']))
-                return
-
-            track.play_sound_loop_set(self.machine.sound_loop_set[settings['sound_loop_set']], settings)
+            try:
+                loop_set = self.machine.sound_loop_sets[settings['sound_loop_set']]
+                track.play_sound_loop_set(loop_set, settings)
+                print("SoundLoopPlayer - call to play_sound_loop_set finished")
+            except Exception as ex:
+                raise Exception(ex)
 
         elif settings['action'].lower() == 'stop':
             pass
         elif settings['action'].lower() == 'stop_looping':
             pass
         elif settings['action'].lower() == 'set_volume':
-            pass
-        elif settings['action'].lower() == 'queue_layer':
             pass
         elif settings['action'].lower() == 'play_layer':
             pass

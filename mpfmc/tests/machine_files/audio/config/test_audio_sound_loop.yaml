@@ -60,15 +60,20 @@ sound_loop_player:
     track: loops
     sound_loop_set: basic_beat
   add_hi_hats:
-    action: queue_layer
+    action: play_layer
     track: loops
     layer: 2
+    queue: True
   add_snare:
     action: play_layer
     track: loops
     fade_in: 2s
     layer: 3
   add_claps:
-    action: queue_layer
+    action: play_layer
     track: loops
     layer: 4
+    queue: True
+
+sound_player:
+    play_sound_synthping: 210871_synthping

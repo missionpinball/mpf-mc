@@ -14635,122 +14635,6 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_14track_standard_end_of_so
   /* function exit code */
 }
 
-/* "mpfmc/core/audio/inline.pxd":7
- * # ---------------------------------------------------------------------------
- * 
- * cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Linearly interpolate between 2 8-bit values.
- */
-
-static CYTHON_INLINE Uint8 __pyx_f_5mpfmc_4core_5audio_6inline_lerpU8(float __pyx_v_progress, Uint8 __pyx_v_a, Uint8 __pyx_v_b) {
-  Uint8 __pyx_r;
-
-  /* "mpfmc/core/audio/inline.pxd":18
- *         New 8-bit value between the supplied values
- *     """
- *     return <Uint8> ((1.0 - progress) * a + progress * b)             # <<<<<<<<<<<<<<
- * 
- * cdef inline float in_out_quad(float progress) nogil:
- */
-  __pyx_r = ((Uint8)(((1.0 - __pyx_v_progress) * __pyx_v_a) + (__pyx_v_progress * __pyx_v_b)));
-  goto __pyx_L0;
-
-  /* "mpfmc/core/audio/inline.pxd":7
- * # ---------------------------------------------------------------------------
- * 
- * cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Linearly interpolate between 2 8-bit values.
- */
-
-  /* function exit code */
-  __pyx_L0:;
-  return __pyx_r;
-}
-
-/* "mpfmc/core/audio/inline.pxd":20
- *     return <Uint8> ((1.0 - progress) * a + progress * b)
- * 
- * cdef inline float in_out_quad(float progress) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     A quadratic easing function used for smoother audio fading
- */
-
-static CYTHON_INLINE float __pyx_f_5mpfmc_4core_5audio_6inline_in_out_quad(float __pyx_v_progress) {
-  float __pyx_v_p;
-  float __pyx_r;
-  int __pyx_t_1;
-
-  /* "mpfmc/core/audio/inline.pxd":30
- *     """
- *     cdef float p
- *     p = progress * 2             # <<<<<<<<<<<<<<
- *     if p < 1:
- *         return 0.5 * p * p
- */
-  __pyx_v_p = (__pyx_v_progress * 2.0);
-
-  /* "mpfmc/core/audio/inline.pxd":31
- *     cdef float p
- *     p = progress * 2
- *     if p < 1:             # <<<<<<<<<<<<<<
- *         return 0.5 * p * p
- *     p -= 1.0
- */
-  __pyx_t_1 = ((__pyx_v_p < 1.0) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/inline.pxd":32
- *     p = progress * 2
- *     if p < 1:
- *         return 0.5 * p * p             # <<<<<<<<<<<<<<
- *     p -= 1.0
- *     return -0.5 * (p * (p - 2.0) - 1.0)
- */
-    __pyx_r = ((0.5 * __pyx_v_p) * __pyx_v_p);
-    goto __pyx_L0;
-
-    /* "mpfmc/core/audio/inline.pxd":31
- *     cdef float p
- *     p = progress * 2
- *     if p < 1:             # <<<<<<<<<<<<<<
- *         return 0.5 * p * p
- *     p -= 1.0
- */
-  }
-
-  /* "mpfmc/core/audio/inline.pxd":33
- *     if p < 1:
- *         return 0.5 * p * p
- *     p -= 1.0             # <<<<<<<<<<<<<<
- *     return -0.5 * (p * (p - 2.0) - 1.0)
- * 
- */
-  __pyx_v_p = (__pyx_v_p - 1.0);
-
-  /* "mpfmc/core/audio/inline.pxd":34
- *         return 0.5 * p * p
- *     p -= 1.0
- *     return -0.5 * (p * (p - 2.0) - 1.0)             # <<<<<<<<<<<<<<
- * 
- */
-  __pyx_r = (-0.5 * ((__pyx_v_p * (__pyx_v_p - 2.0)) - 1.0));
-  goto __pyx_L0;
-
-  /* "mpfmc/core/audio/inline.pxd":20
- *     return <Uint8> ((1.0 - progress) * a + progress * b)
- * 
- * cdef inline float in_out_quad(float progress) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     A quadratic easing function used for smoother audio fading
- */
-
-  /* function exit code */
-  __pyx_L0:;
-  return __pyx_r;
-}
-
 /* "mpfmc/core/audio/notification_message.pxd":43
  * # ---------------------------------------------------------------------------
  * 
@@ -15311,6 +15195,122 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
  */
 
   /* function exit code */
+}
+
+/* "mpfmc/core/audio/inline.pxd":7
+ * # ---------------------------------------------------------------------------
+ * 
+ * cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Linearly interpolate between 2 8-bit values.
+ */
+
+static CYTHON_INLINE Uint8 __pyx_f_5mpfmc_4core_5audio_6inline_lerpU8(float __pyx_v_progress, Uint8 __pyx_v_a, Uint8 __pyx_v_b) {
+  Uint8 __pyx_r;
+
+  /* "mpfmc/core/audio/inline.pxd":18
+ *         New 8-bit value between the supplied values
+ *     """
+ *     return <Uint8> ((1.0 - progress) * a + progress * b)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline float in_out_quad(float progress) nogil:
+ */
+  __pyx_r = ((Uint8)(((1.0 - __pyx_v_progress) * __pyx_v_a) + (__pyx_v_progress * __pyx_v_b)));
+  goto __pyx_L0;
+
+  /* "mpfmc/core/audio/inline.pxd":7
+ * # ---------------------------------------------------------------------------
+ * 
+ * cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Linearly interpolate between 2 8-bit values.
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  return __pyx_r;
+}
+
+/* "mpfmc/core/audio/inline.pxd":20
+ *     return <Uint8> ((1.0 - progress) * a + progress * b)
+ * 
+ * cdef inline float in_out_quad(float progress) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     A quadratic easing function used for smoother audio fading
+ */
+
+static CYTHON_INLINE float __pyx_f_5mpfmc_4core_5audio_6inline_in_out_quad(float __pyx_v_progress) {
+  float __pyx_v_p;
+  float __pyx_r;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/inline.pxd":30
+ *     """
+ *     cdef float p
+ *     p = progress * 2             # <<<<<<<<<<<<<<
+ *     if p < 1:
+ *         return 0.5 * p * p
+ */
+  __pyx_v_p = (__pyx_v_progress * 2.0);
+
+  /* "mpfmc/core/audio/inline.pxd":31
+ *     cdef float p
+ *     p = progress * 2
+ *     if p < 1:             # <<<<<<<<<<<<<<
+ *         return 0.5 * p * p
+ *     p -= 1.0
+ */
+  __pyx_t_1 = ((__pyx_v_p < 1.0) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/inline.pxd":32
+ *     p = progress * 2
+ *     if p < 1:
+ *         return 0.5 * p * p             # <<<<<<<<<<<<<<
+ *     p -= 1.0
+ *     return -0.5 * (p * (p - 2.0) - 1.0)
+ */
+    __pyx_r = ((0.5 * __pyx_v_p) * __pyx_v_p);
+    goto __pyx_L0;
+
+    /* "mpfmc/core/audio/inline.pxd":31
+ *     cdef float p
+ *     p = progress * 2
+ *     if p < 1:             # <<<<<<<<<<<<<<
+ *         return 0.5 * p * p
+ *     p -= 1.0
+ */
+  }
+
+  /* "mpfmc/core/audio/inline.pxd":33
+ *     if p < 1:
+ *         return 0.5 * p * p
+ *     p -= 1.0             # <<<<<<<<<<<<<<
+ *     return -0.5 * (p * (p - 2.0) - 1.0)
+ * 
+ */
+  __pyx_v_p = (__pyx_v_p - 1.0);
+
+  /* "mpfmc/core/audio/inline.pxd":34
+ *         return 0.5 * p * p
+ *     p -= 1.0
+ *     return -0.5 * (p * (p - 2.0) - 1.0)             # <<<<<<<<<<<<<<
+ * 
+ */
+  __pyx_r = (-0.5 * ((__pyx_v_p * (__pyx_v_p - 2.0)) - 1.0));
+  goto __pyx_L0;
+
+  /* "mpfmc/core/audio/inline.pxd":20
+ *     return <Uint8> ((1.0 - progress) * a + progress * b)
+ * 
+ * cdef inline float in_out_quad(float progress) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     A quadratic easing function used for smoother audio fading
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  return __pyx_r;
 }
 static struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard __pyx_vtable_5mpfmc_4core_5audio_14track_standard_TrackStandard;
 
@@ -16101,12 +16101,12 @@ PyMODINIT_FUNC PyInit_track_standard(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/notification_message.pxd":140
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+  /* "mpfmc/core/audio/inline.pxd":20
+ *     return <Uint8> ((1.0 - progress) * a + progress * b)
  * 
- * cdef inline void send_track_paused_notification(TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ * cdef inline float in_out_quad(float progress) nogil:             # <<<<<<<<<<<<<<
  *     """
- *     Sends a track paused notification
+ *     A quadratic easing function used for smoother audio fading
  */
 
   /*--- Wrapped vars code ---*/

@@ -34,17 +34,15 @@ cdef enum SoundLoopSetPlayerStatus:
     player_fading_in = 3
     player_fading_out = 4
     player_playing = 5
-    player_finished = 6
-    player_stopping = 7
 
 ctypedef struct SoundLoopSetPlayer:
     SoundLoopSetPlayerStatus status
+    Uint32 length
     GSList *layers     # An array of SoundLoopLayerSettings objects
     Uint32 sample_pos
     Uint32 fade_in_steps
     Uint32 fade_out_steps
     Uint32 fade_steps_remaining
-    bint synchronize_with_other_player
 
 ctypedef struct TrackSoundLoopState:
     # State variables for TrackSoundLoop tracks
