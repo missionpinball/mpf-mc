@@ -94,7 +94,7 @@ class Command(object):
 
         parser.add_argument("-t",
                             action="store_false", dest='text_ui', default=True,
-                            help="Use the ASCII test-based UI")
+                            help="Use the ASCII text-based UI")
 
         parser.add_argument("-v",
                             action="store_const", dest="loglevel", const=logging.DEBUG,
