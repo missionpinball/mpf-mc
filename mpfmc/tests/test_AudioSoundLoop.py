@@ -43,21 +43,32 @@ class TestAudioSoundLoop(MpfMcTestCase):
         # /sounds/loops
         self.assertTrue(hasattr(self.mc, 'sounds'))
         self.assertIn('kick', self.mc.sounds)
+        self.assertIn('kick2', self.mc.sounds)
         self.assertIn('hihat', self.mc.sounds)
         self.assertIn('snare', self.mc.sounds)
         self.assertIn('clap', self.mc.sounds)
+        self.assertIn('bass_synth', self.mc.sounds)
 
         # Sound loop sets
         self.assertTrue(hasattr(self.mc, 'sound_loop_sets'))
         self.assertIn('basic_beat', self.mc.sound_loop_sets)
+        self.assertIn('basic_beat2', self.mc.sound_loop_sets)
 
         # Test sound_loop_player
-        self.advance_real_time(1)
+        self.advance_time()
         self.mc.events.post('play_sound_synthping')
         self.mc.events.post('play_basic_beat')
         self.advance_real_time(1)
         self.mc.events.post('add_hi_hats')
         self.advance_time()
         self.advance_real_time(3)
-        self.mc.events.post('stop_hi_hats')
-        self.advance_real_time(3)
+        self.mc.events.post('add_snare')
+        self.mc.events.post('add_claps')
+        self.advance_real_time(4)
+        self.mc.events.post('play_basic_beat2')
+        self.advance_real_time(4)
+        self.mc.events.post('fade_out_bass_synth')
+        self.advance_real_time(5)
+
+
+

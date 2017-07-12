@@ -520,6 +520,7 @@ cdef class TrackSoundLoop(Track):
                 if live_loop_track.current.status == player_playing and live_loop_track.next.status == player_pending:
                     live_loop_track.current.status = player_idle
                     reset_track_buffer_pos = False
+                    live_loop_track.next.status = player_playing
                 else:
                     # TODO: send looping notification
                     live_loop_track.current.sample_pos = 0

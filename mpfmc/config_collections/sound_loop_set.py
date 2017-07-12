@@ -48,11 +48,6 @@ class SoundLoopSetCollection(ConfigCollection):
 
         self.mc.config_validator.validate_config('sound_loop_sets', config)
 
-        # Ensure track is set to a live_loop track
-        if self.mc.sound_system.audio_interface.get_track_type(config["track"]) != "sound_loop":
-            raise ValueError("The sound_loop_set is set to an invalid audio track "
-                             "(only sound_loop audio tracks are supported).")
-
         for layer in config["layers"]:
             self.mc.config_validator.validate_config('sound_loop_sets:layers', layer)
 
