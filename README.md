@@ -38,7 +38,7 @@ Authors & Contributing
 ----------------------
 MPF and the MPF-MC are labors of love by awesome pinball-loving people. There's a list of authors in the AUTHORS file.
 We'd love for you to join us! Even if you don't know Python well, there's plenty to do. Drop us a line in the forum, or
-make a change and submit a pull request! More info [here](http://docs.missionpinball.org/en/latest/contribute/).
+make a change and submit a pull request! More info [here](http://docs.missionpinball.org/en/latest/about/contributing_to_mpf.html).
 
 License
 -------
