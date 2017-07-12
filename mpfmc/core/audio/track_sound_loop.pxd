@@ -11,9 +11,10 @@ from mpfmc.core.audio.notification_message cimport *
 
 cdef enum LayerStatus:
     layer_stopped = 0
-    layer_playing = 1
-    layer_fading_in = 2
-    layer_fading_out = 3
+    layer_queued = 1
+    layer_playing = 2
+    layer_fading_in = 3
+    layer_fading_out = 4
 
 ctypedef struct SoundLoopLayerSettings:
     LayerStatus status

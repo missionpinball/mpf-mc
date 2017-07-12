@@ -284,6 +284,112 @@ cdef class TrackSoundLoop(Track):
 
         SDL_UnlockAudio()
 
+    def play_layer(self, int layer, float fade_in=0.0, bint queue=True, volume=None):
+        """
+        Plays the specified layer number in the currently playing sound loop set.
+
+        Args:
+            layer: The layer number to play (1-based array position).
+            fade_in: The number of seconds over which to fade in the layer.
+            queue: Flag indicating whether the layer should be played immediately (False)
+                   or queued until the next loop of the master layer loop (True).
+            volume: The layer volume (overrides sound loop set setting if not None)
+        """
+        cdef SoundLoopLayerSettings *layer_settings
+
+        if layer <= 0:
+            self.log.warning("Illegal layer value in call to play_layer (must be > 1).")
+            return
+
+        if layer == 1:
+            self.log.warning("play_layer cannot be used to control layer 1 (the master layer)")
+            return
+
+        SDL_LockAudio()
+
+        # Retrieve the layer
+        if self.type_state.current.layers == NULL:
+            self.log.info("There are no layers defined in the current sound loop set: play_layers has no effect")
+            SDL_UnlockAudio()
+            return
+
+        layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
+        if layer_settings == NULL:
+            self.log.info("The specified layer could not be found in the current sound loop set: play_layers has no effect")
+            SDL_UnlockAudio()
+            return
+
+        if layer_settings.status != layer_stopped:
+            self.log.info("The current sound loop set layer is already playing: play_layers has no effect")
+            SDL_UnlockAudio()
+            return
+
+        # Layer volume (use layer settings or sound setting if None)
+        if volume:
+            layer_settings.volume = <Uint8>(volume * SDL_MIX_MAXVOLUME)
+
+        # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
+        if fade_in > 0.0:
+            layer_settings.fade_in_steps = <Uint32>(fade_in * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
+            layer_settings.fade_steps_remaining = layer_settings.fade_in_steps
+
+        if queue:
+            layer_settings.status = layer_queued
+        elif layer_settings.fade_in_steps > 0:
+            layer_settings.status = layer_fading_in
+        else:
+            layer_settings.status = layer_playing
+
+        SDL_UnlockAudio()
+
+    def stop_layer(self, int layer, float fade_out=0.0):
+        """
+        Stops the specified layer number in the currently playing sound loop set.
+
+        Args:
+            layer: The layer number to stop (1-based array position).
+            fade_out: The number of seconds over which to fade out the layer before stopping.
+        """
+        cdef SoundLoopLayerSettings *layer_settings
+
+        if layer <= 0:
+            self.log.warning("Illegal layer value in call to stop_layer (must be > 1).")
+            return
+
+        if layer == 1:
+            self.log.warning("stop_layer cannot be used to control layer 1 (the master layer)")
+            return
+
+        SDL_LockAudio()
+
+        # Retrieve the layer
+        if self.type_state.current.layers == NULL:
+            self.log.info("There are no layers defined in the current sound loop set: stop_layers has no effect")
+            SDL_UnlockAudio()
+            return
+
+        layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
+        if layer_settings == NULL:
+            self.log.info("The specified layer could not be found in the current sound loop set: stop_layers has no effect")
+            SDL_UnlockAudio()
+            return
+
+        if layer_settings.status == layer_stopped:
+            self.log.info("The current sound loop set layer is already stopped: stop_layers has no effect")
+            SDL_UnlockAudio()
+            return
+
+        # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
+        if fade_out > 0.0:
+            layer_settings.fade_out_steps = <Uint32>(fade_out * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
+            layer_settings.fade_steps_remaining = layer_settings.fade_out_steps
+            layer_settings.status = layer_fading_out
+        else:
+            # TODO: Could perform a quick fade out rather than an abrupt stop
+            layer_settings.status = layer_stopped
+
+        SDL_UnlockAudio()
+
     cdef _reset_player_layers(self, SoundLoopSetPlayer *player):
         """Reset (free memory) for sound loop set player layers."""
         if player != NULL and player.layers != NULL:
@@ -484,11 +590,15 @@ cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *play
                            current_chunk_bytes,
                            player_volume * layer.volume // SDL_MIX_MAXVOLUME)
 
-        # Now mix any additional player layers
+        # Now mix any additional loop layers
         layer_iterator = layer_iterator.next
         while layer_iterator != NULL:
             layer = <SoundLoopLayerSettings*>layer_iterator.data
-            if layer.status != layer_stopped:
+
+            if layer.status == layer_queued and player.sample_pos == 0:
+                layer.status = layer_playing
+
+            if layer.status in (layer_playing, layer_fading_in, layer_fading_out):
                 layer_track_buffer_pos_offset = 0
                 layer_sample_pos = player.sample_pos
                 layer_bytes_remaining = current_chunk_bytes
@@ -496,6 +606,7 @@ cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *play
                 while layer_bytes_remaining > 0:
                     if layer.status == layer_playing:
                         layer_chunk_bytes = layer_bytes_remaining
+                        layer_volume = layer.volume
                     else:
                         # Calculate layer volume (handle fading)
                         layer_chunk_bytes = min(callback_data.bytes_per_control_point, layer_bytes_remaining)

@@ -77,7 +77,6 @@ Here are several various examples:
             try:
                 loop_set = self.machine.sound_loop_sets[settings['sound_loop_set']]
                 track.play_sound_loop_set(loop_set, settings)
-                print("SoundLoopPlayer - call to play_sound_loop_set finished")
             except Exception as ex:
                 raise Exception(ex)
 
@@ -88,9 +87,12 @@ Here are several various examples:
         elif settings['action'].lower() == 'set_volume':
             pass
         elif settings['action'].lower() == 'play_layer':
-            pass
+            settings.setdefault('volume', None)
+            track.play_layer(settings['layer'], settings['fade_in'], settings['queue'], volume=settings['volume'])
+
         elif settings['action'].lower() == 'stop_layer':
-            pass
+            track.stop_layer(settings['layer'], settings['fade_out'])
+
         elif settings['action'].lower() == 'stop_looping_layer':
             pass
         elif settings['action'].lower() == 'set_layer_volume':

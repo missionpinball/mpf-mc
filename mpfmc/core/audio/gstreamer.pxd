@@ -170,6 +170,7 @@ cdef extern from 'glib.h':
     guint g_slist_length (GSList *list) nogil
     GSList *g_slist_reverse(GSList *list) nogil
     void g_slist_foreach(GSList *list, GFunc func, gpointer user_data) nogil
+    gpointer g_slist_nth_data(GSList *list, guint n) nogil
 
     # Memory slices
     gpointer g_slice_alloc(gsize block_size) nogil

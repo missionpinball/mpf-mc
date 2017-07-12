@@ -64,6 +64,11 @@ sound_loop_player:
     track: loops
     layer: 2
     queue: True
+  stop_hi_hats:
+    action: stop_layer
+    track: loops
+    layer: 2
+    fade_out: 1.5s
   add_snare:
     action: play_layer
     track: loops

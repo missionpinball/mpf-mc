@@ -920,16 +920,17 @@ typedef struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopStat
  * 
  * cdef enum LayerStatus:             # <<<<<<<<<<<<<<
  *     layer_stopped = 0
- *     layer_playing = 1
+ *     layer_queued = 1
  */
 enum __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus {
   __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_stopped = 0,
-  __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing = 1,
-  __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_in = 2,
-  __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out = 3
+  __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_queued = 1,
+  __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing = 2,
+  __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_in = 3,
+  __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out = 4
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":29
+/* "mpfmc/core/audio/track_sound_loop.pxd":30
  *     GArray *markers
  * 
  * cdef enum SoundLoopSetPlayerStatus:             # <<<<<<<<<<<<<<
@@ -945,8 +946,8 @@ enum __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus {
   __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_playing = 5
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":18
- *     layer_fading_out = 3
+/* "mpfmc/core/audio/track_sound_loop.pxd":19
+ *     layer_fading_out = 4
  * 
  * ctypedef struct SoundLoopLayerSettings:             # <<<<<<<<<<<<<<
  *     LayerStatus status
@@ -964,7 +965,7 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings {
   GArray *markers;
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":38
+/* "mpfmc/core/audio/track_sound_loop.pxd":39
  *     player_playing = 5
  * 
  * ctypedef struct SoundLoopSetPlayer:             # <<<<<<<<<<<<<<
@@ -981,7 +982,7 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer {
   Uint32 fade_steps_remaining;
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":47
+/* "mpfmc/core/audio/track_sound_loop.pxd":48
  *     Uint32 fade_steps_remaining
  * 
  * ctypedef struct TrackSoundLoopState:             # <<<<<<<<<<<<<<
@@ -1081,7 +1082,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_14track_standard_TrackStandard {
 };
 
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":58
+/* "mpfmc/core/audio/track_sound_loop.pxd":59
  * #    TrackSoundLoop class
  * # ---------------------------------------------------------------------------
  * cdef class TrackSoundLoop(Track):             # <<<<<<<<<<<<<<
@@ -1260,7 +1261,7 @@ struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard {
 static struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard *__pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard;
 
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":58
+/* "mpfmc/core/audio/track_sound_loop.pxd":59
  * #    TrackSoundLoop class
  * # ---------------------------------------------------------------------------
  * cdef class TrackSoundLoop(Track):             # <<<<<<<<<<<<<<
@@ -13052,8 +13053,8 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   __pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile = __Pyx_ImportType("mpfmc.core.audio.sound_file", "SoundStreamingFile", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile)) __PYX_ERR(2, 47, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard = __Pyx_ImportType("mpfmc.core.audio.track_standard", "TrackStandard", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_14track_standard_TrackStandard), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard)) __PYX_ERR(3, 84, __pyx_L1_error)
   __pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard)) __PYX_ERR(3, 84, __pyx_L1_error)
-  __pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = __Pyx_ImportType("mpfmc.core.audio.track_sound_loop", "TrackSoundLoop", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 58, __pyx_L1_error)
-  __pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 58, __pyx_L1_error)
+  __pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = __Pyx_ImportType("mpfmc.core.audio.track_sound_loop", "TrackSoundLoop", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 59, __pyx_L1_error)
+  __pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 59, __pyx_L1_error)
   /*--- Variable import code ---*/
   /*--- Function import code ---*/
   /*--- Execution code ---*/
