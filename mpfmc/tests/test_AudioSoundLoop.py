@@ -54,7 +54,8 @@ class TestAudioSoundLoop(MpfMcTestCase):
         # Test sound_loop_player
         self.advance_real_time(1)
         self.mc.events.post('play_sound_synthping')
-        self.advance_real_time(1)
+        self.advance_real_time(0.25)
         self.mc.events.post('play_basic_beat')
-        self.advance_time()
-        self.advance_real_time(5)
+        self.advance_real_time(2)
+        self.mc.events.post('add_hi_hats')
+        self.advance_real_time(2)

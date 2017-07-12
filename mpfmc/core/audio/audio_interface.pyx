@@ -155,10 +155,10 @@ cdef class AudioInterface:
         self.audio_callback_data.silence = 0
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
-        #self.audio_callback_data.c_log_file = NULL
-        self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
-        fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
-        fflush(self.audio_callback_data.c_log_file)
+        self.audio_callback_data.c_log_file = NULL
+        #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+        #fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
+        #fflush(self.audio_callback_data.c_log_file)
 
         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
                        rate, channels, buffer_samples)
@@ -670,18 +670,12 @@ cdef class AudioInterface:
         if callback_data == NULL:
             return
 
-        fprintf(callback_data.c_log_file, "AudioInterface.audio_callback\r\n")
-        fflush(callback_data.c_log_file)
-
         # Initialize master output buffer with silence as it arrives uninitialized
         memset(output_buffer, 0, buffer_length)
 
         # Note: There are three separate loops over the tracks that must remain separate due
         # to various track parameters than can be set for any track during each loop.  Difficult
         # to debug logic errors will occur if these track loops are combined.
-
-        fprintf(callback_data.c_log_file, "Initialize tracks\r\n")
-        fflush(callback_data.c_log_file)
 
         # Loop over tracks, initializing the status, track buffer, and track ducking.
         for track_num in range(callback_data.track_count):
@@ -694,14 +688,8 @@ cdef class AudioInterface:
             for control_point in range(CONTROL_POINTS_PER_BUFFER):
                 g_array_set_val_uint8(track.ducking_control_points, control_point, SDL_MIX_MAXVOLUME)
 
-        fprintf(callback_data.c_log_file, "Fill track audio buffers\r\n")
-        fflush(callback_data.c_log_file)
-
         # Loop over tracks, mixing the playing sounds into the track's audio buffer
         for track_num in range(callback_data.track_count):
-            fprintf(callback_data.c_log_file, "Track %d\r\n", track_num)
-            fflush(callback_data.c_log_file)
-
             track = <TrackState*>callback_data.tracks[track_num]
 
             # No need to process/mix the track if the track is stopped or paused
@@ -711,9 +699,6 @@ cdef class AudioInterface:
             # Call the track's mix callback function (generates audio into track buffer)
             if track.mix_callback_function != NULL:
                 track.mix_callback_function(track, buffer_length, callback_data)
-
-        fprintf(callback_data.c_log_file, "Mix down\r\n")
-        fflush(callback_data.c_log_file)
 
         # Loop over tracks again, applying ducking and mixing down tracks to the master output buffer
         for track_num in range(callback_data.track_count):
@@ -728,6 +713,3 @@ cdef class AudioInterface:
 
         # Apply master volume to output buffer
         SDL_MixAudioFormat(output_buffer, output_buffer, callback_data.format, buffer_length, callback_data.master_volume)
-
-        fprintf(callback_data.c_log_file, "AudioInterface.audio_callback - finished\r\n")
-        fflush(callback_data.c_log_file)

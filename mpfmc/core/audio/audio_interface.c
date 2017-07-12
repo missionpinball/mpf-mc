@@ -3464,7 +3464,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
  *         self.audio_callback_data.silence = 0
  *         self.audio_callback_data.track_count = 0             # <<<<<<<<<<<<<<
  *         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
- *         #self.audio_callback_data.c_log_file = NULL
+ *         self.audio_callback_data.c_log_file = NULL
  */
   __pyx_v_self->audio_callback_data.track_count = 0;
 
@@ -3472,40 +3472,22 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
  *         self.audio_callback_data.silence = 0
  *         self.audio_callback_data.track_count = 0
  *         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))             # <<<<<<<<<<<<<<
- *         #self.audio_callback_data.c_log_file = NULL
- *         self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+ *         self.audio_callback_data.c_log_file = NULL
+ *         #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
  */
   __pyx_v_self->audio_callback_data.tracks = ((void **)PyMem_Malloc((8 * (sizeof(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *)))));
 
-  /* "mpfmc/core/audio/audio_interface.pyx":159
+  /* "mpfmc/core/audio/audio_interface.pyx":158
+ *         self.audio_callback_data.track_count = 0
  *         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
- *         #self.audio_callback_data.c_log_file = NULL
- *         self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")             # <<<<<<<<<<<<<<
- *         fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
- *         fflush(self.audio_callback_data.c_log_file)
+ *         self.audio_callback_data.c_log_file = NULL             # <<<<<<<<<<<<<<
+ *         #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+ *         #fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
  */
-  __pyx_v_self->audio_callback_data.c_log_file = ((FILE *)fopen(((char const *)"D:\\Temp\\Dev\\MPFMC_AudioLibrary.log"), ((char const *)"wb")));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":160
- *         #self.audio_callback_data.c_log_file = NULL
- *         self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
- *         fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")             # <<<<<<<<<<<<<<
- *         fflush(self.audio_callback_data.c_log_file)
- * 
- */
-  fprintf(((FILE *)__pyx_v_self->audio_callback_data.c_log_file), ((char const *)"---------------------------------------------------------------------------\r\n"));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":161
- *         self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
- *         fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
- *         fflush(self.audio_callback_data.c_log_file)             # <<<<<<<<<<<<<<
- * 
- *         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
- */
-  fflush(((FILE *)__pyx_v_self->audio_callback_data.c_log_file));
+  __pyx_v_self->audio_callback_data.c_log_file = NULL;
 
   /* "mpfmc/core/audio/audio_interface.pyx":163
- *         fflush(self.audio_callback_data.c_log_file)
+ *         #fflush(self.audio_callback_data.c_log_file)
  * 
  *         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',             # <<<<<<<<<<<<<<
  *                        rate, channels, buffer_samples)
@@ -10610,7 +10592,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  *         if callback_data == NULL:
  *             return             # <<<<<<<<<<<<<<
  * 
- *         fprintf(callback_data.c_log_file, "AudioInterface.audio_callback\r\n")
+ *         # Initialize master output buffer with silence as it arrives uninitialized
  */
     goto __pyx_L0;
 
@@ -10623,25 +10605,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":673
- *             return
- * 
- *         fprintf(callback_data.c_log_file, "AudioInterface.audio_callback\r\n")             # <<<<<<<<<<<<<<
- *         fflush(callback_data.c_log_file)
- * 
- */
-  fprintf(((FILE *)__pyx_v_callback_data->c_log_file), ((char const *)"AudioInterface.audio_callback\r\n"));
-
   /* "mpfmc/core/audio/audio_interface.pyx":674
- * 
- *         fprintf(callback_data.c_log_file, "AudioInterface.audio_callback\r\n")
- *         fflush(callback_data.c_log_file)             # <<<<<<<<<<<<<<
- * 
- *         # Initialize master output buffer with silence as it arrives uninitialized
- */
-  fflush(((FILE *)__pyx_v_callback_data->c_log_file));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":677
  * 
  *         # Initialize master output buffer with silence as it arrives uninitialized
  *         memset(output_buffer, 0, buffer_length)             # <<<<<<<<<<<<<<
@@ -10650,25 +10614,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  */
   memset(__pyx_v_output_buffer, 0, __pyx_v_buffer_length);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":683
- *         # to debug logic errors will occur if these track loops are combined.
- * 
- *         fprintf(callback_data.c_log_file, "Initialize tracks\r\n")             # <<<<<<<<<<<<<<
- *         fflush(callback_data.c_log_file)
- * 
- */
-  fprintf(((FILE *)__pyx_v_callback_data->c_log_file), ((char const *)"Initialize tracks\r\n"));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":684
- * 
- *         fprintf(callback_data.c_log_file, "Initialize tracks\r\n")
- *         fflush(callback_data.c_log_file)             # <<<<<<<<<<<<<<
- * 
- *         # Loop over tracks, initializing the status, track buffer, and track ducking.
- */
-  fflush(((FILE *)__pyx_v_callback_data->c_log_file));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":687
+  /* "mpfmc/core/audio/audio_interface.pyx":681
  * 
  *         # Loop over tracks, initializing the status, track buffer, and track ducking.
  *         for track_num in range(callback_data.track_count):             # <<<<<<<<<<<<<<
@@ -10679,7 +10625,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_track_num = __pyx_t_3;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":688
+    /* "mpfmc/core/audio/audio_interface.pyx":682
  *         # Loop over tracks, initializing the status, track buffer, and track ducking.
  *         for track_num in range(callback_data.track_count):
  *             track = <TrackState*>callback_data.tracks[track_num]             # <<<<<<<<<<<<<<
@@ -10688,7 +10634,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  */
     __pyx_v_track = ((__pyx_t_5mpfmc_4core_5audio_5track_TrackState *)(__pyx_v_callback_data->tracks[__pyx_v_track_num]));
 
-    /* "mpfmc/core/audio/audio_interface.pyx":690
+    /* "mpfmc/core/audio/audio_interface.pyx":684
  *             track = <TrackState*>callback_data.tracks[track_num]
  * 
  *             track.active = False             # <<<<<<<<<<<<<<
@@ -10697,7 +10643,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  */
     __pyx_v_track->active = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":691
+    /* "mpfmc/core/audio/audio_interface.pyx":685
  * 
  *             track.active = False
  *             memset(track.buffer, 0, buffer_length)             # <<<<<<<<<<<<<<
@@ -10706,7 +10652,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  */
     memset(__pyx_v_track->buffer, 0, __pyx_v_buffer_length);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":693
+    /* "mpfmc/core/audio/audio_interface.pyx":687
  *             memset(track.buffer, 0, buffer_length)
  * 
  *             track.ducking_is_active = False             # <<<<<<<<<<<<<<
@@ -10715,7 +10661,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  */
     __pyx_v_track->ducking_is_active = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":694
+    /* "mpfmc/core/audio/audio_interface.pyx":688
  * 
  *             track.ducking_is_active = False
  *             for control_point in range(CONTROL_POINTS_PER_BUFFER):             # <<<<<<<<<<<<<<
@@ -10726,74 +10672,38 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
     for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
       __pyx_v_control_point = __pyx_t_5;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":695
+      /* "mpfmc/core/audio/audio_interface.pyx":689
  *             track.ducking_is_active = False
  *             for control_point in range(CONTROL_POINTS_PER_BUFFER):
  *                 g_array_set_val_uint8(track.ducking_control_points, control_point, SDL_MIX_MAXVOLUME)             # <<<<<<<<<<<<<<
  * 
- *         fprintf(callback_data.c_log_file, "Fill track audio buffers\r\n")
+ *         # Loop over tracks, mixing the playing sounds into the track's audio buffer
  */
       g_array_set_val_uint8(__pyx_v_track->ducking_control_points, __pyx_v_control_point, SDL_MIX_MAXVOLUME);
     }
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":697
- *                 g_array_set_val_uint8(track.ducking_control_points, control_point, SDL_MIX_MAXVOLUME)
- * 
- *         fprintf(callback_data.c_log_file, "Fill track audio buffers\r\n")             # <<<<<<<<<<<<<<
- *         fflush(callback_data.c_log_file)
- * 
- */
-  fprintf(((FILE *)__pyx_v_callback_data->c_log_file), ((char const *)"Fill track audio buffers\r\n"));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":698
- * 
- *         fprintf(callback_data.c_log_file, "Fill track audio buffers\r\n")
- *         fflush(callback_data.c_log_file)             # <<<<<<<<<<<<<<
- * 
- *         # Loop over tracks, mixing the playing sounds into the track's audio buffer
- */
-  fflush(((FILE *)__pyx_v_callback_data->c_log_file));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":701
+  /* "mpfmc/core/audio/audio_interface.pyx":692
  * 
  *         # Loop over tracks, mixing the playing sounds into the track's audio buffer
  *         for track_num in range(callback_data.track_count):             # <<<<<<<<<<<<<<
- *             fprintf(callback_data.c_log_file, "Track %d\r\n", track_num)
- *             fflush(callback_data.c_log_file)
+ *             track = <TrackState*>callback_data.tracks[track_num]
+ * 
  */
   __pyx_t_2 = __pyx_v_callback_data->track_count;
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_track_num = __pyx_t_3;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":702
+    /* "mpfmc/core/audio/audio_interface.pyx":693
  *         # Loop over tracks, mixing the playing sounds into the track's audio buffer
  *         for track_num in range(callback_data.track_count):
- *             fprintf(callback_data.c_log_file, "Track %d\r\n", track_num)             # <<<<<<<<<<<<<<
- *             fflush(callback_data.c_log_file)
- * 
- */
-    fprintf(((FILE *)__pyx_v_callback_data->c_log_file), ((char const *)"Track %d\r\n"), __pyx_v_track_num);
-
-    /* "mpfmc/core/audio/audio_interface.pyx":703
- *         for track_num in range(callback_data.track_count):
- *             fprintf(callback_data.c_log_file, "Track %d\r\n", track_num)
- *             fflush(callback_data.c_log_file)             # <<<<<<<<<<<<<<
- * 
- *             track = <TrackState*>callback_data.tracks[track_num]
- */
-    fflush(((FILE *)__pyx_v_callback_data->c_log_file));
-
-    /* "mpfmc/core/audio/audio_interface.pyx":705
- *             fflush(callback_data.c_log_file)
- * 
  *             track = <TrackState*>callback_data.tracks[track_num]             # <<<<<<<<<<<<<<
  * 
  *             # No need to process/mix the track if the track is stopped or paused
  */
     __pyx_v_track = ((__pyx_t_5mpfmc_4core_5audio_5track_TrackState *)(__pyx_v_callback_data->tracks[__pyx_v_track_num]));
 
-    /* "mpfmc/core/audio/audio_interface.pyx":708
+    /* "mpfmc/core/audio/audio_interface.pyx":696
  * 
  *             # No need to process/mix the track if the track is stopped or paused
  *             if track.status == track_status_stopped or track.status == track_status_paused:             # <<<<<<<<<<<<<<
@@ -10804,7 +10714,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
       case __pyx_e_5mpfmc_4core_5audio_5track_track_status_stopped:
       case __pyx_e_5mpfmc_4core_5audio_5track_track_status_paused:
 
-      /* "mpfmc/core/audio/audio_interface.pyx":709
+      /* "mpfmc/core/audio/audio_interface.pyx":697
  *             # No need to process/mix the track if the track is stopped or paused
  *             if track.status == track_status_stopped or track.status == track_status_paused:
  *                 continue             # <<<<<<<<<<<<<<
@@ -10813,7 +10723,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  */
       goto __pyx_L8_continue;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":708
+      /* "mpfmc/core/audio/audio_interface.pyx":696
  * 
  *             # No need to process/mix the track if the track is stopped or paused
  *             if track.status == track_status_stopped or track.status == track_status_paused:             # <<<<<<<<<<<<<<
@@ -10824,7 +10734,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
       default: break;
     }
 
-    /* "mpfmc/core/audio/audio_interface.pyx":712
+    /* "mpfmc/core/audio/audio_interface.pyx":700
  * 
  *             # Call the track's mix callback function (generates audio into track buffer)
  *             if track.mix_callback_function != NULL:             # <<<<<<<<<<<<<<
@@ -10834,16 +10744,16 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
     __pyx_t_1 = ((__pyx_v_track->mix_callback_function != NULL) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":713
+      /* "mpfmc/core/audio/audio_interface.pyx":701
  *             # Call the track's mix callback function (generates audio into track buffer)
  *             if track.mix_callback_function != NULL:
  *                 track.mix_callback_function(track, buffer_length, callback_data)             # <<<<<<<<<<<<<<
  * 
- *         fprintf(callback_data.c_log_file, "Mix down\r\n")
+ *         # Loop over tracks again, applying ducking and mixing down tracks to the master output buffer
  */
       __pyx_v_track->mix_callback_function(__pyx_v_track, __pyx_v_buffer_length, __pyx_v_callback_data);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":712
+      /* "mpfmc/core/audio/audio_interface.pyx":700
  * 
  *             # Call the track's mix callback function (generates audio into track buffer)
  *             if track.mix_callback_function != NULL:             # <<<<<<<<<<<<<<
@@ -10854,25 +10764,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
     __pyx_L8_continue:;
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":715
- *                 track.mix_callback_function(track, buffer_length, callback_data)
- * 
- *         fprintf(callback_data.c_log_file, "Mix down\r\n")             # <<<<<<<<<<<<<<
- *         fflush(callback_data.c_log_file)
- * 
- */
-  fprintf(((FILE *)__pyx_v_callback_data->c_log_file), ((char const *)"Mix down\r\n"));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":716
- * 
- *         fprintf(callback_data.c_log_file, "Mix down\r\n")
- *         fflush(callback_data.c_log_file)             # <<<<<<<<<<<<<<
- * 
- *         # Loop over tracks again, applying ducking and mixing down tracks to the master output buffer
- */
-  fflush(((FILE *)__pyx_v_callback_data->c_log_file));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":719
+  /* "mpfmc/core/audio/audio_interface.pyx":704
  * 
  *         # Loop over tracks again, applying ducking and mixing down tracks to the master output buffer
  *         for track_num in range(callback_data.track_count):             # <<<<<<<<<<<<<<
@@ -10883,7 +10775,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_track_num = __pyx_t_3;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":720
+    /* "mpfmc/core/audio/audio_interface.pyx":705
  *         # Loop over tracks again, applying ducking and mixing down tracks to the master output buffer
  *         for track_num in range(callback_data.track_count):
  *             track = <TrackState*>callback_data.tracks[track_num]             # <<<<<<<<<<<<<<
@@ -10892,7 +10784,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  */
     __pyx_v_track = ((__pyx_t_5mpfmc_4core_5audio_5track_TrackState *)(__pyx_v_callback_data->tracks[__pyx_v_track_num]));
 
-    /* "mpfmc/core/audio/audio_interface.pyx":723
+    /* "mpfmc/core/audio/audio_interface.pyx":708
  * 
  *             # Only mix the track to the master output and apply ducking if it is active
  *             if track.active:             # <<<<<<<<<<<<<<
@@ -10902,7 +10794,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
     __pyx_t_1 = (__pyx_v_track->active != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":724
+      /* "mpfmc/core/audio/audio_interface.pyx":709
  *             # Only mix the track to the master output and apply ducking if it is active
  *             if track.active:
  *                 Track.mix_track_to_output(track,             # <<<<<<<<<<<<<<
@@ -10911,7 +10803,7 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
  */
       __pyx_vtabptr_5mpfmc_4core_5audio_5track_Track->mix_track_to_output(__pyx_v_track, __pyx_v_callback_data, __pyx_v_output_buffer, __pyx_v_buffer_length);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":723
+      /* "mpfmc/core/audio/audio_interface.pyx":708
  * 
  *             # Only mix the track to the master output and apply ducking if it is active
  *             if track.active:             # <<<<<<<<<<<<<<
@@ -10921,29 +10813,12 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
     }
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":730
+  /* "mpfmc/core/audio/audio_interface.pyx":715
  * 
  *         # Apply master volume to output buffer
  *         SDL_MixAudioFormat(output_buffer, output_buffer, callback_data.format, buffer_length, callback_data.master_volume)             # <<<<<<<<<<<<<<
- * 
- *         fprintf(callback_data.c_log_file, "AudioInterface.audio_callback - finished\r\n")
  */
   SDL_MixAudioFormat(__pyx_v_output_buffer, __pyx_v_output_buffer, __pyx_v_callback_data->format, __pyx_v_buffer_length, __pyx_v_callback_data->master_volume);
-
-  /* "mpfmc/core/audio/audio_interface.pyx":732
- *         SDL_MixAudioFormat(output_buffer, output_buffer, callback_data.format, buffer_length, callback_data.master_volume)
- * 
- *         fprintf(callback_data.c_log_file, "AudioInterface.audio_callback - finished\r\n")             # <<<<<<<<<<<<<<
- *         fflush(callback_data.c_log_file)
- */
-  fprintf(((FILE *)__pyx_v_callback_data->c_log_file), ((char const *)"AudioInterface.audio_callback - finished\r\n"));
-
-  /* "mpfmc/core/audio/audio_interface.pyx":733
- * 
- *         fprintf(callback_data.c_log_file, "AudioInterface.audio_callback - finished\r\n")
- *         fflush(callback_data.c_log_file)             # <<<<<<<<<<<<<<
- */
-  fflush(((FILE *)__pyx_v_callback_data->c_log_file));
 
   /* "mpfmc/core/audio/audio_interface.pyx":651
  * 
@@ -12776,7 +12651,7 @@ static int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_n_s_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(0, 205, __pyx_L1_error)
   __pyx_builtin_round = __Pyx_GetBuiltinName(__pyx_n_s_round); if (!__pyx_builtin_round) __PYX_ERR(0, 257, __pyx_L1_error)
   __pyx_builtin_IndexError = __Pyx_GetBuiltinName(__pyx_n_s_IndexError); if (!__pyx_builtin_IndexError) __PYX_ERR(0, 462, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 687, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 681, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
