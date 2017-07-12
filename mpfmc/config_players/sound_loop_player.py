@@ -94,7 +94,8 @@ Here are several various examples:
             track.stop_layer(settings['layer'], settings['fade_out'])
 
         elif settings['action'].lower() == 'stop_looping_layer':
-            pass
+            track.stop_looping_layer(settings['layer'])
+
         elif settings['action'].lower() == 'set_layer_volume':
             pass
 

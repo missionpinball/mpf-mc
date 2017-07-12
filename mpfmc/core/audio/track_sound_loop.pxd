@@ -24,6 +24,7 @@ ctypedef struct SoundLoopLayerSettings:
     Uint32 fade_in_steps
     Uint32 fade_out_steps
     Uint32 fade_steps_remaining
+    bint looping
     Uint8 marker_count
     GArray *markers
 

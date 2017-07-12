@@ -249,6 +249,9 @@ cdef class TrackSoundLoop(Track):
             layer.sound = cython.address(sound_container.sample)
             layer.sound_id = sound.id
 
+            # By default, all layers will continue to loop when played
+            layer.looping = True
+
             # Layer volume (use layer settings or sound setting if None)
             if layer_settings['volume']:
                 layer.volume = <Uint8>(layer_settings['volume'] * SDL_MIX_MAXVOLUME)
@@ -340,6 +343,8 @@ cdef class TrackSoundLoop(Track):
         else:
             layer_settings.status = layer_playing
 
+        layer_settings.looping = True
+
         SDL_UnlockAudio()
 
     def stop_layer(self, int layer, float fade_out=0.0):
@@ -387,6 +392,50 @@ cdef class TrackSoundLoop(Track):
         else:
             # TODO: Could perform a quick fade out rather than an abrupt stop
             layer_settings.status = layer_stopped
+
+        SDL_UnlockAudio()
+
+    def stop_looping_layer(self, int layer):
+        """
+        Stops the specified layer number in the currently playing sound loop set after
+        the currently playing loop finishes.
+
+        Args:
+            layer: The layer number to stop looping (1-based array position).
+        """
+        cdef SoundLoopLayerSettings *layer_settings
+
+        if layer <= 0:
+            self.log.warning("Illegal layer value in call to stop_looping_layer (must be > 1).")
+            return
+
+        if layer == 1:
+            self.log.warning("stop_looping_layer cannot be used to control layer 1 (the master layer)")
+            return
+
+        SDL_LockAudio()
+
+        # Retrieve the layer
+        if self.type_state.current.layers == NULL:
+            self.log.info("There are no layers defined in the current sound loop set: "
+                          "stop_looping_layers has no effect")
+            SDL_UnlockAudio()
+            return
+
+        layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
+        if layer_settings == NULL:
+            self.log.info("The specified layer could not be found in the current sound loop set: "
+                          "stop_looping_layers has no effect")
+            SDL_UnlockAudio()
+            return
+
+        if layer_settings.status == layer_stopped:
+            self.log.info("The current sound loop set layer is already stopped: "
+                          "stop_looping_layers has no effect")
+            SDL_UnlockAudio()
+            return
+
+        layer_settings.looping = False
 
         SDL_UnlockAudio()
 
@@ -595,8 +644,13 @@ cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *play
         while layer_iterator != NULL:
             layer = <SoundLoopLayerSettings*>layer_iterator.data
 
-            if layer.status == layer_queued and player.sample_pos == 0:
-                layer.status = layer_playing
+            if player.sample_pos == 0:
+
+                if layer.status == layer_queued:
+                    layer.status = layer_playing
+
+                if not layer.looping:
+                    layer.status = layer_stopped
 
             if layer.status in (layer_playing, layer_fading_in, layer_fading_out):
                 layer_track_buffer_pos_offset = 0

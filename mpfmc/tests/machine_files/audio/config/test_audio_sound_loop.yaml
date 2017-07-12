@@ -8,7 +8,6 @@ sound_system:
     loops:
       type: sound_loop
       volume: 0.6
-      maximum_layers: 4
     music:
       volume: 0.5
       simultaneous_sounds: 1
@@ -65,10 +64,9 @@ sound_loop_player:
     layer: 2
     queue: True
   stop_hi_hats:
-    action: stop_layer
+    action: stop_looping_layer
     track: loops
     layer: 2
-    fade_out: 1.5s
   add_snare:
     action: play_layer
     track: loops
