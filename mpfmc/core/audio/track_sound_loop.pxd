@@ -45,6 +45,7 @@ ctypedef struct SoundLoopSetPlayer:
     Uint32 fade_in_steps
     Uint32 fade_out_steps
     Uint32 fade_steps_remaining
+    bint looping
 
 ctypedef struct TrackSoundLoopState:
     # State variables for TrackSoundLoop tracks

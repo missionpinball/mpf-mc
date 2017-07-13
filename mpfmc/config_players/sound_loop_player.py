@@ -81,9 +81,12 @@ Here are several various examples:
                 raise Exception(ex)
 
         elif settings['action'].lower() == 'stop':
-            pass
+            settings.setdefault('fade_out', None)
+            track.stop_current_sound_loop_set(settings['fade_out'])
+
         elif settings['action'].lower() == 'stop_looping':
-            pass
+            track.stop_looping_current_sound_loop_set()
+
         elif settings['action'].lower() == 'set_volume':
             pass
         elif settings['action'].lower() == 'play_layer':

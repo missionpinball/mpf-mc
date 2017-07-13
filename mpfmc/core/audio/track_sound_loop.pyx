@@ -175,7 +175,7 @@ cdef class TrackSoundLoop(Track):
 
         else:
             # TODO: Handle case when both players are busy (i.e. during a cross-fade)
-            self.log.warning("Unable to play sound - both sound loop players are currently busy.")
+            self.log.info("Unable to play sound - both sound loop players are currently busy.")
             SDL_UnlockAudio()
             return
 
@@ -221,6 +221,8 @@ cdef class TrackSoundLoop(Track):
                 player.status = player_playing
 
             player.sample_pos = 0
+
+        player.looping = True
 
         # Setup sound loop set layers
         self._reset_player_layers(player)
@@ -284,6 +286,49 @@ cdef class TrackSoundLoop(Track):
             # Append layer
             player.layers = g_slist_append(player.layers, layer)
             first_layer = False
+
+        SDL_UnlockAudio()
+
+    def stop_current_sound_loop_set(self, fade_out=None):
+        """
+        Stops the currently playing sound loop set.
+        Args:
+            fade_out: The number of seconds over which to fade out the currently playing
+                      sound loop set before stopping.
+        """
+        SDL_LockAudio()
+
+        if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
+            self.log.info("Unable to stop sound loop set - no sound loop set is currently playing.")
+            SDL_UnlockAudio()
+            return
+
+        # Calculate new fade out if specified (overriding current setting)
+        if fade_out:
+            self.type_state.current.fade_out_steps = fade_out * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
+
+        # If no fade out is specified, perform quick fade out
+        if self.type_state.current.fade_out_steps == 0:
+            self.type_state.current.fade_out_steps = self.state.callback_data.quick_fade_steps
+
+        self.type_state.current.fade_steps_remaining = self.type_state.current.fade_out_steps
+        self.type_state.current.status = player_fading_out
+
+        SDL_UnlockAudio()
+
+    def stop_looping_current_sound_loop_set(self):
+        """
+        Stops the currently playing sound loop set from continuing to loop (it will stop
+        after the current loop iteration).
+        """
+        SDL_LockAudio()
+
+        if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
+            self.log.info("Unable to stop looping sound loop set - no sound loop set is currently playing.")
+            SDL_UnlockAudio()
+            return
+
+        self.type_state.current.looping = False
 
         SDL_UnlockAudio()
 
@@ -517,17 +562,20 @@ cdef class TrackSoundLoop(Track):
                 # End of sound loop reached, determine if sound loop set should end or continue looping
                 # If the current player is fading out, we need to wait for it to finish before moving
                 # on to the next player
-                if live_loop_track.current.status == player_playing and live_loop_track.next.status == player_pending:
+                if not live_loop_track.current.looping or (
+                        live_loop_track.current.status == player_playing and live_loop_track.next.status == player_pending):
                     live_loop_track.current.status = player_idle
                     reset_track_buffer_pos = False
-                    live_loop_track.next.status = player_playing
                 else:
                     # TODO: send looping notification
+                    #send_sound_looping_notification(0, sound.sound_id, 0, track)
                     live_loop_track.current.sample_pos = 0
 
             if live_loop_track.current.status == player_idle:
                 # TODO: Send stopped notification
                 switch_players = True
+                if live_loop_track.next.status == player_pending:
+                    live_loop_track.next.status = player_playing
 
         if reset_track_buffer_pos:
             track_buffer_pos = 0

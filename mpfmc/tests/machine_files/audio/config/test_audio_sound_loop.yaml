@@ -60,10 +60,10 @@ sound_loop_sets:
       - sound: snare
         volume: 0.6
       - sound: clap
-        volume: 0.45
+        volume: 0.4
         initial_state: stop
       - sound: bass_synth
-        volume: 0.6
+        volume: 0.5
         initial_state: play
 
 sound_loop_player:
@@ -109,6 +109,15 @@ sound_loop_player:
     track: loops
     layer: 5
     fade_out: 4s
+
+  stop_looping_current_loop:
+    action: stop_looping
+    track: loops
+
+  stop_current_loop:
+    action: stop
+    track: loops
+    fade_out: 1.5s
 
 sound_player:
     play_sound_synthping: 210871_synthping
