@@ -493,10 +493,117 @@ cdef class TrackSoundLoop(Track):
                 if layer.markers != NULL:
                     g_array_free(layer.markers, True)
                     layer.markers = NULL
+                g_slice_free1(sizeof(SoundLoopLayerSettings), layer)
                 iterator = iterator.next
 
             g_slist_free(player.layers)
             player.layers = NULL
+
+    def get_status(self):
+        """
+        Get the current track status (status of all sound loop players on the track).
+        Used for debugging and testing.
+        Returns:
+            A list of status dictionaries containing the current settings for each
+            sound loop player.
+        """
+        cdef SoundLoopSetPlayer *player
+        cdef SoundLoopLayerSettings *layer
+        cdef int index = 0
+
+        SDL_LockAudio()
+        status = []
+        for player_num in range(2):
+            if player_num == 0:
+                player = self.type_state.current
+            else:
+                player = self.type_state.next
+
+            if player == NULL:
+                status.append({
+                    "status": TrackSoundLoop.player_status_to_text(player_idle),
+                    "length": 0
+                })
+            else:
+                layers = []
+                layer = <SoundLoopLayerSettings*>g_slist_nth_data(player.layers, index)
+                while layer != NULL:
+                    layers.append({
+                        "status": TrackSoundLoop.layer_status_to_text(layer.status),
+                        "sound_id": layer.sound_id,
+                        "sound_length": layer.sound.data.memory.size,
+                        "volume": layer.volume,
+                        "fade_in_steps": layer.fade_in_steps,
+                        "fade_out_steps": layer.fade_out_steps,
+                        "fade_steps_remaining": layer.fade_steps_remaining,
+                        "looping": layer.looping,
+                        "marker_count": layer.marker_count,
+                    })
+                    index += 1
+                    layer = <SoundLoopLayerSettings*>g_slist_nth_data(player.layers, index)
+
+                status.append({
+                    "status": TrackSoundLoop.player_status_to_text(<int>player.status),
+                    "length": player.length,
+                    "layers": layers,
+                    "sample_pos": player.sample_pos,
+                    "fade_in_steps": player.fade_in_steps,
+                    "fade_out_steps": player.fade_out_steps,
+                    "fade_steps_remaining": player.fade_steps_remaining,
+                    "looping": player.looping,
+                })
+
+        SDL_UnlockAudio()
+
+        return status
+
+    @staticmethod
+    def player_status_to_text(int status):
+        """
+        Converts a sound loop player status value into an equivalent text string.  Used for testing
+        purposes only.
+        Args:
+            status: Integer sound loop player status value
+
+        Returns:
+            string containing the equivalent status text
+        """
+        status_values = {
+            player_idle: "idle",
+            player_pending: "pending",
+            player_playing: "playing",
+            player_fading_in: "fading in",
+            player_fading_out: "fading out",
+        }
+
+        try:
+            return status_values.get(status)
+        except KeyError:
+            return "unknown"
+
+    @staticmethod
+    def layer_status_to_text(int status):
+        """
+        Converts a sound loop set layer status value into an equivalent text string.  Used for testing
+        purposes only.
+        Args:
+            status: Integer sound loop set layer status value
+
+        Returns:
+            string containing the equivalent status text
+        """
+        status_values = {
+            layer_stopped: "stopped",
+            layer_queued: "queued",
+            layer_playing: "playing",
+            layer_fading_in: "fading in",
+            layer_fading_out: "fading out",
+        }
+
+        try:
+            return status_values.get(status)
+        except KeyError:
+            return "unknown"
 
 
     # ---------------------------------------------------------------------------

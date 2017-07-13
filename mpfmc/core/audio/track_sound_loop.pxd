@@ -32,10 +32,9 @@ cdef enum SoundLoopSetPlayerStatus:
     # Enumeration of the possible sound loop set player status values.
     player_idle = 0
     player_pending = 1
-    player_replacing = 2
-    player_fading_in = 3
-    player_fading_out = 4
-    player_playing = 5
+    player_fading_in = 2
+    player_fading_out = 3
+    player_playing = 4
 
 ctypedef struct SoundLoopSetPlayer:
     SoundLoopSetPlayerStatus status

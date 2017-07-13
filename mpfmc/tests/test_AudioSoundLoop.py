@@ -59,20 +59,35 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.mc.events.post('play_sound_synthping')
         self.mc.events.post('play_basic_beat')
         self.advance_real_time(1)
+
         self.mc.events.post('add_hi_hats')
         self.advance_time()
         self.advance_real_time(3)
+
         self.mc.events.post('add_snare')
         self.mc.events.post('add_claps')
-        self.advance_real_time(4)
+        self.advance_real_time(2)
+        status = track_loops.get_status()
+        self.assertEqual(status[0]['status'], "playing")
+        self.assertTrue(status[0]['looping'])
+        self.assertEqual(len(status[0]['layers']), 4)
+        self.assertEqual(status[0]['layers'][0]['status'], "playing")
+        self.assertEqual(status[0]['layers'][0]['sound_id'], self.mc.sounds["kick"].id)
+        self.assertEqual(status[1]['status'], "idle")
+        self.advance_real_time(2)
+
         self.mc.events.post('play_basic_beat2')
         self.advance_real_time(4)
+        status = track_loops.get_status()
+        self.assertEqual(status[0]['status'], "playing")
+        self.assertTrue(status[0]['looping'])
+        self.assertEqual(len(status[0]['layers']), 5)
+        self.assertEqual(status[0]['layers'][0]['status'], "playing")
+        self.assertEqual(status[0]['layers'][0]['sound_id'], self.mc.sounds["kick2"].id)
+
         self.mc.events.post('fade_out_bass_synth')
         self.advance_real_time(4)
+
         self.mc.events.post('stop_current_loop')
         self.mc.events.post('play_sound_synthping')
         self.advance_real_time(2)
-
-
-
-
