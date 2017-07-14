@@ -44,6 +44,7 @@ class Display(ScreenManager):
         self.name = name
         self.config = kwargs
         self._ready = False
+        self.tags = []
 
         Display.displays_to_initialize += 1
 
