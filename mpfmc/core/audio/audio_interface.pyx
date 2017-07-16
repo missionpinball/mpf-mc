@@ -2302,13 +2302,15 @@ cdef class TrackStandard(Track):
             # account for the sample rate (sampes per second), the number of audio channels, and the
             # number of bytes per sample (all samples are 16 bits)
             sound_settings.sound_has_ducking = True
+            sound_settings.ducking_stage = ducking_stage_delay
             sound_settings.ducking_settings.track_bit_mask = sound_instance.ducking.track_bit_mask
             sound_settings.ducking_settings.attack_start_pos = sound_instance.ducking.delay * self.state.callback_data.seconds_to_bytes_factor
             sound_settings.ducking_settings.attack_duration = sound_instance.ducking.attack * self.state.callback_data.seconds_to_bytes_factor
             sound_settings.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * SDL_MIX_MAXVOLUME)
-            sound_settings.ducking_settings.release_start_pos = sound_instance.ducking.release_point * self.state.callback_data.seconds_to_bytes_factor
             sound_settings.ducking_settings.release_duration = sound_instance.ducking.release * self.state.callback_data.seconds_to_bytes_factor
-            sound_settings.ducking_stage = ducking_stage_delay
+
+            # Release point is relative to the end of the sound
+            sound_settings.ducking_settings.release_start_pos = (sound_container.duration - sound_instance.ducking.release_point) * self.state.callback_data.seconds_to_bytes_factor
         else:
             sound_settings.sound_has_ducking = False
 

@@ -1082,7 +1082,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_TrackStandard {
 };
 
 
-/* "mpfmc/core/audio/audio_interface.pyx":2537
+/* "mpfmc/core/audio/audio_interface.pyx":2539
  * #    SoundFile class
  * # ---------------------------------------------------------------------------
  * cdef class SoundFile:             # <<<<<<<<<<<<<<
@@ -1098,7 +1098,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_SoundFile {
 };
 
 
-/* "mpfmc/core/audio/audio_interface.pyx":2570
+/* "mpfmc/core/audio/audio_interface.pyx":2572
  * #    SoundMemoryFile class
  * # ---------------------------------------------------------------------------
  * cdef class SoundMemoryFile(SoundFile):             # <<<<<<<<<<<<<<
@@ -1111,7 +1111,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile {
 };
 
 
-/* "mpfmc/core/audio/audio_interface.pyx":2696
+/* "mpfmc/core/audio/audio_interface.pyx":2698
  * #    SoundStreamingFile class
  * # ---------------------------------------------------------------------------
  * cdef class SoundStreamingFile(SoundFile):             # <<<<<<<<<<<<<<
@@ -2024,6 +2024,7 @@ static const char __pyx_k_warning[] = "warning";
 static const char __pyx_k_KeyError[] = "KeyError";
 static const char __pyx_k_Loaded_s[] = "Loaded %s";
 static const char __pyx_k_channels[] = "channels";
+static const char __pyx_k_duration[] = "duration";
 static const char __pyx_k_exp_time[] = "exp_time";
 static const char __pyx_k_fade_out[] = "fade_out";
 static const char __pyx_k_finished[] = "finished";
@@ -2331,6 +2332,7 @@ static PyObject *__pyx_n_s_destroy_pipeline;
 static PyObject *__pyx_n_s_disable;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_n_s_ducking;
+static PyObject *__pyx_n_s_duration;
 static PyObject *__pyx_n_s_enabled;
 static PyObject *__pyx_n_s_encode;
 static PyObject *__pyx_n_s_error;
@@ -25236,7 +25238,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
  *             sound_settings.ducking_settings.attack_start_pos = sound_instance.ducking.delay * self.state.callback_data.seconds_to_bytes_factor
  *             sound_settings.ducking_settings.attack_duration = sound_instance.ducking.attack * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
  *             sound_settings.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * SDL_MIX_MAXVOLUME)
- *             sound_settings.ducking_settings.release_start_pos = sound_instance.ducking.release_point * self.state.callback_data.seconds_to_bytes_factor
+ * 
  */
     __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_ducking); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2307, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
@@ -25257,8 +25259,8 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
  *             sound_settings.ducking_settings.attack_start_pos = sound_instance.ducking.delay * self.state.callback_data.seconds_to_bytes_factor
  *             sound_settings.ducking_settings.attack_duration = sound_instance.ducking.attack * self.state.callback_data.seconds_to_bytes_factor
  *             sound_settings.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * SDL_MIX_MAXVOLUME)             # <<<<<<<<<<<<<<
- *             sound_settings.ducking_settings.release_start_pos = sound_instance.ducking.release_point * self.state.callback_data.seconds_to_bytes_factor
- *             sound_settings.ducking_settings.release_duration = sound_instance.ducking.release * self.state.callback_data.seconds_to_bytes_factor
+ * 
+ *             # Release point is relative to the end of the sound
  */
     __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_ducking); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2308, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
@@ -25275,52 +25277,58 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     __pyx_v_sound_settings->ducking_settings.attenuation_volume = ((Uint8)__pyx_t_9);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2309
- *             sound_settings.ducking_settings.attack_duration = sound_instance.ducking.attack * self.state.callback_data.seconds_to_bytes_factor
- *             sound_settings.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * SDL_MIX_MAXVOLUME)
- *             sound_settings.ducking_settings.release_start_pos = sound_instance.ducking.release_point * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
+    /* "mpfmc/core/audio/audio_interface.pyx":2311
+ * 
+ *             # Release point is relative to the end of the sound
+ *             sound_settings.ducking_settings.release_start_pos = (sound_container.duration - sound_instance.ducking.release_point) * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
  *             sound_settings.ducking_settings.release_duration = sound_instance.ducking.release * self.state.callback_data.seconds_to_bytes_factor
  *             sound_settings.ducking_stage = ducking_stage_delay
  */
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_ducking); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2309, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_sound_container), __pyx_n_s_duration); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2311, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_release_point); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2309, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_ducking); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2311, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __pyx_t_13 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2309, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_13);
-    __pyx_t_5 = PyNumber_Multiply(__pyx_t_4, __pyx_t_13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2309, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_release_point); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2311, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_t_4 = PyNumber_Subtract(__pyx_t_13, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2311, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
-    __pyx_t_15 = __Pyx_PyInt_As_Sint32(__pyx_t_5); if (unlikely((__pyx_t_15 == (Sint32)-1) && PyErr_Occurred())) __PYX_ERR(0, 2309, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2311, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+    __pyx_t_13 = PyNumber_Multiply(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2311, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_13);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+    __pyx_t_15 = __Pyx_PyInt_As_Sint32(__pyx_t_13); if (unlikely((__pyx_t_15 == (Sint32)-1) && PyErr_Occurred())) __PYX_ERR(0, 2311, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
     __pyx_v_sound_settings->ducking_settings.release_start_pos = __pyx_t_15;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2310
- *             sound_settings.ducking_settings.attenuation_volume = <Uint8>(sound_instance.ducking.attenuation * SDL_MIX_MAXVOLUME)
- *             sound_settings.ducking_settings.release_start_pos = sound_instance.ducking.release_point * self.state.callback_data.seconds_to_bytes_factor
+    /* "mpfmc/core/audio/audio_interface.pyx":2312
+ *             # Release point is relative to the end of the sound
+ *             sound_settings.ducking_settings.release_start_pos = (sound_container.duration - sound_instance.ducking.release_point) * self.state.callback_data.seconds_to_bytes_factor
  *             sound_settings.ducking_settings.release_duration = sound_instance.ducking.release * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
  *             sound_settings.ducking_stage = ducking_stage_delay
  *         else:
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_ducking); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2310, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_release); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2310, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_ducking); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2312, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_5 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2310, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_13, __pyx_n_s_release); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2312, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_4 = PyNumber_Multiply(__pyx_t_13, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2310, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+    __pyx_t_13 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2312, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_13);
+    __pyx_t_4 = PyNumber_Multiply(__pyx_t_5, __pyx_t_13); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2312, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_15 = __Pyx_PyInt_As_Sint32(__pyx_t_4); if (unlikely((__pyx_t_15 == (Sint32)-1) && PyErr_Occurred())) __PYX_ERR(0, 2310, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+    __pyx_t_15 = __Pyx_PyInt_As_Sint32(__pyx_t_4); if (unlikely((__pyx_t_15 == (Sint32)-1) && PyErr_Occurred())) __PYX_ERR(0, 2312, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_sound_settings->ducking_settings.release_duration = __pyx_t_15;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2311
- *             sound_settings.ducking_settings.release_start_pos = sound_instance.ducking.release_point * self.state.callback_data.seconds_to_bytes_factor
+    /* "mpfmc/core/audio/audio_interface.pyx":2313
+ *             sound_settings.ducking_settings.release_start_pos = (sound_container.duration - sound_instance.ducking.release_point) * self.state.callback_data.seconds_to_bytes_factor
  *             sound_settings.ducking_settings.release_duration = sound_instance.ducking.release * self.state.callback_data.seconds_to_bytes_factor
  *             sound_settings.ducking_stage = ducking_stage_delay             # <<<<<<<<<<<<<<
  *         else:
@@ -25338,7 +25346,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
     goto __pyx_L10;
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2313
+  /* "mpfmc/core/audio/audio_interface.pyx":2315
  *             sound_settings.ducking_stage = ducking_stage_delay
  *         else:
  *             sound_settings.sound_has_ducking = False             # <<<<<<<<<<<<<<
@@ -25350,7 +25358,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   }
   __pyx_L10:;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2316
+  /* "mpfmc/core/audio/audio_interface.pyx":2318
  * 
  *         # Special handling is needed to start streaming for the specified sound at the correct location
  *         if sound_container.sample.type == sound_type_streaming:             # <<<<<<<<<<<<<<
@@ -25360,25 +25368,25 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   __pyx_t_1 = ((__pyx_v_sound_container->sample.type == __pyx_e_5mpfmc_4core_5audio_15audio_interface_sound_type_streaming) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2321
+    /* "mpfmc/core/audio/audio_interface.pyx":2323
  *                                     GST_FORMAT_TIME,
  *                                     <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
  *                                     sound_instance.start_at * GST_SECOND)             # <<<<<<<<<<<<<<
  *             with nogil:
  *                 ret = gst_element_set_state(sound_container.sample.data.stream.pipeline, GST_STATE_PLAYING)
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_start_at); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2321, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_start_at); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2323, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyInt_From_int(GST_SECOND); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2321, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_13 = PyNumber_Multiply(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2321, __pyx_L1_error)
+    __pyx_t_13 = __Pyx_PyInt_From_int(GST_SECOND); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 2323, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_13);
+    __pyx_t_5 = PyNumber_Multiply(__pyx_t_4, __pyx_t_13); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2323, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_16 = __Pyx_PyInt_As_gint64(__pyx_t_13); if (unlikely((__pyx_t_16 == (gint64)-1) && PyErr_Occurred())) __PYX_ERR(0, 2321, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
+    __pyx_t_16 = __Pyx_PyInt_As_gint64(__pyx_t_5); if (unlikely((__pyx_t_16 == (gint64)-1) && PyErr_Occurred())) __PYX_ERR(0, 2323, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2318
+    /* "mpfmc/core/audio/audio_interface.pyx":2320
  *         if sound_container.sample.type == sound_type_streaming:
  *             # Seek to the specified start position
  *             gst_element_seek_simple(sound_container.sample.data.stream.pipeline,             # <<<<<<<<<<<<<<
@@ -25387,7 +25395,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
  */
     gst_element_seek_simple(__pyx_v_sound_container->sample.data.stream->pipeline, GST_FORMAT_TIME, ((GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT)), __pyx_t_16);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2322
+    /* "mpfmc/core/audio/audio_interface.pyx":2324
  *                                     <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
  *                                     sound_instance.start_at * GST_SECOND)
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -25401,7 +25409,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
         #endif
         /*try:*/ {
 
-          /* "mpfmc/core/audio/audio_interface.pyx":2323
+          /* "mpfmc/core/audio/audio_interface.pyx":2325
  *                                     sound_instance.start_at * GST_SECOND)
  *             with nogil:
  *                 ret = gst_element_set_state(sound_container.sample.data.stream.pipeline, GST_STATE_PLAYING)             # <<<<<<<<<<<<<<
@@ -25411,7 +25419,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
           __pyx_v_ret = gst_element_set_state(__pyx_v_sound_container->sample.data.stream->pipeline, GST_STATE_PLAYING);
         }
 
-        /* "mpfmc/core/audio/audio_interface.pyx":2322
+        /* "mpfmc/core/audio/audio_interface.pyx":2324
  *                                     <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT),
  *                                     sound_instance.start_at * GST_SECOND)
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -25429,7 +25437,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
         }
     }
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2316
+    /* "mpfmc/core/audio/audio_interface.pyx":2318
  * 
  *         # Special handling is needed to start streaming for the specified sound at the correct location
  *         if sound_container.sample.type == sound_type_streaming:             # <<<<<<<<<<<<<<
@@ -25464,7 +25472,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2325
+/* "mpfmc/core/audio/audio_interface.pyx":2327
  *                 ret = gst_element_set_state(sound_container.sample.data.stream.pipeline, GST_STATE_PLAYING)
  * 
  *     cdef _set_player_playing(self, SoundPlayer *player, object sound_instance):             # <<<<<<<<<<<<<<
@@ -25487,7 +25495,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   PyObject *__pyx_t_10 = NULL;
   __Pyx_RefNannySetupContext("_set_player_playing", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2332
+  /* "mpfmc/core/audio/audio_interface.pyx":2334
  *             sound_instance: The sound instance to begin playing
  *         """
  *         if player == NULL or sound_instance is None:             # <<<<<<<<<<<<<<
@@ -25506,7 +25514,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2333
+    /* "mpfmc/core/audio/audio_interface.pyx":2335
  *         """
  *         if player == NULL or sound_instance is None:
  *             return             # <<<<<<<<<<<<<<
@@ -25517,7 +25525,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2332
+    /* "mpfmc/core/audio/audio_interface.pyx":2334
  *             sound_instance: The sound instance to begin playing
  *         """
  *         if player == NULL or sound_instance is None:             # <<<<<<<<<<<<<<
@@ -25526,7 +25534,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2336
+  /* "mpfmc/core/audio/audio_interface.pyx":2338
  * 
  *         # Setup the player to start playing the sound
  *         player.status = player_playing             # <<<<<<<<<<<<<<
@@ -25535,18 +25543,18 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
  */
   __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_15audio_interface_player_playing;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2337
+  /* "mpfmc/core/audio/audio_interface.pyx":2339
  *         # Setup the player to start playing the sound
  *         player.status = player_playing
  *         self._set_player_sound_settings(cython.address(player.current), sound_instance)             # <<<<<<<<<<<<<<
  * 
  *         # Send sound started notification
  */
-  __pyx_t_4 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_15audio_interface_TrackStandard *)__pyx_v_self->__pyx_base.__pyx_vtab)->_set_player_sound_settings(__pyx_v_self, (&__pyx_v_player->current), __pyx_v_sound_instance); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2337, __pyx_L1_error)
+  __pyx_t_4 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_15audio_interface_TrackStandard *)__pyx_v_self->__pyx_base.__pyx_vtab)->_set_player_sound_settings(__pyx_v_self, (&__pyx_v_player->current), __pyx_v_sound_instance); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2339, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2340
+  /* "mpfmc/core/audio/audio_interface.pyx":2342
  * 
  *         # Send sound started notification
  *         send_sound_started_notification(player.number, player.current.sound_id, player.current.sound_instance_id, self.state)             # <<<<<<<<<<<<<<
@@ -25555,26 +25563,26 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
  */
   __pyx_f_5mpfmc_4core_5audio_15audio_interface_send_sound_started_notification(__pyx_v_player->number, __pyx_v_player->current.sound_id, __pyx_v_player->current.sound_instance_id, __pyx_v_self->__pyx_base.state);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2342
+  /* "mpfmc/core/audio/audio_interface.pyx":2344
  *         send_sound_started_notification(player.number, player.current.sound_id, player.current.sound_instance_id, self.state)
  * 
  *         self.log.debug("Sound %s is set to begin playback on playlist track (loops=%d)",             # <<<<<<<<<<<<<<
  *                        sound_instance.name, sound_instance.loops)
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2342, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2344, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2343
+  /* "mpfmc/core/audio/audio_interface.pyx":2345
  * 
  *         self.log.debug("Sound %s is set to begin playback on playlist track (loops=%d)",
  *                        sound_instance.name, sound_instance.loops)             # <<<<<<<<<<<<<<
  * 
  *     cdef _set_player_replacing(self, SoundPlayer *player, object sound_instance):
  */
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_name); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2343, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_name); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2345, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_loops); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2343, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_loops); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2345, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_8 = NULL;
   __pyx_t_9 = 0;
@@ -25588,7 +25596,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
       __pyx_t_9 = 1;
     }
   }
-  __pyx_t_10 = PyTuple_New(3+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 2342, __pyx_L1_error)
+  __pyx_t_10 = PyTuple_New(3+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 2344, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
   if (__pyx_t_8) {
     __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -25602,13 +25610,13 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_9, __pyx_t_7);
   __pyx_t_6 = 0;
   __pyx_t_7 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_10, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2342, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_10, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2344, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2325
+  /* "mpfmc/core/audio/audio_interface.pyx":2327
  *                 ret = gst_element_set_state(sound_container.sample.data.stream.pipeline, GST_STATE_PLAYING)
  * 
  *     cdef _set_player_playing(self, SoundPlayer *player, object sound_instance):             # <<<<<<<<<<<<<<
@@ -25634,7 +25642,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2345
+/* "mpfmc/core/audio/audio_interface.pyx":2347
  *                        sound_instance.name, sound_instance.loops)
  * 
  *     cdef _set_player_replacing(self, SoundPlayer *player, object sound_instance):             # <<<<<<<<<<<<<<
@@ -25652,7 +25660,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("_set_player_replacing", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2353
+  /* "mpfmc/core/audio/audio_interface.pyx":2355
  *             sound_instance: The sound instance to begin playing
  *         """
  *         if player == NULL or sound_instance is None:             # <<<<<<<<<<<<<<
@@ -25671,7 +25679,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2354
+    /* "mpfmc/core/audio/audio_interface.pyx":2356
  *         """
  *         if player == NULL or sound_instance is None:
  *             return             # <<<<<<<<<<<<<<
@@ -25682,7 +25690,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2353
+    /* "mpfmc/core/audio/audio_interface.pyx":2355
  *             sound_instance: The sound instance to begin playing
  *         """
  *         if player == NULL or sound_instance is None:             # <<<<<<<<<<<<<<
@@ -25691,7 +25699,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2357
+  /* "mpfmc/core/audio/audio_interface.pyx":2359
  * 
  *         # Set current sound to fade out quickly
  *         player.current.fade_out_steps = self.state.callback_data.quick_fade_steps             # <<<<<<<<<<<<<<
@@ -25701,7 +25709,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   __pyx_t_4 = __pyx_v_self->__pyx_base.state->callback_data->quick_fade_steps;
   __pyx_v_player->current.fade_out_steps = __pyx_t_4;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2358
+  /* "mpfmc/core/audio/audio_interface.pyx":2360
  *         # Set current sound to fade out quickly
  *         player.current.fade_out_steps = self.state.callback_data.quick_fade_steps
  *         player.current.fade_steps_remaining = self.state.callback_data.quick_fade_steps             # <<<<<<<<<<<<<<
@@ -25711,7 +25719,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   __pyx_t_4 = __pyx_v_self->__pyx_base.state->callback_data->quick_fade_steps;
   __pyx_v_player->current.fade_steps_remaining = __pyx_t_4;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2359
+  /* "mpfmc/core/audio/audio_interface.pyx":2361
  *         player.current.fade_out_steps = self.state.callback_data.quick_fade_steps
  *         player.current.fade_steps_remaining = self.state.callback_data.quick_fade_steps
  *         player.current.fading_status = fading_status_fading_out             # <<<<<<<<<<<<<<
@@ -25720,7 +25728,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
  */
   __pyx_v_player->current.fading_status = __pyx_e_5mpfmc_4core_5audio_15audio_interface_fading_status_fading_out;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2362
+  /* "mpfmc/core/audio/audio_interface.pyx":2364
  * 
  *         # Set the next sound to play immediately after the current one fades out
  *         player.status = player_replacing             # <<<<<<<<<<<<<<
@@ -25729,18 +25737,18 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
  */
   __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_15audio_interface_player_replacing;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2363
+  /* "mpfmc/core/audio/audio_interface.pyx":2365
  *         # Set the next sound to play immediately after the current one fades out
  *         player.status = player_replacing
  *         self._set_player_sound_settings(cython.address(player.next), sound_instance)             # <<<<<<<<<<<<<<
  * 
  *         # TODO: Figure out how to handle ducking when replacing an existing sound
  */
-  __pyx_t_5 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_15audio_interface_TrackStandard *)__pyx_v_self->__pyx_base.__pyx_vtab)->_set_player_sound_settings(__pyx_v_self, (&__pyx_v_player->next), __pyx_v_sound_instance); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2363, __pyx_L1_error)
+  __pyx_t_5 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_15audio_interface_TrackStandard *)__pyx_v_self->__pyx_base.__pyx_vtab)->_set_player_sound_settings(__pyx_v_self, (&__pyx_v_player->next), __pyx_v_sound_instance); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2365, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2345
+  /* "mpfmc/core/audio/audio_interface.pyx":2347
  *                        sound_instance.name, sound_instance.loops)
  * 
  *     cdef _set_player_replacing(self, SoundPlayer *player, object sound_instance):             # <<<<<<<<<<<<<<
@@ -25761,7 +25769,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2367
+/* "mpfmc/core/audio/audio_interface.pyx":2369
  *         # TODO: Figure out how to handle ducking when replacing an existing sound
  * 
  *     cdef int _get_player_playing_sound_instance(self, sound_instance):             # <<<<<<<<<<<<<<
@@ -25782,7 +25790,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("_get_player_playing_sound_instance", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2377
+  /* "mpfmc/core/audio/audio_interface.pyx":2379
  *             sound instance is not currently playing.
  *         """
  *         SDL_LockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -25791,7 +25799,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
  */
   SDL_LockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2379
+  /* "mpfmc/core/audio/audio_interface.pyx":2381
  *         SDL_LockAudioDevice(self.device_id)
  * 
  *         for i in range(self.type_state.sound_player_count):             # <<<<<<<<<<<<<<
@@ -25802,7 +25810,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2380
+    /* "mpfmc/core/audio/audio_interface.pyx":2382
  * 
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \             # <<<<<<<<<<<<<<
@@ -25816,26 +25824,26 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
       goto __pyx_L6_bool_binop_done;
     }
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2381
+    /* "mpfmc/core/audio/audio_interface.pyx":2383
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \
  *                             self.type_state.sound_players[i].current.sound_instance_id == sound_instance.id:             # <<<<<<<<<<<<<<
  *                 SDL_UnlockAudioDevice(self.device_id)
  *                 return i
  */
-    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_i]).current.sound_instance_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2381, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_i]).current.sound_instance_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2383, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2381, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2383, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyObject_RichCompare(__pyx_t_5, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2381, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(__pyx_t_5, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2383, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 2381, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 2383, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_3 = __pyx_t_4;
     __pyx_L6_bool_binop_done:;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2380
+    /* "mpfmc/core/audio/audio_interface.pyx":2382
  * 
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \             # <<<<<<<<<<<<<<
@@ -25844,7 +25852,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
  */
     if (__pyx_t_3) {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2382
+      /* "mpfmc/core/audio/audio_interface.pyx":2384
  *             if self.type_state.sound_players[i].status != player_idle and \
  *                             self.type_state.sound_players[i].current.sound_instance_id == sound_instance.id:
  *                 SDL_UnlockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -25853,7 +25861,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
  */
       SDL_UnlockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2383
+      /* "mpfmc/core/audio/audio_interface.pyx":2385
  *                             self.type_state.sound_players[i].current.sound_instance_id == sound_instance.id:
  *                 SDL_UnlockAudioDevice(self.device_id)
  *                 return i             # <<<<<<<<<<<<<<
@@ -25863,7 +25871,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
       __pyx_r = __pyx_v_i;
       goto __pyx_L0;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2380
+      /* "mpfmc/core/audio/audio_interface.pyx":2382
  * 
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \             # <<<<<<<<<<<<<<
@@ -25873,7 +25881,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
     }
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2385
+  /* "mpfmc/core/audio/audio_interface.pyx":2387
  *                 return i
  * 
  *         SDL_UnlockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -25882,7 +25890,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
  */
   SDL_UnlockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2386
+  /* "mpfmc/core/audio/audio_interface.pyx":2388
  * 
  *         SDL_UnlockAudioDevice(self.device_id)
  *         return -1             # <<<<<<<<<<<<<<
@@ -25892,7 +25900,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
   __pyx_r = -1;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2367
+  /* "mpfmc/core/audio/audio_interface.pyx":2369
  *         # TODO: Figure out how to handle ducking when replacing an existing sound
  * 
  *     cdef int _get_player_playing_sound_instance(self, sound_instance):             # <<<<<<<<<<<<<<
@@ -25912,7 +25920,7 @@ static int __pyx_f_5mpfmc_4core_5audio_15audio_interface_13TrackStandard__get_pl
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2388
+/* "mpfmc/core/audio/audio_interface.pyx":2390
  *         return -1
  * 
  *     def get_status(self):             # <<<<<<<<<<<<<<
@@ -25956,7 +25964,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   PyObject *__pyx_t_15 = NULL;
   __Pyx_RefNannySetupContext("get_status", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2396
+  /* "mpfmc/core/audio/audio_interface.pyx":2398
  *             sound player.
  *         """
  *         SDL_LockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -25965,19 +25973,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
   SDL_LockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2397
+  /* "mpfmc/core/audio/audio_interface.pyx":2399
  *         """
  *         SDL_LockAudioDevice(self.device_id)
  *         status = []             # <<<<<<<<<<<<<<
  *         for player in range(self.type_state.sound_player_count):
  *             status.append({
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2397, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2399, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_status = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2398
+  /* "mpfmc/core/audio/audio_interface.pyx":2400
  *         SDL_LockAudioDevice(self.device_id)
  *         status = []
  *         for player in range(self.type_state.sound_player_count):             # <<<<<<<<<<<<<<
@@ -25988,30 +25996,30 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   for (__pyx_t_3 = 0; __pyx_t_3 < __pyx_t_2; __pyx_t_3+=1) {
     __pyx_v_player = __pyx_t_3;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2400
+    /* "mpfmc/core/audio/audio_interface.pyx":2402
  *         for player in range(self.type_state.sound_player_count):
  *             status.append({
  *                 "player": player,             # <<<<<<<<<<<<<<
  *                 "status": TrackStandard.player_status_to_text(<int>self.type_state.sound_players[player].status),
  *                 "fading_status": TrackStandard.player_fading_status_to_text(<int>self.type_state.sound_players[player].current.fading_status),
  */
-    __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2400, __pyx_L1_error)
+    __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_player); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2400, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_player); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_player, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_player, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2401
+    /* "mpfmc/core/audio/audio_interface.pyx":2403
  *             status.append({
  *                 "player": player,
  *                 "status": TrackStandard.player_status_to_text(<int>self.type_state.sound_players[player].status),             # <<<<<<<<<<<<<<
  *                 "fading_status": TrackStandard.player_fading_status_to_text(<int>self.type_state.sound_players[player].current.fading_status),
  *                 "volume": self.type_state.sound_players[player].current.volume,
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard), __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2401, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard), __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyInt_From_int(((int)(__pyx_v_self->type_state->sound_players[__pyx_v_player]).status)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2401, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(((int)(__pyx_v_self->type_state->sound_players[__pyx_v_player]).status)); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2403, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_7 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_5))) {
@@ -26024,34 +26032,34 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
       }
     }
     if (!__pyx_t_7) {
-      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2401, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2403, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_4);
     } else {
-      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2401, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2403, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
       __Pyx_GIVEREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_t_6);
       __pyx_t_6 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2401, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_8, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2403, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_status, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_status, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2402
+    /* "mpfmc/core/audio/audio_interface.pyx":2404
  *                 "player": player,
  *                 "status": TrackStandard.player_status_to_text(<int>self.type_state.sound_players[player].status),
  *                 "fading_status": TrackStandard.player_fading_status_to_text(<int>self.type_state.sound_players[player].current.fading_status),             # <<<<<<<<<<<<<<
  *                 "volume": self.type_state.sound_players[player].current.volume,
  *                 "sound_id": self.type_state.sound_players[player].current.sound_id,
  */
-    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard), __pyx_n_s_player_fading_status_to_text); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2402, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard), __pyx_n_s_player_fading_status_to_text); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2404, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_8 = __Pyx_PyInt_From_int(((int)(__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.fading_status)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2402, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_int(((int)(__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.fading_status)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2404, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __pyx_t_6 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_5))) {
@@ -26064,156 +26072,156 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
       }
     }
     if (!__pyx_t_6) {
-      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2402, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2404, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GOTREF(__pyx_t_4);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2402, __pyx_L1_error)
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
       __Pyx_GIVEREF(__pyx_t_8);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_8);
       __pyx_t_8 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_7, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2402, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_7, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2404, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fading_status, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fading_status, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2403
+    /* "mpfmc/core/audio/audio_interface.pyx":2405
  *                 "status": TrackStandard.player_status_to_text(<int>self.type_state.sound_players[player].status),
  *                 "fading_status": TrackStandard.player_fading_status_to_text(<int>self.type_state.sound_players[player].current.fading_status),
  *                 "volume": self.type_state.sound_players[player].current.volume,             # <<<<<<<<<<<<<<
  *                 "sound_id": self.type_state.sound_players[player].current.sound_id,
  *                 "sound_instance_id": self.type_state.sound_players[player].current.sound_instance_id,
  */
-    __pyx_t_4 = __Pyx_PyInt_From_Uint8((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.volume); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2403, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_Uint8((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.volume); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2405, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_volume, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_volume, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2404
+    /* "mpfmc/core/audio/audio_interface.pyx":2406
  *                 "fading_status": TrackStandard.player_fading_status_to_text(<int>self.type_state.sound_players[player].current.fading_status),
  *                 "volume": self.type_state.sound_players[player].current.volume,
  *                 "sound_id": self.type_state.sound_players[player].current.sound_id,             # <<<<<<<<<<<<<<
  *                 "sound_instance_id": self.type_state.sound_players[player].current.sound_instance_id,
  *                 "priority": self.type_state.sound_players[player].current.sound_priority,
  */
-    __pyx_t_4 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2404, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2406, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_id, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_id, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2405
+    /* "mpfmc/core/audio/audio_interface.pyx":2407
  *                 "volume": self.type_state.sound_players[player].current.volume,
  *                 "sound_id": self.type_state.sound_players[player].current.sound_id,
  *                 "sound_instance_id": self.type_state.sound_players[player].current.sound_instance_id,             # <<<<<<<<<<<<<<
  *                 "priority": self.type_state.sound_players[player].current.sound_priority,
  *                 "loops": self.type_state.sound_players[player].current.loops_remaining,
  */
-    __pyx_t_4 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_instance_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2405, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_instance_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2407, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_instance_id, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_instance_id, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2406
+    /* "mpfmc/core/audio/audio_interface.pyx":2408
  *                 "sound_id": self.type_state.sound_players[player].current.sound_id,
  *                 "sound_instance_id": self.type_state.sound_players[player].current.sound_instance_id,
  *                 "priority": self.type_state.sound_players[player].current.sound_priority,             # <<<<<<<<<<<<<<
  *                 "loops": self.type_state.sound_players[player].current.loops_remaining,
  *                 "has_ducking": self.type_state.sound_players[player].current.sound_has_ducking,
  */
-    __pyx_t_4 = __Pyx_PyInt_From_int((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_priority); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2406, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_priority); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2408, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_priority, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_priority, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2407
+    /* "mpfmc/core/audio/audio_interface.pyx":2409
  *                 "sound_instance_id": self.type_state.sound_players[player].current.sound_instance_id,
  *                 "priority": self.type_state.sound_players[player].current.sound_priority,
  *                 "loops": self.type_state.sound_players[player].current.loops_remaining,             # <<<<<<<<<<<<<<
  *                 "has_ducking": self.type_state.sound_players[player].current.sound_has_ducking,
  *                 "sample_pos": self.type_state.sound_players[player].current.sample_pos
  */
-    __pyx_t_4 = __Pyx_PyInt_From_int((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.loops_remaining); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2407, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.loops_remaining); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2409, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_loops, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_loops, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2408
+    /* "mpfmc/core/audio/audio_interface.pyx":2410
  *                 "priority": self.type_state.sound_players[player].current.sound_priority,
  *                 "loops": self.type_state.sound_players[player].current.loops_remaining,
  *                 "has_ducking": self.type_state.sound_players[player].current.sound_has_ducking,             # <<<<<<<<<<<<<<
  *                 "sample_pos": self.type_state.sound_players[player].current.sample_pos
  *             })
  */
-    __pyx_t_4 = __Pyx_PyBool_FromLong((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_has_ducking); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2408, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyBool_FromLong((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_has_ducking); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2410, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_has_ducking, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_has_ducking, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2409
+    /* "mpfmc/core/audio/audio_interface.pyx":2411
  *                 "loops": self.type_state.sound_players[player].current.loops_remaining,
  *                 "has_ducking": self.type_state.sound_players[player].current.sound_has_ducking,
  *                 "sample_pos": self.type_state.sound_players[player].current.sample_pos             # <<<<<<<<<<<<<<
  *             })
  * 
  */
-    __pyx_t_4 = __Pyx_PyInt_From_Uint32((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sample_pos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2409, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_Uint32((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sample_pos); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2411, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sample_pos, __pyx_t_4) < 0) __PYX_ERR(0, 2400, __pyx_L1_error)
+    if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sample_pos, __pyx_t_4) < 0) __PYX_ERR(0, 2402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2399
+    /* "mpfmc/core/audio/audio_interface.pyx":2401
  *         status = []
  *         for player in range(self.type_state.sound_player_count):
  *             status.append({             # <<<<<<<<<<<<<<
  *                 "player": player,
  *                 "status": TrackStandard.player_status_to_text(<int>self.type_state.sound_players[player].status),
  */
-    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_status, __pyx_t_1); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 2399, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_status, __pyx_t_1); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 2401, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2412
+    /* "mpfmc/core/audio/audio_interface.pyx":2414
  *             })
  * 
  *             self.log.debug("Status - Player %d: Status=%s, Sound=%d, SoundInstance=%d"             # <<<<<<<<<<<<<<
  *                            "Priority=%d, Loops=%d, SamplePos=%d",
  *                            player,
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2412, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2414
+    /* "mpfmc/core/audio/audio_interface.pyx":2416
  *             self.log.debug("Status - Player %d: Status=%s, Sound=%d, SoundInstance=%d"
  *                            "Priority=%d, Loops=%d, SamplePos=%d",
  *                            player,             # <<<<<<<<<<<<<<
  *                            TrackStandard.player_status_to_text(
  *                                self.type_state.sound_players[player].status),
  */
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_player); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2414, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_player); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2416, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2415
+    /* "mpfmc/core/audio/audio_interface.pyx":2417
  *                            "Priority=%d, Loops=%d, SamplePos=%d",
  *                            player,
  *                            TrackStandard.player_status_to_text(             # <<<<<<<<<<<<<<
  *                                self.type_state.sound_players[player].status),
  *                            self.type_state.sound_players[player].current.sound_id,
  */
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard), __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2415, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard), __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2417, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2416
+    /* "mpfmc/core/audio/audio_interface.pyx":2418
  *                            player,
  *                            TrackStandard.player_status_to_text(
  *                                self.type_state.sound_players[player].status),             # <<<<<<<<<<<<<<
  *                            self.type_state.sound_players[player].current.sound_id,
  *                            self.type_state.sound_players[player].current.sound_instance_id,
  */
-    __pyx_t_6 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus((__pyx_v_self->type_state->sound_players[__pyx_v_player]).status); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2416, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus((__pyx_v_self->type_state->sound_players[__pyx_v_player]).status); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2418, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_10 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_8))) {
@@ -26226,70 +26234,70 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
       }
     }
     if (!__pyx_t_10) {
-      __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2415, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2417, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_7);
     } else {
-      __pyx_t_11 = PyTuple_New(1+1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 2415, __pyx_L1_error)
+      __pyx_t_11 = PyTuple_New(1+1); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 2417, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_10); __pyx_t_10 = NULL;
       __Pyx_GIVEREF(__pyx_t_6);
       PyTuple_SET_ITEM(__pyx_t_11, 0+1, __pyx_t_6);
       __pyx_t_6 = 0;
-      __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2415, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2417, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2417
+    /* "mpfmc/core/audio/audio_interface.pyx":2419
  *                            TrackStandard.player_status_to_text(
  *                                self.type_state.sound_players[player].status),
  *                            self.type_state.sound_players[player].current.sound_id,             # <<<<<<<<<<<<<<
  *                            self.type_state.sound_players[player].current.sound_instance_id,
  *                            self.type_state.sound_players[player].current.sound_priority,
  */
-    __pyx_t_8 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_id); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2417, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_id); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2419, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2418
+    /* "mpfmc/core/audio/audio_interface.pyx":2420
  *                                self.type_state.sound_players[player].status),
  *                            self.type_state.sound_players[player].current.sound_id,
  *                            self.type_state.sound_players[player].current.sound_instance_id,             # <<<<<<<<<<<<<<
  *                            self.type_state.sound_players[player].current.sound_priority,
  *                            self.type_state.sound_players[player].current.loops_remaining,
  */
-    __pyx_t_11 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_instance_id); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 2418, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_instance_id); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 2420, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2419
+    /* "mpfmc/core/audio/audio_interface.pyx":2421
  *                            self.type_state.sound_players[player].current.sound_id,
  *                            self.type_state.sound_players[player].current.sound_instance_id,
  *                            self.type_state.sound_players[player].current.sound_priority,             # <<<<<<<<<<<<<<
  *                            self.type_state.sound_players[player].current.loops_remaining,
  *                            self.type_state.sound_players[player].current.sample_pos)
  */
-    __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_priority); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2419, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sound_priority); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2421, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2420
+    /* "mpfmc/core/audio/audio_interface.pyx":2422
  *                            self.type_state.sound_players[player].current.sound_instance_id,
  *                            self.type_state.sound_players[player].current.sound_priority,
  *                            self.type_state.sound_players[player].current.loops_remaining,             # <<<<<<<<<<<<<<
  *                            self.type_state.sound_players[player].current.sample_pos)
  * 
  */
-    __pyx_t_10 = __Pyx_PyInt_From_int((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.loops_remaining); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 2420, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_From_int((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.loops_remaining); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 2422, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2421
+    /* "mpfmc/core/audio/audio_interface.pyx":2423
  *                            self.type_state.sound_players[player].current.sound_priority,
  *                            self.type_state.sound_players[player].current.loops_remaining,
  *                            self.type_state.sound_players[player].current.sample_pos)             # <<<<<<<<<<<<<<
  * 
  *         SDL_UnlockAudioDevice(self.device_id)
  */
-    __pyx_t_12 = __Pyx_PyInt_From_Uint32((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sample_pos); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 2421, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyInt_From_Uint32((__pyx_v_self->type_state->sound_players[__pyx_v_player]).current.sample_pos); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 2423, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
     __pyx_t_13 = NULL;
     __pyx_t_14 = 0;
@@ -26303,7 +26311,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
         __pyx_t_14 = 1;
       }
     }
-    __pyx_t_15 = PyTuple_New(8+__pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 2412, __pyx_L1_error)
+    __pyx_t_15 = PyTuple_New(8+__pyx_t_14); if (unlikely(!__pyx_t_15)) __PYX_ERR(0, 2414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_15);
     if (__pyx_t_13) {
       __Pyx_GIVEREF(__pyx_t_13); PyTuple_SET_ITEM(__pyx_t_15, 0, __pyx_t_13); __pyx_t_13 = NULL;
@@ -26332,14 +26340,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     __pyx_t_6 = 0;
     __pyx_t_10 = 0;
     __pyx_t_12 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_15, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2412, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_15, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2414, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_15); __pyx_t_15 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2423
+  /* "mpfmc/core/audio/audio_interface.pyx":2425
  *                            self.type_state.sound_players[player].current.sample_pos)
  * 
  *         SDL_UnlockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -26348,7 +26356,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
   SDL_UnlockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2425
+  /* "mpfmc/core/audio/audio_interface.pyx":2427
  *         SDL_UnlockAudioDevice(self.device_id)
  * 
  *         return status             # <<<<<<<<<<<<<<
@@ -26360,7 +26368,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __pyx_r = __pyx_v_status;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2388
+  /* "mpfmc/core/audio/audio_interface.pyx":2390
  *         return -1
  * 
  *     def get_status(self):             # <<<<<<<<<<<<<<
@@ -26390,7 +26398,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2427
+/* "mpfmc/core/audio/audio_interface.pyx":2429
  *         return status
  * 
  *     def get_sound_queue_count(self):             # <<<<<<<<<<<<<<
@@ -26419,7 +26427,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   Py_ssize_t __pyx_t_2;
   __Pyx_RefNannySetupContext("get_sound_queue_count", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2433
+  /* "mpfmc/core/audio/audio_interface.pyx":2435
  *             Integer number of sounds currently in the track sound queue.
  *         """
  *         return len(self._sound_queue)             # <<<<<<<<<<<<<<
@@ -26431,17 +26439,17 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __Pyx_INCREF(__pyx_t_1);
   if (unlikely(__pyx_t_1 == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "object of type 'NoneType' has no len()");
-    __PYX_ERR(0, 2433, __pyx_L1_error)
+    __PYX_ERR(0, 2435, __pyx_L1_error)
   }
-  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) __PYX_ERR(0, 2433, __pyx_L1_error)
+  __pyx_t_2 = PyList_GET_SIZE(__pyx_t_1); if (unlikely(__pyx_t_2 == -1)) __PYX_ERR(0, 2435, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2433, __pyx_L1_error)
+  __pyx_t_1 = PyInt_FromSsize_t(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2435, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2427
+  /* "mpfmc/core/audio/audio_interface.pyx":2429
  *         return status
  * 
  *     def get_sound_queue_count(self):             # <<<<<<<<<<<<<<
@@ -26460,7 +26468,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2435
+/* "mpfmc/core/audio/audio_interface.pyx":2437
  *         return len(self._sound_queue)
  * 
  *     def get_sound_players_in_use_count(self):             # <<<<<<<<<<<<<<
@@ -26493,7 +26501,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("get_sound_players_in_use_count", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2442
+  /* "mpfmc/core/audio/audio_interface.pyx":2444
  *             Integer number of sound players currently in use on the track.
  *         """
  *         players_in_use_count = 0             # <<<<<<<<<<<<<<
@@ -26503,7 +26511,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __Pyx_INCREF(__pyx_int_0);
   __pyx_v_players_in_use_count = __pyx_int_0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2443
+  /* "mpfmc/core/audio/audio_interface.pyx":2445
  *         """
  *         players_in_use_count = 0
  *         SDL_LockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -26512,7 +26520,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
   SDL_LockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2444
+  /* "mpfmc/core/audio/audio_interface.pyx":2446
  *         players_in_use_count = 0
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):             # <<<<<<<<<<<<<<
@@ -26523,7 +26531,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2445
+    /* "mpfmc/core/audio/audio_interface.pyx":2447
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle:             # <<<<<<<<<<<<<<
@@ -26533,19 +26541,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     __pyx_t_3 = (((__pyx_v_self->type_state->sound_players[__pyx_v_i]).status != __pyx_e_5mpfmc_4core_5audio_15audio_interface_player_idle) != 0);
     if (__pyx_t_3) {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2446
+      /* "mpfmc/core/audio/audio_interface.pyx":2448
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle:
  *                 players_in_use_count += 1             # <<<<<<<<<<<<<<
  *         SDL_UnlockAudioDevice(self.device_id)
  *         return players_in_use_count
  */
-      __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_players_in_use_count, __pyx_int_1, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2446, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyInt_AddObjC(__pyx_v_players_in_use_count, __pyx_int_1, 1, 1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2448, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF_SET(__pyx_v_players_in_use_count, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2445
+      /* "mpfmc/core/audio/audio_interface.pyx":2447
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle:             # <<<<<<<<<<<<<<
@@ -26555,7 +26563,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     }
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2447
+  /* "mpfmc/core/audio/audio_interface.pyx":2449
  *             if self.type_state.sound_players[i].status != player_idle:
  *                 players_in_use_count += 1
  *         SDL_UnlockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -26564,7 +26572,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
   SDL_UnlockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2448
+  /* "mpfmc/core/audio/audio_interface.pyx":2450
  *                 players_in_use_count += 1
  *         SDL_UnlockAudioDevice(self.device_id)
  *         return players_in_use_count             # <<<<<<<<<<<<<<
@@ -26576,7 +26584,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __pyx_r = __pyx_v_players_in_use_count;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2435
+  /* "mpfmc/core/audio/audio_interface.pyx":2437
  *         return len(self._sound_queue)
  * 
  *     def get_sound_players_in_use_count(self):             # <<<<<<<<<<<<<<
@@ -26596,7 +26604,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2450
+/* "mpfmc/core/audio/audio_interface.pyx":2452
  *         return players_in_use_count
  * 
  *     def sound_is_playing(self, sound not None):             # <<<<<<<<<<<<<<
@@ -26612,7 +26620,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("sound_is_playing (wrapper)", 0);
   if (unlikely(((PyObject *)__pyx_v_sound) == Py_None)) {
-    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound"); __PYX_ERR(0, 2450, __pyx_L1_error)
+    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound"); __PYX_ERR(0, 2452, __pyx_L1_error)
   }
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_34sound_is_playing(((struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_TrackStandard *)__pyx_v_self), ((PyObject *)__pyx_v_sound));
 
@@ -26638,7 +26646,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("sound_is_playing", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2452
+  /* "mpfmc/core/audio/audio_interface.pyx":2454
  *     def sound_is_playing(self, sound not None):
  *         """Returns whether or not the specified sound is currently playing on the track"""
  *         SDL_LockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -26647,7 +26655,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
   SDL_LockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2453
+  /* "mpfmc/core/audio/audio_interface.pyx":2455
  *         """Returns whether or not the specified sound is currently playing on the track"""
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):             # <<<<<<<<<<<<<<
@@ -26658,7 +26666,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2454
+    /* "mpfmc/core/audio/audio_interface.pyx":2456
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \             # <<<<<<<<<<<<<<
@@ -26672,26 +26680,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
       goto __pyx_L6_bool_binop_done;
     }
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2455
+    /* "mpfmc/core/audio/audio_interface.pyx":2457
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \
  *                             self.type_state.sound_players[i].current.sound_id == sound.id:             # <<<<<<<<<<<<<<
  *                 SDL_UnlockAudioDevice(self.device_id)
  *                 return True
  */
-    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_i]).current.sound_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2455, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_i]).current.sound_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2457, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2455, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2457, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyObject_RichCompare(__pyx_t_5, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2455, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(__pyx_t_5, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2457, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 2455, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 2457, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_3 = __pyx_t_4;
     __pyx_L6_bool_binop_done:;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2454
+    /* "mpfmc/core/audio/audio_interface.pyx":2456
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \             # <<<<<<<<<<<<<<
@@ -26700,7 +26708,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
     if (__pyx_t_3) {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2456
+      /* "mpfmc/core/audio/audio_interface.pyx":2458
  *             if self.type_state.sound_players[i].status != player_idle and \
  *                             self.type_state.sound_players[i].current.sound_id == sound.id:
  *                 SDL_UnlockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -26709,7 +26717,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
       SDL_UnlockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2457
+      /* "mpfmc/core/audio/audio_interface.pyx":2459
  *                             self.type_state.sound_players[i].current.sound_id == sound.id:
  *                 SDL_UnlockAudioDevice(self.device_id)
  *                 return True             # <<<<<<<<<<<<<<
@@ -26721,7 +26729,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2454
+      /* "mpfmc/core/audio/audio_interface.pyx":2456
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \             # <<<<<<<<<<<<<<
@@ -26731,7 +26739,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     }
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2459
+  /* "mpfmc/core/audio/audio_interface.pyx":2461
  *                 return True
  * 
  *         SDL_UnlockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -26740,7 +26748,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
   SDL_UnlockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2460
+  /* "mpfmc/core/audio/audio_interface.pyx":2462
  * 
  *         SDL_UnlockAudioDevice(self.device_id)
  *         return False             # <<<<<<<<<<<<<<
@@ -26752,7 +26760,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __pyx_r = Py_False;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2450
+  /* "mpfmc/core/audio/audio_interface.pyx":2452
  *         return players_in_use_count
  * 
  *     def sound_is_playing(self, sound not None):             # <<<<<<<<<<<<<<
@@ -26773,7 +26781,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2462
+/* "mpfmc/core/audio/audio_interface.pyx":2464
  *         return False
  * 
  *     def sound_instance_is_playing(self, sound_instance not None):             # <<<<<<<<<<<<<<
@@ -26789,7 +26797,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("sound_instance_is_playing (wrapper)", 0);
   if (unlikely(((PyObject *)__pyx_v_sound_instance) == Py_None)) {
-    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound_instance"); __PYX_ERR(0, 2462, __pyx_L1_error)
+    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound_instance"); __PYX_ERR(0, 2464, __pyx_L1_error)
   }
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_36sound_instance_is_playing(((struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_TrackStandard *)__pyx_v_self), ((PyObject *)__pyx_v_sound_instance));
 
@@ -26815,7 +26823,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("sound_instance_is_playing", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2464
+  /* "mpfmc/core/audio/audio_interface.pyx":2466
  *     def sound_instance_is_playing(self, sound_instance not None):
  *         """Returns whether or not the specified sound instance is currently playing on the track"""
  *         SDL_LockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -26824,7 +26832,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
   SDL_LockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2465
+  /* "mpfmc/core/audio/audio_interface.pyx":2467
  *         """Returns whether or not the specified sound instance is currently playing on the track"""
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):             # <<<<<<<<<<<<<<
@@ -26835,7 +26843,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   for (__pyx_t_2 = 0; __pyx_t_2 < __pyx_t_1; __pyx_t_2+=1) {
     __pyx_v_i = __pyx_t_2;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2466
+    /* "mpfmc/core/audio/audio_interface.pyx":2468
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \             # <<<<<<<<<<<<<<
@@ -26849,26 +26857,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
       goto __pyx_L6_bool_binop_done;
     }
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2467
+    /* "mpfmc/core/audio/audio_interface.pyx":2469
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \
  *                             self.type_state.sound_players[i].current.sound_instance_id == sound_instance.id:             # <<<<<<<<<<<<<<
  *                 SDL_UnlockAudioDevice(self.device_id)
  *                 return True
  */
-    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_i]).current.sound_instance_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2467, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_v_self->type_state->sound_players[__pyx_v_i]).current.sound_instance_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2469, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2467, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2469, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyObject_RichCompare(__pyx_t_5, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2467, __pyx_L1_error)
+    __pyx_t_7 = PyObject_RichCompare(__pyx_t_5, __pyx_t_6, Py_EQ); __Pyx_XGOTREF(__pyx_t_7); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2469, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 2467, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 2469, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_3 = __pyx_t_4;
     __pyx_L6_bool_binop_done:;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2466
+    /* "mpfmc/core/audio/audio_interface.pyx":2468
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \             # <<<<<<<<<<<<<<
@@ -26877,7 +26885,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
     if (__pyx_t_3) {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2468
+      /* "mpfmc/core/audio/audio_interface.pyx":2470
  *             if self.type_state.sound_players[i].status != player_idle and \
  *                             self.type_state.sound_players[i].current.sound_instance_id == sound_instance.id:
  *                 SDL_UnlockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -26886,7 +26894,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
       SDL_UnlockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2469
+      /* "mpfmc/core/audio/audio_interface.pyx":2471
  *                             self.type_state.sound_players[i].current.sound_instance_id == sound_instance.id:
  *                 SDL_UnlockAudioDevice(self.device_id)
  *                 return True             # <<<<<<<<<<<<<<
@@ -26898,7 +26906,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
       __pyx_r = Py_True;
       goto __pyx_L0;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2466
+      /* "mpfmc/core/audio/audio_interface.pyx":2468
  *         SDL_LockAudioDevice(self.device_id)
  *         for i in range(self.type_state.sound_player_count):
  *             if self.type_state.sound_players[i].status != player_idle and \             # <<<<<<<<<<<<<<
@@ -26908,7 +26916,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     }
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2471
+  /* "mpfmc/core/audio/audio_interface.pyx":2473
  *                 return True
  * 
  *         SDL_UnlockAudioDevice(self.device_id)             # <<<<<<<<<<<<<<
@@ -26917,7 +26925,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
   SDL_UnlockAudioDevice(__pyx_v_self->__pyx_base.device_id);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2472
+  /* "mpfmc/core/audio/audio_interface.pyx":2474
  * 
  *         SDL_UnlockAudioDevice(self.device_id)
  *         return False             # <<<<<<<<<<<<<<
@@ -26929,7 +26937,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __pyx_r = Py_False;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2462
+  /* "mpfmc/core/audio/audio_interface.pyx":2464
  *         return False
  * 
  *     def sound_instance_is_playing(self, sound_instance not None):             # <<<<<<<<<<<<<<
@@ -26950,7 +26958,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2474
+/* "mpfmc/core/audio/audio_interface.pyx":2476
  *         return False
  * 
  *     def sound_is_in_queue(self, sound not None):             # <<<<<<<<<<<<<<
@@ -26966,7 +26974,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("sound_is_in_queue (wrapper)", 0);
   if (unlikely(((PyObject *)__pyx_v_sound) == Py_None)) {
-    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound"); __PYX_ERR(0, 2474, __pyx_L1_error)
+    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound"); __PYX_ERR(0, 2476, __pyx_L1_error)
   }
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_38sound_is_in_queue(((struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_TrackStandard *)__pyx_v_self), ((PyObject *)__pyx_v_sound));
 
@@ -26991,7 +26999,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   int __pyx_t_6;
   __Pyx_RefNannySetupContext("sound_is_in_queue", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2476
+  /* "mpfmc/core/audio/audio_interface.pyx":2478
  *     def sound_is_in_queue(self, sound not None):
  *         """Returns whether or not an instance of the specified sound is currently in the queue"""
  *         for sound_instance in self._sound_queue:             # <<<<<<<<<<<<<<
@@ -27000,42 +27008,42 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
   if (unlikely(__pyx_v_self->_sound_queue == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 2476, __pyx_L1_error)
+    __PYX_ERR(0, 2478, __pyx_L1_error)
   }
   __pyx_t_1 = __pyx_v_self->_sound_queue; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_COMPILING_IN_CPYTHON
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 2476, __pyx_L1_error)
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 2478, __pyx_L1_error)
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2476, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2478, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
     __Pyx_XDECREF_SET(__pyx_v_sound_instance, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2477
+    /* "mpfmc/core/audio/audio_interface.pyx":2479
  *         """Returns whether or not an instance of the specified sound is currently in the queue"""
  *         for sound_instance in self._sound_queue:
  *             if sound_instance.sound.id == sound.id:             # <<<<<<<<<<<<<<
  *                 return True
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_sound); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2477, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound_instance, __pyx_n_s_sound); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2479, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2477, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2479, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2477, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2479, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = PyObject_RichCompare(__pyx_t_4, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2477, __pyx_L1_error)
+    __pyx_t_5 = PyObject_RichCompare(__pyx_t_4, __pyx_t_3, Py_EQ); __Pyx_XGOTREF(__pyx_t_5); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2479, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 2477, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 2479, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (__pyx_t_6) {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2478
+      /* "mpfmc/core/audio/audio_interface.pyx":2480
  *         for sound_instance in self._sound_queue:
  *             if sound_instance.sound.id == sound.id:
  *                 return True             # <<<<<<<<<<<<<<
@@ -27048,7 +27056,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       goto __pyx_L0;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2477
+      /* "mpfmc/core/audio/audio_interface.pyx":2479
  *         """Returns whether or not an instance of the specified sound is currently in the queue"""
  *         for sound_instance in self._sound_queue:
  *             if sound_instance.sound.id == sound.id:             # <<<<<<<<<<<<<<
@@ -27057,7 +27065,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  */
     }
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2476
+    /* "mpfmc/core/audio/audio_interface.pyx":2478
  *     def sound_is_in_queue(self, sound not None):
  *         """Returns whether or not an instance of the specified sound is currently in the queue"""
  *         for sound_instance in self._sound_queue:             # <<<<<<<<<<<<<<
@@ -27067,7 +27075,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2480
+  /* "mpfmc/core/audio/audio_interface.pyx":2482
  *                 return True
  * 
  *         return False             # <<<<<<<<<<<<<<
@@ -27079,7 +27087,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __pyx_r = Py_False;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2474
+  /* "mpfmc/core/audio/audio_interface.pyx":2476
  *         return False
  * 
  *     def sound_is_in_queue(self, sound not None):             # <<<<<<<<<<<<<<
@@ -27102,7 +27110,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2482
+/* "mpfmc/core/audio/audio_interface.pyx":2484
  *         return False
  * 
  *     def sound_instance_is_in_queue(self, sound_instance not None):             # <<<<<<<<<<<<<<
@@ -27118,7 +27126,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("sound_instance_is_in_queue (wrapper)", 0);
   if (unlikely(((PyObject *)__pyx_v_sound_instance) == Py_None)) {
-    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound_instance"); __PYX_ERR(0, 2482, __pyx_L1_error)
+    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound_instance"); __PYX_ERR(0, 2484, __pyx_L1_error)
   }
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_40sound_instance_is_in_queue(((struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_TrackStandard *)__pyx_v_self), ((PyObject *)__pyx_v_sound_instance));
 
@@ -27138,7 +27146,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("sound_instance_is_in_queue", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2484
+  /* "mpfmc/core/audio/audio_interface.pyx":2486
  *     def sound_instance_is_in_queue(self, sound_instance not None):
  *         """Returns whether or not the specified sound instance is currently in the queue"""
  *         return sound_instance in self._sound_queue             # <<<<<<<<<<<<<<
@@ -27146,14 +27154,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  *     @staticmethod
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_v_sound_instance, __pyx_v_self->_sound_queue, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 2484, __pyx_L1_error)
-  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2484, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_v_sound_instance, __pyx_v_self->_sound_queue, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 2486, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyBool_FromLong(__pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2486, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2482
+  /* "mpfmc/core/audio/audio_interface.pyx":2484
  *         return False
  * 
  *     def sound_instance_is_in_queue(self, sound_instance not None):             # <<<<<<<<<<<<<<
@@ -27172,7 +27180,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2487
+/* "mpfmc/core/audio/audio_interface.pyx":2489
  * 
  *     @staticmethod
  *     def player_status_to_text(int status):             # <<<<<<<<<<<<<<
@@ -27207,18 +27215,18 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "player_status_to_text") < 0)) __PYX_ERR(0, 2487, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "player_status_to_text") < 0)) __PYX_ERR(0, 2489, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_status = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_status == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 2487, __pyx_L3_error)
+    __pyx_v_status = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_status == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 2489, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("player_status_to_text", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2487, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("player_status_to_text", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2489, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.audio_interface.TrackStandard.player_status_to_text", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -27244,83 +27252,83 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("player_status_to_text", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2498
+  /* "mpfmc/core/audio/audio_interface.pyx":2500
  *         """
  *         status_values = {
  *             player_idle: "idle",             # <<<<<<<<<<<<<<
  *             player_pending: "pending",
  *             player_replacing: "replacing",
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2498, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2500, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_idle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2498, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_idle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2500, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_idle) < 0) __PYX_ERR(0, 2498, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_idle) < 0) __PYX_ERR(0, 2500, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2499
+  /* "mpfmc/core/audio/audio_interface.pyx":2501
  *         status_values = {
  *             player_idle: "idle",
  *             player_pending: "pending",             # <<<<<<<<<<<<<<
  *             player_replacing: "replacing",
  *             player_playing: "playing",
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_pending); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2499, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_pending); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2501, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_pending) < 0) __PYX_ERR(0, 2498, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_pending) < 0) __PYX_ERR(0, 2500, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2500
+  /* "mpfmc/core/audio/audio_interface.pyx":2502
  *             player_idle: "idle",
  *             player_pending: "pending",
  *             player_replacing: "replacing",             # <<<<<<<<<<<<<<
  *             player_playing: "playing",
  *             player_finished: "finished",
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_replacing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2500, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_replacing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2502, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_replacing) < 0) __PYX_ERR(0, 2498, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_replacing) < 0) __PYX_ERR(0, 2500, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2501
+  /* "mpfmc/core/audio/audio_interface.pyx":2503
  *             player_pending: "pending",
  *             player_replacing: "replacing",
  *             player_playing: "playing",             # <<<<<<<<<<<<<<
  *             player_finished: "finished",
  *             player_stopping: "stopping",
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_playing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2501, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_playing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2503, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_playing) < 0) __PYX_ERR(0, 2498, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_playing) < 0) __PYX_ERR(0, 2500, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2502
+  /* "mpfmc/core/audio/audio_interface.pyx":2504
  *             player_replacing: "replacing",
  *             player_playing: "playing",
  *             player_finished: "finished",             # <<<<<<<<<<<<<<
  *             player_stopping: "stopping",
  *         }
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_finished); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2502, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_finished); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2504, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_finished) < 0) __PYX_ERR(0, 2498, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_finished) < 0) __PYX_ERR(0, 2500, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2503
+  /* "mpfmc/core/audio/audio_interface.pyx":2505
  *             player_playing: "playing",
  *             player_finished: "finished",
  *             player_stopping: "stopping",             # <<<<<<<<<<<<<<
  *         }
  * 
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_stopping); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2503, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_SoundPlayerStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_player_stopping); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2505, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_stopping) < 0) __PYX_ERR(0, 2498, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_stopping) < 0) __PYX_ERR(0, 2500, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_status_values = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2506
+  /* "mpfmc/core/audio/audio_interface.pyx":2508
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -27336,7 +27344,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     __Pyx_XGOTREF(__pyx_t_5);
     /*try:*/ {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2507
+      /* "mpfmc/core/audio/audio_interface.pyx":2509
  * 
  *         try:
  *             return status_values.get(status)             # <<<<<<<<<<<<<<
@@ -27344,16 +27352,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  *             return "unknown"
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_status); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2507, __pyx_L3_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_status); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2509, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_status_values, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2507, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_status_values, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2509, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_r = __pyx_t_2;
       __pyx_t_2 = 0;
       goto __pyx_L7_try_return;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2506
+      /* "mpfmc/core/audio/audio_interface.pyx":2508
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -27366,7 +27374,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2508
+    /* "mpfmc/core/audio/audio_interface.pyx":2510
  *         try:
  *             return status_values.get(status)
  *         except KeyError:             # <<<<<<<<<<<<<<
@@ -27376,12 +27384,12 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     __pyx_t_6 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_KeyError);
     if (__pyx_t_6) {
       __Pyx_AddTraceback("mpfmc.core.audio.audio_interface.TrackStandard.player_status_to_text", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_7) < 0) __PYX_ERR(0, 2508, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_7) < 0) __PYX_ERR(0, 2510, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2509
+      /* "mpfmc/core/audio/audio_interface.pyx":2511
  *             return status_values.get(status)
  *         except KeyError:
  *             return "unknown"             # <<<<<<<<<<<<<<
@@ -27399,7 +27407,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2506
+    /* "mpfmc/core/audio/audio_interface.pyx":2508
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -27428,7 +27436,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     goto __pyx_L0;
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2487
+  /* "mpfmc/core/audio/audio_interface.pyx":2489
  * 
  *     @staticmethod
  *     def player_status_to_text(int status):             # <<<<<<<<<<<<<<
@@ -27450,7 +27458,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2512
+/* "mpfmc/core/audio/audio_interface.pyx":2514
  * 
  *     @staticmethod
  *     def player_fading_status_to_text(int fading_status):             # <<<<<<<<<<<<<<
@@ -27485,18 +27493,18 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "player_fading_status_to_text") < 0)) __PYX_ERR(0, 2512, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "player_fading_status_to_text") < 0)) __PYX_ERR(0, 2514, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_fading_status = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_fading_status == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 2512, __pyx_L3_error)
+    __pyx_v_fading_status = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_fading_status == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 2514, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("player_fading_status_to_text", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2512, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("player_fading_status_to_text", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2514, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.audio_interface.TrackStandard.player_fading_status_to_text", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -27522,47 +27530,47 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("player_fading_status_to_text", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2523
+  /* "mpfmc/core/audio/audio_interface.pyx":2525
  *         """
  *         fading_status_values = {
  *             fading_status_not_fading: "not fading",             # <<<<<<<<<<<<<<
  *             fading_status_fading_in: "fade in",
  *             fading_status_fading_out: "fade out",
  */
-  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2523, __pyx_L1_error)
+  __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_FadingStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_fading_status_not_fading); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2523, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_FadingStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_fading_status_not_fading); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_not_fading) < 0) __PYX_ERR(0, 2523, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_not_fading) < 0) __PYX_ERR(0, 2525, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2524
+  /* "mpfmc/core/audio/audio_interface.pyx":2526
  *         fading_status_values = {
  *             fading_status_not_fading: "not fading",
  *             fading_status_fading_in: "fade in",             # <<<<<<<<<<<<<<
  *             fading_status_fading_out: "fade out",
  *         }
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_FadingStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_fading_status_fading_in); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2524, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_FadingStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_fading_status_fading_in); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2526, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fade_in_2) < 0) __PYX_ERR(0, 2523, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fade_in_2) < 0) __PYX_ERR(0, 2525, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2525
+  /* "mpfmc/core/audio/audio_interface.pyx":2527
  *             fading_status_not_fading: "not fading",
  *             fading_status_fading_in: "fade in",
  *             fading_status_fading_out: "fade out",             # <<<<<<<<<<<<<<
  *         }
  * 
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_FadingStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_fading_status_fading_out); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2525, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_15audio_interface_FadingStatus(__pyx_e_5mpfmc_4core_5audio_15audio_interface_fading_status_fading_out); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2527, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fade_out_2) < 0) __PYX_ERR(0, 2523, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fade_out_2) < 0) __PYX_ERR(0, 2525, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_fading_status_values = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2528
+  /* "mpfmc/core/audio/audio_interface.pyx":2530
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -27578,7 +27586,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     __Pyx_XGOTREF(__pyx_t_5);
     /*try:*/ {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2529
+      /* "mpfmc/core/audio/audio_interface.pyx":2531
  * 
  *         try:
  *             return fading_status_values.get(fading_status)             # <<<<<<<<<<<<<<
@@ -27586,16 +27594,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
  *             return "unknown"
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_fading_status); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2529, __pyx_L3_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_fading_status); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2531, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_fading_status_values, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2529, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_fading_status_values, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2531, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_r = __pyx_t_2;
       __pyx_t_2 = 0;
       goto __pyx_L7_try_return;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2528
+      /* "mpfmc/core/audio/audio_interface.pyx":2530
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -27608,7 +27616,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2530
+    /* "mpfmc/core/audio/audio_interface.pyx":2532
  *         try:
  *             return fading_status_values.get(fading_status)
  *         except KeyError:             # <<<<<<<<<<<<<<
@@ -27618,12 +27626,12 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     __pyx_t_6 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_KeyError);
     if (__pyx_t_6) {
       __Pyx_AddTraceback("mpfmc.core.audio.audio_interface.TrackStandard.player_fading_status_to_text", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_7) < 0) __PYX_ERR(0, 2530, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_7) < 0) __PYX_ERR(0, 2532, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2531
+      /* "mpfmc/core/audio/audio_interface.pyx":2533
  *             return fading_status_values.get(fading_status)
  *         except KeyError:
  *             return "unknown"             # <<<<<<<<<<<<<<
@@ -27641,7 +27649,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2528
+    /* "mpfmc/core/audio/audio_interface.pyx":2530
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -27670,7 +27678,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
     goto __pyx_L0;
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2512
+  /* "mpfmc/core/audio/audio_interface.pyx":2514
  * 
  *     @staticmethod
  *     def player_fading_status_to_text(int fading_status):             # <<<<<<<<<<<<<<
@@ -27692,7 +27700,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2544
+/* "mpfmc/core/audio/audio_interface.pyx":2546
  *     cdef object log
  * 
  *     def __init__(self, str file_name, object audio_callback_data):             # <<<<<<<<<<<<<<
@@ -27728,11 +27736,11 @@ static int __pyx_pw_5mpfmc_4core_5audio_15audio_interface_9SoundFile_1__init__(P
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_audio_callback_data)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 2544, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 2546, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 2544, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 2546, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -27745,13 +27753,13 @@ static int __pyx_pw_5mpfmc_4core_5audio_15audio_interface_9SoundFile_1__init__(P
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2544, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2546, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.audio_interface.SoundFile.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_name), (&PyUnicode_Type), 1, "file_name", 1))) __PYX_ERR(0, 2544, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_name), (&PyUnicode_Type), 1, "file_name", 1))) __PYX_ERR(0, 2546, __pyx_L1_error)
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile___init__(((struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_SoundFile *)__pyx_v_self), __pyx_v_file_name, __pyx_v_audio_callback_data);
 
   /* function exit code */
@@ -27771,19 +27779,19 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile___init__(st
   void *__pyx_t_3;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2545
+  /* "mpfmc/core/audio/audio_interface.pyx":2547
  * 
  *     def __init__(self, str file_name, object audio_callback_data):
  *         self.log = logging.getLogger("SoundFile")             # <<<<<<<<<<<<<<
  *         self.file_name = file_name
  *         self.callback_data = <AudioCallbackData*>pycapsule.PyCapsule_GetPointer(audio_callback_data, NULL)
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_logging); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2545, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_logging); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2547, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2545, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2547, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__29, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2545, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__29, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2547, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_GIVEREF(__pyx_t_1);
@@ -27792,7 +27800,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile___init__(st
   __pyx_v_self->log = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2546
+  /* "mpfmc/core/audio/audio_interface.pyx":2548
  *     def __init__(self, str file_name, object audio_callback_data):
  *         self.log = logging.getLogger("SoundFile")
  *         self.file_name = file_name             # <<<<<<<<<<<<<<
@@ -27805,17 +27813,17 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile___init__(st
   __Pyx_DECREF(__pyx_v_self->file_name);
   __pyx_v_self->file_name = __pyx_v_file_name;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2547
+  /* "mpfmc/core/audio/audio_interface.pyx":2549
  *         self.log = logging.getLogger("SoundFile")
  *         self.file_name = file_name
  *         self.callback_data = <AudioCallbackData*>pycapsule.PyCapsule_GetPointer(audio_callback_data, NULL)             # <<<<<<<<<<<<<<
  *         self.sample.duration = 0
  * 
  */
-  __pyx_t_3 = PyCapsule_GetPointer(__pyx_v_audio_callback_data, NULL); if (unlikely(__pyx_t_3 == NULL && PyErr_Occurred())) __PYX_ERR(0, 2547, __pyx_L1_error)
+  __pyx_t_3 = PyCapsule_GetPointer(__pyx_v_audio_callback_data, NULL); if (unlikely(__pyx_t_3 == NULL && PyErr_Occurred())) __PYX_ERR(0, 2549, __pyx_L1_error)
   __pyx_v_self->callback_data = ((__pyx_t_5mpfmc_4core_5audio_15audio_interface_AudioCallbackData *)__pyx_t_3);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2548
+  /* "mpfmc/core/audio/audio_interface.pyx":2550
  *         self.file_name = file_name
  *         self.callback_data = <AudioCallbackData*>pycapsule.PyCapsule_GetPointer(audio_callback_data, NULL)
  *         self.sample.duration = 0             # <<<<<<<<<<<<<<
@@ -27824,7 +27832,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile___init__(st
  */
   __pyx_v_self->sample.duration = 0.0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2544
+  /* "mpfmc/core/audio/audio_interface.pyx":2546
  *     cdef object log
  * 
  *     def __init__(self, str file_name, object audio_callback_data):             # <<<<<<<<<<<<<<
@@ -27845,7 +27853,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile___init__(st
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2550
+/* "mpfmc/core/audio/audio_interface.pyx":2552
  *         self.sample.duration = 0
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -27871,7 +27879,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_2__re
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__repr__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2551
+  /* "mpfmc/core/audio/audio_interface.pyx":2553
  * 
  *     def __repr__(self):
  *         return '<SoundFile>'             # <<<<<<<<<<<<<<
@@ -27883,7 +27891,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_2__re
   __pyx_r = __pyx_kp_u_SoundFile_2;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2550
+  /* "mpfmc/core/audio/audio_interface.pyx":2552
  *         self.sample.duration = 0
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -27898,7 +27906,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_2__re
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2553
+/* "mpfmc/core/audio/audio_interface.pyx":2555
  *         return '<SoundFile>'
  * 
  *     def load(self):             # <<<<<<<<<<<<<<
@@ -27926,20 +27934,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_4load
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("load", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2555
+  /* "mpfmc/core/audio/audio_interface.pyx":2557
  *     def load(self):
  *         """Load the sound file"""
  *         raise NotImplementedError("Must be implemented in derived class")             # <<<<<<<<<<<<<<
  * 
  *     def unload(self):
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_NotImplementedError, __pyx_tuple__30, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2555, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_NotImplementedError, __pyx_tuple__30, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __PYX_ERR(0, 2555, __pyx_L1_error)
+  __PYX_ERR(0, 2557, __pyx_L1_error)
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2553
+  /* "mpfmc/core/audio/audio_interface.pyx":2555
  *         return '<SoundFile>'
  * 
  *     def load(self):             # <<<<<<<<<<<<<<
@@ -27957,7 +27965,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_4load
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2557
+/* "mpfmc/core/audio/audio_interface.pyx":2559
  *         raise NotImplementedError("Must be implemented in derived class")
  * 
  *     def unload(self):             # <<<<<<<<<<<<<<
@@ -27985,20 +27993,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_6unlo
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("unload", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2559
+  /* "mpfmc/core/audio/audio_interface.pyx":2561
  *     def unload(self):
  *         """Unload the sound file"""
  *         raise NotImplementedError("Must be implemented in derived class")             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_NotImplementedError, __pyx_tuple__31, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2559, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_NotImplementedError, __pyx_tuple__31, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2561, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_Raise(__pyx_t_1, 0, 0, 0);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __PYX_ERR(0, 2559, __pyx_L1_error)
+  __PYX_ERR(0, 2561, __pyx_L1_error)
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2557
+  /* "mpfmc/core/audio/audio_interface.pyx":2559
  *         raise NotImplementedError("Must be implemented in derived class")
  * 
  *     def unload(self):             # <<<<<<<<<<<<<<
@@ -28016,7 +28024,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_6unlo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2562
+/* "mpfmc/core/audio/audio_interface.pyx":2564
  * 
  *     @property
  *     def duration(self):             # <<<<<<<<<<<<<<
@@ -28043,7 +28051,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_8dura
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2564
+  /* "mpfmc/core/audio/audio_interface.pyx":2566
  *     def duration(self):
  *         """Return the duration of the sound file"""
  *         return self.sample.duration             # <<<<<<<<<<<<<<
@@ -28051,13 +28059,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_8dura
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->sample.duration); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2564, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->sample.duration); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2566, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2562
+  /* "mpfmc/core/audio/audio_interface.pyx":2564
  * 
  *     @property
  *     def duration(self):             # <<<<<<<<<<<<<<
@@ -28076,7 +28084,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_9SoundFile_8dura
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2575
+/* "mpfmc/core/audio/audio_interface.pyx":2577
  *     cdef bint _use_sdl_mixer_loader
  * 
  *     def __init__(self, str file_name, object audio_callback_data, bint use_sdl_mixer_loader=True):             # <<<<<<<<<<<<<<
@@ -28114,7 +28122,7 @@ static int __pyx_pw_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile_1__i
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_audio_callback_data)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, 1); __PYX_ERR(0, 2575, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, 1); __PYX_ERR(0, 2577, __pyx_L3_error)
         }
         case  2:
         if (kw_args > 0) {
@@ -28123,7 +28131,7 @@ static int __pyx_pw_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile_1__i
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 2575, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 2577, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -28137,20 +28145,20 @@ static int __pyx_pw_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile_1__i
     __pyx_v_file_name = ((PyObject*)values[0]);
     __pyx_v_audio_callback_data = values[1];
     if (values[2]) {
-      __pyx_v_use_sdl_mixer_loader = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_use_sdl_mixer_loader == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 2575, __pyx_L3_error)
+      __pyx_v_use_sdl_mixer_loader = __Pyx_PyObject_IsTrue(values[2]); if (unlikely((__pyx_v_use_sdl_mixer_loader == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 2577, __pyx_L3_error)
     } else {
       __pyx_v_use_sdl_mixer_loader = ((int)1);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2575, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 2, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2577, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.audio_interface.SoundMemoryFile.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_name), (&PyUnicode_Type), 1, "file_name", 1))) __PYX_ERR(0, 2575, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_name), (&PyUnicode_Type), 1, "file_name", 1))) __PYX_ERR(0, 2577, __pyx_L1_error)
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___init__(((struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile *)__pyx_v_self), __pyx_v_file_name, __pyx_v_audio_callback_data, __pyx_v_use_sdl_mixer_loader);
 
   /* function exit code */
@@ -28172,14 +28180,14 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2577
+  /* "mpfmc/core/audio/audio_interface.pyx":2579
  *     def __init__(self, str file_name, object audio_callback_data, bint use_sdl_mixer_loader=True):
  *         # IMPORTANT: Call super class init function
  *         super().__init__(file_name, audio_callback_data)             # <<<<<<<<<<<<<<
  *         self._use_sdl_mixer_loader = use_sdl_mixer_loader
  *         self.log = logging.getLogger("SoundMemoryFile")
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2577, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2579, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile));
   __Pyx_GIVEREF(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile));
@@ -28187,10 +28195,10 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
   PyTuple_SET_ITEM(__pyx_t_2, 1, ((PyObject *)__pyx_v_self));
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2577, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2579, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2577, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2579, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -28205,7 +28213,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
       __pyx_t_4 = 1;
     }
   }
-  __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2577, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2579, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   if (__pyx_t_3) {
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -28216,13 +28224,13 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
   __Pyx_INCREF(__pyx_v_audio_callback_data);
   __Pyx_GIVEREF(__pyx_v_audio_callback_data);
   PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, __pyx_v_audio_callback_data);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2577, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2579, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2578
+  /* "mpfmc/core/audio/audio_interface.pyx":2580
  *         # IMPORTANT: Call super class init function
  *         super().__init__(file_name, audio_callback_data)
  *         self._use_sdl_mixer_loader = use_sdl_mixer_loader             # <<<<<<<<<<<<<<
@@ -28231,19 +28239,19 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
  */
   __pyx_v_self->_use_sdl_mixer_loader = __pyx_v_use_sdl_mixer_loader;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2579
+  /* "mpfmc/core/audio/audio_interface.pyx":2581
  *         super().__init__(file_name, audio_callback_data)
  *         self._use_sdl_mixer_loader = use_sdl_mixer_loader
  *         self.log = logging.getLogger("SoundMemoryFile")             # <<<<<<<<<<<<<<
  *         self.sample.type = sound_type_memory
  *         self.sample.data.memory = <SampleMemory*>PyMem_Malloc(sizeof(SampleMemory))
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_logging); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2579, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_logging); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2581, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2579, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2581, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__32, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2579, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__32, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2581, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_GIVEREF(__pyx_t_1);
@@ -28252,7 +28260,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
   __pyx_v_self->__pyx_base.log = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2580
+  /* "mpfmc/core/audio/audio_interface.pyx":2582
  *         self._use_sdl_mixer_loader = use_sdl_mixer_loader
  *         self.log = logging.getLogger("SoundMemoryFile")
  *         self.sample.type = sound_type_memory             # <<<<<<<<<<<<<<
@@ -28261,7 +28269,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
  */
   __pyx_v_self->__pyx_base.sample.type = __pyx_e_5mpfmc_4core_5audio_15audio_interface_sound_type_memory;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2581
+  /* "mpfmc/core/audio/audio_interface.pyx":2583
  *         self.log = logging.getLogger("SoundMemoryFile")
  *         self.sample.type = sound_type_memory
  *         self.sample.data.memory = <SampleMemory*>PyMem_Malloc(sizeof(SampleMemory))             # <<<<<<<<<<<<<<
@@ -28270,7 +28278,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
  */
   __pyx_v_self->__pyx_base.sample.data.memory = ((__pyx_t_5mpfmc_4core_5audio_15audio_interface_SampleMemory *)PyMem_Malloc((sizeof(__pyx_t_5mpfmc_4core_5audio_15audio_interface_SampleMemory))));
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2582
+  /* "mpfmc/core/audio/audio_interface.pyx":2584
  *         self.sample.type = sound_type_memory
  *         self.sample.data.memory = <SampleMemory*>PyMem_Malloc(sizeof(SampleMemory))
  *         self.sample.data.memory.data = NULL             # <<<<<<<<<<<<<<
@@ -28279,7 +28287,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
  */
   __pyx_v_self->__pyx_base.sample.data.memory->data = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2583
+  /* "mpfmc/core/audio/audio_interface.pyx":2585
  *         self.sample.data.memory = <SampleMemory*>PyMem_Malloc(sizeof(SampleMemory))
  *         self.sample.data.memory.data = NULL
  *         self.sample.data.memory.size = 0             # <<<<<<<<<<<<<<
@@ -28288,14 +28296,14 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
  */
   __pyx_v_self->__pyx_base.sample.data.memory->size = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2585
+  /* "mpfmc/core/audio/audio_interface.pyx":2587
  *         self.sample.data.memory.size = 0
  * 
  *         self.load()             # <<<<<<<<<<<<<<
  * 
  *     def __dealloc__(self):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2585, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2587, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -28308,16 +28316,16 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
     }
   }
   if (__pyx_t_5) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2585, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2587, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2585, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2587, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2575
+  /* "mpfmc/core/audio/audio_interface.pyx":2577
  *     cdef bint _use_sdl_mixer_loader
  * 
  *     def __init__(self, str file_name, object audio_callback_data, bint use_sdl_mixer_loader=True):             # <<<<<<<<<<<<<<
@@ -28340,7 +28348,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile___in
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2587
+/* "mpfmc/core/audio/audio_interface.pyx":2589
  *         self.load()
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -28367,14 +28375,14 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile_2__
   int __pyx_t_4;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2588
+  /* "mpfmc/core/audio/audio_interface.pyx":2590
  * 
  *     def __dealloc__(self):
  *         self.unload()             # <<<<<<<<<<<<<<
  *         if self.sample.data.memory != NULL:
  *             PyMem_Free(self.sample.data.memory)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unload); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2588, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unload); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2590, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -28387,16 +28395,16 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile_2__
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2588, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2590, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2588, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2590, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2589
+  /* "mpfmc/core/audio/audio_interface.pyx":2591
  *     def __dealloc__(self):
  *         self.unload()
  *         if self.sample.data.memory != NULL:             # <<<<<<<<<<<<<<
@@ -28406,7 +28414,7 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile_2__
   __pyx_t_4 = ((__pyx_v_self->__pyx_base.sample.data.memory != NULL) != 0);
   if (__pyx_t_4) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2590
+    /* "mpfmc/core/audio/audio_interface.pyx":2592
  *         self.unload()
  *         if self.sample.data.memory != NULL:
  *             PyMem_Free(self.sample.data.memory)             # <<<<<<<<<<<<<<
@@ -28415,7 +28423,7 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile_2__
  */
     PyMem_Free(__pyx_v_self->__pyx_base.sample.data.memory);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2589
+    /* "mpfmc/core/audio/audio_interface.pyx":2591
  *     def __dealloc__(self):
  *         self.unload()
  *         if self.sample.data.memory != NULL:             # <<<<<<<<<<<<<<
@@ -28424,7 +28432,7 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile_2__
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2587
+  /* "mpfmc/core/audio/audio_interface.pyx":2589
  *         self.load()
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -28443,7 +28451,7 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFile_2__
   __Pyx_RefNannyFinishContext();
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2592
+/* "mpfmc/core/audio/audio_interface.pyx":2594
  *             PyMem_Free(self.sample.data.memory)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -28476,20 +28484,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("__repr__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2593
+  /* "mpfmc/core/audio/audio_interface.pyx":2595
  * 
  *     def __repr__(self):
  *         if self.loaded:             # <<<<<<<<<<<<<<
  *             return '<SoundMemoryFile({}, Loaded=True, sample_duration={}s)>'.format(self.file_name, self.sample.duration)
  *         else:
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_loaded); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2593, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_loaded); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2595, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 2593, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 2595, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2594
+    /* "mpfmc/core/audio/audio_interface.pyx":2596
  *     def __repr__(self):
  *         if self.loaded:
  *             return '<SoundMemoryFile({}, Loaded=True, sample_duration={}s)>'.format(self.file_name, self.sample.duration)             # <<<<<<<<<<<<<<
@@ -28497,9 +28505,9 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  *             return "<SoundMemoryFile({}, Loaded=False)>".format(self.file_name)
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SoundMemoryFile_Loaded_True_sam, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2594, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SoundMemoryFile_Loaded_True_sam, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.sample.duration); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2594, __pyx_L1_error)
+    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.sample.duration); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     __pyx_t_6 = 0;
@@ -28513,7 +28521,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
         __pyx_t_6 = 1;
       }
     }
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2594, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -28524,7 +28532,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2594, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2596, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -28532,7 +28540,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2593
+    /* "mpfmc/core/audio/audio_interface.pyx":2595
  * 
  *     def __repr__(self):
  *         if self.loaded:             # <<<<<<<<<<<<<<
@@ -28541,7 +28549,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2596
+  /* "mpfmc/core/audio/audio_interface.pyx":2598
  *             return '<SoundMemoryFile({}, Loaded=True, sample_duration={}s)>'.format(self.file_name, self.sample.duration)
  *         else:
  *             return "<SoundMemoryFile({}, Loaded=False)>".format(self.file_name)             # <<<<<<<<<<<<<<
@@ -28550,7 +28558,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   /*else*/ {
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SoundMemoryFile_Loaded_False, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2596, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SoundMemoryFile_Loaded_False, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2598, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_7 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
@@ -28563,16 +28571,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
       }
     }
     if (!__pyx_t_7) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2596, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2598, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2596, __pyx_L1_error)
+      __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2598, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_7); __pyx_t_7 = NULL;
       __Pyx_INCREF(__pyx_v_self->__pyx_base.file_name);
       __Pyx_GIVEREF(__pyx_v_self->__pyx_base.file_name);
       PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_self->__pyx_base.file_name);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2596, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2598, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     }
@@ -28582,7 +28590,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     goto __pyx_L0;
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2592
+  /* "mpfmc/core/audio/audio_interface.pyx":2594
  *             PyMem_Free(self.sample.data.memory)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -28605,7 +28613,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2598
+/* "mpfmc/core/audio/audio_interface.pyx":2600
  *             return "<SoundMemoryFile({}, Loaded=False)>".format(self.file_name)
  * 
  *     def load(self):             # <<<<<<<<<<<<<<
@@ -28639,7 +28647,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("load", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2599
+  /* "mpfmc/core/audio/audio_interface.pyx":2601
  * 
  *     def load(self):
  *         if self._use_sdl_mixer_loader:             # <<<<<<<<<<<<<<
@@ -28649,54 +28657,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_t_1 = (__pyx_v_self->_use_sdl_mixer_loader != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2600
+    /* "mpfmc/core/audio/audio_interface.pyx":2602
  *     def load(self):
  *         if self._use_sdl_mixer_loader:
  *             self._load_using_sdl_mixer()             # <<<<<<<<<<<<<<
  *         else:
  *             self._load_using_sdl()
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_using_sdl_mixer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2600, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = NULL;
-    if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-      }
-    }
-    if (__pyx_t_4) {
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2600, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    } else {
-      __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2600, __pyx_L1_error)
-    }
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "mpfmc/core/audio/audio_interface.pyx":2599
- * 
- *     def load(self):
- *         if self._use_sdl_mixer_loader:             # <<<<<<<<<<<<<<
- *             self._load_using_sdl_mixer()
- *         else:
- */
-    goto __pyx_L3;
-  }
-
-  /* "mpfmc/core/audio/audio_interface.pyx":2602
- *             self._load_using_sdl_mixer()
- *         else:
- *             self._load_using_sdl()             # <<<<<<<<<<<<<<
- * 
- *         self.log.debug('Loaded file: %s Sample duration: %s',
- */
-  /*else*/ {
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_using_sdl); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2602, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_using_sdl_mixer); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2602, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
@@ -28717,27 +28685,67 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+    /* "mpfmc/core/audio/audio_interface.pyx":2601
+ * 
+ *     def load(self):
+ *         if self._use_sdl_mixer_loader:             # <<<<<<<<<<<<<<
+ *             self._load_using_sdl_mixer()
+ *         else:
+ */
+    goto __pyx_L3;
+  }
+
+  /* "mpfmc/core/audio/audio_interface.pyx":2604
+ *             self._load_using_sdl_mixer()
+ *         else:
+ *             self._load_using_sdl()             # <<<<<<<<<<<<<<
+ * 
+ *         self.log.debug('Loaded file: %s Sample duration: %s',
+ */
+  /*else*/ {
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load_using_sdl); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2604, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = NULL;
+    if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_4)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_4);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    if (__pyx_t_4) {
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2604, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    } else {
+      __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2604, __pyx_L1_error)
+    }
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   }
   __pyx_L3:;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2604
+  /* "mpfmc/core/audio/audio_interface.pyx":2606
  *             self._load_using_sdl()
  * 
  *         self.log.debug('Loaded file: %s Sample duration: %s',             # <<<<<<<<<<<<<<
  *                        self.file_name, self.sample.duration)
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2604, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2606, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2605
+  /* "mpfmc/core/audio/audio_interface.pyx":2607
  * 
  *         self.log.debug('Loaded file: %s Sample duration: %s',
  *                        self.file_name, self.sample.duration)             # <<<<<<<<<<<<<<
  * 
  *     def _load_using_sdl_mixer(self):
  */
-  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.sample.duration); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2605, __pyx_L1_error)
+  __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.sample.duration); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2607, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -28751,7 +28759,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
       __pyx_t_6 = 1;
     }
   }
-  __pyx_t_7 = PyTuple_New(3+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2604, __pyx_L1_error)
+  __pyx_t_7 = PyTuple_New(3+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2606, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   if (__pyx_t_5) {
     __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -28765,13 +28773,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_7, 2+__pyx_t_6, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2604, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2606, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2598
+  /* "mpfmc/core/audio/audio_interface.pyx":2600
  *             return "<SoundMemoryFile({}, Loaded=False)>".format(self.file_name)
  * 
  *     def load(self):             # <<<<<<<<<<<<<<
@@ -28796,7 +28804,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2607
+/* "mpfmc/core/audio/audio_interface.pyx":2609
  *                        self.file_name, self.sample.duration)
  * 
  *     def _load_using_sdl_mixer(self):             # <<<<<<<<<<<<<<
@@ -28834,20 +28842,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   Py_ssize_t __pyx_t_9;
   __Pyx_RefNannySetupContext("_load_using_sdl_mixer", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2611
+  /* "mpfmc/core/audio/audio_interface.pyx":2613
  *         cdef Mix_Chunk *chunk
  * 
  *         if self.loaded:             # <<<<<<<<<<<<<<
  *             return
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_loaded); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2611, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_loaded); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2613, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 2611, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 2613, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2612
+    /* "mpfmc/core/audio/audio_interface.pyx":2614
  * 
  *         if self.loaded:
  *             return             # <<<<<<<<<<<<<<
@@ -28858,7 +28866,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2611
+    /* "mpfmc/core/audio/audio_interface.pyx":2613
  *         cdef Mix_Chunk *chunk
  * 
  *         if self.loaded:             # <<<<<<<<<<<<<<
@@ -28867,19 +28875,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2614
+  /* "mpfmc/core/audio/audio_interface.pyx":2616
  *             return
  * 
  *         if not os.path.isfile(self.file_name):             # <<<<<<<<<<<<<<
  *             raise AudioException('Could not locate file ' + self.file_name)
  * 
  */
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2614, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_os); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2616, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2614, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_path); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2616, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_isfile); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2614, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_isfile); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2616, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_4 = NULL;
@@ -28893,35 +28901,35 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     }
   }
   if (!__pyx_t_4) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2614, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2616, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2614, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2616, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
     __Pyx_INCREF(__pyx_v_self->__pyx_base.file_name);
     __Pyx_GIVEREF(__pyx_v_self->__pyx_base.file_name);
     PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_self->__pyx_base.file_name);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2614, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2616, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 2614, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 2616, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_6 = ((!__pyx_t_2) != 0);
   if (__pyx_t_6) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2615
+    /* "mpfmc/core/audio/audio_interface.pyx":2617
  * 
  *         if not os.path.isfile(self.file_name):
  *             raise AudioException('Could not locate file ' + self.file_name)             # <<<<<<<<<<<<<<
  * 
  *         # Load the audio file (will be converted to current sample output format)
  */
-    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2615, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2617, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyUnicode_ConcatSafe(__pyx_kp_u_Could_not_locate_file, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2615, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyUnicode_ConcatSafe(__pyx_kp_u_Could_not_locate_file, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2617, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_4 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -28934,26 +28942,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2615, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2617, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2615, __pyx_L1_error)
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2617, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_GIVEREF(__pyx_t_5);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_5);
       __pyx_t_5 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2615, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2617, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 2615, __pyx_L1_error)
+    __PYX_ERR(0, 2617, __pyx_L1_error)
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2614
+    /* "mpfmc/core/audio/audio_interface.pyx":2616
  *             return
  * 
  *         if not os.path.isfile(self.file_name):             # <<<<<<<<<<<<<<
@@ -28962,7 +28970,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2618
+  /* "mpfmc/core/audio/audio_interface.pyx":2620
  * 
  *         # Load the audio file (will be converted to current sample output format)
  *         chunk = Mix_LoadWAV(self.file_name.encode('utf-8'))             # <<<<<<<<<<<<<<
@@ -28971,15 +28979,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   if (unlikely(__pyx_v_self->__pyx_base.file_name == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "encode");
-    __PYX_ERR(0, 2618, __pyx_L1_error)
+    __PYX_ERR(0, 2620, __pyx_L1_error)
   }
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2618, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2620, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_8 = __Pyx_PyObject_AsString(__pyx_t_1); if (unlikely((!__pyx_t_8) && PyErr_Occurred())) __PYX_ERR(0, 2618, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_AsString(__pyx_t_1); if (unlikely((!__pyx_t_8) && PyErr_Occurred())) __PYX_ERR(0, 2620, __pyx_L1_error)
   __pyx_v_chunk = Mix_LoadWAV(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2619
+  /* "mpfmc/core/audio/audio_interface.pyx":2621
  *         # Load the audio file (will be converted to current sample output format)
  *         chunk = Mix_LoadWAV(self.file_name.encode('utf-8'))
  *         if chunk == NULL:             # <<<<<<<<<<<<<<
@@ -28989,16 +28997,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_t_6 = ((__pyx_v_chunk == NULL) != 0);
   if (__pyx_t_6) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2620
+    /* "mpfmc/core/audio/audio_interface.pyx":2622
  *         chunk = Mix_LoadWAV(self.file_name.encode('utf-8'))
  *         if chunk == NULL:
  *             msg = "Could not load sound file {} due to an error: {}".format(self.file_name, SDL_GetError())             # <<<<<<<<<<<<<<
  *             raise AudioException(msg)
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Could_not_load_sound_file_due_to, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2620, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Could_not_load_sound_file_due_to, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2622, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_7 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2620, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2622, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_5 = NULL;
     __pyx_t_9 = 0;
@@ -29012,7 +29020,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
         __pyx_t_9 = 1;
       }
     }
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2620, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2622, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -29023,21 +29031,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     __Pyx_GIVEREF(__pyx_t_7);
     PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_9, __pyx_t_7);
     __pyx_t_7 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2620, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2622, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_msg = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2621
+    /* "mpfmc/core/audio/audio_interface.pyx":2623
  *         if chunk == NULL:
  *             msg = "Could not load sound file {} due to an error: {}".format(self.file_name, SDL_GetError())
  *             raise AudioException(msg)             # <<<<<<<<<<<<<<
  * 
  *         # Save the loaded sample data
  */
-    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2621, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2623, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -29050,25 +29058,25 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_msg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2621, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_msg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2623, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2621, __pyx_L1_error)
+      __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2623, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_INCREF(__pyx_v_msg);
       __Pyx_GIVEREF(__pyx_v_msg);
       PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_v_msg);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2621, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2623, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 2621, __pyx_L1_error)
+    __PYX_ERR(0, 2623, __pyx_L1_error)
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2619
+    /* "mpfmc/core/audio/audio_interface.pyx":2621
  *         # Load the audio file (will be converted to current sample output format)
  *         chunk = Mix_LoadWAV(self.file_name.encode('utf-8'))
  *         if chunk == NULL:             # <<<<<<<<<<<<<<
@@ -29077,7 +29085,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2624
+  /* "mpfmc/core/audio/audio_interface.pyx":2626
  * 
  *         # Save the loaded sample data
  *         self.sample.data.memory.size = <gsize>chunk.alen             # <<<<<<<<<<<<<<
@@ -29086,7 +29094,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   __pyx_v_self->__pyx_base.sample.data.memory->size = ((gsize)__pyx_v_chunk->alen);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2625
+  /* "mpfmc/core/audio/audio_interface.pyx":2627
  *         # Save the loaded sample data
  *         self.sample.data.memory.size = <gsize>chunk.alen
  *         self.sample.data.memory.data = <gpointer>chunk.abuf             # <<<<<<<<<<<<<<
@@ -29095,7 +29103,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   __pyx_v_self->__pyx_base.sample.data.memory->data = ((gpointer)__pyx_v_chunk->abuf);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2628
+  /* "mpfmc/core/audio/audio_interface.pyx":2630
  * 
  *         # Set the sample duration (in seconds)
  *         self.sample.duration = self.sample.data.memory.size / self.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
@@ -29104,11 +29112,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   if (unlikely(__pyx_v_self->__pyx_base.callback_data->seconds_to_bytes_factor == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 2628, __pyx_L1_error)
+    __PYX_ERR(0, 2630, __pyx_L1_error)
   }
   __pyx_v_self->__pyx_base.sample.duration = (((double)__pyx_v_self->__pyx_base.sample.data.memory->size) / __pyx_v_self->__pyx_base.callback_data->seconds_to_bytes_factor);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2634
+  /* "mpfmc/core/audio/audio_interface.pyx":2636
  *         # can just free the Mix_Chunk structure using SDL_free and the sample buffer will remain intact. The
  *         # sample memory must be freed later when this object is deallocated.
  *         SDL_free(chunk)             # <<<<<<<<<<<<<<
@@ -29117,7 +29125,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   SDL_free(__pyx_v_chunk);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2607
+  /* "mpfmc/core/audio/audio_interface.pyx":2609
  *                        self.file_name, self.sample.duration)
  * 
  *     def _load_using_sdl_mixer(self):             # <<<<<<<<<<<<<<
@@ -29143,7 +29151,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2636
+/* "mpfmc/core/audio/audio_interface.pyx":2638
  *         SDL_free(chunk)
  * 
  *     def _load_using_sdl(self):             # <<<<<<<<<<<<<<
@@ -29190,7 +29198,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   int __pyx_t_12;
   __Pyx_RefNannySetupContext("_load_using_sdl", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2642
+  /* "mpfmc/core/audio/audio_interface.pyx":2644
  *         cdef SDL_AudioSpec *loaded
  *         cdef SDL_AudioCVT wavecvt
  *         cdef Uint8 *temp_sample_data = NULL             # <<<<<<<<<<<<<<
@@ -29199,7 +29207,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   __pyx_v_temp_sample_data = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2643
+  /* "mpfmc/core/audio/audio_interface.pyx":2645
  *         cdef SDL_AudioCVT wavecvt
  *         cdef Uint8 *temp_sample_data = NULL
  *         cdef Uint32 temp_sample_size = 0             # <<<<<<<<<<<<<<
@@ -29208,7 +29216,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   __pyx_v_temp_sample_size = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2644
+  /* "mpfmc/core/audio/audio_interface.pyx":2646
  *         cdef Uint8 *temp_sample_data = NULL
  *         cdef Uint32 temp_sample_size = 0
  *         cdef Uint8* converted_sample_data = NULL             # <<<<<<<<<<<<<<
@@ -29217,7 +29225,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   __pyx_v_converted_sample_data = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2645
+  /* "mpfmc/core/audio/audio_interface.pyx":2647
  *         cdef Uint32 temp_sample_size = 0
  *         cdef Uint8* converted_sample_data = NULL
  *         cdef Uint32 converted_sample_size = 0             # <<<<<<<<<<<<<<
@@ -29226,7 +29234,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   __pyx_v_converted_sample_size = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2648
+  /* "mpfmc/core/audio/audio_interface.pyx":2650
  * 
  *         # Load the WAV file into memory (memory is allocated during the load)
  *         loaded = SDL_LoadWAV(self.file_name.encode('utf-8'), &wave_spec, &temp_sample_data, &temp_sample_size)             # <<<<<<<<<<<<<<
@@ -29235,15 +29243,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   if (unlikely(__pyx_v_self->__pyx_base.file_name == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "encode");
-    __PYX_ERR(0, 2648, __pyx_L1_error)
+    __PYX_ERR(0, 2650, __pyx_L1_error)
   }
-  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2648, __pyx_L1_error)
+  __pyx_t_1 = PyUnicode_AsUTF8String(__pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2650, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_t_1); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 2648, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_AsString(__pyx_t_1); if (unlikely((!__pyx_t_2) && PyErr_Occurred())) __PYX_ERR(0, 2650, __pyx_L1_error)
   __pyx_v_loaded = SDL_LoadWAV(__pyx_t_2, (&__pyx_v_wave_spec), (&__pyx_v_temp_sample_data), (&__pyx_v_temp_sample_size));
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2649
+  /* "mpfmc/core/audio/audio_interface.pyx":2651
  *         # Load the WAV file into memory (memory is allocated during the load)
  *         loaded = SDL_LoadWAV(self.file_name.encode('utf-8'), &wave_spec, &temp_sample_data, &temp_sample_size)
  *         if loaded == NULL:             # <<<<<<<<<<<<<<
@@ -29253,16 +29261,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_t_3 = ((__pyx_v_loaded == NULL) != 0);
   if (__pyx_t_3) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2650
+    /* "mpfmc/core/audio/audio_interface.pyx":2652
  *         loaded = SDL_LoadWAV(self.file_name.encode('utf-8'), &wave_spec, &temp_sample_data, &temp_sample_size)
  *         if loaded == NULL:
  *             msg = "Could not load sound file {} due to an error: {}".format(self.file_name, SDL_GetError())             # <<<<<<<<<<<<<<
  *             raise AudioException(msg)
  * 
  */
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Could_not_load_sound_file_due_to, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2650, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Could_not_load_sound_file_due_to, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2652, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2650, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyBytes_FromString(SDL_GetError()); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2652, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     __pyx_t_7 = 0;
@@ -29276,7 +29284,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
         __pyx_t_7 = 1;
       }
     }
-    __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2650, __pyx_L1_error)
+    __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2652, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     if (__pyx_t_6) {
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -29287,21 +29295,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     __Pyx_GIVEREF(__pyx_t_5);
     PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_t_5);
     __pyx_t_5 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2650, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2652, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_msg = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2651
+    /* "mpfmc/core/audio/audio_interface.pyx":2653
  *         if loaded == NULL:
  *             msg = "Could not load sound file {} due to an error: {}".format(self.file_name, SDL_GetError())
  *             raise AudioException(msg)             # <<<<<<<<<<<<<<
  * 
  *         # Setup desired format for sample data
  */
-    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2651, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2653, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_8 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -29314,25 +29322,25 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
       }
     }
     if (!__pyx_t_8) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_msg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2651, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_msg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2653, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
     } else {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2651, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2653, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_8); __pyx_t_8 = NULL;
       __Pyx_INCREF(__pyx_v_msg);
       __Pyx_GIVEREF(__pyx_v_msg);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_msg);
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2651, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2653, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_Raise(__pyx_t_1, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __PYX_ERR(0, 2651, __pyx_L1_error)
+    __PYX_ERR(0, 2653, __pyx_L1_error)
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2649
+    /* "mpfmc/core/audio/audio_interface.pyx":2651
  *         # Load the WAV file into memory (memory is allocated during the load)
  *         loaded = SDL_LoadWAV(self.file_name.encode('utf-8'), &wave_spec, &temp_sample_data, &temp_sample_size)
  *         if loaded == NULL:             # <<<<<<<<<<<<<<
@@ -29341,7 +29349,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2654
+  /* "mpfmc/core/audio/audio_interface.pyx":2656
  * 
  *         # Setup desired format for sample data
  *         desired_spec.freq = self.callback_data.sample_rate             # <<<<<<<<<<<<<<
@@ -29351,7 +29359,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_t_9 = __pyx_v_self->__pyx_base.callback_data->sample_rate;
   __pyx_v_desired_spec.freq = __pyx_t_9;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2655
+  /* "mpfmc/core/audio/audio_interface.pyx":2657
  *         # Setup desired format for sample data
  *         desired_spec.freq = self.callback_data.sample_rate
  *         desired_spec.format = self.callback_data.format             # <<<<<<<<<<<<<<
@@ -29361,7 +29369,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_t_10 = __pyx_v_self->__pyx_base.callback_data->format;
   __pyx_v_desired_spec.format = __pyx_t_10;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2656
+  /* "mpfmc/core/audio/audio_interface.pyx":2658
  *         desired_spec.freq = self.callback_data.sample_rate
  *         desired_spec.format = self.callback_data.format
  *         desired_spec.channels = self.callback_data.channels             # <<<<<<<<<<<<<<
@@ -29371,7 +29379,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_t_11 = __pyx_v_self->__pyx_base.callback_data->channels;
   __pyx_v_desired_spec.channels = __pyx_t_11;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2658
+  /* "mpfmc/core/audio/audio_interface.pyx":2660
  *         desired_spec.channels = self.callback_data.channels
  * 
  *         if wave_spec.freq != self.callback_data.sample_rate or wave_spec.format != self.callback_data.format or wave_spec.channels != self.callback_data.channels:             # <<<<<<<<<<<<<<
@@ -29395,7 +29403,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_L5_bool_binop_done:;
   if (__pyx_t_3) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2661
+    /* "mpfmc/core/audio/audio_interface.pyx":2663
  * 
  *             # Now we need to check if the audio format must be converted to match the audio interface output format
  *             if convert_audio_to_desired_format(wave_spec, desired_spec, temp_sample_data, temp_sample_size, &converted_sample_data, &converted_sample_size) < 0:             # <<<<<<<<<<<<<<
@@ -29405,7 +29413,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     __pyx_t_3 = ((convert_audio_to_desired_format(__pyx_v_wave_spec, __pyx_v_desired_spec, __pyx_v_temp_sample_data, __pyx_v_temp_sample_size, (&__pyx_v_converted_sample_data), (&__pyx_v_converted_sample_size)) < 0) != 0);
     if (__pyx_t_3) {
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2662
+      /* "mpfmc/core/audio/audio_interface.pyx":2664
  *             # Now we need to check if the audio format must be converted to match the audio interface output format
  *             if convert_audio_to_desired_format(wave_spec, desired_spec, temp_sample_data, temp_sample_size, &converted_sample_data, &converted_sample_size) < 0:
  *                 SDL_FreeWAV(temp_sample_data)             # <<<<<<<<<<<<<<
@@ -29414,14 +29422,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
       SDL_FreeWAV(__pyx_v_temp_sample_data);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2663
+      /* "mpfmc/core/audio/audio_interface.pyx":2665
  *             if convert_audio_to_desired_format(wave_spec, desired_spec, temp_sample_data, temp_sample_size, &converted_sample_data, &converted_sample_size) < 0:
  *                 SDL_FreeWAV(temp_sample_data)
  *                 msg = "Could not convert sound file {} to required format".format(self.file_name)             # <<<<<<<<<<<<<<
  *                 raise AudioException(msg)
  * 
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Could_not_convert_sound_file_to, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2663, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Could_not_convert_sound_file_to, __pyx_n_s_format); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2665, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_5 = NULL;
       if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
@@ -29434,16 +29442,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2663, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2665, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
       } else {
-        __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2663, __pyx_L1_error)
+        __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2665, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_8);
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_5); __pyx_t_5 = NULL;
         __Pyx_INCREF(__pyx_v_self->__pyx_base.file_name);
         __Pyx_GIVEREF(__pyx_v_self->__pyx_base.file_name);
         PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_v_self->__pyx_base.file_name);
-        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2663, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2665, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       }
@@ -29451,14 +29459,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
       __pyx_v_msg = __pyx_t_1;
       __pyx_t_1 = 0;
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2664
+      /* "mpfmc/core/audio/audio_interface.pyx":2666
  *                 SDL_FreeWAV(temp_sample_data)
  *                 msg = "Could not convert sound file {} to required format".format(self.file_name)
  *                 raise AudioException(msg)             # <<<<<<<<<<<<<<
  * 
  *             else:
  */
-      __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2664, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2666, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_8 = NULL;
       if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -29471,25 +29479,25 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
         }
       }
       if (!__pyx_t_8) {
-        __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_msg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2664, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_v_msg); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2666, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
       } else {
-        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2664, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2666, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_8); __pyx_t_8 = NULL;
         __Pyx_INCREF(__pyx_v_msg);
         __Pyx_GIVEREF(__pyx_v_msg);
         PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_msg);
-        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2664, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2666, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       }
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_Raise(__pyx_t_1, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-      __PYX_ERR(0, 2664, __pyx_L1_error)
+      __PYX_ERR(0, 2666, __pyx_L1_error)
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2661
+      /* "mpfmc/core/audio/audio_interface.pyx":2663
  * 
  *             # Now we need to check if the audio format must be converted to match the audio interface output format
  *             if convert_audio_to_desired_format(wave_spec, desired_spec, temp_sample_data, temp_sample_size, &converted_sample_data, &converted_sample_size) < 0:             # <<<<<<<<<<<<<<
@@ -29498,7 +29506,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
     }
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2668
+    /* "mpfmc/core/audio/audio_interface.pyx":2670
  *             else:
  *                 # Reallocate sample buffer as it is very possible it shrank during the conversion process
  *                 self.sample.data.memory.size = <gsize>converted_sample_size             # <<<<<<<<<<<<<<
@@ -29508,7 +29516,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     /*else*/ {
       __pyx_v_self->__pyx_base.sample.data.memory->size = ((gsize)__pyx_v_converted_sample_size);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2669
+      /* "mpfmc/core/audio/audio_interface.pyx":2671
  *                 # Reallocate sample buffer as it is very possible it shrank during the conversion process
  *                 self.sample.data.memory.size = <gsize>converted_sample_size
  *                 self.sample.data.memory.data = <gpointer>converted_sample_data             # <<<<<<<<<<<<<<
@@ -29517,7 +29525,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
       __pyx_v_self->__pyx_base.sample.data.memory->data = ((gpointer)__pyx_v_converted_sample_data);
 
-      /* "mpfmc/core/audio/audio_interface.pyx":2670
+      /* "mpfmc/core/audio/audio_interface.pyx":2672
  *                 self.sample.data.memory.size = <gsize>converted_sample_size
  *                 self.sample.data.memory.data = <gpointer>converted_sample_data
  *                 SDL_FreeWAV(temp_sample_data)             # <<<<<<<<<<<<<<
@@ -29527,7 +29535,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
       SDL_FreeWAV(__pyx_v_temp_sample_data);
     }
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2658
+    /* "mpfmc/core/audio/audio_interface.pyx":2660
  *         desired_spec.channels = self.callback_data.channels
  * 
  *         if wave_spec.freq != self.callback_data.sample_rate or wave_spec.format != self.callback_data.format or wave_spec.channels != self.callback_data.channels:             # <<<<<<<<<<<<<<
@@ -29537,7 +29545,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
     goto __pyx_L4;
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2673
+  /* "mpfmc/core/audio/audio_interface.pyx":2675
  * 
  *         else:
  *             self.sample.data.memory.size = <gsize>temp_sample_size             # <<<<<<<<<<<<<<
@@ -29547,7 +29555,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   /*else*/ {
     __pyx_v_self->__pyx_base.sample.data.memory->size = ((gsize)__pyx_v_temp_sample_size);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2674
+    /* "mpfmc/core/audio/audio_interface.pyx":2676
  *         else:
  *             self.sample.data.memory.size = <gsize>temp_sample_size
  *             self.sample.data.memory.data = <gpointer>temp_sample_data             # <<<<<<<<<<<<<<
@@ -29558,7 +29566,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   }
   __pyx_L4:;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2677
+  /* "mpfmc/core/audio/audio_interface.pyx":2679
  * 
  *         # Set the sample duration (in seconds)
  *         self.sample.duration = self.sample.data.memory.size / self.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
@@ -29567,11 +29575,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   if (unlikely(__pyx_v_self->__pyx_base.callback_data->seconds_to_bytes_factor == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 2677, __pyx_L1_error)
+    __PYX_ERR(0, 2679, __pyx_L1_error)
   }
   __pyx_v_self->__pyx_base.sample.duration = (((double)__pyx_v_self->__pyx_base.sample.data.memory->size) / __pyx_v_self->__pyx_base.callback_data->seconds_to_bytes_factor);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2636
+  /* "mpfmc/core/audio/audio_interface.pyx":2638
  *         SDL_free(chunk)
  * 
  *     def _load_using_sdl(self):             # <<<<<<<<<<<<<<
@@ -29597,7 +29605,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2679
+/* "mpfmc/core/audio/audio_interface.pyx":2681
  *         self.sample.duration = self.sample.data.memory.size / self.callback_data.seconds_to_bytes_factor
  * 
  *     def unload(self):             # <<<<<<<<<<<<<<
@@ -29625,7 +29633,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("unload", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2681
+  /* "mpfmc/core/audio/audio_interface.pyx":2683
  *     def unload(self):
  *         """Unloads the sample data from memory"""
  *         if self.sample.data.memory.data != NULL:             # <<<<<<<<<<<<<<
@@ -29635,7 +29643,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_t_1 = ((__pyx_v_self->__pyx_base.sample.data.memory->data != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2682
+    /* "mpfmc/core/audio/audio_interface.pyx":2684
  *         """Unloads the sample data from memory"""
  *         if self.sample.data.memory.data != NULL:
  *             SDL_free(<void*>self.sample.data.memory.data)             # <<<<<<<<<<<<<<
@@ -29644,7 +29652,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
     SDL_free(((void *)__pyx_v_self->__pyx_base.sample.data.memory->data));
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2681
+    /* "mpfmc/core/audio/audio_interface.pyx":2683
  *     def unload(self):
  *         """Unloads the sample data from memory"""
  *         if self.sample.data.memory.data != NULL:             # <<<<<<<<<<<<<<
@@ -29653,7 +29661,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2684
+  /* "mpfmc/core/audio/audio_interface.pyx":2686
  *             SDL_free(<void*>self.sample.data.memory.data)
  * 
  *         self.sample.data.memory.data = NULL             # <<<<<<<<<<<<<<
@@ -29662,7 +29670,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   __pyx_v_self->__pyx_base.sample.data.memory->data = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2685
+  /* "mpfmc/core/audio/audio_interface.pyx":2687
  * 
  *         self.sample.data.memory.data = NULL
  *         self.sample.data.memory.size = 0             # <<<<<<<<<<<<<<
@@ -29671,7 +29679,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
  */
   __pyx_v_self->__pyx_base.sample.data.memory->size = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2679
+  /* "mpfmc/core/audio/audio_interface.pyx":2681
  *         self.sample.duration = self.sample.data.memory.size / self.callback_data.seconds_to_bytes_factor
  * 
  *     def unload(self):             # <<<<<<<<<<<<<<
@@ -29686,7 +29694,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2688
+/* "mpfmc/core/audio/audio_interface.pyx":2690
  * 
  *     @property
  *     def loaded(self):             # <<<<<<<<<<<<<<
@@ -29715,7 +29723,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2690
+  /* "mpfmc/core/audio/audio_interface.pyx":2692
  *     def loaded(self):
  *         """Returns whether or not the sound file data is loaded in memory"""
  *         return self.sample.data.memory.data != NULL and self.sample.data.memory.size > 0             # <<<<<<<<<<<<<<
@@ -29726,14 +29734,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_t_2 = (__pyx_v_self->__pyx_base.sample.data.memory->data != NULL);
   if (__pyx_t_2) {
   } else {
-    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2690, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2692, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_1 = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L3_bool_binop_done;
   }
   __pyx_t_2 = (__pyx_v_self->__pyx_base.sample.data.memory->size > 0);
-  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2690, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2692, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_1 = __pyx_t_3;
   __pyx_t_3 = 0;
@@ -29742,7 +29750,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2688
+  /* "mpfmc/core/audio/audio_interface.pyx":2690
  * 
  *     @property
  *     def loaded(self):             # <<<<<<<<<<<<<<
@@ -29762,7 +29770,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_15SoundMemoryFil
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2706
+/* "mpfmc/core/audio/audio_interface.pyx":2708
  *     cdef gulong bus_message_handler_id
  * 
  *     def __cinit__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
@@ -29795,7 +29803,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile__
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2708
+  /* "mpfmc/core/audio/audio_interface.pyx":2710
  *     def __cinit__(self, *args, **kwargs):
  *         """C constructor"""
  *         self.pipeline = NULL             # <<<<<<<<<<<<<<
@@ -29804,7 +29812,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile__
  */
   __pyx_v_self->pipeline = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2709
+  /* "mpfmc/core/audio/audio_interface.pyx":2711
  *         """C constructor"""
  *         self.pipeline = NULL
  *         self.bus = NULL             # <<<<<<<<<<<<<<
@@ -29813,7 +29821,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile__
  */
   __pyx_v_self->bus = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2710
+  /* "mpfmc/core/audio/audio_interface.pyx":2712
  *         self.pipeline = NULL
  *         self.bus = NULL
  *         self.bus_message_handler_id = 0             # <<<<<<<<<<<<<<
@@ -29822,7 +29830,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile__
  */
   __pyx_v_self->bus_message_handler_id = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2706
+  /* "mpfmc/core/audio/audio_interface.pyx":2708
  *     cdef gulong bus_message_handler_id
  * 
  *     def __cinit__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
@@ -29836,7 +29844,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile__
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2712
+/* "mpfmc/core/audio/audio_interface.pyx":2714
  *         self.bus_message_handler_id = 0
  * 
  *     def __init__(self, str file_name, object audio_callback_data):             # <<<<<<<<<<<<<<
@@ -29872,11 +29880,11 @@ static int __pyx_pw_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_3
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_audio_callback_data)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 2712, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, 1); __PYX_ERR(0, 2714, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 2712, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 2714, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 2) {
       goto __pyx_L5_argtuple_error;
@@ -29889,13 +29897,13 @@ static int __pyx_pw_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_3
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2712, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 2, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 2714, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.audio_interface.SoundStreamingFile.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_name), (&PyUnicode_Type), 1, "file_name", 1))) __PYX_ERR(0, 2712, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_file_name), (&PyUnicode_Type), 1, "file_name", 1))) __PYX_ERR(0, 2714, __pyx_L1_error)
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2__init__(((struct __pyx_obj_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile *)__pyx_v_self), __pyx_v_file_name, __pyx_v_audio_callback_data);
 
   /* function exit code */
@@ -29917,14 +29925,14 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2714
+  /* "mpfmc/core/audio/audio_interface.pyx":2716
  *     def __init__(self, str file_name, object audio_callback_data):
  *         # IMPORTANT: Call super class init function
  *         super().__init__(file_name, audio_callback_data)             # <<<<<<<<<<<<<<
  *         self.log = logging.getLogger("SoundStreamingFile")
  * 
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2714, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2716, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile));
   __Pyx_GIVEREF(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile));
@@ -29932,10 +29940,10 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
   PyTuple_SET_ITEM(__pyx_t_2, 1, ((PyObject *)__pyx_v_self));
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2714, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2716, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2714, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2716, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -29950,7 +29958,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
       __pyx_t_4 = 1;
     }
   }
-  __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2714, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2716, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   if (__pyx_t_3) {
     __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -29961,25 +29969,25 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
   __Pyx_INCREF(__pyx_v_audio_callback_data);
   __Pyx_GIVEREF(__pyx_v_audio_callback_data);
   PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, __pyx_v_audio_callback_data);
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2714, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2716, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2715
+  /* "mpfmc/core/audio/audio_interface.pyx":2717
  *         # IMPORTANT: Call super class init function
  *         super().__init__(file_name, audio_callback_data)
  *         self.log = logging.getLogger("SoundStreamingFile")             # <<<<<<<<<<<<<<
  * 
  *         self.sample.type = sound_type_streaming
  */
-  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_logging); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2715, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetModuleGlobalName(__pyx_n_s_logging); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2717, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2715, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_getLogger); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2717, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__33, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2715, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__33, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2717, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_GIVEREF(__pyx_t_1);
@@ -29988,7 +29996,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
   __pyx_v_self->__pyx_base.log = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2717
+  /* "mpfmc/core/audio/audio_interface.pyx":2719
  *         self.log = logging.getLogger("SoundStreamingFile")
  * 
  *         self.sample.type = sound_type_streaming             # <<<<<<<<<<<<<<
@@ -29997,7 +30005,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
  */
   __pyx_v_self->__pyx_base.sample.type = __pyx_e_5mpfmc_4core_5audio_15audio_interface_sound_type_streaming;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2718
+  /* "mpfmc/core/audio/audio_interface.pyx":2720
  * 
  *         self.sample.type = sound_type_streaming
  *         self.sample.data.stream = <SampleStream*>PyMem_Malloc(sizeof(SampleStream))             # <<<<<<<<<<<<<<
@@ -30006,7 +30014,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
  */
   __pyx_v_self->__pyx_base.sample.data.stream = ((__pyx_t_5mpfmc_4core_5audio_15audio_interface_SampleStream *)PyMem_Malloc((sizeof(__pyx_t_5mpfmc_4core_5audio_15audio_interface_SampleStream))));
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2719
+  /* "mpfmc/core/audio/audio_interface.pyx":2721
  *         self.sample.type = sound_type_streaming
  *         self.sample.data.stream = <SampleStream*>PyMem_Malloc(sizeof(SampleStream))
  *         self.sample.data.stream.pipeline = NULL             # <<<<<<<<<<<<<<
@@ -30015,7 +30023,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
  */
   __pyx_v_self->__pyx_base.sample.data.stream->pipeline = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2720
+  /* "mpfmc/core/audio/audio_interface.pyx":2722
  *         self.sample.data.stream = <SampleStream*>PyMem_Malloc(sizeof(SampleStream))
  *         self.sample.data.stream.pipeline = NULL
  *         self.sample.data.stream.sink = NULL             # <<<<<<<<<<<<<<
@@ -30024,7 +30032,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
  */
   __pyx_v_self->__pyx_base.sample.data.stream->sink = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2721
+  /* "mpfmc/core/audio/audio_interface.pyx":2723
  *         self.sample.data.stream.pipeline = NULL
  *         self.sample.data.stream.sink = NULL
  *         self.sample.data.stream.sample = NULL             # <<<<<<<<<<<<<<
@@ -30033,7 +30041,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
  */
   __pyx_v_self->__pyx_base.sample.data.stream->sample = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2722
+  /* "mpfmc/core/audio/audio_interface.pyx":2724
  *         self.sample.data.stream.sink = NULL
  *         self.sample.data.stream.sample = NULL
  *         self.sample.data.stream.buffer = NULL             # <<<<<<<<<<<<<<
@@ -30042,7 +30050,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
  */
   __pyx_v_self->__pyx_base.sample.data.stream->buffer = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2723
+  /* "mpfmc/core/audio/audio_interface.pyx":2725
  *         self.sample.data.stream.sample = NULL
  *         self.sample.data.stream.buffer = NULL
  *         self.sample.data.stream.map_contains_valid_sample_data = 0             # <<<<<<<<<<<<<<
@@ -30051,7 +30059,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
  */
   __pyx_v_self->__pyx_base.sample.data.stream->map_contains_valid_sample_data = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2724
+  /* "mpfmc/core/audio/audio_interface.pyx":2726
  *         self.sample.data.stream.buffer = NULL
  *         self.sample.data.stream.map_contains_valid_sample_data = 0
  *         self.sample.data.stream.map_buffer_pos = 0             # <<<<<<<<<<<<<<
@@ -30060,7 +30068,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
  */
   __pyx_v_self->__pyx_base.sample.data.stream->map_buffer_pos = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2725
+  /* "mpfmc/core/audio/audio_interface.pyx":2727
  *         self.sample.data.stream.map_contains_valid_sample_data = 0
  *         self.sample.data.stream.map_buffer_pos = 0
  *         self.sample.data.stream.null_buffer_count = 0             # <<<<<<<<<<<<<<
@@ -30069,14 +30077,14 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
  */
   __pyx_v_self->__pyx_base.sample.data.stream->null_buffer_count = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2727
+  /* "mpfmc/core/audio/audio_interface.pyx":2729
  *         self.sample.data.stream.null_buffer_count = 0
  * 
  *         self.load()             # <<<<<<<<<<<<<<
  * 
  *     def __dealloc__(self):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2727, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_load); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2729, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_5 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -30089,16 +30097,16 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
     }
   }
   if (__pyx_t_5) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2727, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2729, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2727, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2729, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2712
+  /* "mpfmc/core/audio/audio_interface.pyx":2714
  *         self.bus_message_handler_id = 0
  * 
  *     def __init__(self, str file_name, object audio_callback_data):             # <<<<<<<<<<<<<<
@@ -30121,7 +30129,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_2
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2729
+/* "mpfmc/core/audio/audio_interface.pyx":2731
  *         self.load()
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -30145,7 +30153,7 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2730
+  /* "mpfmc/core/audio/audio_interface.pyx":2732
  * 
  *     def __dealloc__(self):
  *         if self.sample.data.stream != NULL:             # <<<<<<<<<<<<<<
@@ -30155,7 +30163,7 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_
   __pyx_t_1 = ((__pyx_v_self->__pyx_base.sample.data.stream != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2731
+    /* "mpfmc/core/audio/audio_interface.pyx":2733
  *     def __dealloc__(self):
  *         if self.sample.data.stream != NULL:
  *             PyMem_Free(self.sample.data.stream)             # <<<<<<<<<<<<<<
@@ -30164,7 +30172,7 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_
  */
     PyMem_Free(__pyx_v_self->__pyx_base.sample.data.stream);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2730
+    /* "mpfmc/core/audio/audio_interface.pyx":2732
  * 
  *     def __dealloc__(self):
  *         if self.sample.data.stream != NULL:             # <<<<<<<<<<<<<<
@@ -30173,7 +30181,7 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2729
+  /* "mpfmc/core/audio/audio_interface.pyx":2731
  *         self.load()
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -30185,7 +30193,7 @@ static void __pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreamingFile_
   __Pyx_RefNannyFinishContext();
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2733
+/* "mpfmc/core/audio/audio_interface.pyx":2735
  *             PyMem_Free(self.sample.data.stream)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -30218,20 +30226,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("__repr__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2734
+  /* "mpfmc/core/audio/audio_interface.pyx":2736
  * 
  *     def __repr__(self):
  *         if self.loaded:             # <<<<<<<<<<<<<<
  *             return '<SoundStreamingFile({}, Loaded=True, sample_duration={}s)>'.format(self.file_name,self.sample.duration)
  *         return "<SoundStreamingFile({}, Loaded=False)>".format(self.file_name)
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_loaded); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2734, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_loaded); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2736, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 2734, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 2736, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2735
+    /* "mpfmc/core/audio/audio_interface.pyx":2737
  *     def __repr__(self):
  *         if self.loaded:
  *             return '<SoundStreamingFile({}, Loaded=True, sample_duration={}s)>'.format(self.file_name,self.sample.duration)             # <<<<<<<<<<<<<<
@@ -30239,9 +30247,9 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  * 
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SoundStreamingFile_Loaded_True, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2735, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SoundStreamingFile_Loaded_True, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2737, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.sample.duration); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2735, __pyx_L1_error)
+    __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.sample.duration); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2737, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     __pyx_t_6 = 0;
@@ -30255,7 +30263,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
         __pyx_t_6 = 1;
       }
     }
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2735, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 2737, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -30266,7 +30274,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2735, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2737, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -30274,7 +30282,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
     __pyx_t_1 = 0;
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2734
+    /* "mpfmc/core/audio/audio_interface.pyx":2736
  * 
  *     def __repr__(self):
  *         if self.loaded:             # <<<<<<<<<<<<<<
@@ -30283,7 +30291,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2736
+  /* "mpfmc/core/audio/audio_interface.pyx":2738
  *         if self.loaded:
  *             return '<SoundStreamingFile({}, Loaded=True, sample_duration={}s)>'.format(self.file_name,self.sample.duration)
  *         return "<SoundStreamingFile({}, Loaded=False)>".format(self.file_name)             # <<<<<<<<<<<<<<
@@ -30291,7 +30299,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  *     def _gst_init(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SoundStreamingFile_Loaded_False, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2736, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_SoundStreamingFile_Loaded_False, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2738, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_7 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
@@ -30304,16 +30312,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
     }
   }
   if (!__pyx_t_7) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2736, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_self->__pyx_base.file_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2738, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
   } else {
-    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2736, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2738, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_7); __pyx_t_7 = NULL;
     __Pyx_INCREF(__pyx_v_self->__pyx_base.file_name);
     __Pyx_GIVEREF(__pyx_v_self->__pyx_base.file_name);
     PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_self->__pyx_base.file_name);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2736, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2738, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
@@ -30322,7 +30330,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2733
+  /* "mpfmc/core/audio/audio_interface.pyx":2735
  *             PyMem_Free(self.sample.data.stream)
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -30345,7 +30353,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2738
+/* "mpfmc/core/audio/audio_interface.pyx":2740
  *         return "<SoundStreamingFile({}, Loaded=False)>".format(self.file_name)
  * 
  *     def _gst_init(self):             # <<<<<<<<<<<<<<
@@ -30384,7 +30392,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("_gst_init", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2739
+  /* "mpfmc/core/audio/audio_interface.pyx":2741
  * 
  *     def _gst_init(self):
  *         if gst_is_initialized():             # <<<<<<<<<<<<<<
@@ -30394,7 +30402,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = (gst_is_initialized() != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2740
+    /* "mpfmc/core/audio/audio_interface.pyx":2742
  *     def _gst_init(self):
  *         if gst_is_initialized():
  *             return True             # <<<<<<<<<<<<<<
@@ -30406,7 +30414,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
     __pyx_r = Py_True;
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2739
+    /* "mpfmc/core/audio/audio_interface.pyx":2741
  * 
  *     def _gst_init(self):
  *         if gst_is_initialized():             # <<<<<<<<<<<<<<
@@ -30415,7 +30423,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2741
+  /* "mpfmc/core/audio/audio_interface.pyx":2743
  *         if gst_is_initialized():
  *             return True
  *         cdef int argc = 0             # <<<<<<<<<<<<<<
@@ -30424,7 +30432,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_argc = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2742
+  /* "mpfmc/core/audio/audio_interface.pyx":2744
  *             return True
  *         cdef int argc = 0
  *         cdef char **argv = NULL             # <<<<<<<<<<<<<<
@@ -30433,7 +30441,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_argv = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2744
+  /* "mpfmc/core/audio/audio_interface.pyx":2746
  *         cdef char **argv = NULL
  *         cdef GError *error
  *         if not gst_init_check(&argc, &argv, &error):             # <<<<<<<<<<<<<<
@@ -30443,26 +30451,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = ((!(gst_init_check((&__pyx_v_argc), (&__pyx_v_argv), (&__pyx_v_error)) != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2745
+    /* "mpfmc/core/audio/audio_interface.pyx":2747
  *         cdef GError *error
  *         if not gst_init_check(&argc, &argv, &error):
  *             msg = 'Unable to initialize gstreamer: code={} message={}'.format(             # <<<<<<<<<<<<<<
  *                     error.code, <bytes>error.message)
  *             raise AudioException(msg)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Unable_to_initialize_gstreamer_c, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2745, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Unable_to_initialize_gstreamer_c, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2747, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2746
+    /* "mpfmc/core/audio/audio_interface.pyx":2748
  *         if not gst_init_check(&argc, &argv, &error):
  *             msg = 'Unable to initialize gstreamer: code={} message={}'.format(
  *                     error.code, <bytes>error.message)             # <<<<<<<<<<<<<<
  *             raise AudioException(msg)
  * 
  */
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_error->code); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2746, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_error->code); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2748, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyBytes_FromString(__pyx_v_error->message); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2746, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyBytes_FromString(__pyx_v_error->message); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2748, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     __pyx_t_7 = 0;
@@ -30476,7 +30484,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
         __pyx_t_7 = 1;
       }
     }
-    __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2745, __pyx_L1_error)
+    __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 2747, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     if (__pyx_t_6) {
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -30488,21 +30496,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
     PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_t_5);
     __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2745, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2747, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_msg = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2747
+    /* "mpfmc/core/audio/audio_interface.pyx":2749
  *             msg = 'Unable to initialize gstreamer: code={} message={}'.format(
  *                     error.code, <bytes>error.message)
  *             raise AudioException(msg)             # <<<<<<<<<<<<<<
  * 
  *     def _destroy_pipeline(self):
  */
-    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2747, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2749, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_8 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -30515,25 +30523,25 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
       }
     }
     if (!__pyx_t_8) {
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_msg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2747, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_msg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2749, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     } else {
-      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2747, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2749, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_8); __pyx_t_8 = NULL;
       __Pyx_INCREF(__pyx_v_msg);
       __Pyx_GIVEREF(__pyx_v_msg);
       PyTuple_SET_ITEM(__pyx_t_5, 0+1, __pyx_v_msg);
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2747, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2749, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 2747, __pyx_L1_error)
+    __PYX_ERR(0, 2749, __pyx_L1_error)
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2744
+    /* "mpfmc/core/audio/audio_interface.pyx":2746
  *         cdef char **argv = NULL
  *         cdef GError *error
  *         if not gst_init_check(&argc, &argv, &error):             # <<<<<<<<<<<<<<
@@ -30542,7 +30550,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2738
+  /* "mpfmc/core/audio/audio_interface.pyx":2740
  *         return "<SoundStreamingFile({}, Loaded=False)>".format(self.file_name)
  * 
  *     def _gst_init(self):             # <<<<<<<<<<<<<<
@@ -30569,7 +30577,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2749
+/* "mpfmc/core/audio/audio_interface.pyx":2751
  *             raise AudioException(msg)
  * 
  *     def _destroy_pipeline(self):             # <<<<<<<<<<<<<<
@@ -30600,7 +30608,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("_destroy_pipeline", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2754
+  /* "mpfmc/core/audio/audio_interface.pyx":2756
  *         cdef GstState current_state, pending_state
  * 
  *         if self.bus != NULL and self.bus_message_handler_id != 0:             # <<<<<<<<<<<<<<
@@ -30618,7 +30626,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2755
+    /* "mpfmc/core/audio/audio_interface.pyx":2757
  * 
  *         if self.bus != NULL and self.bus_message_handler_id != 0:
  *             c_signal_disconnect(<GstElement*>self.bus, self.bus_message_handler_id)             # <<<<<<<<<<<<<<
@@ -30627,7 +30635,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     c_signal_disconnect(((GstElement *)__pyx_v_self->bus), __pyx_v_self->bus_message_handler_id);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2756
+    /* "mpfmc/core/audio/audio_interface.pyx":2758
  *         if self.bus != NULL and self.bus_message_handler_id != 0:
  *             c_signal_disconnect(<GstElement*>self.bus, self.bus_message_handler_id)
  *             self.bus_message_handler_id = 0             # <<<<<<<<<<<<<<
@@ -30636,7 +30644,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     __pyx_v_self->bus_message_handler_id = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2754
+    /* "mpfmc/core/audio/audio_interface.pyx":2756
  *         cdef GstState current_state, pending_state
  * 
  *         if self.bus != NULL and self.bus_message_handler_id != 0:             # <<<<<<<<<<<<<<
@@ -30645,7 +30653,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2758
+  /* "mpfmc/core/audio/audio_interface.pyx":2760
  *             self.bus_message_handler_id = 0
  * 
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -30655,7 +30663,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = ((__pyx_v_self->pipeline != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2762
+    /* "mpfmc/core/audio/audio_interface.pyx":2764
  *             # state is set to NULL, we need to query it. We also put a 5s
  *             # timeout for safety, but normally, nobody should hit it.
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -30669,7 +30677,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
         #endif
         /*try:*/ {
 
-          /* "mpfmc/core/audio/audio_interface.pyx":2763
+          /* "mpfmc/core/audio/audio_interface.pyx":2765
  *             # timeout for safety, but normally, nobody should hit it.
  *             with nogil:
  *                 gst_element_set_state(self.pipeline, GST_STATE_NULL)             # <<<<<<<<<<<<<<
@@ -30678,7 +30686,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
           gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_NULL);
 
-          /* "mpfmc/core/audio/audio_interface.pyx":2764
+          /* "mpfmc/core/audio/audio_interface.pyx":2766
  *             with nogil:
  *                 gst_element_set_state(self.pipeline, GST_STATE_NULL)
  *                 gst_element_get_state(self.pipeline, &current_state,             # <<<<<<<<<<<<<<
@@ -30688,7 +30696,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
           gst_element_get_state(__pyx_v_self->pipeline, (&__pyx_v_current_state), (&__pyx_v_pending_state), ((GstClockTime)5e9));
         }
 
-        /* "mpfmc/core/audio/audio_interface.pyx":2762
+        /* "mpfmc/core/audio/audio_interface.pyx":2764
  *             # state is set to NULL, we need to query it. We also put a 5s
  *             # timeout for safety, but normally, nobody should hit it.
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -30706,7 +30714,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
         }
     }
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2766
+    /* "mpfmc/core/audio/audio_interface.pyx":2768
  *                 gst_element_get_state(self.pipeline, &current_state,
  *                         &pending_state, <GstClockTime>5e9)
  *             gst_object_unref(self.pipeline)             # <<<<<<<<<<<<<<
@@ -30715,7 +30723,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     gst_object_unref(__pyx_v_self->pipeline);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2758
+    /* "mpfmc/core/audio/audio_interface.pyx":2760
  *             self.bus_message_handler_id = 0
  * 
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -30724,7 +30732,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2768
+  /* "mpfmc/core/audio/audio_interface.pyx":2770
  *             gst_object_unref(self.pipeline)
  * 
  *         if self.bus != NULL:             # <<<<<<<<<<<<<<
@@ -30734,7 +30742,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = ((__pyx_v_self->bus != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2769
+    /* "mpfmc/core/audio/audio_interface.pyx":2771
  * 
  *         if self.bus != NULL:
  *             gst_object_unref(self.bus)             # <<<<<<<<<<<<<<
@@ -30743,7 +30751,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     gst_object_unref(__pyx_v_self->bus);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2768
+    /* "mpfmc/core/audio/audio_interface.pyx":2770
  *             gst_object_unref(self.pipeline)
  * 
  *         if self.bus != NULL:             # <<<<<<<<<<<<<<
@@ -30752,7 +30760,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2771
+  /* "mpfmc/core/audio/audio_interface.pyx":2773
  *             gst_object_unref(self.bus)
  * 
  *         self.bus = NULL             # <<<<<<<<<<<<<<
@@ -30761,7 +30769,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_self->bus = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2772
+  /* "mpfmc/core/audio/audio_interface.pyx":2774
  * 
  *         self.bus = NULL
  *         self.pipeline = NULL             # <<<<<<<<<<<<<<
@@ -30770,7 +30778,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_self->pipeline = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2749
+  /* "mpfmc/core/audio/audio_interface.pyx":2751
  *             raise AudioException(msg)
  * 
  *     def _destroy_pipeline(self):             # <<<<<<<<<<<<<<
@@ -30785,7 +30793,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2774
+/* "mpfmc/core/audio/audio_interface.pyx":2776
  *         self.pipeline = NULL
  * 
  *     def _construct_pipeline(self):             # <<<<<<<<<<<<<<
@@ -30831,7 +30839,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   GstElement *__pyx_t_11;
   __Pyx_RefNannySetupContext("_construct_pipeline", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2778
+  /* "mpfmc/core/audio/audio_interface.pyx":2780
  *         cdef GError *error
  *         cdef GstSample *sample
  *         cdef gint64 duration = 0             # <<<<<<<<<<<<<<
@@ -30840,7 +30848,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_duration = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2783
+  /* "mpfmc/core/audio/audio_interface.pyx":2785
  * 
  *         # If the pipeline has already been created, delete it
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -30850,14 +30858,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = ((__pyx_v_self->pipeline != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2784
+    /* "mpfmc/core/audio/audio_interface.pyx":2786
  *         # If the pipeline has already been created, delete it
  *         if self.pipeline != NULL:
  *             self._destroy_pipeline()             # <<<<<<<<<<<<<<
  * 
  *         # Pipeline structure: uridecodebin --> audioconvert --> audioresample --> appsink
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_destroy_pipeline); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2784, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_destroy_pipeline); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2786, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_3))) {
@@ -30870,16 +30878,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
       }
     }
     if (__pyx_t_4) {
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2784, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2786, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else {
-      __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2784, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_CallNoArg(__pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2786, __pyx_L1_error)
     }
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2783
+    /* "mpfmc/core/audio/audio_interface.pyx":2785
  * 
  *         # If the pipeline has already been created, delete it
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -30888,7 +30896,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2789
+  /* "mpfmc/core/audio/audio_interface.pyx":2791
  * 
  *         # Create GStreamer pipeline with the specified caps (from a string)
  *         file_path = 'file:///' + self.file_name.replace('\\', '/')             # <<<<<<<<<<<<<<
@@ -30897,17 +30905,17 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   if (unlikely(__pyx_v_self->__pyx_base.file_name == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%s'", "replace");
-    __PYX_ERR(0, 2789, __pyx_L1_error)
+    __PYX_ERR(0, 2791, __pyx_L1_error)
   }
-  __pyx_t_2 = PyUnicode_Replace(__pyx_v_self->__pyx_base.file_name, __pyx_kp_u__34, __pyx_kp_u__35, -1L); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2789, __pyx_L1_error)
+  __pyx_t_2 = PyUnicode_Replace(__pyx_v_self->__pyx_base.file_name, __pyx_kp_u__34, __pyx_kp_u__35, -1L); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2791, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_file, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2789, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyUnicode_Concat(__pyx_kp_u_file, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2791, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_file_path = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2790
+  /* "mpfmc/core/audio/audio_interface.pyx":2792
  *         # Create GStreamer pipeline with the specified caps (from a string)
  *         file_path = 'file:///' + self.file_name.replace('\\', '/')
  *         if SDL_AUDIO_ISLITTLEENDIAN(self.callback_data.format):             # <<<<<<<<<<<<<<
@@ -30917,7 +30925,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = (SDL_AUDIO_ISLITTLEENDIAN(__pyx_v_self->__pyx_base.callback_data->format) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2791
+    /* "mpfmc/core/audio/audio_interface.pyx":2793
  *         file_path = 'file:///' + self.file_name.replace('\\', '/')
  *         if SDL_AUDIO_ISLITTLEENDIAN(self.callback_data.format):
  *             audio_format = "S16LE"             # <<<<<<<<<<<<<<
@@ -30927,7 +30935,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
     __Pyx_INCREF(__pyx_n_u_S16LE);
     __pyx_v_audio_format = __pyx_n_u_S16LE;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2790
+    /* "mpfmc/core/audio/audio_interface.pyx":2792
  *         # Create GStreamer pipeline with the specified caps (from a string)
  *         file_path = 'file:///' + self.file_name.replace('\\', '/')
  *         if SDL_AUDIO_ISLITTLEENDIAN(self.callback_data.format):             # <<<<<<<<<<<<<<
@@ -30937,7 +30945,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
     goto __pyx_L4;
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2793
+  /* "mpfmc/core/audio/audio_interface.pyx":2795
  *             audio_format = "S16LE"
  *         else:
  *             audio_format = "S16BE"             # <<<<<<<<<<<<<<
@@ -30950,44 +30958,44 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   }
   __pyx_L4:;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2794
+  /* "mpfmc/core/audio/audio_interface.pyx":2796
  *         else:
  *             audio_format = "S16BE"
  *         pipeline_string = 'uridecodebin uri="{}" ! audioconvert ! audioresample ! appsink name=sink caps="audio/x-raw,rate={},channels={},format={},layout=interleaved" sync=true blocksize={}'.format(             # <<<<<<<<<<<<<<
  *             file_path, str(self.callback_data.sample_rate), str(self.callback_data.channels), audio_format, self.callback_data.buffer_size)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_uridecodebin_uri_audioconvert_au, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2794, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_uridecodebin_uri_audioconvert_au, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2796, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2795
+  /* "mpfmc/core/audio/audio_interface.pyx":2797
  *             audio_format = "S16BE"
  *         pipeline_string = 'uridecodebin uri="{}" ! audioconvert ! audioresample ! appsink name=sink caps="audio/x-raw,rate={},channels={},format={},layout=interleaved" sync=true blocksize={}'.format(
  *             file_path, str(self.callback_data.sample_rate), str(self.callback_data.channels), audio_format, self.callback_data.buffer_size)             # <<<<<<<<<<<<<<
  * 
  *         error = NULL
  */
-  __pyx_t_4 = __Pyx_PyInt_From_Uint16(__pyx_v_self->__pyx_base.callback_data->sample_rate); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2795, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_Uint16(__pyx_v_self->__pyx_base.callback_data->sample_rate); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2797, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2795, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2797, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_4);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4);
   __pyx_t_4 = 0;
-  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyUnicode_Type)), __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2795, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_Call(((PyObject *)(&PyUnicode_Type)), __pyx_t_5, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2797, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyInt_From_Uint8(__pyx_v_self->__pyx_base.callback_data->channels); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2795, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_Uint8(__pyx_v_self->__pyx_base.callback_data->channels); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2797, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2795, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2797, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_GIVEREF(__pyx_t_5);
   PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5);
   __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&PyUnicode_Type)), __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2795, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_Call(((PyObject *)(&PyUnicode_Type)), __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 2797, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = __Pyx_PyInt_From_Uint32(__pyx_v_self->__pyx_base.callback_data->buffer_size); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2795, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_Uint32(__pyx_v_self->__pyx_base.callback_data->buffer_size); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2797, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = NULL;
   __pyx_t_8 = 0;
@@ -31001,7 +31009,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
       __pyx_t_8 = 1;
     }
   }
-  __pyx_t_9 = PyTuple_New(5+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2794, __pyx_L1_error)
+  __pyx_t_9 = PyTuple_New(5+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2796, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_9);
   if (__pyx_t_7) {
     __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -31021,14 +31029,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
   __pyx_t_6 = 0;
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2794, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2796, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_pipeline_string = __pyx_t_3;
   __pyx_t_3 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2797
+  /* "mpfmc/core/audio/audio_interface.pyx":2799
  *             file_path, str(self.callback_data.sample_rate), str(self.callback_data.channels), audio_format, self.callback_data.buffer_size)
  * 
  *         error = NULL             # <<<<<<<<<<<<<<
@@ -31037,23 +31045,23 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_error = NULL;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2798
+  /* "mpfmc/core/audio/audio_interface.pyx":2800
  * 
  *         error = NULL
  *         self.pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)             # <<<<<<<<<<<<<<
  * 
  *         if error != NULL:
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_pipeline_string, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2798, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_pipeline_string, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2800, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__36, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2798, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__36, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2800, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_10 = __Pyx_PyObject_AsString(__pyx_t_2); if (unlikely((!__pyx_t_10) && PyErr_Occurred())) __PYX_ERR(0, 2798, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyObject_AsString(__pyx_t_2); if (unlikely((!__pyx_t_10) && PyErr_Occurred())) __PYX_ERR(0, 2800, __pyx_L1_error)
   __pyx_v_self->pipeline = gst_parse_launch(__pyx_t_10, (&__pyx_v_error));
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2800
+  /* "mpfmc/core/audio/audio_interface.pyx":2802
  *         self.pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)
  * 
  *         if error != NULL:             # <<<<<<<<<<<<<<
@@ -31063,18 +31071,18 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = ((__pyx_v_error != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2801
+    /* "mpfmc/core/audio/audio_interface.pyx":2803
  * 
  *         if error != NULL:
  *             msg = 'Unable to create a GStreamer pipeline: code={} message={}'.format(error.code, <bytes>error.message)             # <<<<<<<<<<<<<<
  *             raise AudioException(msg)
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Unable_to_create_a_GStreamer_pip, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2801, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Unable_to_create_a_GStreamer_pip, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2803, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_error->code); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2801, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_From_int(__pyx_v_error->code); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 2803, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
-    __pyx_t_6 = __Pyx_PyBytes_FromString(__pyx_v_error->message); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2801, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyBytes_FromString(__pyx_v_error->message); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2803, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __pyx_t_5 = NULL;
     __pyx_t_8 = 0;
@@ -31088,7 +31096,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
         __pyx_t_8 = 1;
       }
     }
-    __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2801, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2+__pyx_t_8); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 2803, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -31100,21 +31108,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
     PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_8, __pyx_t_6);
     __pyx_t_9 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2801, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2803, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_msg = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2802
+    /* "mpfmc/core/audio/audio_interface.pyx":2804
  *         if error != NULL:
  *             msg = 'Unable to create a GStreamer pipeline: code={} message={}'.format(error.code, <bytes>error.message)
  *             raise AudioException(msg)             # <<<<<<<<<<<<<<
  * 
  *         # Get the pipeline bus (the bus allows applications to receive pipeline messages)
  */
-    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2802, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2804, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -31127,25 +31135,25 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
       }
     }
     if (!__pyx_t_4) {
-      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_msg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2802, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_msg); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2804, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
     } else {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2802, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2804, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
       __Pyx_INCREF(__pyx_v_msg);
       __Pyx_GIVEREF(__pyx_v_msg);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_v_msg);
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2802, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2804, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 2802, __pyx_L1_error)
+    __PYX_ERR(0, 2804, __pyx_L1_error)
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2800
+    /* "mpfmc/core/audio/audio_interface.pyx":2802
  *         self.pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)
  * 
  *         if error != NULL:             # <<<<<<<<<<<<<<
@@ -31154,7 +31162,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2805
+  /* "mpfmc/core/audio/audio_interface.pyx":2807
  * 
  *         # Get the pipeline bus (the bus allows applications to receive pipeline messages)
  *         self.bus = gst_pipeline_get_bus(<GstPipeline*>self.pipeline)             # <<<<<<<<<<<<<<
@@ -31163,7 +31171,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_self->bus = gst_pipeline_get_bus(((GstPipeline *)__pyx_v_self->pipeline));
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2806
+  /* "mpfmc/core/audio/audio_interface.pyx":2808
  *         # Get the pipeline bus (the bus allows applications to receive pipeline messages)
  *         self.bus = gst_pipeline_get_bus(<GstPipeline*>self.pipeline)
  *         if self.bus == NULL:             # <<<<<<<<<<<<<<
@@ -31173,23 +31181,23 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = ((__pyx_v_self->bus == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2807
+    /* "mpfmc/core/audio/audio_interface.pyx":2809
  *         self.bus = gst_pipeline_get_bus(<GstPipeline*>self.pipeline)
  *         if self.bus == NULL:
  *             raise AudioException('Unable to get bus from the pipeline')             # <<<<<<<<<<<<<<
  * 
  *         # Enable pipeline messages and callback message handler
  */
-    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2807, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_GetModuleGlobalName(__pyx_n_s_AudioException); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2809, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__37, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2807, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__37, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2809, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 2807, __pyx_L1_error)
+    __PYX_ERR(0, 2809, __pyx_L1_error)
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2806
+    /* "mpfmc/core/audio/audio_interface.pyx":2808
  *         # Get the pipeline bus (the bus allows applications to receive pipeline messages)
  *         self.bus = gst_pipeline_get_bus(<GstPipeline*>self.pipeline)
  *         if self.bus == NULL:             # <<<<<<<<<<<<<<
@@ -31198,7 +31206,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2814
+  /* "mpfmc/core/audio/audio_interface.pyx":2816
  * 
  *         # Get sink
  *         self.sink = gst_bin_get_by_name(<GstBin*>self.pipeline, "sink")             # <<<<<<<<<<<<<<
@@ -31207,7 +31215,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_self->sink = gst_bin_get_by_name(((GstBin *)__pyx_v_self->pipeline), ((const gchar *)"sink"));
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2817
+  /* "mpfmc/core/audio/audio_interface.pyx":2819
  * 
  *         # Set to PAUSED to make the first frame arrive in the sink
  *         ret = gst_element_set_state(self.pipeline, GST_STATE_PAUSED)             # <<<<<<<<<<<<<<
@@ -31216,7 +31224,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_ret = gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_PAUSED);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2821
+  /* "mpfmc/core/audio/audio_interface.pyx":2823
  *         # Get the preroll sample (forces the code to wait until the sample has been completely loaded
  *         # which is necessary to retrieve the duration).
  *         sample = c_appsink_pull_preroll(self.sink)             # <<<<<<<<<<<<<<
@@ -31225,7 +31233,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   __pyx_v_sample = c_appsink_pull_preroll(__pyx_v_self->sink);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2822
+  /* "mpfmc/core/audio/audio_interface.pyx":2824
  *         # which is necessary to retrieve the duration).
  *         sample = c_appsink_pull_preroll(self.sink)
  *         if sample != NULL:             # <<<<<<<<<<<<<<
@@ -31235,7 +31243,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = ((__pyx_v_sample != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2823
+    /* "mpfmc/core/audio/audio_interface.pyx":2825
  *         sample = c_appsink_pull_preroll(self.sink)
  *         if sample != NULL:
  *             gst_sample_unref(sample)             # <<<<<<<<<<<<<<
@@ -31244,7 +31252,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     gst_sample_unref(__pyx_v_sample);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2822
+    /* "mpfmc/core/audio/audio_interface.pyx":2824
  *         # which is necessary to retrieve the duration).
  *         sample = c_appsink_pull_preroll(self.sink)
  *         if sample != NULL:             # <<<<<<<<<<<<<<
@@ -31253,7 +31261,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2826
+  /* "mpfmc/core/audio/audio_interface.pyx":2828
  * 
  *         # Get duration of audio file (in nanoseconds)
  *         if not gst_element_query_duration(self.sink, GST_FORMAT_TIME, &duration):             # <<<<<<<<<<<<<<
@@ -31263,7 +31271,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = ((!(gst_element_query_duration(__pyx_v_self->sink, GST_FORMAT_TIME, (&__pyx_v_duration)) != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2827
+    /* "mpfmc/core/audio/audio_interface.pyx":2829
  *         # Get duration of audio file (in nanoseconds)
  *         if not gst_element_query_duration(self.sink, GST_FORMAT_TIME, &duration):
  *             duration = 0             # <<<<<<<<<<<<<<
@@ -31272,7 +31280,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     __pyx_v_duration = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2826
+    /* "mpfmc/core/audio/audio_interface.pyx":2828
  * 
  *         # Get duration of audio file (in nanoseconds)
  *         if not gst_element_query_duration(self.sink, GST_FORMAT_TIME, &duration):             # <<<<<<<<<<<<<<
@@ -31281,7 +31289,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2830
+  /* "mpfmc/core/audio/audio_interface.pyx":2832
  * 
  *         # Store duration in seconds
  *         self.sample.duration = duration / GST_SECOND             # <<<<<<<<<<<<<<
@@ -31290,11 +31298,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   if (unlikely(GST_SECOND == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 2830, __pyx_L1_error)
+    __PYX_ERR(0, 2832, __pyx_L1_error)
   }
   __pyx_v_self->__pyx_base.sample.duration = (((double)__pyx_v_duration) / ((double)GST_SECOND));
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2834
+  /* "mpfmc/core/audio/audio_interface.pyx":2836
  *         # The pipeline should now be ready to play.  Store the pointers to the pipeline
  *         # and appsink in the SampleStream struct for use in the application.
  *         self.sample.data.stream.pipeline = self.pipeline             # <<<<<<<<<<<<<<
@@ -31304,7 +31312,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_11 = __pyx_v_self->pipeline;
   __pyx_v_self->__pyx_base.sample.data.stream->pipeline = __pyx_t_11;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2835
+  /* "mpfmc/core/audio/audio_interface.pyx":2837
  *         # and appsink in the SampleStream struct for use in the application.
  *         self.sample.data.stream.pipeline = self.pipeline
  *         self.sample.data.stream.sink = self.sink             # <<<<<<<<<<<<<<
@@ -31314,7 +31322,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_11 = __pyx_v_self->sink;
   __pyx_v_self->__pyx_base.sample.data.stream->sink = __pyx_t_11;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2774
+  /* "mpfmc/core/audio/audio_interface.pyx":2776
  *         self.pipeline = NULL
  * 
  *     def _construct_pipeline(self):             # <<<<<<<<<<<<<<
@@ -31345,7 +31353,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2837
+/* "mpfmc/core/audio/audio_interface.pyx":2839
  *         self.sample.data.stream.sink = self.sink
  * 
  *     def load(self):             # <<<<<<<<<<<<<<
@@ -31378,14 +31386,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   PyObject *__pyx_t_6 = NULL;
   __Pyx_RefNannySetupContext("load", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2843
+  /* "mpfmc/core/audio/audio_interface.pyx":2845
  *         #    return
  * 
  *         self._gst_init()             # <<<<<<<<<<<<<<
  *         self._construct_pipeline()
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_gst_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2843, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_gst_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2845, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
@@ -31398,62 +31406,62 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
     }
   }
   if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2843, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2845, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2843, __pyx_L1_error)
-  }
-  __Pyx_GOTREF(__pyx_t_1);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-
-  /* "mpfmc/core/audio/audio_interface.pyx":2844
- * 
- *         self._gst_init()
- *         self._construct_pipeline()             # <<<<<<<<<<<<<<
- * 
- *         self.log.debug('Loaded file: %s Sample duration: %s',
- */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_construct_pipeline); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2844, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = NULL;
-  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_3)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_3);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_2, function);
-    }
-  }
-  if (__pyx_t_3) {
-    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2844, __pyx_L1_error)
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  } else {
-    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2844, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2845, __pyx_L1_error)
   }
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/audio_interface.pyx":2846
+ * 
+ *         self._gst_init()
+ *         self._construct_pipeline()             # <<<<<<<<<<<<<<
+ * 
+ *         self.log.debug('Loaded file: %s Sample duration: %s',
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_construct_pipeline); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2846, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  if (__pyx_t_3) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2846, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  } else {
+    __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2846, __pyx_L1_error)
+  }
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+  /* "mpfmc/core/audio/audio_interface.pyx":2848
  *         self._construct_pipeline()
  * 
  *         self.log.debug('Loaded file: %s Sample duration: %s',             # <<<<<<<<<<<<<<
  *                        self.file_name, self.sample.duration)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2846, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2848, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2847
+  /* "mpfmc/core/audio/audio_interface.pyx":2849
  * 
  *         self.log.debug('Loaded file: %s Sample duration: %s',
  *                        self.file_name, self.sample.duration)             # <<<<<<<<<<<<<<
  * 
  *     def unload(self):
  */
-  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.sample.duration); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2847, __pyx_L1_error)
+  __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.sample.duration); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2849, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_4 = NULL;
   __pyx_t_5 = 0;
@@ -31467,7 +31475,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
       __pyx_t_5 = 1;
     }
   }
-  __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2846, __pyx_L1_error)
+  __pyx_t_6 = PyTuple_New(3+__pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 2848, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   if (__pyx_t_4) {
     __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -31481,13 +31489,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __Pyx_GIVEREF(__pyx_t_3);
   PyTuple_SET_ITEM(__pyx_t_6, 2+__pyx_t_5, __pyx_t_3);
   __pyx_t_3 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2846, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2848, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2837
+  /* "mpfmc/core/audio/audio_interface.pyx":2839
  *         self.sample.data.stream.sink = self.sink
  * 
  *     def load(self):             # <<<<<<<<<<<<<<
@@ -31512,7 +31520,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2849
+/* "mpfmc/core/audio/audio_interface.pyx":2851
  *                        self.file_name, self.sample.duration)
  * 
  *     def unload(self):             # <<<<<<<<<<<<<<
@@ -31540,7 +31548,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("unload", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2853
+  /* "mpfmc/core/audio/audio_interface.pyx":2855
  * 
  *         # Done with the streaming buffer, release references to it
  *         if self.sample.data.stream.map_contains_valid_sample_data:             # <<<<<<<<<<<<<<
@@ -31550,7 +31558,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = (__pyx_v_self->__pyx_base.sample.data.stream->map_contains_valid_sample_data != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2854
+    /* "mpfmc/core/audio/audio_interface.pyx":2856
  *         # Done with the streaming buffer, release references to it
  *         if self.sample.data.stream.map_contains_valid_sample_data:
  *             gst_buffer_unmap(self.sample.data.stream.buffer, &self.sample.data.stream.map_info)             # <<<<<<<<<<<<<<
@@ -31559,7 +31567,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     gst_buffer_unmap(__pyx_v_self->__pyx_base.sample.data.stream->buffer, (&__pyx_v_self->__pyx_base.sample.data.stream->map_info));
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2855
+    /* "mpfmc/core/audio/audio_interface.pyx":2857
  *         if self.sample.data.stream.map_contains_valid_sample_data:
  *             gst_buffer_unmap(self.sample.data.stream.buffer, &self.sample.data.stream.map_info)
  *             gst_sample_unref(self.sample.data.stream.sample)             # <<<<<<<<<<<<<<
@@ -31568,7 +31576,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     gst_sample_unref(__pyx_v_self->__pyx_base.sample.data.stream->sample);
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2857
+    /* "mpfmc/core/audio/audio_interface.pyx":2859
  *             gst_sample_unref(self.sample.data.stream.sample)
  * 
  *             self.sample.data.stream.buffer = NULL             # <<<<<<<<<<<<<<
@@ -31577,7 +31585,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     __pyx_v_self->__pyx_base.sample.data.stream->buffer = NULL;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2858
+    /* "mpfmc/core/audio/audio_interface.pyx":2860
  * 
  *             self.sample.data.stream.buffer = NULL
  *             self.sample.data.stream.sample = NULL             # <<<<<<<<<<<<<<
@@ -31586,7 +31594,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     __pyx_v_self->__pyx_base.sample.data.stream->sample = NULL;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2859
+    /* "mpfmc/core/audio/audio_interface.pyx":2861
  *             self.sample.data.stream.buffer = NULL
  *             self.sample.data.stream.sample = NULL
  *             self.sample.data.stream.map_buffer_pos = 0             # <<<<<<<<<<<<<<
@@ -31595,7 +31603,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     __pyx_v_self->__pyx_base.sample.data.stream->map_buffer_pos = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2860
+    /* "mpfmc/core/audio/audio_interface.pyx":2862
  *             self.sample.data.stream.sample = NULL
  *             self.sample.data.stream.map_buffer_pos = 0
  *             self.sample.data.stream.map_contains_valid_sample_data = 0             # <<<<<<<<<<<<<<
@@ -31604,7 +31612,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
     __pyx_v_self->__pyx_base.sample.data.stream->map_contains_valid_sample_data = 0;
 
-    /* "mpfmc/core/audio/audio_interface.pyx":2853
+    /* "mpfmc/core/audio/audio_interface.pyx":2855
  * 
  *         # Done with the streaming buffer, release references to it
  *         if self.sample.data.stream.map_contains_valid_sample_data:             # <<<<<<<<<<<<<<
@@ -31613,7 +31621,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2863
+  /* "mpfmc/core/audio/audio_interface.pyx":2865
  * 
  *         # Cleanup the streaming pipeline
  *         gst_element_set_state(self.pipeline, GST_STATE_NULL)             # <<<<<<<<<<<<<<
@@ -31622,7 +31630,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_NULL);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2864
+  /* "mpfmc/core/audio/audio_interface.pyx":2866
  *         # Cleanup the streaming pipeline
  *         gst_element_set_state(self.pipeline, GST_STATE_NULL)
  *         gst_object_unref(self.pipeline)             # <<<<<<<<<<<<<<
@@ -31631,7 +31639,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
  */
   gst_object_unref(__pyx_v_self->pipeline);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2849
+  /* "mpfmc/core/audio/audio_interface.pyx":2851
  *                        self.file_name, self.sample.duration)
  * 
  *     def unload(self):             # <<<<<<<<<<<<<<
@@ -31646,7 +31654,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/audio_interface.pyx":2867
+/* "mpfmc/core/audio/audio_interface.pyx":2869
  * 
  *     @property
  *     def loaded(self):             # <<<<<<<<<<<<<<
@@ -31675,7 +31683,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2869
+  /* "mpfmc/core/audio/audio_interface.pyx":2871
  *     def loaded(self):
  *         """Returns whether or not the sound file data is loaded in memory"""
  *         return self.sample.data.stream != NULL and self.sample.data.stream.pipeline != NULL and self.sample.data.stream.sink != NULL             # <<<<<<<<<<<<<<
@@ -31685,7 +31693,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_2 = (__pyx_v_self->__pyx_base.sample.data.stream != NULL);
   if (__pyx_t_2) {
   } else {
-    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2869, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2871, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_1 = __pyx_t_3;
     __pyx_t_3 = 0;
@@ -31694,14 +31702,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_2 = (__pyx_v_self->__pyx_base.sample.data.stream->pipeline != NULL);
   if (__pyx_t_2) {
   } else {
-    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2869, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2871, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_1 = __pyx_t_3;
     __pyx_t_3 = 0;
     goto __pyx_L3_bool_binop_done;
   }
   __pyx_t_2 = (__pyx_v_self->__pyx_base.sample.data.stream->sink != NULL);
-  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2869, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyBool_FromLong(__pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 2871, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_1 = __pyx_t_3;
   __pyx_t_3 = 0;
@@ -31710,7 +31718,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_18SoundStreaming
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2867
+  /* "mpfmc/core/audio/audio_interface.pyx":2869
  * 
  *     @property
  *     def loaded(self):             # <<<<<<<<<<<<<<
@@ -33547,6 +33555,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_disable, __pyx_k_disable, sizeof(__pyx_k_disable), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_n_s_ducking, __pyx_k_ducking, sizeof(__pyx_k_ducking), 0, 0, 1, 1},
+  {&__pyx_n_s_duration, __pyx_k_duration, sizeof(__pyx_k_duration), 0, 0, 1, 1},
   {&__pyx_n_s_enabled, __pyx_k_enabled, sizeof(__pyx_k_enabled), 0, 0, 1, 1},
   {&__pyx_n_s_encode, __pyx_k_encode, sizeof(__pyx_k_encode), 0, 0, 1, 1},
   {&__pyx_n_s_error, __pyx_k_error, sizeof(__pyx_k_error), 0, 0, 1, 1},
@@ -33741,7 +33750,7 @@ static int __Pyx_InitCachedBuiltins(void) {
   __pyx_builtin_NotImplementedError = __Pyx_GetBuiltinName(__pyx_n_s_NotImplementedError); if (!__pyx_builtin_NotImplementedError) __PYX_ERR(0, 1428, __pyx_L1_error)
   __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 1635, __pyx_L1_error)
   __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 1910, __pyx_L1_error)
-  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) __PYX_ERR(0, 2508, __pyx_L1_error)
+  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) __PYX_ERR(0, 2510, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -34048,80 +34057,80 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__28);
   __Pyx_GIVEREF(__pyx_tuple__28);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2545
+  /* "mpfmc/core/audio/audio_interface.pyx":2547
  * 
  *     def __init__(self, str file_name, object audio_callback_data):
  *         self.log = logging.getLogger("SoundFile")             # <<<<<<<<<<<<<<
  *         self.file_name = file_name
  *         self.callback_data = <AudioCallbackData*>pycapsule.PyCapsule_GetPointer(audio_callback_data, NULL)
  */
-  __pyx_tuple__29 = PyTuple_Pack(1, __pyx_n_u_SoundFile); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(0, 2545, __pyx_L1_error)
+  __pyx_tuple__29 = PyTuple_Pack(1, __pyx_n_u_SoundFile); if (unlikely(!__pyx_tuple__29)) __PYX_ERR(0, 2547, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__29);
   __Pyx_GIVEREF(__pyx_tuple__29);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2555
+  /* "mpfmc/core/audio/audio_interface.pyx":2557
  *     def load(self):
  *         """Load the sound file"""
  *         raise NotImplementedError("Must be implemented in derived class")             # <<<<<<<<<<<<<<
  * 
  *     def unload(self):
  */
-  __pyx_tuple__30 = PyTuple_Pack(1, __pyx_kp_u_Must_be_implemented_in_derived_c); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 2555, __pyx_L1_error)
+  __pyx_tuple__30 = PyTuple_Pack(1, __pyx_kp_u_Must_be_implemented_in_derived_c); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(0, 2557, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__30);
   __Pyx_GIVEREF(__pyx_tuple__30);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2559
+  /* "mpfmc/core/audio/audio_interface.pyx":2561
  *     def unload(self):
  *         """Unload the sound file"""
  *         raise NotImplementedError("Must be implemented in derived class")             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
-  __pyx_tuple__31 = PyTuple_Pack(1, __pyx_kp_u_Must_be_implemented_in_derived_c); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 2559, __pyx_L1_error)
+  __pyx_tuple__31 = PyTuple_Pack(1, __pyx_kp_u_Must_be_implemented_in_derived_c); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 2561, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__31);
   __Pyx_GIVEREF(__pyx_tuple__31);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2579
+  /* "mpfmc/core/audio/audio_interface.pyx":2581
  *         super().__init__(file_name, audio_callback_data)
  *         self._use_sdl_mixer_loader = use_sdl_mixer_loader
  *         self.log = logging.getLogger("SoundMemoryFile")             # <<<<<<<<<<<<<<
  *         self.sample.type = sound_type_memory
  *         self.sample.data.memory = <SampleMemory*>PyMem_Malloc(sizeof(SampleMemory))
  */
-  __pyx_tuple__32 = PyTuple_Pack(1, __pyx_n_u_SoundMemoryFile); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 2579, __pyx_L1_error)
+  __pyx_tuple__32 = PyTuple_Pack(1, __pyx_n_u_SoundMemoryFile); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 2581, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__32);
   __Pyx_GIVEREF(__pyx_tuple__32);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2715
+  /* "mpfmc/core/audio/audio_interface.pyx":2717
  *         # IMPORTANT: Call super class init function
  *         super().__init__(file_name, audio_callback_data)
  *         self.log = logging.getLogger("SoundStreamingFile")             # <<<<<<<<<<<<<<
  * 
  *         self.sample.type = sound_type_streaming
  */
-  __pyx_tuple__33 = PyTuple_Pack(1, __pyx_n_u_SoundStreamingFile); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 2715, __pyx_L1_error)
+  __pyx_tuple__33 = PyTuple_Pack(1, __pyx_n_u_SoundStreamingFile); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 2717, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__33);
   __Pyx_GIVEREF(__pyx_tuple__33);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2798
+  /* "mpfmc/core/audio/audio_interface.pyx":2800
  * 
  *         error = NULL
  *         self.pipeline = gst_parse_launch(pipeline_string.encode('utf-8'), &error)             # <<<<<<<<<<<<<<
  * 
  *         if error != NULL:
  */
-  __pyx_tuple__36 = PyTuple_Pack(1, __pyx_kp_u_utf_8); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(0, 2798, __pyx_L1_error)
+  __pyx_tuple__36 = PyTuple_Pack(1, __pyx_kp_u_utf_8); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(0, 2800, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__36);
   __Pyx_GIVEREF(__pyx_tuple__36);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2807
+  /* "mpfmc/core/audio/audio_interface.pyx":2809
  *         self.bus = gst_pipeline_get_bus(<GstPipeline*>self.pipeline)
  *         if self.bus == NULL:
  *             raise AudioException('Unable to get bus from the pipeline')             # <<<<<<<<<<<<<<
  * 
  *         # Enable pipeline messages and callback message handler
  */
-  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_kp_u_Unable_to_get_bus_from_the_pipel); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 2807, __pyx_L1_error)
+  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_kp_u_Unable_to_get_bus_from_the_pipel); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 2809, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__37);
   __Pyx_GIVEREF(__pyx_tuple__37);
 
@@ -34238,29 +34247,29 @@ static int __Pyx_InitCachedConstants(void) {
  */
   __pyx_codeobj__54 = (PyObject*)__Pyx_PyCode_New(0, 0, 0, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mpf, __pyx_n_s_get_max_markers, 465, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__54)) __PYX_ERR(0, 465, __pyx_L1_error)
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2487
+  /* "mpfmc/core/audio/audio_interface.pyx":2489
  * 
  *     @staticmethod
  *     def player_status_to_text(int status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound player status value into an equivalent text string.  Used for testing
  */
-  __pyx_tuple__55 = PyTuple_Pack(2, __pyx_n_s_status, __pyx_n_s_status_values); if (unlikely(!__pyx_tuple__55)) __PYX_ERR(0, 2487, __pyx_L1_error)
+  __pyx_tuple__55 = PyTuple_Pack(2, __pyx_n_s_status, __pyx_n_s_status_values); if (unlikely(!__pyx_tuple__55)) __PYX_ERR(0, 2489, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__55);
   __Pyx_GIVEREF(__pyx_tuple__55);
-  __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mpf, __pyx_n_s_player_status_to_text, 2487, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) __PYX_ERR(0, 2487, __pyx_L1_error)
+  __pyx_codeobj__56 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__55, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mpf, __pyx_n_s_player_status_to_text, 2489, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__56)) __PYX_ERR(0, 2489, __pyx_L1_error)
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2512
+  /* "mpfmc/core/audio/audio_interface.pyx":2514
  * 
  *     @staticmethod
  *     def player_fading_status_to_text(int fading_status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound player fading status value into an equivalent text string.  Used for
  */
-  __pyx_tuple__57 = PyTuple_Pack(2, __pyx_n_s_fading_status, __pyx_n_s_fading_status_values); if (unlikely(!__pyx_tuple__57)) __PYX_ERR(0, 2512, __pyx_L1_error)
+  __pyx_tuple__57 = PyTuple_Pack(2, __pyx_n_s_fading_status, __pyx_n_s_fading_status_values); if (unlikely(!__pyx_tuple__57)) __PYX_ERR(0, 2514, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__57);
   __Pyx_GIVEREF(__pyx_tuple__57);
-  __pyx_codeobj__58 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__57, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mpf, __pyx_n_s_player_fading_status_to_text, 2512, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__58)) __PYX_ERR(0, 2512, __pyx_L1_error)
+  __pyx_codeobj__58 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__57, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_D_Development_Pinball_mpf_mc_mpf, __pyx_n_s_player_fading_status_to_text, 2514, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__58)) __PYX_ERR(0, 2514, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -34434,19 +34443,19 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   if (__Pyx_SetVtable(__pyx_type_5mpfmc_4core_5audio_15audio_interface_TrackStandard.tp_dict, __pyx_vtabptr_5mpfmc_4core_5audio_15audio_interface_TrackStandard) < 0) __PYX_ERR(0, 1605, __pyx_L1_error)
   if (PyObject_SetAttrString(__pyx_m, "TrackStandard", (PyObject *)&__pyx_type_5mpfmc_4core_5audio_15audio_interface_TrackStandard) < 0) __PYX_ERR(0, 1605, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard = &__pyx_type_5mpfmc_4core_5audio_15audio_interface_TrackStandard;
-  if (PyType_Ready(&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundFile) < 0) __PYX_ERR(0, 2537, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundFile) < 0) __PYX_ERR(0, 2539, __pyx_L1_error)
   __pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundFile.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "SoundFile", (PyObject *)&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundFile) < 0) __PYX_ERR(0, 2537, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "SoundFile", (PyObject *)&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundFile) < 0) __PYX_ERR(0, 2539, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_15audio_interface_SoundFile = &__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundFile;
   __pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile.tp_base = __pyx_ptype_5mpfmc_4core_5audio_15audio_interface_SoundFile;
-  if (PyType_Ready(&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile) < 0) __PYX_ERR(0, 2570, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile) < 0) __PYX_ERR(0, 2572, __pyx_L1_error)
   __pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "SoundMemoryFile", (PyObject *)&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile) < 0) __PYX_ERR(0, 2570, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "SoundMemoryFile", (PyObject *)&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile) < 0) __PYX_ERR(0, 2572, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile = &__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundMemoryFile;
   __pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile.tp_base = __pyx_ptype_5mpfmc_4core_5audio_15audio_interface_SoundFile;
-  if (PyType_Ready(&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile) < 0) __PYX_ERR(0, 2696, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile) < 0) __PYX_ERR(0, 2698, __pyx_L1_error)
   __pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "SoundStreamingFile", (PyObject *)&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile) < 0) __PYX_ERR(0, 2696, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "SoundStreamingFile", (PyObject *)&__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile) < 0) __PYX_ERR(0, 2698, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile = &__pyx_type_5mpfmc_4core_5audio_15audio_interface_SoundStreamingFile;
   if (PyType_Ready(&__pyx_type_5mpfmc_4core_5audio_15audio_interface___pyx_scope_struct__string_to_gain) < 0) __PYX_ERR(0, 252, __pyx_L1_error)
   __pyx_type_5mpfmc_4core_5audio_15audio_interface___pyx_scope_struct__string_to_gain.tp_print = 0;
@@ -35131,119 +35140,119 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_AudioInterface);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2487
+  /* "mpfmc/core/audio/audio_interface.pyx":2489
  * 
  *     @staticmethod
  *     def player_status_to_text(int status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound player status value into an equivalent text string.  Used for testing
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_43player_status_to_text, NULL, __pyx_n_s_mpfmc_core_audio_audio_interface); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2487, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_43player_status_to_text, NULL, __pyx_n_s_mpfmc_core_audio_audio_interface); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2489, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2486
+  /* "mpfmc/core/audio/audio_interface.pyx":2488
  *         return sound_instance in self._sound_queue
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def player_status_to_text(int status):
  *         """
  */
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2486, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2486, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard->tp_dict, __pyx_n_s_player_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 2487, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard->tp_dict, __pyx_n_s_player_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 2489, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2487
+  /* "mpfmc/core/audio/audio_interface.pyx":2489
  * 
  *     @staticmethod
  *     def player_status_to_text(int status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound player status value into an equivalent text string.  Used for testing
  */
-  __pyx_t_1 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard, __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2487, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard, __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2489, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2486
+  /* "mpfmc/core/audio/audio_interface.pyx":2488
  *         return sound_instance in self._sound_queue
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def player_status_to_text(int status):
  *         """
  */
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2486, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2486, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2488, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard->tp_dict, __pyx_n_s_player_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 2487, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard->tp_dict, __pyx_n_s_player_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 2489, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2512
+  /* "mpfmc/core/audio/audio_interface.pyx":2514
  * 
  *     @staticmethod
  *     def player_fading_status_to_text(int fading_status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound player fading status value into an equivalent text string.  Used for
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_45player_fading_status_to_text, NULL, __pyx_n_s_mpfmc_core_audio_audio_interface); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2512, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5audio_15audio_interface_13TrackStandard_45player_fading_status_to_text, NULL, __pyx_n_s_mpfmc_core_audio_audio_interface); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2514, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2511
+  /* "mpfmc/core/audio/audio_interface.pyx":2513
  *             return "unknown"
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def player_fading_status_to_text(int fading_status):
  *         """
  */
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2511, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2513, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2511, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2513, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard->tp_dict, __pyx_n_s_player_fading_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 2512, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard->tp_dict, __pyx_n_s_player_fading_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 2514, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2512
+  /* "mpfmc/core/audio/audio_interface.pyx":2514
  * 
  *     @staticmethod
  *     def player_fading_status_to_text(int fading_status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound player fading status value into an equivalent text string.  Used for
  */
-  __pyx_t_1 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard, __pyx_n_s_player_fading_status_to_text); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2512, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard, __pyx_n_s_player_fading_status_to_text); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2514, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
 
-  /* "mpfmc/core/audio/audio_interface.pyx":2511
+  /* "mpfmc/core/audio/audio_interface.pyx":2513
  *             return "unknown"
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def player_fading_status_to_text(int fading_status):
  *         """
  */
-  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2511, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 2513, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
   __pyx_t_1 = 0;
-  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2511, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(__pyx_builtin_staticmethod, __pyx_t_2, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 2513, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard->tp_dict, __pyx_n_s_player_fading_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 2512, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard->tp_dict, __pyx_n_s_player_fading_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 2514, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_TrackStandard);
 
