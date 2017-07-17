@@ -15,6 +15,8 @@ from kivy.logger import Logger
 
 # The following line is needed to allow mpfmc modules to use the
 # getLogger(name) method
+from mpf.core.device_manager import DeviceCollection
+
 from mpf.core.utility_functions import Util
 from mpfmc.core.assets import ThreadedAssetManager
 from mpfmc.core.mc_placeholder_manager import McPlaceholderManager
@@ -101,7 +103,7 @@ class MpfMc(App):
         self.scriptlets = list()
 
         self.register_boot_hold('init')
-        self.displays = CaseInsensitiveDict()
+        self.displays = DeviceCollection(self, "displays", "displays")
         self.machine_vars = CaseInsensitiveDict()
         self.machine_var_monitor = False
         self.monitors = dict()

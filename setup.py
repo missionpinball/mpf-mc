@@ -587,6 +587,7 @@ setup(
     sound_player=mpfmc.config_players.plugins.sound_player:register_with_mpf
     widget_player=mpfmc.config_players.plugins.widget_player:register_with_mpf
     slide_player=mpfmc.config_players.plugins.slide_player:register_with_mpf
+    display_light_player=mpfmc.config_players.plugins.display_light_player:register_with_mpf
 
     [mpf.command]
     mc=mpfmc.commands.mc:get_command

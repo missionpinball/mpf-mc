@@ -7,6 +7,7 @@ mpf-mc:
         sound: mpfmc.config_players.sound_player
         track: mpfmc.config_players.track_player
         sound_loop: mpfmc.config_players.sound_loop_player
+        display_light: mpfmc.config_players.display_light_player
 
     config_collections:
         slide: mpfmc.config_collections.slide
