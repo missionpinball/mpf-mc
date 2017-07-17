@@ -1,4 +1,5 @@
 from typing import TYPE_CHECKING, Union
+from mpf.core.randomizer import Randomizer
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.core.audio.audio_exception import AudioException
 
@@ -70,6 +71,16 @@ class SoundLoopSetCollection(ConfigCollection):
             self.mc.events.remove_handler(self._validate_handler)
 
         for name, config in self.items():
+            # Validate sound setting (make sure only valid sound assets are referenced)
+            if config["sound"] not in self.mc.sounds:
+                raise ValueError("The '{}' sound_loop_set references an invalid sound asset "
+                                 "name '{}' in its sound setting".format(name, config["sound"]))
+            if self.mc.sounds[config["sound"]].streaming:
+                raise ValueError("The '{}' sound_loop_set references a streaming sound asset "
+                                 "'{}' in its sound setting (only in-memory sounds are "
+                                 "supported in loop sets)".format(name, config["sound"]))
+
+            # Validate sound settings in layers (make sure only valid sound assets are referenced)
             for layer in config["layers"]:
                 if layer["sound"] not in self.mc.sounds:
                     raise ValueError("The '{}' sound_loop_set references an invalid sound asset "
@@ -81,3 +92,9 @@ class SoundLoopSetCollection(ConfigCollection):
 
 
 collection_cls = SoundLoopSetCollection
+
+
+class SoundLoopSetGroup(object):
+
+    def __init__(self):
+        self.items = None

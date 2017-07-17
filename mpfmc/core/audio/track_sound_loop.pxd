@@ -39,12 +39,9 @@ cdef enum SoundLoopSetPlayerStatus:
 ctypedef struct SoundLoopSetPlayer:
     SoundLoopSetPlayerStatus status
     Uint32 length
+    SoundLoopLayerSettings master_sound_layer
     GSList *layers     # An array of SoundLoopLayerSettings objects
     Uint32 sample_pos
-    Uint32 fade_in_steps
-    Uint32 fade_out_steps
-    Uint32 fade_steps_remaining
-    bint looping
 
 ctypedef struct TrackSoundLoopState:
     # State variables for TrackSoundLoop tracks
@@ -66,6 +63,8 @@ cdef class TrackSoundLoop(Track):
     cdef TrackSoundLoopState *type_state
 
     cdef _initialize_player(self, SoundLoopSetPlayer *player)
+    cdef _apply_layer_settings(self, SoundLoopLayerSettings *layer, dict layer_settings)
+    cdef _reset_layer(self, SoundLoopLayerSettings *layer)
     cdef _reset_player_layers(self, SoundLoopSetPlayer *player)
 
     @staticmethod
