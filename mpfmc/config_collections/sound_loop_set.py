@@ -1,5 +1,4 @@
 from typing import TYPE_CHECKING, Union
-from mpf.core.randomizer import Randomizer
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.core.audio.audio_exception import AudioException
 
@@ -49,14 +48,23 @@ class SoundLoopSetCollection(ConfigCollection):
 
         self.mc.config_validator.validate_config('sound_loop_sets', config)
 
-        for layer in config["layers"]:
-            self.mc.config_validator.validate_config('sound_loop_sets:layers', layer)
+        # Clamp volume between 0 and 1
+        if 'volume' in config and config['volume']:
+            if config['volume'] < 0:
+                config['volume'] = 0
+            elif config['volume'] > 1:
+                config['volume'] = 1
 
-            # Clamp volume between 0 and 1
-            if layer['volume'] < 0:
-                layer['volume'] = 0
-            elif layer['volume'] > 1:
-                layer['volume'] = 1
+        # Validate optional layers
+        if 'layers' in config:
+            for layer in config["layers"]:
+                self.mc.config_validator.validate_config('sound_loop_sets:layers', layer)
+
+                # Clamp layer volume between 0 and 1
+                if layer['volume'] < 0:
+                    layer['volume'] = 0
+                elif layer['volume'] > 1:
+                    layer['volume'] = 1
 
         return config
 
@@ -92,9 +100,3 @@ class SoundLoopSetCollection(ConfigCollection):
 
 
 collection_cls = SoundLoopSetCollection
-
-
-class SoundLoopSetGroup(object):
-
-    def __init__(self):
-        self.items = None
