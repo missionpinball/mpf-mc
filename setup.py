@@ -507,6 +507,13 @@ if platform == 'win32':
                          'kivy.deps.gstreamer==0.1.12',
                          ]
 
+# If we're running on Read The Docs, then we just need to copy the files
+# (since mpf-docs uses the test YAML files in the doc build), and we don't
+# need to actually install mpf-mc, so override the installation requirements:
+
+if environ.get('READTHEDOCS') == 'TRUE':
+    install_requires = ['mpf>={}'.format(mpf_version)]
+
 # -----------------------------------------------------------------------------
 # automatically detect package files
 package_files = dict(mpfmc=list())
