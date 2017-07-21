@@ -434,7 +434,13 @@ sources = {
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
 }
 
-sdl2_flags = determine_sdl2()
+
+if not on_rtd:
+    sdl2_flags = determine_sdl2()
+else:
+    sdl2_flags = {}
+
+
 if sdl2_flags:
     for source_file, depends in sources.items():
         sources[source_file] = merge(
@@ -465,7 +471,9 @@ def get_extensions_from_sources(sources):
     return ext_modules
 
 print(sources)
-ext_modules = get_extensions_from_sources(sources)
+
+if not on_rtd:
+    ext_modules = get_extensions_from_sources(sources)
 
 # -----------------------------------------------------------------------------
 # Get the version number of mpf-mc and the required version of MPF by reading
