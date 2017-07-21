@@ -474,6 +474,8 @@ print(sources)
 
 if not on_rtd:
     ext_modules = get_extensions_from_sources(sources)
+else:
+    ext_modules = []
 
 # -----------------------------------------------------------------------------
 # Get the version number of mpf-mc and the required version of MPF by reading
