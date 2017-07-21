@@ -32,6 +32,7 @@ PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
                              'mp4', 'm4v', 'so', 'pyd', 'dylib', 'wav', 'ogg',
                              'pxi', 'pyx', 'c', 'h', 'ttf')
 
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 def getoutput(cmd, env=None):
     import subprocess
@@ -153,7 +154,8 @@ cython_unsupported = '''\
 
 have_cython = False
 skip_cython = False
-if platform in ('ios', 'android'):
+
+if platform in ('ios', 'android') or on_rtd:
     print('\nCython check avoided.')
     skip_cython = True
 else:
@@ -175,7 +177,7 @@ else:
             print(cython_max)
             sleep(1)
     except ImportError:
-        print("\nCython is missing, it's required for compiling kivy !\n\n")
+        print("\nCython is missing, it's required for compiling Kivy!\n\n")
         raise
 
 if not have_cython:
@@ -511,8 +513,8 @@ if platform == 'win32':
 # (since mpf-docs uses the test YAML files in the doc build), and we don't
 # need to actually install mpf-mc, so override the installation requirements:
 
-if environ.get('READTHEDOCS') == 'TRUE':
-    install_requires = ['mpf>={}'.format(mpf_version)]
+if on_rtd:
+    install_requires = []
 
 # -----------------------------------------------------------------------------
 # automatically detect package files
