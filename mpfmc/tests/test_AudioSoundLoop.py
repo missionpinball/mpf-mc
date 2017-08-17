@@ -32,6 +32,11 @@ class TestAudioSoundLoop(MpfMcTestCase):
 
         self.assertIsNotNone(self.mc.sound_system)
         interface = self.mc.sound_system.audio_interface
+        if interface is None:
+            log = logging.getLogger('TestAudioSoundLoop')
+            log.warning("Sound system audio interface could not be loaded - skipping audio tests")
+            self.skipTest("Sound system audio interface could not be loaded")
+
         self.assertIsNotNone(interface)
 
         # Check sound loop track
