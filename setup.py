@@ -32,6 +32,7 @@ PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
                              'mp4', 'm4v', 'so', 'pyd', 'dylib', 'wav', 'ogg',
                              'pxd', 'pyx', 'c', 'h', 'ttf')
 
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 def getoutput(cmd, env=None):
     import subprocess
@@ -153,7 +154,8 @@ cython_unsupported = '''\
 
 have_cython = False
 skip_cython = False
-if platform in ('ios', 'android'):
+
+if platform in ('ios', 'android') or on_rtd:
     print('\nCython check avoided.')
     skip_cython = True
 else:
@@ -175,7 +177,7 @@ else:
             print(cython_max)
             sleep(1)
     except ImportError:
-        print("\nCython is missing, it's required for compiling kivy !\n\n")
+        print("\nCython is missing, it's required for compiling Kivy!\n\n")
         raise
 
 if not have_cython:
@@ -439,7 +441,13 @@ sources = {
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
 }
 
-sdl2_flags = determine_sdl2()
+
+if not on_rtd:
+    sdl2_flags = determine_sdl2()
+else:
+    sdl2_flags = {}
+
+
 if sdl2_flags:
     for source_file, depends in sources.items():
         sources[source_file] = merge(
@@ -470,7 +478,11 @@ def get_extensions_from_sources(sources):
     return ext_modules
 
 print(sources)
-ext_modules = get_extensions_from_sources(sources)
+
+if not on_rtd:
+    ext_modules = get_extensions_from_sources(sources)
+else:
+    ext_modules = []
 
 # -----------------------------------------------------------------------------
 # Get the version number of mpf-mc and the required version of MPF by reading
@@ -513,6 +525,13 @@ if platform == 'win32':
                          'kivy.deps.glew==0.1.9',
                          'kivy.deps.gstreamer==0.1.12',
                          ]
+
+# If we're running on Read The Docs, then we just need to copy the files
+# (since mpf-docs uses the test YAML files in the doc build), and we don't
+# need to actually install mpf-mc, so override the installation requirements:
+
+if on_rtd:
+    install_requires = []
 
 # -----------------------------------------------------------------------------
 # automatically detect package files

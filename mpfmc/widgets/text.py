@@ -208,7 +208,6 @@ class Text(Widget):
 
     def _player_var_change(self, **kwargs) -> None:
         del kwargs
-
         self.update_vars_in_text(self.original_text)
 
     def _machine_var_change(self, **kwargs) -> None:
@@ -227,7 +226,7 @@ class Text(Widget):
                     if source.lstrip('player'):  # we have player num
                         self.add_player_var_handler(name=variable_name)
                     else:  # no player num
-                        self.add_player_var_handler(name=var_string)
+                        self.add_player_var_handler(name=variable_name)
                         self.add_current_player_handler()
                 elif source.lower() == 'machine':
                     self.add_machine_var_handler(name=variable_name)
