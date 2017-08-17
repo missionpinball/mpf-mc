@@ -5,10 +5,13 @@ import logging
 import sys
 import uuid
 from enum import Enum, unique
+from typing import Optional, Union
+
 
 from mpf.core.assets import Asset, AssetPool
 from mpf.core.utility_functions import Util
-from mpfmc.core.audio.audio_interface import AudioInterface, AudioException
+from mpfmc.core.audio.audio_interface import AudioInterface
+from mpfmc.core.audio.audio_exception import AudioException
 
 
 # ---------------------------------------------------------------------------
@@ -31,10 +34,37 @@ class SoundPool(AssetPool):
     # pylint: disable=invalid-name
     def __init__(self, mc, name, config, member_cls):
         super().__init__(mc, name, config, member_cls)
+
+        self._track = None
         self._simultaneous_limit = None
         self._stealing_method = SoundStealingMethod.oldest
-        self._instances = list()
+        self._key = None
         self.log = logging.getLogger('SoundPool')
+
+        config.setdefault('track', None)
+        config.setdefault('key', None)
+
+        # Make sure a legal track name has been specified (unless only one track exists)
+        if config['track']:
+            # Track name specified in config, validate it
+            track = self.machine.sound_system.audio_interface.get_track_by_name(self.config['track'])
+            if track is None:
+                self.log.error("'%s' is not a valid track name. "
+                               "Could not create sound '%s' asset.", self.config['track'], name)
+                raise AudioException("'{}' is not a valid track name. "
+                                     "Could not create sound '{}' asset"
+                                     .format(self.config['track'], name))
+        else:
+            # Track not specified, determine track count
+            if self.machine.sound_system.audio_interface.get_track_count() == 1:
+                # Only one track exists, assign default track
+                track = self.machine.sound_system.audio_interface.get_track(0)
+                config['track'] = track.name
+                self.log.debug("Sound '%s' has been assigned a default track value of '%s' "
+                               "(only one track has been configured)", name, track.name)
+
+        self._track = config['track']
+        self._key = config['key']
 
         if 'simultaneous_limit' in self.config and self.config['simultaneous_limit'] is not None:
             self._simultaneous_limit = int(self.config['simultaneous_limit'])
@@ -53,13 +83,29 @@ class SoundPool(AssetPool):
 
     def __repr__(self):
         """String that's returned if someone prints this object"""
-        return '<SoundPool: {}>'.format(self.name)
+        return '<SoundPool: {} ({}), Loaded={}>'.format(self.name, self.id, self.loaded)
 
-    def unload(self):
-        """Unloads all sounds in the pool"""
-        for asset in self.assets:
-            if asset[0].loaded:
-                asset[0].unload()
+    #pylint: disable=invalid-name
+    @property
+    def id(self):
+        """
+        The id property contains a unique identifier for the sound pool (based on the Python id()
+        function).  This id is used in the audio interface to uniquely identify a sound
+        (rather than the name) due to the hassle of passing strings between Python and Cython.
+        Return:
+            An integer uniquely identifying the sound pool
+        """
+        return id(self)
+
+    @property
+    def key(self):
+        """Return the unique key value for this sound pool"""
+        return self._key
+
+    @property
+    def track(self):
+        """The default track name on which to play the sound"""
+        return self._track
 
     @property
     def sound(self):
@@ -82,129 +128,44 @@ class SoundPool(AssetPool):
         else:
             return self._stealing_method
 
-    def play(self, settings=None):
+    def play(self, context=None, settings=None):
         """
-        Plays the sound using the specified settings
+        Plays the sound pool on the track specified in the settings.
         Args:
-            settings: Optional dictionary of settings to override the default values.
+            context: The context from which the sound is played.
+            settings: A dictionary of settings for playback
         Returns:
-            A new sound instance or None if sound could not be played
+            A SoundInstance object if the sound pool will be played (or queued for playback).
+            None if the sound pool could not be played.
         """
-        self.log.debug("Play sound pool %s", self.name)
-
-        # Determine if the maximum number of instances of this sound pool's sounds has been reached
-        if self.simultaneous_limit is not None and len(self._instances) == self.simultaneous_limit:
-
-            # Perform action based on stealing method
-            if self.stealing_method == SoundStealingMethod.oldest:
-                oldest_instance = self._get_oldest_instance()
-                if oldest_instance is not None:
-                    sound_instance = SoundInstance(self.sound, settings)
-                    sound_instance.track.replace_sound(oldest_instance, sound_instance)
-                    self.log.debug("Sound pool %s has reached the maximum number of instances. "
-                                   "Replacing oldest instance", self.name)
-                    self._instances.append(sound_instance)
-                    sound_instance.add_finished_handler(self.on_sound_instance_finished)
-                    return sound_instance
-            elif self.stealing_method == SoundStealingMethod.newest:
-                newest_instance = self._get_newest_instance()
-                if newest_instance is not None:
-                    sound_instance = SoundInstance(self.sound, settings)
-                    sound_instance.track.replace_sound(newest_instance, sound_instance)
-                    self.log.debug("Sound pool %s has reached the maximum number of instances. "
-                                   "Replacing newest instance", self.name)
-                    self._instances.append(sound_instance)
-                    sound_instance.add_finished_handler(self.on_sound_instance_finished)
-                    return sound_instance
-            else:
-                # New instance will not be played; it will be skipped
-                self.log.info("Sound pool %s has reached the maximum number of instances. "
-                              "Sound will be skipped", self.name)
-                return None
+        if settings and 'track' in settings:
+            track_name = settings['track']
         else:
-            sound_instance = self.sound.play(settings)
-            if sound_instance is None:
-                self.log.info("Selected sound pool %s sound could not be played.")
-                return None
-            self._instances.append(sound_instance)
-            sound_instance.add_finished_handler(self.on_sound_instance_finished)
-            return sound_instance
+            track_name = self.track
 
-    def stop(self, fade_out=None):
-        """
-        Stops all active sound instances in the sound pool.
-        Args:
-            fade_out: The number of seconds over which to fade out the sound instances
-                before stopping.
-        """
-        for sound_instance in self._instances:
-            sound_instance.stop(fade_out)
-
-    def stop_looping(self):
-        """Stops looping on all instances of all sounds contained in the sound pool."""
-        for sound_instance in self._instances:
-            # Assets contain a list of tuples (sound, number)
-            sound_instance.stop_looping()
-
-    def on_sound_instance_finished(self, sound_instance_id, **kwargs):
-        """Callback function that is called when a sound instance of this sound is finished.
-        Remove the specified sound instance from the list of current instances"""
-        del kwargs
-        for sound_instance in self._instances:
-            if sound_instance.id == sound_instance_id:
-                self._instances.remove(sound_instance)
-                return
-
-    def get_instance_by_id(self, sound_instance_id):
-        """
-        Return an active sound instance by id
-        Args:
-            sound_instance_id: The id of the sound instance to return
-
-        Returns:
-            SoundInstance if found, None otherwise
-        """
-        for sound_instance in self._instances:
-            if sound_instance.id == sound_instance_id:
-                return sound_instance
+        if track_name:
+            track = self.machine.sound_system.audio_interface.get_track_by_name(track_name)
+            if track:
+                return track.play_sound(self, context, settings)
 
         return None
 
-    def remove_instance(self, sound_instance):
-        """Remove the specified sound instance from the list of active sound instances"""
-        try:
-            self._instances.remove(sound_instance)
-        except ValueError:
-            pass
+    def stop(self, fade_out=None):
+        """
+        Stops all instances of the the sound pool.
 
-    def _get_oldest_instance(self):
-        """Return the oldest sound instance currently playing"""
-        if len(self._instances) == 0:
-            return None
+        Args:
+            fade_out: Optional number of seconds over which to fade out before stopping. When
+                      None, the SoundInstance value will be used.
+        """
+        if not fade_out:
+            fade_out = 0.0
 
-        oldest_instance = self._instances[0]
-        for sound_instance in self._instances[1:]:
-            if sound_instance.timestamp < oldest_instance.timestamp:
-                oldest_instance = sound_instance
+        self.machine.sound_system.audio_interface.stop_sound(self, fade_out)
 
-        return oldest_instance
-
-    def _get_newest_instance(self):
-        """Return the newest sound instance currently playing"""
-        if len(self._instances) == 0:
-            return None
-
-        newest_instance = self._instances[0]
-        for sound_instance in self._instances[1:]:
-            if sound_instance.timestamp > newest_instance.timestamp:
-                newest_instance = sound_instance
-
-        return newest_instance
-
-    def get_instance_count(self):
-        """Return the number of instances of this sound pool (currently playing or
-        pending playback)."""
-        return len(self._instances)
+    def stop_looping(self):
+        """Stops all instances of the sound pool from continuing to loop."""
+        self.machine.sound_system.audio_interface.stop_sound_looping(self)
 
 
 @unique
@@ -262,86 +223,77 @@ class SoundAsset(Asset):
         self._markers = list()
         self._container = None  # holds the actual sound samples in memory
         self._ducking = None
-        self._instances = list()
+        self._key = None
         self.log = logging.getLogger('SoundAsset')
 
+        config.setdefault('track', None)
+
         # Make sure a legal track name has been specified (unless only one track exists)
-        if 'track' not in self.config:
-            # Track not specified, determine track count
-            if self.machine.sound_system.audio_interface.get_track_count() == 1:
-                # Only one track exists, assign default track
-                track = self.machine.sound_system.audio_interface.get_track(0)
-            else:
-                # More than one track exists, raise error
-                self.log.error("sound must have a valid track name. "
-                               "Could not create sound '%s' asset.", name)
-                raise AudioException("Sound must have a valid track name. "
-                                     "Could not create sound '{}' asset".format(name))
-        else:
-            # Track specified in config, validate it
-            track = self.machine.sound_system.audio_interface.get_track_by_name(
-                self.config['track'])
+        if config['track']:
+            # Track name specified in config, validate it
+            track = self.machine.sound_system.audio_interface.get_track_by_name(self.config['track'])
             if track is None:
                 self.log.error("'%s' is not a valid track name. "
                                "Could not create sound '%s' asset.", self.config['track'], name)
                 raise AudioException("'{}' is not a valid track name. "
                                      "Could not create sound '{}' asset"
                                      .format(self.config['track'], name))
+        else:
+            # Track not specified, determine track count
+            if self.machine.sound_system.audio_interface.get_track_count() == 1:
+                # Only one track exists, assign default track
+                track = self.machine.sound_system.audio_interface.get_track(0)
+                config['track'] = track.name
+                self.log.debug("Sound '%s' has been assigned a default track value of '%s' "
+                               "(only one track has been configured)", name, track.name)
 
-        self._track = track
+        self._track = config['track']
 
         # Validate sound attributes and provide default values
-        if 'streaming' in self.config:
-            self._streaming = self.config['streaming']
+        self.config.setdefault('streaming', False)
+        self._streaming = self.config['streaming']
 
-        # Validate that the assigned track supports the sound loading method selected
-        if self._streaming and not track.supports_streaming_sounds:
-            self.log.error("Track %s does not support streaming sounds. You must set "
-                           "'streaming: False' for the %s sound.", self._track.name, self.name)
-            raise AudioException("Track {} does not support streaming sounds. You must set "
-                                 "'streaming: False' for the {} sound.".format(self._track.name, self.name))
+        self.config.setdefault('volume', 0.5)
+        self._volume = min(max(float(self.config['volume']), 0.0), 1.0)
 
-        if not self._streaming and not track.supports_in_memory_sounds:
-            self.log.error("Track %s does not support in-memory sounds. You must set "
-                           "'streaming: True' for the %s sound.", self._track.name, self.name)
-            raise AudioException("Track {} does not support in-memory sounds. You must set "
-                                 "'streaming: True' for the {} sound.".format(self._track.name, self.name))
+        self.config.setdefault('priority', 0)
+        self.priority = int(self.config['priority'])
 
-        if 'volume' in self.config:
-            self._volume = min(max(float(self.config['volume']), 0.0), 1.0)
-
-        if 'priority' in self.config:
-            self.priority = int(self.config['priority'])
-
-        if 'max_queue_time' in self.config and self.config['max_queue_time'] is not None:
+        self.config.setdefault('max_queue_time', None)
+        if self.config['max_queue_time'] is None:
+            self._max_queue_time = None
+        else:
             self._max_queue_time = AudioInterface.string_to_secs(self.config['max_queue_time'])
 
-        if 'loops' in self.config:
-            self._loops = int(self.config['loops'])
+        self.config.setdefault('loops', 0)
+        self._loops = int(self.config['loops'])
 
-        if 'simultaneous_limit' in self.config and self.config['simultaneous_limit'] is not None:
+        self.config.setdefault('simultaneous_limit', None)
+        if self.config['simultaneous_limit'] is None:
+            self._simultaneous_limit = None
+        else:
             self._simultaneous_limit = int(self.config['simultaneous_limit'])
 
-        if 'start_at' in self.config and self.config['start_at'] is not None:
-            self._start_at = AudioInterface.string_to_secs(self.config['start_at'])
+        self.config.setdefault('start_at', 0)
+        self._start_at = AudioInterface.string_to_secs(self.config['start_at'])
 
-        if 'fade_in' in self.config and self.config['fade_in'] is not None:
-            self._fade_in = AudioInterface.string_to_secs(self.config['fade_in'])
+        self.config.setdefault('fade_in', 0)
+        self._fade_in = AudioInterface.string_to_secs(self.config['fade_in'])
 
-        if 'fade_out' in self.config and self.config['fade_out'] is not None:
-            self._fade_out = AudioInterface.string_to_secs(self.config['fade_out'])
+        self.config.setdefault('fade_out', 0)
+        self._fade_out = AudioInterface.string_to_secs(self.config['fade_out'])
 
-        if 'stealing_method' in self.config and self.config['stealing_method'] is not None:
-            method = str(self.config['stealing_method']).lower()
-            if method == 'skip':
-                self._stealing_method = SoundStealingMethod.skip
-            elif method == 'oldest':
-                self._stealing_method = SoundStealingMethod.oldest
-            elif method == 'newest':
-                self._stealing_method = SoundStealingMethod.newest
-            else:
-                raise AudioException("Illegal value for sound.stealing_method. "
-                                     "Could not create sound '{}' asset".format(name))
+        self.config.setdefault('stealing_method', 'oldest')
+        method = str(self.config['stealing_method']).lower()
+        if method == 'skip':
+            self._stealing_method = SoundStealingMethod.skip
+        elif method == 'oldest':
+            self._stealing_method = SoundStealingMethod.oldest
+        elif method == 'newest':
+            self._stealing_method = SoundStealingMethod.newest
+        else:
+            raise AudioException("Illegal value for sound.stealing_method. "
+                                 "Could not create sound '{}' asset".format(name))
 
         if 'events_when_played' in self.config and isinstance(
                 self.config['events_when_played'], str):
@@ -364,6 +316,9 @@ class SoundAsset(Asset):
             else:
                 raise AudioException("Illegal value for sound.mode_end_action. "
                                      "Could not create sound '{}' asset".format(name))
+
+        if 'key' in self.config:
+            self._key = self.config['key']
 
         if 'markers' in self.config:
             self._markers = SoundAsset.load_markers(self.config['markers'], self.name)
@@ -419,7 +374,7 @@ class SoundAsset(Asset):
 
     @property
     def track(self):
-        """The track object on which to play the sound"""
+        """The default track name on which to play the sound"""
         return self._track
 
     @property
@@ -521,6 +476,54 @@ class SoundAsset(Asset):
         """Return whether or not this sound has ducking"""
         return self._ducking is not None
 
+    @property
+    def key(self):
+        """Return the unique key value for this sound"""
+        return self._key
+
+    def create_instance(self, context: Optional[str]=None, settings: Optional[dict]=None) -> "SoundInstance":
+        """Creates a new SoundInstance."""
+        return SoundInstance(self, context, settings)
+
+    def play(self, context=None, settings=None):
+        """
+        Plays the sound on the track specified in the settings.
+        Args:
+            context: The context from which the sound is played.
+            settings: A dictionary of settings for playback
+        Returns:
+            A SoundInstance object if the sound will be played (or queued for playback).
+            None if the sound could not be played.
+        """
+        if settings and 'track' in settings:
+            track_name = settings['track']
+        else:
+            track_name = self.track
+
+        if track_name:
+            track = self.machine.sound_system.audio_interface.get_track_by_name(track_name)
+            if track:
+                return track.play_sound(self, context, settings)
+
+        return None
+
+    def stop(self, fade_out=None):
+        """
+        Stops all instances of the the sound.
+
+        Args:
+            fade_out: Optional number of seconds over which to fade out before stopping. When
+                      None, the SoundAsset value will be used.
+        """
+        if not fade_out:
+            fade_out = self.fade_out
+
+        self.machine.sound_system.audio_interface.stop_sound(self, fade_out)
+
+    def stop_looping(self):
+        """Stops all instances of the sound from continuing to loop."""
+        self.machine.sound_system.audio_interface.stop_sound_looping(self)
+
     def do_load(self):
         """Loads the sound asset from disk."""
 
@@ -567,116 +570,6 @@ class SoundAsset(Asset):
         """Called when the asset has finished loading"""
         super().is_loaded()
         self.log.debug("Loaded %s (Track %s)", self.name, self.track)
-
-    def play(self, settings=None):
-        """
-        Plays the sound using the specified settings. Creates a new SoundInstance object
-        with the actual settings used to play the sound.
-        Args:
-            settings: Optional dictionary of settings to override the default values.
-        """
-        self.log.debug("Play sound %s on track %s", self.name, self.track)
-
-        # Determine if the maxmimum number of instances of this sound has been reached
-        if self.simultaneous_limit is not None and len(self._instances) == self.simultaneous_limit:
-
-            # Perform action based on stealing method
-            if self.stealing_method == SoundStealingMethod.oldest:
-                oldest_instance = self._get_oldest_instance()
-                if oldest_instance is not None:
-                    sound_instance = SoundInstance(self, settings)
-                    sound_instance.track.replace_sound(oldest_instance, sound_instance)
-                    self.log.debug("Sound %s has reached the maximum number of instances. "
-                                   "Replacing oldest instance", self.name)
-                    self._instances.append(sound_instance)
-                    return sound_instance
-            elif self.stealing_method == SoundStealingMethod.newest:
-                newest_instance = self._get_newest_instance()
-                if newest_instance is not None:
-                    sound_instance = SoundInstance(self, settings)
-                    sound_instance.track.replace_sound(newest_instance, sound_instance)
-                    self.log.debug("Sound %s has reached the maximum number of instances. "
-                                   "Replacing newest instance", self.name)
-                    self._instances.append(sound_instance)
-                    return sound_instance
-            else:
-                # New instance will not be played; it will be skipped
-                self.log.info("Sound %s has reached the maximum number of instances. "
-                              "Sound will be skipped", self.name)
-                return None
-        else:
-            sound_instance = SoundInstance(self, settings)
-            sound_instance.track.play_sound(sound_instance)
-            self._instances.append(sound_instance)
-            return sound_instance
-
-    def stop(self, fade_out=None):
-        """
-        Stops all instances of the sound playing or pending playback.
-        Args:
-            fade_out: The number of seconds over which to fade out the sound instances
-                before stopping.
-        """
-        self.log.debug("Stop sound %s", self.name)
-        for sound_instance in self._instances:
-            sound_instance.stop(fade_out)
-
-    def stop_looping(self):
-        """Stops looping on all instances of the sound playing (and awaiting playback)."""
-        self.log.debug("Stop looping sound %s", self.name)
-        for sound_instance in self._instances:
-            sound_instance.stop_looping()
-
-    def get_instance_by_id(self, sound_instance_id):
-        """
-        Return an active sound instance by id
-        Args:
-            sound_instance_id: The id of the sound instance to return
-
-        Returns:
-            SoundInstance if found, None otherwise
-        """
-        for sound_instance in self._instances:
-            if sound_instance.id == sound_instance_id:
-                return sound_instance
-
-        return None
-
-    def remove_instance(self, sound_instance):
-        """Remove the specified sound instance from the list of active sound instances"""
-        try:
-            self._instances.remove(sound_instance)
-        except ValueError:
-            pass
-
-    def _get_oldest_instance(self):
-        """Return the oldest sound instance currently playing"""
-        if len(self._instances) == 0:
-            return None
-
-        oldest_instance = self._instances[0]
-        for sound_instance in self._instances[1:]:
-            if sound_instance.timestamp < oldest_instance.timestamp:
-                oldest_instance = sound_instance
-
-        return oldest_instance
-
-    def _get_newest_instance(self):
-        """Return the newest sound instance currently playing"""
-        if len(self._instances) == 0:
-            return None
-
-        newest_instance = self._instances[0]
-        for sound_instance in self._instances[1:]:
-            if sound_instance.timestamp > newest_instance.timestamp:
-                newest_instance = sound_instance
-
-        return newest_instance
-
-    def get_instance_count(self):
-        """Return the number of instances of this sound (currently playing or
-        pending playback)."""
-        return len(self._instances)
 
     @staticmethod
     def load_markers(config, sound_name):
@@ -749,7 +642,9 @@ class SoundInstance(object):
     for sound assets that contains all the overridden parameter values for playback."""
 
     # pylint: disable=too-many-branches
-    def __init__(self, sound, settings=None):
+    def __init__(self,
+                 sound: Union[SoundAsset, SoundPool],
+                 context: Optional[str]=None, settings: Optional[dict]=None):
         """Constructor"""
         if sound is None:
             raise ValueError("Cannot create sound instance: sound parameter is None")
@@ -757,27 +652,48 @@ class SoundInstance(object):
         # pylint: disable=invalid-name
         self.mc = sound.machine
         self._timestamp = self.mc.clock.get_time()
-        self._sound = sound
+
+        if context and isinstance(context, str):
+            self._context = context
+        else:
+            self._context = None
+
         self._status = SoundInstanceStatus.pending
         self._played = False
-        self._track = sound.track
         self._loop_count = 0
         self._registered_finished_handlers = list()
         self.log = logging.getLogger('SoundInstance')
+        self._sound_id = sound.id
+
+        # The underlying sound must be accessed differently for SoundAsset objects
+        # (just use the object itself) and SoundPool object (retrieve the next
+        # SoundAsset object in the pool).
+        if isinstance(sound, SoundAsset):
+            self._sound = sound
+        elif isinstance(sound, SoundPool):
+            self._sound = sound.sound
+
+        # Simultaneous limit comes from the SoundAsset or SoundPool class and may not
+        # be overridden
+        self._simultaneous_limit = sound.simultaneous_limit
+        self._stealing_method = sound.stealing_method
+
+        self._track = sound.track
+        self._key = sound.key
 
         # Assign default values from parent sound for parameters that can be overridden
-        self._loops = sound.loops
-        self._volume = sound.volume
-        self._priority = sound.priority
-        self._start_at = sound.start_at
-        self._fade_in = sound.fade_in
-        self._fade_out = sound.fade_out
-        self._max_queue_time = sound.max_queue_time
-        self._events_when_played = sound.events_when_played
-        self._events_when_stopped = sound.events_when_stopped
-        self._events_when_looping = sound.events_when_looping
-        self._mode_end_action = sound.mode_end_action
-        self._markers = sound.markers
+        self._loops = self._sound.loops
+        self._volume = self._sound.volume
+        self._priority = self._sound.priority
+        self._start_at = self._sound.start_at
+        self._fade_in = self._sound.fade_in
+        self._fade_out = self._sound.fade_out
+        self._max_queue_time = self._sound.max_queue_time
+        self._events_when_played = self._sound.events_when_played
+        self._events_when_stopped = self._sound.events_when_stopped
+        self._events_when_looping = self._sound.events_when_looping
+        self._mode_end_action = self._sound.mode_end_action
+        self._markers = self._sound.markers
         self._exp_time = None
 
         if settings is None:
@@ -786,6 +702,9 @@ class SoundInstance(object):
         # TODO: Implement parameter validation for overridden parameters
 
         # Assign any overridden parameter values
+        if 'track' in settings and settings['track'] is not None:
+            self._track = settings['track']
+
         if 'loops' in settings and settings['loops'] is not None:
             self._loops = settings['loops']
 
@@ -826,10 +745,13 @@ class SoundInstance(object):
         if settings is not None and 'markers' in settings:
             self._markers = SoundAsset.load_markers(settings['markers'], self.name)
 
+        if 'key' in settings:
+            self._key = settings['key']
+
     def __repr__(self):
         """String that's returned if someone prints this object"""
         return '<SoundInstance: {} ({}), Volume={}, Loops={}, Priority={}, Loaded={}, Track={}>'.format(
-            self.sound.name, self.id, self.volume, self.loops, self.priority, self.sound.loaded, self.track.name)
+            self.sound.name, self.id, self.volume, self.loops, self.priority, self.sound.loaded, self.track)
 
     def __lt__(self, other):
         """Less than comparison operator"""
@@ -866,6 +788,11 @@ class SoundInstance(object):
         return self._timestamp
 
     @property
+    def context(self):
+        """Return the context in which the sound instance was created"""
+        return self._context
+
+    @property
     def exp_time(self):
         """Return the expiration time of the sound instance"""
         return self._exp_time
@@ -879,6 +806,11 @@ class SoundInstance(object):
     def sound(self):
         """The sound asset wrapped by this object"""
         return self._sound
+
+    @property
+    def sound_id(self):
+        """The parent sound asset (or sound pool) object id this instance was created from"""
+        return self._sound_id
 
     @property
     def streaming(self):
@@ -898,7 +830,7 @@ class SoundInstance(object):
 
     @property
     def track(self):
-        """The track object on which to play the sound"""
+        """The audio track name on which to play the sound"""
         return self._track
 
     @property
@@ -943,14 +875,14 @@ class SoundInstance(object):
     def simultaneous_limit(self):
         """Return the maximum number of instances of the sound that may be
         played simultaneously"""
-        return self._sound.simultaneous_limit
+        return self._simultaneous_limit
 
     @property
     def stealing_method(self):
         """Return the method used when stealing a sound instance (when a new sound
         instance is requested but the maximum number of instances has currently
         been reached)."""
-        return self._sound.stealing_method
+        return self._stealing_method
 
     @property
     def events_when_played(self):
@@ -1003,6 +935,11 @@ class SoundInstance(object):
         return self._sound.ducking is not None
 
     @property
+    def key(self):
+        """Return the unique key value for this sound instance"""
+        return self._key
+
+    @property
     def queued(self):
         """Indicates whether or not this sound reference is currently queued for playback."""
         return self._status == SoundInstanceStatus.queued
@@ -1017,6 +954,33 @@ class SoundInstance(object):
     def playing(self):
         """Return whether or not this sound instance is currently playing."""
         return self._status == SoundInstanceStatus.playing
+
+    def stop(self, fade_out=None):
+        """
+        Stops the sound instance.
+
+        Args:
+            fade_out: Optional number of seconds over which to fade out before stopping. When
+                      None, the SoundInstance value will be used.
+        """
+        if not fade_out:
+            fade_out = self.fade_out
+
+        if self.track is not None:
+            track = self.mc.sound_system.audio_interface.get_track_by_name(self.track)
+            if track:
+                track.stop_sound_instance(self, fade_out)
+        else:
+            self.mc.sound_system.audio_interface.stop_sound_instance(self, fade_out)
+
+    def stop_looping(self):
+        """Stops the sound instance from continuing to loop."""
+        if self.track is not None:
+            track = self.mc.sound_system.audio_interface.get_track_by_name(self.track)
+            if track:
+                track.stop_sound_instance_looping(self)
+        else:
+            self.mc.sound_system.audio_interface.stop_sound_instance_looping(self)
 
     def set_pending(self):
         """Set the sound instance status to pending."""
@@ -1126,7 +1090,7 @@ class SoundInstance(object):
         for handler in self._registered_finished_handlers:
             if handler[3] == key:
                 self._registered_finished_handlers.remove(handler)
-                self.log.debug("Removing finisehd handler method %s from sound %s",
+                self.log.debug("Removing finished handler method %s from sound %s",
                                (str(handler[0]).split(' '))[2], self.name)
 
     def _finished(self):
@@ -1136,13 +1100,9 @@ class SoundInstance(object):
         # Call any registered finished handlers
         for handler in self._registered_finished_handlers:
             merged_kwargs = dict(list(handler[2].items()))
-            merged_kwargs['sound_instance_id'] = self.id
-            merged_kwargs['sound_id'] = self.sound.id
+            merged_kwargs['sound_instance'] = self
 
             handler[0](**merged_kwargs)
-
-        # Remove the instance from the list of active instances for the parent sound
-        self.sound.remove_instance(self)
 
     @property
     def status(self):
@@ -1168,23 +1128,6 @@ class SoundInstance(object):
     def loop_count(self):
         """Return how many times this sound instance has looped back to the beginning."""
         return self._loop_count
-
-    def stop(self, fade_out=None):
-        """
-        Stops the sound instance.
-        Args:
-            fade_out: The number of seconds over which to fade out the sound instance
-                before stopping.
-        """
-        if not self.finished:
-            if fade_out is not None and fade_out >= 0.0:
-                self._fade_out = fade_out
-            self._track.stop_sound(self)
-
-    def stop_looping(self):
-        """Stops looping the sound instance."""
-        if not self.finished:
-            self._track.stop_sound_looping(self)
 
 
 class DuckingSettings(object):
@@ -1336,4 +1279,3 @@ class DuckingSettings(object):
                                  "the ducking attack segment has completed")
 
         return True
-

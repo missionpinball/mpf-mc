@@ -84,6 +84,7 @@ ctypedef struct SoundPlayer:
 cdef class TrackStandard(Track):
 
     cdef list _sound_queue
+    cdef dict _playing_instances_by_id
     cdef int _max_simultaneous_sounds
 
     # Track state needs to be stored in a C struct in order for them to be accessible in
@@ -92,6 +93,8 @@ cdef class TrackStandard(Track):
     # destruction.
     cdef TrackStandardState *type_state
 
+    cdef int _get_playing_sound_count(self, int sound_id)
+    cdef list _get_playing_sound_instances(self, int sound_id)
     cdef int _get_idle_sound_player(self)
     cdef process_notification_message(self, NotificationMessageContainer *notification_message)
     cdef tuple _get_sound_player_with_lowest_priority(self)

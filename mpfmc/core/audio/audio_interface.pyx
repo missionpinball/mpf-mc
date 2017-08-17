@@ -30,7 +30,7 @@ from mpfmc.core.audio.audio_exception import AudioException
 DEF MAX_TRACKS = 8
 
 # The maximum number of markers that can be specified for a single sound
-DEF MAX_MARKERS = 8
+DEF MAX_MARKERS = 16
 
 # The number of seconds over which to perform a quick fade to avoid pops and
 # clicks
@@ -627,20 +627,39 @@ cdef class AudioInterface:
 
         container.unload()
 
-
-    def stop_sound(self, sound_instance not None):
-        """
-        Stops all instances of the specified sound immediately on all tracks.
-        Args:
-            sound_instance: The SoundInstance to stop
-        """
-        for track in self.tracks:
-            track.stop_sound(sound_instance)
-
     def stop_all_sounds(self, float fade_out_seconds = 0.0):
         """Stops all playing and pending sounds in all tracks"""
         for track in self.tracks:
             track.stop_all_sounds(fade_out_seconds)
+
+    def stop_sound_instance(self, sound_instance not None, fade_out=None):
+        """Stops the specified sound instance"""
+        for track in self.tracks:
+            if hasattr(track, "stop_sound_instance"):
+                track.stop_sound_instance(sound_instance, fade_out)
+
+    def stop_sound(self, sound not None, fade_out=None):
+        """Stops all instances of the specified sound on all tracks"""
+        for track in self.tracks:
+            if hasattr(track, "stop_sound"):
+                track.stop_sound(sound, fade_out)
+
+    def stop_sound(self, sound not None):
+        """Stops all instances of the specified sound from continuing to loop on all tracks"""
+        for track in self.tracks:
+            if hasattr(track, "stop_sound_looping"):
+                track.stop_sound_looping(sound)
+
+    def stop_sound_instance_looping(self, sound_instance not None):
+        """Stops the specified sound instance from continuing to loop."""
+        for track in self.tracks:
+            if hasattr(track, "stop_sound_instance_looping"):
+                track.stop_sound_instance_looping(sound_instance)
+
+    def clear_context(self, context):
+        """Clears the context in all tracks"""
+        for track in self.tracks:
+            track.clear_context(context)
 
     def process(self):
         """Process tick function for the audio interface."""

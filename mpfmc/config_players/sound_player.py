@@ -76,7 +76,6 @@ Here are several various examples:
             sound_player (they must be specified in the sounds section of a config file).
 
         """
-        instance_dict = self._get_instance_dict(context)
         settings = deepcopy(settings)
 
         if 'sounds' in settings:
@@ -99,35 +98,40 @@ Here are several various examples:
 
             s.update(kwargs)
 
+            action = s['action'].lower()
+            del s['action']
+
+            s.setdefault('track', sound.track)
+            track = self.machine.sound_system.audio_interface.get_track_by_name(s['track'])
+            if track is None:
+                self.machine.log.error("SoundPlayer: The specified track ('{}') "
+                                       "does not exist. Unable to perform '{}' action "
+                                       "on sound '{}'."
+                                       .format(s['track'], s['action'], sound_name))
+                return
+
             # Determine action to perform
-            if s['action'].lower() == 'play':
-                sound_instance = sound.play(s)
-                if sound_instance is None:
-                    self.machine.log.info("SoundPlayer: The specified sound "
-                                          "could not be played ('{}').".format(sound_name))
-                else:
-                    sound_instance.add_finished_handler(self.on_sound_instance_finished, 1,
-                                                        context=context)
-                    instance_dict[sound_instance.id] = sound_instance
+            if action == 'play':
+                track.play_sound(sound, context, s)
 
-            elif s['action'].lower() == 'stop':
+            elif action == 'stop':
                 if 'fade_out' in s:
-                    sound.stop(s['fade_out'])
+                    track.stop_sound(sound, s['fade_out'])
                 else:
-                    sound.stop()
+                    track.stop_sound(sound)
 
-            elif s['action'].lower() == 'stop_looping':
-                sound.stop_looping()
+            elif action == 'stop_looping':
+                track.stop_sound_looping(sound)
 
-            elif s['action'].lower() == 'load':
+            elif action == 'load':
                 sound.load()
 
-            elif s['action'].lower() == 'unload':
+            elif action == 'unload':
                 sound.unload()
 
             else:
                 self.machine.log.error("SoundPlayer: The specified action "
-                                       "is not valid ('{}').".format(s['action']))
+                                       "is not valid ('{}').".format(action))
 
     def get_express_config(self, value):
         """ express config for sounds is simply a string (sound name)"""
@@ -162,6 +166,13 @@ Here are several various examples:
             if not isinstance(settings, dict):
                 settings = {settings: dict()}
 
+            if 'track' in settings:
+                track = settings['track']
+
+                if self.machine.sound_system.audio_interface.get_track_type(track) != "sound_loop":
+                    raise ValueError("SoundPlayer: An invalid audio track '{}' is specified for event '{}' "
+                                     "(only standard audio tracks are supported).".format(track, event))
+
             for sound, sound_settings in settings.items():
 
                 # Now check to see if all the settings are valid
@@ -187,6 +198,8 @@ Here are several various examples:
         # sound_player config section (only want to override sound settings explicitly
         # and not with any default values).  The default values for these items are not
         # legal values and therefore we know the user did not provide them.
+        if validated_dict[device]['track'] == 'use_sound_setting':
+            del validated_dict[device]['track']
         if validated_dict[device]['priority'] is None:
             del validated_dict[device]['priority']
         if validated_dict[device]['volume'] is None:
@@ -218,25 +231,13 @@ Here are several various examples:
 
     def clear_context(self, context):
         """Stop all sounds from this context."""
-        instance_dict = self._get_instance_dict(context)
         # Iterate over a copy of the dictionary values since it may be modified
         # during the iteration process.
         self.machine.log.debug("SoundPlayer: Clearing context - applying mode_end_action for all active sounds")
-        for sound_instance in list(instance_dict.values()):
-            if sound_instance.stop_on_mode_end:
-                sound_instance.stop()
-            else:
-                sound_instance.stop_looping()
 
-        self._reset_instance_dict(context)
-
-    def on_sound_instance_finished(self, sound_instance_id, context, **kwargs):
-        """Callback function that is called when a sound instance triggered by the sound_player
-        is finished. Remove the specified sound instance from the list of current instances
-        started by the sound_player."""
-        del kwargs
-        instance_dict = self._get_instance_dict(context)
-        if sound_instance_id in instance_dict:
-            del instance_dict[sound_instance_id]
+        for index in range(self.machine.sound_system.audio_interface.get_track_count()):
+            track = self.machine.sound_system.audio_interface.get_track(index)
+            if track.type == "standard":
+                track.clear_context(context)
 
 mc_player_cls = McSoundPlayer

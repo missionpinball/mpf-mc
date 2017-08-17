@@ -38,7 +38,6 @@ cdef class Track:
         """
         self.log = logging.getLogger("Track")
         self.mc = mc
-        self._sound_instances_by_id = dict()
         self._name = name
         self._number = track_num
         self._events_when_stopped = None
@@ -155,6 +154,10 @@ cdef class Track:
             fading = self.state.fade_steps_remaining > 0
             SDL_UnlockAudio()
         return fading
+
+    def clear_context(self, context):
+        """Stop all sounds played from the specified context."""
+        raise NotImplementedError('Must be overridden in derived class')
 
     def set_volume(self, float volume, float fade_seconds = 0.0):
         """Sets the current track volume with an optional fade time"""

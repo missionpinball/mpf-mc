@@ -845,13 +845,12 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopState {
  * #    Track base class
  * # ---------------------------------------------------------------------------
  * cdef class Track:             # <<<<<<<<<<<<<<
- *     cdef dict _sound_instances_by_id
+ * 
  *     cdef str _name
  */
 struct __pyx_obj_5mpfmc_4core_5audio_5track_Track {
   PyObject_HEAD
   struct __pyx_vtabstruct_5mpfmc_4core_5audio_5track_Track *__pyx_vtab;
-  PyObject *_sound_instances_by_id;
   PyObject *_name;
   int _number;
   PyObject *_events_when_stopped;
@@ -930,7 +929,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop {
  * #    Track base class
  * # ---------------------------------------------------------------------------
  * cdef class Track:             # <<<<<<<<<<<<<<
- *     cdef dict _sound_instances_by_id
+ * 
  *     cdef str _name
  */
 

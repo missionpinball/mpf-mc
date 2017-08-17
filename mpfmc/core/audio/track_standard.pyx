@@ -8,6 +8,7 @@ import logging
 import time
 from heapq import heappush, heappop, heapify
 
+from mpfmc.assets.sound import SoundInstance, SoundStealingMethod
 from mpfmc.core.audio.sdl2 cimport *
 from mpfmc.core.audio.gstreamer cimport *
 from mpfmc.core.audio.track cimport *
@@ -56,6 +57,10 @@ cdef class TrackStandard(Track):
 
         SDL_LockAudio()
 
+        # Dictionary of SoundInstance class objects keyed by SoundInstance.id
+        self._playing_instances_by_id = dict()
+
+        # Priority queue of SoundInstance objects waiting to be played
         self._sound_queue = list()
 
         # Set track type specific settings
@@ -251,31 +256,32 @@ cdef class TrackStandard(Track):
         self.log.debug("Processing notification message %d for sound instance (id: %d)",
                        notification_message.message, notification_message.sound_instance_id)
 
-        if notification_message.sound_instance_id not in self._sound_instances_by_id:
+        if notification_message.sound_instance_id not in self._playing_instances_by_id:
             self.log.warning("Received a notification message for a sound instance (id: %d) "
                              "that is no longer managed in the audio library. "
                              "Notification will be discarded.",
                              notification_message.sound_instance_id)
 
         elif notification_message.message == notification_sound_started:
-            sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
+            sound_instance = self._playing_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_playing()
 
         elif notification_message.message == notification_sound_stopped:
-            sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
+            sound_instance = self._playing_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_stopped()
-                self.log.debug("Removing sound instance %s from active sound dictionary", str(sound_instance))
-                del self._sound_instances_by_id[sound_instance.id]
+                self.log.debug("Removing sound instance %s from playing sound "
+                               "instance dictionary", str(sound_instance))
+                del self._playing_instances_by_id[sound_instance.id]
 
         elif notification_message.message == notification_sound_looping:
-            sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
+            sound_instance = self._playing_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_looping()
 
         elif notification_message.message == notification_sound_marker:
-            sound_instance = self._sound_instances_by_id[notification_message.sound_instance_id]
+            sound_instance = self._playing_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_marker(notification_message.data.marker.id)
         else:
@@ -332,11 +338,26 @@ cdef class TrackStandard(Track):
                     self.log.debug("Discarding expired sound from queue %s", sound_instance)
                     sound_instance.set_expired()  # Notify sound instance it has expired
 
-    def _remove_sound_from_queue(self, sound_instance not None):
+    def _remove_sound_from_queue(self, sound not None):
+        """
+        Removes all sound instances of the specify sound from the priority sound queue.
+
+        Args:
+            sound: The sound object to remove
+        """
+        cdef list sound_queue_copy = self._sound_queue.copy()
+        for sound_instance in sound_queue_copy:
+            if sound_instance.sound_id == sound.id:
+                self._sound_queue.remove(sound_instance)
+                sound_instance.set_canceled()
+
+        heapify(self._sound_queue)
+
+    def _remove_sound_instance_from_queue(self, sound_instance not None):
         """
         Removes a sound from the priority sound queue.
         Args:
-            sound_instance: The sound object to remove
+            sound_instance: The sound instance object to remove
         """
         try:
             self._sound_queue.remove(sound_instance)
@@ -345,6 +366,28 @@ cdef class TrackStandard(Track):
             heapify(self._sound_queue)
         except ValueError:
             pass
+
+    def _remove_all_sounds_with_context_from_queue(self, context):
+        """Removes all sounds with the specified context from the priority sound queue.
+        """
+        for sound_instance in self._sound_queue.copy():
+            if sound_instance.context == context:
+                self.log.debug("Removing pending sound with context %s from queue %s", context, sound_instance)
+                sound_instance.set_canceled()
+                self._sound_queue.remove(sound_instance)
+
+        heapify(self._sound_queue)
+
+    def _remove_all_sounds_with_key_from_queue(self, key):
+        """Removes all sounds with the specified key from the priority sound queue.
+        """
+        for sound_instance in self._sound_queue.copy():
+            if sound_instance.key == key:
+                self.log.debug("Removing pending sound with key %s from queue %s", key, sound_instance)
+                sound_instance.set_canceled()
+                self._sound_queue.remove(sound_instance)
+
+        heapify(self._sound_queue)
 
     def _remove_all_sounds_from_queue(self):
         """Removes all sounds from the priority sound queue.
@@ -355,90 +398,214 @@ cdef class TrackStandard(Track):
 
         self._sound_queue.clear()
 
-    def play_sound(self, sound_instance not None):
+    cdef int _get_playing_sound_count(self, int sound_id):
+        """Return the number of currently playing instances of the given sound id"""
+        cdef int count = 0
+        SDL_LockAudio()
+        
+        for i in range(self.type_state.sound_player_count):
+            if self.type_state.sound_players[i].status != player_idle and \
+                            self.type_state.sound_players[i].current.sound_id == sound_id:
+                count += 1
+
+        SDL_UnlockAudio()
+        return count
+
+    cdef list _get_playing_sound_instances(self, int sound_id):
+        """Return the list of currently playing instances of the given sound id"""
+        cdef list instances = list()
+        cdef int instance_id
+
+        SDL_LockAudio()
+        
+        for i in range(self.type_state.sound_player_count):
+            if self.type_state.sound_players[i].status != player_idle and \
+                            self.type_state.sound_players[i].current.sound_id == sound_id:
+
+                if self.type_state.sound_players[i].status == player_replacing:
+                    instance_id = self.type_state.sound_players[i].next.sound_instance_id
+                else:
+                    instance_id = self.type_state.sound_players[i].current.sound_instance_id
+                
+                if instance_id in self._playing_instances_by_id:
+                    instances.append(self._playing_instances_by_id[instance_id])
+
+        SDL_UnlockAudio()
+        return instances
+
+    def _get_oldest_playing_sound_instance(self, int sound_id):
+        """Return the oldest sound instance currently playing"""
+        cdef list playing_instances = self._get_playing_sound_instances(sound_id)
+        
+        if not playing_instances:
+            return None
+
+        oldest_instance = playing_instances[0]
+        for sound_instance in playing_instances[1:]:
+            if sound_instance.timestamp < oldest_instance.timestamp:
+                oldest_instance = sound_instance
+
+        return oldest_instance
+
+    def _get_newest_playing_sound_instance(self, int sound_id):
+        """Return the newest sound instance currently playing"""
+        cdef list playing_instances = self._get_playing_sound_instances(sound_id)
+        
+        if not playing_instances:
+            return None
+
+        newest_instance = playing_instances[0]
+        for sound_instance in playing_instances[1:]:
+            if sound_instance.timestamp > newest_instance.timestamp:
+                newest_instance = sound_instance
+
+        return newest_instance
+
+    def play_sound(self, sound not None, context=None, settings=None):
         """
         Plays a sound on the current track.
         Args:
-            sound_instance: The SoundInstance object to play
+            sound: The SoundAsset or SoundPool object to play
+            context: The context from which the sound is played.
+            settings: A dictionary of settings for playback
+        Returns:
+            A SoundInstance object if the sound will be played (or queued for playback).
+            None if the sound could not be played.
         """
-        self.log.debug("play_sound - Processing sound '%s' for playback.", sound_instance.name)
+        self.log.debug("play_sound - Processing sound '%s' for playback.", sound.name)
 
         SDL_LockAudio()
 
-        # Sound instance cannot be played if the track is stopped or paused
-        if self.state.status == track_status_stopped or self.state.status == track_status_paused:
-            self.log.debug("play_sound - %s track is not currently playing and "
-                           "therefore the request to play sound %s will be canceled",
-                           self.name, sound_instance.name)
-            sound_instance.set_canceled()
-            SDL_UnlockAudio()
-            return
+        # A try/else/finally block is used here to ensure SDL_UnlockAudio is always called
+        # before the function returns (since there are so many return branches it is easier
+        # to use than placing the SDL_UnlockAudio call before every return).
+        try:
 
-        if sound_instance.max_queue_time is None:
-            sound_instance.exp_time = None
-        else:
-            sound_instance.exp_time = time.time() + sound_instance.max_queue_time
+            # Sound cannot be played if the track is stopped or paused
+            if self.state.status == track_status_stopped or self.state.status == track_status_paused:
+                self.log.debug("play_sound - %s track is not currently playing and "
+                               "therefore the request to play sound %s will be canceled",
+                               self.name, sound.name)
+                return None
 
-        # Make sure sound is loaded.  If not, we assume the sound is being loaded and we
-        # add it to the queue so it will be picked up on the next loop.
-        if not sound_instance.sound.loaded:
-            # If the sound is not already loading, load it now
-            if not sound_instance.sound.loading:
-                sound_instance.sound.load()
+            sound_instance = None
 
-            if sound_instance.max_queue_time != 0:
-                self._queue_sound(sound_instance)
-                self.log.debug("play_sound - Sound %s was not loaded and therefore has been "
-                               "queued for playback.", sound_instance.name)
-            else:
-                self.log.debug("play_sound - Sound %s was not loaded and max_queue_time = 0, "
-                               "therefore it has been discarded and will not be played.", sound_instance.name)
-                sound_instance.set_expired()
-        else:
-            # If the sound can be played right away (available player) then play it.
-            # Is there an available sound player?
-            sound_player = self._get_sound_player_with_lowest_priority()
-            player = sound_player[0]
-            lowest_priority = sound_player[1]
+            # Check if sound can be played based on if the maximum number of playing instances of
+            # this sound has been reached or not.
+            if sound.simultaneous_limit is not None and self._get_playing_sound_count(sound.id) >= sound.simultaneous_limit:
 
-            if lowest_priority is None:
-                self.log.debug("play_sound - Sound player %d is available "
-                               "for playback", player)
-                # Play the sound using the available player
-                self._play_sound_on_sound_player(sound_instance=sound_instance, player=player)
-            else:
-                # All sound players are currently busy:
-                self.log.debug("play_sound - No idle sound player is available.")
-                self.log.debug("play_sound - Sound player %d is currently playing the sound with "
-                               "the lowest priority (%d).", player, lowest_priority)
+                # Maximum number of simultaneous instances of the specified sound has been reached.
+                # Perform action based on sound stealing method
+                if sound.stealing_method == SoundStealingMethod.oldest:
+                    oldest_instance = self._get_oldest_playing_sound_instance(sound.id)
+                    if oldest_instance is not None:
+                        sound_instance = SoundInstance(sound, context, settings)
+                        self._replace_sound_instance(oldest_instance, sound_instance)
+                        self.log.debug("Sound %s has reached the maximum number of instances. "
+                                       "Replacing oldest instance", sound.name)
+                        return sound_instance
 
-                # If the lowest priority of all the sounds currently playing is lower than
-                # the requested sound, kill the lowest priority sound and replace it.
-                if sound_instance.priority > lowest_priority:
-                    self.log.debug("play_sound - Sound priority (%d) is higher than the "
-                                   "lowest sound currently playing (%d). Forcing playback "
-                                   "on sound player %d.", sound_instance.priority, lowest_priority, player)
-                    self._play_sound_on_sound_player(sound_instance=sound_instance,
-                                                     player=player,
-                                                     force=True)
-                elif sound_instance.max_queue_time == 0:
-                    # The sound could not be played immediately and has now expired (max_queue_time == 0)
-                    self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
-                                   "lowest sound currently playing (%d). Sound could not be played"
-                                   "immediately and has now expired (max_queue_time = 0) and will "
-                                   "not be played.",
-                                   sound_instance.priority, lowest_priority)
-                    sound_instance.set_expired()
+                elif sound.stealing_method == SoundStealingMethod.newest:
+                    newest_instance = self._get_newest_playing_sound_instance(sound.id)
+                    if newest_instance is not None:
+                        sound_instance = SoundInstance(sound, context, settings)
+                        self._replace_sound_instance(newest_instance, sound_instance)
+                        self.log.debug("Sound %s has reached the maximum number of instances. "
+                                       "Replacing newest instance", sound.name)
+                        return sound_instance
+
                 else:
-                    # Add the requested sound to the priority queue
-                    self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
-                                   "lowest sound currently playing (%d). Sound will be queued "
-                                   "for playback.", sound_instance.priority, lowest_priority)
+                    # New instance will not be played; it will be skipped
+                    self.log.debug("Sound %s has reached the maximum number of instances. "
+                                   "Sound will be skipped", sound.name)
+                    return None
+            else:
+                sound_instance = SoundInstance(sound, context, settings)
+
+            if sound_instance.max_queue_time is None:
+                sound_instance.exp_time = None
+            else:
+                sound_instance.exp_time = time.time() + sound_instance.max_queue_time
+
+            # Make sure sound is loaded.  If not, we assume the sound is being loaded and we
+            # add it to the queue so it will be picked up on the next loop.
+            if not sound_instance.sound.loaded:
+                # If the sound is not already loading, load it now
+                if not sound_instance.sound.loading:
+                    sound_instance.sound.load()
+
+                if sound_instance.max_queue_time != 0:
                     self._queue_sound(sound_instance)
+                    self.log.debug("play_sound - Sound %s was not loaded and therefore has been "
+                                   "queued for playback.", sound_instance.name)
+                else:
+                    self.log.debug("play_sound - Sound %s was not loaded and max_queue_time = 0, "
+                                   "therefore it has been discarded and will not be played.", sound_instance.name)
+                    sound_instance.set_expired()
+                    return None
 
-        SDL_UnlockAudio()
+            else:
+                # The sound is loaded and ready for playback.
+                # If the sound can be played right away (available player) then play it.
+                # Is there an available sound player?
+                sound_player = self._get_sound_player_with_lowest_priority()
+                player = sound_player[0]
+                lowest_priority = sound_player[1]
 
-    def replace_sound(self, old_instance not None, sound_instance not None):
+                if lowest_priority is None:
+                    self.log.debug("play_sound - Sound player %d is available "
+                                   "for playback", player)
+                    # Play the sound using the available player
+                    self._play_sound_on_sound_player(sound_instance=sound_instance, player=player)
+                else:
+                    # All sound players are currently busy:
+                    self.log.debug("play_sound - No idle sound player is available.")
+                    self.log.debug("play_sound - Sound player %d is currently playing the sound with "
+                                   "the lowest priority (%d).", player, lowest_priority)
+
+                    # If the lowest priority of all the sounds currently playing is lower than
+                    # the requested sound, kill the lowest priority sound and replace it.
+                    if sound_instance.priority > lowest_priority:
+                        self.log.debug("play_sound - Sound priority (%d) is higher than the "
+                                       "lowest sound currently playing (%d). Forcing playback "
+                                       "on sound player %d.", sound_instance.priority, lowest_priority, player)
+                        self._play_sound_on_sound_player(sound_instance=sound_instance,
+                                                         player=player,
+                                                         force=True)
+
+                    elif sound_instance.max_queue_time == 0:
+                        # The sound could not be played immediately and has now expired (max_queue_time == 0)
+                        self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
+                                       "lowest sound currently playing (%d). Sound could not be played"
+                                       "immediately and has now expired (max_queue_time = 0) and will "
+                                       "not be played.",
+                                       sound_instance.priority, lowest_priority)
+                        sound_instance.set_expired()
+                        return None
+
+                    else:
+                        # Add the requested sound to the priority queue
+                        self.log.debug("play_sound - Sound priority (%d) is less than or equal to the "
+                                       "lowest sound currently playing (%d). Sound will be queued "
+                                       "for playback.", sound_instance.priority, lowest_priority)
+                        self._queue_sound(sound_instance)
+
+        except Exception as ex:
+            # An exception occurred, sound could not be played
+            self.log.error("Track %s: play_sound encountered an unexpected exception while "
+                           "attempting to play the %s sound: %s", self.name, sound.name, ex)
+            raise AudioException("Track {} play_sound encountered an unexpected exception while "
+                                 "attempting to play the {} sound.".format(self.name, sound.name)) from ex
+
+        else:
+            # No exception occurred, return the newly created sound instance that will be played
+            return sound_instance
+
+        finally:
+            # Always unlock the audio mutex before returning
+            SDL_UnlockAudio()
+
+    def _replace_sound_instance(self, old_instance not None, sound_instance not None):
         """
         Replace a currently playing instance with another sound instance.
         Args:
@@ -446,7 +613,7 @@ cdef class TrackStandard(Track):
             sound_instance: The new sound instance to begin playing immediately
         """
 
-        self.log.debug("replace_sound - Preparing to replace existing sound with a new sound instance")
+        self.log.debug("replace_sound_instance - Preparing to replace existing sound with a new sound instance")
 
         # Find which player is currently playing the specified sound instance to replace
         SDL_LockAudio()
@@ -455,7 +622,7 @@ cdef class TrackStandard(Track):
         if player >= 0:
             self._play_sound_on_sound_player(sound_instance, player, force=True)
         else:
-            self.log.debug("replace_sound - Could not locate specified sound instance to replace")
+            self.log.debug("replace_sound_instance - Could not locate specified sound instance to replace")
             sound_instance.set_canceled()
 
         SDL_UnlockAudio()
@@ -476,18 +643,54 @@ cdef class TrackStandard(Track):
         sound_instance.set_queued()
         self.log.debug("Queueing sound %s", sound_instance)
 
-    def stop_sound(self, sound_instance not None):
+    def _get_sound_instances_for_sound(self, sound not None):
+        """Return list of sound instances of the given sound."""
+
+        cdef list instances = list()
+
+        SDL_LockAudio()
+
+        for i in range(self.type_state.sound_player_count):
+            if self.type_state.sound_players[i].status != player_idle and self.type_state.sound_players[
+                i].current.sound_id == sound.id:
+
+                sound_instance_id = self.type_state.sound_players[i].current.sound_instance_id
+                if sound_instance_id in self._playing_instances_by_id:
+                    instances.append(self._playing_instances_by_id[sound_instance_id])
+
+        SDL_UnlockAudio()
+
+        return instances
+
+    def stop_sound(self, sound not None, fade_out=None):
         """
         Stops all instances of the specified sound immediately on the track. Any queued instances
         will be removed from the queue.
         Args:
+            sound: The Sound to stop
+            fade_out: Optional amount of time (seconds) to fade out before stopping
+        """
+        for sound_instance in self._get_sound_instances_for_sound(sound):
+            self.stop_sound_instance(sound_instance, fade_out)
+
+        self._remove_sound_from_queue(sound)
+
+    def stop_sound_instance(self, sound_instance not None, fade_out=None):
+        """
+        Stops the specified sound instance immediately on the track. Any queued instances
+        will be removed from the queue.
+        Args:
             sound_instance: The SoundInstance to stop
+            fade_out: Optional amount of time (seconds) to fade out before stopping
         """
         cdef SoundPlayer *player
 
         SDL_LockAudio()
 
         self.log.debug("Stopping sound %s and removing any pending instances from queue", sound_instance.name)
+
+        if fade_out is None:
+            fade_out = sound_instance.fade_out
 
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle and self.type_state.sound_players[
@@ -497,7 +700,7 @@ cdef class TrackStandard(Track):
                 player = cython.address(self.type_state.sound_players[i])
 
                 # Calculate fade out (if necessary)
-                player.current.fade_steps_remaining = sound_instance.fade_out * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
+                player.current.fade_steps_remaining = fade_out * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
                 if player.current.fade_steps_remaining > 0:
                     player.current.fade_out_steps = player.current.fade_steps_remaining
                     player.current.fading_status = fading_status_fading_out
@@ -516,16 +719,27 @@ cdef class TrackStandard(Track):
                     #       originally scheduled to finish.
                     pass
 
-        # Remove any instances of the specified sound that are pending in the sound queue.
-        if self.sound_instance_is_in_queue(sound_instance):
-            self._remove_sound_from_queue(sound_instance)
+        # Remove any instances of the specified sound that are pending in the sound queue
+        self._remove_sound_instance_from_queue(sound_instance)
 
         SDL_UnlockAudio()
 
-    def stop_sound_looping(self, sound_instance not None):
+    def stop_sound_looping(self, sound not None):
         """
-        Stops all instances of the specified sound on the track after they finish the current loop.
-        Any queued instances of the sound will be removed.
+        Cancels looping for all instances of the specified sound on the track. Any queued instances
+        will be removed from the queue.
+        Args:
+            sound: The Sound to stop looping
+        """
+        for sound_instance in self._get_sound_instances_for_sound(sound):
+            self.stop_sound_instance_looping(sound_instance)
+
+        self._remove_sound_from_queue(sound)
+
+    def stop_sound_instance_looping(self, sound_instance not None):
+        """
+        Stops the specified sound instance on the track after the current loop iteration
+        has finished. Any queued instances of the sound will be removed.
         Args:
             sound_instance: The Sound to stop
         """
@@ -540,7 +754,32 @@ cdef class TrackStandard(Track):
 
         # Remove any instances of the specified sound that are pending in the sound queue.
         if self.sound_instance_is_in_queue(sound_instance):
-            self._remove_sound_from_queue(sound_instance)
+            self._remove_sound_instance_from_queue(sound_instance)
+
+        SDL_UnlockAudio()
+
+    def clear_context(self, context):
+        """
+        Triggers the end mode action for current sound instances played from the specified context.
+        Any queued instances with a matching context will be canceled (removed).
+
+        Args:
+            context: The context to clear
+        """
+        self.log.debug("Clearing context %s", context)
+
+        SDL_LockAudio()
+
+        # Clear any instances in the queue with the given context value
+        self._remove_all_sounds_with_context_from_queue(context)
+
+        for sound_instance in list(self._playing_instances_by_id.values()):
+            if sound_instance.context == context:
+                # Stop or stop looping the sound instance (depends upon mode end action value)
+                if sound_instance.stop_on_mode_end:
+                    self.stop_sound_instance(sound_instance)
+                else:
+                    self.stop_sound_instance_looping(sound_instance)
 
         SDL_UnlockAudio()
 
@@ -675,7 +914,7 @@ cdef class TrackStandard(Track):
 
             # Add sound to the dictionary of active sound instances
             self.log.debug("Adding sound instance %s to active sound dictionary", str(sound_instance))
-            self._sound_instances_by_id[sound_instance.id] = sound_instance
+            self._playing_instances_by_id[sound_instance.id] = sound_instance
 
             # Check if sound player is idle
             if self.type_state.sound_players[player].status == player_idle:
@@ -710,7 +949,7 @@ cdef class TrackStandard(Track):
         # Setup the player to start playing the sound
         sound_settings.sample_pos = <Uint32>(sound_instance.start_at * self.state.callback_data.seconds_to_bytes_factor)
         sound_settings.current_loop = 0
-        sound_settings.sound_id = sound_instance.sound.id
+        sound_settings.sound_id = sound_instance.sound_id
         sound_settings.sound_instance_id = sound_instance.id
         sound_settings.sample = cython.address(sound_container.sample)
         sound_settings.volume = <Uint8>(sound_instance.volume * SDL_MIX_MAXVOLUME)
@@ -824,6 +1063,12 @@ cdef class TrackStandard(Track):
 
         SDL_UnlockAudio()
         return -1
+
+    def get_playing_sound_instance_by_id(self, sound_instance_id):
+        if sound_instance_id in self._playing_instances_by_id:
+            return self._playing_instances_by_id[sound_instance_id]
+        else:
+            return None
 
     def get_status(self):
         """

@@ -49,7 +49,7 @@ ctypedef struct TrackState:
 #    Track base class
 # ---------------------------------------------------------------------------
 cdef class Track:
-    cdef dict _sound_instances_by_id
+
     cdef str _name
     cdef int _number
     cdef list _events_when_stopped
