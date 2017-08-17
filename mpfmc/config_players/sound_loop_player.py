@@ -134,6 +134,10 @@ Here are several various examples:
 
         validated_config = dict()
 
+        # No need to validate if sound system is not enabled, just return empty dict
+        if self.machine.sound_system is None or self.machine.sound_system.audio_interface is None:
+            return validated_config
+
         for event, settings in config.items():
             validated_config[event] = dict()
 

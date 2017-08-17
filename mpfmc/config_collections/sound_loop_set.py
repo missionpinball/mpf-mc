@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.core.audio.audio_exception import AudioException
 
@@ -37,10 +37,6 @@ class SoundLoopSetCollection(ConfigCollection):
         # mc.sound_loop_sets dict.
 
         # config is localized to 'sound_loop_sets' section
-
-        if self.mc.sound_system is None or self.mc.sound_system.audio_interface is None:
-            raise AudioException("Audio features are not enabled. Cannot validate sound_loop_sets config collection.")
-
         return self.process_loop_set(config)
 
     def process_loop_set(self, config: dict) -> dict:
