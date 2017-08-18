@@ -4,6 +4,7 @@ modes:
     - mode1
     - mode2
     - mode3
+    - mode4
 
 dmds:
   default:
@@ -18,6 +19,17 @@ window:
   fullscreen: false
   borderless: false
   exit_on_escape: true
+
+player_vars:
+  test_int:
+    value_type: int
+    initial_value: 7
+  test_str:
+    value_type: str
+    initial_value: "Test"
+  test_float:
+    value_type: float
+    initial_value: 1.75
 
 displays:
   window:

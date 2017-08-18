@@ -1,14 +1,31 @@
 from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 from mpfmc.tests.MpfSlideTestCase import MpfSlideTestCase
+from mpf.tests.MpfFakeGameTestCase import MpfFakeGameTestCase
 
 
-class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfSlideTestCase):
+class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlideTestCase):
 
     def getConfigFile(self):
         return 'config.yaml'
 
     def getMachinePath(self):
         return 'integration/machine_files/widgets_and_slides/'
+
+    def test_placeholders(self):
+        self.start_game()
+        self.post_event("start_mode4")
+        self.advance_time_and_run(.1)
+        self.post_event("show_variable_slide")
+        self.machine.set_machine_var("test1", "asd")
+        self.advance_time_and_run(.1)
+        self.assertSlideOnTop("variable_slide")
+        self.assertTextInSlide('MAIN TEXT 1:Test 2:7 3:1.75 4:asd', "variable_slide")
+        self.machine.game.player["test_int"] = 42
+        self.machine.game.player["test_float"] = 42.23
+        self.machine.game.player["test_str"] = "1337"
+        self.machine.set_machine_var("test1", "l33t")
+        self.advance_time_and_run(.1)
+        self.assertTextInSlide('MAIN TEXT 1:1337 2:42 3:42.23 4:l33t', "variable_slide")
 
     def test_widget_on_slide_of_another_mode(self):
         self.post_event("start_mode1")
