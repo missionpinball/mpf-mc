@@ -99,7 +99,7 @@ class Text(MpfWidget, Label):
                                         str(self.mc.machine_vars[
                                                 var_string.split('|')[1]]))
                 except KeyError:
-                    text = ''
+                    text = text.replace('(' + var_string + ')', '')
 
             elif self.mc.player:
                 if var_string.startswith('player|'):
@@ -118,9 +118,9 @@ class Text(MpfWidget, Label):
                             text = text.replace('(' + var_string + ')',
                                                 str(value))
                         else:
-                            text = ''
+                            text = text.replace('(' + var_string + ')', '')
                     except IndexError:
-                        text = ''
+                        text = text.replace('(' + var_string + ')', '')
                     continue
                 elif self.mc.player.is_player_var(var_string):
                     text = text.replace('(' + var_string + ')',
