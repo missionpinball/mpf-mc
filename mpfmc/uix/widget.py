@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Union, Optional, List
+from typing import Union, Optional, List
 from copy import deepcopy
 from functools import reduce
 
@@ -13,7 +13,8 @@ from mpfmc.uix.relative_animation import RelativeAnimation
 from mpfmc.core.utils import percent_to_float
 from mpf.core.rgba_color import RGBAColor
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 magic_events = ('add_to_slide',

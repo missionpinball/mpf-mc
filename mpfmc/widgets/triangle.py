@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from kivy.graphics import Triangle as KivyTriangle
 from kivy.graphics.context_instructions import Color, Rotate, Scale
@@ -7,7 +7,8 @@ from kivy.properties import ListProperty, NumericProperty
 from mpfmc.uix.widget import Widget
 from mpfmc.core.utils import center_of_points_list
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 

@@ -1,5 +1,5 @@
 """Contains the Display base class, which is a logical display in the mpf-mc."""
-from typing import TYPE_CHECKING, List, Union, Optional
+from typing import List, Union, Optional
 
 from kivy.clock import Clock
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
@@ -17,7 +17,8 @@ from mpfmc.uix.widget import WidgetContainer, Widget
 from mpfmc.uix.slide import Slide
 from kivy.properties import ObjectProperty
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 

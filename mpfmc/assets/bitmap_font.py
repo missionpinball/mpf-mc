@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Dict, Optional
+from typing import Dict, Optional
 from os import path
 from xml.etree.ElementTree import ElementTree, ParseError
 

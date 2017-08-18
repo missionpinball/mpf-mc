@@ -1,11 +1,12 @@
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union
 
 from kivy.properties import ObjectProperty, NumericProperty, AliasProperty
 from kivy.graphics import Rectangle, Color, Rotate, Scale
 
 from mpfmc.uix.widget import Widget
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
     from mpfmc.assets.image import ImageAsset
 

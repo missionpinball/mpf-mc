@@ -1,4 +1,4 @@
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 from kivy.uix.effectwidget import EffectWidget
 from kivy.uix.relativelayout import RelativeLayout
@@ -7,7 +7,8 @@ from kivy.properties import NumericProperty
 from mpfmc.uix.widget import Widget
 from mpfmc.uix.display import DisplayOutput
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
     from mpfmc.uix.slide import Slide
 

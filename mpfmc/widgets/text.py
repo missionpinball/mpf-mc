@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from kivy.uix.label import Label
 from kivy.properties import AliasProperty, NumericProperty, BooleanProperty, \
@@ -9,7 +9,8 @@ from kivy.graphics import Rectangle, Color, Rotate, Scale
 from mpfmc.uix.widget import Widget
 from mpfmc.uix.bitmap_font.label_bitmap_font import LabelBitmapFont
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 
