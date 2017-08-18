@@ -66,3 +66,6 @@ build_scripts/wheels
 
 # Mac OS files
 .DS_Store
+
+# editor tmp
+.*.swp
