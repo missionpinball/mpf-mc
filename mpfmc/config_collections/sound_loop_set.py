@@ -1,9 +1,5 @@
-from typing import TYPE_CHECKING
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.core.audio.audio_exception import AudioException
-
-if TYPE_CHECKING:
-    from mpfmc.core.mc import MpfMc
 
 
 class SoundLoopSetCollection(ConfigCollection):
@@ -12,7 +8,7 @@ class SoundLoopSetCollection(ConfigCollection):
     collection = 'sound_loop_sets'
     class_label = 'SoundLoopSets'
 
-    def __init__(self, mc: "MpfMc"):
+    def __init__(self, mc):
         super().__init__(mc)
 
         self._validate_handler = None
