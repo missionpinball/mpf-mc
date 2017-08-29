@@ -75,6 +75,10 @@ sound_player:
   play_sound_synthping: 210871_synthping
   play_sound_sfx_028: 198361_sfx-028
   play_city_loop: city_loop
+  stop_city_loop:
+    city_loop:
+      action: stop
+      fade_out: 0.1s
 
 slides:
   video_test:
