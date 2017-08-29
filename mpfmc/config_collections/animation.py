@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, Union, List
+from typing import Union, List
 from mpfmc.core.config_collection import ConfigCollection
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.uix.widget import Widget
 
 

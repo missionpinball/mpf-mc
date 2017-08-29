@@ -1,5 +1,5 @@
 import re
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from kivy.uix.label import Label
 from kivy.properties import AliasProperty, NumericProperty, BooleanProperty, \
@@ -9,7 +9,8 @@ from kivy.graphics import Rectangle, Color, Rotate, Scale
 from mpfmc.uix.widget import Widget
 from mpfmc.uix.bitmap_font.label_bitmap_font import LabelBitmapFont
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 
@@ -155,7 +156,7 @@ class Text(Widget):
                                         str(self.mc.machine_vars[
                                                 var_string.split('|')[1]]))
                 except KeyError:
-                    text = ''
+                    text = text.replace('(' + var_string + ')', '')
 
             elif self.mc.player:
                 if var_string.startswith('player|'):
@@ -174,9 +175,9 @@ class Text(Widget):
                             text = text.replace('(' + var_string + ')',
                                                 str(value))
                         else:
-                            text = ''
+                            text = text.replace('(' + var_string + ')', '')
                     except IndexError:
-                        text = ''
+                        text = text.replace('(' + var_string + ')', '')
                     continue
                 elif self.mc.player.is_player_var(var_string):
                     text = text.replace('(' + var_string + ')',

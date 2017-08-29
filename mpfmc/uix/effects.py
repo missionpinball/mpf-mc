@@ -1,6 +1,6 @@
 import importlib
 import abc
-from typing import TYPE_CHECKING, Optional, List, Union
+from typing import Optional, List, Union
 
 from kivy.event import EventDispatcher
 from kivy.uix.effectwidget import (MonochromeEffect, InvertEffect,
@@ -9,7 +9,8 @@ from kivy.uix.effectwidget import (MonochromeEffect, InvertEffect,
                                    VerticalBlurEffect, FXAAEffect,
                                    EffectBase)
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 

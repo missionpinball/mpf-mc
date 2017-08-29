@@ -8,13 +8,14 @@ that's been entered so far.
 
 """
 from collections import deque
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 from kivy.clock import Clock
 
 from mpfmc.uix.widget import WidgetContainer
 from mpfmc.widgets.text import Text
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 

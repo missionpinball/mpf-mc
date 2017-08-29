@@ -1,10 +1,9 @@
-from typing import TYPE_CHECKING
-
 from mpf.tests.MpfTestCase import MpfTestCase
 from mpfmc.widgets.display import DisplayWidget
 from mpfmc.uix.widget import WidgetContainer
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.uix.slide import Slide
 
 
@@ -45,7 +44,7 @@ class MpfSlideTestCase(MpfTestCase):
     def assertTextInSlide(self, text: str, slide_name: str):
         self.assertSlideActive(slide_name)
         self.assertIn(text, self._get_texts_from_slide(self.mc.active_slides[slide_name]),
-                      "Text {} not found in slide {}.".format(text, slide_name))
+                "Text {} not found in slide {}. Text found: {}".format(text, slide_name, self._get_texts_from_slide(self.mc.active_slides[slide_name])))
 
     def assertTextNotInSlide(self, text: str, slide_name: str):
         self.assertSlideActive(slide_name)

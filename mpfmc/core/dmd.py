@@ -1,6 +1,5 @@
 """DMD (hardware device)."""
 import struct
-from typing import TYPE_CHECKING
 from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
@@ -11,7 +10,8 @@ from mpfmc.effects.gain import GainEffect
 from mpfmc.effects.flip_vertical import FlipVerticalEffect
 from mpfmc.effects.gamma import GammaEffect
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 

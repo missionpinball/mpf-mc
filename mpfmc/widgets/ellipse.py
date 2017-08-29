@@ -1,11 +1,12 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 from kivy.graphics.vertex_instructions import Ellipse as KivyEllipse
 from kivy.graphics.context_instructions import Color, Rotate, Scale
 from kivy.properties import NumericProperty
 
 from mpfmc.uix.widget import Widget
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 

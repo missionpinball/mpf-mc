@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Union, List
+from typing import Union, List
 from functools import partial
 from importlib import import_module
 
@@ -7,7 +7,8 @@ from mpf.core.utility_functions import Util
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.uix.widget import magic_events
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.uix.widget import Widget
 
 

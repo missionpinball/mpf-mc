@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
 from kivy.uix.video import Video
 from kivy.core.video import Video as CoreVideo
@@ -7,7 +7,8 @@ from kivy.properties import NumericProperty
 
 from mpfmc.uix.widget import Widget, magic_events
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
     from kivy.graphics.texture import Texture
 

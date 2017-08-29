@@ -1,0 +1,17 @@
+#config_version=5
+mode:
+  start_events: start_mode4
+  stop_events: stop_mode4
+
+slide_player:
+  show_variable_slide: variable_slide
+
+slides:
+  variable_slide:
+  - type: text
+    text: MAIN TEXT 1:(player|test_str) 2:(player|test_int) 3:(player|test_float) 4:(machine|test1)
+    anchor_y: top
+    y: top-3
+    font_size: 30
+    z: 1
+

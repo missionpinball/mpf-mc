@@ -1,11 +1,10 @@
-from typing import TYPE_CHECKING
-
 from kivy.core.window import Window as KivyWindow
 from mpfmc.core.keyboard import Keyboard
 from mpfmc.uix.display import Display
 from mpfmc.widgets.display import DisplayWidget
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 

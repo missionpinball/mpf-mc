@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, List
+from typing import List
 
 from kivy.properties import NumericProperty, ListProperty
 
@@ -9,7 +9,8 @@ from mpfmc.effects.reduce import ReduceEffect
 from mpfmc.effects.colorize import ColorizeEffect
 from mpfmc.effects.gain import GainEffect
 
-if TYPE_CHECKING:
+MYPY = False
+if MYPY:   # pragma: no cover
     from kivy.uix.effectwidget import EffectBase
 
 
