@@ -146,6 +146,8 @@ class MpfMc(App):
             self.sound_system = None
         else:
             self.sound_system = SoundSystem(self)
+            if self.sound_system.audio_interface is None:
+                self.sound_system = None
 
         self.asset_manager = ThreadedAssetManager(self)
         self.bcp_processor = BcpProcessor(self)
@@ -190,9 +192,10 @@ class MpfMc(App):
             SoundAsset.initialize(self)
         else:
             # If the sound system is not loaded or enabled, remove the
-            # sound_player and track_player from the list of config_player modules to setup
+            # audio-related config_player modules and config collections
             del self.machine_config['mpf-mc']['config_players']['sound']
             del self.machine_config['mpf-mc']['config_players']['track']
+            del self.machine_config['mpf-mc']['config_collections']['sound_loop_set']
 
     def get_system_config(self):
         return self.machine_config['mpf-mc']

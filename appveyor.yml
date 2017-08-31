@@ -181,7 +181,9 @@ build_script:
       python ../build_scripts/rename_wheels.py
 
       echo "Uploding wheels to pypi..."
-      python -m twine upload -u $env:pypi_user -p $env:pypi_password --skip-existing *
+      $output = Invoke-Expression "python -m twine upload -u $env:pypi_user -p $env:pypi_password --skip-existing *" -ErrorVariable e
+      echo $output
+      echo $e
     }
 
 test_script:

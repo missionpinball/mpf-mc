@@ -170,6 +170,7 @@ cdef extern from 'glib.h':
     guint g_slist_length (GSList *list) nogil
     GSList *g_slist_reverse(GSList *list) nogil
     void g_slist_foreach(GSList *list, GFunc func, gpointer user_data) nogil
+    gpointer g_slist_nth_data(GSList *list, guint n) nogil
 
     # Memory slices
     gpointer g_slice_alloc(gsize block_size) nogil
@@ -177,6 +178,14 @@ cdef extern from 'glib.h':
     void g_slice_free1(gsize block_size, gpointer mem_block) nogil
     gpointer g_slice_copy(gsize block_size, gconstpointer mem_block) nogil
 
+    # Array
+    ctypedef struct GArray:
+        gchar *data
+        guint len
+    GArray *g_array_new(gboolean zero_terminated, gboolean clear_, guint element_size) nogil
+    GArray *g_array_sized_new(gboolean zero_terminated, gboolean clear_, guint element_size, guint reserved_size) nogil
+    GArray *g_array_set_size(GArray *array, guint length) nogil
+    gchar *g_array_free(GArray *array, gboolean free_segment) nogil
 
 # ---------------------------------------------------------------------------
 #    GStreamer helper functions defined in gstreamer_helper.h
@@ -193,4 +202,9 @@ cdef extern from 'gstreamer_helper.h':
             buscallback_t callback, void *userdata)
     void c_signal_disconnect(GstElement *appsink, gulong handler_id)
 
-
+    void g_array_insert_val_uint(GArray *array, guint index, guint value) nogil
+    void g_array_insert_val_uint8(GArray *array, guint index, guint8 value) nogil
+    guint g_array_index_uint(GArray* array, guint index) nogil
+    guint8 g_array_index_uint8(GArray* array, guint index) nogil
+    void g_array_set_val_uint(GArray *array, guint index, guint value) nogil
+    void g_array_set_val_uint8(GArray *array, guint index, guint8 value) nogil

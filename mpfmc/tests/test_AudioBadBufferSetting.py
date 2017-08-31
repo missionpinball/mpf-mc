@@ -20,11 +20,16 @@ class TestAudioBadBufferSetting(MpfMcTestCase):
             log = logging.getLogger('TestAudio')
             log.warning("Sound system is not enabled - unable to run audio tests")
             self.skipTest("Sound system is not enabled - unable to run audio tests")
-            return
 
         logging.getLogger('TestAudio').setLevel(10)
 
         self.assertIsNotNone(self.mc.sound_system)
+
+        if self.mc.sound_system.audio_interface is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system audio interface could not be loaded - skipping audio tests")
+            self.skipTest("Sound system audio interface could not be loaded")
+
         self.assertIsNotNone(self.mc.sound_system.audio_interface)
         settings = self.mc.sound_system.audio_interface.get_settings()
         self.assertIsNotNone(settings)

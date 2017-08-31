@@ -30,7 +30,7 @@ CYTHON_UNSUPPORTED = ()
 
 PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
                              'mp4', 'm4v', 'so', 'pyd', 'dylib', 'wav', 'ogg',
-                             'pxi', 'pyx', 'c', 'h', 'ttf')
+                             'pxd', 'pyx', 'c', 'h', 'ttf')
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
@@ -428,9 +428,16 @@ gl_flags = {}
 # -----------------------------------------------------------------------------
 # sources to compile
 sources = {
+    'core/audio/sound_file.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
+    'core/audio/track.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
+    'core/audio/track_standard.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
+    'core/audio/track_sound_loop.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/audio_interface.pyx': {
-        'depends': ['core/audio/sdl2_helper.h', 'core/audio/sdl2.pxi',
-                    'core/audio/gstreamer_helper.h', 'core/audio/gstreamer.pxi']},
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
 }
 

@@ -36,6 +36,11 @@ class TestAudioGStreamer(MpfMcTestCase):
 
         self.assertIsNotNone(self.mc.sound_system)
         interface = self.mc.sound_system.audio_interface
+        if interface is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system audio interface could not be loaded - skipping audio tests")
+            self.skipTest("Sound system audio interface could not be loaded")
+
         self.assertIsNotNone(interface)
 
         # Mock BCP send method
@@ -66,5 +71,41 @@ class TestAudioGStreamer(MpfMcTestCase):
 
         self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_played')
 
+    def test_retrigger_streamed_sound(self):
+        """ Tests retriggering a streamed sound (play, stop, play) (using gstreamer) """
+
+        if SoundSystem is None or self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        if interface is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system audio interface could not be loaded - skipping audio tests")
+            self.skipTest("Sound system audio interface could not be loaded")
+
+        self.assertIsNotNone(interface)
+        track_music = interface.get_track_by_name("music")
+        self.assertIsNotNone(track_music)
+
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
+
+        self.mc.events.post('play_city_loop')
+
+        self.advance_real_time(1)
+        self.assertTrue(track_music.sound_is_playing(self.mc.sounds['city_loop']))
+
+        self.mc.events.post('stop_city_loop')
+        self.advance_real_time(0.25)
+        self.assertFalse(track_music.sound_is_playing(self.mc.sounds['city_loop']))
+        self.advance_real_time(0.25)
+        self.mc.events.post('play_city_loop')
+        self.advance_real_time(1)
+        self.assertTrue(track_music.sound_is_playing(self.mc.sounds['city_loop']))
+        self.advance_real_time(1)
 
 

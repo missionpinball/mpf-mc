@@ -80,6 +80,7 @@ sound_pools:
         type: sequence
         simultaneous_limit: 3
         stealing_method: skip
+        track: sfx
         sounds:
             - 4832__zajo__drum07
             - 84480__zgump__drum-fx-4
