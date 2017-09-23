@@ -166,6 +166,12 @@ class McSlidePlayer(McConfigPlayer):
             s.pop("target")
 
             if s['action'] == 'play':
+                # remove slide if it already exists
+                if slide in instance_dict[target_name]:
+                    del instance_dict[target_name][slide]
+                    target.remove_slide(slide=slide,
+                                        transition_config=s['transition'])
+
                 # is this a named slide, or a new slide?
                 if 'widgets' in s:
                     target.add_and_show_slide(key=full_context,
