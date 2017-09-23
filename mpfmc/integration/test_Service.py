@@ -50,6 +50,22 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
         self.assertTextOnTopSlide("First coil")
         self.assertTextOnTopSlide("Coil Power Off")
 
+        # exit
+        self.hit_and_release_switch("s_service_esc")
+        self.advance_time_and_run()
+        self.assertSlideOnTop("service_menu")
+
+        self.hit_and_release_switch("s_service_up")
+        self.advance_time_and_run()
+
+        # enter light test
+        self.hit_and_release_switch("s_service_enter")
+        self.advance_time_and_run()
+        self.assertSlideOnTop("service_light_test")
+        self.assertTextOnTopSlide("l_light1")
+        self.assertTextOnTopSlide("First light")
+        self.assertTextOnTopSlide("1/white")
+
         # close door
         self.release_switch_and_run("s_door_open", 1)
         self.assertTextNotOnTopSlide("Coil Power Off")

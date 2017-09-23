@@ -33,6 +33,13 @@ switches:
         number:
         label: "The test switch label"
 
+lights:
+    l_light1:
+      number: 1
+      label: First light
+    l_light5:
+      number: 5
+
 sound_system:
   tracks:
     voice:
