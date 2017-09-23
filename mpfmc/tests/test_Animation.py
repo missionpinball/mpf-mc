@@ -134,7 +134,7 @@ class TestAnimation(MpfMcTestCase):
         self.mc.events.post('show_slide13')
         self.advance_time(.1)
 
-        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        widget = self.mc.active_slides['slide13'].children[0].children[0]
 
         self.assertAlmostEqual(-130, widget.x, delta=20)
         self.advance_time(.5)
@@ -148,6 +148,10 @@ class TestAnimation(MpfMcTestCase):
         # animations should start from orig position
         self.mc.events.post('show_slide13')
         self.advance_time(.1)
+
+        # refetch widget because this is another slide instance
+        widget = self.mc.active_slides['slide13'].children[0].children[0]
+
         self.assertAlmostEqual(-130, widget.x, delta=20)
         self.advance_time(.5)
         self.assertAlmostEqual(-8, widget.x, delta=20)
@@ -158,7 +162,7 @@ class TestAnimation(MpfMcTestCase):
         self.mc.events.post('show_slide14')
         self.advance_time(.1)
 
-        widget = self.mc.targets['default'].current_slide.children[0].children[0]
+        widget = self.mc.active_slides['slide14'].children[0].children[0]
 
         self.assertAlmostEqual(-108, widget.x, delta=20)
         self.advance_time(.5)
@@ -172,6 +176,10 @@ class TestAnimation(MpfMcTestCase):
         # animations should start from orig position
         self.mc.events.post('show_slide14')
         self.advance_time(.1)
+
+        # refetch widget because this is another slide instance
+        widget = self.mc.active_slides['slide14'].children[0].children[0]
+
         self.assertAlmostEqual(-108, widget.x, delta=20)
         self.advance_time(.5)
         self.assertAlmostEqual(-8, widget.x, delta=20)
