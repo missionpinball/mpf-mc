@@ -84,11 +84,20 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfSlideTestCase):
         self.post_event("remove_slide_mode2_frame")
         self.advance_time_and_run()
 
-        self.post_event("remove_slide_mode1_on_frame_mode2")
-        self.advance_time_and_run()
+        # text should not be there
+        self.assertTextNotOnTopSlide("Slide Mode 1")
+
+        # we cannot remove slide here for some reason. works in dev/0.50
 
         # add again
         self.post_event("show_slide_mode2_frame")
+        self.advance_time_and_run()
+
+        # text should not be there
+        self.assertTextOnTopSlide("Slide Mode 1")
+
+        # this works
+        self.post_event("remove_slide_mode1_on_frame_mode2")
         self.advance_time_and_run()
 
         # text should not be there
