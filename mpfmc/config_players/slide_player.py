@@ -169,8 +169,7 @@ class McSlidePlayer(McConfigPlayer):
                 # remove slide if it already exists
                 if slide in instance_dict[target_name]:
                     del instance_dict[target_name][slide]
-                    target.remove_slide(slide=slide,
-                                        transition_config=s['transition'])
+                    target.remove_slide(slide=slide)
 
                 # is this a named slide, or a new slide?
                 if 'widgets' in s:
@@ -188,7 +187,7 @@ class McSlidePlayer(McConfigPlayer):
                 if slide in instance_dict[target_name]:
                     del instance_dict[target_name][slide]
                     target.remove_slide(slide=slide,
-                                        transition_config=s['transition'])
+                                        transition_config=s['transition'] if 'transition' in s else [])
 
     def get_express_config(self, value):
         # express config for slides can either be a string (slide name) or a
