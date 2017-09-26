@@ -1,6 +1,7 @@
-from kivy.uix.screenmanager import WipeTransition, FadeTransition
+import weakref
 
-from mpf.core.config_player import ConfigPlayer
+import gc
+from kivy.uix.screenmanager import WipeTransition, FadeTransition
 
 from mpfmc.config_players.slide_player import McSlidePlayer
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
@@ -526,6 +527,33 @@ class TestSlidePlayer(MpfMcTestCase):
 
         bcp_command = ('register_trigger', None, {'event': 'flash_widget_2'})
         self.assertIn(bcp_command, self.sent_bcp_commands)
+
+    def test_play_multiple_times(self):
+        # set a baseline slide
+        self.mc.events.post('show_slide_1')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'machine_slide_1')
+
+        # start the mode and then post that event again. The slide should
+        # switch
+        self.mc.modes['mode1'].start()
+
+        self.mc.events.post('show_mode1_slide')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name, 'mode1_slide')
+        slide = weakref.ref(self.mc.targets['display1'].current_slide)
+
+        for i in range(10):
+            self.mc.events.post('show_mode1_slide')
+            self.advance_time()
+            self.assertEqual(self.mc.targets['display1'].current_slide_name, 'mode1_slide')
+            # run garbage collector
+            gc.collect()
+            # weak ref to the slide should be none
+            self.assertIsNone(slide())
+            # build weak ref to curent slide
+            slide = weakref.ref(self.mc.targets['display1'].current_slide)
 
 
 class TestMpfSlidePlayer(MpfTestCase):
