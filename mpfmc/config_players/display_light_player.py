@@ -18,6 +18,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
     def __init__(self, machine):
         super().__init__(machine)
         self._scheduled = False
+        self._last_color = {}
 
     def play_element(self, settings, element, context, calling_context, priority=0, **kwargs):
         context_dict = self._get_instance_dict(context)
@@ -26,6 +27,13 @@ class McDisplayLightPlayer(BcpConfigPlayer):
                 self._scheduled = True
                 Clock.schedule_interval(self._tick, 0)
             context_dict[element] = self._setup_fbo(element, settings)
+        elif settings['action'] == "stop":
+            try:
+                del context_dict[element]
+            except IndexError:
+                pass
+        else:
+            raise AssertionError("Unknown action {}".format(settings['action']))
 
     def _setup_fbo(self, element, settings):
         """Setup FBO for a display."""
@@ -50,9 +58,9 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         del dt
         for context, instances in self.instances.items():
             for element, instance in instances.items():
-                self._render(instance, element)
+                self._render(instance, element, context)
 
-    def _render(self, instance, element):
+    def _render(self, instance, element, context):
         fbo, effect_widget, source, settings = instance
 
         # detach the widget from the parent
@@ -76,20 +84,29 @@ class McDisplayLightPlayer(BcpConfigPlayer):
             parent.add_widget(source)
 
         values = {}
+        width = source.native_size[0]
+        height = source.native_size[1]
         for x, y, name in settings['light_map']:
-            values[name] = (
-                data[source.native_size[0] * y * 3 + x * 3],
-                data[source.native_size[0] * y * 3 + x * 3 + 1],
-                data[source.native_size[0] * y * 3 + x * 3 + 2])
+            x_pixel = int(x * width)
+            y_pixel = height - int(y * height)
+            value = (
+                data[width * y_pixel * 3 + x_pixel * 3],
+                data[width * y_pixel * 3 + x_pixel * 3 + 1],
+                data[width * y_pixel * 3 + x_pixel * 3 + 2])
 
-        self.machine.bcp_processor.send("trigger", name="display_light_player_apply", values=values, element=element)
+            if name not in self._last_color or self._last_color[name] != value:
+                self._last_color[name] = value
+                values[name] = value
+
+        self.machine.bcp_processor.send("trigger", name="display_light_player_apply", context=context,
+                                        values=values, element=element)
         # clear the fbo background
         fbo.bind()
         fbo.clear_buffer()
         fbo.release()
 
-    def clear_context_element(self, context, element):
-        pass
+    def clear_context(self, context):
+        self._reset_instance_dict(context)
 
 
 mc_player_cls = McDisplayLightPlayer

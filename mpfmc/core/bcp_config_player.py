@@ -44,7 +44,7 @@ class BcpConfigPlayer(metaclass=abc.ABCMeta):
     def clear_from_trigger(self, context, **kwargs):
         """Call clear_context from BCP trigger."""
         del kwargs
-        self.clear_context_element(context=context)
+        self.clear_context(context=context)
 
     @abc.abstractmethod
     def play_element(self, settings, element, context, calling_context, priority=0, **kwargs):
@@ -53,6 +53,6 @@ class BcpConfigPlayer(metaclass=abc.ABCMeta):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def clear_context_element(self, context, element):
+    def clear_context(self, context):
         """Clear the context."""
         raise NotImplementedError
