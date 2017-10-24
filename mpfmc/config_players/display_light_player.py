@@ -52,7 +52,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
 
         fbo.add(effect_widget.canvas)
 
-        return (fbo, effect_widget, source, settings)
+        return [fbo, effect_widget, source, settings, True]
 
     def _tick(self, dt):
         del dt
@@ -61,7 +61,8 @@ class McDisplayLightPlayer(BcpConfigPlayer):
                 self._render(instance, element, context)
 
     def _render(self, instance, element, context):
-        fbo, effect_widget, source, settings = instance
+        fbo, effect_widget, source, settings, first = instance
+        instance[4] = False
 
         # detach the widget from the parent
         parent = source.parent
@@ -83,23 +84,25 @@ class McDisplayLightPlayer(BcpConfigPlayer):
             effect_widget.remove_widget(source)
             parent.add_widget(source)
 
-        values = {}
-        width = source.native_size[0]
-        height = source.native_size[1]
-        for x, y, name in settings['light_map']:
-            x_pixel = int(x * width)
-            y_pixel = height - int(y * height)
-            value = (
-                data[width * y_pixel * 3 + x_pixel * 3],
-                data[width * y_pixel * 3 + x_pixel * 3 + 1],
-                data[width * y_pixel * 3 + x_pixel * 3 + 2])
+        if not first:
+            # for some reasons we got garbage in the first buffer. we just skip it for now
+            values = {}
+            width = source.native_size[0]
+            height = source.native_size[1]
+            for x, y, name in settings['light_map']:
+                x_pixel = int(x * width)
+                y_pixel = height - int(y * height)
+                value = (
+                    data[width * y_pixel * 3 + x_pixel * 3],
+                    data[width * y_pixel * 3 + x_pixel * 3 + 1],
+                    data[width * y_pixel * 3 + x_pixel * 3 + 2])
 
-            if name not in self._last_color or self._last_color[name] != value:
-                self._last_color[name] = value
-                values[name] = value
+                if name not in self._last_color or self._last_color[name] != value:
+                    self._last_color[name] = value
+                    values[name] = value
 
-        self.machine.bcp_processor.send("trigger", name="display_light_player_apply", context=context,
-                                        values=values, element=element)
+            self.machine.bcp_processor.send("trigger", name="display_light_player_apply", context=context,
+                                            values=values, element=element)
         # clear the fbo background
         fbo.bind()
         fbo.clear_buffer()
