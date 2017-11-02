@@ -63,7 +63,7 @@ class SoundPool(AssetPool):
                 self.log.debug("Sound '%s' has been assigned a default track value of '%s' "
                                "(only one track has been configured)", name, track.name)
             else:
-                raise AssertionError("Sound {} does not have a valid track.".format(name))
+                raise AssertionError("SoundPool {} does not have a valid track.".format(name))
 
         self._track = config['track']
         self._key = config['key']
@@ -249,7 +249,7 @@ class SoundAsset(Asset):
                 self.log.debug("Sound '%s' has been assigned a default track value of '%s' "
                                "(only one track has been configured)", name, track.name)
             else:
-                raise AssertionError("SoundPool {} does not have a valid track.".format(name))
+                raise AssertionError("Sound {} does not have a valid track.".format(name))
 
         self._track = config['track']
 
