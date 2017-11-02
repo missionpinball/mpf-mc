@@ -57,6 +57,10 @@ class DisplayWidget(Widget, RelativeLayout):
 
             self.effects.effects = effects_list
 
+    def get_display(self):
+        """List display."""
+        return self.display
+
     @property
     def current_slide(self) -> Optional["Slide"]:
         """The current slide shown on the linked display."""

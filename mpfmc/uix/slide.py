@@ -46,11 +46,11 @@ class Slide(Screen, StencilView):
         self.transition_out = config.get('transition_out', None)
         self.expire = config.get('expire', None)
 
-        target = self.mc.targets[target]
+        self.display = self.mc.targets[target]
 
         self.size_hint = (None, None)
         super().__init__()
-        self.size = target.native_size
+        self.size = self.display.native_size
         self.orig_w, self.orig_h = self.size
         self.z = 0
 
@@ -62,7 +62,7 @@ class Slide(Screen, StencilView):
 
             self.add_widgets(widgets)
 
-        target.add_widget(self)
+        self.display.add_widget(self)
         self.mc.active_slides[name] = self
         self.mc.slides[name] = config
 
@@ -216,6 +216,9 @@ class Slide(Screen, StencilView):
 
         """
         del kwargs
+        if widget.get_display() == self.display:
+            raise AssertionError("Cannot add widget {} to display {} because the widget uses the same display.".
+                                 format(widget, self.display))
 
         if widget.z < 0:
             self.add_widget_to_parent_frame(widget)

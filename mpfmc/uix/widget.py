@@ -138,6 +138,10 @@ class Widget(KivyWidget):
     def __repr__(self) -> str:  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
+    def get_display(self):
+        """Get the display used"""
+        return None
+
     def pass_to_kivy_widget_init(self) -> dict:
         """Initializes the dictionary of settings to pass to Kivy."""
         return dict()
@@ -883,6 +887,10 @@ class WidgetContainer(RelativeLayout):
     z = NumericProperty(0)
     '''Z position (z-order) of the widget (used to determine the drawing order of widgets).
     '''
+
+    def get_display(self):
+        """Get the display used"""
+        return self._widget.get_display()
 
     def _get_widget(self):
         return self._widget
