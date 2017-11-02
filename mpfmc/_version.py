@@ -1,4 +1,4 @@
-__version__ = '0.50.0-dev.9'
+__version__ = '0.50.0-dev.10'
 __short_version__ = '0.50'
 __bcp_version__ = '1.1'
 __config_version__ = '5'
