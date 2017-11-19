@@ -73,6 +73,8 @@ class DisplayLightPlayer(BcpPluginPlayer):
         for element in context_dics:
             self._clear_key_from_lights(element)
 
+        self._reset_instance_dict(context)
+
         super().clear_context(context)
 
     def get_express_config(self, value):
