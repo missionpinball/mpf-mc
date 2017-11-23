@@ -76,7 +76,7 @@ class McWidgetPlayer(McConfigPlayer):
 
             return
 
-        if 'slide' in s:
+        if 'slide' in s and s['slide']:
             if s['key'] in instance_dict and isinstance(instance_dict[s['key']], EventHandlerKey):
                 self.machine.events.remove_handler_by_key(instance_dict[s['key']])
             handler = self.machine.events.add_handler(
