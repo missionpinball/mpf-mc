@@ -16,9 +16,11 @@ class DisplayLightPlayer(BcpPluginPlayer):
         if element not in self._get_instance_dict(context):
             return
 
+        priority = self._get_instance_dict(context)[element]
+
         key = "display_light_player_{}".format(element)
         for light, color in values.items():
-            self.machine.lights[light].color(key=key, color=color)
+            self.machine.lights[light].color(key=key, color=color, priority=priority)
 
     def _validate_config_item(self, device, device_settings):
         device_settings = super()._validate_config_item(device, device_settings)
@@ -34,7 +36,7 @@ class DisplayLightPlayer(BcpPluginPlayer):
 
         for element, s in settings.items():
             if s['action'] == "play":
-                context_dict[element] = True
+                context_dict[element] = priority
             elif s['action'] == "stop":
                 try:
                     del context_dict[element]
