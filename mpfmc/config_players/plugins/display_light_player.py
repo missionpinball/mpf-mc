@@ -13,12 +13,19 @@ class DisplayLightPlayer(BcpPluginPlayer):
 
     def _apply_lights(self, context, element, values, **kwargs):
         del kwargs
-        if element not in self._get_instance_dict(context):
+        context_dict = self._get_instance_dict(context)
+        if element not in context_dict:
             return
+
+        # get delta to last frame for interframe interpolation
+        last_frame = context_dict[element]
+        current_frame = self.machine.clock.get_time()
+        context_dict[element] = current_frame
 
         key = "display_light_player_{}".format(element)
         for light, color in values.items():
-            self.machine.lights[light].color(key=key, color=color)
+            self.machine.lights[light].color(key=key, color=color,
+                                             fade_ms=int((current_frame - last_frame) * 1000))
 
     def _validate_config_item(self, device, device_settings):
         device_settings = super()._validate_config_item(device, device_settings)
@@ -34,7 +41,7 @@ class DisplayLightPlayer(BcpPluginPlayer):
 
         for element, s in settings.items():
             if s['action'] == "play":
-                context_dict[element] = True
+                context_dict[element] = self.machine.clock.get_time()
             elif s['action'] == "stop":
                 try:
                     del context_dict[element]
