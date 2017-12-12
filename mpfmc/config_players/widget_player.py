@@ -30,7 +30,7 @@ class McWidgetPlayer(McConfigPlayer):
     def _get_slide(self, s):
         slide = None
 
-        if s['slide']:
+        if 'slide' in s and s['slide']:
             slide_name = s.pop('slide')
             try:
                 slide = self.machine.active_slides[slide_name]
