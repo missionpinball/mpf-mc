@@ -37,6 +37,9 @@ assets:
         music:
             load: on_demand
             track: music
+        loops:
+            load: preload
+            track: sfx
 
 sounds:
     264828_text:
