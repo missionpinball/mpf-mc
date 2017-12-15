@@ -37,6 +37,8 @@ class McDisplayLightPlayer(BcpConfigPlayer):
 
     def _setup_fbo(self, element, settings):
         """Setup FBO for a display."""
+        if element not in self.machine.displays:
+            raise AssertionError("Display {} not found. Please create it to use display_light_player.".format(element))
         source = self.machine.displays[element]
 
         # put the widget canvas on a Fbo
