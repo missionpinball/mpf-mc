@@ -18,3 +18,6 @@ assets:
         music:
             load: on_demand
             track: default
+        loops:
+            load: preload
+            track: default

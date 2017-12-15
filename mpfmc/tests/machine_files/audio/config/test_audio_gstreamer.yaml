@@ -33,6 +33,9 @@ assets:
     music:
       load: on_demand
       track: music
+    loops:
+      load: preload
+      track: sfx
   videos:
       default:
           load: preload
