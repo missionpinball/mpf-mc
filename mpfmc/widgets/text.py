@@ -93,16 +93,20 @@ class Text(Widget):
     def _draw_widget(self, *args):
         """Draws the image (draws a rectangle using the image texture)"""
         del args
-
-        anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
         self.canvas.clear()
+
+        # Redrawing the widget doesn't reposition, so update manually
+        anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
+        # Save the updated position as a new variable, such that consecutive text
+        # changes don't introduce gradual shifts in position.
+        pos = super(Text, self).calculate_rounded_position(anchor)
 
         if len(self._label.text) > 0:
             with self.canvas:
                 Color(*self.color)
                 Rotate(angle=self.rotation, origin=anchor)
                 Scale(self.scale).origin = anchor
-                Rectangle(pos=self.pos, size=self.size, texture=self._label.texture)
+                Rectangle(pos=pos, size=self.size, texture=self._label.texture)
 
     def on_label_texture(self, instance, texture):
         del instance
