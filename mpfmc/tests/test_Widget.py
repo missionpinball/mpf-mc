@@ -165,6 +165,68 @@ class TestWidget(MpfMcTestCase):
         widget = Rectangle(self.mc, config)
         self.assertEqual(widget.anchor_offset_pos, (-10, -10))
 
+    def test_on_container_parent(self):
+        parent = self.mc.targets['default'].add_slide(name='parent')
+
+        # test without rounding
+        config = {"anchor_x": "center", "anchor_y": "middle",
+                  "width": 11, "height": 11, "type": "rectangle"}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+
+        widget.on_container_parent(None, parent)
+        self.assertEqual(widget.pos, [400, 300])
+
+        # test with offsetting down
+        config = {"anchor_x": "center", "anchor_y": "middle",
+                  "width": 11, "height": 11, "type": "rectangle",
+                  "round_anchor_x": "left", "round_anchor_y": "bottom",}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        widget.on_container_parent(None, parent)
+        self.assertEqual(widget.pos, [399.5, 299.5])
+
+        # test with offsetting up
+        config = {"anchor_x": "center", "anchor_y": "middle",
+                  "width": 11, "height": 11, "type": "rectangle",
+                  "round_anchor_x": "right", "round_anchor_y": "top",}
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        widget.on_container_parent(None, parent)
+        self.assertEqual(widget.pos, [400.5, 300.5])
+
+        # test with inheriting parent offsets
+        config = {"anchor_x": "center", "anchor_y": "middle",
+                  "width": 11, "height": 11, "type": "rectangle"}
+        parent.display.config['round_anchor_x'] = "left"
+        parent.display.config['round_anchor_y'] = "top"
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        widget.on_container_parent(None, parent)
+        self.assertEqual(widget.pos, [399.5, 300.5])
+
+        # test with widget config overriding parent offset
+        config = {"anchor_x": "center", "anchor_y": "middle",
+                  "width": 11, "height": 11, "type": "rectangle",
+                  "round_anchor_x": "right", "round_anchor_y": "bottom"}
+        parent.display.config['round_anchor_x'] = "left"
+        parent.display.config['round_anchor_y'] = "top"
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        widget.on_container_parent(None, parent)
+        self.assertEqual(widget.pos, [400.5, 299.5])
+
+        # test with widget config removing parent offset
+        config = {"anchor_x": "center", "anchor_y": "middle",
+                  "width": 11, "height": 11, "type": "rectangle",
+                  "round_anchor_x": "center", "round_anchor_y": "middle"}
+        parent.display.config['round_anchor_x'] = "left"
+        parent.display.config['round_anchor_y'] = "top"
+        self.mc.config_validator.validate_config('widgets:rectangle', config, base_spec='widgets:common')
+        widget = Rectangle(self.mc, config)
+        widget.on_container_parent(None, parent)
+        self.assertEqual(widget.pos, [400, 300])
+
     def test_calculate_initial_position(self):
         # Parent is
         # 100x100, so center of the parent is 50, 50
