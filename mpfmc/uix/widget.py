@@ -328,10 +328,10 @@ class Widget(KivyWidget):
                 return
         else:
             try:
-                style = self.mc.machine_config['widget_styles'][self.config['style'].lower()]
+                style = self.mc.machine_config['widget_styles'][self.config['style']]
             except KeyError:
                 raise ValueError("{} has an invalid style name: {}".format(
-                    self, self.config['style'].lower()))
+                    self, self.config['style']))
 
         found = False
 

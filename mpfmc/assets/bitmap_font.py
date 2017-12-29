@@ -30,8 +30,8 @@ class BitmapFontAsset(Asset):
 
         if isinstance(self.config['descriptor'], str):
             if not path.isfile(self.config['descriptor']):
-                raise FileNotFoundError('Could not locate the bitmap font descriptor file ' +
-                                        self._descriptor_file)
+                raise FileNotFoundError('Could not locate the bitmap font descriptor file {}'.format(
+                                        self.config['descriptor']))
 
         elif not isinstance(self.config['descriptor'], list):
             raise ValueError('Bitmap font descriptor must contain either a list or file name.')
