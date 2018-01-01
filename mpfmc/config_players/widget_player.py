@@ -73,6 +73,8 @@ class McWidgetPlayer(McConfigPlayer):
                                                    name=widget,
                                                    play_kwargs=play_kwargs,
                                                    **s))  # todo
+            if not s['key'] in instance_dict:
+                instance_dict[s['key']] = True
 
             return
 
@@ -163,7 +165,6 @@ class McWidgetPlayer(McConfigPlayer):
 
     def clear_context(self, context):
         """Clear context."""
-
         instance_dict = self._get_instance_dict(context)
         for key in instance_dict:
             if isinstance(instance_dict[key], EventHandlerKey):
