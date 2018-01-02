@@ -1,6 +1,7 @@
-from typing import Union, Optional, List
+from typing import Union, Optional, List, Tuple
 from copy import deepcopy
 from functools import reduce
+import math
 
 from kivy.clock import Clock
 from kivy.animation import Animation
@@ -96,6 +97,8 @@ class Widget(KivyWidget):
 
         self._percent_prop_dicts = dict()
 
+        self._round_anchor_styles = (None, None)
+
         self._default_style = None
         self._set_default_style()
         self._apply_style()
@@ -171,42 +174,58 @@ class Widget(KivyWidget):
                                             opacity=1,
                                             line_height=1)
 
-            self.pos = self.calculate_initial_position(parent.width,
-                                                       parent.height,
-                                                       self.config['x'],
-                                                       self.config['y'])
-
             # The top-most parent owns the display, so traverse up to find the config
             top_widget = parent
-            while top_widget.parent:
+            while hasattr(top_widget, 'parent') and not hasattr(top_widget, 'display'):
                 top_widget = top_widget.parent
             displayconfig = top_widget.display.config if hasattr(top_widget, 'display') else dict()
 
             # If the positioning is centered, look for a rounding setting to avoid
             # fractional anchor positions. Fallback to display's config if available
-            round_anchor_x = self.config['anchor_x'] in ('center', 'middle') and (self.config['round_anchor_x'] or displayconfig.get('round_anchor_x'))
-            round_anchor_y = self.config['anchor_y'] in ('center', 'middle') and (self.config['round_anchor_y'] or displayconfig.get('round_anchor_y'))
-            offset_x = 0
-            offset_y = 0
+            round_anchor_x = self.config['round_anchor_x'] or displayconfig.get('round_anchor_x')
+            round_anchor_y = self.config['round_anchor_y'] or displayconfig.get('round_anchor_y')
 
-            if round_anchor_x == 'left':
-                offset_x = self.anchor_offset_pos[0] % -1
-            elif round_anchor_x == 'right':
-                offset_x = self.anchor_offset_pos[0] % 1
-            if round_anchor_y == 'top':
-                offset_y = self.anchor_offset_pos[1] % 1
-            elif round_anchor_y == 'bottom':
-                offset_y = self.anchor_offset_pos[1] % -1
+            # Store the anchor rounding config from widget/display to avoid recalculation
+            self._round_anchor_styles = (round_anchor_x, round_anchor_y)
 
-            self.pos[0] += offset_x
-            self.pos[1] += offset_y
+            self.pos = self.calculate_initial_position(parent.width,
+                                                       parent.height,
+                                                       self.config['x'],
+                                                       self.config['y'],
+                                                       round_anchor_x,
+                                                       round_anchor_y)
+
+            # Update the initial widget position based on the rounding config
+            self.pos = self.calculate_rounded_position(self.anchor_offset_pos)
+
+    def calculate_rounded_position(self, anchor: Tuple[int, int]) -> tuple:
+        """Returns a tuple of (x, y) coordinates for the position of the widget,
+        accounting for odd-numbered pixel dimensions and the rounding configuration
+        of the widget/display."""
+        # Start with the given initial position of the widget
+        rounded_x = self.pos[0]
+        rounded_y = self.pos[1]
+
+        # Shift each of the x/y coordinates according to the anchor rounding
+        if self._round_anchor_styles[0] == 'left':
+            rounded_x -= anchor[0] % 1
+        elif self._round_anchor_styles[0] == 'right':
+            rounded_x += (1 - anchor[0]) % 1
+        if self._round_anchor_styles[1] == 'bottom':
+            rounded_y -= anchor[1] % 1
+        elif self._round_anchor_styles[1] == 'top':
+            rounded_y += (1 - anchor[1]) % 1
+
+        return rounded_x, rounded_y
 
     # pylint: disable-msg=too-many-arguments
     # pylint: disable-msg=too-many-statements
     @staticmethod
     def calculate_initial_position(parent_w: int, parent_h: int,
                                    x: Optional[Union[int, str]] = None,
-                                   y: Optional[Union[int, str]] = None) -> tuple:
+                                   y: Optional[Union[int, str]] = None,
+                                   round_x: Optional[Union[bool, str]] = None,
+                                   round_y: Optional[Union[bool,str]] = None) -> tuple:
         """Returns the initial x,y position for the widget within a larger
         parent frame based on several positioning parameters. This position will
         be combined with the widget anchor position to determine its actual
@@ -235,6 +254,14 @@ class Widget(KivyWidget):
                 return the vertical center (parent height / 2). Can also start
                 with the strings "top", "middle", or "bottom" which can be combined
                 with values. (e.g top-2, bottom+4, middle-1)
+            round_x: (Optional) Specifies a direction of either "left" or "right"
+                to round the calculated pixel value for the horizontal position.
+                Used to prevent partial pixel placement on DMDs, especially when
+                position/anchors are specified in percentages
+            round_y: (Optional) Specifies a direction of either "bottom" or "top"
+                to round the calculated pixel value for the vertical position.
+                Used to prevent partial pixel placement on DMDs, especially when
+                position/anchors are specified in percentages
 
         Returns: Tuple of x, y coordinates for the lower-left corner of the
             widget you're placing.
@@ -279,6 +306,11 @@ class Widget(KivyWidget):
             x = percent_to_float(x, parent_w)
             x += start_x
 
+            if round_x == 'left':
+                x = math.floor(x)
+            elif round_x == 'right':
+                x = math.ceil(x)
+
         # --------------------
         # Y / height / vertical
         # --------------------
@@ -309,6 +341,11 @@ class Widget(KivyWidget):
 
             y = percent_to_float(y, parent_h)
             y += start_y
+
+            if round_y == 'bottom':
+                y = math.floor(y)
+            elif round_y == 'top':
+                y = math.ceil(y)
 
         return x, y
 

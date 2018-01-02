@@ -182,6 +182,57 @@ class TestText(MpfMcTestCase):
         self.advance_time()
         self.assertEqual(self.get_widget().text, 'Player 2 test variable')
 
+    def test_position_rounding(self):
+        # staight var, no player specified
+        self.mc.game_start()
+        self.advance_time()
+        self.mc.add_player(1)
+        self.advance_time()
+        self.mc.player_start_turn(1)
+        self.advance_time()
+
+        self.assertTrue(self.mc.player)
+
+        # set var, should update widget with even pixel width and not offset
+        self.mc.player.test_var = 'its even'
+        self.mc.events.post('text_with_player_var1')
+        self.advance_time()
+
+        self.get_widget()._round_anchor_styles = ('left', None)
+
+        bounding_box = self.get_widget().canvas.children[-1]
+        self.assertEqual(self.get_widget().text, 'its even')
+        self.assertEqual(bounding_box.size, (343, 118))
+        self.assertEqual(bounding_box.pos, (200, 150))
+
+        # update var, should update widget with an odd pixel width and offset DOWN
+        self.mc.player.test_var = 'odd'
+        self.advance_time()
+
+        bounding_box = self.get_widget().canvas.children[-1]
+        self.assertEqual(self.get_widget().text, 'odd')
+        self.assertEqual(bounding_box.size, (169, 118))
+        self.assertEqual(bounding_box.pos, (199.5, 150))
+
+        # update var, should update widget with an odd pixel width and offset UP
+        self.get_widget()._round_anchor_styles = ('right', None)
+        self.mc.player.test_var = 'also odd'
+        self.advance_time()
+
+        bounding_box = self.get_widget().canvas.children[-1]
+        self.assertEqual(self.get_widget().text, 'also odd')
+        self.assertEqual(bounding_box.size, (381, 118))
+        self.assertEqual(bounding_box.pos, (200.5, 150))
+
+        # update var, should update widget with an even pixel width and not offset
+        self.mc.player.test_var = 'no round'
+        self.advance_time()
+
+        bounding_box = self.get_widget().canvas.children[-1]
+        self.assertEqual(self.get_widget().text, 'no round')
+        self.assertEqual(bounding_box.size, (394, 118))
+        self.assertEqual(bounding_box.pos, (200, 150))
+
     def test_current_player(self):
         # verifies that current player text update when current player changes
         self.mc.game_start()
