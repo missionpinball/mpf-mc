@@ -100,6 +100,11 @@ class SoundPool(AssetPool):
         return id(self)
 
     @property
+    def loops(self):
+        """Return loops."""
+        return 0
+
+    @property
     def key(self):
         """Return the unique key value for this sound pool"""
         return self._key
