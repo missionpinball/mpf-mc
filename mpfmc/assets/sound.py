@@ -340,11 +340,20 @@ class SoundAsset(Asset):
                                      "Could not create sound '{}' asset"
                                      .format(sys.exc_info()[1], self.name))
 
-            # An attenuation value of exactly 1.0 does absolutely nothing so
-            # there is no point in keeping the ducking settings for this
-            # sound when attenuation is 1.0.
-            if self._ducking.attenuation == 1.0:
-                self._ducking = None
+        elif self.config['track'] and 'ducking' in self.machine.sound_system.config['tracks'][self.config['track']]:
+            try:
+                self._ducking = DuckingSettings(
+                    self.machine, self.machine.sound_system.config['tracks'][self.config['track']]['ducking'])
+            except AudioException:
+                raise AudioException("Error in ducking settings: {} of track {}"
+                                     "Could not create sound '{}' asset"
+                                     .format(sys.exc_info()[1], self.config['track'], self.name))
+
+        # An attenuation value of exactly 1.0 does absolutely nothing so
+        # there is no point in keeping the ducking settings for this
+        # sound when attenuation is 1.0.
+        if self._ducking and self._ducking.attenuation == 1.0:
+            self._ducking = None
 
     def __del__(self):
         """Destructor"""
