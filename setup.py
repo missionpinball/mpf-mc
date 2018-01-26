@@ -519,7 +519,7 @@ install_requires = ['ruamel.yaml>=0.10,<0.11',  # better YAML library
                     ]
 
 if platform == 'win32':
-    install_requires += ['pypiwin32',
+    install_requires += ['pypiwin32==219',
                          'kivy.deps.sdl2==0.1.17',
                          'kivy.deps.sdl2_dev==0.1.17',
                          'kivy.deps.glew==0.1.9',
