@@ -104,7 +104,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
                     values[name] = value
 
             self.machine.bcp_processor.send("trigger", name="display_light_player_apply", context=context,
-                                            values=values, element=element)
+                                            values=values, element=element, _silent=True)
         # clear the fbo background
         fbo.bind()
         fbo.clear_buffer()
