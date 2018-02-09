@@ -65,7 +65,6 @@ class DmdBase(object):
     def _set_dmd_fps(self) -> None:
         # fps is the rate that the connected client requested. We'll use the
         # lower of the two
-
         mc_fps = self.config['fps']
 
         if mc_fps == 0:
@@ -95,6 +94,11 @@ class DmdBase(object):
 
     def tick(self, dt) -> None:
         """Draw image for DMD and send it."""
+        del dt
+        # run this at the end of the tick to make sure all kivy bind callbacks have executed
+        Clock.schedule_once(self._render, -1)
+
+    def _render(self, dt):
         del dt
         widget = self.source
         fbo = self.fbo

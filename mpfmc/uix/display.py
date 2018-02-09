@@ -10,8 +10,8 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
 from kivy.uix.widget import Widget as KivyWidget, WidgetException as KivyWidgetException
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatter import Scatter
-from kivy.graphics.context_instructions import Color
-from kivy.graphics import Rectangle
+from kivy.graphics import (
+    Translate, Fbo, ClearColor, ClearBuffers, Scale)
 
 from mpfmc.uix.widget import WidgetContainer, Widget
 from mpfmc.uix.slide import Slide
@@ -77,6 +77,35 @@ class Display(ScreenManager):
     def __repr__(self):
         return '<Display name={}{}, current slide={}, total slides={}>'.format(
             self.name, self.size, self.current_slide_name, len(self.slides))
+
+    def get_frame_data(self, *args):
+        """Return the content of this display as buffer.
+
+        @see: widget.export_to_png
+        """
+        del args
+        if self._slide_manager_parent.parent is not None:
+            canvas_parent_index = self._slide_manager_parent.parent.canvas.indexof(self._slide_manager_parent.canvas)
+            if canvas_parent_index > -1:
+                self._slide_manager_parent.parent.canvas.remove(self._slide_manager_parent.canvas)
+
+        fbo = Fbo(size=self._slide_manager_parent.size, with_stencilbuffer=True)
+
+        with fbo:
+            ClearColor(0, 0, 0, 1)
+            ClearBuffers()
+            Scale(1, -1, 1)
+            Translate(-self._slide_manager_parent.x, -self._slide_manager_parent.y - self._slide_manager_parent.height, 0)
+
+        fbo.add(self._slide_manager_parent.canvas)
+        fbo.draw()
+        data = fbo.texture.pixels
+        fbo.remove(self._slide_manager_parent.canvas)
+
+        if self._slide_manager_parent.parent is not None and canvas_parent_index > -1:
+            self._slide_manager_parent.parent.canvas.insert(canvas_parent_index, self._slide_manager_parent.canvas)
+
+        return data
 
     @property
     def ready(self):
@@ -582,7 +611,7 @@ class DisplayOutput(Scatter):
 
         parent.bind(size=self.on_parent_resize)
         parent.add_widget(self)
-        Clock.schedule_once(self._fit_to_parent, -1)
+        self._fit_to_parent()
         Clock.schedule_interval(self._redraw, 0)
 
     def __repr__(self) -> str:  # pragma: no cover

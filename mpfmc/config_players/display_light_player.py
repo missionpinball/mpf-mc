@@ -1,6 +1,6 @@
 from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
-from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_RGBA, GL_UNSIGNED_BYTE
+from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 from kivy.graphics.texture import Texture
 from kivy.uix.effectwidget import EffectWidget
 
@@ -59,7 +59,12 @@ class McDisplayLightPlayer(BcpConfigPlayer):
 
         return [fbo, effect_widget, source, settings, True, True]
 
-    def _tick(self, dt):
+    def _tick(self, dt) -> None:
+        del dt
+        # run this at the end of the tick to make sure all kivy bind callbacks have executed
+        Clock.schedule_once(self._render_all, -1)
+
+    def _render_all(self, dt):
         del dt
         for context, instances in self.instances.items():
             for element, instance in instances.items():
