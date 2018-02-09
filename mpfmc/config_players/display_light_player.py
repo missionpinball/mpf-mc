@@ -26,10 +26,13 @@ class McDisplayLightPlayer(BcpConfigPlayer):
             if not self._scheduled:
                 self._scheduled = True
                 Clock.schedule_interval(self._tick, 0)
-            context_dict[element] = self._setup_fbo(element, settings)
+            if element not in context_dict:
+                context_dict[element] = self._setup_fbo(element, settings)
+            else:
+                context_dict[element][5] = True
         elif settings['action'] == "stop":
             try:
-                del context_dict[element]
+                context_dict[element][5] = False
             except IndexError:
                 pass
         else:
@@ -54,16 +57,18 @@ class McDisplayLightPlayer(BcpConfigPlayer):
 
         fbo.add(effect_widget.canvas)
 
-        return [fbo, effect_widget, source, settings, True]
+        return [fbo, effect_widget, source, settings, True, True]
 
     def _tick(self, dt):
         del dt
         for context, instances in self.instances.items():
             for element, instance in instances.items():
+                if not element[5]:
+                     continue
                 self._render(instance, element, context)
 
     def _render(self, instance, element, context):
-        fbo, effect_widget, source, settings, first = instance
+        fbo, effect_widget, source, settings, first, enabled = instance
         instance[4] = False
 
         # detach the widget from the parent
