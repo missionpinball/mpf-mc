@@ -1,4 +1,4 @@
-"""Mission Pinball Framework Media Controller (mpf-mc) setup.py"""
+"""Mission Pinball Framework Media Controller (mpf-mc) setup.py."""
 
 
 import sys
@@ -6,7 +6,7 @@ import re
 
 from copy import deepcopy
 import os
-from os.path import join, dirname, sep, exists, basename, isdir
+from os.path import join, dirname, sep, exists, isdir
 from os import walk, environ
 from distutils.version import LooseVersion
 from distutils.sysconfig import get_python_inc
@@ -15,8 +15,8 @@ from time import sleep
 from setuptools import setup, Extension
 
 
-# fix error with py3's LooseVersion comparisons
 def ver_equal(self, other):
+    """Fix error with py3's LooseVersion comparisons."""
     return self.version == other
 
 LooseVersion.__eq__ = ver_equal
@@ -33,6 +33,7 @@ PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
                              'pxd', 'pyx', 'c', 'h', 'ttf')
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
+
 
 def getoutput(cmd, env=None):
     import subprocess
@@ -516,15 +517,12 @@ install_requires = ['ruamel.yaml>=0.10,<0.11',  # better YAML library
                     'kivy>=1.10.0',
                     'psutil',
                     'pygments',  # YAML syntax formatting for the iMC
+                    'pypiwin32==219;platform_system=="Windows"',
+                    'kivy.deps.sdl2==0.1.17;platform_system=="Windows"',
+                    'kivy.deps.sdl2_dev==0.1.17;platform_system=="Windows"',
+                    'kivy.deps.glew==0.1.9;platform_system=="Windows"',
+                    'kivy.deps.gstreamer==0.1.12;platform_system=="Windows"',
                     ]
-
-if platform == 'win32':
-    install_requires += ['pypiwin32==219',
-                         'kivy.deps.sdl2==0.1.17',
-                         'kivy.deps.sdl2_dev==0.1.17',
-                         'kivy.deps.glew==0.1.9',
-                         'kivy.deps.gstreamer==0.1.12',
-                         ]
 
 # If we're running on Read The Docs, then we just need to copy the files
 # (since mpf-docs uses the test YAML files in the doc build), and we don't
