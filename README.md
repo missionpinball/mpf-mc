@@ -22,6 +22,7 @@ The MPF project homepage is here : http://missionpinball.org
 [![Coverage Status](https://coveralls.io/repos/missionpinball/mpf-mc/badge.svg?branch=dev&service=github)](https://coveralls.io/github/missionpinball/mpf-mc?branch=dev)
 [![Build Status](https://travis-ci.org/missionpinball/mpf-mc.svg?branch=dev)](https://travis-ci.org/missionpinball/mpf-mc)
 [![Code Health](https://landscape.io/github/missionpinball/mpf-mc/dev/landscape.svg?style=flat)](https://landscape.io/github/missionpinball/mpf-mc/dev)
+[![Open Source Helpers](https://www.codetriage.com/missionpinball/mpf-mc/badges/users.svg)](https://www.codetriage.com/missionpinball/mpf-mc)
 
 Installation, Documentation, and Examples
 -----------------------------------------
