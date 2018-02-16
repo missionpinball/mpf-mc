@@ -137,6 +137,12 @@ class McSlidePlayer(McConfigPlayer):
             settings = settings['slides']
 
         for slide, s in settings.items():
+            slide_dict = self.machine.placeholder_manager.parse_conditional_template(slide)
+
+            if slide_dict["condition"] and not slide_dict["condition"].evaluate(kwargs):
+                continue
+            slide = slide_dict["name"]
+
             s.update(kwargs)
 
             if s["slide"]:
