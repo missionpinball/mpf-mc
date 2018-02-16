@@ -28,6 +28,7 @@ from kivy.config import Config
 from mpfmc.assets.video import VideoAsset
 from mpfmc.core.bcp_processor import BcpProcessor
 from mpfmc.core.config_processor import ConfigProcessor
+from mpf.core.config_processor import ConfigProcessor as MpfConfigProcessor
 from mpfmc.core.mode_controller import ModeController
 from mpfmc.uix.transitions import TransitionManager
 from mpfmc.uix.effects import EffectsManager
@@ -83,6 +84,10 @@ class MpfMc(App):
         self.options = options
         self.log.info("Machine path: %s", machine_path)
         self.machine_path = machine_path
+        # load machine into path to load modules
+        if machine_path not in sys.path:
+            sys.path.append(machine_path)
+        self.mpf_config_processor = MpfConfigProcessor()
         self.machine_config = self._load_config()
 
         self.clock = Clock
@@ -171,24 +176,6 @@ class MpfMc(App):
         self.receive_machine_var_update('mpfmc_ver', __version__, 0, True)
 
     @staticmethod
-    def _get_machine_path_and_add_to_path(machine_path, machine_files_default='machine_files'):
-        # If the machine folder value passed starts with a forward or
-        # backward slash, then we assume it's from the mpf root. Otherwise we
-        # assume it's in the mpf/machine_files folder
-        if machine_path.startswith('/') or machine_path.startswith('\\'):
-            machine_path = machine_path
-        else:
-            machine_path = os.path.join(machine_files_default, machine_path)
-
-        machine_path = os.path.abspath(machine_path)
-
-        # Add the machine folder to sys.path so we can import modules from it
-        if machine_path not in sys.path:
-            sys.path.append(machine_path)
-
-        return machine_path
-
-    @staticmethod
     def _load_machine_config(config_file_list, machine_path,
                             config_path='config', existing_config=None):
 
@@ -241,16 +228,11 @@ class MpfMc(App):
         Config.set('graphics', 'maxfps', int(config['mpf-mc']['fps']))
 
     def _load_config(self):
-        mpf_config = ConfigProcessor.load_config_file(os.path.join(
-            mpfmc.__path__[0], self.options["mcconfigfile"]), 'machine')
-
-        machine_path = self._get_machine_path_and_add_to_path(self.machine_path,
-                                                              mpf_config['mpf-mc']['paths'][
-                                                                'machine_files'])
-
-        mpf_config = self._load_machine_config(self.options["configfile"], machine_path,
-                                         mpf_config['mpf-mc']['paths'][
-                                             'config'], mpf_config)
+        files = [os.path.join(
+            mpfmc.__path__[0], self.options["mcconfigfile"])]
+        for config_file in self.options["configfile"]:
+            files.append(os.path.join(self.machine_path, "config", config_file))
+        mpf_config = self.mpf_config_processor.load_config_files_with_cache(files, "machine")
 
         self._preprocess_config(mpf_config)
 

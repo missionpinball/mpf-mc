@@ -87,6 +87,7 @@ class ModeController(object):
                              "folder in your machine's 'modes' folder?"
                              .format(mode_string))
 
+        config_files = []
         # Is there an MPF default config for this mode? If so, load it first
         try:
             mpf_mode_config = os.path.join(
@@ -97,8 +98,7 @@ class ModeController(object):
                 self._mpf_mode_folders[mode_string] + '.yaml')
 
             if os.path.isfile(mpf_mode_config):
-                config = ConfigProcessor.load_config_file(mpf_mode_config,
-                                                          'mode', ignore_unknown_sections=True)
+                config_files.append(mpf_mode_config)
 
                 if self.debug:
                     self.log.debug("Loading config from %s", mpf_mode_config)
@@ -117,15 +117,17 @@ class ModeController(object):
                 self._machine_mode_folders[mode_string] + '.yaml')
 
             if os.path.isfile(mode_config_file):
-                config = Util.dict_merge(config,
-                            ConfigProcessor.load_config_file(
-                                mode_config_file, 'mode', ignore_unknown_sections=True))
+                config_files.append(mode_config_file)
 
                 if self.debug:
                     self.log.debug("Loading config from %s", mode_config_file)
 
         except KeyError:
             pass
+
+        config = self.mc.mpf_config_processor.load_config_files_with_cache(
+            config_files, "mode", load_from_cache=not self.mc.options['no_load_cache'],
+            store_to_cache=self.mc.options['create_config_cache'])
 
         # validate config
         if 'mode' not in config:

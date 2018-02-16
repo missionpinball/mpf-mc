@@ -45,6 +45,8 @@ class MpfMcTestCase(unittest.TestCase):
         return dict(machine_path=self.get_machine_path(),
                     mcconfigfile='mcconfig.yaml',
                     configfile=Util.string_to_list(self.get_config_file()),
+                    no_load_cache=False,
+                    create_config_cache=True,
                     bcp=False)
 
     def getAbsoluteMachinePath(self):

@@ -104,16 +104,17 @@ class Command(object):
                             help="Enables verbose logging to the console. Do NOT on "
                                  "Windows platforms")
 
-        # The following are just included for full compatibility with mpf.py
-        # which is needed when using "mpf both".
-
         parser.add_argument("-a",
-                            action="store_const", dest="force_platform",
-                            const='no_load_cache', help=argparse.SUPPRESS)
+                            action="store_true", dest="no_load_cache",
+                            help="Forces the config to be loaded from files "
+                                 "and not cache")
 
         parser.add_argument("-A",
-                            action="store_const", dest="force_platform",
-                            const='create_config_cache', help=argparse.SUPPRESS)
+                            action="store_false", dest="create_config_cache",
+                            help="Does not create the cache config files")
+
+        # The following are just included for full compatibility with mpf.py
+        # which is needed when using "mpf both".
 
         parser.add_argument("-x",
                             action="store_const", dest="force_platform",

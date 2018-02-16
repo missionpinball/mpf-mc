@@ -54,7 +54,6 @@ mpf-mc:
         shows: shows
         sounds: sounds
         machine_files: examples
-        config: config
         fonts: fonts
         images: images
         animations: animations
