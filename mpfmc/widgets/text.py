@@ -209,7 +209,7 @@ class Text(Widget):
                     grouped_item = Text.group_digits(item)
                     text = text.replace(str(item), grouped_item)
 
-            if self.config['casing'] in ('lower', 'upper', 'title', 'capitalize'):
+            if self.config.get('casing', None) in ('lower', 'upper', 'title', 'capitalize'):
                 text = getattr(text, self.config['casing'])()
 
         self._label.text = text
