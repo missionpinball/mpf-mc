@@ -24,6 +24,7 @@ from mpfmc.core.mc_settings_controller import McSettingsController
 
 logging.Logger.manager.root = Logger
 
+from kivy.config import Config
 from mpfmc.assets.video import VideoAsset
 from mpfmc.core.bcp_processor import BcpProcessor
 from mpfmc.core.config_processor import ConfigProcessor
@@ -59,7 +60,7 @@ class MpfMc(App):
 
     """Kivy app for the mpf media controller."""
 
-    def __init__(self, options, config, machine_path,
+    def __init__(self, options, machine_path,
                  thread_stopper=None, **kwargs):
 
         self.log = logging.getLogger('mpfmc')
@@ -80,9 +81,10 @@ class MpfMc(App):
         super().__init__(**kwargs)
 
         self.options = options
-        self.machine_config = config
         self.log.info("Machine path: %s", machine_path)
         self.machine_path = machine_path
+        self.machine_config = self._load_config()
+
         self.clock = Clock
         # pylint: disable-msg=protected-access
         self.log.info("Starting clock at %sHz", Clock._max_fps)
@@ -167,6 +169,92 @@ class MpfMc(App):
         self.create_machine_var('mpfmc_ver', __version__)
         # force setting it here so we have it before MPF connects
         self.receive_machine_var_update('mpfmc_ver', __version__, 0, True)
+
+    @staticmethod
+    def _get_machine_path_and_add_to_path(machine_path, machine_files_default='machine_files'):
+        # If the machine folder value passed starts with a forward or
+        # backward slash, then we assume it's from the mpf root. Otherwise we
+        # assume it's in the mpf/machine_files folder
+        if machine_path.startswith('/') or machine_path.startswith('\\'):
+            machine_path = machine_path
+        else:
+            machine_path = os.path.join(machine_files_default, machine_path)
+
+        machine_path = os.path.abspath(machine_path)
+
+        # Add the machine folder to sys.path so we can import modules from it
+        if machine_path not in sys.path:
+            sys.path.append(machine_path)
+
+        return machine_path
+
+    @staticmethod
+    def _load_machine_config(config_file_list, machine_path,
+                            config_path='config', existing_config=None):
+
+        machine_config = dict()
+
+        for num, config_file in enumerate(config_file_list):
+            if not existing_config:
+                machine_config = CaseInsensitiveDict()
+            else:
+                machine_config = existing_config
+
+            if not (config_file.startswith('/') or
+                        config_file.startswith('\\')):
+                config_file = os.path.join(machine_path, config_path,
+                                           config_file)
+
+            machine_config = Util.dict_merge(machine_config,
+                                             ConfigProcessor.load_config_file(config_file, 'machine',
+                                                                              ignore_unknown_sections=True))
+
+        return machine_config
+
+    @staticmethod
+    def _preprocess_config(config):
+        kivy_config = config['kivy_config']
+
+        try:
+            kivy_config['graphics'].update(config['window'])
+        except KeyError:
+            pass
+
+        if ('top' in kivy_config['graphics'] and
+                'left' in kivy_config['graphics']):
+            kivy_config['graphics']['position'] = 'custom'
+
+        for section, settings in kivy_config.items():
+            for k, v in settings.items():
+                try:
+                    if k in Config[section]:
+                        Config.set(section, k, v)
+                except KeyError:
+                    continue
+
+        try:  # config not validated yet, so we use try
+            if config['window']['exit_on_escape']:
+                Config.set('kivy', 'exit_on_escape', '1')
+        except KeyError:
+            pass
+
+        Config.set('graphics', 'maxfps', int(config['mpf-mc']['fps']))
+
+    def _load_config(self):
+        mpf_config = ConfigProcessor.load_config_file(os.path.join(
+            mpfmc.__path__[0], self.options["mcconfigfile"]), 'machine')
+
+        machine_path = self._get_machine_path_and_add_to_path(self.machine_path,
+                                                              mpf_config['mpf-mc']['paths'][
+                                                                'machine_files'])
+
+        mpf_config = self._load_machine_config(self.options["configfile"], machine_path,
+                                         mpf_config['mpf-mc']['paths'][
+                                             'config'], mpf_config)
+
+        self._preprocess_config(mpf_config)
+
+        return mpf_config
 
     def _create_dmds(self, **kwargs):
         self.create_dmds()
