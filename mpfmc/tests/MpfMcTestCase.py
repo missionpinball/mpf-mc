@@ -175,17 +175,23 @@ class MpfMcTestCase(unittest.TestCase):
                 mpf_config['mpf-mc']['paths']['config'], mpf_config)
         self.preprocess_config(mpf_config)
 
-        self.mc = MpfMc(options=self.get_options(),
-                        config=mpf_config,
-                        machine_path=machine_path)
+        try:
+            self.mc = MpfMc(options=self.get_options(),
+                            config=mpf_config,
+                            machine_path=machine_path)
 
-        self.patch_bcp()
+            self.patch_bcp()
 
-        from kivy.core.window import Window
-        Window.create_window()
-        Window.canvas.clear()
+            from kivy.core.window import Window
+            Window.create_window()
+            Window.canvas.clear()
 
-        self._start_app_as_slave()
+            self._start_app_as_slave()
+        except Exception:
+            if self.mc:
+                # prevent dead locks with two asset manager threads
+                self.mc.stop()
+            raise
 
     def _start_app_as_slave(self):
         # from app::run
