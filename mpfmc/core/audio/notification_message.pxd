@@ -104,6 +104,25 @@ cdef inline void send_sound_looping_notification(int player, long sound_id, long
 
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
+cdef inline void send_sound_about_to_finish_notification(int player, long sound_id, long sound_instance_id,
+                                                         TrackState *track) nogil:
+    """
+    Sends a sound almost finished notification
+    Args:
+        player: The sound player number on which the event occurred
+        sound_id: The sound id
+        sound_instance_id: The sound instance id
+        track: The TrackState pointer
+    """
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_sound_about_to_finish
+        notification_message.player = player
+        notification_message.sound_id = sound_id
+        notification_message.sound_instance_id = sound_instance_id
+
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+
 cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,
                                                 TrackState *track,
                                                 int marker_id) nogil:
