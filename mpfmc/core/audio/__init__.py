@@ -214,8 +214,9 @@ class SoundSystem(object):
                                                                config['simultaneous_sounds'],
                                                                config['volume'])
         elif config['type'] == 'playlist':
-            # TODO: Implement playlist track create
-            raise NotImplementedError('Playlist track not yet implemented')
+            track = self.audio_interface.create_playlist_track(self.mc,
+                                                               name,
+                                                               config['volume'])
 
         elif config['type'] == 'sound_loop':
             if 'max_layers' not in config:

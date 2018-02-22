@@ -7,6 +7,7 @@ mpf-mc:
         sound: mpfmc.config_players.sound_player
         track: mpfmc.config_players.track_player
         sound_loop: mpfmc.config_players.sound_loop_player
+        playlist: mpfmc.config_players.playlist_player
         display_light: mpfmc.config_players.display_light_player
 
     config_collections:
@@ -15,6 +16,7 @@ mpf-mc:
         animation: mpfmc.config_collections.animation
         widget_styles: mpfmc.config_collections.widget_styles
         sound_loop_set: mpfmc.config_collections.sound_loop_set
+        playlist: mpfmc.config_collections.playlist
 
     widgets:
         image: mpfmc.widgets.image

@@ -924,7 +924,7 @@ cdef class TrackStandard(Track):
                 # The player is currently busy playing another sound, force it to be replaced with the sound instance
                 self._set_player_replacing(cython.address(self.type_state.sound_players[player]), sound_instance)
 
-            self.log.debug("Sound %s is set to begin playback on playlist track (loops=%d)",
+            self.log.debug("Sound %s is set to begin playback on standard track (loops=%d)",
                            sound_instance.name, sound_instance.loops)
 
             SDL_UnlockAudio()
@@ -972,6 +972,9 @@ cdef class TrackStandard(Track):
             g_array_insert_val_uint(sound_settings.markers,
                                     index,
                                     <guint>(sound_instance.markers[index]['time'] * self.state.callback_data.seconds_to_bytes_factor))
+
+        # Set almost finished marker (calculate based on the end of the sound)
+        sound_settings.almost_finished_marker = (sound_container.duration - sound_instance.almost_finished_time) * self.state.callback_data.seconds_to_bytes_factor
 
         # If the sound has ducking settings, apply them
         if sound_instance.ducking is not None and sound_instance.ducking.track_bit_mask != 0:
