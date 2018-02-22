@@ -22,6 +22,7 @@ DEFAULT_PRIORITY = 0
 DEFAULT_MAX_QUEUE_TIME = None
 DEFAULT_LOOPS = 0
 MINIMUM_DUCKING_DURATION = "10ms"
+DEFAULT_ALMOST_FINISHED_TIME = 2.0
 
 
 class SoundPool(AssetPool):
@@ -706,6 +707,7 @@ class SoundInstance(object):
         self._start_at = self._sound.start_at
         self._fade_in = self._sound.fade_in
         self._fade_out = self._sound.fade_out
+        self._almost_finished_time = DEFAULT_ALMOST_FINISHED_TIME
         self._max_queue_time = self._sound.max_queue_time
         self._events_when_played = self._sound.events_when_played
         self._events_when_stopped = self._sound.events_when_stopped
@@ -740,6 +742,9 @@ class SoundInstance(object):
 
         if 'fade_out' in settings and settings['fade_out'] is not None:
             self._fade_out = settings['fade_out']
+
+        if 'almost_finished_time' in settings and settings['almost_finished_time'] is not None:
+            self._almost_finished_time = settings['almost_finished_time']
 
         if 'max_queue_time' in settings:
             self._max_queue_time = settings['max_queue_time']
@@ -881,6 +886,11 @@ class SoundInstance(object):
     def fade_out(self):
         """Return the fade out time for the sound (in seconds)"""
         return self._fade_out
+
+    @property
+    def almost_finished_time(self):
+        """Return the time before the end when an almost finished marker will be generated (in seconds)"""
+        return self._almost_finished_time
 
     @property
     def loops(self):
