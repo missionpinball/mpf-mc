@@ -8,15 +8,16 @@ class MpfSoundLoopPlayer(PluginPlayer):
     MPF, not the mpf-mc. MPF finds this instance because the mpf-mc setup.py
     has the following entry_point configured:
 
-        sound_player=mpfmc.config_players.sound_loop_player:register_with_mpf
+        sound_loop_player=mpfmc.config_players.sound_loop_player:register_with_mpf
 
     """
     config_file_section = 'sound_loop_player'
     show_section = 'sound_loop_sets'
+
 
 player_cls = MpfSoundLoopPlayer
 
 
 def register_with_mpf(machine):
     """Registers the sound loop player plug-in with MPF"""
-    return 'sound_loop_sets', MpfSoundLoopPlayer(machine)
+    return 'sound_loop', MpfSoundLoopPlayer(machine)
