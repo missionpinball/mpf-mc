@@ -60,6 +60,9 @@ cdef class TrackSoundLoop(Track):
         self._initialize_player(self.type_state.current)
         self._initialize_player(self.type_state.next)
 
+        self.log.debug("Created Track %d %s",
+                       self.number, self.name)
+
         SDL_UnlockAudio()
 
     def __dealloc__(self):
@@ -315,6 +318,8 @@ cdef class TrackSoundLoop(Track):
         """
         SDL_LockAudio()
 
+        self.log.debug("Stopping current sound loop set")
+
         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
             self.log.info("Unable to stop sound loop set - no sound loop set is currently playing.")
             SDL_UnlockAudio()
@@ -339,6 +344,8 @@ cdef class TrackSoundLoop(Track):
         after the current loop iteration).
         """
         SDL_LockAudio()
+
+        self.log.debug("Stopping looping current sound loop set")
 
         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
             self.log.info("Unable to stop looping sound loop set - no sound loop set is currently playing.")
@@ -367,6 +374,9 @@ cdef class TrackSoundLoop(Track):
             return
 
         SDL_LockAudio()
+
+        self.log.debug("play_layer - Play layer %d of the currently playing sound_loop_set (fade-in = %f sec).",
+                       layer, fade_in)
 
         # Retrieve the layer
         if self.type_state.current.layers == NULL:
@@ -421,6 +431,9 @@ cdef class TrackSoundLoop(Track):
 
         SDL_LockAudio()
 
+        self.log.debug("stop_layer - Stop layer %d of the currently playing sound_loop_set (fade-out = %f sec).",
+                       layer, fade_out)
+
         # Retrieve the layer
         if self.type_state.current.layers == NULL:
             self.log.info("There are no layers defined in the current sound loop set: stop_layers has no effect")
@@ -464,6 +477,8 @@ cdef class TrackSoundLoop(Track):
             return
 
         SDL_LockAudio()
+
+        self.log.debug("stop_looping_layer - Stop looping layer %d of the currently playing sound_loop_set.", layer)
 
         # Retrieve the layer
         if self.type_state.current.layers == NULL:
