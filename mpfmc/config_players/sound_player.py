@@ -169,7 +169,7 @@ Here are several various examples:
             if 'track' in settings:
                 track = settings['track']
 
-                if self.machine.sound_system.audio_interface.get_track_type(track) != "sound_loop":
+                if self.machine.sound_system.audio_interface.get_track_type(track) != "standard":
                     raise ValueError("SoundPlayer: An invalid audio track '{}' is specified for event '{}' "
                                      "(only standard audio tracks are supported).".format(track, event))
 
@@ -239,5 +239,6 @@ Here are several various examples:
             track = self.machine.sound_system.audio_interface.get_track(index)
             if track.type == "standard":
                 track.clear_context(context)
+
 
 mc_player_cls = McSoundPlayer
