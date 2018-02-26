@@ -1,0 +1,31 @@
+#config_version=5
+
+mode:
+  priority: 100
+  start_events: start_mode1
+  stop_events: stop_mode1
+  game_mode: false
+
+slide_player:
+  mode_mode1_started:
+    mode1_slide1:
+      widgets:
+      - type: text
+        text: Sound Loop Player Test
+
+sound_loop_sets:
+  basic_beat:
+    sound: kick
+    volume: 0.5
+
+sound_loop_player:
+  play_basic_beat:
+    loops:
+      action: play
+      sound_loop_set: basic_beat
+      queue: True
+  stop_current_loop:
+    loops:
+      action: stop
+      fade_out: 1.5s
+

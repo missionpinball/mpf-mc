@@ -696,6 +696,8 @@ struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDat
 typedef struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDataLooping __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDataLooping;
 struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDataMarker;
 typedef struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDataMarker __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDataMarker;
+struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageSoundLoopSet;
+typedef struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageSoundLoopSet __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageSoundLoopSet;
 union __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageData;
 typedef union __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageData __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageData;
 struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer;
@@ -716,11 +718,14 @@ enum __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessage {
   __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_about_to_finish = 5,
   __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_player_idle = 10,
   __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_stopped = 0,
-  __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_paused = 21
+  __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_paused = 21,
+  __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_started = 31,
+  __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_stopped = 32,
+  __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_looping = 33
 };
 
-/* "mpfmc/core/audio/notification_message.pxd":20
- *     notification_track_paused = 21            # Notification that the track has been paused
+/* "mpfmc/core/audio/notification_message.pxd":23
+ *     notification_sound_loop_set_looping = 33  # Notification that a sound_loop_set is looping back to the beginning
  * 
  * ctypedef struct NotificationMessageDataLooping:             # <<<<<<<<<<<<<<
  *     int loop_count
@@ -731,7 +736,7 @@ struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDat
   int loops_remaining;
 };
 
-/* "mpfmc/core/audio/notification_message.pxd":24
+/* "mpfmc/core/audio/notification_message.pxd":27
  *     int loops_remaining
  * 
  * ctypedef struct NotificationMessageDataMarker:             # <<<<<<<<<<<<<<
@@ -742,8 +747,19 @@ struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDat
   int id;
 };
 
-/* "mpfmc/core/audio/notification_message.pxd":27
+/* "mpfmc/core/audio/notification_message.pxd":30
  *     int id
+ * 
+ * ctypedef struct NotificationMessageSoundLoopSet:             # <<<<<<<<<<<<<<
+ *     long id
+ * 
+ */
+struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageSoundLoopSet {
+  long id;
+};
+
+/* "mpfmc/core/audio/notification_message.pxd":33
+ *     long id
  * 
  * ctypedef union NotificationMessageData:             # <<<<<<<<<<<<<<
  *     NotificationMessageDataLooping looping
@@ -752,10 +768,11 @@ struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDat
 union __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageData {
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDataLooping looping;
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageDataMarker marker;
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageSoundLoopSet sound_loop_set;
 };
 
-/* "mpfmc/core/audio/notification_message.pxd":31
- *     NotificationMessageDataMarker marker
+/* "mpfmc/core/audio/notification_message.pxd":38
+ *     NotificationMessageSoundLoopSet sound_loop_set
  * 
  * ctypedef struct NotificationMessageContainer:             # <<<<<<<<<<<<<<
  *     NotificationMessage message
@@ -930,7 +947,7 @@ enum __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus {
   __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out = 4
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":31
+/* "mpfmc/core/audio/track_sound_loop.pxd":32
  *     GArray *markers
  * 
  * cdef enum SoundLoopSetPlayerStatus:             # <<<<<<<<<<<<<<
@@ -956,6 +973,7 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings {
   enum __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus status;
   __pyx_t_5mpfmc_4core_5audio_10sound_file_SoundSample *sound;
   Uint8 volume;
+  long sound_loop_set_id;
   long sound_id;
   Uint32 fade_in_steps;
   Uint32 fade_out_steps;
@@ -965,7 +983,7 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings {
   GArray *markers;
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":39
+/* "mpfmc/core/audio/track_sound_loop.pxd":40
  *     player_playing = 4
  * 
  * ctypedef struct SoundLoopSetPlayer:             # <<<<<<<<<<<<<<
@@ -980,7 +998,7 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer {
   Uint32 sample_pos;
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":46
+/* "mpfmc/core/audio/track_sound_loop.pxd":47
  *     Uint32 sample_pos
  * 
  * ctypedef struct TrackSoundLoopState:             # <<<<<<<<<<<<<<
@@ -1080,7 +1098,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_14track_standard_TrackStandard {
 };
 
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":57
+/* "mpfmc/core/audio/track_sound_loop.pxd":58
  * #    TrackSoundLoop class
  * # ---------------------------------------------------------------------------
  * cdef class TrackSoundLoop(Track):             # <<<<<<<<<<<<<<
@@ -1090,6 +1108,8 @@ struct __pyx_obj_5mpfmc_4core_5audio_14track_standard_TrackStandard {
 struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop {
   struct __pyx_obj_5mpfmc_4core_5audio_5track_Track __pyx_base;
   __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopState *type_state;
+  long _sound_loop_set_counter;
+  PyObject *_active_sound_loop_sets;
 };
 
 
@@ -1261,7 +1281,7 @@ struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard {
 static struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard *__pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard;
 
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":57
+/* "mpfmc/core/audio/track_sound_loop.pxd":58
  * #    TrackSoundLoop class
  * # ---------------------------------------------------------------------------
  * cdef class TrackSoundLoop(Track):             # <<<<<<<<<<<<<<
@@ -1271,6 +1291,7 @@ static struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandar
 
 struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop {
   struct __pyx_vtabstruct_5mpfmc_4core_5audio_5track_Track __pyx_base;
+  PyObject *(*process_notification_message)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *);
   PyObject *(*_initialize_player)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *);
   PyObject *(*_apply_layer_settings)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *, PyObject *);
   PyObject *(*_reset_layer)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *);
@@ -11585,568 +11606,6 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
   __pyx_L0:;
 }
 
-/* "mpfmc/core/audio/notification_message.pxd":43
- * # ---------------------------------------------------------------------------
- * 
- * cdef inline NotificationMessageContainer *_create_notification_message() nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Creates a new notification message.
- */
-
-static CYTHON_INLINE __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message(void) {
-  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_r;
-
-  /* "mpfmc/core/audio/notification_message.pxd":48
- *     :return: A pointer to the new notification message.
- *     """
- *     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))             # <<<<<<<<<<<<<<
- * 
- * cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,
- */
-  __pyx_r = ((__pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *)g_slice_alloc0((sizeof(__pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer))));
-  goto __pyx_L0;
-
-  /* "mpfmc/core/audio/notification_message.pxd":43
- * # ---------------------------------------------------------------------------
- * 
- * cdef inline NotificationMessageContainer *_create_notification_message() nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Creates a new notification message.
- */
-
-  /* function exit code */
-  __pyx_L0:;
-  return __pyx_r;
-}
-
-/* "mpfmc/core/audio/notification_message.pxd":50
- *     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))
- * 
- * cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
- *                                                  TrackState *track) nogil:
- *     """
- */
-
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_started_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
-  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
-  int __pyx_t_1;
-
-  /* "mpfmc/core/audio/notification_message.pxd":60
- *         track: The TrackState pointer
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_started
- */
-  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
-
-  /* "mpfmc/core/audio/notification_message.pxd":61
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_sound_started
- *         notification_message.player = player
- */
-  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/notification_message.pxd":62
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_started             # <<<<<<<<<<<<<<
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id
- */
-    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_started;
-
-    /* "mpfmc/core/audio/notification_message.pxd":63
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_started
- *         notification_message.player = player             # <<<<<<<<<<<<<<
- *         notification_message.sound_id = sound_id
- *         notification_message.sound_instance_id = sound_instance_id
- */
-    __pyx_v_notification_message->player = __pyx_v_player;
-
-    /* "mpfmc/core/audio/notification_message.pxd":64
- *         notification_message.message = notification_sound_started
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
- *         notification_message.sound_instance_id = sound_instance_id
- * 
- */
-    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
-
-    /* "mpfmc/core/audio/notification_message.pxd":65
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id
- *         notification_message.sound_instance_id = sound_instance_id             # <<<<<<<<<<<<<<
- * 
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- */
-    __pyx_v_notification_message->sound_instance_id = __pyx_v_sound_instance_id;
-
-    /* "mpfmc/core/audio/notification_message.pxd":67
- *         notification_message.sound_instance_id = sound_instance_id
- * 
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
- * 
- * cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,
- */
-    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
-
-    /* "mpfmc/core/audio/notification_message.pxd":61
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_sound_started
- *         notification_message.player = player
- */
-  }
-
-  /* "mpfmc/core/audio/notification_message.pxd":50
- *     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))
- * 
- * cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
- *                                                  TrackState *track) nogil:
- *     """
- */
-
-  /* function exit code */
-}
-
-/* "mpfmc/core/audio/notification_message.pxd":69
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
- *                                                  TrackState *track) nogil:
- *     """
- */
-
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_stopped_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
-  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
-  int __pyx_t_1;
-
-  /* "mpfmc/core/audio/notification_message.pxd":79
- *         track: The TrackState pointer
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_stopped
- */
-  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
-
-  /* "mpfmc/core/audio/notification_message.pxd":80
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_sound_stopped
- *         notification_message.player = player
- */
-  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/notification_message.pxd":81
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_stopped             # <<<<<<<<<<<<<<
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id
- */
-    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_stopped;
-
-    /* "mpfmc/core/audio/notification_message.pxd":82
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_stopped
- *         notification_message.player = player             # <<<<<<<<<<<<<<
- *         notification_message.sound_id = sound_id
- *         notification_message.sound_instance_id = sound_instance_id
- */
-    __pyx_v_notification_message->player = __pyx_v_player;
-
-    /* "mpfmc/core/audio/notification_message.pxd":83
- *         notification_message.message = notification_sound_stopped
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
- *         notification_message.sound_instance_id = sound_instance_id
- * 
- */
-    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
-
-    /* "mpfmc/core/audio/notification_message.pxd":84
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id
- *         notification_message.sound_instance_id = sound_instance_id             # <<<<<<<<<<<<<<
- * 
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- */
-    __pyx_v_notification_message->sound_instance_id = __pyx_v_sound_instance_id;
-
-    /* "mpfmc/core/audio/notification_message.pxd":86
- *         notification_message.sound_instance_id = sound_instance_id
- * 
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
- * 
- * cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,
- */
-    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
-
-    /* "mpfmc/core/audio/notification_message.pxd":80
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_sound_stopped
- *         notification_message.player = player
- */
-  }
-
-  /* "mpfmc/core/audio/notification_message.pxd":69
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
- *                                                  TrackState *track) nogil:
- *     """
- */
-
-  /* function exit code */
-}
-
-/* "mpfmc/core/audio/notification_message.pxd":88
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
- *                                                  TrackState *track) nogil:
- *     """
- */
-
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
-  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
-  int __pyx_t_1;
-
-  /* "mpfmc/core/audio/notification_message.pxd":98
- *         track: The TrackState pointer
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_looping
- */
-  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
-
-  /* "mpfmc/core/audio/notification_message.pxd":99
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_sound_looping
- *         notification_message.player = player
- */
-  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/notification_message.pxd":100
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_looping             # <<<<<<<<<<<<<<
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id
- */
-    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_looping;
-
-    /* "mpfmc/core/audio/notification_message.pxd":101
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_looping
- *         notification_message.player = player             # <<<<<<<<<<<<<<
- *         notification_message.sound_id = sound_id
- *         notification_message.sound_instance_id = sound_instance_id
- */
-    __pyx_v_notification_message->player = __pyx_v_player;
-
-    /* "mpfmc/core/audio/notification_message.pxd":102
- *         notification_message.message = notification_sound_looping
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
- *         notification_message.sound_instance_id = sound_instance_id
- * 
- */
-    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
-
-    /* "mpfmc/core/audio/notification_message.pxd":103
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id
- *         notification_message.sound_instance_id = sound_instance_id             # <<<<<<<<<<<<<<
- * 
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- */
-    __pyx_v_notification_message->sound_instance_id = __pyx_v_sound_instance_id;
-
-    /* "mpfmc/core/audio/notification_message.pxd":105
- *         notification_message.sound_instance_id = sound_instance_id
- * 
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
- * 
- * cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,
- */
-    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
-
-    /* "mpfmc/core/audio/notification_message.pxd":99
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_sound_looping
- *         notification_message.player = player
- */
-  }
-
-  /* "mpfmc/core/audio/notification_message.pxd":88
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
- *                                                  TrackState *track) nogil:
- *     """
- */
-
-  /* function exit code */
-}
-
-/* "mpfmc/core/audio/notification_message.pxd":107
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
- *                                                 TrackState *track,
- *                                                 int marker_id) nogil:
- */
-
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_marker_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track, int __pyx_v_marker_id) {
-  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
-  int __pyx_t_1;
-
-  /* "mpfmc/core/audio/notification_message.pxd":119
- *         marker_id: The id of the marker being sent for the specified sound
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_marker
- */
-  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
-
-  /* "mpfmc/core/audio/notification_message.pxd":120
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_sound_marker
- *         notification_message.player = player
- */
-  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/notification_message.pxd":121
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_marker             # <<<<<<<<<<<<<<
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id
- */
-    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_marker;
-
-    /* "mpfmc/core/audio/notification_message.pxd":122
- *     if notification_message != NULL:
- *         notification_message.message = notification_sound_marker
- *         notification_message.player = player             # <<<<<<<<<<<<<<
- *         notification_message.sound_id = sound_id
- *         notification_message.sound_instance_id = sound_instance_id
- */
-    __pyx_v_notification_message->player = __pyx_v_player;
-
-    /* "mpfmc/core/audio/notification_message.pxd":123
- *         notification_message.message = notification_sound_marker
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
- *         notification_message.sound_instance_id = sound_instance_id
- *         notification_message.data.marker.id = marker_id
- */
-    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
-
-    /* "mpfmc/core/audio/notification_message.pxd":124
- *         notification_message.player = player
- *         notification_message.sound_id = sound_id
- *         notification_message.sound_instance_id = sound_instance_id             # <<<<<<<<<<<<<<
- *         notification_message.data.marker.id = marker_id
- * 
- */
-    __pyx_v_notification_message->sound_instance_id = __pyx_v_sound_instance_id;
-
-    /* "mpfmc/core/audio/notification_message.pxd":125
- *         notification_message.sound_id = sound_id
- *         notification_message.sound_instance_id = sound_instance_id
- *         notification_message.data.marker.id = marker_id             # <<<<<<<<<<<<<<
- * 
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- */
-    __pyx_v_notification_message->data.marker.id = __pyx_v_marker_id;
-
-    /* "mpfmc/core/audio/notification_message.pxd":127
- *         notification_message.data.marker.id = marker_id
- * 
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
- * 
- * cdef inline void send_track_stopped_notification(TrackState *track) nogil:
- */
-    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
-
-    /* "mpfmc/core/audio/notification_message.pxd":120
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_sound_marker
- *         notification_message.player = player
- */
-  }
-
-  /* "mpfmc/core/audio/notification_message.pxd":107
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
- *                                                 TrackState *track,
- *                                                 int marker_id) nogil:
- */
-
-  /* function exit code */
-}
-
-/* "mpfmc/core/audio/notification_message.pxd":129
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_track_stopped_notification(TrackState *track) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Sends a track stopped notification
- */
-
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_track_stopped_notification(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
-  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
-  int __pyx_t_1;
-
-  /* "mpfmc/core/audio/notification_message.pxd":135
- *         track: The TrackState pointer
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
- *     if notification_message != NULL:
- *         notification_message.message = notification_track_stopped
- */
-  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
-
-  /* "mpfmc/core/audio/notification_message.pxd":136
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_track_stopped
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- */
-  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/notification_message.pxd":137
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:
- *         notification_message.message = notification_track_stopped             # <<<<<<<<<<<<<<
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- */
-    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_stopped;
-
-    /* "mpfmc/core/audio/notification_message.pxd":138
- *     if notification_message != NULL:
- *         notification_message.message = notification_track_stopped
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
- * 
- * cdef inline void send_track_paused_notification(TrackState *track) nogil:
- */
-    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
-
-    /* "mpfmc/core/audio/notification_message.pxd":136
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_track_stopped
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- */
-  }
-
-  /* "mpfmc/core/audio/notification_message.pxd":129
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_track_stopped_notification(TrackState *track) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Sends a track stopped notification
- */
-
-  /* function exit code */
-}
-
-/* "mpfmc/core/audio/notification_message.pxd":140
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_track_paused_notification(TrackState *track) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Sends a track paused notification
- */
-
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_track_paused_notification(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
-  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
-  int __pyx_t_1;
-
-  /* "mpfmc/core/audio/notification_message.pxd":146
- *         track: The TrackState pointer
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
- *     if notification_message != NULL:
- *         notification_message.message = notification_track_paused
- */
-  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
-
-  /* "mpfmc/core/audio/notification_message.pxd":147
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_track_paused
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- */
-  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/notification_message.pxd":148
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:
- *         notification_message.message = notification_track_paused             # <<<<<<<<<<<<<<
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- */
-    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_paused;
-
-    /* "mpfmc/core/audio/notification_message.pxd":149
- *     if notification_message != NULL:
- *         notification_message.message = notification_track_paused
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
- */
-    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
-
-    /* "mpfmc/core/audio/notification_message.pxd":147
- *     """
- *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
- *     if notification_message != NULL:             # <<<<<<<<<<<<<<
- *         notification_message.message = notification_track_paused
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- */
-  }
-
-  /* "mpfmc/core/audio/notification_message.pxd":140
- *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
- * 
- * cdef inline void send_track_paused_notification(TrackState *track) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Sends a track paused notification
- */
-
-  /* function exit code */
-}
-
 /* "mpfmc/core/audio/track_standard.pxd":119
  * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
  *                                       TrackState *track, int player_num) nogil
@@ -12279,6 +11738,885 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_14track_standard_end_of_so
  * cdef inline void end_of_sound_processing(SoundPlayer* player,             # <<<<<<<<<<<<<<
  *                                          TrackState *track) nogil:
  *     """
+ */
+
+  /* function exit code */
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":50
+ * # ---------------------------------------------------------------------------
+ * 
+ * cdef inline NotificationMessageContainer *_create_notification_message() nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Creates a new notification message.
+ */
+
+static CYTHON_INLINE __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message(void) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_r;
+
+  /* "mpfmc/core/audio/notification_message.pxd":55
+ *     :return: A pointer to the new notification message.
+ *     """
+ *     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,
+ */
+  __pyx_r = ((__pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *)g_slice_alloc0((sizeof(__pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer))));
+  goto __pyx_L0;
+
+  /* "mpfmc/core/audio/notification_message.pxd":50
+ * # ---------------------------------------------------------------------------
+ * 
+ * cdef inline NotificationMessageContainer *_create_notification_message() nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Creates a new notification message.
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  return __pyx_r;
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":57
+ *     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))
+ * 
+ * cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ *                                                  TrackState *track) nogil:
+ *     """
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_started_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/notification_message.pxd":67
+ *         track: The TrackState pointer
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_started
+ */
+  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
+
+  /* "mpfmc/core/audio/notification_message.pxd":68
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_started
+ *         notification_message.player = player
+ */
+  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/notification_message.pxd":69
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_started             # <<<<<<<<<<<<<<
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id
+ */
+    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_started;
+
+    /* "mpfmc/core/audio/notification_message.pxd":70
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_started
+ *         notification_message.player = player             # <<<<<<<<<<<<<<
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = sound_instance_id
+ */
+    __pyx_v_notification_message->player = __pyx_v_player;
+
+    /* "mpfmc/core/audio/notification_message.pxd":71
+ *         notification_message.message = notification_sound_started
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
+ *         notification_message.sound_instance_id = sound_instance_id
+ * 
+ */
+    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":72
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = sound_instance_id             # <<<<<<<<<<<<<<
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+    __pyx_v_notification_message->sound_instance_id = __pyx_v_sound_instance_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":74
+ *         notification_message.sound_instance_id = sound_instance_id
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,
+ */
+    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
+
+    /* "mpfmc/core/audio/notification_message.pxd":68
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_started
+ *         notification_message.player = player
+ */
+  }
+
+  /* "mpfmc/core/audio/notification_message.pxd":57
+ *     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))
+ * 
+ * cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ *                                                  TrackState *track) nogil:
+ *     """
+ */
+
+  /* function exit code */
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":76
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ *                                                  TrackState *track) nogil:
+ *     """
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_stopped_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/notification_message.pxd":86
+ *         track: The TrackState pointer
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_stopped
+ */
+  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
+
+  /* "mpfmc/core/audio/notification_message.pxd":87
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_stopped
+ *         notification_message.player = player
+ */
+  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/notification_message.pxd":88
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_stopped             # <<<<<<<<<<<<<<
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id
+ */
+    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_stopped;
+
+    /* "mpfmc/core/audio/notification_message.pxd":89
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_stopped
+ *         notification_message.player = player             # <<<<<<<<<<<<<<
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = sound_instance_id
+ */
+    __pyx_v_notification_message->player = __pyx_v_player;
+
+    /* "mpfmc/core/audio/notification_message.pxd":90
+ *         notification_message.message = notification_sound_stopped
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
+ *         notification_message.sound_instance_id = sound_instance_id
+ * 
+ */
+    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":91
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = sound_instance_id             # <<<<<<<<<<<<<<
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+    __pyx_v_notification_message->sound_instance_id = __pyx_v_sound_instance_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":93
+ *         notification_message.sound_instance_id = sound_instance_id
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,
+ */
+    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
+
+    /* "mpfmc/core/audio/notification_message.pxd":87
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_stopped
+ *         notification_message.player = player
+ */
+  }
+
+  /* "mpfmc/core/audio/notification_message.pxd":76
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ *                                                  TrackState *track) nogil:
+ *     """
+ */
+
+  /* function exit code */
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":95
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ *                                                  TrackState *track) nogil:
+ *     """
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/notification_message.pxd":105
+ *         track: The TrackState pointer
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_looping
+ */
+  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
+
+  /* "mpfmc/core/audio/notification_message.pxd":106
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_looping
+ *         notification_message.player = player
+ */
+  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/notification_message.pxd":107
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_looping             # <<<<<<<<<<<<<<
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id
+ */
+    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_looping;
+
+    /* "mpfmc/core/audio/notification_message.pxd":108
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_looping
+ *         notification_message.player = player             # <<<<<<<<<<<<<<
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = sound_instance_id
+ */
+    __pyx_v_notification_message->player = __pyx_v_player;
+
+    /* "mpfmc/core/audio/notification_message.pxd":109
+ *         notification_message.message = notification_sound_looping
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
+ *         notification_message.sound_instance_id = sound_instance_id
+ * 
+ */
+    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":110
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = sound_instance_id             # <<<<<<<<<<<<<<
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+    __pyx_v_notification_message->sound_instance_id = __pyx_v_sound_instance_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":112
+ *         notification_message.sound_instance_id = sound_instance_id
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,
+ */
+    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
+
+    /* "mpfmc/core/audio/notification_message.pxd":106
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_looping
+ *         notification_message.player = player
+ */
+  }
+
+  /* "mpfmc/core/audio/notification_message.pxd":95
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ *                                                  TrackState *track) nogil:
+ *     """
+ */
+
+  /* function exit code */
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":114
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ *                                                 TrackState *track,
+ *                                                 int marker_id) nogil:
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_marker_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track, int __pyx_v_marker_id) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/notification_message.pxd":126
+ *         marker_id: The id of the marker being sent for the specified sound
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_marker
+ */
+  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
+
+  /* "mpfmc/core/audio/notification_message.pxd":127
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_marker
+ *         notification_message.player = player
+ */
+  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/notification_message.pxd":128
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_marker             # <<<<<<<<<<<<<<
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id
+ */
+    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_marker;
+
+    /* "mpfmc/core/audio/notification_message.pxd":129
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_marker
+ *         notification_message.player = player             # <<<<<<<<<<<<<<
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = sound_instance_id
+ */
+    __pyx_v_notification_message->player = __pyx_v_player;
+
+    /* "mpfmc/core/audio/notification_message.pxd":130
+ *         notification_message.message = notification_sound_marker
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
+ *         notification_message.sound_instance_id = sound_instance_id
+ *         notification_message.data.marker.id = marker_id
+ */
+    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":131
+ *         notification_message.player = player
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = sound_instance_id             # <<<<<<<<<<<<<<
+ *         notification_message.data.marker.id = marker_id
+ * 
+ */
+    __pyx_v_notification_message->sound_instance_id = __pyx_v_sound_instance_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":132
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = sound_instance_id
+ *         notification_message.data.marker.id = marker_id             # <<<<<<<<<<<<<<
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+    __pyx_v_notification_message->data.marker.id = __pyx_v_marker_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":134
+ *         notification_message.data.marker.id = marker_id
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline void send_track_stopped_notification(TrackState *track) nogil:
+ */
+    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
+
+    /* "mpfmc/core/audio/notification_message.pxd":127
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_marker
+ *         notification_message.player = player
+ */
+  }
+
+  /* "mpfmc/core/audio/notification_message.pxd":114
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ *                                                 TrackState *track,
+ *                                                 int marker_id) nogil:
+ */
+
+  /* function exit code */
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":136
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_track_stopped_notification(TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a track stopped notification
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_track_stopped_notification(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/notification_message.pxd":142
+ *         track: The TrackState pointer
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_track_stopped
+ */
+  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
+
+  /* "mpfmc/core/audio/notification_message.pxd":143
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_track_stopped
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/notification_message.pxd":144
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_track_stopped             # <<<<<<<<<<<<<<
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ */
+    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_stopped;
+
+    /* "mpfmc/core/audio/notification_message.pxd":145
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_track_stopped
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline void send_track_paused_notification(TrackState *track) nogil:
+ */
+    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
+
+    /* "mpfmc/core/audio/notification_message.pxd":143
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_track_stopped
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+  }
+
+  /* "mpfmc/core/audio/notification_message.pxd":136
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_track_stopped_notification(TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a track stopped notification
+ */
+
+  /* function exit code */
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":147
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_track_paused_notification(TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a track paused notification
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_track_paused_notification(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/notification_message.pxd":153
+ *         track: The TrackState pointer
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_track_paused
+ */
+  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
+
+  /* "mpfmc/core/audio/notification_message.pxd":154
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_track_paused
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/notification_message.pxd":155
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_track_paused             # <<<<<<<<<<<<<<
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ */
+    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_paused;
+
+    /* "mpfmc/core/audio/notification_message.pxd":156
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_track_paused
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+ */
+    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
+
+    /* "mpfmc/core/audio/notification_message.pxd":154
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_track_paused
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+  }
+
+  /* "mpfmc/core/audio/notification_message.pxd":147
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_track_paused_notification(TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a track paused notification
+ */
+
+  /* function exit code */
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":158
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a sound_loop_set started notification
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_started_notification(int __pyx_v_sound_loop_set_id, long __pyx_v_sound_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/notification_message.pxd":166
+ *         track: The TrackState pointer
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_loop_set_started
+ */
+  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
+
+  /* "mpfmc/core/audio/notification_message.pxd":167
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_loop_set_started
+ *         notification_message.player = 0
+ */
+  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/notification_message.pxd":168
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_loop_set_started             # <<<<<<<<<<<<<<
+ *         notification_message.player = 0
+ *         notification_message.sound_id = sound_id
+ */
+    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_started;
+
+    /* "mpfmc/core/audio/notification_message.pxd":169
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_loop_set_started
+ *         notification_message.player = 0             # <<<<<<<<<<<<<<
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = 0
+ */
+    __pyx_v_notification_message->player = 0;
+
+    /* "mpfmc/core/audio/notification_message.pxd":170
+ *         notification_message.message = notification_sound_loop_set_started
+ *         notification_message.player = 0
+ *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
+ *         notification_message.sound_instance_id = 0
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id
+ */
+    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":171
+ *         notification_message.player = 0
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = 0             # <<<<<<<<<<<<<<
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id
+ * 
+ */
+    __pyx_v_notification_message->sound_instance_id = 0;
+
+    /* "mpfmc/core/audio/notification_message.pxd":172
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = 0
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id             # <<<<<<<<<<<<<<
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+    __pyx_v_notification_message->data.sound_loop_set.id = __pyx_v_sound_loop_set_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":174
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+ */
+    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
+
+    /* "mpfmc/core/audio/notification_message.pxd":167
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_loop_set_started
+ *         notification_message.player = 0
+ */
+  }
+
+  /* "mpfmc/core/audio/notification_message.pxd":158
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a sound_loop_set started notification
+ */
+
+  /* function exit code */
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":176
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a sound_loop_set stopped notification
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_stopped_notification(int __pyx_v_sound_loop_set_id, long __pyx_v_sound_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/notification_message.pxd":184
+ *         track: The TrackState pointer
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_loop_set_stopped
+ */
+  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
+
+  /* "mpfmc/core/audio/notification_message.pxd":185
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_loop_set_stopped
+ *         notification_message.player = 0
+ */
+  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/notification_message.pxd":186
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_loop_set_stopped             # <<<<<<<<<<<<<<
+ *         notification_message.player = 0
+ *         notification_message.sound_id = sound_id
+ */
+    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_stopped;
+
+    /* "mpfmc/core/audio/notification_message.pxd":187
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_loop_set_stopped
+ *         notification_message.player = 0             # <<<<<<<<<<<<<<
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = 0
+ */
+    __pyx_v_notification_message->player = 0;
+
+    /* "mpfmc/core/audio/notification_message.pxd":188
+ *         notification_message.message = notification_sound_loop_set_stopped
+ *         notification_message.player = 0
+ *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
+ *         notification_message.sound_instance_id = 0
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id
+ */
+    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":189
+ *         notification_message.player = 0
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = 0             # <<<<<<<<<<<<<<
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id
+ * 
+ */
+    __pyx_v_notification_message->sound_instance_id = 0;
+
+    /* "mpfmc/core/audio/notification_message.pxd":190
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = 0
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id             # <<<<<<<<<<<<<<
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+    __pyx_v_notification_message->data.sound_loop_set.id = __pyx_v_sound_loop_set_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":192
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+ */
+    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
+
+    /* "mpfmc/core/audio/notification_message.pxd":185
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_loop_set_stopped
+ *         notification_message.player = 0
+ */
+  }
+
+  /* "mpfmc/core/audio/notification_message.pxd":176
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a sound_loop_set stopped notification
+ */
+
+  /* function exit code */
+}
+
+/* "mpfmc/core/audio/notification_message.pxd":194
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a sound_loop_set looping notification
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_looping_notification(int __pyx_v_sound_loop_set_id, long __pyx_v_sound_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+  __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/notification_message.pxd":202
+ *         track: The TrackState pointer
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()             # <<<<<<<<<<<<<<
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_loop_set_looping
+ */
+  __pyx_v_notification_message = __pyx_f_5mpfmc_4core_5audio_20notification_message__create_notification_message();
+
+  /* "mpfmc/core/audio/notification_message.pxd":203
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_loop_set_looping
+ *         notification_message.player = 0
+ */
+  __pyx_t_1 = ((__pyx_v_notification_message != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/notification_message.pxd":204
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_loop_set_looping             # <<<<<<<<<<<<<<
+ *         notification_message.player = 0
+ *         notification_message.sound_id = sound_id
+ */
+    __pyx_v_notification_message->message = __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_looping;
+
+    /* "mpfmc/core/audio/notification_message.pxd":205
+ *     if notification_message != NULL:
+ *         notification_message.message = notification_sound_loop_set_looping
+ *         notification_message.player = 0             # <<<<<<<<<<<<<<
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = 0
+ */
+    __pyx_v_notification_message->player = 0;
+
+    /* "mpfmc/core/audio/notification_message.pxd":206
+ *         notification_message.message = notification_sound_loop_set_looping
+ *         notification_message.player = 0
+ *         notification_message.sound_id = sound_id             # <<<<<<<<<<<<<<
+ *         notification_message.sound_instance_id = 0
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id
+ */
+    __pyx_v_notification_message->sound_id = __pyx_v_sound_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":207
+ *         notification_message.player = 0
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = 0             # <<<<<<<<<<<<<<
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id
+ * 
+ */
+    __pyx_v_notification_message->sound_instance_id = 0;
+
+    /* "mpfmc/core/audio/notification_message.pxd":208
+ *         notification_message.sound_id = sound_id
+ *         notification_message.sound_instance_id = 0
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id             # <<<<<<<<<<<<<<
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ */
+    __pyx_v_notification_message->data.sound_loop_set.id = __pyx_v_sound_loop_set_id;
+
+    /* "mpfmc/core/audio/notification_message.pxd":210
+ *         notification_message.data.sound_loop_set.id = sound_loop_set_id
+ * 
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
+ * 
+ */
+    __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
+
+    /* "mpfmc/core/audio/notification_message.pxd":203
+ *     """
+ *     cdef NotificationMessageContainer *notification_message = _create_notification_message()
+ *     if notification_message != NULL:             # <<<<<<<<<<<<<<
+ *         notification_message.message = notification_sound_loop_set_looping
+ *         notification_message.player = 0
+ */
+  }
+
+  /* "mpfmc/core/audio/notification_message.pxd":194
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Sends a sound_loop_set looping notification
  */
 
   /* function exit code */
@@ -13821,8 +14159,8 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   __pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile = __Pyx_ImportType("mpfmc.core.audio.sound_file", "SoundStreamingFile", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile)) __PYX_ERR(2, 47, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard = __Pyx_ImportType("mpfmc.core.audio.track_standard", "TrackStandard", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_14track_standard_TrackStandard), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard)) __PYX_ERR(3, 84, __pyx_L1_error)
   __pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard)) __PYX_ERR(3, 84, __pyx_L1_error)
-  __pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = __Pyx_ImportType("mpfmc.core.audio.track_sound_loop", "TrackSoundLoop", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 57, __pyx_L1_error)
-  __pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 57, __pyx_L1_error)
+  __pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = __Pyx_ImportType("mpfmc.core.audio.track_sound_loop", "TrackSoundLoop", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 58, __pyx_L1_error)
+  __pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 58, __pyx_L1_error)
   /*--- Variable import code ---*/
   /*--- Function import code ---*/
   /*--- Execution code ---*/
@@ -14429,12 +14767,12 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_standard.pxd":119
- * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
- *                                       TrackState *track, int player_num) nogil
- * cdef inline void end_of_sound_processing(SoundPlayer* player,             # <<<<<<<<<<<<<<
- *                                          TrackState *track) nogil:
+  /* "mpfmc/core/audio/notification_message.pxd":194
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
+ *     Sends a sound_loop_set looping notification
  */
 
   /*--- Wrapped vars code ---*/

@@ -1,0 +1,28 @@
+#config_version=5
+
+displays:
+  default:
+    width: 400
+    height: 300
+
+modes:
+  - mode1
+
+sound_system:
+  buffer: 2048
+  frequency: 44100
+  channels: 2
+  master_volume: 0.9
+  tracks:
+    loops:
+      type: sound_loop
+      volume: 0.6
+
+assets:
+  sounds:
+    default:
+      load: preload
+    loops:
+      load: preload
+      track: loops
+

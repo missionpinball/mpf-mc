@@ -16,6 +16,9 @@ cdef enum NotificationMessage:
     notification_player_idle = 10             # Notification that a player is now idle and ready to play another sound
     notification_track_stopped = 0            # Notification that the track has stopped
     notification_track_paused = 21            # Notification that the track has been paused
+    notification_sound_loop_set_started = 31  # Notification that a sound_loop_set has started playing
+    notification_sound_loop_set_stopped = 32  # Notification that a sound_loop_set has stopped
+    notification_sound_loop_set_looping = 33  # Notification that a sound_loop_set is looping back to the beginning
 
 ctypedef struct NotificationMessageDataLooping:
     int loop_count
@@ -24,9 +27,13 @@ ctypedef struct NotificationMessageDataLooping:
 ctypedef struct NotificationMessageDataMarker:
     int id
 
+ctypedef struct NotificationMessageSoundLoopSet:
+    long id
+
 ctypedef union NotificationMessageData:
     NotificationMessageDataLooping looping
     NotificationMessageDataMarker marker
+    NotificationMessageSoundLoopSet sound_loop_set
 
 ctypedef struct NotificationMessageContainer:
     NotificationMessage message
@@ -166,3 +173,58 @@ cdef inline void send_track_paused_notification(TrackState *track) nogil:
     if notification_message != NULL:
         notification_message.message = notification_track_paused
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+
+cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+    """
+    Sends a sound_loop_set started notification
+    Args:
+        sound_loop_set_id: The sound_loop_set id
+        sound_id: The sound id
+        track: The TrackState pointer
+    """
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_sound_loop_set_started
+        notification_message.player = 0
+        notification_message.sound_id = sound_id
+        notification_message.sound_instance_id = 0
+        notification_message.data.sound_loop_set.id = sound_loop_set_id
+
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+
+cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+    """
+    Sends a sound_loop_set stopped notification
+    Args:
+        sound_loop_set_id: The sound_loop_set id
+        sound_id: The sound id
+        track: The TrackState pointer
+    """
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_sound_loop_set_stopped
+        notification_message.player = 0
+        notification_message.sound_id = sound_id
+        notification_message.sound_instance_id = 0
+        notification_message.data.sound_loop_set.id = sound_loop_set_id
+
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+
+cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+    """
+    Sends a sound_loop_set looping notification
+    Args:
+        sound_loop_set_id: The sound_loop_set id
+        sound_id: The sound id
+        track: The TrackState pointer
+    """
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_sound_loop_set_looping
+        notification_message.player = 0
+        notification_message.sound_id = sound_id
+        notification_message.sound_instance_id = 0
+        notification_message.data.sound_loop_set.id = sound_loop_set_id
+
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+

@@ -30,7 +30,7 @@ CYTHON_UNSUPPORTED = ()
 
 PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
                              'mp4', 'm4v', 'so', 'pyd', 'dylib', 'wav', 'ogg',
-                             'pxd', 'pyx', 'c', 'h', 'ttf')
+                             'pxd', 'pyx', 'c', 'h', 'ttf', 'fnt')
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
@@ -602,6 +602,7 @@ setup(
     entry_points="""
     [mpf.config_player]
     sound_player=mpfmc.config_players.plugins.sound_player:register_with_mpf
+    sound_loop_player=mpfmc.config_players.plugins.sound_loop_player:register_with_mpf
     widget_player=mpfmc.config_players.plugins.widget_player:register_with_mpf
     slide_player=mpfmc.config_players.plugins.slide_player:register_with_mpf
     track_player=mpfmc.config_players.plugins.track_player:register_with_mpf

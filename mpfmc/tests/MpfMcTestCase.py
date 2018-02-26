@@ -15,9 +15,7 @@ from kivy.clock import Clock
 from kivy.uix.widget import Widget as KivyWidget
 
 import mpfmc
-from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
-from mpfmc.core.utils import load_machine_config
 
 if not verbose:
     Config.set('kivy', 'log_enable', '0')
@@ -45,8 +43,10 @@ class MpfMcTestCase(unittest.TestCase):
 
     def get_options(self):
         return dict(machine_path=self.get_machine_path(),
-                    mcconfigfile='mpfmc/mcconfig.yaml',
+                    mcconfigfile='mcconfig.yaml',
                     configfile=Util.string_to_list(self.get_config_file()),
+                    no_load_cache=False,
+                    create_config_cache=True,
                     bcp=False)
 
     def getAbsoluteMachinePath(self):
@@ -61,32 +61,6 @@ class MpfMcTestCase(unittest.TestCase):
 
     def get_abs_path(self, path):
         return os.path.join(os.path.abspath(os.curdir), path)
-
-    def preprocess_config(self, config):
-        # TODO this method is copied from the mc.py launcher. Prob a better way
-        kivy_config = config['kivy_config']
-
-        try:
-            kivy_config['graphics'].update(config['displays']['window'])
-        except KeyError:
-            pass
-
-        try:
-            kivy_config['graphics'].update(config['window'])
-        except KeyError:
-            pass
-
-        if 'top' in kivy_config['graphics'] and 'left' in kivy_config[
-            'graphics']:
-            kivy_config['graphics']['position'] = 'custom'
-
-        for section, settings in kivy_config.items():
-            for k, v in settings.items():
-                try:
-                    if k in Config[section]:
-                        Config.set(section, k, v)
-                except KeyError:
-                    continue
 
     def advance_time(self, secs=.1):
         start = self._current_time
@@ -163,29 +137,24 @@ class MpfMcTestCase(unittest.TestCase):
         from mpf.core.player import Player
         Player.monitor_enabled = False
 
-        mpf_config = ConfigProcessor.load_config_file(os.path.abspath(
-            os.path.join(mpfmc.__path__[0], os.pardir,
-                         self.get_options()['mcconfigfile'])), 'machine')
-
         machine_path = self.getAbsoluteMachinePath()
 
-        mpf_config = load_machine_config(
-                Util.string_to_list(self.get_config_file()),
-                machine_path,
-                mpf_config['mpf-mc']['paths']['config'], mpf_config)
-        self.preprocess_config(mpf_config)
+        try:
+            self.mc = MpfMc(options=self.get_options(),
+                            machine_path=machine_path)
 
-        self.mc = MpfMc(options=self.get_options(),
-                        config=mpf_config,
-                        machine_path=machine_path)
+            self.patch_bcp()
 
-        self.patch_bcp()
+            from kivy.core.window import Window
+            Window.create_window()
+            Window.canvas.clear()
 
-        from kivy.core.window import Window
-        Window.create_window()
-        Window.canvas.clear()
-
-        self._start_app_as_slave()
+            self._start_app_as_slave()
+        except Exception:
+            if self.mc:
+                # prevent dead locks with two asset manager threads
+                self.mc.stop()
+            raise
 
     def _start_app_as_slave(self):
         # from app::run

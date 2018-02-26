@@ -341,7 +341,8 @@ class SoundAsset(Asset):
                                      "Could not create sound '{}' asset"
                                      .format(sys.exc_info()[1], self.name))
 
-        elif self.config['track'] and 'ducking' in self.machine.sound_system.config['tracks'][self.config['track']]:
+        elif self._track and "tracks" in self.machine.sound_system.config and \
+                        'ducking' in self.machine.sound_system.config['tracks'][self._track]:
             try:
                 self._ducking = DuckingSettings(
                     self.machine, self.machine.sound_system.config['tracks'][self.config['track']]['ducking'])

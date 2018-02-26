@@ -60,6 +60,12 @@ cdef class TrackSoundLoop(Track):
         self._initialize_player(self.type_state.current)
         self._initialize_player(self.type_state.next)
 
+        self._sound_loop_set_counter = 0
+        self._active_sound_loop_sets = dict()
+
+        self.log.debug("Created Track %d %s",
+                       self.number, self.name)
+
         SDL_UnlockAudio()
 
     def __dealloc__(self):
@@ -108,6 +114,7 @@ cdef class TrackSoundLoop(Track):
             player.master_sound_layer.status = layer_playing
             player.master_sound_layer.sound = NULL
             player.master_sound_layer.volume = 0
+            player.master_sound_layer.sound_loop_set_id = 0
             player.master_sound_layer.sound_id = 0
             player.master_sound_layer.fade_in_steps = 0
             player.master_sound_layer.fade_out_steps = 0
@@ -126,9 +133,135 @@ cdef class TrackSoundLoop(Track):
         """
         pass
 
-    def process(self):
-        """Processes the track queue each tick."""
+    def stop_sound(self, sound not None, fade_out=None):
+        """
+        Stops all instances of the specified sound immediately on the track. This function is not used
+        in the sound loop track, but is provided for compatibility in case the sound player is
+        mistakenly used against this track.
+        Args:
+            sound: The Sound to stop
+            fade_out: Optional amount of time (seconds) to fade out before stopping
+        """
         pass
+
+    def stop_sound_instance(self, sound_instance not None, fade_out=None):
+        """
+        Stops the specified sound instance immediately on the track. This function is not used
+        in the sound loop track, but is provided for compatibility in case the sound player is
+        mistakenly used against this track.
+        Args:
+            sound_instance: The SoundInstance to stop
+            fade_out: Optional amount of time (seconds) to fade out before stopping
+        """
+        pass
+
+    def stop_sound_looping(self, sound not None):
+        """
+        Cancels looping for all instances of the specified sound on the track. This function is not used
+        in the sound loop track, but is provided for compatibility in case the sound player is
+        mistakenly used against this track.
+        Args:
+            sound: The Sound to stop looping
+        """
+
+    def stop_sound_instance_looping(self, sound_instance not None):
+        """
+        Stops the specified sound instance on the track after the current loop iteration
+        has finished. This function is not used in the sound loop track, but is provided for compatibility
+        in case the sound player is mistakenly used against this track.
+        Args:
+            sound_instance: The Sound to stop
+        """
+        pass
+
+    def process(self):
+        """Processes track messages each tick."""
+
+        # Lock the mutex to ensure no audio data is changed during the playback processing
+        # (multi-threaded protection)
+        SDL_LockAudio()
+
+        # Process track notification messages
+        if self.state.notification_messages != NULL:
+            self.state.notification_messages = g_slist_reverse(self.state.notification_messages)
+            iterator = self.state.notification_messages
+            while iterator != NULL:
+                self.process_notification_message(<NotificationMessageContainer*>iterator.data)
+                g_slice_free1(sizeof(NotificationMessageContainer), iterator.data)
+                iterator = iterator.next
+
+            g_slist_free(self.state.notification_messages)
+            self.state.notification_messages = NULL
+
+        # Unlock the mutex since we are done accessing the audio data
+        SDL_UnlockAudio()
+
+    cdef process_notification_message(self, NotificationMessageContainer *notification_message):
+        """Process a notification message to this track"""
+
+        if notification_message == NULL:
+            return
+
+        SDL_LockAudio()
+
+        # Check for track notification messages first (they do not need sound instance information)
+        if notification_message.message in (notification_track_stopped, notification_track_paused):
+            if notification_message.message == notification_track_stopped:
+                # Trigger any events
+                if self._events_when_stopped is not None:
+                    for event in self._events_when_stopped:
+                        self.mc.post_mc_native_event(event)
+
+            elif notification_message.message == notification_track_paused:
+                # Trigger any events
+                if self._events_when_paused is not None:
+                    for event in self._events_when_paused:
+                        self.mc.post_mc_native_event(event)
+                pass
+
+            SDL_UnlockAudio()
+            return
+
+        self.log.debug("Processing notification message %d for sound instance (id: %d)",
+                       notification_message.message, notification_message.sound_instance_id)
+
+        if notification_message.message in (notification_sound_loop_set_started, notification_sound_loop_set_stopped,
+                                            notification_sound_loop_set_looping):
+
+            if notification_message.data.sound_loop_set.id not in self._active_sound_loop_sets.keys():
+                self.log.warning("Received a notification message for a sound loop set (id: %d) "
+                                 "that is no longer active. Notification will be discarded.",
+                                 notification_message.data.sound_loop_set.id)
+                SDL_UnlockAudio()
+                return
+
+            sound_loop_set_settings = self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
+            if not sound_loop_set_settings:
+                self.log.warning("Could not retrieve settings for a sound loop set (id: %d) "
+                                 "Notification will be discarded.",
+                                 notification_message.data.sound_loop_set.id)
+                SDL_UnlockAudio()
+                return
+
+            if notification_message.message == notification_sound_loop_set_started:
+                if sound_loop_set_settings['events_when_played'] is not None:
+                    for event in sound_loop_set_settings['events_when_played']:
+                        self.mc.post_mc_native_event(event)
+
+            elif notification_message.message == notification_sound_loop_set_stopped:
+                if sound_loop_set_settings['events_when_stopped'] is not None:
+                    for event in sound_loop_set_settings['events_when_stopped']:
+                        self.mc.post_mc_native_event(event)
+
+                self.log.debug("Removing sound_loop_set settings %d from active list", notification_message.data.sound_loop_set.id)
+                del self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
+
+            elif notification_message.message == notification_sound_loop_set_looping:
+                if sound_loop_set_settings['events_when_looping'] is not None:
+                    for event in sound_loop_set_settings['events_when_looping']:
+                        self.mc.post_mc_native_event(event)
+
+        SDL_UnlockAudio()
 
     def play_sound_loop_set(self, dict sound_loop_set not None, dict player_settings):
         """
@@ -156,6 +289,7 @@ cdef class TrackSoundLoop(Track):
         player_settings.setdefault('mode_end_action', sound_loop_set['mode_end_action'])
         player_settings.setdefault('queue', True)
         player_settings.setdefault('synchronize', False)
+        player_settings['sound'] = sound_loop_set['sound']
 
         SDL_LockAudio()
 
@@ -170,13 +304,17 @@ cdef class TrackSoundLoop(Track):
             player = self.type_state.current
             player_already_playing = False
 
-        elif self.type_state.next.status == player_idle:
+        elif self.type_state.next.status in (player_idle, player_pending):
 
             # The current player is busy playing a loop set.  In this case the queue and
             # synchronize settings are important and dictate how the requested loop set
             # will be played.
             player = self.type_state.next
             player_already_playing = True
+
+            # Remove the previously pending sound_loop_set from the active sound loop set dict (if exists)
+            if self.type_state.next.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:
+                del self._active_sound_loop_sets[player.master_sound_layer.sound_loop_set_id]
 
         else:
             # TODO: Handle case when both players are busy (i.e. during a cross-fade)
@@ -227,11 +365,17 @@ cdef class TrackSoundLoop(Track):
 
             player.sample_pos = 0
 
+        # Save current sound loop set so it can be referred to again while it is active (event notifications)
+        self._sound_loop_set_counter += 1
+        self._active_sound_loop_sets[self._sound_loop_set_counter] = player_settings
+
         master_layer_settings = {
+            "sound_loop_set_id": self._sound_loop_set_counter,
             "sound": sound_loop_set['sound'],
             "volume": sound_loop_set['volume'],
             "initial_state": "play"
         }
+
         self._apply_layer_settings(&player.master_sound_layer, master_layer_settings)
 
         # Determine master sound length
@@ -260,6 +404,13 @@ cdef class TrackSoundLoop(Track):
             # Append layer
             player.layers = g_slist_append(player.layers, layer)
 
+        # Send sound_loop_set started notification (if not pending/queued)
+        if player.status not in (player_idle, player_pending):
+            send_sound_loop_set_started_notification(player.master_sound_layer.sound_loop_set_id,
+                                                     player.master_sound_layer.sound_id,
+                                                     self.state)
+            # send_sound_started_notification(0, player.master_sound_layer.sound_id, 0, self.state)
+
         SDL_UnlockAudio()
 
     cdef _apply_layer_settings(self, SoundLoopLayerSettings *layer, dict layer_settings):
@@ -269,6 +420,11 @@ cdef class TrackSoundLoop(Track):
             layer.status = layer_playing
         else:
             layer.status = layer_stopped
+
+        if 'sound_loop_set_id' in layer_settings:
+            layer.sound_loop_set_id = layer_settings['sound_loop_set_id']
+        else:
+            layer.sound_loop_set_id = 0
 
         # Set layer sound
         sound = self.mc.sounds[layer_settings['sound']]
@@ -315,6 +471,8 @@ cdef class TrackSoundLoop(Track):
         """
         SDL_LockAudio()
 
+        self.log.debug("Stopping current sound loop set")
+
         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
             self.log.info("Unable to stop sound loop set - no sound loop set is currently playing.")
             SDL_UnlockAudio()
@@ -331,6 +489,17 @@ cdef class TrackSoundLoop(Track):
         self.type_state.current.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_out_steps
         self.type_state.current.status = player_fading_out
 
+        # Need to check if the next sound player has a loop set queued for playback and if so, cancel it
+        if self.type_state.next.status == player_pending:
+            self.type_state.next.status = player_idle
+            self.type_state.next.master_sound_layer.sound_loop_set_id = 0
+            self.type_state.next.master_sound_layer.sound_id = 0
+
+        elif self.type_state.next.status == player_fading_out:
+            # Do we need to shorted the current fade-out?
+            if self.type_state.next.master_sound_layer.fade_steps_remaining > self.type_state.current.master_sound_layer.fade_steps_remaining:
+                self.type_state.next.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_steps_remaining
+
         SDL_UnlockAudio()
 
     def stop_looping_current_sound_loop_set(self):
@@ -339,6 +508,8 @@ cdef class TrackSoundLoop(Track):
         after the current loop iteration).
         """
         SDL_LockAudio()
+
+        self.log.debug("Stopping looping current sound loop set")
 
         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
             self.log.info("Unable to stop looping sound loop set - no sound loop set is currently playing.")
@@ -367,6 +538,9 @@ cdef class TrackSoundLoop(Track):
             return
 
         SDL_LockAudio()
+
+        self.log.debug("play_layer - Play layer %d of the currently playing sound_loop_set (fade-in = %f sec).",
+                       layer, fade_in)
 
         # Retrieve the layer
         if self.type_state.current.layers == NULL:
@@ -421,6 +595,9 @@ cdef class TrackSoundLoop(Track):
 
         SDL_LockAudio()
 
+        self.log.debug("stop_layer - Stop layer %d of the currently playing sound_loop_set (fade-out = %f sec).",
+                       layer, fade_out)
+
         # Retrieve the layer
         if self.type_state.current.layers == NULL:
             self.log.info("There are no layers defined in the current sound loop set: stop_layers has no effect")
@@ -464,6 +641,8 @@ cdef class TrackSoundLoop(Track):
             return
 
         SDL_LockAudio()
+
+        self.log.debug("stop_looping_layer - Stop looping layer %d of the currently playing sound_loop_set.", layer)
 
         # Retrieve the layer
         if self.type_state.current.layers == NULL:
@@ -690,14 +869,22 @@ cdef class TrackSoundLoop(Track):
                     live_loop_track.current.status = player_idle
                     reset_track_buffer_pos = False
 
-                    # TODO: Send stopped notification
+                    # Send stopped notification
+                    send_sound_loop_set_stopped_notification(live_loop_track.current.master_sound_layer.sound_loop_set_id,
+                                                             live_loop_track.current.master_sound_layer.sound_id,
+                                                             track)
 
                     switch_players = True
                     if live_loop_track.next.status == player_pending:
                         live_loop_track.next.status = player_playing
+                        send_sound_loop_set_started_notification(live_loop_track.next.master_sound_layer.sound_loop_set_id,
+                                                                 live_loop_track.next.master_sound_layer.sound_id,
+                                                                 track)
                 else:
-                    # TODO: send looping notification
-                    #send_sound_looping_notification(0, sound.sound_id, 0, track)
+                    # Send looping notification
+                    send_sound_loop_set_looping_notification(live_loop_track.current.master_sound_layer.sound_loop_set_id,
+                                                             live_loop_track.current.master_sound_layer.sound_id,
+                                                             track)
                     live_loop_track.current.sample_pos = 0
 
         if reset_track_buffer_pos:
@@ -717,8 +904,17 @@ cdef class TrackSoundLoop(Track):
             # Check if we have reached the end of the sound loop.
             if live_loop_track.next.sample_pos >= live_loop_track.next.length:
                 # End of sound loop reached, the next player will always loop
-                # TODO: send looping notification
+                send_sound_loop_set_looping_notification(live_loop_track.next.master_sound_layer.sound_loop_set_id,
+                                                         live_loop_track.next.master_sound_layer.sound_id,
+                                                         track)
                 live_loop_track.next.sample_pos = 0
+
+            # Check if sound loop has finished playing/fading out
+            if live_loop_track.next.status == player_idle:
+                # Sound stopped, send notification
+                send_sound_loop_set_stopped_notification(live_loop_track.next.master_sound_layer.sound_loop_set_id,
+                                                         live_loop_track.next.master_sound_layer.sound_id,
+                                                         track)
 
         # Switch current and next players (if necessary)
         if switch_players:

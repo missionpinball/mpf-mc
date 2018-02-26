@@ -52,7 +52,7 @@ class Text(Widget):
                       'valign', 'padding_x', 'padding_y', 'text_size',
                       'shorten', 'mipmap', 'markup', 'line_height',
                       'max_lines', 'strip', 'shorten_from', 'split_str',
-                      'unicode_errors', 'color')
+                      'unicode_errors', 'color', 'casing')
     animation_properties = ('x', 'y', 'font_size', 'color', 'opacity', 'rotation', 'scale')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
@@ -208,6 +208,10 @@ class Text(Widget):
                 for item in number_list:
                     grouped_item = Text.group_digits(item)
                     text = text.replace(str(item), grouped_item)
+
+            if self.config.get('casing', None) in ('lower', 'upper', 'title', 'capitalize'):
+                text = getattr(text, self.config['casing'])()
+
         self._label.text = text
         self._label.texture_update()
 

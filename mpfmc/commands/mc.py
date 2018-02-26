@@ -39,10 +39,7 @@ class Command(object):
 
         # Need to have these in here because we don't want them to load when
         # the module is loaded as an mpf.command
-        import mpfmc
         from mpf.core.utility_functions import Util
-        from mpfmc.core.config_processor import ConfigProcessor
-        from mpfmc.core.utils import set_machine_path, load_machine_config
 
         del mpf_path
 
@@ -107,16 +104,17 @@ class Command(object):
                             help="Enables verbose logging to the console. Do NOT on "
                                  "Windows platforms")
 
-        # The following are just included for full compatibility with mpf.py
-        # which is needed when using "mpf both".
-
         parser.add_argument("-a",
-                            action="store_const", dest="force_platform",
-                            const='no_load_cache', help=argparse.SUPPRESS)
+                            action="store_true", dest="no_load_cache",
+                            help="Forces the config to be loaded from files "
+                                 "and not cache")
 
         parser.add_argument("-A",
-                            action="store_const", dest="force_platform",
-                            const='create_config_cache', help=argparse.SUPPRESS)
+                            action="store_false", dest="create_config_cache",
+                            help="Does not create the cache config files")
+
+        # The following are just included for full compatibility with mpf.py
+        # which is needed when using "mpf both".
 
         parser.add_argument("-x",
                             action="store_const", dest="force_platform",
@@ -174,19 +172,6 @@ class Command(object):
         # add the handler to the root logger
         logging.getLogger('').addHandler(console)
 
-        mpf_config = ConfigProcessor.load_config_file(os.path.join(
-            mpfmc.__path__[0], args.mcconfigfile), 'machine')
-
-        machine_path = set_machine_path(machine_path,
-                                        mpf_config['mpf-mc']['paths'][
-                                            'machine_files'])
-
-        mpf_config = load_machine_config(args.configfile, machine_path,
-                                         mpf_config['mpf-mc']['paths'][
-                                             'config'], mpf_config)
-
-        self.preprocess_config(mpf_config)
-
         from mpfmc.core.mc import MpfMc
 
         logging.info("Loading MPF-MC controller")
@@ -194,7 +179,7 @@ class Command(object):
         thread_stopper = threading.Event()
 
         try:
-            MpfMc(options=vars(args), config=mpf_config,
+            MpfMc(options=vars(args),
                   machine_path=machine_path,
                   thread_stopper=thread_stopper).run()
             logging.info("MC run loop ended.")
@@ -215,37 +200,6 @@ class Command(object):
             input('Press ENTER to continue...')
 
         sys.exit()
-
-    def preprocess_config(self, config):
-        from kivy.config import Config
-
-        kivy_config = config['kivy_config']
-
-        try:
-            kivy_config['graphics'].update(config['window'])
-        except KeyError:
-            pass
-
-        if ('top' in kivy_config['graphics'] and
-                'left' in kivy_config['graphics']):
-            kivy_config['graphics']['position'] = 'custom'
-
-        for section, settings in kivy_config.items():
-            for k, v in settings.items():
-                try:
-                    if k in Config[section]:
-                        Config.set(section, k, v)
-                except KeyError:
-                    continue
-
-        try:  # config not validated yet, so we use try
-            if config['window']['exit_on_escape']:
-                Config.set('kivy', 'exit_on_escape', '1')
-        except KeyError:
-            pass
-
-        Config.set('graphics', 'maxfps', int(config['mpf-mc']['fps']))
-
 
 def get_command():
     return 'mc', Command

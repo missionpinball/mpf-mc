@@ -51,6 +51,9 @@ sound_loop_sets:
       - sound: clap
         volume: 0.45
         initial_state: stop
+    events_when_played: basic_beat_played
+    events_when_looping: basic_beat_looping
+    events_when_stopped: basic_beat_stopped, sound_loop_set_stopped
   basic_beat2:
     sound: kick2
     volume: 0.5
@@ -67,58 +70,54 @@ sound_loop_sets:
         initial_state: play
 
 sound_loop_player:
-
   play_basic_beat:
-    action: play
-    track: loops
-    sound_loop_set: basic_beat
-    queue: True
+    loops:
+      action: play
+      sound_loop_set: basic_beat
+      queue: True
   add_hi_hats:
-    action: play_layer
-    track: loops
-    layer: 1
-    queue: True
+    loops:
+      action: play_layer
+      layer: 1
+      queue: True
   stop_hi_hats:
-    action: stop_looping_layer
-    track: loops
-    layer: 1
+    loops:
+      action: stop_looping_layer
+      layer: 1
   add_snare:
-    action: play_layer
-    track: loops
-    fade_in: 2s
-    layer: 2
+    loops:
+      action: play_layer
+      fade_in: 2s
+      layer: 2
   add_claps:
-    action: play_layer
-    track: loops
-    layer: 3
-    queue: True
+    loops:
+      action: play_layer
+      layer: 3
+      queue: True
 
   play_basic_beat2:
-    action: play
-    track: loops
-    sound_loop_set: basic_beat2
-    queue: True
+    loops:
+      action: play
+      sound_loop_set: basic_beat2
+      queue: True
   add_bass_synth:
-    action: play_layer
-    track: loops
-    layer: 4
-    queue: True
-    fade_in: 3s
+    loops:
+      action: play_layer
+      layer: 4
+      queue: True
+      fade_in: 3s
   fade_out_bass_synth:
-    action: stop_layer
-    track: loops
-    layer: 4
-    fade_out: 4s
-
+    loops:
+      action: stop_layer
+      layer: 4
+      fade_out: 4s
   stop_looping_current_loop:
-    action: stop_looping
-    track: loops
-
+    loops:
+      action: stop_looping
   stop_current_loop:
-    action: stop
-    track: loops
-    fade_out: 1.5s
-
+    loops:
+      action: stop
+      fade_out: 1.5s
 
 sound_player:
     play_sound_synthping: 210871_synthping

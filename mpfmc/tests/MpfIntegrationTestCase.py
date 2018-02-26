@@ -13,8 +13,6 @@ from kivy.uix.widget import Widget as KivyWidget
 import mpfmc
 from mpf.tests.MpfBcpTestCase import MockBcpClient
 from mpf.tests.MpfTestCase import MpfTestCase, patch
-from mpfmc.core.config_processor import ConfigProcessor
-from mpfmc.core.utils import load_machine_config
 
 
 class TestBcpClient(MockBcpClient):
@@ -47,8 +45,10 @@ class TestBcpClient(MockBcpClient):
 
     def get_options(self):
         return dict(machine_path=self.getAbsoluteMachinePath(),
-                    mcconfigfile='mpfmc/mcconfig.yaml',
+                    mcconfigfile='mcconfig.yaml',
                     configfile=self.machine.options['configfile'],
+                    no_load_cache=False,
+                    create_config_cache=True,
                     bcp=False)
 
     def preprocess_config(self, config):
@@ -118,20 +118,9 @@ class TestBcpClient(MockBcpClient):
         # prevent sleep in clock
         Clock._max_fps = 0
 
-        mpf_config = ConfigProcessor.load_config_file(os.path.abspath(
-            os.path.join(mpfmc.__path__[0], os.pardir,
-                         self.get_options()['mcconfigfile'])), 'machine')
-
         machine_path = self.getAbsoluteMachinePath()
 
-        mpf_config = load_machine_config(
-            self.machine.options['configfile'],
-            machine_path,
-            mpf_config['mpf-mc']['paths']['config'], mpf_config)
-        self.preprocess_config(mpf_config)
-
         self.mc = MpfMc(options=self.get_options(),
-                        config=mpf_config,
                         machine_path=machine_path)
 
         from kivy.core.window import Window
