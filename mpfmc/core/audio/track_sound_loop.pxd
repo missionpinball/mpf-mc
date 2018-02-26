@@ -20,6 +20,7 @@ ctypedef struct SoundLoopLayerSettings:
     LayerStatus status
     SoundSample *sound
     Uint8 volume
+    long sound_loop_set_id
     long sound_id
     Uint32 fade_in_steps
     Uint32 fade_out_steps
@@ -61,6 +62,10 @@ cdef class TrackSoundLoop(Track):
     # The TrackSoundLoopState struct is allocated during construction and freed during
     # destruction.
     cdef TrackSoundLoopState *type_state
+    cdef long _sound_loop_set_counter
+    cdef dict _active_sound_loop_sets
+
+    cdef process_notification_message(self, NotificationMessageContainer *notification_message)
 
     cdef _initialize_player(self, SoundLoopSetPlayer *player)
     cdef _apply_layer_settings(self, SoundLoopLayerSettings *layer, dict layer_settings)
