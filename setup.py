@@ -603,6 +603,7 @@ setup(
     [mpf.config_player]
     sound_player=mpfmc.config_players.plugins.sound_player:register_with_mpf
     sound_loop_player=mpfmc.config_players.plugins.sound_loop_player:register_with_mpf
+    playlist_player=mpfmc.config_players.plugins.playlist_player:register_with_mpf
     widget_player=mpfmc.config_players.plugins.widget_player:register_with_mpf
     slide_player=mpfmc.config_players.plugins.slide_player:register_with_mpf
     track_player=mpfmc.config_players.plugins.track_player:register_with_mpf
