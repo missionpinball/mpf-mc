@@ -485,6 +485,17 @@ cdef class TrackSoundLoop(Track):
         self.type_state.current.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_out_steps
         self.type_state.current.status = player_fading_out
 
+        # Need to check if the next sound player has a loop set queued for playback and if so, cancel it
+        if self.type_state.next.status == player_pending:
+            self.type_state.next.status = player_idle
+            self.type_state.next.master_sound_layer.sound_loop_set_id = 0
+            self.type_state.next.master_sound_layer.sound_id = 0
+
+        elif self.type_state.next.status == player_fading_out:
+            # Do we need to shorted the current fade-out?
+            if self.type_state.next.master_sound_layer.fade_steps_remaining > self.type_state.current.master_sound_layer.fade_steps_remaining:
+                self.type_state.next.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_steps_remaining
+
         SDL_UnlockAudio()
 
     def stop_looping_current_sound_loop_set(self):
@@ -893,6 +904,13 @@ cdef class TrackSoundLoop(Track):
                                                          live_loop_track.next.master_sound_layer.sound_id,
                                                          track)
                 live_loop_track.next.sample_pos = 0
+
+            # Check if sound loop has finished playing/fading out
+            if live_loop_track.next.status == player_idle:
+                # Sound stopped, send notification
+                send_sound_loop_set_stopped_notification(live_loop_track.next.master_sound_layer.sound_loop_set_id,
+                                                         live_loop_track.next.master_sound_layer.sound_id,
+                                                         track)
 
         # Switch current and next players (if necessary)
         if switch_players:
