@@ -51,6 +51,9 @@ sound_loop_sets:
       - sound: clap
         volume: 0.45
         initial_state: stop
+    events_when_played: basic_beat_played
+    events_when_looping: basic_beat_looping
+    events_when_stopped: basic_beat_stopped, sound_loop_set_stopped
   basic_beat2:
     sound: kick2
     volume: 0.5

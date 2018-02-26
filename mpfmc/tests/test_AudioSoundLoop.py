@@ -59,11 +59,18 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.assertIn('basic_beat', self.mc.sound_loop_sets)
         self.assertIn('basic_beat2', self.mc.sound_loop_sets)
 
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
+
         # Test sound_loop_player
         self.advance_time()
         self.mc.events.post('play_sound_synthping')
         self.mc.events.post('play_basic_beat')
         self.advance_real_time(1)
+
+        # Ensure sound_loop_set.events_when_played is working properly (send event when a sound_loop_set is played)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='basic_beat_played')
 
         self.mc.events.post('add_hi_hats')
         self.advance_time()
@@ -72,6 +79,10 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.mc.events.post('add_snare')
         self.mc.events.post('add_claps')
         self.advance_real_time(2)
+
+        # Ensure sound_loop_set.events_when_looping is working properly (send event when a sound_loop_set loops)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='basic_beat_looping')
+
         status = track_loops.get_status()
         self.assertEqual(status[0]['status'], "playing")
         self.assertEqual(status[0]['sound_id'], self.mc.sounds["kick"].id)
@@ -87,6 +98,10 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.assertEqual(status[0]['sound_id'], self.mc.sounds["kick2"].id)
         self.assertTrue(status[0]['looping'])
         self.assertEqual(len(status[0]['layers']), 4)
+
+        # Ensure sound_loop_set.events_when_stopped is working properly (send event when a sound_loop_set stops)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='basic_beat_stopped')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='sound_loop_set_stopped')
 
         self.mc.events.post('fade_out_bass_synth')
         self.advance_real_time(4)

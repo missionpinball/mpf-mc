@@ -17,6 +17,11 @@ class SoundLoopSetCollection(ConfigCollection):
         # config is localized to this collection's section
         del kwargs
 
+        # No need to create entries if sound system is not enabled
+        if self.mc.sound_system is None or self.mc.sound_system.audio_interface is None:
+            self.log.info("Unable to create sound_loop_sets - sound system is not available")
+            return
+
         for name, settings in config.items():
             try:
                 self[name] = self.process_config(settings)
@@ -70,25 +75,26 @@ class SoundLoopSetCollection(ConfigCollection):
         if self._validate_handler:
             self.mc.events.remove_handler(self._validate_handler)
 
-        for name, config in self.items():
-            # Validate sound setting (make sure only valid sound assets are referenced)
-            if config["sound"] not in self.mc.sounds:
-                raise ValueError("The '{}' sound_loop_set references an invalid sound asset "
-                                 "name '{}' in its sound setting".format(name, config["sound"]))
-            if self.mc.sounds[config["sound"]].streaming:
-                raise ValueError("The '{}' sound_loop_set references a streaming sound asset "
-                                 "'{}' in its sound setting (only in-memory sounds are "
-                                 "supported in loop sets)".format(name, config["sound"]))
-
-            # Validate sound settings in layers (make sure only valid sound assets are referenced)
-            for layer in config["layers"]:
-                if layer["sound"] not in self.mc.sounds:
+        if hasattr(self.mc, 'sounds'):
+            for name, config in self.items():
+                # Validate sound setting (make sure only valid sound assets are referenced)
+                if config["sound"] not in self.mc.sounds:
                     raise ValueError("The '{}' sound_loop_set references an invalid sound asset "
-                                     "name '{}' in one of its layers".format(name, layer["sound"]))
-                if self.mc.sounds[layer["sound"]].streaming:
+                                     "name '{}' in its sound setting".format(name, config["sound"]))
+                if self.mc.sounds[config["sound"]].streaming:
                     raise ValueError("The '{}' sound_loop_set references a streaming sound asset "
-                                     "'{}' in one of its layers (only in-memory sounds are "
-                                     "supported in loop sets)".format(name, layer["sound"]))
+                                     "'{}' in its sound setting (only in-memory sounds are "
+                                     "supported in loop sets)".format(name, config["sound"]))
+
+                # Validate sound settings in layers (make sure only valid sound assets are referenced)
+                for layer in config["layers"]:
+                    if layer["sound"] not in self.mc.sounds:
+                        raise ValueError("The '{}' sound_loop_set references an invalid sound asset "
+                                         "name '{}' in one of its layers".format(name, layer["sound"]))
+                    if self.mc.sounds[layer["sound"]].streaming:
+                        raise ValueError("The '{}' sound_loop_set references a streaming sound asset "
+                                         "'{}' in one of its layers (only in-memory sounds are "
+                                         "supported in loop sets)".format(name, layer["sound"]))
 
 
 collection_cls = SoundLoopSetCollection
