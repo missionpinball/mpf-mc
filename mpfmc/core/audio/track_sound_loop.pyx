@@ -304,13 +304,17 @@ cdef class TrackSoundLoop(Track):
             player = self.type_state.current
             player_already_playing = False
 
-        elif self.type_state.next.status == player_idle:
+        elif self.type_state.next.status in (player_idle, player_pending):
 
             # The current player is busy playing a loop set.  In this case the queue and
             # synchronize settings are important and dictate how the requested loop set
             # will be played.
             player = self.type_state.next
             player_already_playing = True
+
+            # Remove the previously pending sound_loop_set from the active sound loop set dict (if exists)
+            if self.type_state.next.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:
+                del self._active_sound_loop_sets[player.master_sound_layer.sound_loop_set_id]
 
         else:
             # TODO: Handle case when both players are busy (i.e. during a cross-fade)
