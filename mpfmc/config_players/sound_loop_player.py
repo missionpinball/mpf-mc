@@ -127,10 +127,6 @@ Here are several various examples:
         unique options.
 
         """
-        # first, we're looking to see if we have a string, a list, or a dict.
-        # if it's a dict, we look to see whether we have the name of some sound
-        # loop set.
-
         validated_config = dict()
 
         # No need to validate if sound system is not enabled, just return empty dict
