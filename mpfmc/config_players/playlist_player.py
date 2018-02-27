@@ -15,7 +15,7 @@ class McPlaylistPlayer(McConfigPlayer):
 
     playlist_player:
         <event_name>:
-            <playlist_name>:
+            <playlist_track_name>:
                 <playlist_settings>: ...
 
     The express config just puts a playlist_name next to an event.
@@ -29,20 +29,21 @@ class McPlaylistPlayer(McConfigPlayer):
 
     playlist_player:
         some_event:
-            playlist_name_to_act_upon:
+            playlist_track_name:
                 action: advance
 
 Here are several various examples:
 
     playlist_player:
         some_event:
-            attract_mode_music:
+            playlist:
+                playlist: attract_mode_music
                 volume: 0.65
 
         some_event2:
-            another_beat:
-                volume: -4.5 db
-                action: set_volume
+            playlist:
+                action: stop
+                fade-out: 2s
 
     """
     
@@ -65,8 +66,8 @@ Here are several various examples:
             self.machine.log.error("PlaylistPlayer: track is a required setting and must be specified.")
             return
 
-        track = self.machine.sound_system.audio_interface.get_track_by_name(settings['track'])
-        if track.type != 'playlist':
+        playlist_controller = self.machine.sound_system.audio_interface.get_playlist_controller(settings['track'])
+        if playlist_controller is None:
             self.machine.log.error("PlaylistPlayer: track must refer to an existing audio playlist track.")
             return
 
@@ -78,30 +79,18 @@ Here are several various examples:
                 return
             try:
                 playlist = self.machine.playlists[settings['playlist']]
-                track.play_playlist(playlist, settings)
+                playlist_controller.play(playlist, settings)
             except Exception as ex:
                 raise Exception(ex)
 
         elif settings['action'].lower() == 'stop':
             settings.setdefault('fade_out', None)
-            track.stop_current_sound_loop_set(settings['fade_out'])
+            playlist_controller.stop(settings['fade_out'])
 
         elif settings['action'].lower() == 'stop_looping':
-            track.stop_looping_current_sound_loop_set()
+            playlist_controller.stop_looping()
 
         elif settings['action'].lower() == 'set_volume':
-            pass
-        elif settings['action'].lower() == 'play_layer':
-            settings.setdefault('volume', None)
-            track.play_layer(settings['layer'], settings['fade_in'], settings['queue'], volume=settings['volume'])
-
-        elif settings['action'].lower() == 'stop_layer':
-            track.stop_layer(settings['layer'], settings['fade_out'])
-
-        elif settings['action'].lower() == 'stop_looping_layer':
-            track.stop_looping_layer(settings['layer'])
-
-        elif settings['action'].lower() == 'set_layer_volume':
             pass
 
         else:
@@ -111,22 +100,22 @@ Here are several various examples:
     def get_express_config(self, value):
         """There is no express config for the sound loop player."""
         del value
-        raise AssertionError("Sound Loop Player does not support express config")
+        raise AssertionError("Playlist Player does not support express config")
 
     # pylint: disable=too-many-branches
     def validate_config(self, config):
-        """Validates the sound_loop_player: section of a config file (either a
+        """Validates the playlist_player: section of a config file (either a
         machine-wide config or a mode config).
 
         Args:
-            config: A dict of the contents of the sound_loop_player section
+            config: A dict of the contents of the playlist_player section
             from the config file. It's assumed that keys are event names, and
-            values are settings for what the sound_loop_player should do when
+            values are settings for what the playlist_player should do when
             that event is posted.
 
         Returns: A dict a validated entries.
 
-        This method overrides the base method since the sound_loop_player has
+        This method overrides the base method since the playlist_player has
         unique options.
 
         """
@@ -151,7 +140,7 @@ Here are several various examples:
 
                 if self.machine.sound_system.audio_interface.get_track_type(track) != "sound_loop":
                     raise ValueError("PlaylistPlayer: An invalid audio track '{}' is specified for event '{}' "
-                                     "(only sound_loop audio tracks are supported).".format(track, event))
+                                     "(only playlist audio tracks are supported).".format(track, event))
             else:
                 raise ValueError("PlaylistPlayer: track is a required setting in event '{}'".format(event))
 
@@ -162,7 +151,6 @@ Here are several various examples:
     def _validate_config_item(self, track, track_settings):
         """Validates the config when in a show or in a player"""
 
-        # device is sound loop set name
         # Validate the settings against the config spec
 
         # First validate the action item (since it will be used to validate the rest
