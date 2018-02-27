@@ -22,7 +22,6 @@ DEFAULT_PRIORITY = 0
 DEFAULT_MAX_QUEUE_TIME = None
 DEFAULT_LOOPS = 0
 MINIMUM_DUCKING_DURATION = "10ms"
-DEFAULT_ALMOST_FINISHED_TIME = 2.0
 
 
 class SoundPool(AssetPool):
@@ -222,11 +221,13 @@ class SoundAsset(Asset):
         self._start_at = 0
         self._fade_in = 0
         self._fade_out = 0
+        self._about_to_finish_time = None
         self._simultaneous_limit = None
         self._stealing_method = SoundStealingMethod.oldest
         self._events_when_played = None
         self._events_when_stopped = None
         self._events_when_looping = None
+        self._events_when_about_to_finish = None
         self._mode_end_action = ModeEndAction.stop_looping
         self._markers = list()
         self._container = None  # holds the actual sound samples in memory
@@ -293,6 +294,12 @@ class SoundAsset(Asset):
         self.config.setdefault('fade_out', 0)
         self._fade_out = AudioInterface.string_to_secs(self.config['fade_out'])
 
+        self.config.setdefault('about_to_finish_time', None)
+        if self.config['about_to_finish_time'] is None:
+            self._about_to_finish_time = None
+        else:
+            self._about_to_finish_time = AudioInterface.string_to_secs(self.config['about_to_finish_time'])
+
         self.config.setdefault('stealing_method', 'oldest')
         method = str(self.config['stealing_method']).lower()
         if method == 'skip':
@@ -316,6 +323,10 @@ class SoundAsset(Asset):
         if 'events_when_looping' in self.config and isinstance(
                 self.config['events_when_looping'], str):
             self._events_when_looping = Util.string_to_list(self.config['events_when_looping'])
+
+        if 'events_when_about_to_finish' in self.config and isinstance(
+                self.config['events_when_about_to_finish'], str):
+            self._events_when_about_to_finish = Util.string_to_list(self.config['events_when_about_to_finish'])
 
         if 'mode_end_action' in self.config and self.config['mode_end_action'] is not None:
             action = str(self.config['mode_end_action']).lower()
@@ -418,6 +429,14 @@ class SoundAsset(Asset):
         return self._fade_out
 
     @property
+    def about_to_finish_time(self):
+        """
+        Return the time before the end when an about to finish marker will be generated (in seconds).
+        If set to None, no about to finish marker will be generated.
+        """
+        return self._about_to_finish_time
+
+    @property
     def max_queue_time(self):
         """Return the maximum time a sound may be queued before
         playing or being discarded"""
@@ -465,6 +484,11 @@ class SoundAsset(Asset):
     def events_when_looping(self):
         """Return the list of events that are posted when the sound begins a new loop"""
         return self._events_when_looping
+
+    @property
+    def events_when_about_to_finish(self):
+        """Return the list of events that are posted when the sound is about to finish"""
+        return self._events_when_about_to_finish
 
     @property
     def mode_end_action(self):
@@ -708,11 +732,12 @@ class SoundInstance(object):
         self._start_at = self._sound.start_at
         self._fade_in = self._sound.fade_in
         self._fade_out = self._sound.fade_out
-        self._almost_finished_time = DEFAULT_ALMOST_FINISHED_TIME
+        self._about_to_finish_time = self._sound.about_to_finish_time
         self._max_queue_time = self._sound.max_queue_time
         self._events_when_played = self._sound.events_when_played
         self._events_when_stopped = self._sound.events_when_stopped
         self._events_when_looping = self._sound.events_when_looping
+        self._events_when_about_to_finish = self._sound.events_when_about_to_finish
         self._mode_end_action = self._sound.mode_end_action
         self._markers = self._sound.markers
         self._exp_time = None
@@ -744,8 +769,8 @@ class SoundInstance(object):
         if 'fade_out' in settings and settings['fade_out'] is not None:
             self._fade_out = settings['fade_out']
 
-        if 'almost_finished_time' in settings and settings['almost_finished_time'] is not None:
-            self._almost_finished_time = settings['almost_finished_time']
+        if 'about_to_finish_time' in settings:
+            self._about_to_finish_time = settings['about_to_finish_time']
 
         if 'max_queue_time' in settings:
             self._max_queue_time = settings['max_queue_time']
@@ -758,6 +783,9 @@ class SoundInstance(object):
 
         if 'events_when_looping' in settings:
             self._events_when_looping = settings['events_when_looping']
+
+        if 'events_when_about_to_finish' in settings:
+            self._events_when_about_to_finish = settings['events_when_about_to_finish']
 
         if 'mode_end_action' in settings and settings['mode_end_action'] is not None:
             action = str(settings['mode_end_action']).lower()
@@ -889,9 +917,12 @@ class SoundInstance(object):
         return self._fade_out
 
     @property
-    def almost_finished_time(self):
-        """Return the time before the end when an almost finished marker will be generated (in seconds)"""
-        return self._almost_finished_time
+    def about_to_finish_time(self):
+        """
+        Return the time before the end when an about to finish marker will be generated (in seconds).
+        If set to None, no about to finish marker will be generated.
+        """
+        return self._about_to_finish_time
 
     @property
     def loops(self):
@@ -927,6 +958,11 @@ class SoundInstance(object):
     def events_when_looping(self):
         """Return the list of events that are posted when the sound begins a new loop"""
         return self._events_when_looping
+
+    @property
+    def events_when_about_to_finish(self):
+        """Return the list of events that are posted when the sound is about to finish"""
+        return self._events_when_about_to_finish
 
     @property
     def mode_end_action(self):
@@ -1027,7 +1063,7 @@ class SoundInstance(object):
         self._played = True
         if self.events_when_played is not None:
             for event in self.events_when_played:
-                self.mc.post_mc_native_event(event)
+                self.mc.post_mc_native_event(event, name=self.name, id=self.id, sound_id=self.sound_id)
 
     def set_stopped(self):
         """Notifies the sound instance that it has now stopped and triggers any
@@ -1036,7 +1072,7 @@ class SoundInstance(object):
         # Trigger any events
         if self.events_when_stopped is not None:
             for event in self.events_when_stopped:
-                self.mc.post_mc_native_event(event)
+                self.mc.post_mc_native_event(event, name=self.name, id=self.id, sound_id=self.sound_id)
 
         self._finished()
 
@@ -1049,7 +1085,18 @@ class SoundInstance(object):
         # Trigger any events
         if self.events_when_looping is not None:
             for event in self.events_when_looping:
-                self.mc.post_mc_native_event(event)
+                self.mc.post_mc_native_event(event,
+                                             name=self.name, id=self.id,
+                                             sound_id=self.sound_id, loop_count=self._loop_count)
+
+    def set_about_to_finish(self):
+        """Notifies the sound instance that it is about to finish and triggers any
+        corresponding actions."""
+
+        # Trigger any events
+        if self.events_when_about_to_finish is not None:
+            for event in self.events_when_about_to_finish:
+                self.mc.post_mc_native_event(event, name=self.name, id=self.id, sound_id=self.sound_id)
 
     def set_marker(self, marker_id):
         """Notifies the sound instance that the specified marker has just been reached
@@ -1063,7 +1110,9 @@ class SoundInstance(object):
         # Trigger any events
         if marker['events'] is not None:
             for event in marker['events']:
-                self.mc.post_mc_native_event(event)
+                self.mc.post_mc_native_event(event,
+                                             name=self.name, id=self.id,
+                                             sound_id=self.sound_id, marker_id=marker_id)
 
     def set_expired(self):
         """Notifies the sound instance that it has expired and will not be played."""
