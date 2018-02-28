@@ -1063,7 +1063,7 @@ class SoundInstance(object):
         self._played = True
         if self.events_when_played is not None:
             for event in self.events_when_played:
-                self.mc.post_mc_native_event(event, name=self.name, id=self.id, sound_id=self.sound_id)
+                self.mc.post_mc_native_event(event, sound_instance=self)
 
     def set_stopped(self):
         """Notifies the sound instance that it has now stopped and triggers any
@@ -1072,7 +1072,7 @@ class SoundInstance(object):
         # Trigger any events
         if self.events_when_stopped is not None:
             for event in self.events_when_stopped:
-                self.mc.post_mc_native_event(event, name=self.name, id=self.id, sound_id=self.sound_id)
+                self.mc.post_mc_native_event(event, sound_instance=self)
 
         self._finished()
 
@@ -1085,9 +1085,7 @@ class SoundInstance(object):
         # Trigger any events
         if self.events_when_looping is not None:
             for event in self.events_when_looping:
-                self.mc.post_mc_native_event(event,
-                                             name=self.name, id=self.id,
-                                             sound_id=self.sound_id, loop_count=self._loop_count)
+                self.mc.post_mc_native_event(event, sound_instance=self)
 
     def set_about_to_finish(self):
         """Notifies the sound instance that it is about to finish and triggers any
@@ -1096,7 +1094,7 @@ class SoundInstance(object):
         # Trigger any events
         if self.events_when_about_to_finish is not None:
             for event in self.events_when_about_to_finish:
-                self.mc.post_mc_native_event(event, name=self.name, id=self.id, sound_id=self.sound_id)
+                self.mc.post_mc_native_event(event, sound_instance=self)
 
     def set_marker(self, marker_id):
         """Notifies the sound instance that the specified marker has just been reached
@@ -1110,9 +1108,7 @@ class SoundInstance(object):
         # Trigger any events
         if marker['events'] is not None:
             for event in marker['events']:
-                self.mc.post_mc_native_event(event,
-                                             name=self.name, id=self.id,
-                                             sound_id=self.sound_id, marker_id=marker_id)
+                self.mc.post_mc_native_event(event, sound_instance=self, marker_id=marker_id)
 
     def set_expired(self):
         """Notifies the sound instance that it has expired and will not be played."""
