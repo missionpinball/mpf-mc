@@ -283,6 +283,7 @@ cdef class TrackSoundLoop(Track):
         # Determine settings (override sound loop set with player settings)
         player_settings.setdefault('fade_in', sound_loop_set['fade_in'])
         player_settings.setdefault('fade_out', sound_loop_set['fade_out'])
+        player_settings.setdefault('start_at', 0)
         player_settings.setdefault('events_when_played', sound_loop_set['events_when_played'])
         player_settings.setdefault('events_when_stopped', sound_loop_set['events_when_stopped'])
         player_settings.setdefault('events_when_looping', sound_loop_set['events_when_looping'])
@@ -332,7 +333,7 @@ cdef class TrackSoundLoop(Track):
             # Determine if playing immediately or queuing until next loop
             if player_settings['queue']:
                 player.status = player_pending
-                player.sample_pos = 0
+                player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
 
             else:
                 # Synchronize the loop set to the current player (if flag is set)
@@ -363,7 +364,7 @@ cdef class TrackSoundLoop(Track):
             else:
                 player.status = player_playing
 
-            player.sample_pos = 0
+            player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
 
         # Save current sound loop set so it can be referred to again while it is active (event notifications)
         self._sound_loop_set_counter += 1
@@ -499,6 +500,26 @@ cdef class TrackSoundLoop(Track):
             # Do we need to shorted the current fade-out?
             if self.type_state.next.master_sound_layer.fade_steps_remaining > self.type_state.current.master_sound_layer.fade_steps_remaining:
                 self.type_state.next.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_steps_remaining
+
+        SDL_UnlockAudio()
+
+    def jump_to_time_current_sound_loop_set(self, time=0.0):
+        """Immediately jumps the loop playback position to the specified time."""
+
+        SDL_LockAudio()
+
+        self.log.debug("Jumping to %f seconds playback position in current sound loop set")
+
+        if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
+            self.log.info("Unable to jump to specified playback position - "
+                          "no sound loop set is currently playing.")
+            SDL_UnlockAudio()
+            return
+
+        # Set new playback position (make sure it is within the current sample length)
+        self.type_state.current.sample_pos = time * self.state.callback_data.seconds_to_bytes_factor
+        while self.type_state.current.sample_pos >= self.type_state.current.length:
+            self.type_state.current.sample_pos -= self.type_state.current.length
 
         SDL_UnlockAudio()
 
