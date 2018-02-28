@@ -78,8 +78,7 @@ Here are several various examples:
                                        "does not exist ('{}').".format(settings['playlist']))
                 return
             try:
-                playlist = self.machine.playlists[settings['playlist']]
-                playlist_controller.play(playlist, settings)
+                playlist_controller.play(settings['playlist'], context, settings)
             except Exception as ex:
                 raise Exception(ex)
 

@@ -1,3 +1,4 @@
+from enum import Enum, unique
 from typing import Optional, Union
 
 from mpfmc.core.config_collection import ConfigCollection
@@ -77,6 +78,18 @@ class PlaylistCollection(ConfigCollection):
 
 
 # ---------------------------------------------------------------------------
+#    PlaylistInstanceStatus class
+# ---------------------------------------------------------------------------
+@unique
+class PlaylistInstanceStatus(Enum):
+    """Enumerated class containing status values for PlayfieldInstance class."""
+    pending = 0
+    playing = 2
+    stopping = 3
+    finished = 4
+
+
+# ---------------------------------------------------------------------------
 #    PlaylistInstance class
 # ---------------------------------------------------------------------------
 # pylint: disable=too-many-public-methods
@@ -85,9 +98,10 @@ class PlaylistInstance(object):
     PlaylistInstance class represents an instance of a playlist asset.
     """
 
-    def __init__(self, playlist: dict, track_crossfade_time: float,
+    def __init__(self, name: str, playlist: dict, track_crossfade_time: float,
                  context: Optional[str]=None, settings: Optional[dict]=None):
         """Constructor"""
+        self._name = name
         if playlist is None:
             raise ValueError("Cannot create playlist instance: playlist parameter is None")
 
@@ -116,6 +130,17 @@ class PlaylistInstance(object):
         self._sounds.force_all = True
         self._sounds.force_different = True
         self._sounds.loop = self._settings['repeat']
+
+        self._current_sound_instance = None
+        self._fading_sound_instance = None
+
+    def __repr__(self):
+        """String that's returned if someone prints this object"""
+        return '<PlaylistInstance: {}>'.format(self.name)
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def crossfade_time(self):
@@ -173,6 +198,18 @@ class PlaylistInstance(object):
             return self._sounds.get_current()
         except StopIteration:
             return None
+
+    def set_playing(self):
+        """Notifies the playlist instance that it is now playing and triggers any
+        corresponding actions."""
+        self._status = PlaylistInstanceStatus.playing
+        self._played = True
+
+    def set_stopped(self):
+        """Notifies the sound instance that it has now stopped and triggers any
+        corresponding actions."""
+
+        self._finished()
 
 
 collection_cls = PlaylistCollection
