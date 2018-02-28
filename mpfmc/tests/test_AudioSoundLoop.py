@@ -106,6 +106,17 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.mc.events.post('fade_out_bass_synth')
         self.advance_real_time(4)
 
+        self.mc.events.post('reset_current_loop')
+        self.advance_real_time(0.1)
+        self.mc.events.post('reset_current_loop')
+        self.advance_real_time(0.1)
+        self.mc.events.post('reset_current_loop')
+        self.advance_real_time(0.1)
+        self.mc.events.post('reset_current_loop')
+        self.advance_real_time(0.2)
+        self.mc.events.post('reset_current_loop')
+        self.advance_real_time(0.1)
+
         self.mc.events.post('play_basic_beat')
         self.mc.events.post('stop_current_loop')
         self.mc.events.post('play_sound_synthping')

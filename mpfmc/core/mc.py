@@ -176,29 +176,6 @@ class MpfMc(App):
         self.receive_machine_var_update('mpfmc_ver', __version__, 0, True)
 
     @staticmethod
-    def _load_machine_config(config_file_list, machine_path,
-                            config_path='config', existing_config=None):
-
-        machine_config = dict()
-
-        for num, config_file in enumerate(config_file_list):
-            if not existing_config:
-                machine_config = CaseInsensitiveDict()
-            else:
-                machine_config = existing_config
-
-            if not (config_file.startswith('/') or
-                        config_file.startswith('\\')):
-                config_file = os.path.join(machine_path, config_path,
-                                           config_file)
-
-            machine_config = Util.dict_merge(machine_config,
-                                             ConfigProcessor.load_config_file(config_file, 'machine',
-                                                                              ignore_unknown_sections=True))
-
-        return machine_config
-
-    @staticmethod
     def _preprocess_config(config):
         kivy_config = config['kivy_config']
 

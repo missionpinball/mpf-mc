@@ -84,9 +84,15 @@ Here are several various examples:
     
             elif player_settings['action'].lower() == 'stop_looping':
                 track.stop_looping_current_sound_loop_set()
-    
+
+            elif player_settings['action'].lower() == 'jump_to':
+                player_settings.setdefault('time', 0)
+                track.jump_to_time_current_sound_loop_set(player_settings['time'])
+
             elif player_settings['action'].lower() == 'set_volume':
+                # TODO: Implement setting current loop_set volume
                 pass
+
             elif player_settings['action'].lower() == 'play_layer':
                 player_settings.setdefault('volume', None)
                 track.play_layer(player_settings['layer'], player_settings['fade_in'], player_settings['queue'], volume=player_settings['volume'])
@@ -98,6 +104,7 @@ Here are several various examples:
                 track.stop_looping_layer(player_settings['layer'])
     
             elif player_settings['action'].lower() == 'set_layer_volume':
+                # TODO: Implement setting layer volume
                 pass
     
             else:

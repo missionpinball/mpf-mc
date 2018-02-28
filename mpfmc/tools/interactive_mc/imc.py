@@ -19,6 +19,7 @@ from mpf.core.events import EventManager
 from mpf.core.mode_controller import ModeController
 from mpf.core.config_validator import ConfigValidator
 from mpf.file_interfaces.yaml_interface import YamlInterface
+from mpf.core.config_processor import ConfigProcessor as MpfConfigProcessor
 
 import mpfmc
 from mpfmc.config_players.plugins.slide_player import MpfSlidePlayer
@@ -31,10 +32,9 @@ class InteractiveMc(App):
         super().__init__(**kwargs)
 
         self.config_validator = ConfigValidator(self)
-        self.machine_config = ConfigProcessor.load_config_file(
-            os.path.join(mpfmc.__path__[0],
-                         'tools/interactive_mc/imcconfig.yaml'),
-            config_type='machine')
+        self.mpf_config_processor = MpfConfigProcessor()
+        files = [os.path.join(mpfmc.__path__[0], 'tools/interactive_mc/imcconfig.yaml')]
+        self.machine_config = self.mpf_config_processor.load_config_files_with_cache(files, "machine")
         self.machine_config['mpf'] = dict()
         self.machine_config['mpf']['allow_invalid_config_sections'] = True
         self.config = self.machine_config

@@ -111,6 +111,7 @@ sound_loop_player:
       action: stop_layer
       layer: 4
       fade_out: 4s
+
   stop_looping_current_loop:
     loops:
       action: stop_looping
@@ -118,6 +119,10 @@ sound_loop_player:
     loops:
       action: stop
       fade_out: 1.5s
+  reset_current_loop:
+    loops:
+      action: jump_to
+      time: 0s
 
 sound_player:
     play_sound_synthping: 210871_synthping
