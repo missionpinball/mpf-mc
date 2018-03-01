@@ -209,7 +209,7 @@ class MpfMc(App):
             mpfmc.__path__[0], self.options["mcconfigfile"])]
         for config_file in self.options["configfile"]:
             files.append(os.path.join(self.machine_path, "config", config_file))
-        mpf_config = self.mpf_config_processor.load_config_files_with_cache(files, "machine")
+        mpf_config = self.mpf_config_processor.load_config_files_with_cache(files, "machine", True)
 
         self._preprocess_config(mpf_config)
 
