@@ -60,7 +60,6 @@ install:
       pip3 install -e _mpf/;
       pip3 install .;
     fi;
-  - pip3 install packaging coveralls coverage setuptools --upgrade
 
 env:
   global:
