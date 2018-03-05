@@ -99,7 +99,7 @@ class McWidgetPlayer(McConfigPlayer):
             raise ValueError("Cannot add widget. No current slide")
 
         # remove from any slides since we are not targeting a specific slide
-        self._remove_widgets_by_key(s['key'])
+        self._remove_widget_by_key(s['key'])
         # add widget
         slide.add_widgets_from_library(name=widget, play_kwargs=play_kwargs, **s)
         if not s['key'] in instance_dict:
@@ -162,7 +162,7 @@ class McWidgetPlayer(McConfigPlayer):
         if slide_name in self.machine.active_slides:
             slide = self.machine.active_slides[slide_name]
             # remove any instances of this widget from this slide first
-            slide.remove_widget_by_key(s['key'])
+            slide.remove_widgets_by_key(s['key'])
             # add widget
             slide.add_widgets_from_library(name=widget, play_kwargs=play_kwargs, **s)
 
