@@ -66,7 +66,8 @@ class McWidgetPlayer(McConfigPlayer):
                                format(self.machine.targets, s['target'], s,
                                       widget, context, play_kwargs))
 
-                # todo add delayed adding like in slide_player
+            # remove any instances of this widget from this slide first
+            target.remove_widgets_by_key(s['key'])
 
             target.add_widgets_to_current_slide(
                 create_widget_objects_from_library(mc=self.machine,
@@ -97,6 +98,9 @@ class McWidgetPlayer(McConfigPlayer):
         if not slide:  # pragma: no cover
             raise ValueError("Cannot add widget. No current slide")
 
+        # remove from any slides since we are not targeting a specific slide
+        self._remove_widget_by_key(s['key'])
+        # add widget
         slide.add_widgets_from_library(name=widget, play_kwargs=play_kwargs, **s)
         if not s['key'] in instance_dict:
             instance_dict[s['key']] = True
@@ -157,6 +161,9 @@ class McWidgetPlayer(McConfigPlayer):
         del kwargs
         if slide_name in self.machine.active_slides:
             slide = self.machine.active_slides[slide_name]
+            # remove any instances of this widget from this slide first
+            slide.remove_widgets_by_key(s['key'])
+            # add widget
             slide.add_widgets_from_library(name=widget, play_kwargs=play_kwargs, **s)
 
     def get_express_config(self, value):
