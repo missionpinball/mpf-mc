@@ -41,6 +41,7 @@ sound_loop_sets:
   basic_beat:
     sound: kick
     volume: 0.5
+    tempo: 130
     layers:
       - sound: hihat
         volume: 0.7
@@ -57,29 +58,29 @@ sound_loop_sets:
   basic_beat2:
     sound: kick2
     volume: 0.5
+    tempo: 130
     layers:
       - sound: hihat
         volume: 0.7
       - sound: snare
         volume: 0.6
       - sound: clap
-        volume: 0.4
+        volume: 0.45
         initial_state: stop
       - sound: bass_synth
         volume: 0.5
         initial_state: play
+    events_when_played: basic_beat2_played
 
 sound_loop_player:
   play_basic_beat:
     loops:
       action: play
       sound_loop_set: basic_beat
-      queue: True
   add_hi_hats:
     loops:
       action: play_layer
       layer: 1
-      queue: True
   stop_hi_hats:
     loops:
       action: stop_looping_layer
@@ -93,18 +94,17 @@ sound_loop_player:
     loops:
       action: play_layer
       layer: 3
-      queue: True
 
   play_basic_beat2:
     loops:
       action: play
       sound_loop_set: basic_beat2
-      queue: True
+      timing: next_beat_interval
+      interval: 2
   add_bass_synth:
     loops:
       action: play_layer
       layer: 4
-      queue: True
       fade_in: 3s
   fade_out_bass_synth:
     loops:
@@ -126,3 +126,4 @@ sound_loop_player:
 
 sound_player:
     play_sound_synthping: 210871_synthping
+    basic_beat2_played: 210871_synthping

@@ -95,7 +95,7 @@ Here are several various examples:
 
             elif player_settings['action'].lower() == 'play_layer':
                 player_settings.setdefault('volume', None)
-                track.play_layer(player_settings['layer'], player_settings['fade_in'], player_settings['queue'], volume=player_settings['volume'])
+                track.play_layer(player_settings['layer'], player_settings['fade_in'], player_settings['timing'], volume=player_settings['volume'])
     
             elif player_settings['action'].lower() == 'stop_layer':
                 track.stop_layer(player_settings['layer'], player_settings['fade_out'])
@@ -175,6 +175,11 @@ Here are several various examples:
         validated_settings = self.machine.config_validator.validate_config(
             'sound_loop_player_actions:{}'.format(player_settings['action']).lower(),
             player_settings)
+
+        # A timing interval value of 0 is not legal (only applies to play action)
+        if player_settings['action'].lower() == 'play' and validated_settings['interval'] <= 0:
+            raise ValueError("SoundLoopPlayer: Illegal 'interval' value for sound_loop_set '{}' on track '{}' "
+                             "('interval' must be > 0)'.".format(validated_settings['sound_loop_set'], track_name))
 
         # Remove any items from the settings that were not explicitly provided in the
         # sound_loop_player config section (only want to override sound settings explicitly
