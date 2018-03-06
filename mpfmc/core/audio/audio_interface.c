@@ -932,8 +932,19 @@ typedef struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer
 struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopState;
 typedef struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopState __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopState;
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":12
+/* "mpfmc/core/audio/track_sound_loop.pxd":11
+ * #    Sound Loop Track types
  * # ---------------------------------------------------------------------------
+ * cdef enum:             # <<<<<<<<<<<<<<
+ *     do_not_stop_loop = 0xFFFFFFFF
+ * 
+ */
+enum  {
+  __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_do_not_stop_loop = 0xFFFFFFFF
+};
+
+/* "mpfmc/core/audio/track_sound_loop.pxd":14
+ *     do_not_stop_loop = 0xFFFFFFFF
  * 
  * cdef enum LayerStatus:             # <<<<<<<<<<<<<<
  *     layer_stopped = 0
@@ -947,7 +958,7 @@ enum __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus {
   __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out = 4
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":32
+/* "mpfmc/core/audio/track_sound_loop.pxd":34
  *     GArray *markers
  * 
  * cdef enum SoundLoopSetPlayerStatus:             # <<<<<<<<<<<<<<
@@ -962,7 +973,7 @@ enum __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus {
   __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_playing = 4
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":19
+/* "mpfmc/core/audio/track_sound_loop.pxd":21
  *     layer_fading_out = 4
  * 
  * ctypedef struct SoundLoopLayerSettings:             # <<<<<<<<<<<<<<
@@ -983,7 +994,7 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings {
   GArray *markers;
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":40
+/* "mpfmc/core/audio/track_sound_loop.pxd":42
  *     player_playing = 4
  * 
  * ctypedef struct SoundLoopSetPlayer:             # <<<<<<<<<<<<<<
@@ -996,10 +1007,12 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer {
   __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings master_sound_layer;
   GSList *layers;
   Uint32 sample_pos;
+  Uint32 stop_loop_at_pos;
+  float tempo;
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":47
- *     Uint32 sample_pos
+/* "mpfmc/core/audio/track_sound_loop.pxd":51
+ *     float tempo
  * 
  * ctypedef struct TrackSoundLoopState:             # <<<<<<<<<<<<<<
  *     # State variables for TrackSoundLoop tracks
@@ -1098,7 +1111,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_14track_standard_TrackStandard {
 };
 
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":58
+/* "mpfmc/core/audio/track_sound_loop.pxd":62
  * #    TrackSoundLoop class
  * # ---------------------------------------------------------------------------
  * cdef class TrackSoundLoop(Track):             # <<<<<<<<<<<<<<
@@ -1281,7 +1294,7 @@ struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard {
 static struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard *__pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard;
 
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":58
+/* "mpfmc/core/audio/track_sound_loop.pxd":62
  * #    TrackSoundLoop class
  * # ---------------------------------------------------------------------------
  * cdef class TrackSoundLoop(Track):             # <<<<<<<<<<<<<<
@@ -1296,6 +1309,7 @@ struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop {
   PyObject *(*_apply_layer_settings)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *, PyObject *);
   PyObject *(*_reset_layer)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *);
   PyObject *(*_reset_player_layers)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *);
+  Uint32 (*_round_sample_pos_up_to_interval)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, Uint32, Uint32);
   void (*mix_playing_sounds)(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *, Uint32, __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData *);
 };
 static struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop;
@@ -14159,8 +14173,8 @@ PyMODINIT_FUNC PyInit_audio_interface(void)
   __pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile = __Pyx_ImportType("mpfmc.core.audio.sound_file", "SoundStreamingFile", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile)) __PYX_ERR(2, 47, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard = __Pyx_ImportType("mpfmc.core.audio.track_standard", "TrackStandard", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_14track_standard_TrackStandard), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard)) __PYX_ERR(3, 84, __pyx_L1_error)
   __pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard)) __PYX_ERR(3, 84, __pyx_L1_error)
-  __pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = __Pyx_ImportType("mpfmc.core.audio.track_sound_loop", "TrackSoundLoop", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 58, __pyx_L1_error)
-  __pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 58, __pyx_L1_error)
+  __pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = __Pyx_ImportType("mpfmc.core.audio.track_sound_loop", "TrackSoundLoop", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 62, __pyx_L1_error)
+  __pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(4, 62, __pyx_L1_error)
   /*--- Variable import code ---*/
   /*--- Function import code ---*/
   /*--- Execution code ---*/
