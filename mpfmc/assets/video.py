@@ -15,6 +15,28 @@ class VideoPool(AssetPool):
         return self.asset
 
 
+class VideoWrapper(Video):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.register_event_type('on_play')
+        self.register_event_type('on_stop')
+
+    def on_play(self):
+        pass
+
+    def on_stop(self):
+        pass
+
+    def stop(self):
+        super().stop()
+        self.dispatch('on_stop')
+
+    def play(self):
+        super().play()
+        self.dispatch('on_play')
+
+
 class VideoAsset(Asset):
 
     attribute = 'videos'
@@ -28,6 +50,16 @@ class VideoAsset(Asset):
     def __init__(self, mc, name, file, config):
         self._video = None
         super().__init__(mc, name, file, config)
+
+        # Setup events to post when video state changes
+        self._events_when_played = list()
+        self._events_when_stopped = list()
+
+        if self.config['events_when_played']:
+            self._events_when_played = self.config['events_when_played']
+
+        if self.config['events_when_stopped']:
+            self._events_when_stopped = self.config['events_when_stopped']
 
     @property
     def video(self):
@@ -52,8 +84,10 @@ class VideoAsset(Asset):
         self.loading = False
         self.loaded = True
         self.unloading = False
-        self._video = Video(filename=self.file)
-        self._video.bind(on_load=self._check_duration)
+        self._video = VideoWrapper(filename=self.file)
+        self._video.bind(on_load=self._check_duration,
+                         on_play=self.on_play,
+                         on_stop=self.on_stop)
 
         if isinstance(self._video, VideoNull):
             raise AssertionError("Kivy cannot load video {} because there is no provider.".format(self.file))
@@ -67,6 +101,20 @@ class VideoAsset(Asset):
                 "Video file {} was loaded, but seems to have no content. Check"
                 " to make sure you have the proper Gstreamer plugins for the "
                 "codec this video needs".format(self.file))
+
+    def on_play(self, *args):
+        del args
+
+        if self._events_when_played:
+            for event in self._events_when_played:
+                self.machine.post_mc_native_event(event)
+
+    def on_stop(self, *args):
+        del args
+
+        if self._events_when_stopped:
+            for event in self._events_when_stopped:
+                self.machine.post_mc_native_event(event)
 
     #
     # Properties
