@@ -694,7 +694,7 @@ cdef class AudioInterface:
 
         # Note: There are three separate loops over the tracks that must remain separate due
         # to various track parameters than can be set for any track during each loop.  Difficult
-        # to debug logic errors will occur if these track loops are combined.
+        # to debug logic errors can occur when these track loops are combined.
 
         # Loop over tracks, initializing the status, track buffer, and track ducking.
         for track_num in range(callback_data.track_count):
