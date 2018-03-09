@@ -6,6 +6,7 @@ os: Visual Studio 2015
 environment:
   USE_SDL2: 1
   USE_GSTREAMER: 1
+  USE_CYTHON: 1
 
   matrix:
   - PYVER: 34
