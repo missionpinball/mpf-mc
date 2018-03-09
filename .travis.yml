@@ -55,7 +55,7 @@ install:
     fi;
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       cd ${TRAVIS_BUILD_DIR};
-      pip3 install pip setuptools Cython --upgrade;
+      pip3 install pip setuptools Cython==0.25.2 --upgrade;
       git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
       pip3 install -e _mpf/;
       pip3 install .;
