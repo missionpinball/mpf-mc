@@ -1,4 +1,8 @@
-"""Mission Pinball Framework Media Controller (mpf-mc) setup.py."""
+"""Mission Pinball Framework Media Controller (mpf-mc) setup.py.
+
+Notes:
+    This setup script is a modified/customized version of the Kivy setup.py script.
+"""
 
 import sys
 import re
@@ -130,7 +134,7 @@ cython_unsupported_append = '''
 '''.format(', '.join(map(str, CYTHON_UNSUPPORTED)))
 
 cython_min = '''\
-  This version of Cython is not compatible with Kivy. Please upgrade to
+  This version of Cython is not compatible with MPF-MC. Please upgrade to
   at least version {0}, preferably the newest supported version {1}.
 
   If your platform provides a Cython package, make sure you have upgraded
@@ -142,7 +146,7 @@ cython_min = '''\
            cython_unsupported_append if CYTHON_UNSUPPORTED else '')
 
 cython_max = '''\
-  This version of Cython is untested with Kivy. While this version may
+  This version of Cython is untested with MPF-MC. While this version may
   work perfectly fine, it is possible that you may experience issues. If
   you do have issues, please downgrade to a supported version. It is
   best to use the newest supported version, {1}, but the minimum
@@ -193,7 +197,7 @@ else:
             print(cython_max)
             sleep(1)
     except ImportError:
-        print("\nCython is missing, it's required for compiling kivy !\n\n")
+        print("\nCython is missing and the USE_CYTHON environment variable is set to True!\n\n")
         raise
 
 if not have_cython:
