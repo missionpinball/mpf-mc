@@ -858,12 +858,12 @@ union __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageData
  * 
  * ctypedef struct NotificationMessageContainer:             # <<<<<<<<<<<<<<
  *     NotificationMessage message
- *     long sound_id
+ *     Uint64 sound_id
  */
 struct __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer {
   enum __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessage message;
-  long sound_id;
-  long sound_instance_id;
+  Uint64 sound_id;
+  Uint64 sound_instance_id;
   int player;
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageData data;
 };
@@ -5645,7 +5645,7 @@ static CYTHON_INLINE __pyx_t_5mpfmc_4core_5audio_20notification_message_Notifica
  *     """
  *     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))             # <<<<<<<<<<<<<<
  * 
- * cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,
+ * cdef inline void send_sound_started_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
  */
   __pyx_r = ((__pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *)g_slice_alloc0((sizeof(__pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer))));
   goto __pyx_L0;
@@ -5666,12 +5666,12 @@ static CYTHON_INLINE __pyx_t_5mpfmc_4core_5audio_20notification_message_Notifica
 /* "mpfmc/core/audio/notification_message.pxd":57
  *     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))
  * 
- * cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_started_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                  TrackState *track) nogil:
  *     """
  */
 
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_started_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_started_notification(int __pyx_v_player, Uint64 __pyx_v_sound_id, Uint64 __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
   int __pyx_t_1;
 
@@ -5735,7 +5735,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
  * 
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
  * 
- * cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,
+ * cdef inline void send_sound_stopped_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
  */
     __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
 
@@ -5751,7 +5751,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
   /* "mpfmc/core/audio/notification_message.pxd":57
  *     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))
  * 
- * cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_started_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                  TrackState *track) nogil:
  *     """
  */
@@ -5762,12 +5762,12 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
 /* "mpfmc/core/audio/notification_message.pxd":76
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_stopped_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                  TrackState *track) nogil:
  *     """
  */
 
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_stopped_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_stopped_notification(int __pyx_v_player, Uint64 __pyx_v_sound_id, Uint64 __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
   int __pyx_t_1;
 
@@ -5831,7 +5831,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
  * 
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
  * 
- * cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,
+ * cdef inline void send_sound_looping_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
  */
     __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
 
@@ -5847,7 +5847,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
   /* "mpfmc/core/audio/notification_message.pxd":76
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_stopped_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                  TrackState *track) nogil:
  *     """
  */
@@ -5858,12 +5858,12 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
 /* "mpfmc/core/audio/notification_message.pxd":95
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_looping_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                  TrackState *track) nogil:
  *     """
  */
 
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(int __pyx_v_player, Uint64 __pyx_v_sound_id, Uint64 __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
   int __pyx_t_1;
 
@@ -5927,7 +5927,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
  * 
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
  * 
- * cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,
+ * cdef inline void send_sound_marker_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
  */
     __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
 
@@ -5943,7 +5943,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
   /* "mpfmc/core/audio/notification_message.pxd":95
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_looping_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                  TrackState *track) nogil:
  *     """
  */
@@ -5954,12 +5954,12 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
 /* "mpfmc/core/audio/notification_message.pxd":114
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_marker_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                 TrackState *track,
  *                                                 int marker_id) nogil:
  */
 
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_marker_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track, int __pyx_v_marker_id) {
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_marker_notification(int __pyx_v_player, Uint64 __pyx_v_sound_id, Uint64 __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track, int __pyx_v_marker_id) {
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
   int __pyx_t_1;
 
@@ -6048,7 +6048,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
   /* "mpfmc/core/audio/notification_message.pxd":114
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_marker_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                 TrackState *track,
  *                                                 int marker_id) nogil:
  */
@@ -6170,7 +6170,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
  *         notification_message.message = notification_track_paused
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
  * 
- * cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+ * cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:
  */
     __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
 
@@ -6197,12 +6197,12 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
 /* "mpfmc/core/audio/notification_message.pxd":158
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
  *     Sends a sound_loop_set started notification
  */
 
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_started_notification(int __pyx_v_sound_loop_set_id, long __pyx_v_sound_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_started_notification(int __pyx_v_sound_loop_set_id, Uint64 __pyx_v_sound_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
   int __pyx_t_1;
 
@@ -6275,7 +6275,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
  * 
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
  * 
- * cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+ * cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:
  */
     __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
 
@@ -6291,7 +6291,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
   /* "mpfmc/core/audio/notification_message.pxd":158
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
  *     Sends a sound_loop_set started notification
  */
@@ -6302,12 +6302,12 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
 /* "mpfmc/core/audio/notification_message.pxd":176
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
  *     Sends a sound_loop_set stopped notification
  */
 
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_stopped_notification(int __pyx_v_sound_loop_set_id, long __pyx_v_sound_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_stopped_notification(int __pyx_v_sound_loop_set_id, Uint64 __pyx_v_sound_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
   int __pyx_t_1;
 
@@ -6380,7 +6380,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
  * 
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
  * 
- * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+ * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:
  */
     __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
 
@@ -6396,7 +6396,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
   /* "mpfmc/core/audio/notification_message.pxd":176
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
  *     Sends a sound_loop_set stopped notification
  */
@@ -6407,12 +6407,12 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
 /* "mpfmc/core/audio/notification_message.pxd":194
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
  *     Sends a sound_loop_set looping notification
  */
 
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_looping_notification(int __pyx_v_sound_loop_set_id, long __pyx_v_sound_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_looping_notification(int __pyx_v_sound_loop_set_id, Uint64 __pyx_v_sound_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
   int __pyx_t_1;
 
@@ -6500,7 +6500,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
   /* "mpfmc/core/audio/notification_message.pxd":194
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
  *     Sends a sound_loop_set looping notification
  */
@@ -7231,7 +7231,7 @@ static int __pyx_pymod_exec_track(PyObject *__pyx_pyinit_module)
   /* "mpfmc/core/audio/notification_message.pxd":194
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
  *     Sends a sound_loop_set looping notification
  */
