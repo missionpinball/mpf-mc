@@ -398,7 +398,7 @@ cdef class TrackStandard(Track):
 
         self._sound_queue.clear()
 
-    cdef int _get_playing_sound_count(self, int sound_id):
+    cdef int _get_playing_sound_count(self, Uint64 sound_id):
         """Return the number of currently playing instances of the given sound id"""
         cdef int count = 0
         SDL_LockAudio()
@@ -411,10 +411,10 @@ cdef class TrackStandard(Track):
         SDL_UnlockAudio()
         return count
 
-    cdef list _get_playing_sound_instances(self, int sound_id):
+    cdef list _get_playing_sound_instances(self, Uint64 sound_id):
         """Return the list of currently playing instances of the given sound id"""
         cdef list instances = list()
-        cdef int instance_id
+        cdef Uint64 instance_id
 
         SDL_LockAudio()
         
@@ -433,7 +433,7 @@ cdef class TrackStandard(Track):
         SDL_UnlockAudio()
         return instances
 
-    def _get_oldest_playing_sound_instance(self, int sound_id):
+    def _get_oldest_playing_sound_instance(self, Uint64 sound_id):
         """Return the oldest sound instance currently playing"""
         cdef list playing_instances = self._get_playing_sound_instances(sound_id)
         
@@ -447,7 +447,7 @@ cdef class TrackStandard(Track):
 
         return oldest_instance
 
-    def _get_newest_playing_sound_instance(self, int sound_id):
+    def _get_newest_playing_sound_instance(self, Uint64 sound_id):
         """Return the newest sound instance currently playing"""
         cdef list playing_instances = self._get_playing_sound_instances(sound_id)
         

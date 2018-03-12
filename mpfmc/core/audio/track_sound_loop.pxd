@@ -21,7 +21,7 @@ ctypedef struct SoundLoopLayerSettings:
     SoundSample *sound
     Uint8 volume
     long sound_loop_set_id
-    long sound_id
+    Uint64 sound_id
     Uint32 fade_in_steps
     Uint32 fade_out_steps
     Uint32 fade_steps_remaining
@@ -76,4 +76,4 @@ cdef class TrackSoundLoop(Track):
     cdef void mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil
 
 
-cdef inline SoundLoopLayerSettings *_create_sound_loop_layer_settings() nogil
+cdef SoundLoopLayerSettings *_create_sound_loop_layer_settings() nogil
