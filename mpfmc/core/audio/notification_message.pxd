@@ -37,8 +37,8 @@ ctypedef union NotificationMessageData:
 
 ctypedef struct NotificationMessageContainer:
     NotificationMessage message
-    long sound_id
-    long sound_instance_id
+    Uint64 sound_id
+    Uint64 sound_instance_id
     int player
     NotificationMessageData data
 
@@ -54,7 +54,7 @@ cdef inline NotificationMessageContainer *_create_notification_message() nogil:
     """
     return <NotificationMessageContainer*>g_slice_alloc0(sizeof(NotificationMessageContainer))
 
-cdef inline void send_sound_started_notification(int player, long sound_id, long sound_instance_id,
+cdef inline void send_sound_started_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
                                                  TrackState *track) nogil:
     """
     Sends a sound started notification
@@ -73,7 +73,7 @@ cdef inline void send_sound_started_notification(int player, long sound_id, long
 
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
-cdef inline void send_sound_stopped_notification(int player, long sound_id, long sound_instance_id,
+cdef inline void send_sound_stopped_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
                                                  TrackState *track) nogil:
     """
     Sends a sound stopped notification
@@ -92,7 +92,7 @@ cdef inline void send_sound_stopped_notification(int player, long sound_id, long
 
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
-cdef inline void send_sound_looping_notification(int player, long sound_id, long sound_instance_id,
+cdef inline void send_sound_looping_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
                                                  TrackState *track) nogil:
     """
     Sends a sound looping notification
@@ -130,7 +130,7 @@ cdef inline void send_sound_about_to_finish_notification(int player, long sound_
 
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
-cdef inline void send_sound_marker_notification(int player, long sound_id, long sound_instance_id,
+cdef inline void send_sound_marker_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
                                                 TrackState *track,
                                                 int marker_id) nogil:
     """
@@ -174,7 +174,7 @@ cdef inline void send_track_paused_notification(TrackState *track) nogil:
         notification_message.message = notification_track_paused
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
-cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:
     """
     Sends a sound_loop_set started notification
     Args:
@@ -192,7 +192,7 @@ cdef inline void send_sound_loop_set_started_notification(int sound_loop_set_id,
 
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
-cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:
     """
     Sends a sound_loop_set stopped notification
     Args:
@@ -210,7 +210,7 @@ cdef inline void send_sound_loop_set_stopped_notification(int sound_loop_set_id,
 
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
-cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, long sound_id, TrackState *track) nogil:
+cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:
     """
     Sends a sound_loop_set looping notification
     Args:
