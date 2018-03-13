@@ -107,7 +107,7 @@ Here are several various examples:
                 self.machine.log.error("SoundPlayer: The specified track ('{}') "
                                        "does not exist. Unable to perform '{}' action "
                                        "on sound '{}'."
-                                       .format(s['track'], s['action'], sound_name))
+                                       .format(s['track'], action, sound_name))
                 return
 
             # Determine action to perform

@@ -62,6 +62,7 @@ class BcpProcessor(object):
         self.send(bcp_command="monitor_start", category="core_events")
         self.register_trigger("master_volume_increase")
         self.register_trigger("master_volume_decrease")
+        self.register_trigger("debug_dump_stats")
         self.connected = True
 
     def register_trigger(self, event):

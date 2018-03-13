@@ -94,11 +94,15 @@ class BCPServer(threading.Thread):
                 '''
                 self.mc.bcp_client_connected = False
 
+                start_time = time.time()
                 while (not self.connection and
                         not self.mc.thread_stopper.is_set()):
                     try:
                         self.connection, client_address = self.socket.accept()
                     except (socket.timeout, OSError):
+                        if self.mc.options['production'] and start_time + 30 < time.time():
+                            self.log.warning("Timeout while waiting for connection. Stopping!")
+                            return self.mc.stop()
                         if self.mc.thread_stopper.is_set():
                             self.log.info("Stopping BCP listener thread")
                             return

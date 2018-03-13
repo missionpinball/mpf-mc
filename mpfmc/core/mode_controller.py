@@ -127,7 +127,7 @@ class ModeController(object):
 
         config = self.mc.mpf_config_processor.load_config_files_with_cache(
             config_files, "mode", load_from_cache=not self.mc.options['no_load_cache'],
-            store_to_cache=self.mc.options['create_config_cache'])
+            store_to_cache=self.mc.options['create_config_cache'], ignore_unknown_sections=True)
 
         # validate config
         if 'mode' not in config:
