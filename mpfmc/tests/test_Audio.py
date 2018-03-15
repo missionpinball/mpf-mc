@@ -1,7 +1,7 @@
 import logging
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, ANY
 
 try:
     from mpfmc.core.audio import SoundSystem
@@ -163,7 +163,7 @@ class TestAudio(MpfMcTestCase):
         self.assertTrue(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
 
         # Ensure sound.events_when_looping is working properly (send event when a sound loops)
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_looping')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='text_sound_looping')
 
         # Send an event to stop the text sound looping
         self.mc.events.post('stop_sound_looping_text')
@@ -198,12 +198,12 @@ class TestAudio(MpfMcTestCase):
         self.advance_real_time(1)
 
         # Test sound events
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_played')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_test_stopped')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='synthping_played')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_marker')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='moron_next_marker')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='last_marker')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='moron_test_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='moron_test_stopped')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='synthping_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=0, name='moron_marker')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=1, name='moron_next_marker')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=1, name='last_marker')
 
     def test_mode_sounds(self):
         """ Test the sound system using sounds specified in a mode """
@@ -421,12 +421,12 @@ class TestAudio(MpfMcTestCase):
 
         self.advance_real_time(0.5)
 
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='instance1_played')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='instance2_played')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='instance3_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='instance1_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='instance2_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='instance3_played')
         with self.assertRaises(AssertionError):
-            self.mc.bcp_processor.send.assert_any_call('trigger', name='instance4_played')
-            self.mc.bcp_processor.send.assert_any_call('trigger', name='instance5_played')
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='instance4_played')
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='instance5_played')
 
         self.assertTrue(instance1.played)
         self.assertTrue(instance2.played)
@@ -452,40 +452,40 @@ class TestAudio(MpfMcTestCase):
         synthping_instance1 = synthping.play(settings={'events_when_played': ['synthping_instance1_played'],
                                                        'events_when_stopped': ['synthping_instance1_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='synthping_instance1_played')])
 
         synthping_instance2 = synthping.play(settings={'events_when_played': ['synthping_instance2_played'],
                                                        'events_when_stopped': ['synthping_instance2_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played'),
-                                                     call('trigger', name='synthping_instance2_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='synthping_instance1_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance2_played')])
 
         synthping_instance3 = synthping.play(settings={'events_when_played': ['synthping_instance3_played'],
                                                        'events_when_stopped': ['synthping_instance3_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played'),
-                                                     call('trigger', name='synthping_instance2_played'),
-                                                     call('trigger', name='synthping_instance3_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='synthping_instance1_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance2_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance3_played')])
 
         synthping_instance4 = synthping.play(settings={'events_when_played': ['synthping_instance4_played'],
                                                        'events_when_stopped': ['synthping_instance4_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played'),
-                                                     call('trigger', name='synthping_instance2_played'),
-                                                     call('trigger', name='synthping_instance3_played'),
-                                                     call('trigger', name='synthping_instance1_stopped'),
-                                                     call('trigger', name='synthping_instance4_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='synthping_instance1_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance2_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance3_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance1_stopped'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance4_played')])
 
         synthping_instance5 = synthping.play(settings={'events_when_played': ['synthping_instance5_played'],
                                                        'events_when_stopped': ['synthping_instance5_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='synthping_instance1_played'),
-                                                     call('trigger', name='synthping_instance2_played'),
-                                                     call('trigger', name='synthping_instance3_played'),
-                                                     call('trigger', name='synthping_instance1_stopped'),
-                                                     call('trigger', name='synthping_instance4_played'),
-                                                     call('trigger', name='synthping_instance2_stopped'),
-                                                     call('trigger', name='synthping_instance5_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='synthping_instance1_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance2_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance3_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance1_stopped'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance4_played'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance2_stopped'),
+                                                     call('trigger', sound_instance=ANY, name='synthping_instance5_played')])
 
         self.assertTrue(synthping_instance1.played)
         self.assertTrue(synthping_instance2.played)
@@ -511,40 +511,40 @@ class TestAudio(MpfMcTestCase):
         sfx_instance1 = sfx.play(
             settings={'events_when_played': ['sfx_instance1_played'], 'events_when_stopped': ['sfx_instance1_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='sfx_instance1_played')])
 
         sfx_instance2 = sfx.play(
             settings={'events_when_played': ['sfx_instance2_played'], 'events_when_stopped': ['sfx_instance2_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played'),
-                                                     call('trigger', name='sfx_instance2_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='sfx_instance1_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance2_played')])
 
         sfx_instance3 = sfx.play(
             settings={'events_when_played': ['sfx_instance3_played'], 'events_when_stopped': ['sfx_instance3_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played'),
-                                                     call('trigger', name='sfx_instance2_played'),
-                                                     call('trigger', name='sfx_instance3_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='sfx_instance1_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance2_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance3_played')])
 
         sfx_instance4 = sfx.play(
             settings={'events_when_played': ['sfx_instance4_played'], 'events_when_stopped': ['sfx_instance4_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played'),
-                                                     call('trigger', name='sfx_instance2_played'),
-                                                     call('trigger', name='sfx_instance3_played'),
-                                                     call('trigger', name='sfx_instance3_stopped'),
-                                                     call('trigger', name='sfx_instance4_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='sfx_instance1_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance2_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance3_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance3_stopped'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance4_played')])
 
         sfx_instance5 = sfx.play(
             settings={'events_when_played': ['sfx_instance5_played'], 'events_when_stopped': ['sfx_instance5_stopped']})
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='sfx_instance1_played'),
-                                                     call('trigger', name='sfx_instance2_played'),
-                                                     call('trigger', name='sfx_instance3_played'),
-                                                     call('trigger', name='sfx_instance3_stopped'),
-                                                     call('trigger', name='sfx_instance4_played'),
-                                                     call('trigger', name='sfx_instance4_stopped'),
-                                                     call('trigger', name='sfx_instance5_played')])
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY, name='sfx_instance1_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance2_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance3_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance3_stopped'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance4_played'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance4_stopped'),
+                                                     call('trigger', sound_instance=ANY, name='sfx_instance5_played')])
 
         self.assertTrue(sfx_instance1.played)
         self.assertTrue(sfx_instance2.played)
@@ -573,12 +573,12 @@ class TestAudio(MpfMcTestCase):
         drum_group_instance5 = drum_group.play(settings={'events_when_played': ['drum_group_instance5_played']})
         self.advance_real_time()
 
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance1_played')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance2_played')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance3_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='drum_group_instance1_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='drum_group_instance2_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='drum_group_instance3_played')
         with self.assertRaises(AssertionError):
-            self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance4_played')
-            self.mc.bcp_processor.send.assert_any_call('trigger', name='drum_group_instance5_played')
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='drum_group_instance4_played')
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='drum_group_instance5_played')
 
         self.assertTrue(drum_group_instance1.played)
         self.assertTrue(drum_group_instance2.played)
@@ -620,7 +620,7 @@ class TestAudio(MpfMcTestCase):
         # Test sound played from sound_player with all default parameter values
         self.mc.events.post('play_sound_text_default_params')
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='text_sound_played')
         status = track_sfx.get_status()
         self.assertEqual(status[0]['sound_id'], text_sound.id)
         instance_id = status[0]['sound_instance_id']
@@ -637,12 +637,12 @@ class TestAudio(MpfMcTestCase):
 
         track_sfx.stop_all_sounds()
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_stopped')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='text_sound_stopped')
 
         # Now test sound played from sound_player with overridden parameter values
         self.mc.events.post('play_sound_text_param_set_1')
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_played_param_set_1')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='text_sound_played_param_set_1')
         status = track_sfx.get_status()
         self.assertEqual(status[0]['sound_id'], text_sound.id)
         instance_id = status[0]['sound_instance_id']
@@ -659,7 +659,7 @@ class TestAudio(MpfMcTestCase):
 
         track_sfx.stop_all_sounds()
         self.advance_real_time()
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_stopped_param_set_1')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='text_sound_stopped_param_set_1')
 
     def test_track_player(self):
         """Tests the track_player"""
@@ -702,23 +702,23 @@ class TestAudio(MpfMcTestCase):
         self.advance_real_time(2)
         self.mc.events.post('pause_music_track')
         self.advance_real_time(2)
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_paused')
+        self.mc.bcp_processor.send.assert_any_call('trigger', track='music', name='music_track_paused')
         self.mc.bcp_processor.send.reset_mock()
 
         self.mc.events.post('resume_music_track')
         self.advance_real_time(2)
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_played')
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='keep_going')
+        self.mc.bcp_processor.send.assert_any_call('trigger', track='music', name='music_track_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', track='music', name='keep_going')
         self.mc.bcp_processor.send.reset_mock()
 
         self.mc.events.post('stop_all_tracks')
         self.advance_real_time(2)
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_stopped')
+        self.mc.bcp_processor.send.assert_any_call('trigger', track='music', name='music_track_stopped')
         self.mc.bcp_processor.send.reset_mock()
 
         self.mc.events.post('play_music_track')
         self.advance_real_time(1)
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='music_track_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', track='music', name='music_track_played')
         self.mc.bcp_processor.send.reset_mock()
 
         instance = self.mc.sounds['263774_music'].play()

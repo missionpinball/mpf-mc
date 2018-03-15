@@ -241,13 +241,13 @@ cdef class TrackStandard(Track):
                 # Trigger any events
                 if self.events_when_stopped is not None:
                     for event in self.events_when_stopped:
-                        self.mc.post_mc_native_event(event, name=self._name)
+                        self.mc.post_mc_native_event(event, track=self._name)
 
             elif notification_message.message == notification_track_paused:
                 # Trigger any events
                 if self.events_when_paused is not None:
                     for event in self.events_when_paused:
-                        self.mc.post_mc_native_event(event, name=self._name)
+                        self.mc.post_mc_native_event(event, track=self._name)
                 pass
 
             SDL_UnlockAudio()
