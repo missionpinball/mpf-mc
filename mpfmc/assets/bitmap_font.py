@@ -1,6 +1,5 @@
-from typing import Dict, Optional
+from typing import Optional
 from os import path
-from xml.etree.ElementTree import ElementTree, ParseError
 
 from mpf.core.assets import Asset
 from mpfmc.uix.bitmap_font.bitmap_font import BitmapFont
@@ -43,20 +42,20 @@ class BitmapFontAsset(Asset):
     def get_extents(self, text, font_kerning=True):
         if self._bitmap_font:
             return self.bitmap_font.get_extents(text, font_kerning)
-        else:
-            return 0, 0
+
+        return 0, 0
 
     def get_descent(self):
         if self._bitmap_font:
             return self.bitmap_font.get_descent()
-        else:
-            return 0
+
+        return 0
 
     def get_ascent(self):
         if self._bitmap_font:
             return self.bitmap_font.get_ascent()
-        else:
-            return 0
+
+        return 0
 
     def do_load(self):
         # Load the bitmap font image atlas
