@@ -185,6 +185,26 @@ class PlaylistInstance(object):
         else:
             return len(self._sounds.data['items_sent']) == len(self._sounds.items)
 
+    @property
+    def current_sound_instance(self):
+        """Return the current sound instance"""
+        return self._current_sound_instance
+
+    @current_sound_instance.setter
+    def current_sound_instance(self, value):
+        """Set the current sound instance"""
+        self._current_sound_instance = value
+
+    @property
+    def fading_sound_instance(self):
+        """Return the fading sound instance"""
+        return self._fading_sound_instance
+
+    @fading_sound_instance.setter
+    def fading_sound_instance(self, value):
+        """Set the fading sound instance"""
+        self._fading_sound_instance = value
+
     def get_next_sound_name(self):
         """Return the name of the next sound in the playlist (advance iterator)"""
         try:
@@ -198,18 +218,6 @@ class PlaylistInstance(object):
             return self._sounds.get_current()
         except StopIteration:
             return None
-
-    def set_playing(self):
-        """Notifies the playlist instance that it is now playing and triggers any
-        corresponding actions."""
-        self._status = PlaylistInstanceStatus.playing
-        self._played = True
-
-    def set_stopped(self):
-        """Notifies the sound instance that it has now stopped and triggers any
-        corresponding actions."""
-
-        self._finished()
 
 
 collection_cls = PlaylistCollection

@@ -69,6 +69,7 @@ cdef class AudioInterface:
     libraries.
     """
     cdef list tracks
+    cdef dict playlist_controllers
     cdef object mc
     cdef object log
 
@@ -630,7 +631,7 @@ cdef class AudioInterface:
                                   name,
                                   track_num,
                                   self.audio_callback_data.buffer_size,
-                                  3,
+                                  2,
                                   volume)
         self.tracks.append(new_track)
 

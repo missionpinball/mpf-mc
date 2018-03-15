@@ -2,10 +2,9 @@
 #cython: embedsignature=True, language_level=3
 
 import logging
+from functools import partial
 
 from mpfmc.config_collections.playlist import PlaylistInstance
-from mpfmc.assets.sound import SoundInstance
-from mpfmc.core.audio.audio_exception import AudioException
 from mpfmc.core.audio.track cimport *
 
 
@@ -22,29 +21,34 @@ cdef class PlaylistController:
         Constructor
         Args:
             mc: The media controller app
-            track: The audio track that will be managed by this playlist controller
+            track: The audio track that will be managed by this playlist controller (standard track)
             crossfade_time: The default crossfade time (secs) to use when fading between sounds
-            volume: The track volume (0.0 to 1.0)
+            volume: The playlist volume (0.0 to 1.0)
         """
         self.log = logging.getLogger("PlaylistController")
         self.mc = mc
         self._track = track
         self._crossfade_time = crossfade_time
 
-        # Dictionary of PlaylistInstance class objects keyed by playlist names
-        self._playlist_instances = dict()
+        # Dictionary of PlaylistInstance class objects keyed by SoundInstance ID
         self._playlists_by_sound_instance = dict()
 
         # Keep track of current and previous playlist
         self._current_playlist = None
 
-        self.log.debug("Created PlaylistController %s: ", self._track.name)
+        # Keeps track of a pending request that cannot be immediately serviced because the
+        # underlying audio track is busy (only 2 players)
+        self._pending_request = None
 
         # Create event handlers for sound instance events
-        self.mc.events.add_handler(self.name.lower() + '_playlist_sound_stopped',
-                                   self._on_sound_instance_stopped)
-        self.mc.events.add_handler(self.name.lower() + '_playlist_sound_about_to_finish',
+        # Note: we don't have to worry about played events since the playlist controller will initiate
+        # playback and therefore will already know when those events are occurring.
+        self.mc.events.add_handler('{}_playlist_sound_stopped'.format(self.name.lower()),
+                                   self._on_sound_instance_stopped, 0)
+        self.mc.events.add_handler('{}_playlist_sound_about_to_finish'.format(self.name.lower()),
                                    self._on_sound_instance_about_to_finish)
+
+        self.log.debug("Created PlaylistController %s: ", self._track.name)
 
     def __dealloc__(self):
         """Destructor"""
@@ -55,7 +59,7 @@ cdef class PlaylistController:
 
     @property
     def name(self):
-        """The name of the playlist controller (and corresponding track)"""
+        """The name of the playlist controller (and corresponding audio track)"""
         return self._track.name
 
     @property
@@ -93,7 +97,13 @@ cdef class PlaylistController:
                            "(%s) as it does not exist", self.name, playlist)
             return
 
-        # TODO: Special behavior needed if specified playlist is already playing (or finishing/fading)
+        # Is there already a previous playlist that is still active (fading)?
+        if self._is_busy():
+            # Delay play playlist until track is finished with current crossfade (too busy)
+            self._pending_request = partial(self.play, playlist=playlist, context=context,
+                                            player_settings=player_settings)
+            self.log.debug("play - Playlist track is too busy. Delaying play playlist call.")
+            return
 
         # Determine settings (override playlist with player settings)
         playlist_instance = PlaylistInstance(playlist,
@@ -102,55 +112,69 @@ cdef class PlaylistController:
                                              context,
                                              player_settings)
 
-        self._playlist_instances[playlist] = { 'playlist': playlist_instance, 'sound_instances': [] }
-
         # Is there already a playlist playing?
         if self._current_playlist:
             # Already a playlist playing
-
-            # Is there already a previous playlist that is still active (fading)?
-            if self._previous_playlist:
-                # TODO: need mechanism to delay new playlist until previous is finished
-                # Set a callback function on previous playlist completion?
-                pass
-
             pass
+            # TODO:
+
         else:
             # No playlist playing
             self._current_playlist = playlist_instance
 
             # Get next sound to play from playlist
             sound_name = self._current_playlist.get_next_sound_name()
+            self._play_playlist_sound(sound_name, self._current_playlist)
 
-            # Create sound instance
-            sound = self.mc.sounds[sound_name]
+    def _is_busy(self):
+        """Returns whether or not all the sound players for the playlist track are currently busy"""
+        if self._track.get_sound_players_in_use_count() > 1:
+            return True
+        else:
+            return False
 
-            events_when_stopped = [self.name.lower() + '_playlist_sound_stopped']
-            if sound.events_when_stopped:
-                events_when_stopped.extend(sound.events_when_stopped)
+    def _play_playlist_sound(self, str sound_name, object playlist, float fade_in=0.0):
+        """
+        Plays the specified playlist sound
+        Args:
+            sound_name: The name of the sound to start playing
+            playlist: The playlist from which the sound came from
+            fade_in: The number of seconds over which to fade in the sound (frequently the
+                crossfade time).
 
-            events_when_about_to_finish = [self.name.lower() + '_playlist_sound_about_to_finish']
-            if sound.events_when_about_to_finish:
-                events_when_about_to_finish.extend(sound.events_when_about_to_finish)
+        """
 
-            # Play sound on playlist track (override certain settings needed to manage playlist)
-            # Standard track will return a sound instance if play was successful
-            sound_instance = self._track.play_sound(sound,
-                                                    context,
-                                                    {
-                                                        'fade_in': 0.0,
-                                                        'fade_out': 0.0,
-                                                        'about_to_finish_time': playlist_instance.crossfade_time,
-                                                        'max_queue_time': None,
-                                                        'events_when_stopped': events_when_stopped,
-                                                        'events_when_about_to_finish': events_when_about_to_finish
-                                                    })
+        # Create sound instance
+        sound = self.mc.sounds[sound_name]
 
-            # Associate sound instance with playlist instance
-            self._playlist_instances[playlist_instance.name]['sound_instances'].append(sound_instance)
-            self._playlists_by_sound_instance[sound_instance] = playlist_instance
+        # Add custom events to post when particular sound actions occur (stop, about to finish).
+        # These events are used to trigger playlist events (advance, stop)
+        events_when_stopped = []
+        if sound.events_when_stopped:
+            events_when_stopped.extend(sound.events_when_stopped)
+        events_when_stopped.extend(['{}_playlist_sound_stopped'.format(self.name.lower())])
 
-        pass
+        events_when_about_to_finish = []
+        if sound.events_when_about_to_finish:
+            events_when_about_to_finish.extend(sound.events_when_about_to_finish)
+        events_when_about_to_finish.extend(['{}_playlist_sound_about_to_finish'.format(self.name.lower())])
+
+        # Play sound on playlist track (override certain settings needed to manage playlist)
+        # Standard track will return a sound instance if play was successful
+        sound_instance = self._track.play_sound(sound,
+                                                context,
+                                                {
+                                                    'fade_in': fade_in,
+                                                    'fade_out': 0.0,
+                                                    'about_to_finish_time': playlist.crossfade_time,
+                                                    'max_queue_time': None,
+                                                    'events_when_stopped': events_when_stopped,
+                                                    'events_when_about_to_finish': events_when_about_to_finish
+                                                })
+
+        # Associate sound instance with playlist instance
+        self._playlists_by_sound_instance[sound_instance] = playlist
+        playlist.current_sound_instance = sound_instance
 
     def stop(self):
         """Immediately stop the currently playing playlist. Will fade out using the crossfade setting."""
@@ -161,6 +185,16 @@ cdef class PlaylistController:
 
         # If there is no current playlist, do nothing
         if not self._current_playlist:
+            self.log.debug("advance - No playlist is currently playing. Could not advance to next sound")
+            return
+
+        self.log.debug("advance - Advancing the current playlist ('%s') to the next sound.",
+                       self._current_playlist.name)
+
+        if self._is_busy():
+            # Delay advance playlist until track is finished with current crossfade (too busy)
+            self._pending_request = partial(self.advance)
+            self.log.debug("advance - Playlist track is too busy. Delaying advance to next sound")
             return
 
         # Determine if playlist will now repeat/loop.  Post playlist looping events (if necessary)
@@ -172,39 +206,69 @@ cdef class PlaylistController:
         # Set the next sound in the sound player and calculate the fades based on the crossfade setting
         next_sound_name = self._current_playlist.get_next_sound_name()
         if next_sound_name:
-            pass
-        else:
-            self._current_playlist_ending = True
+            if self._current_playlist.current_sound_instance is not None:
+                self._track.stop_sound_instance(self._current_playlist.current_sound_instance,
+                                                self._current_playlist.crossfade_time)
+                self._current_playlist.fading_sound_instance = self._current_playlist.current_sound_instance
 
-    def _play_sound(self):
-        pass
+            self._play_playlist_sound(next_sound_name, self._current_playlist, self._current_playlist.crossfade_time)
+
+    def set_repeat(self, repeat=True):
+        """Set whether or not the currently playing playlist should repeat when finished."""
+
+        if self._current_playlist:
+            self._current_playlist.loop = repeat
+            self.log.debug("set_repeat - Setting repeat for currently playlist to {}.", str(repeat))
+        else:
+            self.log.debug("set_repeat - No playlist is currently playing. "
+                           "Could not set repeat to {}.", str(repeat))
 
     def _on_sound_instance_stopped(self, sound_instance=None, **kwargs):
         """Callback function called whenever a playlist sound has finished playing."""
 
-        if sound_instance is None:
+        if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:
             return
 
-        if sound_instance not in self._playlists_by_sound_instance:
-            return
-
-        # Get playlist for sound_instance
+        # Get playlist for sound_instance and remove it from dictionary of active sounds
         playlist = self._playlists_by_sound_instance[sound_instance]
+        del self._playlists_by_sound_instance[sound_instance]
 
-        # TODO: Determine if playlist has finished. If so, send events
+        if playlist.current_sound_instance == sound_instance:
+            playlist.current_sound_instance = None
+        if playlist.fading_sound_instance == sound_instance:
+            playlist.fading_sound_instance = None
+
         # Playlist is finished when last sound instance of playlist has completed
+        if playlist not in self._playlists_by_sound_instance.values():
+
+            # Playlist has stopped
+
+            # Trigger any stopped events
+            if playlist.events_when_stopped is not None:
+                for event in playlist.events_when_stopped:
+                    self.mc.post_mc_native_event(event, playlist=playlist.name)
+
+            if playlist == self._current_playlist:
+                self._current_playlist = None
+
+        # Service any pending request (play, advance)
+        if self._pending_request:
+            request = self._pending_request
+            self._pending_request = None
+            request()
 
     def _on_sound_instance_about_to_finish(self, sound_instance=None, **kwargs):
         """Callback function called whenever a playlist sound is about to finish playing."""
         
-        if sound_instance is None:
-            return
-
-        if sound_instance not in self._playlists_by_sound_instance:
+        if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:
             return
 
         # Get playlist for sound_instance
         playlist = self._playlists_by_sound_instance[sound_instance]
+
+        # Take no action if the sound is not from the current playlist
+        if playlist != self._current_playlist:
+            return
 
         # Determine if this is the last sound in the playlist
         if playlist.end_of_playlist and not playlist.repeat:
@@ -212,5 +276,3 @@ cdef class PlaylistController:
 
         # Advance to the next sound in the playlist
         self.advance()
-
-

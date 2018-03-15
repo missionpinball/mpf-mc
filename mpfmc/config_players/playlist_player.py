@@ -18,14 +18,10 @@ class McPlaylistPlayer(McConfigPlayer):
             <playlist_track_name>:
                 <playlist_settings>: ...
 
-    The express config just puts a playlist_name next to an event.
+    Express config is not supported in the playlist player.
 
-    playlist_player:
-        some_event: playlist_name_to_play
-
-    If you want to control other settings (such as track, volume,
-    loops, etc.), enter the playlist name on the next line and the settings
-    indented under it, like this:
+    To control other settings (such as track, action, etc.), enter the playlist name on
+    the next line and the settings indented under it, like this:
 
     playlist_player:
         some_event:
@@ -86,8 +82,9 @@ Here are several various examples:
             settings.setdefault('fade_out', None)
             playlist_controller.stop(settings['fade_out'])
 
-        elif settings['action'].lower() == 'stop_looping':
-            playlist_controller.stop_looping()
+        elif settings['action'].lower() == 'set_repeat':
+            settings.setdefault('repeat', True)
+            playlist_controller.repeat = settings['repeat']
 
         elif settings['action'].lower() == 'set_volume':
             pass
@@ -97,7 +94,7 @@ Here are several various examples:
                                    "is not valid ('{}').".format(settings['action']))
 
     def get_express_config(self, value):
-        """There is no express config for the sound loop player."""
+        """There is no express config for the playlist player."""
         del value
         raise AssertionError("Playlist Player does not support express config")
 
@@ -137,7 +134,8 @@ Here are several various examples:
             if 'track' in settings:
                 track = settings['track']
 
-                if self.machine.sound_system.audio_interface.get_track_type(track) != "sound_loop":
+                playlist_controller = self.machine.sound_system.audio_interface.get_playlist_controller(track)
+                if playlist_controller is None:
                     raise ValueError("PlaylistPlayer: An invalid audio track '{}' is specified for event '{}' "
                                      "(only playlist audio tracks are supported).".format(track, event))
             else:
@@ -147,51 +145,56 @@ Here are several various examples:
 
         return validated_config
 
-    def _validate_config_item(self, track, track_settings):
+    def _validate_config_item(self, track_name, player_settings):
         """Validates the config when in a show or in a player"""
 
+        # event contains the event name that triggers the playlist_player action
         # Validate the settings against the config spec
 
         # First validate the action item (since it will be used to validate the rest
         # of the config)
-        if 'action' in track_settings:
-            track_settings['action'] = self.machine.config_validator.validate_config_item(
-                self.machine.config_validator.config_spec['sound_loop_player']['common']['action'],
-                'sound_loop_player:{}'.format(track),
-                track_settings['action'])
+        if 'action' in player_settings:
+            player_settings['action'] = self.machine.config_validator.validate_config_item(
+                self.machine.config_validator.config_spec['playlist_player']['action'],
+                'playlist_player:{}'.format(track_name),
+                player_settings['action'])
         else:
-            track_settings['action'] = self.machine.config_validator.validate_config_item(
-                self.machine.config_validator.config_spec['sound_loop_player']['common']['action'],
-                'sound_loop_player:{}'.format(track))
+            player_settings['action'] = self.machine.config_validator.validate_config_item(
+                self.machine.config_validator.config_spec['playlist_player']['action'],
+                'playlist_player:{}'.format(track_name))
 
-        validated_dict = self.machine.config_validator.validate_config(
-            'sound_loop_player:actions:{}'.format(track_settings['action']).lower(),
-            track_settings,
-            base_spec='sound_loop_player:common')
+        validated_settings = self.machine.config_validator.validate_config(
+            'playlist_player_actions:{}'.format(player_settings['action']).lower(),
+            player_settings)
 
         # Remove any items from the settings that were not explicitly provided in the
-        # sound_loop_player config section (only want to override sound settings explicitly
+        # playlist_player config section (only want to override settings explicitly
         # and not with any default values).  The default values for these items are not
         # legal values and therefore we know the user did not provide them.
-        if 'volume' in validated_dict and validated_dict['volume'] is None:
-            del validated_dict['volume']
-        if 'fade_in' in validated_dict and validated_dict['fade_in'] is None:
-            del validated_dict['fade_in']
-        if 'fade_out' in validated_dict and validated_dict['fade_out'] is None:
-            del validated_dict['fade_out']
-        if 'events_when_played' in validated_dict and len(validated_dict['events_when_played']) == 1 and \
-                validated_dict['events_when_played'][0] == 'use_sound_loop_setting':
-            del validated_dict['events_when_played']
-        if 'events_when_stopped' in validated_dict and len(validated_dict['events_when_stopped']) == 1 and \
-                validated_dict['events_when_stopped'][0] == 'use_sound_loop_setting':
-            del validated_dict['events_when_stopped']
-        if 'events_when_looping' in validated_dict and len(validated_dict['events_when_looping']) == 1 and \
-                validated_dict['events_when_looping'][0] == 'use_sound_loop_setting':
-            del validated_dict['events_when_looping']
-        if 'mode_end_action' in validated_dict and (validated_dict['mode_end_action'] is None or
-                                                    validated_dict['mode_end_action'] == 'use_sound_loop_setting'):
-            del validated_dict['mode_end_action']
+        if 'volume' in validated_settings and validated_settings['volume'] is None:
+            del validated_settings['volume']
+        if 'fade_in' in validated_settings and validated_settings['fade_in'] is None:
+            del validated_settings['fade_in']
+        if 'events_when_played' in validated_settings and len(validated_settings['events_when_played']) == 1 and \
+                validated_settings['events_when_played'][0] == 'use_playlist_setting':
+            del validated_settings['events_when_played']
+        if 'events_when_stopped' in validated_settings and len(validated_settings['events_when_stopped']) == 1 and \
+                validated_settings['events_when_stopped'][0] == 'use_playlist_setting':
+            del validated_settings['events_when_stopped']
+        if 'events_when_looping' in validated_settings and len(validated_settings['events_when_looping']) == 1 and \
+                validated_settings['events_when_looping'][0] == 'use_playlist_setting':
+            del validated_settings['events_when_looping']
+        if 'events_when_sound_changed' in validated_settings and len(
+                validated_settings['events_when_sound_changed']) == 1 and \
+                validated_settings['events_when_sound_changed'][0] == 'use_playlist_setting':
+            del validated_settings['events_when_sound_changed']
+        if 'events_when_sound_stopped' in validated_settings and len(
+                validated_settings['events_when_sound_stopped']) == 1 and \
+                validated_settings['events_when_sound_stopped'][0] == 'use_playlist_setting':
+            del validated_settings['events_when_sound_stopped']
 
+        validated_dict = dict()
+        validated_dict[track_name] = validated_settings
         return validated_dict
 
     def clear_context(self, context):
@@ -199,23 +202,10 @@ Here are several various examples:
         instance_dict = self._get_instance_dict(context)
         # Iterate over a copy of the dictionary values since it may be modified
         # during the iteration process.
-        self.machine.log.debug("PlaylistPlayer: Clearing context - applying mode_end_action for active sound loop set")
-        for sound_instance in list(instance_dict.values()):
-            if sound_instance.stop_on_mode_end:
-                sound_instance.stop()
-            else:
-                sound_instance.stop_looping()
+        self.machine.log.debug("PlaylistPlayer: Clearing context")
+        # TODO: clear context on playlist track(s)
 
         self._reset_instance_dict(context)
-
-    def on_sound_instance_finished(self, sound_instance_id, context, **kwargs):
-        """Callback function that is called when a sound instance triggered by the sound_player
-        is finished. Remove the specified sound instance from the list of current instances
-        started by the sound_player."""
-        del kwargs
-        instance_dict = self._get_instance_dict(context)
-        if sound_instance_id in instance_dict:
-            del instance_dict[sound_instance_id]
 
 
 mc_player_cls = McPlaylistPlayer

@@ -8,17 +8,6 @@ sound_system:
     playlist:
       type: playlist
       volume: 0.6
-    music:
-      volume: 0.5
-      simultaneous_sounds: 1
-    sfx:
-      volume: 0.4
-      simultaneous_sounds: 8
-      preload: yes
-    voice:
-      volume: 0.6
-      simultaneous_sounds: 1
-      preload: yes
 
 assets:
   sounds:
@@ -27,15 +16,6 @@ assets:
     playlist:
       load: preload
       track: playlist
-    voice:
-      load: preload
-      track: voice
-    sfx:
-      load: preload
-      track: sfx
-    music:
-      load: on_demand
-      track: music
 
 playlists:
 
