@@ -1897,6 +1897,7 @@ static const char __pyx_k_loops[] = "loops";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_sound[] = "sound";
 static const char __pyx_k_super[] = "super";
+static const char __pyx_k_track[] = "track";
 static const char __pyx_k_attack[] = "attack";
 static const char __pyx_k_format[] = "format";
 static const char __pyx_k_import[] = "__import__";
@@ -2239,6 +2240,7 @@ static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_time;
 static PyObject *__pyx_n_u_time;
 static PyObject *__pyx_n_s_timestamp;
+static PyObject *__pyx_n_s_track;
 static PyObject *__pyx_n_s_track_bit_mask;
 static PyObject *__pyx_n_s_track_num;
 static PyObject *__pyx_n_u_unknown;
@@ -4442,7 +4444,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
  *                 # Trigger any events
  *                 if self.events_when_stopped is not None:             # <<<<<<<<<<<<<<
  *                     for event in self.events_when_stopped:
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  */
       __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_events_when_stopped); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 242, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
@@ -4455,7 +4457,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
  *                 # Trigger any events
  *                 if self.events_when_stopped is not None:
  *                     for event in self.events_when_stopped:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  */
         __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_events_when_stopped); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 243, __pyx_L1_error)
@@ -4506,7 +4508,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
           /* "mpfmc/core/audio/track_standard.pyx":244
  *                 if self.events_when_stopped is not None:
  *                     for event in self.events_when_stopped:
- *                         self.mc.post_mc_native_event(event, name=self._name)             # <<<<<<<<<<<<<<
+ *                         self.mc.post_mc_native_event(event, track=self._name)             # <<<<<<<<<<<<<<
  * 
  *             elif notification_message.message == notification_track_paused:
  */
@@ -4519,7 +4521,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
           PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_event);
           __pyx_t_8 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 244, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_name, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 244, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_8, __pyx_n_s_track, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 244, __pyx_L1_error)
           __pyx_t_9 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, __pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 244, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4531,7 +4533,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
  *                 # Trigger any events
  *                 if self.events_when_stopped is not None:
  *                     for event in self.events_when_stopped:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  */
         }
@@ -4542,7 +4544,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
  *                 # Trigger any events
  *                 if self.events_when_stopped is not None:             # <<<<<<<<<<<<<<
  *                     for event in self.events_when_stopped:
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  */
       }
 
@@ -4557,7 +4559,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
     }
 
     /* "mpfmc/core/audio/track_standard.pyx":246
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  *             elif notification_message.message == notification_track_paused:             # <<<<<<<<<<<<<<
  *                 # Trigger any events
@@ -4571,7 +4573,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
  *                 # Trigger any events
  *                 if self.events_when_paused is not None:             # <<<<<<<<<<<<<<
  *                     for event in self.events_when_paused:
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  */
       __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_events_when_paused); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 248, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
@@ -4584,7 +4586,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
  *                 # Trigger any events
  *                 if self.events_when_paused is not None:
  *                     for event in self.events_when_paused:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  *                 pass
  */
         __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_events_when_paused); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
@@ -4635,7 +4637,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
           /* "mpfmc/core/audio/track_standard.pyx":250
  *                 if self.events_when_paused is not None:
  *                     for event in self.events_when_paused:
- *                         self.mc.post_mc_native_event(event, name=self._name)             # <<<<<<<<<<<<<<
+ *                         self.mc.post_mc_native_event(event, track=self._name)             # <<<<<<<<<<<<<<
  *                 pass
  * 
  */
@@ -4648,7 +4650,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
           PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_v_event);
           __pyx_t_4 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 250, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_name, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 250, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_4, __pyx_n_s_track, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 250, __pyx_L1_error)
           __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 250, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4660,7 +4662,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
  *                 # Trigger any events
  *                 if self.events_when_paused is not None:
  *                     for event in self.events_when_paused:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  *                 pass
  */
         }
@@ -4671,12 +4673,12 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_pr
  *                 # Trigger any events
  *                 if self.events_when_paused is not None:             # <<<<<<<<<<<<<<
  *                     for event in self.events_when_paused:
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  */
       }
 
       /* "mpfmc/core/audio/track_standard.pyx":246
- *                         self.mc.post_mc_native_event(event, name=self._name)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  *             elif notification_message.message == notification_track_paused:             # <<<<<<<<<<<<<<
  *                 # Trigger any events
@@ -20874,122 +20876,6 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/inline.pxd":7
- * # ---------------------------------------------------------------------------
- * 
- * cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Linearly interpolate between 2 8-bit values.
- */
-
-static CYTHON_INLINE Uint8 __pyx_f_5mpfmc_4core_5audio_6inline_lerpU8(float __pyx_v_progress, Uint8 __pyx_v_a, Uint8 __pyx_v_b) {
-  Uint8 __pyx_r;
-
-  /* "mpfmc/core/audio/inline.pxd":18
- *         New 8-bit value between the supplied values
- *     """
- *     return <Uint8> ((1.0 - progress) * a + progress * b)             # <<<<<<<<<<<<<<
- * 
- * cdef inline float in_out_quad(float progress) nogil:
- */
-  __pyx_r = ((Uint8)(((1.0 - __pyx_v_progress) * __pyx_v_a) + (__pyx_v_progress * __pyx_v_b)));
-  goto __pyx_L0;
-
-  /* "mpfmc/core/audio/inline.pxd":7
- * # ---------------------------------------------------------------------------
- * 
- * cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     Linearly interpolate between 2 8-bit values.
- */
-
-  /* function exit code */
-  __pyx_L0:;
-  return __pyx_r;
-}
-
-/* "mpfmc/core/audio/inline.pxd":20
- *     return <Uint8> ((1.0 - progress) * a + progress * b)
- * 
- * cdef inline float in_out_quad(float progress) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     A quadratic easing function used for smoother audio fading
- */
-
-static CYTHON_INLINE float __pyx_f_5mpfmc_4core_5audio_6inline_in_out_quad(float __pyx_v_progress) {
-  float __pyx_v_p;
-  float __pyx_r;
-  int __pyx_t_1;
-
-  /* "mpfmc/core/audio/inline.pxd":30
- *     """
- *     cdef float p
- *     p = progress * 2             # <<<<<<<<<<<<<<
- *     if p < 1:
- *         return 0.5 * p * p
- */
-  __pyx_v_p = (__pyx_v_progress * 2.0);
-
-  /* "mpfmc/core/audio/inline.pxd":31
- *     cdef float p
- *     p = progress * 2
- *     if p < 1:             # <<<<<<<<<<<<<<
- *         return 0.5 * p * p
- *     p -= 1.0
- */
-  __pyx_t_1 = ((__pyx_v_p < 1.0) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/inline.pxd":32
- *     p = progress * 2
- *     if p < 1:
- *         return 0.5 * p * p             # <<<<<<<<<<<<<<
- *     p -= 1.0
- *     return -0.5 * (p * (p - 2.0) - 1.0)
- */
-    __pyx_r = ((0.5 * __pyx_v_p) * __pyx_v_p);
-    goto __pyx_L0;
-
-    /* "mpfmc/core/audio/inline.pxd":31
- *     cdef float p
- *     p = progress * 2
- *     if p < 1:             # <<<<<<<<<<<<<<
- *         return 0.5 * p * p
- *     p -= 1.0
- */
-  }
-
-  /* "mpfmc/core/audio/inline.pxd":33
- *     if p < 1:
- *         return 0.5 * p * p
- *     p -= 1.0             # <<<<<<<<<<<<<<
- *     return -0.5 * (p * (p - 2.0) - 1.0)
- * 
- */
-  __pyx_v_p = (__pyx_v_p - 1.0);
-
-  /* "mpfmc/core/audio/inline.pxd":34
- *         return 0.5 * p * p
- *     p -= 1.0
- *     return -0.5 * (p * (p - 2.0) - 1.0)             # <<<<<<<<<<<<<<
- * 
- */
-  __pyx_r = (-0.5 * ((__pyx_v_p * (__pyx_v_p - 2.0)) - 1.0));
-  goto __pyx_L0;
-
-  /* "mpfmc/core/audio/inline.pxd":20
- *     return <Uint8> ((1.0 - progress) * a + progress * b)
- * 
- * cdef inline float in_out_quad(float progress) nogil:             # <<<<<<<<<<<<<<
- *     """
- *     A quadratic easing function used for smoother audio fading
- */
-
-  /* function exit code */
-  __pyx_L0:;
-  return __pyx_r;
-}
-
 /* "mpfmc/core/audio/notification_message.pxd":50
  * # ---------------------------------------------------------------------------
  * 
@@ -21965,6 +21851,122 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
   /* function exit code */
 }
 
+/* "mpfmc/core/audio/inline.pxd":7
+ * # ---------------------------------------------------------------------------
+ * 
+ * cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Linearly interpolate between 2 8-bit values.
+ */
+
+static CYTHON_INLINE Uint8 __pyx_f_5mpfmc_4core_5audio_6inline_lerpU8(float __pyx_v_progress, Uint8 __pyx_v_a, Uint8 __pyx_v_b) {
+  Uint8 __pyx_r;
+
+  /* "mpfmc/core/audio/inline.pxd":18
+ *         New 8-bit value between the supplied values
+ *     """
+ *     return <Uint8> ((1.0 - progress) * a + progress * b)             # <<<<<<<<<<<<<<
+ * 
+ * cdef inline float in_out_quad(float progress) nogil:
+ */
+  __pyx_r = ((Uint8)(((1.0 - __pyx_v_progress) * __pyx_v_a) + (__pyx_v_progress * __pyx_v_b)));
+  goto __pyx_L0;
+
+  /* "mpfmc/core/audio/inline.pxd":7
+ * # ---------------------------------------------------------------------------
+ * 
+ * cdef inline Uint8 lerpU8(float progress, Uint8 a, Uint8 b) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     Linearly interpolate between 2 8-bit values.
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  return __pyx_r;
+}
+
+/* "mpfmc/core/audio/inline.pxd":20
+ *     return <Uint8> ((1.0 - progress) * a + progress * b)
+ * 
+ * cdef inline float in_out_quad(float progress) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     A quadratic easing function used for smoother audio fading
+ */
+
+static CYTHON_INLINE float __pyx_f_5mpfmc_4core_5audio_6inline_in_out_quad(float __pyx_v_progress) {
+  float __pyx_v_p;
+  float __pyx_r;
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/inline.pxd":30
+ *     """
+ *     cdef float p
+ *     p = progress * 2             # <<<<<<<<<<<<<<
+ *     if p < 1:
+ *         return 0.5 * p * p
+ */
+  __pyx_v_p = (__pyx_v_progress * 2.0);
+
+  /* "mpfmc/core/audio/inline.pxd":31
+ *     cdef float p
+ *     p = progress * 2
+ *     if p < 1:             # <<<<<<<<<<<<<<
+ *         return 0.5 * p * p
+ *     p -= 1.0
+ */
+  __pyx_t_1 = ((__pyx_v_p < 1.0) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/inline.pxd":32
+ *     p = progress * 2
+ *     if p < 1:
+ *         return 0.5 * p * p             # <<<<<<<<<<<<<<
+ *     p -= 1.0
+ *     return -0.5 * (p * (p - 2.0) - 1.0)
+ */
+    __pyx_r = ((0.5 * __pyx_v_p) * __pyx_v_p);
+    goto __pyx_L0;
+
+    /* "mpfmc/core/audio/inline.pxd":31
+ *     cdef float p
+ *     p = progress * 2
+ *     if p < 1:             # <<<<<<<<<<<<<<
+ *         return 0.5 * p * p
+ *     p -= 1.0
+ */
+  }
+
+  /* "mpfmc/core/audio/inline.pxd":33
+ *     if p < 1:
+ *         return 0.5 * p * p
+ *     p -= 1.0             # <<<<<<<<<<<<<<
+ *     return -0.5 * (p * (p - 2.0) - 1.0)
+ * 
+ */
+  __pyx_v_p = (__pyx_v_p - 1.0);
+
+  /* "mpfmc/core/audio/inline.pxd":34
+ *         return 0.5 * p * p
+ *     p -= 1.0
+ *     return -0.5 * (p * (p - 2.0) - 1.0)             # <<<<<<<<<<<<<<
+ * 
+ */
+  __pyx_r = (-0.5 * ((__pyx_v_p * (__pyx_v_p - 2.0)) - 1.0));
+  goto __pyx_L0;
+
+  /* "mpfmc/core/audio/inline.pxd":20
+ *     return <Uint8> ((1.0 - progress) * a + progress * b)
+ * 
+ * cdef inline float in_out_quad(float progress) nogil:             # <<<<<<<<<<<<<<
+ *     """
+ *     A quadratic easing function used for smoother audio fading
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  return __pyx_r;
+}
+
 /* "mpfmc/core/audio/track_standard.pxd":122
  * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
  *                                       TrackState *track, int player_num) nogil
@@ -22499,6 +22501,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
   {&__pyx_n_u_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 1, 0, 1},
   {&__pyx_n_s_timestamp, __pyx_k_timestamp, sizeof(__pyx_k_timestamp), 0, 0, 1, 1},
+  {&__pyx_n_s_track, __pyx_k_track, sizeof(__pyx_k_track), 0, 0, 1, 1},
   {&__pyx_n_s_track_bit_mask, __pyx_k_track_bit_mask, sizeof(__pyx_k_track_bit_mask), 0, 0, 1, 1},
   {&__pyx_n_s_track_num, __pyx_k_track_num, sizeof(__pyx_k_track_num), 0, 0, 1, 1},
   {&__pyx_n_u_unknown, __pyx_k_unknown, sizeof(__pyx_k_unknown), 0, 1, 0, 1},
