@@ -219,6 +219,9 @@ Here are several various examples:
         if len(validated_dict[device]['events_when_played']) == 1 and \
                         validated_dict[device]['events_when_played'][0] == 'use_sound_setting':
             del validated_dict[device]['events_when_played']
+        if len(validated_dict[device]['events_when_about_to_finish']) == 1 and \
+                        validated_dict[device]['events_when_about_to_finish'][0] == 'use_sound_setting':
+            del validated_dict[device]['events_when_about_to_finish']
         if len(validated_dict[device]['events_when_stopped']) == 1 and \
                         validated_dict[device]['events_when_stopped'][0] == 'use_sound_setting':
             del validated_dict[device]['events_when_stopped']
