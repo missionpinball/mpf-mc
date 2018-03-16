@@ -132,8 +132,8 @@ class SoundPool(AssetPool):
         has currently been reached)."""
         if self.simultaneous_limit is None:
             return None
-        else:
-            return self._stealing_method
+
+        return self._stealing_method
 
     def play(self, context=None, settings=None):
         """
@@ -382,9 +382,9 @@ class SoundAsset(Asset):
         # greater than because the PriorityQueue puts lowest first.)
         if other is None:
             return False
-        else:
-            return ("%s, %s" % (self.priority, self._id) >
-                    "%s, %s" % (other.priority, other.get_id()))
+
+        return ("%s, %s" % (self.priority, self._id) >
+                "%s, %s" % (other.priority, other.get_id()))
 
     #pylint: disable=invalid-name
     @property
@@ -457,8 +457,8 @@ class SoundAsset(Asset):
             # Streamed sounds only support a single instance at a time, no matter what the
             # 'simultaneous_limit' setting is.
             return 1
-        else:
-            return self._simultaneous_limit
+
+        return self._simultaneous_limit
 
     @property
     def stealing_method(self):
@@ -467,8 +467,8 @@ class SoundAsset(Asset):
         been reached)."""
         if self.simultaneous_limit is None:
             return None
-        else:
-            return self._stealing_method
+
+        return self._stealing_method
 
     @property
     def events_when_played(self):
@@ -591,16 +591,14 @@ class SoundAsset(Asset):
 
         # Validate ducking now that the sound has been loaded
         # TODO: Implement me
-        """
-        if self._ducking is not None:
-            try:
-                self._ducking.validate(self._container.length)
-            except AudioException as exception:
-                self.log.error("Ducking settings for sound %s are not valid: %s",
-                               self.name, str(exception))
-                raise
-        """
-        pass
+        # if self._ducking is not None:
+        #    try:
+        #        self._ducking.validate(self._container.length)
+        #    except AudioException as exception:
+        #        self.log.error("Ducking settings for sound %s are not valid: %s",
+        #                       self.name, str(exception))
+        #        raise
+        #
 
     def _do_unload(self):
         """Unloads the asset from memory"""
@@ -634,7 +632,7 @@ class SoundAsset(Asset):
         elif isinstance(config, list):
             config_markers = config
         else:
-            raise AudioException("Sound %s has an invalid markers section", sound_name)
+            raise AudioException("Sound {} has an invalid markers section".format(sound_name))
 
         last_marker_time = 0
 
@@ -645,15 +643,13 @@ class SoundAsset(Asset):
             # Set marker parameters
             marker['time'] = AudioInterface.string_to_secs(settings['time'])
             if marker['time'] < last_marker_time:
-                raise AudioException("Sound markers for sound %s must be in ascending time order",
-                                     sound_name)
+                raise AudioException("Sound markers for sound {} must be in ascending time order".format(sound_name))
             last_marker_time = marker['time']
 
             if 'events' in settings and settings['events'] is not None:
                 marker['events'] = Util.string_to_list(settings['events'])
             else:
-                raise AudioException("Sound markers for sound %s must specify at least one event",
-                                     sound_name)
+                raise AudioException("Sound markers for sound {} must specify at least one event".format(sound_name))
 
             if 'name' in settings and settings['name'] is not None:
                 marker['name'] = settings['name'].lower()
@@ -661,10 +657,10 @@ class SoundAsset(Asset):
                 marker['name'] = None
 
             if len(markers) == AudioInterface.get_max_markers():
-                raise AudioException("Cannot add marker - the limit of %d sound markers has been "
-                                     "reached for sound %s.",
-                                     AudioInterface.get_max_markers(),
-                                     sound_name)
+                raise AudioException("Cannot add marker - the limit of {} sound markers has been "
+                                     "reached for sound {}.".format(
+                                        AudioInterface.get_max_markers(),
+                                        sound_name))
 
             markers.append(marker)
 
