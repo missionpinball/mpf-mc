@@ -1756,6 +1756,7 @@ static const char __pyx_k_queue[] = "queue";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_sound[] = "sound";
 static const char __pyx_k_super[] = "super";
+static const char __pyx_k_track[] = "track";
 static const char __pyx_k_format[] = "format";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_layers[] = "layers";
@@ -1972,6 +1973,7 @@ static PyObject *__pyx_n_s_super;
 static PyObject *__pyx_n_u_synchronize;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_n_s_time;
+static PyObject *__pyx_n_s_track;
 static PyObject *__pyx_n_s_track_num;
 static PyObject *__pyx_n_u_unknown;
 static PyObject *__pyx_n_s_volume;
@@ -3832,7 +3834,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  *                 # Trigger any events
  *                 if self._events_when_stopped is not None:             # <<<<<<<<<<<<<<
  *                     for event in self._events_when_stopped:
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  */
       __pyx_t_1 = (__pyx_v_self->__pyx_base._events_when_stopped != ((PyObject*)Py_None));
       __pyx_t_2 = (__pyx_t_1 != 0);
@@ -3842,7 +3844,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  *                 # Trigger any events
  *                 if self._events_when_stopped is not None:
  *                     for event in self._events_when_stopped:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  */
         if (unlikely(__pyx_v_self->__pyx_base._events_when_stopped == Py_None)) {
@@ -3864,62 +3866,32 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
           /* "mpfmc/core/audio/track_sound_loop.pyx":213
  *                 if self._events_when_stopped is not None:
  *                     for event in self._events_when_stopped:
- *                         self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
+ *                         self.mc.post_mc_native_event(event, track=self._name)             # <<<<<<<<<<<<<<
  * 
  *             elif notification_message.message == notification_track_paused:
  */
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 213, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 213, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 213, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_7 = NULL;
-          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
-            __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_6);
-            if (likely(__pyx_t_7)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-              __Pyx_INCREF(__pyx_t_7);
-              __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_6, function);
-            }
-          }
-          if (!__pyx_t_7) {
-            __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_v_event); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 213, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-          } else {
-            #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_6)) {
-              PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_v_event};
-              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 213, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-            } else
-            #endif
-            #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
-              PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_v_event};
-              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 213, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-            } else
-            #endif
-            {
-              __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 213, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_8);
-              __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
-              __Pyx_INCREF(__pyx_v_event);
-              __Pyx_GIVEREF(__pyx_v_event);
-              PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_v_event);
-              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_8, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 213, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-            }
-          }
-          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+          __Pyx_INCREF(__pyx_v_event);
+          __Pyx_GIVEREF(__pyx_v_event);
+          PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_v_event);
+          __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 213, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_7);
+          if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_track, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 213, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 213, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+          __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
           /* "mpfmc/core/audio/track_sound_loop.pyx":212
  *                 # Trigger any events
  *                 if self._events_when_stopped is not None:
  *                     for event in self._events_when_stopped:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  */
         }
@@ -3930,7 +3902,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  *                 # Trigger any events
  *                 if self._events_when_stopped is not None:             # <<<<<<<<<<<<<<
  *                     for event in self._events_when_stopped:
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  */
       }
 
@@ -3945,7 +3917,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     }
 
     /* "mpfmc/core/audio/track_sound_loop.pyx":215
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  *             elif notification_message.message == notification_track_paused:             # <<<<<<<<<<<<<<
  *                 # Trigger any events
@@ -3959,7 +3931,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  *                 # Trigger any events
  *                 if self._events_when_paused is not None:             # <<<<<<<<<<<<<<
  *                     for event in self._events_when_paused:
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  */
       __pyx_t_2 = (__pyx_v_self->__pyx_base._events_when_paused != ((PyObject*)Py_None));
       __pyx_t_1 = (__pyx_t_2 != 0);
@@ -3969,7 +3941,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  *                 # Trigger any events
  *                 if self._events_when_paused is not None:
  *                     for event in self._events_when_paused:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  *                 pass
  */
         if (unlikely(__pyx_v_self->__pyx_base._events_when_paused == Py_None)) {
@@ -3980,65 +3952,35 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         for (;;) {
           if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 218, __pyx_L1_error)
+          __pyx_t_8 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_8); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 218, __pyx_L1_error)
           #else
-          __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 218, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_8 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 218, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_8);
           #endif
-          __Pyx_XDECREF_SET(__pyx_v_event, __pyx_t_5);
-          __pyx_t_5 = 0;
+          __Pyx_XDECREF_SET(__pyx_v_event, __pyx_t_8);
+          __pyx_t_8 = 0;
 
           /* "mpfmc/core/audio/track_sound_loop.pyx":219
  *                 if self._events_when_paused is not None:
  *                     for event in self._events_when_paused:
- *                         self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
+ *                         self.mc.post_mc_native_event(event, track=self._name)             # <<<<<<<<<<<<<<
  *                 pass
  * 
  */
-          __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_8);
+          __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_7);
+          __Pyx_INCREF(__pyx_v_event);
+          __Pyx_GIVEREF(__pyx_v_event);
+          PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v_event);
+          __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 219, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          __pyx_t_8 = NULL;
-          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
-            __pyx_t_8 = PyMethod_GET_SELF(__pyx_t_6);
-            if (likely(__pyx_t_8)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_6);
-              __Pyx_INCREF(__pyx_t_8);
-              __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_6, function);
-            }
-          }
-          if (!__pyx_t_8) {
-            __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_v_event); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-          } else {
-            #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_6)) {
-              PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_v_event};
-              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-            } else
-            #endif
-            #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
-              PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_v_event};
-              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-            } else
-            #endif
-            {
-              __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 219, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_7);
-              __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_8); __pyx_t_8 = NULL;
-              __Pyx_INCREF(__pyx_v_event);
-              __Pyx_GIVEREF(__pyx_v_event);
-              PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_v_event);
-              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-            }
-          }
+          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_track, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
@@ -4046,7 +3988,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  *                 # Trigger any events
  *                 if self._events_when_paused is not None:
  *                     for event in self._events_when_paused:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  *                 pass
  */
         }
@@ -4057,12 +3999,12 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  *                 # Trigger any events
  *                 if self._events_when_paused is not None:             # <<<<<<<<<<<<<<
  *                     for event in self._events_when_paused:
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  */
       }
 
       /* "mpfmc/core/audio/track_sound_loop.pyx":215
- *                         self.mc.post_mc_native_event(event)
+ *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  *             elif notification_message.message == notification_track_paused:             # <<<<<<<<<<<<<<
  *                 # Trigger any events
@@ -13423,6 +13365,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_u_synchronize, __pyx_k_synchronize, sizeof(__pyx_k_synchronize), 0, 1, 0, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_n_s_time, __pyx_k_time, sizeof(__pyx_k_time), 0, 0, 1, 1},
+  {&__pyx_n_s_track, __pyx_k_track, sizeof(__pyx_k_track), 0, 0, 1, 1},
   {&__pyx_n_s_track_num, __pyx_k_track_num, sizeof(__pyx_k_track_num), 0, 0, 1, 1},
   {&__pyx_n_u_unknown, __pyx_k_unknown, sizeof(__pyx_k_unknown), 0, 1, 0, 1},
   {&__pyx_n_s_volume, __pyx_k_volume, sizeof(__pyx_k_volume), 0, 0, 1, 1},
