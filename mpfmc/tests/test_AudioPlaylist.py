@@ -2,6 +2,7 @@ import logging
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from unittest.mock import MagicMock, call
+from mpfmc.config_collections.playlist import PlaylistInstance
 
 try:
     from mpfmc.core.audio import SoundSystem
@@ -45,52 +46,83 @@ class TestAudioPlaylist(MpfMcTestCase):
         self.assertEqual(track_playlist.name, "playlist")
         self.assertAlmostEqual(track_playlist.volume, 0.6, 1)
 
+        playlist_controller = interface.get_playlist_controller("playlist")
+        self.assertIsNotNone(playlist_controller)
+        self.assertEqual(playlist_controller.name, "playlist")
+        self.assertEqual(playlist_controller.crossfade_time, 2.0)
+
         # /sounds/playlist
         self.assertTrue(hasattr(self.mc, 'sounds'))
-        self.assertIn('kick', self.mc.sounds)
-        self.assertIn('kick2', self.mc.sounds)
-        self.assertIn('hihat', self.mc.sounds)
-        self.assertIn('snare', self.mc.sounds)
-        self.assertIn('clap', self.mc.sounds)
-        self.assertIn('bass_synth', self.mc.sounds)
+        self.assertIn('drumbeat_7', self.mc.sounds)
+        self.assertIn('hippie_ahead', self.mc.sounds)
+        self.assertIn('rainbow_disco_bears', self.mc.sounds)
+        self.assertIn('dirty_grinding_beat_loop', self.mc.sounds)
 
         # Playlists
         self.assertTrue(hasattr(self.mc, 'playlists'))
-        self.assertIn('basic_beat', self.mc.playlists)
-        self.assertIn('basic_beat2', self.mc.playlists)
+        self.assertIn('attract_music', self.mc.playlists)
+        self.assertListEqual(['drumbeat_7', 'hippie_ahead', 'rainbow_disco_bears', 'dirty_grinding_beat_loop'],
+                             self.mc.playlists['attract_music']['sounds'])
+
+        # Create a PlaylistInstance to manipulate directly for testing
+        attract_music_playlist = PlaylistInstance('attract_music',
+                                                  self.mc.playlists['attract_music'],
+                                                  playlist_controller.crossfade_time)
+        self.assertIsNotNone(attract_music_playlist)
+        self.assertFalse(attract_music_playlist.repeat)
+
+        # Advance through the playlist
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('drumbeat_7', current_sound)
+        self.assertFalse(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('hippie_ahead', current_sound)
+        self.assertFalse(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('rainbow_disco_bears', current_sound)
+        self.assertFalse(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('dirty_grinding_beat_loop', current_sound)
+        self.assertTrue(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertIsNone(current_sound)
+
+        # Create another PlaylistInstance, this time enable repeat
+        attract_music_playlist = PlaylistInstance('attract_music',
+                                                  self.mc.playlists['attract_music'],
+                                                  playlist_controller.crossfade_time,
+                                                  settings={'repeat': True})
+        self.assertIsNotNone(attract_music_playlist)
+        self.assertTrue(attract_music_playlist.repeat)
+
+        # Advance through the playlist
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('drumbeat_7', current_sound)
+        self.assertFalse(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('hippie_ahead', current_sound)
+        self.assertFalse(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('rainbow_disco_bears', current_sound)
+        self.assertFalse(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('dirty_grinding_beat_loop', current_sound)
+        self.assertTrue(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('drumbeat_7', current_sound)
+        self.assertFalse(attract_music_playlist.end_of_playlist)
 
         # Test playlist_player
         self.advance_time()
-        self.mc.events.post('play_sound_synthping')
-        self.mc.events.post('play_basic_beat')
+        self.mc.events.post('play_attract_music')
         self.advance_real_time(1)
 
-        self.mc.events.post('add_hi_hats')
-        self.advance_time()
-        self.advance_real_time(3)
-
-        self.mc.events.post('add_snare')
-        self.mc.events.post('add_claps')
-        self.advance_real_time(2)
         status = track_playlist.get_status()
         self.assertEqual(status[0]['status'], "playing")
-        self.assertEqual(status[0]['sound_id'], self.mc.sounds["kick"].id)
-        self.assertTrue(status[0]['looping'])
-        self.assertEqual(len(status[0]['layers']), 3)
+        self.assertEqual(status[0]['sound_id'], self.mc.sounds["drumbeat_7"].id)
         self.assertEqual(status[1]['status'], "idle")
         self.advance_real_time(2)
 
-        self.mc.events.post('play_basic_beat2')
-        self.advance_real_time(4)
-        status = track_playlist.get_status()
-        self.assertEqual(status[0]['status'], "playing")
-        self.assertEqual(status[0]['sound_id'], self.mc.sounds["kick2"].id)
-        self.assertTrue(status[0]['looping'])
-        self.assertEqual(len(status[0]['layers']), 4)
+        self.mc.events.post('advance_playlist')
+        self.advance_real_time(10)
 
-        self.mc.events.post('fade_out_bass_synth')
-        self.advance_real_time(4)
-
-        self.mc.events.post('stop_current_loop')
-        self.mc.events.post('play_sound_synthping')
-        self.advance_real_time(2)
