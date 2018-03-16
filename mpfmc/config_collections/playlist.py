@@ -110,6 +110,9 @@ class PlaylistInstance(object):
         if settings is None:
             settings = {}
 
+        # Set crossfade time that will be used for playing this instance (will either
+        # use the track time or the playlist time depending upon the crossfade_mode
+        # setting
         settings.setdefault('crossfade_mode', playlist['crossfade_mode'])
         if settings['crossfade_mode'] == 'use_track_setting':
             settings['crossfade_time'] = track_crossfade_time

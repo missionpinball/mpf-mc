@@ -21,3 +21,6 @@ assets:
         loops:
             load: preload
             track: default
+        playlist:
+            load: on_demand
+            track: default

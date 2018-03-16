@@ -36,6 +36,9 @@ assets:
     music:
       load: on_demand
       track: music
+    playlist:
+      load: on_demand
+      track: sfx
 
 sound_loop_sets:
   basic_beat:

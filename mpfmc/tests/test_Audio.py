@@ -123,6 +123,9 @@ class TestAudio(MpfMcTestCase):
 
         # Make sure sound has ducking (since it was specified in the config files)
         self.assertTrue(self.mc.sounds['104457_moron_test'].has_ducking)
+        self.assertEqual(2.0, self.mc.sounds['104457_moron_test'].about_to_finish_time)
+        self.assertListEqual(['moron_test_about_to_finish'],
+                             self.mc.sounds['104457_moron_test'].events_when_about_to_finish)
 
         # Test sound_player
         self.assertFalse(track_sfx.sound_is_playing(self.mc.sounds['264828_text']))
@@ -199,6 +202,7 @@ class TestAudio(MpfMcTestCase):
 
         # Test sound events
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='moron_test_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='moron_test_about_to_finish')
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='moron_test_stopped')
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='synthping_played')
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=0, name='moron_marker')
