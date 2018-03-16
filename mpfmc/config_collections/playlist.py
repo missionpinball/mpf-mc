@@ -113,8 +113,14 @@ class PlaylistInstance(object):
         settings.setdefault('crossfade_mode', playlist['crossfade_mode'])
         if settings['crossfade_mode'] == 'use_track_setting':
             settings['crossfade_time'] = track_crossfade_time
+        elif settings['crossfade_mode'] == 'use_playlist_setting':
+            if playlist['crossfade_mode'] == 'use_track_setting':
+                settings['crossfade_time'] = track_crossfade_time
+            else:
+                settings.setdefault('crossfade_time', playlist['crossfade_time'])
         else:
             settings.setdefault('crossfade_time', playlist['crossfade_time'])
+
         settings.setdefault('shuffle', playlist['shuffle'])
         settings.setdefault('repeat', playlist['repeat'])
         settings['sounds'] = playlist['sounds']
@@ -148,7 +154,7 @@ class PlaylistInstance(object):
 
     @property
     def shuffle(self):
-        return self._settings['crossfade']
+        return self._settings['shuffle']
 
     @property
     def repeat(self):

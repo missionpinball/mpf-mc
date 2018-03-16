@@ -56,42 +56,41 @@ Here are several various examples:
         """
         instance_dict = self._get_instance_dict(context)
         settings = deepcopy(settings)
-        settings.update(kwargs)
 
-        if 'track' not in settings:
-            self.machine.log.error("PlaylistPlayer: track is a required setting and must be specified.")
-            return
+        self.machine.log.debug("PlaylistPlayer: Play called with settings=%s", settings)
 
-        playlist_controller = self.machine.sound_system.audio_interface.get_playlist_controller(settings['track'])
-        if playlist_controller is None:
-            self.machine.log.error("PlaylistPlayer: track must refer to an existing audio playlist track.")
-            return
+        for track_name, player_settings in settings.items():
+            player_settings.update(kwargs)
 
-        # Determine action to perform
-        if settings['action'].lower() == 'play':
-            if settings['playlist'] not in self.machine.playlists:
-                self.machine.log.error("PlaylistPlayer: The specified playlist "
-                                       "does not exist ('{}').".format(settings['playlist']))
-                return
-            try:
-                playlist_controller.play(settings['playlist'], context, settings)
-            except Exception as ex:
-                raise Exception(ex)
+            playlist_controller = self.machine.sound_system.audio_interface.get_playlist_controller(track_name)
 
-        elif settings['action'].lower() == 'stop':
-            settings.setdefault('fade_out', None)
-            playlist_controller.stop(settings['fade_out'])
+            # Determine action to perform
+            if player_settings['action'].lower() == 'play':
+                if player_settings['playlist'] not in self.machine.playlists:
+                    self.machine.log.error("PlaylistPlayer: The specified playlist "
+                                           "does not exist ('{}').".format(player_settings['playlist']))
+                    return
+                try:
+                    playlist_name = player_settings['playlist']
+                    del player_settings['playlist']
+                    playlist_controller.play(playlist_name, context, player_settings)
+                except Exception as ex:
+                    raise Exception(ex)
 
-        elif settings['action'].lower() == 'set_repeat':
-            settings.setdefault('repeat', True)
-            playlist_controller.repeat = settings['repeat']
+            elif player_settings['action'].lower() == 'stop':
+                player_settings.setdefault('fade_out', None)
+                playlist_controller.stop()
 
-        elif settings['action'].lower() == 'set_volume':
-            pass
+            elif player_settings['action'].lower() == 'advance':
+                playlist_controller.advance()
 
-        else:
-            self.machine.log.error("PlaylistPlayer: The specified action "
-                                   "is not valid ('{}').".format(settings['action']))
+            elif player_settings['action'].lower() == 'set_repeat':
+                player_settings.setdefault('repeat', True)
+                playlist_controller.set_repeat(player_settings['repeat'])
+
+            else:
+                self.machine.log.error("SoundLoopPlayer: The specified action "
+                                       "is not valid ('{}').".format(player_settings['action']))
 
     def get_express_config(self, value):
         """There is no express config for the playlist player."""
@@ -115,10 +114,6 @@ Here are several various examples:
         unique options.
 
         """
-        # first, we're looking to see if we have a string, a list, or a dict.
-        # if it's a dict, we look to see whether we have the name of some sound
-        # loop set.
-
         validated_config = dict()
 
         # No need to validate if sound system is not enabled, just return empty dict
@@ -128,20 +123,17 @@ Here are several various examples:
         for event, settings in config.items():
             validated_config[event] = dict()
 
-            if not isinstance(settings, dict):
-                settings = {settings: dict()}
+            for track_name, player_settings in settings.items():
 
-            if 'track' in settings:
-                track = settings['track']
-
-                playlist_controller = self.machine.sound_system.audio_interface.get_playlist_controller(track)
-                if playlist_controller is None:
+                # Validate the specified track name is a sound_loop track
+                playlist_controller = self.machine.sound_system.audio_interface.get_playlist_controller(track_name)
+                if playlist_controller is None or \
+                        playlist_controller.track is None or \
+                        playlist_controller.track.type != "standard":
                     raise ValueError("PlaylistPlayer: An invalid audio track '{}' is specified for event '{}' "
-                                     "(only playlist audio tracks are supported).".format(track, event))
-            else:
-                raise ValueError("PlaylistPlayer: track is a required setting in event '{}'".format(event))
+                                     "(only playlist audio tracks are supported).".format(track_name, event))
 
-            validated_config[event].update(self._validate_config_item(track, settings))
+                validated_config[event].update(self._validate_config_item(track_name, player_settings))
 
         return validated_config
 
@@ -171,6 +163,8 @@ Here are several various examples:
         # playlist_player config section (only want to override settings explicitly
         # and not with any default values).  The default values for these items are not
         # legal values and therefore we know the user did not provide them.
+        if 'crossfade_time' in validated_settings and validated_settings['crossfade_time'] is None:
+            del validated_settings['crossfade_time']
         if 'volume' in validated_settings and validated_settings['volume'] is None:
             del validated_settings['volume']
         if 'fade_in' in validated_settings and validated_settings['fade_in'] is None:

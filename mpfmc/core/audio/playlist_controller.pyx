@@ -11,7 +11,7 @@ from mpfmc.core.audio.track cimport *
 # ---------------------------------------------------------------------------
 #    PlaylistController class
 # ---------------------------------------------------------------------------
-cdef class PlaylistController:
+class PlaylistController:
     """
     PlaylistController class
     """
@@ -61,6 +61,11 @@ cdef class PlaylistController:
     def name(self):
         """The name of the playlist controller (and corresponding audio track)"""
         return self._track.name
+
+    @property
+    def track(self):
+        """The corresponding audio track the playlist is managing"""
+        return self._track
 
     @property
     def crossfade_time(self):
@@ -162,7 +167,7 @@ cdef class PlaylistController:
         # Play sound on playlist track (override certain settings needed to manage playlist)
         # Standard track will return a sound instance if play was successful
         sound_instance = self._track.play_sound(sound,
-                                                context,
+                                                playlist.context,
                                                 {
                                                     'fade_in': fade_in,
                                                     'fade_out': 0.0,
@@ -226,6 +231,8 @@ cdef class PlaylistController:
     def _on_sound_instance_stopped(self, sound_instance=None, **kwargs):
         """Callback function called whenever a playlist sound has finished playing."""
 
+        print("_on_sound_instance_stopped", sound_instance, kwargs)
+
         if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:
             return
 
@@ -259,7 +266,9 @@ cdef class PlaylistController:
 
     def _on_sound_instance_about_to_finish(self, sound_instance=None, **kwargs):
         """Callback function called whenever a playlist sound is about to finish playing."""
-        
+
+        print("_on_sound_instance_about_to_finish", sound_instance, kwargs)
+
         if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:
             return
 
