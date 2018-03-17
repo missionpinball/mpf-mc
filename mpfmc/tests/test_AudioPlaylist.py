@@ -1,7 +1,7 @@
 import logging
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, call, ANY
 from mpfmc.config_collections.playlist import PlaylistInstance
 
 try:
@@ -43,13 +43,13 @@ class TestAudioPlaylist(MpfMcTestCase):
         # Check playlist track
         track_playlist = interface.get_track_by_name("playlist")
         self.assertIsNotNone(track_playlist)
-        self.assertEqual(track_playlist.name, "playlist")
-        self.assertAlmostEqual(track_playlist.volume, 0.6, 1)
+        self.assertEqual("playlist", track_playlist.name)
+        self.assertAlmostEqual(0.6, track_playlist.volume, 1)
 
         playlist_controller = interface.get_playlist_controller("playlist")
         self.assertIsNotNone(playlist_controller)
-        self.assertEqual(playlist_controller.name, "playlist")
-        self.assertEqual(playlist_controller.crossfade_time, 2.0)
+        self.assertEqual("playlist", playlist_controller.name)
+        self.assertEqual(2.0, playlist_controller.crossfade_time)
 
         # /sounds/playlist
         self.assertTrue(hasattr(self.mc, 'sounds'))
@@ -61,7 +61,7 @@ class TestAudioPlaylist(MpfMcTestCase):
         # Playlists
         self.assertTrue(hasattr(self.mc, 'playlists'))
         self.assertIn('attract_music', self.mc.playlists)
-        self.assertListEqual(['drumbeat_7', 'hippie_ahead', 'rainbow_disco_bears', 'dirty_grinding_beat_loop'],
+        self.assertListEqual(['drumbeat_7', 'rainbow_disco_bears', 'dirty_grinding_beat_loop', 'hippie_ahead'],
                              self.mc.playlists['attract_music']['sounds'])
 
         # Create a PlaylistInstance to manipulate directly for testing
@@ -76,13 +76,13 @@ class TestAudioPlaylist(MpfMcTestCase):
         self.assertEqual('drumbeat_7', current_sound)
         self.assertFalse(attract_music_playlist.end_of_playlist)
         current_sound = attract_music_playlist.get_next_sound_name()
-        self.assertEqual('hippie_ahead', current_sound)
-        self.assertFalse(attract_music_playlist.end_of_playlist)
-        current_sound = attract_music_playlist.get_next_sound_name()
         self.assertEqual('rainbow_disco_bears', current_sound)
         self.assertFalse(attract_music_playlist.end_of_playlist)
         current_sound = attract_music_playlist.get_next_sound_name()
         self.assertEqual('dirty_grinding_beat_loop', current_sound)
+        self.assertFalse(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('hippie_ahead', current_sound)
         self.assertTrue(attract_music_playlist.end_of_playlist)
         current_sound = attract_music_playlist.get_next_sound_name()
         self.assertIsNone(current_sound)
@@ -100,29 +100,117 @@ class TestAudioPlaylist(MpfMcTestCase):
         self.assertEqual('drumbeat_7', current_sound)
         self.assertFalse(attract_music_playlist.end_of_playlist)
         current_sound = attract_music_playlist.get_next_sound_name()
-        self.assertEqual('hippie_ahead', current_sound)
-        self.assertFalse(attract_music_playlist.end_of_playlist)
-        current_sound = attract_music_playlist.get_next_sound_name()
         self.assertEqual('rainbow_disco_bears', current_sound)
         self.assertFalse(attract_music_playlist.end_of_playlist)
         current_sound = attract_music_playlist.get_next_sound_name()
         self.assertEqual('dirty_grinding_beat_loop', current_sound)
+        self.assertFalse(attract_music_playlist.end_of_playlist)
+        current_sound = attract_music_playlist.get_next_sound_name()
+        self.assertEqual('hippie_ahead', current_sound)
         self.assertTrue(attract_music_playlist.end_of_playlist)
         current_sound = attract_music_playlist.get_next_sound_name()
         self.assertEqual('drumbeat_7', current_sound)
         self.assertFalse(attract_music_playlist.end_of_playlist)
+
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
 
         # Test playlist_player
         self.advance_time()
         self.mc.events.post('play_attract_music')
         self.advance_real_time(1)
 
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='attract_music_played'),
+                                                     call('trigger', name='attract_music_sound_changed'),
+                                                     call('trigger', sound_instance=ANY, name='drumbeat_7_played')])
+
         status = track_playlist.get_status()
-        self.assertEqual(status[0]['status'], "playing")
-        self.assertEqual(status[0]['sound_id'], self.mc.sounds["drumbeat_7"].id)
-        self.assertEqual(status[1]['status'], "idle")
+        self.assertEqual("playing", status[0]['status'])
+        self.assertEqual(self.mc.sounds["drumbeat_7"].id, status[0]['sound_id'])
+        self.assertEqual("idle", status[1]['status'])
         self.advance_real_time(2)
 
+        self.mc.bcp_processor.send.reset_mock()
         self.mc.events.post('advance_playlist')
-        self.advance_real_time(10)
+        self.advance_real_time(0.25)
 
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='attract_music_sound_changed'),
+                                                     call('trigger', sound_instance=ANY,
+                                                          name='rainbow_disco_bears_played')])
+
+        status = track_playlist.get_status()
+        self.assertEqual("stopping", status[0]['status'])
+        self.assertEqual(self.mc.sounds["drumbeat_7"].id, status[0]['sound_id'])
+        self.assertEqual("playing", status[1]['status'])
+        self.assertEqual(self.mc.sounds["rainbow_disco_bears"].id, status[1]['sound_id'])
+
+        self.mc.bcp_processor.send.reset_mock()
+        self.advance_real_time(2)
+
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY,
+                                                          name='drumbeat_7_stopped'),
+                                                     call('trigger', sound_instance=ANY,
+                                                          name='playlist_playlist_sound_stopped'),
+                                                     call('trigger', name='attract_music_sound_stopped')])
+
+        status = track_playlist.get_status()
+        self.assertEqual("idle", status[0]['status'])
+        self.assertEqual("playing", status[1]['status'])
+        self.assertEqual(self.mc.sounds["rainbow_disco_bears"].id, status[1]['sound_id'])
+
+        self.mc.bcp_processor.send.reset_mock()
+        self.advance_real_time(15)
+
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY,
+                                                          name='playlist_playlist_sound_about_to_finish'),
+                                                     call('trigger', name='attract_music_sound_changed'),
+                                                     call('trigger', sound_instance=ANY,
+                                                          name='dirty_grinding_beat_loop_played'),
+                                                     call('trigger', sound_instance=ANY,
+                                                          name='rainbow_disco_bears_stopped'),
+                                                     call('trigger', sound_instance=ANY,
+                                                          name='playlist_playlist_sound_stopped'),
+                                                     call('trigger', name='attract_music_sound_stopped')])
+
+        status = track_playlist.get_status()
+        self.assertEqual("playing", status[0]['status'])
+        self.assertEqual(self.mc.sounds["dirty_grinding_beat_loop"].id, status[0]['sound_id'])
+
+        self.advance_real_time(2)
+        self.mc.bcp_processor.send.reset_mock()
+
+        self.mc.events.post('advance_playlist')
+        self.advance_real_time(0.25)
+
+        status = track_playlist.get_status()
+        self.assertEqual("stopping", status[0]['status'])
+        self.assertEqual(self.mc.sounds["dirty_grinding_beat_loop"].id, status[0]['sound_id'])
+        self.assertEqual("playing", status[1]['status'])
+        self.assertEqual(self.mc.sounds["hippie_ahead"].id, status[1]['sound_id'])
+
+        self.advance_real_time(2)
+
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', name='attract_music_sound_changed'),
+                                                     call('trigger', sound_instance=ANY,
+                                                          name='hippie_ahead_played'),
+                                                     call('trigger', sound_instance=ANY,
+                                                          name='dirty_grinding_beat_loop_stopped'),
+                                                     call('trigger', sound_instance=ANY,
+                                                          name='playlist_playlist_sound_stopped'),
+                                                     call('trigger', name='attract_music_sound_stopped')])
+
+        self.mc.bcp_processor.send.reset_mock()
+        self.mc.events.post('stop_playlist')
+        self.advance_real_time(3)
+
+        self.mc.bcp_processor.send.assert_has_calls([call('trigger', sound_instance=ANY,
+                                                          name='hippie_ahead_stopped'),
+                                                     call('trigger', sound_instance=ANY,
+                                                          name='playlist_playlist_sound_stopped'),
+                                                     call('trigger', name='attract_music_sound_stopped'),
+                                                     call('trigger', name='attract_music_stopped')])
+
+        status = track_playlist.get_status()
+        self.assertEqual("idle", status[0]['status'])
+        self.assertEqual("idle", status[1]['status'])

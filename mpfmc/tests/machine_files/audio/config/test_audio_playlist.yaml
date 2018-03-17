@@ -38,7 +38,7 @@ sounds:
 
 playlists:
   attract_music:
-    sounds: drumbeat_7, hippie_ahead, rainbow_disco_bears, dirty_grinding_beat_loop
+    sounds: drumbeat_7, rainbow_disco_bears, dirty_grinding_beat_loop, hippie_ahead
     shuffle: False
     repeat: False
     events_when_played: attract_music_played
@@ -56,3 +56,7 @@ playlist_player:
   advance_playlist:
     playlist:
       action: advance
+
+  stop_playlist:
+    playlist:
+      action: stop
