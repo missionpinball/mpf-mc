@@ -33,3 +33,6 @@ assets:
         loops:
             load: preload
             track: sfx
+        playlist:
+            load: on_demand
+            track: sfx

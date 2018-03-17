@@ -39,7 +39,7 @@ CYTHON_UNSUPPORTED = (
 
 PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
                              'mp4', 'm4v', 'so', 'pyd', 'dylib', 'wav', 'ogg',
-                             'pxd', 'pyx', 'c', 'h', 'ttf', 'fnt')
+                             'pxd', 'pyx', 'c', 'h', 'ttf', 'fnt', 'txt')
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
@@ -499,6 +499,7 @@ sources = {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/audio_interface.pyx': {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
+    'core/audio/playlist_controller.pyx': {},
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
 }
 
@@ -658,6 +659,7 @@ setup(
     [mpf.config_player]
     sound_player=mpfmc.config_players.plugins.sound_player:register_with_mpf
     sound_loop_player=mpfmc.config_players.plugins.sound_loop_player:register_with_mpf
+    playlist_player=mpfmc.config_players.plugins.playlist_player:register_with_mpf
     widget_player=mpfmc.config_players.plugins.widget_player:register_with_mpf
     slide_player=mpfmc.config_players.plugins.slide_player:register_with_mpf
     track_player=mpfmc.config_players.plugins.track_player:register_with_mpf

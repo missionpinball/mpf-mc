@@ -22,6 +22,7 @@ from mpfmc.core.audio.track_standard cimport *
 from mpfmc.core.audio.track_sound_loop cimport *
 from mpfmc.core.audio.sound_file cimport *
 from mpfmc.core.audio.audio_exception import AudioException
+from mpfmc.core.audio.playlist_controller import PlaylistController
 
 
 # ---------------------------------------------------------------------------
@@ -68,6 +69,7 @@ cdef class AudioInterface:
     libraries.
     """
     cdef list tracks
+    cdef dict playlist_controllers
     cdef object mc
     cdef object log
 
@@ -171,6 +173,7 @@ cdef class AudioInterface:
         SDL_UnlockAudio()
 
         self.tracks = list()
+        self.playlist_controllers = dict()
 
     def __del__(self):
         """Shut down the audio interface and clean up allocated memory"""
@@ -588,6 +591,83 @@ cdef class AudioInterface:
         self.log.debug("The '%s' live loop track has successfully been created.", name)
 
         return new_track
+
+    def create_playlist_track(self, object mc, str name not None, float crossfade_time=0.0, float volume=1.0):
+        """
+        Creates a new playlist track in the audio interface
+        Args:
+            mc: The media controller app
+            name: The name of the new track
+            crossfade_time: The default crossfade time (secs) to use when fading between sounds
+            volume: The track volume (0.0 to 1.0)
+
+        Returns:
+            A Track object for the newly created track
+
+        Notes:
+            There is no specialized playlist track type.  This function creates a standard
+            audio track AND a corresponding playlist controller that will be used to manage
+            all sound actions on the track.
+        """
+        cdef int track_num = len(self.tracks)
+        if track_num == MAX_TRACKS:
+            self.log.error("Add track failed - the maximum number of tracks "
+                           "(%d) has been reached.", MAX_TRACKS)
+            return None
+
+        # Make sure track name does not already exist (no duplicates allowed)
+        name = name.lower()
+        for track in self.tracks:
+            if name == track.name:
+                self.log.error("Add track failed - the track name '%s' already exists.", name)
+                return None
+
+        # Make sure audio callback function cannot be called while we are changing the track data
+        SDL_LockAudio()
+
+        # Create the new standard track
+        new_track = TrackStandard(mc,
+                                  pycapsule.PyCapsule_New(&self.audio_callback_data, NULL, NULL),
+                                  name,
+                                  track_num,
+                                  self.audio_callback_data.buffer_size,
+                                  2,
+                                  volume)
+        self.tracks.append(new_track)
+
+        # Update audio callback data with new track
+        self.audio_callback_data.track_count = len(self.tracks)
+        self.audio_callback_data.tracks[track_num] = new_track.state
+
+        # Allow audio callback function to be called again
+        SDL_UnlockAudio()
+
+        # Create playlist controller for the track
+        playlist_controller = PlaylistController(mc, new_track, crossfade_time)
+        self.playlist_controllers[name] = playlist_controller
+
+        self.log.debug("The '%s' playlist track and controller have successfully been created.", name)
+
+        return new_track
+
+    def get_playlist_controller_count(self):
+        """Returns the number of playlist controllers that have been created."""
+        return len(self.playlist_controllers)
+
+    def get_playlist_controller_names(self):
+        """Return the list of names of the playlist controllers that have been created."""
+        return [controller for controller in self.playlist_controllers.keys()]
+
+    def get_playlist_controller(self, str controller_name):
+        """
+        Returns the playlist controller with the specified name.
+        Args:
+            controller_name: The playlist controller name to retrieve
+        """
+        try:
+            return self.playlist_controllers[controller_name]
+        except KeyError:
+            return None
 
     def load_sound_file_to_memory(self, str file_name):
         """

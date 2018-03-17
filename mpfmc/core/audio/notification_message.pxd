@@ -11,7 +11,7 @@ cdef enum NotificationMessage:
     notification_sound_started = 1            # Notification that a sound has started playing
     notification_sound_stopped = 2            # Notification that a sound has stopped
     notification_sound_looping = 3            # Notification that a sound is looping back to the beginning
-    notification_sound_marker = 4             # Notification that a sound marker has been reached
+    notification_sound_marker = 4             # Notification that a sound marker has been reached during playback
     notification_sound_about_to_finish = 5    # Notification that a sound is about to finish playing
     notification_player_idle = 10             # Notification that a player is now idle and ready to play another sound
     notification_track_stopped = 0            # Notification that the track has stopped
@@ -105,6 +105,25 @@ cdef inline void send_sound_looping_notification(int player, Uint64 sound_id, Ui
     cdef NotificationMessageContainer *notification_message = _create_notification_message()
     if notification_message != NULL:
         notification_message.message = notification_sound_looping
+        notification_message.player = player
+        notification_message.sound_id = sound_id
+        notification_message.sound_instance_id = sound_instance_id
+
+        track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+
+cdef inline void send_sound_about_to_finish_notification(int player, long sound_id, long sound_instance_id,
+                                                         TrackState *track) nogil:
+    """
+    Sends a sound about to finish notification
+    Args:
+        player: The sound player number on which the event occurred
+        sound_id: The sound id
+        sound_instance_id: The sound instance id
+        track: The TrackState pointer
+    """
+    cdef NotificationMessageContainer *notification_message = _create_notification_message()
+    if notification_message != NULL:
+        notification_message.message = notification_sound_about_to_finish
         notification_message.player = player
         notification_message.sound_id = sound_id
         notification_message.sound_instance_id = sound_instance_id

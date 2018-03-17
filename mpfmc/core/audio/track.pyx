@@ -228,7 +228,7 @@ cdef class Track:
             # Trigger any events
             if self.events_when_played is not None:
                 for event in self.events_when_played:
-                    self.mc.post_mc_native_event(event)
+                    self.mc.post_mc_native_event(event, track=self._name)
         else:
             self.log.warning("play - Action may only be used when a track is stopped or is in the process "
                              "of stopping; action will be ignored.")

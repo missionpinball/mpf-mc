@@ -212,11 +212,16 @@ Here are several various examples:
             del validated_dict[device]['fade_in']
         if validated_dict[device]['fade_out'] is None:
             del validated_dict[device]['fade_out']
+        if validated_dict[device]['about_to_finish_time'] == -1:
+            del validated_dict[device]['about_to_finish_time']
         if validated_dict[device]['max_queue_time'] == -1:
             del validated_dict[device]['max_queue_time']
         if len(validated_dict[device]['events_when_played']) == 1 and \
                         validated_dict[device]['events_when_played'][0] == 'use_sound_setting':
             del validated_dict[device]['events_when_played']
+        if len(validated_dict[device]['events_when_about_to_finish']) == 1 and \
+                        validated_dict[device]['events_when_about_to_finish'][0] == 'use_sound_setting':
+            del validated_dict[device]['events_when_about_to_finish']
         if len(validated_dict[device]['events_when_stopped']) == 1 and \
                         validated_dict[device]['events_when_stopped'][0] == 'use_sound_setting':
             del validated_dict[device]['events_when_stopped']

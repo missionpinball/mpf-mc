@@ -9,6 +9,9 @@ from mpfmc.core.audio.notification_message cimport *
 #    Standard Track types
 # ---------------------------------------------------------------------------
 
+cdef enum:
+    no_marker = 0xFFFFFFFF
+
 ctypedef struct TrackStandardState:
     # State variables for TrackStandard tracks
     int sound_player_count
@@ -61,7 +64,7 @@ ctypedef struct SoundSettings:
     Uint32 fade_steps_remaining
     Uint8 marker_count
     GArray *markers
-    Uint32 almost_finished_marker
+    Uint32 about_to_finish_marker
     bint sound_has_ducking
     DuckingSettings ducking_settings
     DuckingStage ducking_stage

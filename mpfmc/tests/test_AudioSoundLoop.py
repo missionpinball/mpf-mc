@@ -1,7 +1,7 @@
 import logging
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
 try:
     from mpfmc.core.audio import SoundSystem
