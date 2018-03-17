@@ -99,7 +99,7 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].current.sound_instance_id = 0
             self.type_state.sound_players[i].current.sound_priority = 0
             self.type_state.sound_players[i].current.fading_status = fading_status_not_fading
-            self.type_state.sound_players[i].current.almost_finished_marker = 0
+            self.type_state.sound_players[i].current.about_to_finish_marker = no_marker
             self.type_state.sound_players[i].current.sound_has_ducking = False
             self.type_state.sound_players[i].current.ducking_stage = ducking_stage_idle
             self.type_state.sound_players[i].current.ducking_control_points = g_array_sized_new(False, False, sizeof(guint8), CONTROL_POINTS_PER_BUFFER)
@@ -114,7 +114,7 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].next.sound_instance_id = 0
             self.type_state.sound_players[i].next.sound_priority = 0
             self.type_state.sound_players[i].next.fading_status = fading_status_not_fading
-            self.type_state.sound_players[i].next.almost_finished_marker = 0
+            self.type_state.sound_players[i].next.about_to_finish_marker = no_marker
             self.type_state.sound_players[i].next.sound_has_ducking = False
             self.type_state.sound_players[i].next.ducking_stage = ducking_stage_idle
             self.type_state.sound_players[i].next.ducking_control_points = g_array_sized_new(False, False, sizeof(guint8), CONTROL_POINTS_PER_BUFFER)
@@ -241,13 +241,13 @@ cdef class TrackStandard(Track):
                 # Trigger any events
                 if self.events_when_stopped is not None:
                     for event in self.events_when_stopped:
-                        self.mc.post_mc_native_event(event)
+                        self.mc.post_mc_native_event(event, track=self._name)
 
             elif notification_message.message == notification_track_paused:
                 # Trigger any events
                 if self.events_when_paused is not None:
                     for event in self.events_when_paused:
-                        self.mc.post_mc_native_event(event)
+                        self.mc.post_mc_native_event(event, track=self._name)
                 pass
 
             SDL_UnlockAudio()
@@ -279,6 +279,11 @@ cdef class TrackStandard(Track):
             sound_instance = self._playing_instances_by_id[notification_message.sound_instance_id]
             if sound_instance is not None:
                 sound_instance.set_looping()
+
+        elif notification_message.message == notification_sound_about_to_finish:
+            sound_instance = self._playing_instances_by_id[notification_message.sound_instance_id]
+            if sound_instance is not None:
+                sound_instance.set_about_to_finish()
 
         elif notification_message.message == notification_sound_marker:
             sound_instance = self._playing_instances_by_id[notification_message.sound_instance_id]
@@ -398,7 +403,7 @@ cdef class TrackStandard(Track):
 
         self._sound_queue.clear()
 
-    cdef int _get_playing_sound_count(self, int sound_id):
+    cdef int _get_playing_sound_count(self, Uint64 sound_id):
         """Return the number of currently playing instances of the given sound id"""
         cdef int count = 0
         SDL_LockAudio()
@@ -411,10 +416,10 @@ cdef class TrackStandard(Track):
         SDL_UnlockAudio()
         return count
 
-    cdef list _get_playing_sound_instances(self, int sound_id):
+    cdef list _get_playing_sound_instances(self, Uint64 sound_id):
         """Return the list of currently playing instances of the given sound id"""
         cdef list instances = list()
-        cdef int instance_id
+        cdef Uint64 instance_id
 
         SDL_LockAudio()
         
@@ -433,7 +438,7 @@ cdef class TrackStandard(Track):
         SDL_UnlockAudio()
         return instances
 
-    def _get_oldest_playing_sound_instance(self, int sound_id):
+    def _get_oldest_playing_sound_instance(self, Uint64 sound_id):
         """Return the oldest sound instance currently playing"""
         cdef list playing_instances = self._get_playing_sound_instances(sound_id)
         
@@ -447,7 +452,7 @@ cdef class TrackStandard(Track):
 
         return oldest_instance
 
-    def _get_newest_playing_sound_instance(self, int sound_id):
+    def _get_newest_playing_sound_instance(self, Uint64 sound_id):
         """Return the newest sound instance currently playing"""
         cdef list playing_instances = self._get_playing_sound_instances(sound_id)
         
@@ -924,7 +929,7 @@ cdef class TrackStandard(Track):
                 # The player is currently busy playing another sound, force it to be replaced with the sound instance
                 self._set_player_replacing(cython.address(self.type_state.sound_players[player]), sound_instance)
 
-            self.log.debug("Sound %s is set to begin playback on playlist track (loops=%d)",
+            self.log.debug("Sound %s is set to begin playback on standard track (loops=%d)",
                            sound_instance.name, sound_instance.loops)
 
             SDL_UnlockAudio()
@@ -973,6 +978,14 @@ cdef class TrackStandard(Track):
                                     index,
                                     <guint>(sound_instance.markers[index]['time'] * self.state.callback_data.seconds_to_bytes_factor))
 
+        # Set almost finished marker (calculate based on the end of the sound)
+        if sound_instance.about_to_finish_time is None:
+            sound_settings.about_to_finish_marker = no_marker
+        elif sound_instance.about_to_finish_time > sound_container.duration:
+            sound_settings.about_to_finish_marker = 0
+        else:
+            sound_settings.about_to_finish_marker = (sound_container.duration - sound_instance.about_to_finish_time) * self.state.callback_data.seconds_to_bytes_factor
+
         # If the sound has ducking settings, apply them
         if sound_instance.ducking is not None and sound_instance.ducking.track_bit_mask != 0:
             # To convert between the number of seconds and a buffer position (bytes), we need to
@@ -989,7 +1002,14 @@ cdef class TrackStandard(Track):
             # Release point is relative to the end of the sound
             sound_settings.ducking_settings.release_start_pos = (sound_container.duration - sound_instance.ducking.release_point) * self.state.callback_data.seconds_to_bytes_factor
         else:
+            # Sound does not have ducking, assign settings appropriately
             sound_settings.sound_has_ducking = False
+            sound_settings.ducking_stage = ducking_stage_idle
+            sound_settings.ducking_settings.track_bit_mask = 0
+            sound_settings.ducking_settings.attack_start_pos = 0
+            sound_settings.ducking_settings.attack_duration = 0
+            sound_settings.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME
+            sound_settings.ducking_settings.release_duration = 0
 
         # Special handling is needed to start streaming for the specified sound at the correct location
         if sound_container.sample.type == sound_type_streaming:
@@ -1366,6 +1386,24 @@ cdef class TrackStandard(Track):
                 # Process markers (do any markers fall in the current chunk?)
                 # Note: the current sample position has already been incremented when the sample data was received so
                 # we need to look backwards from the current position to determine if marker falls in chunk window.
+                
+                # About to finish marker
+                if player.current.about_to_finish_marker != no_marker:
+                    if player.current.sample_pos - current_chunk_bytes <= player.current.about_to_finish_marker < player.current.sample_pos:
+                        # Marker is in window, send notification
+                        send_sound_about_to_finish_notification(player_num,
+                                                                player.current.sound_id,
+                                                                player.current.sound_instance_id,
+                                                                track)
+                    # Special check if buffer wraps back around to the beginning of the sample
+                    if not end_of_sound and player.current.sample_pos - current_chunk_bytes < 0 and player.current.about_to_finish_marker < player.current.sample_pos:
+                        # Marker is in window, send notification
+                        send_sound_about_to_finish_notification(player_num,
+                                                                player.current.sound_id,
+                                                                player.current.sound_instance_id,
+                                                                track)
+                
+                # User-defined markers
                 for marker_id in range(player.current.marker_count):
                     if player.current.sample_pos - current_chunk_bytes <= g_array_index_uint(player.current.markers, marker_id) < player.current.sample_pos:
                         # Marker is in window, send notification
@@ -1406,6 +1444,7 @@ cdef class TrackStandard(Track):
                         player.current.fade_out_steps = player.next.fade_out_steps
                         player.current.fade_steps_remaining = player.next.fade_steps_remaining
                         player.current.fading_status = player.next.fading_status
+                        player.current.about_to_finish_marker = player.next.about_to_finish_marker
 
                         player.current.marker_count = player.next.marker_count
                         g_array_set_size(player.current.markers, player.current.marker_count)

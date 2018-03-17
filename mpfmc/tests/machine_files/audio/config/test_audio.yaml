@@ -20,6 +20,7 @@ sound_system:
       simultaneous_sounds: 1
       preload: yes
 
+
 modes:
  - mode1
  - mode2
@@ -40,6 +41,9 @@ assets:
         loops:
             load: preload
             track: sfx
+        playlist:
+            load: on_demand
+            track: sfx
 
 sounds:
     264828_text:
@@ -53,7 +57,9 @@ sounds:
         streaming: False
         events_when_played: moron_test_played
         events_when_stopped: moron_test_stopped
+        events_when_about_to_finish: moron_test_about_to_finish
         volume: 0.6
+        about_to_finish_time: 2s
         ducking:
             target: music
             delay: 0

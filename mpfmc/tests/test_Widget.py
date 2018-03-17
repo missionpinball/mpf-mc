@@ -34,7 +34,7 @@ class TestWidget(MpfMcTestCase):
         self.assertEqual(widget.anchor_offset_pos, (-5, -5))
 
         # test anchors
-        
+
         # bottom left
         config = {"anchor_x": "left", "anchor_y": "bottom",
                   "width": 10, "height": 10, "type": "rectangle"}
@@ -1089,7 +1089,7 @@ class TestWidget(MpfMcTestCase):
 
     def test_animation_properties_from_widget_player(self):
         """Test multiple widget types with animations."""
-        
+
         self.mc.events.post('show_text_widget')
         self.mc.events.post('show_bezier_widget')
         self.mc.events.post('show_rectangle_widget')
@@ -1129,25 +1129,20 @@ class TestWidget(MpfMcTestCase):
         self.assertEqual(ellipse_widget.rotation, 360)
         self.assertEqual(ellipse_widget.pos, [500, 400])
 
-        ellipse_widget2 = self.mc.targets['default'].current_slide.widgets[5].widget
-        self.assertIsInstance(ellipse_widget2, Ellipse)
-        self.assertEqual(ellipse_widget2.rotation, 360)
-        self.assertEqual(ellipse_widget2.pos, [500, 400])
-
-        quad_widget = self.mc.targets['default'].current_slide.widgets[6].widget
+        quad_widget = self.mc.targets['default'].current_slide.widgets[5].widget
         self.assertIsInstance(quad_widget, Quad)
         self.assertEqual(quad_widget.rotation, 0)
         self.assertEqual(quad_widget.scale, 1)
         self.assertEqual(quad_widget.points, [300, 100, 350, 200, 500, 150, 450, 50])
 
-        points_widget = self.mc.targets['default'].current_slide.widgets[7].widget
+        points_widget = self.mc.targets['default'].current_slide.widgets[6].widget
         self.assertIsInstance(points_widget, Point)
         self.assertEqual(points_widget.rotation, 900)
         self.assertEqual(points_widget.scale, 1.5)
         self.assertEqual(points_widget.points, [100, 450, 100, 550, 200, 450])
         self.assertEqual(points_widget.pointsize, 8)
 
-        triangle_widget = self.mc.targets['default'].current_slide.widgets[8].widget
+        triangle_widget = self.mc.targets['default'].current_slide.widgets[7].widget
         self.assertIsInstance(triangle_widget, Triangle)
         self.assertEqual(triangle_widget.rotation, -900)
         self.assertEqual(triangle_widget.scale, 1.5)

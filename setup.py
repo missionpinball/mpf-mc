@@ -1,5 +1,8 @@
-"""Mission Pinball Framework Media Controller (mpf-mc) setup.py."""
+"""Mission Pinball Framework Media Controller (mpf-mc) setup.py.
 
+Notes:
+    This setup script is a modified/customized version of the Kivy setup.py script.
+"""
 
 import sys
 import re
@@ -12,25 +15,31 @@ from distutils.version import LooseVersion
 from distutils.sysconfig import get_python_inc
 from collections import OrderedDict
 from time import sleep
+
 from setuptools import setup, Extension
+print('Using setuptools')
 
 
+# fix error with py3's LooseVersion comparisons
 def ver_equal(self, other):
-    """Fix error with py3's LooseVersion comparisons."""
     return self.version == other
+
 
 LooseVersion.__eq__ = ver_equal
 
 
 MIN_CYTHON_STRING = '0.23'
 MIN_CYTHON_VERSION = LooseVersion(MIN_CYTHON_STRING)
-MAX_CYTHON_STRING = '0.24.1'
+MAX_CYTHON_STRING = '0.27.3'
 MAX_CYTHON_VERSION = LooseVersion(MAX_CYTHON_STRING)
-CYTHON_UNSUPPORTED = ()
+CYTHON_UNSUPPORTED = (
+    # ref https://github.com/cython/cython/issues/1968
+    '0.27', '0.27.2'
+)
 
 PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
                              'mp4', 'm4v', 'so', 'pyd', 'dylib', 'wav', 'ogg',
-                             'pxd', 'pyx', 'c', 'h', 'ttf', 'fnt')
+                             'pxd', 'pyx', 'c', 'h', 'ttf', 'fnt', 'txt')
 
 on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
@@ -82,6 +91,13 @@ if sys.platform == 'darwin':
     else:
         osx_arch = 'i386'
 
+# Detect Python for android project (http://github.com/kivy/python-for-android)
+ndkplatform = environ.get('NDKPLATFORM')
+if ndkplatform is not None and environ.get('LIBLINK'):
+    platform = 'android'
+kivy_ios_root = environ.get('KIVYIOSROOT', None)
+if kivy_ios_root is not None:
+    platform = 'ios'
 if exists('/opt/vc/include/bcm_host.h'):
     platform = 'rpi'
 if exists('/usr/lib/arm-linux-gnueabihf/libMali.so'):
@@ -93,6 +109,9 @@ if exists('/usr/lib/arm-linux-gnueabihf/libMali.so'):
 c_options = OrderedDict()
 c_options['use_rpi'] = platform == 'rpi'
 c_options['use_mali'] = platform == 'mali'
+c_options['use_sdl2'] = True
+c_options['use_gstreamer'] = True
+c_options['use_avfoundation'] = platform == 'darwin'
 c_options['use_osx_frameworks'] = platform == 'darwin'
 
 # now check if environ is changing the default values
@@ -103,10 +122,11 @@ for key in list(c_options.keys()):
         print('Environ change {0} -> {1}'.format(key, value))
         c_options[key] = value
 
+
 # -----------------------------------------------------------------------------
 # Cython check
+# Cython usage is optional (.c files are included to build without Cython)
 #
-
 cython_unsupported_append = '''
 
   Please note that the following versions of Cython are not supported
@@ -114,7 +134,7 @@ cython_unsupported_append = '''
 '''.format(', '.join(map(str, CYTHON_UNSUPPORTED)))
 
 cython_min = '''\
-  This version of Cython is not compatible with Kivy. Please upgrade to
+  This version of Cython is not compatible with MPF-MC. Please upgrade to
   at least version {0}, preferably the newest supported version {1}.
 
   If your platform provides a Cython package, make sure you have upgraded
@@ -126,7 +146,7 @@ cython_min = '''\
            cython_unsupported_append if CYTHON_UNSUPPORTED else '')
 
 cython_max = '''\
-  This version of Cython is untested with Kivy. While this version may
+  This version of Cython is untested with MPF-MC. While this version may
   work perfectly fine, it is possible that you may experience issues. If
   you do have issues, please downgrade to a supported version. It is
   best to use the newest supported version, {1}, but the minimum
@@ -154,11 +174,10 @@ cython_unsupported = '''\
            cython_unsupported_append)
 
 have_cython = False
-skip_cython = False
+skip_cython = not (environ.get('USE_CYTHON', False) in ['1', 'True', 'TRUE', 'true', 'Yes', 'YES', 'y', 'Y'])
 
-if platform in ('ios', 'android') or on_rtd:
-    print('\nCython check avoided.')
-    skip_cython = True
+if skip_cython:
+    print("\nSkipping Cython build (using .c files)")
 else:
     try:
         # check for cython
@@ -178,16 +197,43 @@ else:
             print(cython_max)
             sleep(1)
     except ImportError:
-        print("\nCython is missing, it's required for compiling Kivy!\n\n")
+        print("\nCython is missing and the USE_CYTHON environment variable is set to True!\n\n")
         raise
 
 if not have_cython:
     from distutils.command.build_ext import build_ext
 
+# -----------------------------------------------------------------------------
+# Setup classes
+
+# the build path where kivy is being compiled
+src_path = build_path = dirname(__file__)
+
+
+class CustomBuildExt(build_ext):
+
+    def finalize_options(self):
+        retval = build_ext.finalize_options(self)
+        global build_path
+        if (self.build_lib is not None and exists(self.build_lib) and
+                not self.inplace):
+            build_path = self.build_lib
+        return retval
+
+    def build_extensions(self):
+        c = self.compiler.compiler_type
+        print('Detected compiler is {}'.format(c))
+        if c != 'msvc':
+            for e in self.extensions:
+                e.extra_link_args += ['-lm']
+
+        build_ext.build_extensions(self)
+
 
 def _check_and_fix_sdl2_mixer(f_path):
     print("Check if SDL2_mixer smpeg2 have an @executable_path")
-    rpath_from = "@executable_path/../Frameworks/SDL2.framework/Versions/A/SDL2"
+    rpath_from = ("@executable_path/../Frameworks/SDL2.framework"
+                  "/Versions/A/SDL2")
     rpath_to = "@rpath/../../../../SDL2.framework/Versions/A/SDL2"
     smpeg2_path = ("{}/Versions/A/Frameworks/smpeg2.framework"
                    "/Versions/A/smpeg2").format(f_path)
@@ -212,12 +258,7 @@ def _check_and_fix_sdl2_mixer(f_path):
     else:
         print("WARNING: Unable to apply the changes, sorry.")
 
-
-# -----------------------------------------------------------------------------
-# Setup classes
-
-# the build path where mpfmc is being compiled
-src_path = build_path = dirname(__file__)
+gst_flags = {}
 
 if platform == 'darwin':
     if c_options['use_osx_frameworks']:
@@ -228,64 +269,81 @@ if platform == 'darwin':
             environ["ARCHFLAGS"] = environ.get("ARCHFLAGS", "-arch x86_64")
             print("OSX ARCHFLAGS are: {}".format(environ["ARCHFLAGS"]))
 
-gst_flags = {}
+# detect gstreamer, only on desktop
+# works if we forced the options or in autodetection
+if c_options['use_gstreamer'] in (None, True):
+    gstreamer_valid = False
+    if c_options['use_osx_frameworks'] and platform == 'darwin':
+        # check the existence of frameworks
+        f_path = '/Library/Frameworks/GStreamer.framework'
+        if not exists(f_path):
+            c_options['use_gstreamer'] = False
+            print('GStreamer framework not found, fallback on pkg-config')
+        else:
+            print('GStreamer framework found')
+            gstreamer_valid = True
+            c_options['use_gstreamer'] = True
+            gst_flags = {
+                'extra_link_args': [
+                    '-F/Library/Frameworks',
+                    '-Xlinker', '-rpath',
+                    '-Xlinker', '/Library/Frameworks',
+                    '-Xlinker', '-headerpad',
+                    '-Xlinker', '190',
+                    '-framework', 'GStreamer'],
+                'include_dirs': [join(f_path, 'Headers')]}
 
-if platform == 'darwin':
-    # check the existence of frameworks
-    f_path = '/Library/Frameworks/GStreamer.framework'
-    if not exists(f_path):
-        raise EnvironmentError('Missing GStreamer framework {}'.format(f_path))
+    if not gstreamer_valid:
+        # use pkg-config approach instead
+        gst_flags = pkgconfig('gstreamer-1.0')
+        if 'libraries' in gst_flags:
+            print('GStreamer found via pkg-config')
+            c_options['use_gstreamer'] = True
 
-    else:
-        gst_flags = {
+
+# detect SDL2
+# works if we forced the options or in autodetection
+sdl2_flags = {}
+if c_options['use_sdl2'] in (None, True):
+    sdl2_valid = False
+    if c_options['use_osx_frameworks'] and platform == 'darwin':
+        # check the existence of frameworks
+        sdl2_valid = True
+        sdl2_flags = {
             'extra_link_args': [
                 '-F/Library/Frameworks',
                 '-Xlinker', '-rpath',
                 '-Xlinker', '/Library/Frameworks',
                 '-Xlinker', '-headerpad',
-                '-Xlinker', '190',
-                '-framework', 'GStreamer'],
-            'include_dirs': [join(f_path, 'Headers')]}
+                '-Xlinker', '190'],
+            'include_dirs': [],
+            'extra_compile_args': ['-F/Library/Frameworks']
+        }
+        for name in ('SDL2', 'SDL2_image', 'SDL2_mixer'):
+            f_path = '/Library/Frameworks/{}.framework'.format(name)
+            if not exists(f_path):
+                print('Missing framework {}'.format(f_path))
+                sdl2_valid = False
+                continue
+            sdl2_flags['extra_link_args'] += ['-framework', name]
+            sdl2_flags['include_dirs'] += [join(f_path, 'Headers')]
+            print('Found sdl2 frameworks: {}'.format(f_path))
+            if name == 'SDL2_mixer':
+                _check_and_fix_sdl2_mixer(f_path)
 
-else:
-    # use pkg-config approach instead
-    gst_flags = pkgconfig('gstreamer-1.0')
+        if not sdl2_valid:
+            c_options['use_sdl2'] = False
+            print('SDL2 frameworks not found, fallback on pkg-config')
+        else:
+            c_options['use_sdl2'] = True
+            print('Activate SDL2 compilation')
 
-# detect SDL2
-sdl2_flags = {}
-
-if platform == 'darwin':
-    # check the existence of frameworks
-    sdl2_valid = True
-    sdl2_flags = {
-        'extra_link_args': [
-            '-F/Library/Frameworks',
-            '-Xlinker', '-rpath',
-            '-Xlinker', '/Library/Frameworks',
-            '-Xlinker', '-headerpad',
-            '-Xlinker', '190'],
-        'include_dirs': [],
-        'extra_compile_args': ['-F/Library/Frameworks']
-    }
-    for name in ('SDL2', 'SDL2_mixer', 'SDL2_image'):
-        f_path = '/Library/Frameworks/{}.framework'.format(name)
-        if not exists(f_path):
-            print('Missing framework {}'.format(f_path))
-            sdl2_valid = False
-            continue
-
-        sdl2_flags['extra_link_args'] += ['-framework', name]
-        sdl2_flags['include_dirs'] += [join(f_path, 'Headers')]
-        print('Found sdl2 frameworks: {}'.format(f_path))
-        if name == 'SDL2_mixer':
-            _check_and_fix_sdl2_mixer(f_path)
-
-    if not sdl2_valid:
-        raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
-
-else:
-    # use pkg-config approach instead
-    sdl2_flags = pkgconfig('sdl2', 'SDL2_mixer', 'SDL2_image')
+    if not sdl2_valid and platform != "ios":
+        # use pkg-config approach instead
+        sdl2_flags = pkgconfig('sdl2', 'SDL2_image', 'SDL2_mixer')
+        if 'libraries' in sdl2_flags:
+            print('SDL2 found via pkg-config')
+            c_options['use_sdl2'] = True
 
 
 # -----------------------------------------------------------------------------
@@ -336,14 +394,14 @@ def merge(d1, *args):
 def determine_base_flags():
     flags = {
         'libraries': [],
-        'include_dirs': [],
+        'include_dirs': [join(src_path, 'kivy', 'include')],
         'library_dirs': [],
         'extra_link_args': [],
         'extra_compile_args': []}
     if platform.startswith('freebsd'):
         flags['include_dirs'] += [join(
             environ.get('LOCALBASE', '/usr/local'), 'include')]
-        flags['extra_link_args'] += ['-L', join(
+        flags['library_dirs'] += [join(
             environ.get('LOCALBASE', '/usr/local'), 'lib')]
     elif platform == 'darwin':
         v = os.uname()
@@ -354,12 +412,12 @@ def determine_base_flags():
             xcode_dev = getoutput('xcode-select -p').splitlines()[0]
             sdk_mac_ver = '.'.join(_platform.mac_ver()[0].split('.')[:2])
             print('Xcode detected at {}, and using OS X{} sdk'.format(
-                    xcode_dev, sdk_mac_ver))
+                xcode_dev, sdk_mac_ver))
             sysroot = join(
-                    xcode_dev.decode('utf-8'),
-                    'Platforms/MacOSX.platform/Developer/SDKs',
-                    'MacOSX{}.sdk'.format(sdk_mac_ver),
-                    'System/Library/Frameworks')
+                xcode_dev.decode('utf-8'),
+                'Platforms/MacOSX.platform/Developer/SDKs',
+                'MacOSX{}.sdk'.format(sdk_mac_ver),
+                'System/Library/Frameworks')
         else:
             sysroot = ('/System/Library/Frameworks/'
                        'ApplicationServices.framework/Frameworks')
@@ -373,6 +431,8 @@ def determine_base_flags():
 
 def determine_sdl2():
     flags = {}
+    if not c_options['use_sdl2']:
+        return flags
 
     sdl2_path = environ.get('KIVY_SDL2_PATH', None)
 
@@ -381,7 +441,7 @@ def determine_sdl2():
 
     # no pkgconfig info, or we want to use a specific sdl2 path, so perform
     # manual configuration
-    flags['libraries'] = ['SDL2', 'SDL2_mixer', 'SDL2_image']
+    flags['libraries'] = ['SDL2', 'SDL2_ttf', 'SDL2_image', 'SDL2_mixer']
     split_chr = ';' if platform == 'win32' else ':'
     sdl2_paths = sdl2_path.split(split_chr) if sdl2_path else []
 
@@ -401,8 +461,8 @@ def determine_sdl2():
     if sdl2_flags:
         flags = merge(flags, sdl2_flags)
 
-    # ensure headers for all the SDL2 library is available
-    libs_to_check = ['SDL', 'SDL_mixer', 'SDL_image']
+    # ensure headers for all the SDL2 and sub libraries are available
+    libs_to_check = ['SDL', 'SDL_mixer', 'SDL_ttf', 'SDL_image']
     can_compile = True
     for lib in libs_to_check:
         found = False
@@ -414,17 +474,17 @@ def determine_sdl2():
                 break
 
         if not found:
-            print('SDL2: missing library {}'.format(lib))
+            print('SDL2: missing sub library {}'.format(lib))
             can_compile = False
 
     if not can_compile:
-        raise EnvironmentError('Cannot perform mpfmc compilation due to missing SDL2 framework')
+        c_options['use_sdl2'] = False
+        return {}
 
     return flags
 
 
 base_flags = determine_base_flags()
-gl_flags = {}
 
 # -----------------------------------------------------------------------------
 # sources to compile
@@ -439,15 +499,14 @@ sources = {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/audio_interface.pyx': {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
+    'core/audio/playlist_controller.pyx': {},
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
 }
 
-
-if not on_rtd:
+if c_options["use_sdl2"] and not on_rtd:
     sdl2_flags = determine_sdl2()
 else:
     sdl2_flags = {}
-
 
 if sdl2_flags:
     for source_file, depends in sources.items():
@@ -460,7 +519,6 @@ if sdl2_flags:
 
 def get_extensions_from_sources(sources):
     ext_modules = []
-
     for pyx, flags in sources.items():
         pyx = expand(src_path, pyx)
         depends = [expand(src_path, x) for x in flags.pop('depends', [])]
@@ -477,6 +535,7 @@ def get_extensions_from_sources(sources):
         ext_modules.append(CythonExtension(
             module_name, [pyx] + f_depends + c_depends, **flags_clean))
     return ext_modules
+
 
 print(sources)
 
@@ -511,13 +570,13 @@ else:
     raise RuntimeError("Unable to find MPF version string in %s." % (
         version_file,))
 
-
 install_requires = ['ruamel.yaml>=0.10,<0.11',  # better YAML library
                     'mpf>={}'.format(mpf_version),
                     'kivy>=1.10.0',
                     'psutil',
                     'pygments',  # YAML syntax formatting for the iMC
-                    'pypiwin32==219;platform_system=="Windows"',
+                    'pypiwin32>=223;platform_system=="Windows" and python_version>"3.4"',
+                    'pypiwin32<=219;platform_system=="Windows" and python_version=="3.4"',
                     'kivy.deps.sdl2==0.1.17;platform_system=="Windows"',
                     'kivy.deps.sdl2_dev==0.1.17;platform_system=="Windows"',
                     'kivy.deps.glew==0.1.9;platform_system=="Windows"',
@@ -544,11 +603,16 @@ for root, subFolders, files in walk('mpfmc'):
         directory = dirname(filename)
         package_files['mpfmc'].append('/'.join(filename.split(os.sep)[1:]))
 
+
 # -----------------------------------------------------------------------------
 # setup !
 setup(
     name='mpf-mc',
     version=mc_version,
+    author='The Mission Pinball Framework Team',
+    author_email='brian@missionpinball.org',
+    url='http://missionpinball.org',
+    license='MIT',
     description='Mission Pinball Framework Media Controller',
     long_description='''Graphics, video, and audio engine for the
         Mission Pinball Framework.
@@ -568,17 +632,20 @@ setup(
         actively developing it and checking in several commits a week. It's
         MIT licensed, actively developed by fun people, and supported by a
         vibrant pinball-loving community.''',
-
-    url='http://missionpinball.org',
-    author='The Mission Pinball Framework Team',
-    author_email='brian@missionpinball.org',
-    license='MIT',
-
+    keywords='pinball',
+    ext_modules=ext_modules,
+    cmdclass={'build_ext': CustomBuildExt},
+    packages=['mpfmc',],
+    package_dir={'mpfmc': 'mpfmc'},
+    package_data=package_files,
+    zip_safe=False,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Natural Language :: English',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Microsoft :: Windows',
@@ -586,23 +653,13 @@ setup(
         'Topic :: Artistic Software',
         'Topic :: Games/Entertainment :: Arcade'
     ],
-
-    keywords='pinball',
-    ext_modules=ext_modules,
-
-    packages=['mpfmc',],
-    package_dir={'mpfmc': 'mpfmc'},
-    package_data=package_files,
-    zip_safe=False,
-
     install_requires=install_requires,
-
     tests_require=[],
-
-    entry_points="""
+    entry_points='''
     [mpf.config_player]
     sound_player=mpfmc.config_players.plugins.sound_player:register_with_mpf
     sound_loop_player=mpfmc.config_players.plugins.sound_loop_player:register_with_mpf
+    playlist_player=mpfmc.config_players.plugins.playlist_player:register_with_mpf
     widget_player=mpfmc.config_players.plugins.widget_player:register_with_mpf
     slide_player=mpfmc.config_players.plugins.slide_player:register_with_mpf
     track_player=mpfmc.config_players.plugins.track_player:register_with_mpf
@@ -611,5 +668,5 @@ setup(
     [mpf.command]
     mc=mpfmc.commands.mc:get_command
     imc=mpfmc.commands.imc:get_command
-    """,
+    ''',
     setup_requires=['cython>=' + MIN_CYTHON_STRING] if not skip_cython else [])

@@ -33,8 +33,8 @@ ctypedef union RequestMessageData:
 
 ctypedef struct RequestMessageContainer:
     RequestMessage message
-    long sound_id
-    long sound_instance_id
+    Uint64 sound_id
+    Uint64 sound_instance_id
     int player
     RequestMessageData data
 

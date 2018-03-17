@@ -1,7 +1,7 @@
 import logging
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock, ANY
 from mpfmc.widgets.video import VideoWidget
 
 try:
@@ -67,9 +67,11 @@ class TestAudioGStreamer(MpfMcTestCase):
         self.mc.events.post('play_sound_text')
         self.advance_real_time(0.35)
         self.mc.events.post('play_sound_text')
-        self.advance_real_time(4)
+        self.advance_real_time(6)
 
-        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_sound_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='text_sound_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='test_video_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='test_video_stopped')
 
     def test_retrigger_streamed_sound(self):
         """ Tests retriggering a streamed sound (play, stop, play) (using gstreamer) """

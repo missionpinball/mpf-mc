@@ -383,6 +383,20 @@ class MpfMc(App):
         self.start_time = time.time()
         self.ticks = 0
         self.clock.schedule_interval(self.tick, 0)
+        self.events.add_handler("debug_dump_stats", self._debug_dump_displays)
+
+    def _debug_dump_displays(self, **kwargs):
+        del kwargs
+        self.log.info("--- DEBUG DUMP STATS ---")
+        self.log.info("Active slides: %s (Count: %s). Displays: %s (Count: %s)", self.active_slides, len(self.active_slides), self.displays, len(self.displays))
+        for display in self.displays:
+            self.log.info("Listing children for display: %s", display)
+            children = 0
+            for child in display.walk():
+                self.log.info(child)
+                children += 1
+            self.log.info("Total children: %s", children)
+        self.log.info("--- DEBUG DUMP STATS END ---")
 
     def on_stop(self):
         self.log.info("Stopping...")

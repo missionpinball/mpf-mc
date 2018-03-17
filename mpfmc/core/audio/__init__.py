@@ -55,6 +55,8 @@ class SoundSystem(object):
         else:
             self.config = self.mc.machine_config['sound_system']
 
+        # TODO: Use config spec validator
+
         # Validate configuration and provide default values where needed
         if 'enabled' not in self.config:
             self.config['enabled'] = DEFAULT_AUDIO_ENABLED
@@ -214,8 +216,13 @@ class SoundSystem(object):
                                                                config['simultaneous_sounds'],
                                                                config['volume'])
         elif config['type'] == 'playlist':
-            # TODO: Implement playlist track create
-            raise NotImplementedError('Playlist track not yet implemented')
+            config.setdefault('crossfade_time', 0.0)
+            config['crossfade_time'] = Util.string_to_secs(config['crossfade_time'])
+
+            track = self.audio_interface.create_playlist_track(self.mc,
+                                                               name,
+                                                               config['crossfade_time'],
+                                                               config['volume'])
 
         elif config['type'] == 'sound_loop':
             if 'max_layers' not in config:
