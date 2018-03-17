@@ -1002,7 +1002,14 @@ cdef class TrackStandard(Track):
             # Release point is relative to the end of the sound
             sound_settings.ducking_settings.release_start_pos = (sound_container.duration - sound_instance.ducking.release_point) * self.state.callback_data.seconds_to_bytes_factor
         else:
+            # Sound does not have ducking, assign settings appropriately
             sound_settings.sound_has_ducking = False
+            sound_settings.ducking_stage = ducking_stage_idle
+            sound_settings.ducking_settings.track_bit_mask = 0
+            sound_settings.ducking_settings.attack_start_pos = 0
+            sound_settings.ducking_settings.attack_duration = 0
+            sound_settings.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME
+            sound_settings.ducking_settings.release_duration = 0
 
         # Special handling is needed to start streaming for the specified sound at the correct location
         if sound_container.sample.type == sound_type_streaming:
