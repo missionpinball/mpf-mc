@@ -218,6 +218,7 @@ class MpfMc(App):
     def _create_dmds(self, **kwargs):
         self.create_dmds()
         self.create_rgb_dmds()
+        self.events.remove_all_handlers_for_event("client_connected")
 
     def _load_font_paths(self):
         # Add local machine fonts path
@@ -315,6 +316,7 @@ class MpfMc(App):
 
         '''
         self.events.process_event_queue()
+        self.events.remove_all_handlers_for_event("displays_initialized")
         self._init()
 
     def create_dmds(self):
@@ -371,6 +373,11 @@ class MpfMc(App):
         # no events docstring as this event is also in mpf
         self.events.process_event_queue()
         self.clear_boot_hold('init')
+        self.events.remove_all_handlers_for_event("init_phase_1")
+        self.events.remove_all_handlers_for_event("init_phase_2")
+        self.events.remove_all_handlers_for_event("init_phase_3")
+        self.events.remove_all_handlers_for_event("init_phase_4")
+        self.events.remove_all_handlers_for_event("init_phase_5")
 
     def init_done(self):
         self.is_init_done.set()
@@ -387,7 +394,7 @@ class MpfMc(App):
 
     def _debug_dump_displays(self, **kwargs):
         del kwargs
-        self.log.info("--- DEBUG DUMP STATS ---")
+        self.log.info("--- DEBUG DUMP DISPLAYS ---")
         self.log.info("Active slides: %s (Count: %s). Displays: %s (Count: %s)", self.active_slides, len(self.active_slides), self.displays, len(self.displays))
         for display in self.displays:
             self.log.info("Listing children for display: %s", display)
@@ -396,7 +403,7 @@ class MpfMc(App):
                 self.log.info(child)
                 children += 1
             self.log.info("Total children: %s", children)
-        self.log.info("--- DEBUG DUMP STATS END ---")
+        self.log.info("--- DEBUG DUMP DISPLAYS END ---")
 
     def on_stop(self):
         self.log.info("Stopping...")
