@@ -37,4 +37,5 @@ pylint:
 
 ignore-paths:
   - docs
+  - build_scripts
   - _mpf                        # ignore mpf in subpath on travis
