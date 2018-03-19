@@ -171,11 +171,10 @@ class VideoWidget(Widget, Video):
             return
         self.state = 'stop'
 
-    def seek(self, percent, **kwargs) -> None:
-        del kwargs
+    def seek(self, percent, precise=True) -> None:
         if not self.video.loaded:
             return
-        super().seek(percent)
+        super().seek(percent, precise=precise)
 
     def set_volume(self, volume, **kwargs) -> None:
         del kwargs

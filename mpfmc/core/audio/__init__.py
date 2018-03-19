@@ -174,7 +174,7 @@ class SoundSystem(object):
         self.master_volume -= delta
         self.log.info("Decreased master volume by %s to %s.", delta, self.master_volume)
 
-    def _create_track(self, name, config=None):
+    def _create_track(self, name, config=None):     # noqa
         """Create a track in the audio system with the specified name and configuration.
 
         Args:
@@ -237,7 +237,7 @@ class SoundSystem(object):
             raise AudioException("Could not create '{}' track due to an error".format(name))
 
         self.tracks[name] = track
-        
+
         if 'events_when_stopped' in config and config['events_when_stopped'] is not None:
             track.events_when_stopped = Util.string_to_list(config['events_when_stopped'])
 
@@ -249,7 +249,7 @@ class SoundSystem(object):
 
         if 'events_when_resumed' in config and config['events_when_resumed'] is not None:
             track.events_when_resumed = Util.string_to_list(config['events_when_resumed'])
-    
+
     def tick(self, dt):
         """Clock callback function"""
         del dt

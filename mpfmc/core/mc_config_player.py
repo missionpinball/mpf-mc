@@ -12,9 +12,6 @@ class McConfigPlayer(DeviceConfigPlayer, metaclass=abc.ABCMeta):
     show_section = None
     machine_collection_name = None
 
-    def __init__(self, machine):
-        super().__init__(machine)
-
     def __repr__(self):
         return 'McConfigPlayer.{}'.format(self.show_section)
 
@@ -55,7 +52,7 @@ class McConfigPlayer(DeviceConfigPlayer, metaclass=abc.ABCMeta):
         if self.config_file_section not in self.instances[context]:
             self.instances[context][self.config_file_section] = dict()
 
-        self.play(settings=settings, context=context, priority=priority, **kwargs)
+        self.play(settings=settings, context=context, calling_context="", priority=priority, **kwargs)
 
     def clear_from_trigger(self, context, **kwargs):
         """Call clear_context from BCP trigger."""

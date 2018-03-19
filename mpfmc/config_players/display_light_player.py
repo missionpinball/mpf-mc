@@ -20,6 +20,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         self._scheduled = False
         self._last_color = {}
 
+    # pylint: disable-msg=too-many-arguments
     def play_element(self, settings, element, context, calling_context, priority=0, **kwargs):
         context_dict = self._get_instance_dict(context)
         if settings['action'] == "play":
@@ -69,11 +70,12 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         for context, instances in self.instances.items():
             for element, instance in instances.items():
                 if not element[5]:
-                     continue
+                    continue
                 self._render(instance, element, context)
 
+    # pylint: disable-msg=too-many-locals
     def _render(self, instance, element, context):
-        fbo, effect_widget, source, settings, first, enabled = instance
+        fbo, effect_widget, source, settings, first, _ = instance
         instance[4] = False
 
         # detach the widget from the parent

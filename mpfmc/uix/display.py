@@ -95,7 +95,8 @@ class Display(ScreenManager):
             ClearColor(0, 0, 0, 1)
             ClearBuffers()
             Scale(1, -1, 1)
-            Translate(-self._slide_manager_parent.x, -self._slide_manager_parent.y - self._slide_manager_parent.height, 0)
+            Translate(-self._slide_manager_parent.x,
+                      -self._slide_manager_parent.y - self._slide_manager_parent.height, 0)
 
         fbo.add(self._slide_manager_parent.canvas)
         fbo.draw()
@@ -559,8 +560,8 @@ class Display(ScreenManager):
 
         # First find all matching widgets owned by the slide parent
         for child in self.parent_widgets:
-                widgets.extend([x for x in child.walk(restrict=True, loopback=False)
-                                if x.key == key])
+            widgets.extend([x for x in child.walk(restrict=True, loopback=False)
+                            if x.key == key])
 
         # Finally find all matching widgets owned by each slide
         for slide in self.slides:

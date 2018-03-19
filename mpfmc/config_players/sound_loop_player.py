@@ -50,15 +50,15 @@ Here are several various examples:
     machine_collection_name = 'sound_loop_sets'
 
     # pylint: disable=invalid-name
-    def play(self, settings, context, priority=0, **kwargs):
+    def play(self, settings, context, calling_context, priority=0, **kwargs):
         """Plays a validated section from a sound_loop_player: section of a
         config file or the sound_loops: section of a show.
 
         The config must be validated.
         """
-        instance_dict = self._get_instance_dict(context)
+        del calling_context
         settings = deepcopy(settings)
-        
+
         self.machine.log.info("SoundLoopPlayer: Play called with settings=%s", settings)
 
         for track_name, player_settings in settings.items():
@@ -77,11 +77,11 @@ Here are several various examples:
                     track.play_sound_loop_set(loop_set, player_settings)
                 except Exception as ex:
                     raise Exception(ex)
-    
+
             elif player_settings['action'].lower() == 'stop':
                 player_settings.setdefault('fade_out', None)
                 track.stop_current_sound_loop_set(player_settings['fade_out'])
-    
+
             elif player_settings['action'].lower() == 'stop_looping':
                 track.stop_looping_current_sound_loop_set()
 
@@ -95,18 +95,19 @@ Here are several various examples:
 
             elif player_settings['action'].lower() == 'play_layer':
                 player_settings.setdefault('volume', None)
-                track.play_layer(player_settings['layer'], player_settings['fade_in'], player_settings['queue'], volume=player_settings['volume'])
-    
+                track.play_layer(player_settings['layer'], player_settings['fade_in'], player_settings['queue'],
+                                 volume=player_settings['volume'])
+
             elif player_settings['action'].lower() == 'stop_layer':
                 track.stop_layer(player_settings['layer'], player_settings['fade_out'])
-    
+
             elif player_settings['action'].lower() == 'stop_looping_layer':
                 track.stop_looping_layer(player_settings['layer'])
-    
+
             elif player_settings['action'].lower() == 'set_layer_volume':
                 # TODO: Implement setting layer volume
                 pass
-    
+
             else:
                 self.machine.log.error("SoundLoopPlayer: The specified action "
                                        "is not valid ('{}').".format(player_settings['action']))
@@ -154,7 +155,7 @@ Here are several various examples:
 
         return validated_config
 
-    def _validate_config_item(self, track_name, player_settings):
+    def _validate_config_item(self, device, device_settings):
         """Validates the config when in a show or in a player"""
 
         # event contains the event name that triggers the sound_loop_player action
@@ -162,19 +163,19 @@ Here are several various examples:
 
         # First validate the action item (since it will be used to validate the rest
         # of the config)
-        if 'action' in player_settings:
-            player_settings['action'] = self.machine.config_validator.validate_config_item(
+        if 'action' in device_settings:
+            device_settings['action'] = self.machine.config_validator.validate_config_item(
                 self.machine.config_validator.config_spec['sound_loop_player']['action'],
-                'sound_loop_player:{}'.format(track_name),
-                player_settings['action'])
+                'sound_loop_player:{}'.format(device),
+                device_settings['action'])
         else:
-            player_settings['action'] = self.machine.config_validator.validate_config_item(
+            device_settings['action'] = self.machine.config_validator.validate_config_item(
                 self.machine.config_validator.config_spec['sound_loop_player']['action'],
-                'sound_loop_player:{}'.format(track_name))
+                'sound_loop_player:{}'.format(device))
 
         validated_settings = self.machine.config_validator.validate_config(
-            'sound_loop_player_actions:{}'.format(player_settings['action']).lower(),
-            player_settings)
+            'sound_loop_player_actions:{}'.format(device_settings['action']).lower(),
+            device_settings)
 
         # Remove any items from the settings that were not explicitly provided in the
         # sound_loop_player config section (only want to override sound settings explicitly
@@ -200,7 +201,7 @@ Here are several various examples:
             del validated_settings['mode_end_action']
 
         validated_dict = dict()
-        validated_dict[track_name] = validated_settings
+        validated_dict[device] = validated_settings
         return validated_dict
 
     def clear_context(self, context):

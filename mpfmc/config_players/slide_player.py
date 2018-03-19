@@ -99,6 +99,7 @@ class McSlidePlayer(McConfigPlayer):
     show_section = 'slides'
     machine_collection_name = 'slides'
 
+    # pylint: disable-msg=too-many-arguments
     def _add_slide_to_target(self, target_name, key, slide_name, s, instance_dict, **kwargs):
         del kwargs
         target = self.machine.targets[target_name]
@@ -110,6 +111,7 @@ class McSlidePlayer(McConfigPlayer):
         self.machine.events.remove_handler_by_key(instance_dict[target_name][slide_name])
         instance_dict[target_name][slide_name] = False
 
+    # pylint: disable-msg=too-many-arguments
     def _add_slide_to_target_when_active(self, target_name, s, slide, instance_dict, full_context):
 
         if target_name not in instance_dict:
@@ -126,15 +128,15 @@ class McSlidePlayer(McConfigPlayer):
                 target_name=target_name, instance_dict=instance_dict)
             instance_dict[target_name][slide] = handler
 
-    def play(self, settings, context, priority=0, **kwargs):
+    def play(self, settings, context, calling_context, priority=0, **kwargs):
+        del calling_context
         instance_dict = self._get_instance_dict(context)
         full_context = self._get_full_context(context)
         settings = deepcopy(settings)
 
         self.machine.log.info("SlidePlayer: Play called with settings=%s", settings)
 
-        if 'slides' in settings:
-            settings = settings['slides']
+        settings = settings['slides'] if 'slides' in settings else settings
 
         for slide, s in settings.items():
             slide_dict = self.machine.placeholder_manager.parse_conditional_template(slide)
@@ -193,11 +195,10 @@ class McSlidePlayer(McConfigPlayer):
                 if slide not in instance_dict[target_name]:
                     instance_dict[target_name][slide] = False
 
-            elif s['action'] == 'remove':
-                if slide in instance_dict[target_name]:
-                    del instance_dict[target_name][slide]
-                    target.remove_slide(slide=slide,
-                                        transition_config=s['transition'] if 'transition' in s else [])
+            elif s['action'] == 'remove' and slide in instance_dict[target_name]:
+                del instance_dict[target_name][slide]
+                target.remove_slide(slide=slide,
+                                    transition_config=s['transition'] if 'transition' in s else [])
 
     def get_express_config(self, value):
         # express config for slides can either be a string (slide name) or a
@@ -271,7 +272,7 @@ class McSlidePlayer(McConfigPlayer):
                         "Expected a dict in slide_player {}:{}.".format(event,
                                                                         slide))
 
-                for key in slide_settings.keys():
+                for key in slide_settings:
                     if key not in ConfigValidator.config_spec['slide_player']:
                         dict_is_widgets = True
                         break

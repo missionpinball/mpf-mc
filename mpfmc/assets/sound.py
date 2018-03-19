@@ -207,8 +207,7 @@ class SoundAsset(Asset):
     pool_config_section = 'sound_pools'  # Will setup groups if present
     asset_group_class = SoundPool  # Class or None to not use pools
 
-    # pylint: disable=too-many-branches, too-many-statements, invalid-name
-    def __init__(self, mc, name, file, config):
+    def __init__(self, mc, name, file, config):     # noqa
         """ Constructor"""
         super().__init__(mc, name, file, config)
 
@@ -681,9 +680,7 @@ class SoundInstance(object):
     """An instance of a playing sound asset. This class is essentially a wrapper container
     for sound assets that contains all the overridden parameter values for playback."""
 
-    # pylint: disable=too-many-branches
-    def __init__(self,
-                 sound: Union[SoundAsset, SoundPool],
+    def __init__(self, sound: Union[SoundAsset, SoundPool],     # noqa
                  context: Optional[str]=None, settings: Optional[dict]=None):
         """Constructor"""
         if sound is None:
@@ -1180,11 +1177,6 @@ class SoundInstance(object):
         return self._status
 
     @property
-    def playing(self):
-        """Return whether the instance is currently playing"""
-        return self._status == SoundInstanceStatus.playing
-
-    @property
     def played(self):
         """Return whether or not this sound instance has been played."""
         return self._played
@@ -1237,7 +1229,7 @@ class DuckingSettings(object):
 
         # Target can contain a list of track names - convert string to list and validate
         self._targets = Util.string_to_list(config['target'])
-        if len(self._targets) == 0:
+        if not self._targets:
             raise AudioException("'ducking.target' must contain at least one "
                                  "valid audio track name")
 
@@ -1247,7 +1239,7 @@ class DuckingSettings(object):
         for target in self._targets:
             track = mc.sound_system.audio_interface.get_track_by_name(target)
             if track is None:
-                raise AudioException("'ducking.target' contains an invalid track name '%s'", target)
+                raise AudioException("'ducking.target' contains an invalid track name '{}'".format(target))
             self._track_bit_mask += (1 << track.number)
 
         # Delay is optional (defaults to 0, must be >= 0)

@@ -86,6 +86,7 @@ class EffectsManager(object):
     def process_effect(self, config: dict) -> dict:
         try:
             effect_cls = self._effects[config['type']]
+            del effect_cls
         except (KeyError, TypeError):
             try:
                 raise ValueError(
@@ -105,9 +106,6 @@ class EffectsManager(object):
 class EffectsChain(EventDispatcher, metaclass=abc.ABCMeta):
     """Abstract base class for an effect that is actually a chain of 
     one or more individual effects."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     @abc.abstractmethod
     def get_effects(self) -> List["EffectBase"]:

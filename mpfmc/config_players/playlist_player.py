@@ -42,19 +42,19 @@ Here are several various examples:
                 fade-out: 2s
 
     """
-    
+
     config_file_section = 'playlist_player'
     show_section = 'playlists'
     machine_collection_name = 'playlists'
 
     # pylint: disable=invalid-name
-    def play(self, settings, context, priority=0, **kwargs):
+    def play(self, settings, context, calling_context, priority=0, **kwargs):
         """Plays a validated section from a playlist_player: section of a
         config file or the playlists: section of a show.
 
         The config must be validated.
         """
-        instance_dict = self._get_instance_dict(context)
+        del calling_context
         settings = deepcopy(settings)
 
         self.machine.log.debug("PlaylistPlayer: Play called with settings=%s", settings)
@@ -137,7 +137,7 @@ Here are several various examples:
 
         return validated_config
 
-    def _validate_config_item(self, track_name, player_settings):
+    def _validate_config_item(self, device, device_settings):
         """Validates the config when in a show or in a player"""
 
         # event contains the event name that triggers the playlist_player action
@@ -145,19 +145,19 @@ Here are several various examples:
 
         # First validate the action item (since it will be used to validate the rest
         # of the config)
-        if 'action' in player_settings:
-            player_settings['action'] = self.machine.config_validator.validate_config_item(
+        if 'action' in device_settings:
+            device_settings['action'] = self.machine.config_validator.validate_config_item(
                 self.machine.config_validator.config_spec['playlist_player']['action'],
-                'playlist_player:{}'.format(track_name),
-                player_settings['action'])
+                'playlist_player:{}'.format(device),
+                device_settings['action'])
         else:
-            player_settings['action'] = self.machine.config_validator.validate_config_item(
+            device_settings['action'] = self.machine.config_validator.validate_config_item(
                 self.machine.config_validator.config_spec['playlist_player']['action'],
-                'playlist_player:{}'.format(track_name))
+                'playlist_player:{}'.format(device))
 
         validated_settings = self.machine.config_validator.validate_config(
-            'playlist_player_actions:{}'.format(player_settings['action']).lower(),
-            player_settings)
+            'playlist_player_actions:{}'.format(device_settings['action']).lower(),
+            device_settings)
 
         # Remove any items from the settings that were not explicitly provided in the
         # playlist_player config section (only want to override settings explicitly
@@ -188,12 +188,11 @@ Here are several various examples:
             del validated_settings['events_when_sound_stopped']
 
         validated_dict = dict()
-        validated_dict[track_name] = validated_settings
+        validated_dict[device] = validated_settings
         return validated_dict
 
     def clear_context(self, context):
         """Stop all sounds from this context."""
-        instance_dict = self._get_instance_dict(context)
         # Iterate over a copy of the dictionary values since it may be modified
         # during the iteration process.
         self.machine.log.debug("PlaylistPlayer: Clearing context")

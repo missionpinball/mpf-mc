@@ -31,6 +31,10 @@ class CustomLabel(Label):
 
         super().__init__(**kwargs)
 
+    def get_label(self):
+        """Return the label."""
+        return self._label
+
     def _create_label(self):
         if self.bitmap_font:
             d = Label._font_properties
@@ -65,7 +69,7 @@ class Text(Widget):
         # Special handling for baseline anchor
         if self.config['anchor_y'] == 'baseline':
             self.anchor_y = 'bottom'
-            self.adjust_bottom = self._label._label.get_descent() * -1
+            self.adjust_bottom = self._label.get_label().get_descent() * -1
 
         self.original_text = self._get_text_string(config.get('text', ''))
 
@@ -99,9 +103,9 @@ class Text(Widget):
         anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
         # Save the updated position as a new variable, such that consecutive text
         # changes don't introduce gradual shifts in position.
-        pos = super(Text, self).calculate_rounded_position(anchor)
+        pos = self.calculate_rounded_position(anchor)
 
-        if len(self._label.text) > 0:
+        if self._label.text:
             with self.canvas:
                 Color(*self.color)
                 Rotate(angle=self.rotation, origin=anchor)
@@ -114,7 +118,7 @@ class Text(Widget):
             self.size = texture.size
 
             if self.config['anchor_y'] == 'baseline':
-                self.adjust_bottom = self._label._label.get_descent() * -1
+                self.adjust_bottom = self._label.get_label().get_descent() * -1
 
     def update_kwargs(self, **kwargs) -> None:
         self.event_replacements.update(kwargs)

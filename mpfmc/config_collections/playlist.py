@@ -98,6 +98,7 @@ class PlaylistInstance(object):
     PlaylistInstance class represents an instance of a playlist asset.
     """
 
+    # pylint: disable-msg=too-many-arguments
     def __init__(self, name: str, playlist: dict, track_crossfade_time: float,
                  context: Optional[str]=None, settings: Optional[dict]=None):
         """Constructor"""

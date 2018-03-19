@@ -160,7 +160,7 @@ class Keyboard(KivyWidget):
 
         else:
             # do we have an event or a switch?
-            if type(self.key_map[key_string]) == str:  # switch
+            if isinstance(self.key_map[key_string], str):  # switch
 
                 if self.key_map[key_string] in self.inverted_keys:
                     self.send_switch(state=0, name=self.key_map[key_string])
@@ -171,7 +171,7 @@ class Keyboard(KivyWidget):
                     self.send_switch(state=1, name=self.key_map[key_string])
                     self.active_keys[key] = self.key_map[key_string]
 
-            elif type(self.key_map[key_string]) == dict:  # event
+            elif isinstance(self.key_map[key_string], dict):  # event
                 event_dict = self.key_map[key_string]
                 event_params = event_dict['params'] or {}
 

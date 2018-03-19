@@ -218,14 +218,100 @@ class Widget(KivyWidget):
 
         return rounded_x, rounded_y
 
-    # pylint: disable-msg=too-many-arguments
-    # pylint: disable-msg=too-many-statements
     @staticmethod
-    def calculate_initial_position(parent_w: int, parent_h: int,
+    def _calculate_x_position(parent_w: int, x: Optional[Union[int, str]] = None,
+                              round_x: Optional[Union[bool, str]] = None) -> float:
+        # ----------------------
+        # X / width / horizontal
+        # ----------------------
+        if x is None:
+            x = 'center'
+        # Calculate position
+        if isinstance(x, str):
+
+            x = str(x).replace(' ', '')
+            start_x = 0
+
+            if x.startswith('right'):
+                x = x.strip('right')
+                start_x = parent_w
+
+            elif x.startswith('middle'):
+                x = x.strip('middle')
+                start_x = parent_w / 2
+
+            elif x.startswith('center'):
+                x = x.strip('center')
+                start_x = parent_w / 2
+
+            elif x.startswith('left'):
+                x = x.strip('left')
+
+            if not x:
+                x = '0'
+
+            x = percent_to_float(x, parent_w)
+            x += start_x
+
+            if round_x == 'left':
+                x = math.floor(x)
+            elif round_x == 'right':
+                x = math.ceil(x)
+
+        return x
+
+    @staticmethod
+    def _calculate_y_position(parent_h: int, y: Optional[Union[int, str]] = None,
+                              round_y: Optional[Union[bool, str]] = None) -> float:
+        # Set defaults
+        if y is None:
+            y = 'middle'
+
+        # --------------------
+        # Y / height / vertical
+        # --------------------
+
+        # Calculate position
+        if isinstance(y, str):
+
+            y = str(y).replace(' ', '')
+            start_y = 0
+
+            if y.startswith('top'):
+                y = y.strip('top')
+                start_y = parent_h
+
+            elif y.startswith('middle'):
+                y = y.strip('middle')
+                start_y = parent_h / 2
+
+            elif y.startswith('center'):
+                y = y.strip('center')
+                start_y = parent_h / 2
+
+            elif y.startswith('bottom'):
+                y = y.strip('bottom')
+
+            if not y:
+                y = '0'
+
+            y = percent_to_float(y, parent_h)
+            y += start_y
+
+            if round_y == 'bottom':
+                y = math.floor(y)
+            elif round_y == 'top':
+                y = math.ceil(y)
+
+        return y
+
+    # pylint: disable-msg=too-many-arguments
+    @classmethod
+    def calculate_initial_position(cls, parent_w: int, parent_h: int,
                                    x: Optional[Union[int, str]] = None,
                                    y: Optional[Union[int, str]] = None,
                                    round_x: Optional[Union[bool, str]] = None,
-                                   round_y: Optional[Union[bool,str]] = None) -> tuple:
+                                   round_y: Optional[Union[bool, str]] = None) -> Tuple[float, float]:
         """Returns the initial x,y position for the widget within a larger
         parent frame based on several positioning parameters. This position will
         be combined with the widget anchor position to determine its actual
@@ -269,85 +355,7 @@ class Widget(KivyWidget):
         See the widgets documentation for examples.
 
         """
-        # Set defaults
-        if x is None:
-            x = 'center'
-        if y is None:
-            y = 'middle'
-
-        # ----------------------
-        # X / width / horizontal
-        # ----------------------
-
-        # Set position
-        if isinstance(x, str):
-
-            x = str(x).replace(' ', '')
-            start_x = 0
-
-            if x.startswith('right'):
-                x = x.strip('right')
-                start_x = parent_w
-
-            elif x.startswith('middle'):
-                x = x.strip('middle')
-                start_x = parent_w / 2
-
-            elif x.startswith('center'):
-                x = x.strip('center')
-                start_x = parent_w / 2
-
-            elif x.startswith('left'):
-                x = x.strip('left')
-
-            if not x:
-                x = '0'
-
-            x = percent_to_float(x, parent_w)
-            x += start_x
-
-            if round_x == 'left':
-                x = math.floor(x)
-            elif round_x == 'right':
-                x = math.ceil(x)
-
-        # --------------------
-        # Y / height / vertical
-        # --------------------
-
-        # Set position
-        if isinstance(y, str):
-
-            y = str(y).replace(' ', '')
-            start_y = 0
-
-            if y.startswith('top'):
-                y = y.strip('top')
-                start_y = parent_h
-
-            elif y.startswith('middle'):
-                y = y.strip('middle')
-                start_y = parent_h / 2
-
-            elif y.startswith('center'):
-                y = y.strip('center')
-                start_y = parent_h / 2
-
-            elif y.startswith('bottom'):
-                y = y.strip('bottom')
-
-            if not y:
-                y = '0'
-
-            y = percent_to_float(y, parent_h)
-            y += start_y
-
-            if round_y == 'bottom':
-                y = math.floor(y)
-            elif round_y == 'top':
-                y = math.ceil(y)
-
-        return x, y
+        return cls._calculate_x_position(parent_w, x, round_x), cls._calculate_y_position(parent_h, y, round_y)
 
     def _set_default_style(self) -> None:
         """Sets the default widget style name."""
@@ -437,11 +445,7 @@ class Widget(KivyWidget):
 
         return val
 
-    def build_animation_from_config(self, config_list: list) -> Animation:
-        """Build animation object from config."""
-        if not isinstance(config_list, list):
-            raise TypeError('build_animation_from_config requires a list')
-
+    def _resolve_named_animations(self, config_list):
         # find any named animations and replace them with the real ones
         animation_list = list()
 
@@ -452,6 +456,17 @@ class Widget(KivyWidget):
                     animation_list.append(named_anim_settings)
             else:
                 animation_list.append(entry)
+
+        return animation_list
+
+    # pylint: disable-msg=too-many-branches
+    def build_animation_from_config(self, config_list: list) -> Animation:
+        """Build animation object from config."""
+        if not isinstance(config_list, list):
+            raise TypeError('build_animation_from_config requires a list')
+
+        # find any named animations and replace them with the real ones
+        animation_list = self._resolve_named_animations(config_list)
 
         repeat = False
         animation_sequence_list = []
@@ -877,8 +892,9 @@ def create_widget_objects_from_library(mc: "MpfMc", name: str,
     Returns:
         A list of the MpfWidget objects created.
     """
+    del kwargs
     if name not in mc.widgets:
-        raise ValueError("Widget %s not found", name)
+        raise ValueError("Widget {} not found".format(name))
 
     return create_widget_objects_from_config(mc=mc,
                                              config=mc.widgets[name],
@@ -916,7 +932,7 @@ class WidgetContainer(RelativeLayout):
         if hasattr(other, 'z'):
             return other.z < self.z
         else:
-            return 0 < self.z
+            return self.z > 0
 
     def prepare_for_removal(self) -> None:
         if self._widget:
@@ -959,4 +975,3 @@ class WidgetContainer(RelativeLayout):
 
     widget = AliasProperty(_get_widget, None)
     '''The MC Widget child of this container widget.'''
-
