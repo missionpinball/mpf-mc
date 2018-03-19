@@ -5,7 +5,7 @@ import logging
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 
 
-class ConfigCollection(CaseInsensitiveDict):
+class ConfigCollection(dict):
     """ A lightweight collection of validated configs from the machine or
     mode config. Used to hold configs for things like slides, widgets,
     animations, widget_styles, etc.
@@ -27,9 +27,6 @@ class ConfigCollection(CaseInsensitiveDict):
 
     def __getattr__(self, attr):
         return self[attr]
-
-    def __getitem__(self, key):
-        return super().__getitem__(deepcopy(self.__class__.lower(key)))
 
     def __init__(self, mc):
         super().__init__()
