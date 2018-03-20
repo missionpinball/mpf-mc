@@ -282,4 +282,5 @@ class BcpProcessor(object):
         self.mc.reset()
 
     def _reset_complete(self, **kwargs):
+        del kwargs
         self.send('reset_complete')

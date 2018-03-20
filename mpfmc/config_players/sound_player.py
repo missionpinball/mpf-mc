@@ -54,7 +54,7 @@ Here are several various examples:
     machine_collection_name = 'sounds'
 
     # pylint: disable=invalid-name
-    def play(self, settings, context, priority=0, **kwargs):
+    def play(self, settings, context, calling_context, priority=0, **kwargs):
         """Plays a validated sounds: section from a sound_player: section of a
         config file or the sounds: section of a show.
 
@@ -76,6 +76,7 @@ Here are several various examples:
             sound_player (they must be specified in the sounds section of a config file).
 
         """
+        del calling_context
         settings = deepcopy(settings)
 
         if 'sounds' in settings:
@@ -178,7 +179,7 @@ Here are several various examples:
                 # Now check to see if all the settings are valid
                 # sound settings. If not, assume it's a single sound settings.
                 if isinstance(sound_settings, dict):
-                    for key in sound_settings.keys():
+                    for key in sound_settings:
                         if key not in ConfigValidator.config_spec['sound_player']:
                             break
 

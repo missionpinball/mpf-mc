@@ -52,7 +52,7 @@ Here are several various examples:
     machine_collection_name = None
 
     # pylint: disable=invalid-name
-    def play(self, settings, context, priority=0, **kwargs):
+    def play(self, settings, context, calling_context, priority=0, **kwargs):
         """Initiates an action from a validated tracks: section from a track_player: section of a
         config file or the tracks: section of a show.
 
@@ -68,6 +68,7 @@ Here are several various examples:
         fade:
         """
         del priority
+        del calling_context
         settings = deepcopy(settings)
 
         if 'tracks' in settings:
@@ -95,7 +96,7 @@ Here are several various examples:
             # TODO: perform validation on parameters
 
             # Loop over selected tracks performing action with settings on each one
-            for name, track in selected_tracks.items():
+            for track in selected_tracks.values():
 
                 # Determine action to perform
                 if s['action'].lower() == 'play':
@@ -115,7 +116,7 @@ Here are several various examples:
 
                 else:
                     self.machine.log.error("TrackPlayer: The specified action "
-                                           "is not valid ('{}').".format(s['action']))
+                                           "is not valid ('%s').", s['action'])
 
     def get_express_config(self, value):
         """ express config for tracks is not supported"""
@@ -156,7 +157,7 @@ Here are several various examples:
                 # Now check to see if all the settings are valid
                 # sound settings. If not, assume it's a single sound settings.
                 if isinstance(track_settings, dict):
-                    for key in track_settings.keys():
+                    for key in track_settings:
                         if key not in ConfigValidator.config_spec['track_player']:
                             break
 
@@ -171,7 +172,7 @@ Here are several various examples:
         # device is track name
 
         # Ensure volume parameter value has been provided for 'set_volume' actions
-        if validated_dict[device]['action'] is 'set_volume' and \
+        if validated_dict[device]['action'] == 'set_volume' and \
                         validated_dict[device]['volume'] is None:
             raise ValueError("track_player: 'volume' must be provided for all 'set_volume' "
                              "actions ({} track)".format(device))

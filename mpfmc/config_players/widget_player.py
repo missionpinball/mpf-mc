@@ -47,6 +47,7 @@ class McWidgetPlayer(McConfigPlayer):
 
         return slide
 
+    # pylint: disable-msg=too-many-arguments
     def _action_add(self, s, instance_dict, widget, context, play_kwargs):
         if not s['key']:
             try:
@@ -127,10 +128,11 @@ class McWidgetPlayer(McConfigPlayer):
         else:
             self._remove_widget_by_key(key)
 
-    def play(self, settings, context, priority=0, **kwargs):
+    def play(self, settings, context, calling_context, priority=0, **kwargs):
         """Play widgets."""
         # **kwargs since this is an event callback
         del priority
+        del calling_context
         settings = deepcopy(settings)
         instance_dict = self._get_instance_dict(context)
 

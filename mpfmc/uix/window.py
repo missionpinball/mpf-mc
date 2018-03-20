@@ -82,4 +82,3 @@ class Window(object):
 
         for widget in KivyWindow.children:
             widget.size = value
-

@@ -20,6 +20,7 @@ import errno
 class Command(object):
 
     # pylint: disable-msg=too-many-locals
+    # pylint: disable-msg=too-many-statements
     def __init__(self, mpf_path, machine_path, args):
         """Run MC."""
         p = psutil.Process(os.getpid())

@@ -184,7 +184,7 @@ class ImageWidget(Widget):
         if frame == self._image.image.anim_index:
             return
         else:
-            self._image.image._anim_index = frame
+            self._image.image._anim_index = frame   # pylint: disable-msg=protected-access
             self._image.image.anim_reset(True)
 
     current_frame = AliasProperty(_get_current_frame, _set_current_frame)

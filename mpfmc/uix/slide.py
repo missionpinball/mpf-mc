@@ -68,7 +68,7 @@ class Slide(Screen, StencilView):
 
         self.background_color = config.get('background_color', [0.0, 0.0, 0.0, 1.0])
         if self.background_color != [0.0, 0.0, 0.0, 0.0]:
-            with self.canvas.before:
+            with self.canvas.before:    # noqa
                 Color(*self.background_color)
                 Rectangle(size=self.size, pos=(0, 0))
 
@@ -121,7 +121,7 @@ class Slide(Screen, StencilView):
         del kwargs
 
         if name not in self.mc.widgets:
-            raise ValueError("Widget %s not found", name)
+            raise ValueError("Widget {} not found".format(name))
 
         return self.add_widgets_from_config(config=self.mc.widgets[name],
                                             key=key,
@@ -194,6 +194,7 @@ class Slide(Screen, StencilView):
         for w in widgets:
             self.add_widget(w)
 
+    # pylint: disable-msg=arguments-differ
     def add_widget(self, widget: "Widget", **kwargs) -> None:
         """Adds a widget to this slide.
 

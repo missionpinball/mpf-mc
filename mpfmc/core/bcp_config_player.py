@@ -46,6 +46,7 @@ class BcpConfigPlayer(metaclass=abc.ABCMeta):
         del kwargs
         self.clear_context(context=context)
 
+    # pylint: disable-msg=too-many-arguments
     @abc.abstractmethod
     def play_element(self, settings, element, context, calling_context, priority=0, **kwargs):
         """Directly play player."""

@@ -7,22 +7,12 @@ import sys
 import threading
 import time
 import logging
+import asyncio
 
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.resources import resource_add_path
 from kivy.logger import Logger
-
-# The following line is needed to allow mpfmc modules to use the
-# getLogger(name) method
-from mpf.core.device_manager import DeviceCollection
-
-from mpf.core.utility_functions import Util
-from mpfmc.core.assets import ThreadedAssetManager
-from mpfmc.core.mc_placeholder_manager import McPlaceholderManager
-from mpfmc.core.mc_settings_controller import McSettingsController
-
-logging.Logger.manager.root = Logger
 
 from kivy.config import Config
 from mpfmc.assets.video import VideoAsset
@@ -33,7 +23,6 @@ from mpfmc.core.mode_controller import ModeController
 from mpfmc.uix.transitions import TransitionManager
 from mpfmc.uix.effects import EffectsManager
 from mpfmc.core.config_collection import create_config_collections
-import asyncio
 
 import mpf
 import mpfmc
@@ -46,6 +35,11 @@ from mpf.core.player import Player
 from mpfmc.assets.image import ImageAsset
 from mpfmc.assets.bitmap_font import BitmapFontAsset
 from mpfmc.core.dmd import Dmd, RgbDmd
+from mpf.core.device_manager import DeviceCollection
+from mpf.core.utility_functions import Util
+from mpfmc.core.assets import ThreadedAssetManager
+from mpfmc.core.mc_placeholder_manager import McPlaceholderManager
+from mpfmc.core.mc_settings_controller import McSettingsController
 
 try:
     from mpfmc.core.audio import SoundSystem
@@ -56,11 +50,16 @@ except ImportError:
     logging.warning("mpfmc.core.audio library could not be loaded. Audio "
                     "features will not be available")
 
+# The following line is needed to allow mpfmc modules to use the
+# getLogger(name) method
+logging.Logger.manager.root = Logger
+
 
 class MpfMc(App):
 
     """Kivy app for the mpf media controller."""
 
+    # pylint: disable-msg=too-many-statements
     def __init__(self, options, machine_path,
                  thread_stopper=None, **kwargs):
 
@@ -72,8 +71,8 @@ class MpfMc(App):
                 __version__.split('.')[1] != __mpfversion__.split('.')[1]):
 
             self.log.error("MPF MC and MPF Game engines must be same "
-                           "major.minor versions. You have MPF v{} and MPF-MC"
-                           " v{}".format(__mpfversion__, __version__))
+                           "major.minor versions. You have MPF v%s and MPF-MC"
+                           " v%s", __mpfversion__, __version__)
 
             raise ValueError("MPF MC and MPF Game engines must be same "
                            "major.minor versions. You have MPF v{} and MPF-MC"
@@ -216,8 +215,10 @@ class MpfMc(App):
         return mpf_config
 
     def _create_dmds(self, **kwargs):
+        del kwargs
         self.create_dmds()
         self.create_rgb_dmds()
+        self.events.remove_all_handlers_for_event("client_connected")
 
     def _load_font_paths(self):
         # Add local machine fonts path
@@ -315,6 +316,7 @@ class MpfMc(App):
 
         '''
         self.events.process_event_queue()
+        self.events.remove_all_handlers_for_event("displays_initialized")
         self._init()
 
     def create_dmds(self):
@@ -371,6 +373,11 @@ class MpfMc(App):
         # no events docstring as this event is also in mpf
         self.events.process_event_queue()
         self.clear_boot_hold('init')
+        self.events.remove_all_handlers_for_event("init_phase_1")
+        self.events.remove_all_handlers_for_event("init_phase_2")
+        self.events.remove_all_handlers_for_event("init_phase_3")
+        self.events.remove_all_handlers_for_event("init_phase_4")
+        self.events.remove_all_handlers_for_event("init_phase_5")
 
     def init_done(self):
         self.is_init_done.set()
@@ -387,8 +394,9 @@ class MpfMc(App):
 
     def _debug_dump_displays(self, **kwargs):
         del kwargs
-        self.log.info("--- DEBUG DUMP STATS ---")
-        self.log.info("Active slides: %s (Count: %s). Displays: %s (Count: %s)", self.active_slides, len(self.active_slides), self.displays, len(self.displays))
+        self.log.info("--- DEBUG DUMP DISPLAYS ---")
+        self.log.info("Active slides: %s (Count: %s). Displays: %s (Count: %s)", self.active_slides,
+                      len(self.active_slides), self.displays, len(self.displays))
         for display in self.displays:
             self.log.info("Listing children for display: %s", display)
             children = 0
@@ -396,7 +404,7 @@ class MpfMc(App):
                 self.log.info(child)
                 children += 1
             self.log.info("Total children: %s", children)
-        self.log.info("--- DEBUG DUMP STATS END ---")
+        self.log.info("--- DEBUG DUMP DISPLAYS END ---")
 
     def on_stop(self):
         self.log.info("Stopping...")

@@ -140,8 +140,8 @@ class Mode(object):
         self.priority = 0
         self.active = False
 
-        for callback in self.mc.mode_controller.stop_methods:
-            callback[0](self)
+        for callback_func in self.mc.mode_controller.stop_methods:
+            callback_func[0](self)
 
         for item in self.stop_methods:
             item[0](item[1])

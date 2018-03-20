@@ -67,7 +67,6 @@ class BCPServer(threading.Thread):
 
     def run(self):
         """The socket thread's run loop."""
-
         try:
             while not self.mc.thread_stopper.is_set():
                 self.log.info("Waiting for a connection...")
@@ -102,7 +101,8 @@ class BCPServer(threading.Thread):
                     except (socket.timeout, OSError):
                         if self.mc.options['production'] and start_time + 30 < time.time():
                             self.log.warning("Timeout while waiting for connection. Stopping!")
-                            return self.mc.stop()
+                            self.mc.stop()
+                            return
                         if self.mc.thread_stopper.is_set():
                             self.log.info("Stopping BCP listener thread")
                             return
@@ -153,15 +153,7 @@ class BCPServer(threading.Thread):
                             socket_chars = commands.pop()
 
                             # process all complete commands
-                            for cmd in commands:
-                                if cmd:
-                                    try:
-                                        decoded_cmd = cmd.strip().decode()
-                                    except UnicodeDecodeError:
-                                        self.log.warning("Failed to decode BCP message: {}".format(cmd.strip()))
-                                        continue
-
-                                    self.process_received_message(decoded_cmd)
+                            self._process_receives_messages(commands)
                         else:
                             # no bytes -> socket closed
                             break
@@ -171,7 +163,8 @@ class BCPServer(threading.Thread):
                 self.connection = None
 
                 # always exit
-                return self.mc.stop()
+                self.mc.stop()
+                return
 
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -179,6 +172,18 @@ class BCPServer(threading.Thread):
                                                exc_traceback)
             msg = ''.join(line for line in lines)
             self.mc.crash_queue.put(msg)
+
+    def _process_receives_messages(self, commands):
+        # process all complete commands
+        for cmd in commands:
+            if cmd:
+                try:
+                    decoded_cmd = cmd.strip().decode()
+                except UnicodeDecodeError:
+                    self.log.warning("Failed to decode BCP message: %s", cmd.strip())
+                    continue
+
+                self.process_received_message(decoded_cmd)
 
     def stop(self):
         """ Stops and shuts down the BCP server."""
