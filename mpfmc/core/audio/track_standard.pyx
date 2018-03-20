@@ -1463,6 +1463,12 @@ cdef class TrackStandard(Track):
                             player.current.ducking_settings.release_duration = player.next.ducking_settings.release_duration
                         else:
                             player.current.sound_has_ducking = False
+                            player.current.ducking_stage = ducking_stage_idle
+                            player.current.ducking_settings.track_bit_mask = 0
+                            player.current.ducking_settings.attack_start_pos = 0
+                            player.current.ducking_settings.attack_duration = 0
+                            player.current.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME
+                            player.current.ducking_settings.release_duration = 0
 
                         # Send sound started notification
                         send_sound_started_notification(player_num, player.current.sound_id, player.current.sound_instance_id, track)
