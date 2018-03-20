@@ -207,6 +207,7 @@ class SoundAsset(Asset):
     pool_config_section = 'sound_pools'  # Will setup groups if present
     asset_group_class = SoundPool  # Class or None to not use pools
 
+    # pylint: disable=too-many-statements, too-many-branches
     def __init__(self, mc, name, file, config):     # noqa
         """ Constructor"""
         super().__init__(mc, name, file, config)
@@ -524,7 +525,7 @@ class SoundAsset(Asset):
         """Return the unique key value for this sound"""
         return self._key
 
-    def create_instance(self, context: Optional[str]=None, settings: Optional[dict]=None) -> "SoundInstance":
+    def create_instance(self, context: Optional[str] = None, settings: Optional[dict] = None) -> "SoundInstance":
         """Creates a new SoundInstance."""
         return SoundInstance(self, context, settings)
 
@@ -657,9 +658,7 @@ class SoundAsset(Asset):
 
             if len(markers) == AudioInterface.get_max_markers():
                 raise AudioException("Cannot add marker - the limit of {} sound markers has been "
-                                     "reached for sound {}.".format(
-                                        AudioInterface.get_max_markers(),
-                                        sound_name))
+                                     "reached for sound {}.".format(AudioInterface.get_max_markers(), sound_name))
 
             markers.append(marker)
 
@@ -680,8 +679,9 @@ class SoundInstance(object):
     """An instance of a playing sound asset. This class is essentially a wrapper container
     for sound assets that contains all the overridden parameter values for playback."""
 
+    # pylint: disable=too-many-statements, too-many-branches
     def __init__(self, sound: Union[SoundAsset, SoundPool],     # noqa
-                 context: Optional[str]=None, settings: Optional[dict]=None):
+                 context: Optional[str] = None, settings: Optional[dict] = None):
         """Constructor"""
         if sound is None:
             raise ValueError("Cannot create sound instance: sound parameter is None")

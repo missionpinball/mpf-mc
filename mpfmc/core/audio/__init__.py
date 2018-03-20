@@ -2,10 +2,10 @@
 import logging
 
 from kivy.clock import Clock
-from mpfmc.core.audio.audio_interface import AudioInterface
-from mpfmc.core.audio.audio_exception import AudioException
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
+from mpfmc.core.audio.audio_interface import AudioInterface
+from mpfmc.core.audio.audio_exception import AudioException
 
 __all__ = ('SoundSystem',
            'AudioInterface',
@@ -154,7 +154,7 @@ class SoundSystem(object):
         """Return default track."""
         return self.audio_interface.get_track(0)
 
-    def master_volume_increase(self, delta: float=0.05, **kwargs):
+    def master_volume_increase(self, delta: float = 0.05, **kwargs):
         """Increase master volume by delta.
 
         Args:
@@ -164,7 +164,7 @@ class SoundSystem(object):
         self.master_volume += delta
         self.log.info("Increased master volume by %s to %s.", delta, self.master_volume)
 
-    def master_volume_decrease(self, delta: float=0.05, **kwargs):
+    def master_volume_decrease(self, delta: float = 0.05, **kwargs):
         """Decrease master volume by delta.
 
         Args:
