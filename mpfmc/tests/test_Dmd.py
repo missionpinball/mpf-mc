@@ -44,3 +44,9 @@ class TestDmd(MpfMcTestCase):
         self.assertLess(left.x, bottom.x)
         self.assertGreater(top.y, left.y)
         self.assertLess(bottom.y, left.y)
+
+        # trigger the same widget again
+        self.mc.events.post('position_widget_left')
+        self.advance_time(.1)
+        self.assertEqual(left.text, 'Left Widget')
+        self.assertEqual(4, len(self.mc.displays['dmd'].current_slide.widgets))
