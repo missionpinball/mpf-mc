@@ -103,7 +103,9 @@ class TestSlidePlayer(MpfMcTestCase):
         self.advance_time()
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'mode1_slide')
-
+        slide = weakref.ref(self.mc.targets['display1'].current_slide)
+        self.assertTrue(slide())
+        print("STOP")
         # stop the mode and make sure the slide is removed
         num_slides = len(self.mc.targets['display1'].slides)
         self.mc.modes['mode1'].stop()
@@ -111,6 +113,9 @@ class TestSlidePlayer(MpfMcTestCase):
                          'machine_slide_1')
         self.assertEqual(len(self.mc.targets['display1'].slides),
                          num_slides - 1)
+
+        gc.collect()
+        self.assertFalse(slide())
 
         # post the slide_player event from the mode. Should not show the slide
         # since the mode is not running

@@ -468,13 +468,16 @@ class Display(ScreenManager):
                     self.current_slide.transition_out)
             else:
                 self.transition = NoTransition()
-
-            self._set_current_slide(new_slide)
+        else:
+            new_slide = None
 
         try:
             self.remove_widget(slide)
         except ScreenManagerException:
             return False
+        finally:
+            if new_slide:
+                self._set_current_slide(new_slide)
 
         return True
 

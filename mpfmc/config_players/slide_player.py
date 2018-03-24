@@ -163,7 +163,7 @@ class McSlidePlayer(McConfigPlayer):
             if target_name not in self.machine.targets or not self.machine.targets[target_name].ready:
                 # Target does not exist yet or is not ready. Perform action when it is ready
                 self._add_slide_to_target_when_active(target_name, s, slide, instance_dict, full_context)
-                return
+                continue
             else:
                 target = self.machine.targets[target_name]
 
