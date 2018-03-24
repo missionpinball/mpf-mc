@@ -257,6 +257,7 @@ class Text(Widget):
                                    self._machine_var_change)
 
     def prepare_for_removal(self) -> None:
+        super().prepare_for_removal()
         self.mc.events.remove_handler(self._player_var_change)
         self.mc.events.remove_handler(self._machine_var_change)
 

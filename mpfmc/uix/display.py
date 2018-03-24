@@ -421,17 +421,17 @@ class Display(ScreenManager):
                      transition_config: Optional[dict]=None) -> bool:
         """
         Remove a slide from the display.
-        
+
         Args:
             slide: The slide to remove (can be name string or Slide object)
             transition_config: Optional dictionary containing the transition configuration
                 to use while removing the slide (overrides slide setting).
-                
+
         Returns:
             True if the slide is scheduled to be removed, False otherwise
 
         Notes:
-            You can't remove the automatically generated blank slide, so if you try it will 
+            You can't remove the automatically generated blank slide, so if you try it will
             raise an exception.
         """
         # TODO:

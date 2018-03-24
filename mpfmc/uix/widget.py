@@ -413,6 +413,8 @@ class Widget(KivyWidget):
         """Perform the actual removal of the widget."""
         del dt
 
+        self.prepare_for_removal()
+
         try:
             # This widget has a container parent that must be removed
             self._container.parent.remove_widget(self._container)

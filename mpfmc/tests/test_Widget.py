@@ -1,4 +1,8 @@
 """Test widgets."""
+import weakref
+
+import gc
+
 from mpfmc.uix.widget import WidgetContainer, Widget
 from mpfmc.widgets.rectangle import Rectangle
 from mpfmc.widgets.text import Text
@@ -749,6 +753,8 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('add_widget1_to_current')
         self.mc.events.post('add_widget7')
         self.advance_time()
+        widget7 = weakref.ref([x.widget for x in self.mc.targets['default'].current_slide.widgets if x.widget.key == '_global-widget7'][0])
+        self.assertTrue(widget7())
 
         self.assertIn('_global-widget1', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
@@ -761,6 +767,9 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.widgets])
         self.assertNotIn('_global-widget7', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
+
+        gc.collect()
+        self.assertFalse(widget7())
 
     def test_widget_player_expire(self):
         self.mc.targets['default'].add_slide(name='slide1')
