@@ -232,7 +232,7 @@ class Slide(Screen, StencilView):
         """Removes all widgets from this slide with the specified key value."""
         for widget in self.find_widgets_by_key(key):
             if isinstance(widget, Widget):
-                self.remove_widget(widget.container)
+                widget.remove()
             else:
                 self.remove_widget(widget)
 
@@ -263,6 +263,7 @@ class Slide(Screen, StencilView):
     def remove(self, dt=None) -> None:
         """Removes the slide from the parent display."""
         del dt
+        self.prepare_for_removal()
 
         try:
             self.manager.remove_slide(slide=self,
@@ -272,7 +273,6 @@ class Slide(Screen, StencilView):
             # looks like slide was already removed, but let's clean it up just
             # in case
 
-            self.prepare_for_removal()
             self.mc.active_slides.pop(self.name, None)
 
     def prepare_for_removal(self) -> None:
