@@ -263,7 +263,6 @@ class Slide(Screen, StencilView):
     def remove(self, dt=None) -> None:
         """Removes the slide from the parent display."""
         del dt
-        self.prepare_for_removal()
 
         try:
             self.manager.remove_slide(slide=self,
@@ -272,7 +271,7 @@ class Slide(Screen, StencilView):
         except AttributeError:
             # looks like slide was already removed, but let's clean it up just
             # in case
-
+            self.prepare_for_removal()
             self.mc.active_slides.pop(self.name, None)
 
     def prepare_for_removal(self) -> None:

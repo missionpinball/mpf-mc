@@ -164,6 +164,16 @@ slide_player:
         y: 33%
       target: display1
       transition: move_in
+  anon_slide_widgets2:
+    slide_8:
+      widgets:
+      - type: text
+        text: Another text
+        color: green
+        font_size: 15
+        y: 66%
+      target: display1
+      transition: none
   base_slide_no_expire: machine_slide_6
   new_slide_expire:
     machine_slide_1:

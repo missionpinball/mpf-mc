@@ -1,6 +1,5 @@
 from copy import deepcopy
 from mpf.core.config_validator import ConfigValidator
-from mpf.core.events import EventHandlerKey
 from mpfmc.core.mc_config_player import McConfigPlayer
 
 
@@ -99,36 +98,8 @@ class McSlidePlayer(McConfigPlayer):
     show_section = 'slides'
     machine_collection_name = 'slides'
 
-    # pylint: disable-msg=too-many-arguments
-    def _add_slide_to_target(self, target_name, key, slide_name, s, instance_dict, **kwargs):
-        del kwargs
-        target = self.machine.targets[target_name]
-        if 'widgets' in s:
-            target.add_and_show_slide(key=key, slide_name=slide_name, **s)
-        else:
-            target.show_slide(slide_name=slide_name, key=key, **s)
-
-        self.machine.events.remove_handler_by_key(instance_dict[target_name][slide_name])
-        instance_dict[target_name][slide_name] = False
-
-    # pylint: disable-msg=too-many-arguments
-    def _add_slide_to_target_when_active(self, target_name, s, slide, instance_dict, full_context):
-
-        if target_name not in instance_dict:
-            instance_dict[target_name] = {}
-        elif (slide in instance_dict[target_name] and
-                instance_dict[target_name][slide]):
-            self.machine.events.remove_handler_by_key(
-                instance_dict[target_name][slide])
-        if s['action'] == "play":
-            handler = self.machine.events.add_handler(
-                "display_{}_ready".format(target_name),
-                self._add_slide_to_target,
-                key=full_context, slide_name=slide, s=s,
-                target_name=target_name, instance_dict=instance_dict)
-            instance_dict[target_name][slide] = handler
-
     def play(self, settings, context, calling_context, priority=0, **kwargs):
+        """Process a slide_player event."""
         del calling_context
         instance_dict = self._get_instance_dict(context)
         full_context = self._get_full_context(context)
@@ -162,10 +133,9 @@ class McSlidePlayer(McConfigPlayer):
 
             if target_name not in self.machine.targets or not self.machine.targets[target_name].ready:
                 # Target does not exist yet or is not ready. Perform action when it is ready
-                self._add_slide_to_target_when_active(target_name, s, slide, instance_dict, full_context)
-                continue
-            else:
-                target = self.machine.targets[target_name]
+                raise AssertionError("Target {} not ready".format(target_name))
+
+            target = self.machine.targets[target_name]
 
             # remove target
             s.pop("target")
@@ -176,8 +146,8 @@ class McSlidePlayer(McConfigPlayer):
             if s['action'] == 'play':
                 # remove slide if it already exists
                 if slide in instance_dict[target_name]:
+                    instance_dict[target_name][slide].remove()
                     del instance_dict[target_name][slide]
-                    target.remove_slide(slide=slide)
 
                 # is this a named slide, or a new slide?
                 self.machine.log.debug("SlidePlayer: Playing slide '%s' on target '%s' (Args=%s)",
@@ -192,8 +162,7 @@ class McSlidePlayer(McConfigPlayer):
 
                 target.get_screen(slide).on_slide_play()
 
-                if slide not in instance_dict[target_name]:
-                    instance_dict[target_name][slide] = False
+                instance_dict[target_name][slide] = target.get_slide(slide)
 
             elif s['action'] == 'remove' and slide in instance_dict[target_name]:
                 del instance_dict[target_name][slide]
@@ -303,14 +272,8 @@ class McSlidePlayer(McConfigPlayer):
         """Remove all slides from this player context."""
         instance_dict = self._get_instance_dict(context)
         for target_name, slides in instance_dict.items():
-            try:
-                target = self.machine.targets[target_name]
-            except KeyError:
-                continue
-            for slide, handler in slides.items():
-                if isinstance(handler, EventHandlerKey):
-                    self.machine.events.remove_handler_by_key(handler)
-                target.remove_slide(slide)
+            for slide in slides.values():
+                slide.remove()
 
         self._reset_instance_dict(context)
 

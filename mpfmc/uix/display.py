@@ -459,6 +459,8 @@ class Display(ScreenManager):
         # priority one to show instead.
         if self.current_slide == slide:
             new_slide = self._get_next_highest_priority_slide(slide)
+            if self.transition:
+                self.transition.stop()
 
             if transition_config:
                 self.transition = self.mc.transition_manager.get_transition(

@@ -181,6 +181,18 @@ class TestSlidePlayer(MpfMcTestCase):
         self.mc.events.post('anon_slide_widgets')
         self.advance_time()
 
+        slide = weakref.ref(self.mc.targets['display1'].current_slide)
+        self.assertTrue(slide())
+
+        self.mc.events.post('anon_slide_widgets2')
+        self.advance_time(1)
+        slide2 = weakref.ref(self.mc.targets['display1'].current_slide)
+
+        gc.collect()
+
+        self.assertFalse(slide())
+        self.assertTrue(slide2())
+
     def test_expire_in_slide(self):
         # tests that slide expire time works when configured in a slide
         self.mc.events.post('base_slide_no_expire')
