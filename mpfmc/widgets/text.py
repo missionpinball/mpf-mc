@@ -14,7 +14,10 @@ if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 
+# pylint: disable-msg=too-many-instance-attributes
 class CustomLabel(Label):
+
+    """Injects a font or bitmap font into a text widget."""
 
     def __init__(self, mc: "MpfMc", config: dict, **kwargs):
 
@@ -44,14 +47,17 @@ class CustomLabel(Label):
             super()._create_label()
 
     bitmap_font = BooleanProperty(False)
-    '''Flag indicating whether or not the font_name attribute refers to a 
+    '''Flag indicating whether or not the font_name attribute refers to a
     bitmap font.'''
 
 
 class Text(Widget):
+
+    """A text widget on a slide."""
+
     widget_type_name = 'Text'
-    var_finder = re.compile("(?<=\()[a-zA-Z_0-9|]+(?=\))")
-    string_finder = re.compile("(?<=\$)[a-zA-Z_0-9]+")
+    var_finder = re.compile(r"(?<=\()[a-zA-Z_0-9|]+(?=\))")
+    string_finder = re.compile(r"(?<=\$)[a-zA-Z_0-9]+")
     merge_settings = ('font_name', 'font_size', 'bold', 'italic', 'halign',
                       'valign', 'padding_x', 'padding_y', 'text_size',
                       'shorten', 'mipmap', 'markup', 'line_height',
@@ -59,8 +65,8 @@ class Text(Widget):
                       'unicode_errors', 'color', 'casing')
     animation_properties = ('x', 'y', 'font_size', 'color', 'opacity', 'rotation', 'scale')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
-                 play_kwargs: Optional[dict]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None,
+                 play_kwargs: Optional[dict] = None, **kwargs) -> None:
         self._label = CustomLabel(mc, config)
         self._label.fbind('texture', self.on_label_texture)
 
@@ -141,7 +147,8 @@ class Text(Widget):
             # if the text string is not found, put the $ back on
             return '${}'.format(text_string)
 
-    def _get_text_vars(self, text: str):
+    @staticmethod
+    def _get_text_vars(text: str):
         return Text.var_finder.findall(text)
 
     def _process_text(self, text: str) -> None:
@@ -161,20 +168,17 @@ class Text(Widget):
             if var_string.startswith('machine|'):
                 try:
                     text = text.replace('(' + var_string + ')',
-                                        str(self.mc.machine_vars[
-                                                var_string.split('|')[1]]))
+                                        str(self.mc.machine_vars[var_string.split('|')[1]]))
                 except KeyError:
                     text = text.replace('(' + var_string + ')', '')
 
             elif self.mc.player:
                 if var_string.startswith('player|'):
                     text = text.replace('(' + var_string + ')',
-                                        str(self.mc.player[
-                                                var_string.split('|')[1]]))
+                                        str(self.mc.player[var_string.split('|')[1]]))
                     continue
                 elif var_string.startswith('player') and '|' in var_string:
-                    player_num, var_name = var_string.lstrip('player').split(
-                            '|')
+                    player_num, var_name = var_string.lstrip('player').split('|')
                     try:
                         value = self.mc.player_list[int(player_num) - 1][
                             var_name]
@@ -194,7 +198,7 @@ class Text(Widget):
 
             if var_string in self.event_replacements:
                 text = text.replace('({})'.format(var_string),
-                    str(self.event_replacements[var_string]))
+                                    str(self.event_replacements[var_string]))
 
         self.update_text(text)
 
@@ -262,9 +266,8 @@ class Text(Widget):
         self.mc.events.remove_handler(self._machine_var_change)
 
     @staticmethod
-    def group_digits(text: str, separator: str=',', group_size: int=3) -> str:
-        """Enables digit grouping (i.e. adds comma separators between
-        thousands digits).
+    def group_digits(text: str, separator: str = ',', group_size: int = 3) -> str:
+        """Enable digit grouping (i.e. adds comma separators between thousands digits).
 
         Args:
             text: The incoming string of text
@@ -394,7 +397,7 @@ class Text(Widget):
         self._label.line_height = line_height
 
     bitmap_font = BooleanProperty(False)
-    '''Flag indicating whether or not the font_name attribute refers to a 
+    '''Flag indicating whether or not the font_name attribute refers to a
     bitmap font.'''
 
     line_height = AliasProperty(_get_line_height, _set_line_height)
@@ -508,7 +511,7 @@ class Text(Widget):
         self._label.halign = halign
 
     halign = AliasProperty(_get_halign, _set_halign)
-    '''Horizontal alignment of the text. Available options are : left, center, 
+    '''Horizontal alignment of the text. Available options are : left, center,
     right and justify.
 
     .. warning::

@@ -17,7 +17,7 @@ class DisplayWidget(Widget, RelativeLayout):
     widget_type_name = 'Display'
     animation_properties = ('x', 'y', 'pos')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         del kwargs
         self.display = None
 
@@ -37,10 +37,9 @@ class DisplayWidget(Widget, RelativeLayout):
     def __repr__(self) -> str:  # pragma: no cover
         try:
             return '<DisplayWidget size={}, pos={}, source={}>'.format(
-                    self.size, self.pos, self.display.name)
+                self.size, self.pos, self.display.name)
         except AttributeError:
-            return '<DisplayWidget size={}, source=(none)>'.format(
-                    self.size)
+            return '<DisplayWidget size={}, source=(none)>'.format(self.size)
 
     def on_pos(self, instance, pos):
         del instance

@@ -15,28 +15,29 @@ from kivy.resources import resource_add_path
 from kivy.logger import Logger
 
 from kivy.config import Config
-from mpfmc.assets.video import VideoAsset
-from mpfmc.core.bcp_processor import BcpProcessor
-from mpfmc.core.config_processor import ConfigProcessor
-from mpf.core.config_processor import ConfigProcessor as MpfConfigProcessor
-from mpfmc.core.mode_controller import ModeController
-from mpfmc.uix.transitions import TransitionManager
-from mpfmc.uix.effects import EffectsManager
-from mpfmc.core.config_collection import create_config_collections
 
 import mpf
-import mpfmc
-from mpfmc._version import __version__
+from mpf.core.config_processor import ConfigProcessor as MpfConfigProcessor
 from mpf._version import __version__ as __mpfversion__
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
 from mpf.core.player import Player
+from mpf.core.device_manager import DeviceCollection
+from mpf.core.utility_functions import Util
+
+import mpfmc
+from mpfmc._version import __version__
+from mpfmc.assets.video import VideoAsset
+from mpfmc.core.bcp_processor import BcpProcessor
+from mpfmc.core.config_processor import ConfigProcessor
+from mpfmc.core.mode_controller import ModeController
+from mpfmc.uix.transitions import TransitionManager
+from mpfmc.uix.effects import EffectsManager
+from mpfmc.core.config_collection import create_config_collections
 from mpfmc.assets.image import ImageAsset
 from mpfmc.assets.bitmap_font import BitmapFontAsset
 from mpfmc.core.dmd import Dmd, RgbDmd
-from mpf.core.device_manager import DeviceCollection
-from mpf.core.utility_functions import Util
 from mpfmc.core.assets import ThreadedAssetManager
 from mpfmc.core.mc_placeholder_manager import McPlaceholderManager
 from mpfmc.core.mc_settings_controller import McSettingsController
@@ -55,6 +56,7 @@ except ImportError:
 logging.Logger.manager.root = Logger
 
 
+# pylint: disable-msg=too-many-instance-attributes
 class MpfMc(App):
 
     """Kivy app for the mpf media controller."""
@@ -75,8 +77,8 @@ class MpfMc(App):
                            " v%s", __mpfversion__, __version__)
 
             raise ValueError("MPF MC and MPF Game engines must be same "
-                           "major.minor versions. You have MPF v{} and MPF-MC"
-                           " v{}".format(__mpfversion__, __version__))
+                             "major.minor versions. You have MPF v{} and MPF-MC"
+                             " v{}".format(__mpfversion__, __version__))
 
         super().__init__(**kwargs)
 
@@ -223,10 +225,10 @@ class MpfMc(App):
     def _load_font_paths(self):
         # Add local machine fonts path
         if os.path.isdir(os.path.join(self.machine_path,
-                self.machine_config['mpf-mc']['paths']['fonts'])):
+                                      self.machine_config['mpf-mc']['paths']['fonts'])):
 
             resource_add_path(os.path.join(self.machine_path,
-                self.machine_config['mpf-mc']['paths']['fonts']))
+                                           self.machine_config['mpf-mc']['paths']['fonts']))
 
         # Add mpfmc fonts path
         resource_add_path(os.path.join(os.path.dirname(mpfmc.__file__),
@@ -518,8 +520,9 @@ class MpfMc(App):
                 callback(name=name, value=self.vars[name],
                          prev_value=prev_value, change=change)
 
-    def tick(self, time):
-        del time
+    def tick(self, dt):
+        """Process event queue."""
+        del dt
         self.ticks += 1
         self.events.process_event_queue()
 

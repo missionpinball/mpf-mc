@@ -12,6 +12,7 @@ def percent_to_float(number_str, total):
     else:
         return float(number_str)
 
+
 def center_of_points_list(points: list) -> tuple:
     """Calculates the center (average) of points in a list."""
 

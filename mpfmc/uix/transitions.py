@@ -56,8 +56,7 @@ class TransitionManager(object):
             try:
                 config['transition'] = (
                     self.mc.config_validator.validate_config(
-                        'transitions:{}'.format(
-                        config['transition']['type']),
+                        'transitions:{}'.format(config['transition']['type']),
                         config['transition']))
 
             except KeyError:

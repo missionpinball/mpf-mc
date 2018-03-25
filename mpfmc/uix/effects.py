@@ -23,12 +23,15 @@ class EffectsManager(object):
 
     @property
     def effects(self) -> dict:
+        """Return effects."""
         return self._effects
 
     def register_effect(self, name: str, transition_cls) -> None:
+        """Register effect."""
         self._effects[name] = transition_cls
 
-    def get_effect(self, config: Optional[dict]=None) -> List["EffectBase"]:
+    def get_effect(self, config: Optional[dict] = None) -> List["EffectBase"]:
+        """Return effects."""
         if config:
             # The kivy shader transitions can't accept unexpected kwargs
             kwargs = config.copy()
@@ -64,11 +67,10 @@ class EffectsManager(object):
         self.register_effect('anti_aliasing', FXAAEffect)
 
     def validate_effects(self, config: Union[dict, list]) -> list:
-        """
-        Validate the effects section of a widget.
-        
+        """Validate the effects section of a widget.
+
         Args:
-            config: The localized 'effects' config dictionary for a single widget. 
+            config: The localized 'effects' config dictionary for a single widget.
 
         Returns:
             A list of 'effects' config dictionary entries that have been validated.
@@ -104,7 +106,8 @@ class EffectsManager(object):
 
 
 class EffectsChain(EventDispatcher, metaclass=abc.ABCMeta):
-    """Abstract base class for an effect that is actually a chain of 
+
+    """Abstract base class for an effect that is actually a chain of
     one or more individual effects."""
 
     @abc.abstractmethod

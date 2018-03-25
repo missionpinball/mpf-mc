@@ -87,7 +87,7 @@ class SoundPool(AssetPool):
         """String that's returned if someone prints this object"""
         return '<SoundPool: {} ({}), Loaded={}>'.format(self.name, self.id, self.loaded)
 
-    #pylint: disable=invalid-name
+    # pylint: disable=invalid-name
     @property
     def id(self):
         """
@@ -352,7 +352,7 @@ class SoundAsset(Asset):
                                      .format(sys.exc_info()[1], self.name))
 
         elif self._track and "tracks" in self.machine.sound_system.config and \
-                        'ducking' in self.machine.sound_system.config['tracks'][self._track]:
+                'ducking' in self.machine.sound_system.config['tracks'][self._track]:
             try:
                 self._ducking = DuckingSettings(
                     self.machine, self.machine.sound_system.config['tracks'][self.config['track']]['ducking'])
@@ -385,7 +385,7 @@ class SoundAsset(Asset):
         return ("%s, %s" % (self.priority, self._id) >
                 "%s, %s" % (other.priority, other.get_id()))
 
-    #pylint: disable=invalid-name
+    # pylint: disable=invalid-name
     @property
     def id(self):
         """
@@ -524,7 +524,7 @@ class SoundAsset(Asset):
         """Return the unique key value for this sound"""
         return self._key
 
-    def create_instance(self, context: Optional[str]=None, settings: Optional[dict]=None) -> "SoundInstance":
+    def create_instance(self, context: Optional[str] = None, settings: Optional[dict] = None) -> "SoundInstance":
         """Creates a new SoundInstance."""
         return SoundInstance(self, context, settings)
 
@@ -657,9 +657,7 @@ class SoundAsset(Asset):
 
             if len(markers) == AudioInterface.get_max_markers():
                 raise AudioException("Cannot add marker - the limit of {} sound markers has been "
-                                     "reached for sound {}.".format(
-                                        AudioInterface.get_max_markers(),
-                                        sound_name))
+                                     "reached for sound {}.".format(AudioInterface.get_max_markers(), sound_name))
 
             markers.append(marker)
 
@@ -681,8 +679,8 @@ class SoundInstance(object):
     for sound assets that contains all the overridden parameter values for playback."""
 
     def __init__(self, sound: Union[SoundAsset, SoundPool],     # noqa
-                 context: Optional[str]=None, settings: Optional[dict]=None):
-        """Constructor"""
+                 context: Optional[str] = None, settings: Optional[dict] = None):
+        """Construct sound instance."""
         if sound is None:
             raise ValueError("Cannot create sound instance: sound parameter is None")
 

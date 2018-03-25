@@ -10,7 +10,7 @@ from mpfmc.uix.widget import Widget, magic_events
 MYPY = False
 if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
-    from kivy.graphics.texture import Texture
+    from kivy.graphics.texture import Texture   # noqa
 
 
 class VideoWidget(Widget, Video):
@@ -18,7 +18,7 @@ class VideoWidget(Widget, Video):
     merge_settings = ('height', 'width')
     animation_properties = ('x', 'y')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         del kwargs
 
         super().__init__(mc=mc, config=config, key=key)

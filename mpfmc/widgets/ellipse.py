@@ -17,7 +17,7 @@ class Ellipse(Widget):
                             'angle_start', 'angle_end', 'opacity', 'rotation', 'scale')
     merge_settings = ('width', 'height')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 
@@ -55,7 +55,7 @@ class Ellipse(Widget):
     #
 
     segments = NumericProperty(180)
-    '''Defines how many segments will be used for drawing the ellipse. The 
+    '''Defines how many segments will be used for drawing the ellipse. The
     drawing will be smoother if you have many segments.
     '''
 

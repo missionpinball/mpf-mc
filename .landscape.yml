@@ -1,4 +1,4 @@
-#strictness: veryhigh
+strictness: veryhigh
 max-line-length: 120
 
 mccabe:

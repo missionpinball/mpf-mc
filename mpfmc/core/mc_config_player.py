@@ -4,6 +4,7 @@ import abc
 from mpf.config_players.device_config_player import DeviceConfigPlayer
 
 
+# pylint: disable-msg=abstract-method
 class McConfigPlayer(DeviceConfigPlayer, metaclass=abc.ABCMeta):
 
     """Remote config player which is triggered via BCP."""

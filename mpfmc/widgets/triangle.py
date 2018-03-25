@@ -14,10 +14,12 @@ if MYPY:   # pragma: no cover
 
 class Triangle(Widget):
 
+    """A triangle widget."""
+
     widget_type_name = 'Triangle'
     animation_properties = ('points', 'color', 'opacity', 'rotation', 'scale')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 

@@ -13,13 +13,15 @@ from mpf.core.config_processor import ConfigProcessor as ConfigProcessorBase
 
 class ConfigProcessor(ConfigProcessorBase):
 
+    """Reads the config for mc."""
+
     config_spec = None
 
     def __init__(self, machine):
+        super().__init__()
         self.mc = machine
         self.machine = machine
         self.system_config = self.mc.machine_config['mpf-mc']
-        self.log = logging.getLogger('ConfigProcessor')
         self.machine_sections = None
         self.mode_sections = None
 
@@ -85,6 +87,4 @@ class ConfigProcessor(ConfigProcessorBase):
     def create_display(self, name, config):
         # config is localized display settings
         from mpfmc.uix.display import Display
-        return Display(self.mc, name,
-            **self.machine.config_validator.validate_config('displays',
-                                                            config))
+        return Display(self.mc, name, **self.machine.config_validator.validate_config('displays', config))

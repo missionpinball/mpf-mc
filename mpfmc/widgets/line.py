@@ -18,7 +18,7 @@ class Line(Widget):
     widget_type_name = 'Line'
     animation_properties = ('color', 'thickness', 'opacity', 'points', 'rotation', 'scale')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 
@@ -82,7 +82,7 @@ class Line(Widget):
     '''
 
     joint = OptionProperty("round", options=["none", "round", "bevel", "miter"])
-    '''The join of the line, defaults to 'round'. Can be one of 'none', 'round', 
+    '''The join of the line, defaults to 'round'. Can be one of 'none', 'round',
     'bevel', 'miter'.
     '''
 

@@ -8,9 +8,8 @@ import sys
 import threading
 from datetime import datetime
 import time
-import psutil
-
 import errno
+import psutil
 
 # Note, other imports are done deeper in this file, which we need to do there
 # since Kivy does so much with singletons and we don't want MPF to import
@@ -189,7 +188,7 @@ class Command(object):
                   machine_path=machine_path,
                   thread_stopper=thread_stopper).run()
             logging.info("MC run loop ended.")
-        except Exception as e:
+        except Exception as e:  # noqa
             logging.exception(str(e))
 
         logging.info("Stopping child threads... (%s remaining)", len(threading.enumerate()) - 1)
@@ -206,6 +205,7 @@ class Command(object):
             input('Press ENTER to continue...')
 
         sys.exit()
+
 
 def get_command():
     return 'mc', Command

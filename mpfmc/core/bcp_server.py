@@ -75,8 +75,8 @@ class BCPServer(threading.Thread):
                 # main loop pick it up
                 self.receive_queue.put(('trigger',
                                         {'name': 'client_disconnected',
-                                        'host': self.socket.getsockname()[0],
-                                        'port': self.socket.getsockname()[1]}))
+                                         'host': self.socket.getsockname()[0],
+                                         'port': self.socket.getsockname()[1]}))
                 '''event: client_disconnected
                 desc: Posted on the MPF-MC only (e.g. not in MPF) when the BCP
                 client disconnects. This event is also posted when the MPF-MC
@@ -115,8 +115,8 @@ class BCPServer(threading.Thread):
                 # main loop pick it up
                 self.receive_queue.put(('trigger',
                                         {'name': 'client_connected',
-                                        'host': client_address[0],
-                                        'port': client_address[1]}))
+                                         'host': client_address[0],
+                                         'port': client_address[1]}))
 
                 '''event: client_connected
                 desc: Posted on the MPF-MC only when a BCP client has
@@ -166,7 +166,7 @@ class BCPServer(threading.Thread):
                 self.mc.stop()
                 return
 
-        except Exception:
+        except Exception:   # noqa
             exc_type, exc_value, exc_traceback = sys.exc_info()
             lines = traceback.format_exception(exc_type, exc_value,
                                                exc_traceback)
@@ -225,7 +225,7 @@ class BCPServer(threading.Thread):
                         msg, len(rawbytes)).encode('utf-8'))
                     self.connection.sendall(rawbytes)
 
-        except Exception:
+        except Exception:   # noqa
             exc_type, exc_value, exc_traceback = sys.exc_info()
             lines = traceback.format_exception(exc_type, exc_value,
                                                exc_traceback)

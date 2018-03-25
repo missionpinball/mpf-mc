@@ -12,10 +12,11 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatter import Scatter
 from kivy.graphics import (
     Translate, Fbo, ClearColor, ClearBuffers, Scale)
+from kivy.properties import ObjectProperty
 
 from mpfmc.uix.widget import WidgetContainer, Widget
 from mpfmc.uix.slide import Slide
-from kivy.properties import ObjectProperty
+
 
 MYPY = False
 if MYPY:   # pragma: no cover
@@ -31,6 +32,7 @@ transition_map = dict(none=NoTransition,
                       rise_in=RiseInTransition)
 
 
+# pylint: disable-msg=too-many-instance-attributes
 class Display(ScreenManager):
     displays_to_initialize = 0
 
@@ -270,15 +272,16 @@ class Display(ScreenManager):
         return self.get_screen(name)
 
     # pylint: disable-msg=too-many-arguments
-    def add_slide(self, name: str, config: Optional[dict]=None, priority: int=0,
-                  key: Optional[str]=None, play_kwargs: Optional[dict]=None) -> "Slide":
-        """
+    def add_slide(self, name: str, config: Optional[dict] = None, priority: int = 0,
+                  key: Optional[str] = None, play_kwargs: Optional[dict] = None) -> "Slide":
+        """Add a slide to this display.
+
         Add a slide to the list of slides managed by the display (or returns the existing
-        slide with the specified name if it already exists).  This method just adds the 
+        slide with the specified name if it already exists).  This method just adds the
         slide.  It does not display it.
-        
+
         Args:
-            name: The slide name. 
+            name: The slide name.
             config: The slide config.
             priority: The slide priority.
             key: Optional key.
@@ -297,14 +300,14 @@ class Display(ScreenManager):
                      play_kwargs=play_kwargs)
 
     # pylint: disable-msg=too-many-arguments
-    def show_slide(self, slide_name: str, transition: Optional[str]=None,
-                   key: Optional[str]=None, force: bool=False, priority: int=0,
-                   show: Optional[bool]=True, expire: Optional[float]=None,
-                   play_kwargs: Optional[dict]=None, **kwargs) -> bool:
+    def show_slide(self, slide_name: str, transition: Optional[str] = None,
+                   key: Optional[str] = None, force: bool = False, priority: int = 0,
+                   show: Optional[bool] = True, expire: Optional[float] = None,
+                   play_kwargs: Optional[dict] = None, **kwargs) -> bool:
         """
-        Request to show the specified slide. Many of the slide parameters may be overridden 
+        Request to show the specified slide. Many of the slide parameters may be overridden
         using the arguments for this function.
-        
+
         Args:
             slide_name: The name of the slide.
             transition: The slide transition (overrides any stored in the slide).
@@ -313,17 +316,15 @@ class Display(ScreenManager):
                 current slide.
             priority: The priority of the slide to show.
             show: Whether or not to actually show the slide.
-            expire: Expiration time (in seconds) after which the slide will be automatically 
+            expire: Expiration time (in seconds) after which the slide will be automatically
                 removed (overrides value stored in the slide).
             play_kwargs: Kwargs related to playing/displaying the slide.
-            **kwargs: Additional kwargs (will override settings in the play_kwargs parameter). 
+            **kwargs: Additional kwargs (will override settings in the play_kwargs parameter).
 
         Returns:
             True is the slide will be shown, False otherwise.
         """
-
         # TODO: Is the show parameter really needed?  Why call show_slide and not show the slide?
-
         if not play_kwargs:
             play_kwargs = kwargs
         else:
@@ -374,16 +375,16 @@ class Display(ScreenManager):
             return False
 
     # pylint: disable-msg=too-many-arguments
-    def add_and_show_slide(self, widgets: Optional[dict]=None,
-                           slide_name: Optional[str]=None,
-                           transition: Optional[str]=None, priority: int=0,
-                           key: Optional[str]=None, force: bool=False,
-                           expire: Optional[float]=None, play_kwargs=None,
+    def add_and_show_slide(self, widgets: Optional[dict] = None,
+                           slide_name: Optional[str] = None,
+                           transition: Optional[str] = None, priority: int = 0,
+                           key: Optional[str] = None, force: bool = False,
+                           expire: Optional[float] = None, play_kwargs=None,
                            **kwargs) -> bool:
-        """
-        Create and show the slide.  If a slide with this name already exists, it will
-        be replaced.
-        
+        """Create and show the slide.
+
+        If a slide with this name already exists, it will be replaced.
+
         Args:
             widgets: An optional dictionary of widgets to add to the slide.
             slide_name: The name of the slide.
@@ -392,18 +393,15 @@ class Display(ScreenManager):
                 current slide.
             key: The slide key.
             priority: The priority of the slide to show.
-            expire: Expiration time (in seconds) after which the slide will be automatically 
+            expire: Expiration time (in seconds) after which the slide will be automatically
                 removed (overrides value stored in the slide).
             play_kwargs: Kwargs related to playing/displaying the slide.
-            **kwargs: Additional kwargs (will override settings in the play_kwargs parameter). 
+            **kwargs: Additional kwargs (will override settings in the play_kwargs parameter).
 
         Returns:
             True is the slide will be shown, False otherwise.
-            
         """
-
         # TODO: how can slide_name be optional? Blank slide?
-
         if not play_kwargs:
             play_kwargs = kwargs
         else:
@@ -418,9 +416,8 @@ class Display(ScreenManager):
                                expire=expire, play_kwargs=play_kwargs)
 
     def remove_slide(self, slide: Union["Slide", str],
-                     transition_config: Optional[dict]=None) -> bool:
-        """
-        Remove a slide from the display.
+                     transition_config: Optional[dict] = None) -> bool:
+        """Remove a slide from the display.
 
         Args:
             slide: The slide to remove (can be name string or Slide object)
@@ -440,7 +437,6 @@ class Display(ScreenManager):
         # at the exact perfect instant when a mode was starting or something?
 
         # maybe we make sure to run a Kivy tick between bcp reads or something?
-
         try:
             slide = self.get_slide(slide)
         except ScreenManagerException:  # no slide by that name
@@ -623,10 +619,9 @@ class DisplayOutput(Scatter):
     def __repr__(self) -> str:  # pragma: no cover
         try:
             return '<DisplayOutput size={}, pos={}, source={}>'.format(
-                    self.size, self.pos, self.display.name)
+                self.size, self.pos, self.display.name)
         except AttributeError:
-            return '<DisplayOutput size={}, source=(none)>'.format(
-                    self.size)
+            return '<DisplayOutput size={}, source=(none)>'.format(self.size)
 
     def _redraw(self, *args):
         del args

@@ -9,8 +9,7 @@ from mpf.core.utility_functions import Util
 
 __all__ = ('SoundSystem',
            'AudioInterface',
-           'AudioException',
-          )
+           'AudioException')
 
 # ---------------------------------------------------------------------------
 #    Default sound system and track values
@@ -154,7 +153,7 @@ class SoundSystem(object):
         """Return default track."""
         return self.audio_interface.get_track(0)
 
-    def master_volume_increase(self, delta: float=0.05, **kwargs):
+    def master_volume_increase(self, delta: float = 0.05, **kwargs):
         """Increase master volume by delta.
 
         Args:
@@ -164,7 +163,7 @@ class SoundSystem(object):
         self.master_volume += delta
         self.log.info("Increased master volume by %s to %s.", delta, self.master_volume)
 
-    def master_volume_decrease(self, delta: float=0.05, **kwargs):
+    def master_volume_decrease(self, delta: float = 0.05, **kwargs):
         """Decrease master volume by delta.
 
         Args:

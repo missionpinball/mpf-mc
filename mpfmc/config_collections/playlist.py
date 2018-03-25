@@ -100,7 +100,7 @@ class PlaylistInstance(object):
 
     # pylint: disable-msg=too-many-arguments
     def __init__(self, name: str, playlist: dict, track_crossfade_time: float,
-                 context: Optional[str]=None, settings: Optional[dict]=None):
+                 context: Optional[str] = None, settings: Optional[dict] = None):
         """Constructor"""
         self._name = name
         if playlist is None:

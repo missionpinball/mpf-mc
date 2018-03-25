@@ -17,7 +17,7 @@ class Point(Widget):
     widget_type_name = 'Point'
     animation_properties = ('points', 'pointsize', 'color', 'opacity', 'rotation', 'scale')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 

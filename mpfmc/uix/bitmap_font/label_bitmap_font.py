@@ -10,6 +10,7 @@ class LabelBitmapFont(LabelBase):
     def __init__(self, mc: MpfMc, font_name, text='', font_kerning=True, **kwargs):
         del kwargs
         self.mc = mc
+        self._surface = None
         super().__init__(text=text, font_name=font_name, font_kerning=font_kerning)
 
     def get_font_asset(self) -> BitmapFontAsset:

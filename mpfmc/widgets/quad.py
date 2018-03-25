@@ -17,7 +17,7 @@ class Quad(Widget):
     widget_type_name = 'Quad'
     animation_properties = ('points', 'color', 'opacity', 'rotation', 'scale')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 
@@ -61,14 +61,14 @@ class Quad(Widget):
 
     rotation = NumericProperty(0)
     '''Rotation angle value of the widget.
-    
+
     :attr:`rotation` is an :class:`~kivy.properties.NumericProperty` and defaults to
     0.
     '''
 
     scale = NumericProperty(1.0)
     '''Scale value of the widget.
-    
+
     :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
     1.0.
     '''

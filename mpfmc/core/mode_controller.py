@@ -17,6 +17,7 @@ be called on mode_start or mode_stop.
 
 # todo create a single ModeController base class for MPF and MPF-MC
 
+
 class ModeController(object):
     """Parent class for the Mode Controller. There is one instance of this in
     MPF and it's responsible for loading, unloading, and managing all game
@@ -158,9 +159,9 @@ class ModeController(object):
         for folder in mode_folders:
 
             this_mode_folder = os.path.join(
-                    base_folder,
-                    self.mc.machine_config['mpf-mc']['paths']['modes'],
-                    folder)
+                base_folder,
+                self.mc.machine_config['mpf-mc']['paths']['modes'],
+                folder)
 
             if os.path.isdir(this_mode_folder) and not folder.startswith('_'):
                 final_mode_folders[folder.lower()] = folder
