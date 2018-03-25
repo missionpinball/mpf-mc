@@ -105,7 +105,6 @@ class TestSlidePlayer(MpfMcTestCase):
                          'mode1_slide')
         slide = weakref.ref(self.mc.targets['display1'].current_slide)
         self.assertTrue(slide())
-        print("STOP")
         # stop the mode and make sure the slide is removed
         num_slides = len(self.mc.targets['display1'].slides)
         self.mc.modes['mode1'].stop()
