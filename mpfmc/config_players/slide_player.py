@@ -271,7 +271,7 @@ class McSlidePlayer(McConfigPlayer):
     def clear_context(self, context):
         """Remove all slides from this player context."""
         instance_dict = self._get_instance_dict(context)
-        for target_name, slides in instance_dict.items():
+        for _, slides in instance_dict.items():
             for slide in slides.values():
                 slide.remove()
 
