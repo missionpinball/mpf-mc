@@ -1,6 +1,7 @@
 from mpf.core.assets import Asset
 
 
+# pylint: disable-msg=abstract-method
 class McAsset(Asset):
 
     """Baseclass for all assets in mc."""

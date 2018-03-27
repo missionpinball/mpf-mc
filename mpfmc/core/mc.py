@@ -430,7 +430,7 @@ class MpfMc(App):
         else:
             self.log.info("--- DEBUG DUMP OBJECTS DISABLED BECAUSE OF PRODUCTION FLAG ---")
         self.log.info("--- DEBUG DUMP CLOCK ---")
-        ev = Clock._root_event
+        ev = Clock._root_event  # pylint: disable-msg=protected-access
         while ev:
             self.log.info(ev)
             ev = ev.next
