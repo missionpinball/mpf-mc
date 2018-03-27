@@ -408,6 +408,7 @@ class Widget(KivyWidget):
     def prepare_for_removal(self) -> None:
         """Prepare the widget to be removed."""
         self.mc.clock.unschedule(self.remove)
+        self.stop_animation()
         self._remove_animation_events()
 
     def schedule_removal(self, secs: float) -> None:
@@ -569,7 +570,7 @@ class Widget(KivyWidget):
     def stop_animation(self) -> None:
         """Stop the current widget animation."""
         try:
-            self.animation.stop(self)
+            self.animation.cancel(self)
         except AttributeError:
             pass
 

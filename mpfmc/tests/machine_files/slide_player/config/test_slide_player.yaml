@@ -98,7 +98,7 @@ slides:
       height: 300
       color: lime
     transition: move_in
-  machine_slide_10:
+  machine_slide_10:   # used for test_SlidePlayer::test_animation_triggers
     widgets:
     - type: text
       text: WIDGET 1
@@ -210,8 +210,8 @@ slide_player:
   slide2_expire_1s:
     machine_slide_2:
       expire: 1s
-  show_slide_with_animations:
-    my_slide:
+  random_player_with_animations:  # used for test_SlidePlayer::test_animation_triggers
+    random_slide:
       widgets:
       - type: text
         text: WIDGET 1
@@ -224,3 +224,19 @@ slide_player:
             value: 0
             duration: .25s
             repeat: yes
+  show_slide_with_animations:
+    my_slide:
+      widgets:
+      - type: text
+        text: WIDGET 1
+        animations:
+          pre_show_slide:
+          - property: opacity
+            value: 1
+            duration: .25s
+          - property: opacity
+            value: 0
+            duration: .25s
+            repeat: yes
+  remove_slide_with_animations:
+    my_slide: remove
