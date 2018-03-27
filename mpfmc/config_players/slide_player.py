@@ -172,7 +172,6 @@ class McSlidePlayer(McConfigPlayer):
     def get_express_config(self, value):
         # express config for slides can either be a string (slide name) or a
         # list (widgets which are put on a new slide)
-
         if isinstance(value, list):
             return dict(widgets=value)
         else:
@@ -233,8 +232,11 @@ class McSlidePlayer(McConfigPlayer):
                 elif isinstance(slide_settings, str):
                     # slide_settings could be a string 'slide: slide_name',
                     # so we rename the key to the slide name with an empty dict
-                    slide = slide_settings
-                    slide_settings = dict()
+                    if slide_settings == "remove":
+                        slide_settings = {"action": "remove"}
+                    else:
+                        slide = slide_settings
+                        slide_settings = dict()
 
                 elif not isinstance(slide_settings, dict):
                     raise AssertionError(
