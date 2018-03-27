@@ -15,22 +15,16 @@ if MYPY:   # pragma: no cover
 
 
 # pylint: disable-msg=too-many-instance-attributes
-class CustomLabel(Label):
+class BitmapFontLabel(Label):
 
     """Injects a font or bitmap font into a text widget."""
 
-    def __init__(self, mc: "MpfMc", config: dict, **kwargs):
+    def __init__(self, mc: "MpfMc", font_name, **kwargs):
 
         self.mc = mc
-
-        if 'bitmap_font' in config:
-            self.bitmap_font = config['bitmap_font']
-
-        if self.bitmap_font:
-            if 'font_name' not in config:
-                raise ValueError("Text widget: font_name is required when bitmap_font is True.")
-            kwargs.setdefault('font_name', config['font_name'])
-            kwargs.setdefault('font_kerning', True)
+        self.mc.track_leak_reference(self)
+        kwargs.setdefault('font_name', font_name)
+        kwargs.setdefault('font_kerning', True)
 
         super().__init__(**kwargs)
 
@@ -39,16 +33,13 @@ class CustomLabel(Label):
         return self._label
 
     def _create_label(self):
-        if self.bitmap_font:
-            d = Label._font_properties
-            dkw = dict(list(zip(d, [getattr(self, x) for x in d])))
-            self._label = LabelBitmapFont(self.mc, **dkw)
-        else:
-            super()._create_label()
+        d = Label._font_properties
+        dkw = dict(list(zip(d, [getattr(self, x) for x in d])))
+        self._label = LabelBitmapFont(self.mc, **dkw)
 
-    bitmap_font = BooleanProperty(False)
-    '''Flag indicating whether or not the font_name attribute refers to a
-    bitmap font.'''
+
+var_finder = re.compile(r"(?<=\()[a-zA-Z_0-9|]+(?=\))")
+string_finder = re.compile(r"(?<=\$)[a-zA-Z_0-9]+")
 
 
 class Text(Widget):
@@ -56,8 +47,6 @@ class Text(Widget):
     """A text widget on a slide."""
 
     widget_type_name = 'Text'
-    var_finder = re.compile(r"(?<=\()[a-zA-Z_0-9|]+(?=\))")
-    string_finder = re.compile(r"(?<=\$)[a-zA-Z_0-9]+")
     merge_settings = ('font_name', 'font_size', 'bold', 'italic', 'halign',
                       'valign', 'padding_x', 'padding_y', 'text_size',
                       'shorten', 'mipmap', 'markup', 'line_height',
@@ -67,7 +56,12 @@ class Text(Widget):
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None,
                  play_kwargs: Optional[dict] = None, **kwargs) -> None:
-        self._label = CustomLabel(mc, config)
+        if config['bitmap_font']:
+            if 'font_name' not in config or not config['font_name']:
+                raise ValueError("Text widget: font_name is required when bitmap_font is True.")
+            self._label = BitmapFontLabel(mc, config['font_name'])
+        else:
+            self._label = Label()
         self._label.fbind('texture', self.on_label_texture)
 
         super().__init__(mc=mc, config=config, key=key)
@@ -134,7 +128,7 @@ class Text(Widget):
         if '$' not in text:
             return text
 
-        for text_string in Text.string_finder.findall(text):
+        for text_string in string_finder.findall(text):
             text = text.replace('${}'.format(text_string),
                                 self._do_get_text_string(text_string))
 
@@ -149,7 +143,7 @@ class Text(Widget):
 
     @staticmethod
     def _get_text_vars(text: str):
-        return Text.var_finder.findall(text)
+        return var_finder.findall(text)
 
     def _process_text(self, text: str) -> None:
         for var_string in self._get_text_vars(text):
