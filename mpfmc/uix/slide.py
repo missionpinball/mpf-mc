@@ -1,3 +1,4 @@
+"""A slide which can show widgets."""
 from bisect import bisect
 from typing import List, Optional
 
@@ -43,6 +44,7 @@ class Slide(Screen, StencilView):
         self.priority = priority
         self.pending_widgets = set()
         self.key = key
+        self.mc.track_leak_reference(self)
 
         if not config:
             config = self.mc.config_validator.validate_config('slides', dict())

@@ -1,3 +1,4 @@
+"""A widget on a slide."""
 from typing import Union, Optional, List, Tuple
 from copy import deepcopy
 from functools import reduce
@@ -79,6 +80,7 @@ class Widget(KivyWidget):
         super().__init__(**self.pass_to_kivy_widget_init())
 
         self.mc = mc
+        self.mc.track_leak_reference(self)
 
         # Create a container widget as this widget's parent.  The container will adjust
         # the coordinate system for this widget so that all positional properties are

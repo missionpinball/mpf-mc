@@ -9,6 +9,9 @@ import time
 import logging
 import asyncio
 
+import gc
+import weakref
+
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.resources import resource_add_path
@@ -127,6 +130,7 @@ class MpfMc(App):
         self.crash_queue = queue.Queue()
         self.ticks = 0
         self.start_time = 0
+        self.debug_refs = []
 
         if thread_stopper:
             self.thread_stopper = thread_stopper
@@ -175,6 +179,13 @@ class MpfMc(App):
         self.create_machine_var('mpfmc_ver', __version__)
         # force setting it here so we have it before MPF connects
         self.receive_machine_var_update('mpfmc_ver', __version__, 0, True)
+
+    def track_leak_reference(self, element):
+        """Track elements to find leaks."""
+        if not self.options["production"]:
+            self.debug_refs.append(weakref.ref(element))
+            # cleanup all dead references
+            self.debug_refs = [element for element in self.debug_refs if element()]
 
     @staticmethod
     def _preprocess_config(config):
@@ -407,6 +418,13 @@ class MpfMc(App):
                 children += 1
             self.log.info("Total children: %s", children)
         self.log.info("--- DEBUG DUMP DISPLAYS END ---")
+        self.log.info("--- DEBUG DUMP LEAKS ---")
+        gc.collect()
+        for element in self.debug_refs:
+            real_element = element()
+            if real_element:
+                self.log.info(real_element)
+        self.log.info("--- DEBUG DUMP LEAKS END ---")
 
     def on_stop(self):
         self.log.info("Stopping...")
