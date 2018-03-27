@@ -418,13 +418,23 @@ class MpfMc(App):
                 children += 1
             self.log.info("Total children: %s", children)
         self.log.info("--- DEBUG DUMP DISPLAYS END ---")
-        self.log.info("--- DEBUG DUMP LEAKS ---")
         gc.collect()
-        for element in self.debug_refs:
-            real_element = element()
-            if real_element:
-                self.log.info(real_element)
-        self.log.info("--- DEBUG DUMP LEAKS END ---")
+        if not self.options["production"]:
+            self.log.info("--- DEBUG DUMP OBJECTS ---")
+            self.log.info("Elements in list (may be dead): %s", len(self.debug_refs))
+            for element in self.debug_refs:
+                real_element = element()
+                if real_element:
+                    self.log.info(real_element)
+            self.log.info("--- DEBUG DUMP OBJECTS END ---")
+        else:
+            self.log.info("--- DEBUG DUMP OBJECTS DISABLED BECAUSE OF PRODUCTION FLAG ---")
+        self.log.info("--- DEBUG DUMP CLOCK ---")
+        ev = Clock._root_event
+        while ev:
+            self.log.info(ev)
+            ev = ev.next
+        self.log.info("--- DEBUG DUMP CLOCK END ---")
 
     def on_stop(self):
         self.log.info("Stopping...")

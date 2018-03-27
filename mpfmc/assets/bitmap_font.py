@@ -1,11 +1,11 @@
-from typing import Optional
 from os import path
 
-from mpf.core.assets import Asset
 from mpfmc.uix.bitmap_font.bitmap_font import BitmapFont
 
+from mpfmc.assets.mc_asset import McAsset
 
-class BitmapFontAsset(Asset):
+
+class BitmapFontAsset(McAsset):
 
     attribute = 'bitmap_fonts'
     path_string = 'bitmap_fonts'

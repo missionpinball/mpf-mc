@@ -8,9 +8,11 @@ from enum import Enum, unique
 from typing import Optional, Union
 
 
-from mpf.core.assets import Asset, AssetPool
+from mpf.core.assets import AssetPool
 from mpf.core.utility_functions import Util
 from mpfmc.core.audio.audio_interface import AudioInterface
+
+from mpfmc.assets.mc_asset import McAsset
 from mpfmc.core.audio.audio_exception import AudioException
 
 
@@ -191,7 +193,7 @@ class ModeEndAction(Enum):
 
 
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
-class SoundAsset(Asset):
+class SoundAsset(McAsset):
     """
     Sound asset class contains a single sound that may be played using the audio engine.
 

@@ -2,7 +2,8 @@ from kivy.core.video import Video
 from kivy.core.video.video_null import VideoNull
 from kivy.properties import AliasProperty
 
-from mpf.core.assets import Asset, AssetPool
+from mpf.core.assets import AssetPool
+from mpfmc.assets.mc_asset import McAsset
 
 
 class VideoPool(AssetPool):
@@ -37,7 +38,7 @@ class VideoWrapper(Video):
         self.dispatch('on_play')
 
 
-class VideoAsset(Asset):
+class VideoAsset(McAsset):
 
     attribute = 'videos'
     path_string = 'videos'

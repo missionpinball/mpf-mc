@@ -48,6 +48,7 @@ class Display(ScreenManager):
         self.config = kwargs
         self._ready = False
         self.tags = []
+        self.mc.track_leak_reference(self)
 
         Display.displays_to_initialize += 1
 
