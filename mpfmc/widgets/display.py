@@ -1,11 +1,10 @@
 from typing import Optional
 
-from mpfmc.widgets.effect_widget import EffectWidget
-
 from kivy.uix.relativelayout import RelativeLayout
 
 from mpfmc.uix.widget import Widget
 from mpfmc.uix.display import DisplayOutput
+from mpfmc.widgets.effect_widget import EffectWidget
 
 MYPY = False
 if MYPY:   # pragma: no cover
