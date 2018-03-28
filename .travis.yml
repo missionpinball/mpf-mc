@@ -26,7 +26,7 @@ matrix:
      python: "3.5"
    - os: osx
      language: generic
-     osx_image: xcode8.2  # OS 10.12
+     osx_image: xcode8.3  # OS 10.12
    - os: osx
      language: generic
      osx_image: xcode8  # OS 10.11
@@ -52,10 +52,12 @@ install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       curl --progress-bar -S https://www.python.org/ftp/python/3.5.4/python-3.5.4-macosx10.6.pkg -o python-3.5.4-macosx10.6.pkg;
       sudo installer -pkg python-3.5.4-macosx10.6.pkg -target /;
+      curl -sS https://bootstrap.pypa.io/get-pip.py > get-pip.py;
+      sudo python3 get-pip.py;
     fi;
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       cd ${TRAVIS_BUILD_DIR};
-      pip3 install pip setuptools Cython==0.25.2 --upgrade;
+      pip3 install setuptools Cython==0.25.2 --upgrade;
       git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
       pip3 install -e _mpf/;
       pip3 install .;
