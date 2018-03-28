@@ -1,5 +1,8 @@
 """DMD (hardware device)."""
 import struct
+
+from kivy.graphics.instructions import Callback
+
 from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
@@ -32,6 +35,7 @@ class DmdBase(object):
 
         self.source = self.mc.displays[self.config['source_display']]
         self.prev_data = None
+        self._dirty = True
 
         # put the widget canvas on a Fbo
         texture = Texture.create(size=self.source.size, colorfmt='rgb')
@@ -57,7 +61,14 @@ class DmdBase(object):
 
         self.fbo.add(self.effect_widget.canvas)
 
+        with self.source.canvas:
+            self.callback = Callback(self._trigger_rendering)
+
         self._set_dmd_fps()
+
+    def _trigger_rendering(self, *args):
+        del args
+        self._dirty = True
 
     def _get_validated_config(self, config: dict) -> dict:
         raise NotImplementedError
@@ -92,28 +103,30 @@ class DmdBase(object):
         self.mc.log.info("Setting %s to %sfps",
                          DmdBase.dmd_name_string, fps)
 
-    def tick(self, dt) -> None:
+    def tick(self, *args) -> None:
         """Draw image for DMD and send it."""
-        del dt
+        del args
         # run this at the end of the tick to make sure all kivy bind callbacks have executed
-        Clock.schedule_once(self._render, -1)
+        if self._dirty:
+            Clock.schedule_once(self._render, -1)
 
     def _render(self, dt):
         del dt
+        self._dirty = False
         widget = self.source
         fbo = self.fbo
 
         # detach the widget from the parent
         parent = widget.parent
         if parent:
-            parent.remove_widget(widget)
-
-        self.effect_widget.add_widget(widget)
+            parent.remove_display_source(widget)
 
         # clear the fbo background
         fbo.bind()
         fbo.clear_buffer()
         fbo.release()
+
+        self.effect_widget.add_widget(widget)
 
         fbo.draw()
 
@@ -122,10 +135,11 @@ class DmdBase(object):
                             GL_RGB, GL_UNSIGNED_BYTE)
         fbo.release()
 
+        self.effect_widget.remove_widget(widget)
+
         # reattach to the parent
         if parent:
-            self.effect_widget.remove_widget(widget)
-            parent.add_widget(widget)
+            parent.add_display_source(widget)
 
         if not self.config['only_send_changes'] or self.prev_data != data:
             self.prev_data = data

@@ -8,7 +8,6 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     FallOutTransition, RiseInTransition,
                                     ScreenManagerException)
 from kivy.uix.widget import Widget as KivyWidget, WidgetException as KivyWidgetException
-from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.scatter import Scatter
 from kivy.graphics import (
     Translate, Fbo, ClearColor, ClearBuffers, Scale)
@@ -48,6 +47,8 @@ class Display(ScreenManager):
         self.config = kwargs
         self._ready = False
         self.tags = []
+        self.display = self
+        self.parents = []
         self.mc.track_leak_reference(self)
 
         Display.displays_to_initialize += 1
@@ -68,14 +69,8 @@ class Display(ScreenManager):
         # per clock frame no matter how many times it is called.
         self._current_slide_changed = Clock.create_trigger(self._post_active_slide_event, -1)
 
-        # Need to create a widget that will be the parent of the slide manager.  This is
-        # necessary to allow widgets with negative z values to remain in the display while
-        # slides are changed.
-        self._slide_manager_parent = FloatLayout(size_hint=(None, None), size=self.size)
-        self._slide_manager_parent.z = 0
-        self._slide_manager_parent.add_widget(self)
-
         Clock.schedule_once(self._display_created, 0)
+        self._updating = True
 
     def __repr__(self):
         return '<Display name={}{}, current slide={}, total slides={}>'.format(
@@ -87,10 +82,6 @@ class Display(ScreenManager):
         @see: widget.export_to_png
         """
         del args
-        if self._slide_manager_parent.parent is not None:
-            canvas_parent_index = self._slide_manager_parent.parent.canvas.indexof(self._slide_manager_parent.canvas)
-            if canvas_parent_index > -1:
-                self._slide_manager_parent.parent.canvas.remove(self._slide_manager_parent.canvas)
 
         fbo = Fbo(size=self._slide_manager_parent.size, with_stencilbuffer=True)
 
@@ -98,16 +89,13 @@ class Display(ScreenManager):
             ClearColor(0, 0, 0, 1)
             ClearBuffers()
             Scale(1, -1, 1)
-            Translate(-self._slide_manager_parent.x,
-                      -self._slide_manager_parent.y - self._slide_manager_parent.height, 0)
+            Translate(-self.x,
+                      -self.y - self.height, 0)
 
-        fbo.add(self._slide_manager_parent.canvas)
+        fbo.add(self.canvas)
         fbo.draw()
         data = fbo.texture.pixels
-        fbo.remove(self._slide_manager_parent.canvas)
-
-        if self._slide_manager_parent.parent is not None and canvas_parent_index > -1:
-            self._slide_manager_parent.parent.canvas.insert(canvas_parent_index, self._slide_manager_parent.canvas)
+        fbo.remove(self.canvas)
 
         return data
 
@@ -118,11 +106,11 @@ class Display(ScreenManager):
     @property
     def parent_widgets(self) -> List["WidgetContainer"]:
         """The list of all widgets owned by the display parent."""
-        return [x for x in self._slide_manager_parent.children if x != self]
+        return self.parents
 
     def has_parent(self) -> bool:
         """Returns whether or not the display has a parent."""
-        return self._slide_manager_parent.parent is not None
+        return bool(self.parents)
 
     def _display_created(self, *args) -> None:
         """Callback after this display is created."""
@@ -551,9 +539,9 @@ class Display(ScreenManager):
     def remove_widgets_by_key(self, key: str) -> None:
         """Removes all widgets with the specified key."""
         for widget in self.find_widgets_by_key(key):
-            if isinstance(widget, Widget):
+            if isinstance(widget, Widget) and widget.container and widget.container.parent:
                 widget.container.parent.remove_widget(widget.container)
-            else:
+            elif widget.parent:
                 widget.parent.remove_widget(widget)
 
     def find_widgets_by_key(self, key: str) -> List["KivyWidget"]:
@@ -563,7 +551,7 @@ class Display(ScreenManager):
         # First find all matching widgets owned by the slide parent
         for child in self.parent_widgets:
             widgets.extend([x for x in child.walk(restrict=True, loopback=False)
-                            if x.key == key])
+                            if hasattr(x, "key") and x.key == key])
 
         # Finally find all matching widgets owned by each slide
         for slide in self.slides:
@@ -610,12 +598,45 @@ class DisplayOutput(Scatter):
         # to essentially have multiple parents. The canvas contains all the
         # instructions needed to draw the widgets.
         self.display = display
-        self.canvas.add(self.display.parent.canvas)
 
         parent.bind(size=self.on_parent_resize)
-        parent.add_widget(self)
         self._fit_to_parent()
-        Clock.schedule_interval(self._redraw, 0)
+
+    #
+    # Tree management
+    #
+    def add_display_source(self, widget):
+        """Add a new widget as a child of this widget.
+
+        :Parameters:
+            `widget`: :class:`Widget`
+                Widget to add to our list of children.
+        """
+        if not isinstance(widget, Display):
+            raise KivyWidgetException(
+                'add_widget_multi_parent() can be used only with instances'
+                ' of the Display class.')
+
+        widget = widget.__self__
+        if widget is self:
+            raise KivyWidgetException(
+                'Widget instances cannot be added to themselves.')
+
+        widget.parent = self
+        widget.parents.append(self)
+
+        canvas = self.canvas
+        canvas.add(widget.canvas)
+
+    def remove_display_source(self, widget):
+        """Remove a display."""
+        if not isinstance(widget, Display):
+            raise KivyWidgetException(
+                'remove_display_source() can be used only with instances'
+                ' of the Display class.')
+        widget.parents.remove(self)
+        widget.parent = None
+        self.canvas.remove(widget.canvas)
 
     def __repr__(self) -> str:  # pragma: no cover
         try:
@@ -624,14 +645,8 @@ class DisplayOutput(Scatter):
         except AttributeError:
             return '<DisplayOutput size={}, source=(none)>'.format(self.size)
 
-    def _redraw(self, *args):
-        del args
-        # TODO: Add more intelligence to canvas update process
-        # Probably only need to update the canvas when there are multiple display
-        # objects connected to the same source display (rare)
-        self.canvas.ask_update()
-
     def on_parent_resize(self, *args):
+        """Fit to parent on resize."""
         del args
         self._fit_to_parent()
 

@@ -2,7 +2,6 @@ from typing import Optional
 
 from kivy.uix.effectwidget import EffectWidget
 from kivy.uix.relativelayout import RelativeLayout
-from kivy.properties import NumericProperty
 
 from mpfmc.uix.widget import Widget
 from mpfmc.uix.display import DisplayOutput
@@ -24,15 +23,25 @@ class DisplayWidget(Widget, RelativeLayout):
         super().__init__(mc=mc, config=config, key=key)
 
         self.display = self.mc.displays[self.config['source_display']]
-        self.effects = EffectWidget(pos=self.pos, size_hint=(1, 1))
-        self.effects.key = None
 
-        if 'effects' in self.config:
+        if 'effects' in self.config and self.config['effects']:
+            self.effects = EffectWidget(pos=self.pos, size_hint=(1, 1))
+            self.effects.key = None
             self._add_effects(self.config['effects'])
+        else:
+            self.effects = RelativeLayout(pos=self.pos, size_hint=(1, 1))
 
         # Establish link between display and this display widget
-        self.add_widget(self.effects)
         self.display_output = DisplayOutput(self.effects, self.display)
+        self.effects.add_widget(self.display_output)
+        self.add_widget(self.effects)
+        self.display_output.add_display_source(self.display)
+
+    def prepare_for_removal(self):
+        """Remove display and effects."""
+        super().prepare_for_removal()
+        self.remove_widget(self.effects)
+        self.display_output.remove_display_source(self.display)
 
     def __repr__(self) -> str:  # pragma: no cover
         try:

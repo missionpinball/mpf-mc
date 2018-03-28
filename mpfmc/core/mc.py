@@ -11,6 +11,7 @@ import asyncio
 
 import gc
 import weakref
+from collections import defaultdict
 
 from kivy.app import App
 from kivy.clock import Clock
@@ -131,6 +132,7 @@ class MpfMc(App):
         self.ticks = 0
         self.start_time = 0
         self.debug_refs = []
+        self.object_stats = defaultdict(int)
 
         if thread_stopper:
             self.thread_stopper = thread_stopper
@@ -435,6 +437,14 @@ class MpfMc(App):
             self.log.info(ev)
             ev = ev.next
         self.log.info("--- DEBUG DUMP CLOCK END ---")
+        gc.collect()
+        current_obj = defaultdict(int)
+        for i in gc.get_objects():
+            current_obj[type(i)] += 1
+
+        self.log.info([(k, current_obj[k] - self.object_stats[k]) for k in current_obj
+                       if current_obj[k] - self.object_stats[k]])
+        self.object_stats = current_obj
 
     def on_stop(self):
         self.log.info("Stopping...")

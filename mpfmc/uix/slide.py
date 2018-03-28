@@ -245,7 +245,7 @@ class Slide(Screen, StencilView):
         """Return a list of widgets with the matching key value by searching
         the tree of children belonging to this slide."""
         return [w for child in self.children
-                for w in child.walk(restrict=True, loopback=False) if w.key == key]
+                for w in child.walk(restrict=True, loopback=False) if hasattr(w, "key") and w.key == key]
 
     def add_widget_to_parent_frame(self, widget: "KivyWidget"):
         """Adds this widget to this slide's parent instead of to this slide.

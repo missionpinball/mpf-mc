@@ -9,7 +9,7 @@ from kivy.animation import Animation
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.widget import Widget as KivyWidget
 from kivy.properties import (NumericProperty, ReferenceListProperty,
-                             StringProperty, AliasProperty, ListProperty)
+                             StringProperty, AliasProperty, ListProperty, ObjectProperty)
 
 from mpf.core.rgba_color import RGBAColor
 
@@ -182,7 +182,8 @@ class Widget(KivyWidget):
 
             # The top-most parent owns the display, so traverse up to find the config
             top_widget = parent
-            while hasattr(top_widget, 'parent') and not hasattr(top_widget, 'display'):
+            while not hasattr(top_widget, "display") and top_widget.parent != top_widget and top_widget.parent:
+                print(top_widget)
                 top_widget = top_widget.parent
             displayconfig = top_widget.display.config if hasattr(top_widget, 'display') else dict()
 
@@ -717,6 +718,10 @@ class Widget(KivyWidget):
     key = StringProperty(None, allownone=True)
     '''Widget keys are used to uniquely identify instances of widgets which you can later
     use to update or remove the widget.
+    '''
+
+    display = ObjectProperty(None, allownone=True)
+    '''The current display which displays this widget. Propagated to the bottom.
     '''
 
     color = ListProperty([1.0, 1.0, 1.0, 1.0])

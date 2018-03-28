@@ -605,7 +605,7 @@ class TestWidget(MpfMcTestCase):
         # verify widget6 is the highest priority in the parent frame
         # (highest priority is the first element in the list)
         self.assertEqual('widget6', self.mc.targets[
-            'default'].parent_widgets[0].widget.text)
+            'default'].parent_widgets[0].children[0].children[0].text)
 
         # now switch the slide
         self.mc.targets['default'].add_slide(name='slide2')
@@ -621,7 +621,7 @@ class TestWidget(MpfMcTestCase):
 
         # make sure widget6 is still in the SlideFrameParent
         self.assertEqual('widget6', self.mc.targets[
-            'default'].parent_widgets[0].widget.text)
+            'default'].parent_widgets[0].children[0].children[0].text)
 
     def test_widget_to_parent_via_widget_settings(self):
         # create a slide and add some base widgets
@@ -704,9 +704,9 @@ class TestWidget(MpfMcTestCase):
 
         # verify widget6 is the highest priority in the parent frame
         self.assertEqual('widget6', self.mc.targets[
-            'default'].parent_widgets[0].widget.text)
+            'default'].parent_widgets[0].children[0].children[0].text)
         self.assertTrue(isinstance(self.mc.targets[
-            'default'].parent_widgets[0].widget, Text))
+            'default'].parent_widgets[0].children[0].children[0], Text))
 
         # stop the mode
         self.mc.modes['mode1'].stop()
@@ -813,19 +813,19 @@ class TestWidget(MpfMcTestCase):
 
         self.assertIn('_global-widget1', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
-        self.assertIn('_global-widget8', [x.widget.key for x in self.mc.targets[
-            'default'].parent_widgets])
+        self.assertIn('_global-widget8', [x.key for x in self.mc.targets[
+            'default'].parent.walk()])
 
-        widget8 = weakref.ref([x.widget for x in self.mc.targets['default'].parent_widgets
-                               if x.widget.key == '_global-widget8'][0])
+        widget8 = weakref.ref(self.mc.targets[
+            'default'].parent.children[0].children[0])
         self.assertTrue(widget8())
 
         self.advance_time(1)
 
         self.assertIn('_global-widget1', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
-        self.assertNotIn('_global-widget8', [x.widget.key for x in self.mc.targets[
-            'default'].parent_widgets])
+        self.assertNotIn('_global-widget8', [x.key for x in self.mc.targets[
+            'default'].parent.walk()])
 
         gc.collect()
         self.assertFalse(widget8())
