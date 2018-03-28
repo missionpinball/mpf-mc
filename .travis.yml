@@ -50,8 +50,8 @@ install:
       sudo cp -r frameworks/*.* /Library/Frameworks;
     fi;
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      curl --progress-bar -S https://www.python.org/ftp/python/3.5.2/python-3.5.2-macosx10.6.pkg -o python-3.5.2-macosx10.6.pkg;
-      sudo installer -pkg python-3.5.2-macosx10.6.pkg -target /;
+      curl --progress-bar -S https://www.python.org/ftp/python/3.5.4/python-3.5.4-macosx10.6.pkg -o python-3.5.4-macosx10.6.pkg;
+      sudo installer -pkg python-3.5.4-macosx10.6.pkg -target /;
     fi;
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       cd ${TRAVIS_BUILD_DIR};
