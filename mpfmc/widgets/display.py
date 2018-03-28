@@ -1,6 +1,7 @@
 from typing import Optional
 
-from kivy.uix.effectwidget import EffectWidget
+from mpfmc.widgets.effect_widget import EffectWidget
+
 from kivy.uix.relativelayout import RelativeLayout
 
 from mpfmc.uix.widget import Widget
