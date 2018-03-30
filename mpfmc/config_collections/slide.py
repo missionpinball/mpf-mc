@@ -23,7 +23,10 @@ class SlideCollection(ConfigCollection):
                 config = new_dict
 
             elif not isinstance(config['widgets'], list):
-                config['widgets'] = [config['widgets']]
+                if config['widgets']:
+                    config['widgets'] = [config['widgets']]
+                else:
+                    config['widgets'] = []
 
         for i, widget in enumerate(config['widgets']):
             # since dict is mutable it updates in place

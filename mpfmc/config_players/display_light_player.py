@@ -5,7 +5,7 @@ from kivy.uix.relativelayout import RelativeLayout
 
 from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
-from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
+from kivy.graphics.opengl import glReadPixels, GL_RGBA, GL_UNSIGNED_BYTE
 from kivy.graphics.texture import Texture
 from kivy.uix.effectwidget import EffectWidget
 
@@ -51,7 +51,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         source = self.machine.displays[element]
 
         # put the widget canvas on a Fbo
-        texture = Texture.create(size=source.size, colorfmt='rgb')
+        texture = Texture.create(size=source.size, colorfmt='rgba')
         fbo = Fbo(size=source.size, texture=texture)
 
         effect_widget = RelativeLayout()
@@ -101,7 +101,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
 
         fbo.bind()
         data = glReadPixels(0, 0, source.native_size[0], source.native_size[1],
-                            GL_RGB, GL_UNSIGNED_BYTE)
+                            GL_RGBA, GL_UNSIGNED_BYTE)
 
         fbo.release()
 
@@ -119,10 +119,14 @@ class McDisplayLightPlayer(BcpConfigPlayer):
             for x, y, name in settings['light_map']:
                 x_pixel = int(x * width)
                 y_pixel = height - int(y * height)
-                value = (
-                    data[width * y_pixel * 3 + x_pixel * 3],
-                    data[width * y_pixel * 3 + x_pixel * 3 + 1],
-                    data[width * y_pixel * 3 + x_pixel * 3 + 2])
+                if (data[width * y_pixel * 4 + x_pixel * 4 + 3]) == 0:
+                    # pixel is transparent
+                    value = -1
+                else:
+                    value = (
+                        data[width * y_pixel * 4 + x_pixel * 4],
+                        data[width * y_pixel * 4 + x_pixel * 4 + 1],
+                        data[width * y_pixel * 4 + x_pixel * 4 + 2])
 
                 if name not in self._last_color or self._last_color[name] != value:
                     self._last_color[name] = value
