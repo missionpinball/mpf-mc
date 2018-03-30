@@ -9,7 +9,7 @@ from kivy.animation import Animation
 from kivy.uix.relativelayout import RelativeLayout
 from kivy.uix.widget import Widget as KivyWidget
 from kivy.properties import (NumericProperty, ReferenceListProperty,
-                             StringProperty, AliasProperty, ListProperty, ObjectProperty)
+                             StringProperty, AliasProperty, ListProperty)
 
 from mpf.core.rgba_color import RGBAColor
 
@@ -718,10 +718,6 @@ class Widget(KivyWidget):
     key = StringProperty(None, allownone=True)
     '''Widget keys are used to uniquely identify instances of widgets which you can later
     use to update or remove the widget.
-    '''
-
-    display = ObjectProperty(None, allownone=True)
-    '''The current display which displays this widget. Propagated to the bottom.
     '''
 
     color = ListProperty([1.0, 1.0, 1.0, 1.0])
