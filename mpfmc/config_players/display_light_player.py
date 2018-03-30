@@ -95,7 +95,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         if parent:
             parent.remove_display_source(source)
 
-        effect_widget.add_widget(source)
+        effect_widget.add_widget(source.container)
 
         fbo.draw()
 
@@ -105,7 +105,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
 
         fbo.release()
 
-        effect_widget.remove_widget(source)
+        effect_widget.remove_widget(source.container)
 
         # reattach to the parent
         if parent:

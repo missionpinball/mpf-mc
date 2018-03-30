@@ -61,7 +61,8 @@ class Window(object):
             config['effects'] = mc.effects_manager.validate_effects(mc.machine_config['window']['effects'])
 
         display_widget = DisplayWidget(mc, config=config)
-        Window.set_source_display(display_widget.container)
+        display_widget.parent.remove_widget(display_widget)
+        Window.set_source_display(display_widget)
 
         if (display.width / display.height !=
                 KivyWindow.width / KivyWindow.height):

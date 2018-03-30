@@ -13,16 +13,17 @@ if MYPY:   # pragma: no cover
 
 
 class DisplayWidget(Widget, RelativeLayout):
+
+    """A widget showing a display."""
+
     widget_type_name = 'Display'
     animation_properties = ('x', 'y', 'pos')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         del kwargs
-        self.display = None
+        self.display = mc.displays[config['source_display']]
 
         super().__init__(mc=mc, config=config, key=key)
-
-        self.display = self.mc.displays[self.config['source_display']]
 
         if 'effects' in self.config and self.config['effects']:
             self.effects = EffectWidget(pos=self.pos, size_hint=(1, 1))

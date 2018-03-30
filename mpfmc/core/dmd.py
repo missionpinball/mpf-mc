@@ -126,7 +126,7 @@ class DmdBase(object):
         fbo.clear_buffer()
         fbo.release()
 
-        self.effect_widget.add_widget(widget)
+        self.effect_widget.add_widget(widget.container)
 
         fbo.draw()
 
@@ -135,7 +135,7 @@ class DmdBase(object):
                             GL_RGB, GL_UNSIGNED_BYTE)
         fbo.release()
 
-        self.effect_widget.remove_widget(widget)
+        self.effect_widget.remove_widget(widget.container)
 
         # reattach to the parent
         if parent:

@@ -1,6 +1,8 @@
 """Contains the Display base class, which is a logical display in the mpf-mc."""
 from typing import List, Union, Optional
 
+from kivy.uix.floatlayout import FloatLayout
+
 from kivy.clock import Clock
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     SlideTransition, SwapTransition,
@@ -33,15 +35,20 @@ transition_map = dict(none=NoTransition,
 
 # pylint: disable-msg=too-many-instance-attributes
 class Display(ScreenManager):
+
+    """A display which can be used to show slides."""
+
     displays_to_initialize = 0
 
     texture = ObjectProperty(None, allownone=True)
 
     @staticmethod
     def create_default_display(mc: "MpfMc") -> None:
+        """Create default display."""
         Display(mc, 'default', width=800, height=600)
 
     def __init__(self, mc: "MpfMc", name: str, **kwargs) -> None:
+        """Initialise Display."""
         self.mc = mc
         self.name = name
         self.config = kwargs
@@ -69,8 +76,14 @@ class Display(ScreenManager):
         # per clock frame no matter how many times it is called.
         self._current_slide_changed = Clock.create_trigger(self._post_active_slide_event, -1)
 
+        # Need to create a widget that will be the parent of the slide manager.  This is
+        # necessary to allow widgets with negative z values to remain in the display while
+        # slides are changed.
+        self.container = FloatLayout(size_hint=(None, None), size=self.size)
+        self.container.z = 0
+        self.container.add_widget(self)
+
         Clock.schedule_once(self._display_created, 0)
-        self._updating = True
 
     def __repr__(self):
         return '<Display name={}{}, current slide={}, total slides={}>'.format(
@@ -101,16 +114,17 @@ class Display(ScreenManager):
 
     @property
     def ready(self):
+        """Return true if display is ready."""
         return self._ready
 
     @property
     def parent_widgets(self) -> List["WidgetContainer"]:
         """The list of all widgets owned by the display parent."""
-        return self.parents
+        return [x for x in self.container.children if x != self]
 
     def has_parent(self) -> bool:
         """Returns whether or not the display has a parent."""
-        return bool(self.parents)
+        return bool(self.container.parent is not None)
 
     def _display_created(self, *args) -> None:
         """Callback after this display is created."""
@@ -390,7 +404,6 @@ class Display(ScreenManager):
         Returns:
             True is the slide will be shown, False otherwise.
         """
-        # TODO: how can slide_name be optional? Blank slide?
         if not play_kwargs:
             play_kwargs = kwargs
         else:
@@ -510,8 +523,6 @@ class Display(ScreenManager):
 
     def _get_next_highest_priority_slide(self, slide: "Slide") -> "Slide":
         """Return the slide with the next highest priority."""
-        # TODO This should be a list comprehension?
-
         new_slide = None
 
         for s in self.slides:
@@ -578,6 +589,8 @@ class Display(ScreenManager):
 
 class DisplayOutput(Scatter):
 
+    """Show a display as a widget."""
+
     def __init__(self, parent: "KivyWidget", display: "Display", **kwargs):
         kwargs.setdefault('size', parent.size)
         kwargs.setdefault('size_hint', (1, 1))
@@ -626,7 +639,7 @@ class DisplayOutput(Scatter):
         widget.parents.append(self)
 
         canvas = self.canvas
-        canvas.add(widget.canvas)
+        canvas.add(widget.container.canvas)
 
     def remove_display_source(self, widget):
         """Remove a display."""
@@ -636,7 +649,7 @@ class DisplayOutput(Scatter):
                 ' of the Display class.')
         widget.parents.remove(self)
         widget.parent = None
-        self.canvas.remove(widget.canvas)
+        self.canvas.remove(widget.container.canvas)
 
     def __repr__(self) -> str:  # pragma: no cover
         try:

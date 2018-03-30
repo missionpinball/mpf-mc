@@ -259,7 +259,7 @@ class Slide(Screen, StencilView):
             if the slide in the frame changes.
         """
         # TODO: Determine proper z-order for negative z-order values
-        self.manager.parent.add_widget(widget)
+        self.manager.container.add_widget(widget)
 
     def schedule_removal(self, secs: float) -> None:
         """Schedules the removal of this slide after the specified number of seconds elapse."""
