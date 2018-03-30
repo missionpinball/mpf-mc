@@ -655,16 +655,16 @@ class TestWidget(MpfMcTestCase):
 
         # verify box11 is in the parent frame
         self.assertTrue(isinstance(self.mc.targets[
-            'default'].current_slide.parent_widgets[0], WidgetContainer))
+            'default'].parent_widgets[0], WidgetContainer))
 
         self.assertEqual('box11', self.mc.targets[
-            'default'].current_slide.parent_widgets[0].widget.text)
+            'default'].parent_widgets[0].widget.text)
 
         # switch the slide
         self.mc.events.post('show_new_slide')
         self.advance_time()
         self.assertEqual('box11', self.mc.targets[
-            'default'].current_slide.parent_widgets[0].widget.text)
+            'default'].parent_widgets[0].widget.text)
         self.assertEqual('NEW SLIDE', self.mc.targets[
             'default'].current_slide.widgets[0].widget.text)
 
@@ -816,16 +816,16 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('_global-widget8', [x.widget.key for x in self.mc.targets[
             'default'].parent_widgets])
 
-        widget8 = weakref.ref([x.widget for x in self.mc.targets['default'].parent_widgets
-                               if x.widget.key == '_global-widget8'][0])
+        widget8 = weakref.ref(self.mc.targets[
+            'default'].parent_widgets[0])
         self.assertTrue(widget8())
 
         self.advance_time(1)
 
         self.assertIn('_global-widget1', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
-        self.assertNotIn('_global-widget8', [x.widget.key for x in self.mc.targets[
-            'default'].parent_widgets])
+        self.assertNotIn('_global-widget8', [x.key for x in self.mc.targets[
+            'default'].parent.walk()])
 
         gc.collect()
         self.assertFalse(widget8())

@@ -15,6 +15,16 @@ if MYPY:   # pragma: no cover
 
 
 # pylint: disable-msg=too-many-instance-attributes
+class McFontLabel(Label):
+
+    """Normal label."""
+
+    def get_label(self):
+        """Return the label."""
+        return self._label
+
+
+# pylint: disable-msg=too-many-instance-attributes
 class BitmapFontLabel(Label):
 
     """Injects a font or bitmap font into a text widget."""
@@ -56,12 +66,12 @@ class Text(Widget):
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None,
                  play_kwargs: Optional[dict] = None, **kwargs) -> None:
-        if config['bitmap_font']:
+        if 'bitmap_font' in config and config['bitmap_font']:
             if 'font_name' not in config or not config['font_name']:
                 raise ValueError("Text widget: font_name is required when bitmap_font is True.")
             self._label = BitmapFontLabel(mc, config['font_name'])
         else:
-            self._label = Label()
+            self._label = McFontLabel()
         self._label.fbind('texture', self.on_label_texture)
 
         super().__init__(mc=mc, config=config, key=key)

@@ -182,7 +182,8 @@ class Widget(KivyWidget):
 
             # The top-most parent owns the display, so traverse up to find the config
             top_widget = parent
-            while hasattr(top_widget, 'parent') and not hasattr(top_widget, 'display'):
+            while not hasattr(top_widget, "display") and top_widget.parent != top_widget and top_widget.parent:
+                print(top_widget)
                 top_widget = top_widget.parent
             displayconfig = top_widget.display.config if hasattr(top_widget, 'display') else dict()
 
