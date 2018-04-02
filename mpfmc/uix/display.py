@@ -19,7 +19,6 @@ from kivy.properties import ObjectProperty
 from mpfmc.uix.widget import WidgetContainer, Widget
 from mpfmc.uix.slide import Slide
 
-
 MYPY = False
 if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
@@ -589,7 +588,6 @@ class Display(ScreenManager):
 
 
 class DisplayOutput(Scatter):
-
     """Show a display as a widget."""
 
     def __init__(self, parent: "KivyWidget", display: "Display", **kwargs):
@@ -602,7 +600,6 @@ class DisplayOutput(Scatter):
         super().__init__(**kwargs)
 
         self.key = None
-        self.callback = None
 
         # It is important that the content of this display output does not contain any
         # circular references to the same display (cannot do a recursive
@@ -664,8 +661,10 @@ class DisplayOutput(Scatter):
 
         if widget.parents:
             widget.parent = widget.parents[-1]
-            with widget.parent.canvas.after:
-                Callback(widget.parent.on_draw_display_source)
+
+            if len(widget.parents) > 1:
+                with widget.parent.canvas.after:
+                    Callback(widget.parent.on_draw_display_source)
         else:
             widget.parent = None
 
@@ -679,8 +678,9 @@ class DisplayOutput(Scatter):
             return '<DisplayOutput size={}, source=(none), id={}>'.format(self.size, id(self))
 
     def on_draw_display_source(self, instr):
-        """Callback function when display source is redrawn."""
+        """Callback function when primary display source is redrawn."""
         del instr
+
         for display_source in self.display.parents:
             if display_source != self:
                 display_source.canvas.ask_update()
