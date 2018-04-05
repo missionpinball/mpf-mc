@@ -55,17 +55,15 @@ cdef class TrackSoundLoop(Track):
         self.state.type_state = <void*>self.type_state
 
         # Initialize track specific state structures
+        self._initialize_player(&self.type_state.player_1)
+        self._initialize_player(&self.type_state.player_2)
         self.type_state.current = cython.address(self.type_state.player_1)
         self.type_state.next = cython.address(self.type_state.player_2)
-
-        self._initialize_player(self.type_state.current)
-        self._initialize_player(self.type_state.next)
 
         self._sound_loop_set_counter = 0
         self._active_sound_loop_sets = dict()
 
-        self.log.debug("Created Track %d %s",
-                       self.number, self.name)
+        self.log.debug("Created Track %d %s", self.number, self.name)
 
         SDL_UnlockAudio()
 
@@ -280,8 +278,8 @@ cdef class TrackSoundLoop(Track):
         self.log.debug("play_sound_loop_set - Preparing sound_loop_set '%s' for playback.", sound_loop_set)
         print("play_sound_loop_set - Preparing sound_loop_set for playback", sound_loop_set)
 
-        #fprintf(self.state.callback_data.c_log_file, "play_sound_loop_set - Preparing sound_loop_set for playback.\r\n")
-        #fflush(self.state.callback_data.c_log_file)
+        fprintf(self.state.callback_data.c_log_file, "play_sound_loop_set - Preparing sound_loop_set for playback.\r\n")
+        fflush(self.state.callback_data.c_log_file)
 
         if player_settings is None:
             player_settings = dict()
@@ -374,9 +372,9 @@ cdef class TrackSoundLoop(Track):
                 while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:
                     self.type_state.current.stop_loop_at_pos -= self.type_state.current.length
 
-                # If stop position is at beginning of loop, set it to be the end so it won't start
+                # If stop position is at beginning of loop (first 10ms), set it to be the end so it won't start
                 # another iteration of the loop (probably a rounding error anyway)
-                if self.type_state.current.stop_loop_at_pos < 10:
+                if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):
                     self.type_state.current.stop_loop_at_pos = self.type_state.current.length
 
                 print("play_sound_loop_set - next_time_interval - sample_pos, stop_loop_at_pos, length:", self.type_state.current.sample_pos, self.type_state.current.stop_loop_at_pos, self.type_state.current.length)
@@ -393,15 +391,15 @@ cdef class TrackSoundLoop(Track):
                 while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:
                     self.type_state.current.stop_loop_at_pos -= self.type_state.current.length
 
-                # If stop position is at beginning of loop, set it to be the end so it won't start
+                # If stop position is at beginning of loop (first 10ms), set it to be the end so it won't start
                 # another iteration of the loop (probably a rounding error anyway)
-                if self.type_state.current.stop_loop_at_pos < 10:
+                if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):
                     self.type_state.current.stop_loop_at_pos = self.type_state.current.length
 
                 print("play_sound_loop_set - next_beat interval - sample_pos, stop_loop_at_pos, length:", self.type_state.current.sample_pos, self.type_state.current.stop_loop_at_pos, self.type_state.current.length)
 
-                #fprintf(self.state.callback_data.c_log_file, "play_sound_loop_set - next_beat_interval - sample_pos = %d, stop_loop_at_pos = %d, length = %d\r\n", self.type_state.current.sample_pos, self.type_state.current.stop_loop_at_pos, self.type_state.current.length)
-                #fflush(self.state.callback_data.c_log_file)
+                fprintf(self.state.callback_data.c_log_file, "play_sound_loop_set - next_beat_interval - sample_pos = %d, stop_loop_at_pos = %d, length = %d\r\n", self.type_state.current.sample_pos, self.type_state.current.stop_loop_at_pos, self.type_state.current.length)
+                fflush(self.state.callback_data.c_log_file)
 
             else:
                 # Play now
@@ -944,8 +942,8 @@ cdef class TrackSoundLoop(Track):
         cdef bint reset_track_buffer_pos = True
         cdef SoundLoopSetPlayer *player
 
-        #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds ###########################\r\n")
-        #fflush(callback_data.c_log_file)
+        fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds ###########################\r\n")
+        fflush(callback_data.c_log_file)
 
         if track == NULL or track.type_state == NULL:
             return
@@ -967,21 +965,21 @@ cdef class TrackSoundLoop(Track):
         while track_buffer_pos < buffer_length and sound_loop_track.current.status \
                 in (player_playing, player_fading_in, player_fading_out):
 
-            #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - current track_buffer_pos = %u\r\n", track_buffer_pos)
-            #fflush(callback_data.c_log_file)
+            fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - current track_buffer_pos = %u\r\n", track_buffer_pos)
+            fflush(callback_data.c_log_file)
 
             track_buffer_pos = get_player_sound_samples(track, sound_loop_track.current,
                                                         buffer_length, track_buffer_pos,
                                                         callback_data)
 
-            #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - after get current sound samples, sample_pos = %u, length = %u, end = %u\r\n", sound_loop_track.current.sample_pos, sound_loop_track.current.length, sound_loop_track.current.stop_loop_at_pos)
-            #fflush(callback_data.c_log_file)
+            fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - after get current sound samples, sample_pos = %u, length = %u, end = %u\r\n", sound_loop_track.current.sample_pos, sound_loop_track.current.length, sound_loop_track.current.stop_loop_at_pos)
+            fflush(callback_data.c_log_file)
 
             # Determine if we have reached the stop position for the loop (might not be at the end).
             if sound_loop_track.current.sample_pos == sound_loop_track.current.stop_loop_at_pos:
 
-                #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - stop loop position reached\r\n")
-                #fflush(callback_data.c_log_file)
+                fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - stop loop position reached\r\n")
+                fflush(callback_data.c_log_file)
 
                 sound_loop_track.current.status = player_idle
 
@@ -990,8 +988,8 @@ cdef class TrackSoundLoop(Track):
                                                          sound_loop_track.current.master_sound_layer.sound_id,
                                                          track)
 
-                #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - current sound stopped\r\n")
-                #fflush(callback_data.c_log_file)
+                fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - current sound stopped\r\n")
+                fflush(callback_data.c_log_file)
 
                 # This player has finished, switch the other player to current at the end of this method 
                 switch_players = True
@@ -1004,14 +1002,14 @@ cdef class TrackSoundLoop(Track):
                                                              sound_loop_track.next.master_sound_layer.sound_id,
                                                              track)
 
-                    #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - starting next sound\r\n")
-                    #fflush(callback_data.c_log_file)
+                    fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - starting next sound\r\n")
+                    fflush(callback_data.c_log_file)
 
             # Determine if sound should continue to loop
             elif sound_loop_track.current.sample_pos >= sound_loop_track.current.length:
 
-                    #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - end of sound samples reached\r\n")
-                    #fflush(callback_data.c_log_file)
+                    fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - end of sound samples reached\r\n")
+                    fflush(callback_data.c_log_file)
 
                     # Send looping notification
                     send_sound_loop_set_looping_notification(sound_loop_track.current.master_sound_layer.sound_loop_set_id,
@@ -1019,8 +1017,8 @@ cdef class TrackSoundLoop(Track):
                                                              track)
                     sound_loop_track.current.sample_pos = 0
 
-                    #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - looping current sound\r\n")
-                    #fflush(callback_data.c_log_file)
+                    fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - looping current sound\r\n")
+                    fflush(callback_data.c_log_file)
 
         if reset_track_buffer_pos:
             track_buffer_pos = 0
@@ -1029,15 +1027,15 @@ cdef class TrackSoundLoop(Track):
         while track_buffer_pos < buffer_length and sound_loop_track.next.status \
                 in (player_playing, player_fading_in, player_fading_out):
 
-            #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - next track_buffer_pos = %u\r\n", track_buffer_pos)
-            #fflush(callback_data.c_log_file)
+            fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - next track_buffer_pos = %u\r\n", track_buffer_pos)
+            fflush(callback_data.c_log_file)
 
             track_buffer_pos = get_player_sound_samples(track, sound_loop_track.next,
                                                         buffer_length, track_buffer_pos,
                                                         callback_data)
 
-            #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - after get next sound samples, sample_pos = %u, length = %u, end = %u\r\n", sound_loop_track.next.sample_pos, sound_loop_track.next.length, sound_loop_track.next.stop_loop_at_pos)
-            #fflush(callback_data.c_log_file)
+            fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - after get next sound samples, sample_pos = %u, length = %u, end = %u\r\n", sound_loop_track.next.sample_pos, sound_loop_track.next.length, sound_loop_track.next.stop_loop_at_pos)
+            fflush(callback_data.c_log_file)
 
             # NOTE: It is not possible for the next loop player to have a stop position set (only
             #       the current loop player can have stop_loop_at_pos set) so we don't need to
@@ -1051,8 +1049,8 @@ cdef class TrackSoundLoop(Track):
                                                          track)
                 sound_loop_track.next.sample_pos = 0
 
-                #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - looping next sound\r\n")
-                #fflush(callback_data.c_log_file)
+                fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - looping next sound\r\n")
+                fflush(callback_data.c_log_file)
 
             # Check if sound loop has finished playing/fading out
             if sound_loop_track.next.status == player_idle:
@@ -1061,21 +1059,21 @@ cdef class TrackSoundLoop(Track):
                                                          sound_loop_track.next.master_sound_layer.sound_id,
                                                          track)
 
-                #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - stopping next sound\r\n")
-                #fflush(callback_data.c_log_file)
+                fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - stopping next sound\r\n")
+                fflush(callback_data.c_log_file)
 
 
         # Switch current and next players (if necessary)
         if switch_players:
-            #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - switching players (next <--> current)\r\n")
-            #fflush(callback_data.c_log_file)
+            fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - switching players (next <--> current)\r\n")
+            fflush(callback_data.c_log_file)
 
             player = sound_loop_track.current
             sound_loop_track.current = sound_loop_track.next
             sound_loop_track.next = player
 
-        #fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - finished\r\n")
-        #fflush(callback_data.c_log_file)
+        fprintf(callback_data.c_log_file, "TrackSoundLoop.mix_playing_sounds - finished\r\n")
+        fflush(callback_data.c_log_file)
 
 cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *player,
                                      Uint32 buffer_length, Uint32 track_buffer_pos,
@@ -1104,15 +1102,15 @@ cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *play
     cdef SoundLoopLayerSettings *layer
     cdef GSList *layer_iterator
     cdef Uint8 player_volume, layer_volume
-    cdef Uint32 layer_sample_pos, layer_bytes_remaining, layer_chunk_bytes, current_chunk_bytes
+    cdef Uint32 layer_sample_pos, layer_bytes_remaining, layer_chunk_bytes, current_chunk_bytes, temp_chunk_bytes
     cdef Uint32 layer_track_buffer_pos_offset
     cdef Uint32 buffer_bytes_remaining = buffer_length - track_buffer_pos
 
     # Loop over the output buffer
     while buffer_bytes_remaining > 0:
 
-        #fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples buffer_bytes_remaining = %u\r\n", buffer_bytes_remaining)
-        #fflush(callback_data.c_log_file)
+        fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples buffer_bytes_remaining = %u\r\n", buffer_bytes_remaining)
+        fflush(callback_data.c_log_file)
 
         # Mix current player into track buffer.  Processing is done at control rate during player
         # fading and using full buffer when no fading is occurring.
@@ -1141,14 +1139,20 @@ cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *play
 
         # Adjust chunk size if the loop is set to stop early (if not the chunk size will remain unchanged)
         if player.sample_pos < player.stop_loop_at_pos:
+            temp_chunk_bytes = current_chunk_bytes
             current_chunk_bytes = min(current_chunk_bytes, player.stop_loop_at_pos - player.sample_pos)
+            if current_chunk_bytes != temp_chunk_bytes:
+                fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples adjusting chunk size for stop position from %u to %u\r\n", temp_chunk_bytes, current_chunk_bytes)
+                fflush(callback_data.c_log_file)
 
         if player.status == player_idle:
             return buffer_length
 
-        #fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples player.sample_pos = %u, current_chunk_bytes = %u, volume = %u\r\n", player.sample_pos, current_chunk_bytes, player_volume * player.master_sound_layer.volume // SDL_MIX_MAXVOLUME)
-        #fflush(callback_data.c_log_file)
+        fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples player.sample_pos = %u, current_chunk_bytes = %u, volume = %u\r\n", player.sample_pos, current_chunk_bytes, player_volume * player.master_sound_layer.volume // SDL_MIX_MAXVOLUME)
+        fflush(callback_data.c_log_file)
 
+        fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples SDL_MixAudioFormat: sample data size = %u, memory location = %u\r\n", player.master_sound_layer.sound.data.memory.size, player.master_sound_layer.sound.data.memory.data)
+        fflush(callback_data.c_log_file)
         # Get master layer samples
         SDL_MixAudioFormat(track.buffer + track_buffer_pos,
                            <Uint8*>player.master_sound_layer.sound.data.memory.data + player.sample_pos,
@@ -1214,13 +1218,13 @@ cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *play
 
         # Stop looping and generating samples if we have reached the end of the sound or
         # the player is now idle (due to reaching end of a fade out)
-        #fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples player.sample_pos = %u, player.length = %u\r\n", player.sample_pos, player.length)
-        #fflush(callback_data.c_log_file)
+        fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples player.sample_pos = %u, player.length = %u\r\n", player.sample_pos, player.length)
+        fflush(callback_data.c_log_file)
         if player.status == player_idle or \
                 player.sample_pos >= player.length or \
                 player.sample_pos == player.stop_loop_at_pos:
-            #fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples player has stopped or reached end of sound\r\n")
-            #fflush(callback_data.c_log_file)
+            fprintf(callback_data.c_log_file, "TrackSoundLoop.get_player_sound_samples player has stopped or reached end of sound\r\n")
+            fflush(callback_data.c_log_file)
             break
 
     return track_buffer_pos
