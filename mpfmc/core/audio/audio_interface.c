@@ -4165,7 +4165,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
  *         self.audio_callback_data.track_count = 0
  *         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))             # <<<<<<<<<<<<<<
  *         self.audio_callback_data.c_log_file = NULL
- *         #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+ *         self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
  */
   __pyx_v_self->audio_callback_data.tracks = ((void **)PyMem_Malloc((8 * (sizeof(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *)))));
 
@@ -4173,13 +4173,40 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
  *         self.audio_callback_data.track_count = 0
  *         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
  *         self.audio_callback_data.c_log_file = NULL             # <<<<<<<<<<<<<<
- *         #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
- *         #fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
+ *         self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+ *         fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
  */
   __pyx_v_self->audio_callback_data.c_log_file = NULL;
 
+  /* "mpfmc/core/audio/audio_interface.pyx":161
+ *         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
+ *         self.audio_callback_data.c_log_file = NULL
+ *         self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")             # <<<<<<<<<<<<<<
+ *         fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
+ *         fflush(self.audio_callback_data.c_log_file)
+ */
+  __pyx_v_self->audio_callback_data.c_log_file = ((FILE *)fopen(((char const *)"D:\\Temp\\Dev\\MPFMC_AudioLibrary.log"), ((char const *)"wb")));
+
+  /* "mpfmc/core/audio/audio_interface.pyx":162
+ *         self.audio_callback_data.c_log_file = NULL
+ *         self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+ *         fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")             # <<<<<<<<<<<<<<
+ *         fflush(self.audio_callback_data.c_log_file)
+ * 
+ */
+  fprintf(((FILE *)__pyx_v_self->audio_callback_data.c_log_file), ((char const *)"---------------------------------------------------------------------------\r\n"));
+
+  /* "mpfmc/core/audio/audio_interface.pyx":163
+ *         self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+ *         fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
+ *         fflush(self.audio_callback_data.c_log_file)             # <<<<<<<<<<<<<<
+ * 
+ *         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
+ */
+  fflush(((FILE *)__pyx_v_self->audio_callback_data.c_log_file));
+
   /* "mpfmc/core/audio/audio_interface.pyx":165
- *         #fflush(self.audio_callback_data.c_log_file)
+ *         fflush(self.audio_callback_data.c_log_file)
  * 
  *         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',             # <<<<<<<<<<<<<<
  *                        rate, channels, buffer_samples)
