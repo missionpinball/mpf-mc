@@ -1010,6 +1010,7 @@ cdef class TrackStandard(Track):
             sound_settings.ducking_settings.attack_duration = 0
             sound_settings.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME
             sound_settings.ducking_settings.release_duration = 0
+            sound_settings.ducking_settings.release_start_pos = 0
 
         # Special handling is needed to start streaming for the specified sound at the correct location
         if sound_container.sample.type == sound_type_streaming:
@@ -1455,6 +1456,7 @@ cdef class TrackStandard(Track):
 
                         if player.next.sound_has_ducking:
                             player.current.sound_has_ducking = True
+                            player.current.ducking_stage = ducking_stage_delay
                             player.current.ducking_settings.track_bit_mask = player.next.ducking_settings.track_bit_mask
                             player.current.ducking_settings.attack_start_pos = player.next.ducking_settings.attack_start_pos
                             player.current.ducking_settings.attack_duration = player.next.ducking_settings.attack_duration
@@ -1468,6 +1470,7 @@ cdef class TrackStandard(Track):
                             player.current.ducking_settings.attack_start_pos = 0
                             player.current.ducking_settings.attack_duration = 0
                             player.current.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME
+                            player.current.ducking_settings.release_start_pos = 0
                             player.current.ducking_settings.release_duration = 0
 
                         # Send sound started notification
