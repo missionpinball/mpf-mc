@@ -44,6 +44,7 @@ class MpfMcTestCase(unittest.TestCase):
     def get_options(self):
         return dict(machine_path=self.get_machine_path(),
                     mcconfigfile='mcconfig.yaml',
+                    production=False,
                     configfile=Util.string_to_list(self.get_config_file()),
                     no_load_cache=False,
                     create_config_cache=True,

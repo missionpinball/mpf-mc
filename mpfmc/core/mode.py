@@ -11,6 +11,7 @@ be called on mode_start or mode_stop.
 """
 
 
+# pylint: disable-msg=too-many-instance-attributes
 class Mode(object):
     """Parent class for in-game mode code."""
 
@@ -106,12 +107,13 @@ class Mode(object):
         for item in self.mc.mode_controller.start_methods:
             if item.config_section in self.config or not item.config_section:
                 self.stop_methods.append(item.method(
-                                config=self.config.get(item.config_section),
-                                priority=self.priority,
-                                mode=self,
-                                **item.kwargs))
+                    config=self.config.get(item.config_section),
+                    priority=self.priority,
+                    mode=self,
+                    **item.kwargs))
 
-    def is_game_mode(self) -> bool:
+    @staticmethod
+    def is_game_mode() -> bool:
         """Return false since mc does not have game modes."""
         return False
 

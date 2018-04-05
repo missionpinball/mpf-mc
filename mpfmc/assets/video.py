@@ -2,7 +2,8 @@ from kivy.core.video import Video
 from kivy.core.video.video_null import VideoNull
 from kivy.properties import AliasProperty
 
-from mpf.core.assets import Asset, AssetPool
+from mpf.core.assets import AssetPool
+from mpfmc.assets.mc_asset import McAsset
 
 
 class VideoPool(AssetPool):
@@ -37,7 +38,7 @@ class VideoWrapper(Video):
         self.dispatch('on_play')
 
 
-class VideoAsset(Asset):
+class VideoAsset(McAsset):
 
     attribute = 'videos'
     path_string = 'videos'
@@ -129,7 +130,7 @@ class VideoAsset(Asset):
     def _set_position(self, pos):
         # position in secs
         try:
-            self._video.position = pos
+            self._video.position = pos  # noqa
         except AttributeError:
             pass
 
@@ -164,7 +165,7 @@ class VideoAsset(Asset):
     def _set_volume(self, volume):
         # float 0.0 - 1.0
         try:
-            self._video.volume = volume
+            self._video.volume = volume     # noqa
         except AttributeError:
             pass
 

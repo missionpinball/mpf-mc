@@ -1,7 +1,6 @@
 """Contains the sound loop config player class"""
 
 from copy import deepcopy
-from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
 
 
@@ -188,16 +187,17 @@ Here are several various examples:
         if 'fade_out' in validated_settings and validated_settings['fade_out'] is None:
             del validated_settings['fade_out']
         if 'events_when_played' in validated_settings and len(validated_settings['events_when_played']) == 1 and \
-                        validated_settings['events_when_played'][0] == 'use_sound_loop_setting':
+                validated_settings['events_when_played'][0] == 'use_sound_loop_setting':
             del validated_settings['events_when_played']
         if 'events_when_stopped' in validated_settings and len(validated_settings['events_when_stopped']) == 1 and \
-                        validated_settings['events_when_stopped'][0] == 'use_sound_loop_setting':
+                validated_settings['events_when_stopped'][0] == 'use_sound_loop_setting':
             del validated_settings['events_when_stopped']
         if 'events_when_looping' in validated_settings and len(validated_settings['events_when_looping']) == 1 and \
-                        validated_settings['events_when_looping'][0] == 'use_sound_loop_setting':
+                validated_settings['events_when_looping'][0] == 'use_sound_loop_setting':
             del validated_settings['events_when_looping']
         if 'mode_end_action' in validated_settings and (validated_settings['mode_end_action'] is None or
-                        validated_settings['mode_end_action'] == 'use_sound_loop_setting'):
+                                                        validated_settings['mode_end_action'] ==
+                                                        'use_sound_loop_setting'):
             del validated_settings['mode_end_action']
 
         validated_dict = dict()

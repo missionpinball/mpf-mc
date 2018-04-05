@@ -173,7 +173,7 @@ Here are several various examples:
 
         # Ensure volume parameter value has been provided for 'set_volume' actions
         if validated_dict[device]['action'] == 'set_volume' and \
-                        validated_dict[device]['volume'] is None:
+                validated_dict[device]['volume'] is None:
             raise ValueError("track_player: 'volume' must be provided for all 'set_volume' "
                              "actions ({} track)".format(device))
 

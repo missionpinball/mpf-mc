@@ -26,8 +26,11 @@ class DisplayLightPlayer(BcpPluginPlayer):
 
         key = "display_light_player_{}".format(element)
         for light, color in values.items():
-            self.machine.lights[light].color(key=key, color=color, priority=priority,
-                                             fade_ms=int((current_frame - last_frame) * 1000))
+            if color == -1:
+                self.machine.lights[light].remove_from_stack_by_key(key=key)
+            else:
+                self.machine.lights[light].color(key=key, color=color, priority=priority,
+                                                 fade_ms=int((current_frame - last_frame) * 1000))
 
     def _validate_config_item(self, device, device_settings):
         device_settings = super()._validate_config_item(device, device_settings)

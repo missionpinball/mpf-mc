@@ -8,9 +8,11 @@ from enum import Enum, unique
 from typing import Optional, Union
 
 
-from mpf.core.assets import Asset, AssetPool
+from mpf.core.assets import AssetPool
 from mpf.core.utility_functions import Util
 from mpfmc.core.audio.audio_interface import AudioInterface
+
+from mpfmc.assets.mc_asset import McAsset
 from mpfmc.core.audio.audio_exception import AudioException
 
 
@@ -87,7 +89,7 @@ class SoundPool(AssetPool):
         """String that's returned if someone prints this object"""
         return '<SoundPool: {} ({}), Loaded={}>'.format(self.name, self.id, self.loaded)
 
-    #pylint: disable=invalid-name
+    # pylint: disable=invalid-name
     @property
     def id(self):
         """
@@ -191,7 +193,7 @@ class ModeEndAction(Enum):
 
 
 # pylint: disable=too-many-instance-attributes, too-many-public-methods
-class SoundAsset(Asset):
+class SoundAsset(McAsset):
     """
     Sound asset class contains a single sound that may be played using the audio engine.
 
@@ -207,7 +209,6 @@ class SoundAsset(Asset):
     pool_config_section = 'sound_pools'  # Will setup groups if present
     asset_group_class = SoundPool  # Class or None to not use pools
 
-    # pylint: disable=too-many-statements, too-many-branches
     def __init__(self, mc, name, file, config):     # noqa
         """ Constructor"""
         super().__init__(mc, name, file, config)
@@ -353,7 +354,7 @@ class SoundAsset(Asset):
                                      .format(sys.exc_info()[1], self.name))
 
         elif self._track and "tracks" in self.machine.sound_system.config and \
-                        'ducking' in self.machine.sound_system.config['tracks'][self._track]:
+                'ducking' in self.machine.sound_system.config['tracks'][self._track]:
             try:
                 self._ducking = DuckingSettings(
                     self.machine, self.machine.sound_system.config['tracks'][self.config['track']]['ducking'])
@@ -386,7 +387,7 @@ class SoundAsset(Asset):
         return ("%s, %s" % (self.priority, self._id) >
                 "%s, %s" % (other.priority, other.get_id()))
 
-    #pylint: disable=invalid-name
+    # pylint: disable=invalid-name
     @property
     def id(self):
         """
@@ -679,10 +680,9 @@ class SoundInstance(object):
     """An instance of a playing sound asset. This class is essentially a wrapper container
     for sound assets that contains all the overridden parameter values for playback."""
 
-    # pylint: disable=too-many-statements, too-many-branches
     def __init__(self, sound: Union[SoundAsset, SoundPool],     # noqa
                  context: Optional[str] = None, settings: Optional[dict] = None):
-        """Constructor"""
+        """Construct sound instance."""
         if sound is None:
             raise ValueError("Cannot create sound instance: sound parameter is None")
 

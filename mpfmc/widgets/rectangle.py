@@ -16,7 +16,7 @@ class Rectangle(Widget):
     animation_properties = ('x', 'y', 'width', 'height', 'color', 'opacity', 'corner_radius',
                             'rotation', 'scale')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 

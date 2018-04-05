@@ -23,14 +23,14 @@ class MpfTextInput(Text):
     widget_type_name = 'text_input'
     animation_properties = list()
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
-        super().__init__(mc=mc, config=config, key=key)
-        """
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
+        """Initialise text input.
 
         Note that this class is called *MpfTextInput* instead of *TextInput*
         because Kivy has a class called *TextInput* which collides with this
         one if they have the same name.
         """
+        super().__init__(mc=mc, config=config, key=key)
 
         del kwargs
 
@@ -136,7 +136,7 @@ class MpfTextInput(Text):
 
         self.shift(0, True)
 
-    def shift(self, places: int=1, force: bool=False, **kwargs) -> None:
+    def shift(self, places: int = 1, force: bool = False, **kwargs) -> None:
         del kwargs
         if self.active or force:
             self.char_list.rotate(-places)

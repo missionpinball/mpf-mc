@@ -46,6 +46,7 @@ class TestBcpClient(MockBcpClient):
     def get_options(self):
         return dict(machine_path=self.getAbsoluteMachinePath(),
                     mcconfigfile='mcconfig.yaml',
+                    production=False,
                     configfile=self.machine.options['configfile'],
                     no_load_cache=False,
                     create_config_cache=True,

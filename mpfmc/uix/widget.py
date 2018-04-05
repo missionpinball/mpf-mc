@@ -1,3 +1,4 @@
+"""A widget on a slide."""
 from typing import Union, Optional, List, Tuple
 from copy import deepcopy
 from functools import reduce
@@ -10,9 +11,10 @@ from kivy.uix.widget import Widget as KivyWidget
 from kivy.properties import (NumericProperty, ReferenceListProperty,
                              StringProperty, AliasProperty, ListProperty)
 
+from mpf.core.rgba_color import RGBAColor
+
 from mpfmc.uix.relative_animation import RelativeAnimation
 from mpfmc.core.utils import percent_to_float
-from mpf.core.rgba_color import RGBAColor
 
 MYPY = False
 if MYPY:   # pragma: no cover
@@ -30,6 +32,7 @@ are not real MPF events, rather, they're used to trigger animations from
 things the slide is doing."""
 
 
+# pylint: disable-msg=too-many-instance-attributes
 class Widget(KivyWidget):
     """MPF-MC Widget class.
 
@@ -65,8 +68,8 @@ class Widget(KivyWidget):
     animation_properties = list()
     """List of properties for this widget that may be animated using widget animations."""
 
-    def __init__(self, mc: "MpfMc", config: Optional[dict]=None,
-                 key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: Optional[dict] = None,
+                 key: Optional[str] = None, **kwargs) -> None:
         del kwargs
         self._container = None
         self.size_hint = (None, None)
@@ -77,6 +80,7 @@ class Widget(KivyWidget):
         super().__init__(**self.pass_to_kivy_widget_init())
 
         self.mc = mc
+        self.mc.track_leak_reference(self)
 
         # Create a container widget as this widget's parent.  The container will adjust
         # the coordinate system for this widget so that all positional properties are
@@ -141,11 +145,13 @@ class Widget(KivyWidget):
     def __repr__(self) -> str:  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
-    def get_display(self):
+    @staticmethod
+    def get_display():
         """Get the display used"""
         return None
 
-    def pass_to_kivy_widget_init(self) -> dict:
+    @staticmethod
+    def pass_to_kivy_widget_init() -> dict:
         """Initializes the dictionary of settings to pass to Kivy."""
         return dict()
 
@@ -176,7 +182,8 @@ class Widget(KivyWidget):
 
             # The top-most parent owns the display, so traverse up to find the config
             top_widget = parent
-            while hasattr(top_widget, 'parent') and not hasattr(top_widget, 'display'):
+            while not hasattr(top_widget, "display") and top_widget.parent != top_widget and top_widget.parent:
+                print(top_widget)
                 top_widget = top_widget.parent
             displayconfig = top_widget.display.config if hasattr(top_widget, 'display') else dict()
 
@@ -364,7 +371,7 @@ class Widget(KivyWidget):
             self._default_style = self.mc.machine_config['widget_styles'][
                 '{}_default'.format(self.widget_type_name.lower())]
 
-    def _apply_style(self, force_default: bool=False) -> None:
+    def _apply_style(self, force_default: bool = False) -> None:
         """Apply any style to the widget that is specified in the config."""
         if not self.config['style'] or force_default:
             if self._default_style:
@@ -402,6 +409,7 @@ class Widget(KivyWidget):
     def prepare_for_removal(self) -> None:
         """Prepare the widget to be removed."""
         self.mc.clock.unschedule(self.remove)
+        self.stop_animation()
         self._remove_animation_events()
 
     def schedule_removal(self, secs: float) -> None:
@@ -412,6 +420,8 @@ class Widget(KivyWidget):
     def remove(self, *dt) -> None:
         """Perform the actual removal of the widget."""
         del dt
+
+        self.prepare_for_removal()
 
         try:
             # This widget has a container parent that must be removed
@@ -561,7 +571,7 @@ class Widget(KivyWidget):
     def stop_animation(self) -> None:
         """Stop the current widget animation."""
         try:
-            self.animation.stop(self)
+            self.animation.cancel(self)
         except AttributeError:
             pass
 
@@ -591,8 +601,7 @@ class Widget(KivyWidget):
         self.animation.start(self)
 
     def _remove_animation_events(self) -> None:
-        """Remove previously registered handlers for the various events that 
-        trigger animation actions."""
+        """Remove previously registered handlers for the various events that trigger animation actions."""
         self.mc.events.remove_handlers_by_keys(self._animation_event_keys)
         self._animation_event_keys = set()
 
@@ -707,7 +716,7 @@ class Widget(KivyWidget):
     It has no graphical representation.'''
 
     key = StringProperty(None, allownone=True)
-    '''Widget keys are used to uniquely identify instances of widgets which you can later 
+    '''Widget keys are used to uniquely identify instances of widgets which you can later
     use to update or remove the widget.
     '''
 
@@ -719,12 +728,12 @@ class Widget(KivyWidget):
     '''
 
     anchor_x = StringProperty(None, allownone=True)
-    '''Which edge of the widget will be used for positioning. ('left', 'center' 
+    '''Which edge of the widget will be used for positioning. ('left', 'center'
     (or 'middle'), or 'right'. If None, 'center' will be used.
     '''
 
     anchor_y = StringProperty(None, allownone=True)
-    '''Which edge of the widget will be used for positioning. ('top', 'middle' 
+    '''Which edge of the widget will be used for positioning. ('top', 'middle'
     (or 'center'), or 'bottom'. If None, 'center' will be used.
     '''
 
@@ -737,36 +746,37 @@ class Widget(KivyWidget):
 
     adjust_top = NumericProperty(0)
     '''Moves the "top" of this widget's anchor position down, meaning any
-    positioning that includes calculations involving the top (anchor_y of 'top' 
-    or 'middle') use the alternate top position. Positive values move the top 
-    towards the center of the widget, negative values move it away. Negative 
-    values can be used to give the widget "space" on the top, and positive 
-    values can be used to remove unwanted space from the top of the widget. 
-    Note that this setting does not actually crop or cut off the top of the 
+    positioning that includes calculations involving the top (anchor_y of 'top'
+    or 'middle') use the alternate top position. Positive values move the top
+    towards the center of the widget, negative values move it away. Negative
+    values can be used to give the widget "space" on the top, and positive
+    values can be used to remove unwanted space from the top of the widget.
+    Note that this setting does not actually crop or cut off the top of the
     widget, rather, it just adjusts how the positioning is calculated.
     '''
 
     adjust_right = NumericProperty(0)
-    '''Adjusts the anchor position calculations for the right side of the widget. 
-    Positive values move the right position  towards the center, negative values 
+    '''Adjusts the anchor position calculations for the right side of the widget.
+    Positive values move the right position  towards the center, negative values
     move it away from the center.
     '''
 
     adjust_bottom = NumericProperty(0)
-    '''Adjusts the anchor position calculations for the bottom of the widget. 
-    Positive values move the bottom position towards the center, negative values 
+    '''Adjusts the anchor position calculations for the bottom of the widget.
+    Positive values move the bottom position towards the center, negative values
     move it away from the center.
     '''
 
     adjust_left = NumericProperty(0)
-    '''Adjusts the anchor position calculations for the left side of the widget. 
-    Positive values move the left position towards the center, negative values 
+    '''Adjusts the anchor position calculations for the left side of the widget.
+    Positive values move the left position towards the center, negative values
     move it away from the center.
     '''
 
     def _get_anchor_offset_pos(self):
-        """Calculates the anchor offset position relative to the lower-left corner 
-        of a widget based on several positioning parameters.
+        """Calculate the anchor offset position relative to the lower-left corner of the widget.
+
+        Based on several positioning parameters.
         """
         # Set defaults
         offset_x = 0
@@ -823,11 +833,11 @@ def create_widget_objects_from_config(mc: "MpfMc", config: Union[dict, list],
     Creates one or more widgets from config settings.
 
     Args:
-        mc: 
-        config: 
-        key: 
-        play_kwargs: 
-        widget_settings: 
+        mc:
+        config:
+        key:
+        play_kwargs:
+        widget_settings:
 
     Returns:
         A list of the WidgetContainer objects created.
@@ -882,12 +892,12 @@ def create_widget_objects_from_library(mc: "MpfMc", name: str,
     """
 
     Args:
-        mc: 
-        name: 
-        key: 
-        widget_settings: 
-        play_kwargs: 
-        **kwargs: 
+        mc:
+        name:
+        key:
+        widget_settings:
+        play_kwargs:
+        **kwargs:
 
     Returns:
         A list of the MpfWidget objects created.
@@ -906,7 +916,7 @@ def create_widget_objects_from_library(mc: "MpfMc", name: str,
 class WidgetContainer(RelativeLayout):
 
     def __init__(self, widget: "Widget",
-                 key: Optional[str]=None, z: int=0, **kwargs) -> None:
+                 key: Optional[str] = None, z: int = 0, **kwargs) -> None:
         del kwargs
         self.key = None
         super().__init__(size_hint=(1, 1))
@@ -919,9 +929,9 @@ class WidgetContainer(RelativeLayout):
         return '<WidgetContainer id={} z={} key={}>'.format(self.id, self.z, self.key)
 
     def __lt__(self, other: "KivyWidget") -> bool:
-        """
-        Less than comparison operator (based on z-order value). Used to 
-        maintain proper z-order when adding widgets to a parent.
+        """Less than comparison operator (based on z-order value).
+
+        Used to maintain proper z-order when adding widgets to a parent.
         Args:
             other: The widget to compare to this one.
 

@@ -71,8 +71,8 @@ def pkgconfig(*packages, **kw):
     cmd = 'pkg-config --libs --cflags {}'.format(' '.join(packages))
     results = getoutput(cmd, lenviron).split()
     for token in results:
-        ext = token[:2].decode('utf-8')
-        flag = flag_map.get(ext)
+        extension = token[:2].decode('utf-8')
+        flag = flag_map.get(extension)
         if not flag:
             continue
         kw.setdefault(flag, []).append(token[2:].decode('utf-8'))
@@ -174,7 +174,7 @@ cython_unsupported = '''\
            cython_unsupported_append)
 
 have_cython = False
-skip_cython = not (environ.get('USE_CYTHON', False) in ['1', 'True', 'TRUE', 'true', 'Yes', 'YES', 'y', 'Y'])
+skip_cython = environ.get('USE_CYTHON', False) not in ['1', 'True', 'TRUE', 'true', 'Yes', 'YES', 'y', 'Y']
 
 if skip_cython:
     print("\nSkipping Cython build (using .c files)")
@@ -201,7 +201,7 @@ else:
         raise
 
 if not have_cython:
-    from distutils.command.build_ext import build_ext
+    from distutils.command.build_ext import build_ext   # noqa
 
 # -----------------------------------------------------------------------------
 # Setup classes
@@ -214,7 +214,7 @@ class CustomBuildExt(build_ext):
 
     def finalize_options(self):
         retval = build_ext.finalize_options(self)
-        global build_path
+        global build_path   # noqa
         if (self.build_lib is not None and exists(self.build_lib) and
                 not self.inplace):
             build_path = self.build_lib
@@ -230,13 +230,13 @@ class CustomBuildExt(build_ext):
         build_ext.build_extensions(self)
 
 
-def _check_and_fix_sdl2_mixer(f_path):
+def _check_and_fix_sdl2_mixer(f_path_to_check):
     print("Check if SDL2_mixer smpeg2 have an @executable_path")
     rpath_from = ("@executable_path/../Frameworks/SDL2.framework"
                   "/Versions/A/SDL2")
     rpath_to = "@rpath/../../../../SDL2.framework/Versions/A/SDL2"
     smpeg2_path = ("{}/Versions/A/Frameworks/smpeg2.framework"
-                   "/Versions/A/smpeg2").format(f_path)
+                   "/Versions/A/smpeg2").format(f_path_to_check)
     output = getoutput(("otool -L '{}'").format(smpeg2_path)).decode('utf-8')
     if "@executable_path" not in output:
         return
@@ -350,9 +350,9 @@ if c_options['use_sdl2'] in (None, True):
 # declare flags
 
 
-def get_modulename_from_file(filename):
-    filename = filename.replace(sep, '/')
-    pyx = '.'.join(filename.split('.')[:-1])
+def get_modulename_from_file(filename_to_check):
+    filename_to_check = filename_to_check.replace(sep, '/')
+    pyx = '.'.join(filename_to_check.split('.')[:-1])
     pyxl = pyx.split('/')
     while pyxl[0] != 'mpfmc':
         pyxl.pop(0)
@@ -361,8 +361,8 @@ def get_modulename_from_file(filename):
     return '.'.join(pyxl)
 
 
-def expand(root, *args):
-    return join(root, 'mpfmc', *args)
+def expand(root_path, *args):
+    return join(root_path, 'mpfmc', *args)
 
 
 class CythonExtension(Extension):
@@ -382,12 +382,12 @@ class CythonExtension(Extension):
 def merge(d1, *args):
     d1 = deepcopy(d1)
     for d2 in args:
-        for key, value in d2.items():
-            value = deepcopy(value)
-            if key in d1:
-                d1[key].extend(value)
+        for item_key, item_value in d2.items():
+            item_value = deepcopy(item_value)
+            if item_key in d1:
+                d1[item_key].extend(item_value)
             else:
-                d1[key] = value
+                d1[item_key] = item_value
     return d1
 
 
@@ -467,10 +467,10 @@ def determine_sdl2():
     for lib in libs_to_check:
         found = False
         for d in flags['include_dirs']:
-            fn = join(d, '{}.h'.format(lib))
-            if exists(fn):
+            header_file = join(d, '{}.h'.format(lib))
+            if exists(header_file):
                 found = True
-                print('SDL2: found {} header at {}'.format(lib, fn))
+                print('SDL2: found {} header at {}'.format(lib, header_file))
                 break
 
         if not found:
@@ -517,24 +517,24 @@ if sdl2_flags:
 # -----------------------------------------------------------------------------
 # extension modules
 
-def get_extensions_from_sources(sources):
-    ext_modules = []
-    for pyx, flags in sources.items():
+def get_extensions_from_sources(sources_to_search):
+    ext_modules_found = []
+    for pyx, flags in sources_to_search.items():
         pyx = expand(src_path, pyx)
-        depends = [expand(src_path, x) for x in flags.pop('depends', [])]
+        depends_souces = [expand(src_path, x) for x in flags.pop('depends', [])]
         c_depends = [expand(src_path, x) for x in flags.pop('c_depends', [])]
         if not have_cython:
             pyx = '%s.c' % pyx[:-4]
-        f_depends = [x for x in depends if x.rsplit('.', 1)[-1] in (
+        f_depends = [x for x in depends_souces if x.rsplit('.', 1)[-1] in (
             'c', 'cpp', 'm')]
         module_name = get_modulename_from_file(pyx)
-        flags_clean = {'depends': depends}
-        for key, value in flags.items():
-            if len(value):
-                flags_clean[key] = value
-        ext_modules.append(CythonExtension(
+        flags_clean = {'depends': depends_souces}
+        for item_key, item_value in flags.items():
+            if item_value:
+                flags_clean[item_key] = item_value
+        ext_modules_found.append(CythonExtension(
             module_name, [pyx] + f_depends + c_depends, **flags_clean))
-    return ext_modules
+    return ext_modules_found
 
 
 print(sources)
@@ -635,7 +635,7 @@ setup(
     keywords='pinball',
     ext_modules=ext_modules,
     cmdclass={'build_ext': CustomBuildExt},
-    packages=['mpfmc',],
+    packages=['mpfmc'],
     package_dir={'mpfmc': 'mpfmc'},
     package_data=package_files,
     zip_safe=False,

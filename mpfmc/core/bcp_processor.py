@@ -207,10 +207,12 @@ class BcpProcessor(object):
         if name in self.mc.modes:
             self.mc.modes[name].stop()
 
-    def _bcp_ball_start(self, player_num, ball, **kwargs):
+    @staticmethod
+    def _bcp_ball_start(player_num, ball, **kwargs):
         del player_num, ball, kwargs
 
-    def _bcp_ball_end(self, **kwargs):
+    @staticmethod
+    def _bcp_ball_end(**kwargs):
         del kwargs
 
     def _bcp_settings(self, settings, **kwargs):

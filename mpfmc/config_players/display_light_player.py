@@ -1,6 +1,11 @@
+from functools import partial
+
+from kivy.graphics.instructions import Callback
+from kivy.uix.relativelayout import RelativeLayout
+
 from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
-from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
+from kivy.graphics.opengl import glReadPixels, GL_RGBA, GL_UNSIGNED_BYTE
 from kivy.graphics.texture import Texture
 from kivy.uix.effectwidget import EffectWidget
 
@@ -28,7 +33,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
                 self._scheduled = True
                 Clock.schedule_interval(self._tick, 0)
             if element not in context_dict:
-                context_dict[element] = self._setup_fbo(element, settings)
+                context_dict[element] = self._setup_fbo(element, settings, context)
             else:
                 context_dict[element][5] = True
         elif settings['action'] == "stop":
@@ -39,26 +44,32 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         else:
             raise AssertionError("Unknown action {}".format(settings['action']))
 
-    def _setup_fbo(self, element, settings):
+    def _setup_fbo(self, element, settings, context):
         """Setup FBO for a display."""
         if element not in self.machine.displays:
             raise AssertionError("Display {} not found. Please create it to use display_light_player.".format(element))
         source = self.machine.displays[element]
 
         # put the widget canvas on a Fbo
-        texture = Texture.create(size=source.size, colorfmt='rgb')
+        texture = Texture.create(size=source.size, colorfmt='rgba')
         fbo = Fbo(size=source.size, texture=texture)
 
-        effect_widget = EffectWidget()
+        effect_widget = RelativeLayout()
 
-        effect_list = list()
-
-        effect_widget.effects = effect_list
         effect_widget.size = source.size
 
         fbo.add(effect_widget.canvas)
+        with source.canvas:
+            callback = Callback(partial(self._trigger_render, context, element))
 
-        return [fbo, effect_widget, source, settings, True, True]
+        return [fbo, effect_widget, source, settings, True, True, True, callback]
+
+    def _trigger_render(self, context, element, *args):
+        del args
+        context_dict = self._get_instance_dict(context)
+        if element not in context_dict:
+            return
+        context_dict[element][6] = True
 
     def _tick(self, dt) -> None:
         del dt
@@ -69,34 +80,36 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         del dt
         for context, instances in self.instances.items():
             for element, instance in instances.items():
-                if not element[5]:
+                if not element[5] or not element[6]:
                     continue
                 self._render(instance, element, context)
 
     # pylint: disable-msg=too-many-locals
     def _render(self, instance, element, context):
-        fbo, effect_widget, source, settings, first, _ = instance
+        fbo, effect_widget, source, settings, first, _, _, _ = instance
         instance[4] = False
+        instance[6] = False
 
         # detach the widget from the parent
         parent = source.parent
         if parent:
-            parent.remove_widget(source)
+            parent.remove_display_source(source)
 
-        effect_widget.add_widget(source)
+        effect_widget.add_widget(source.container)
 
         fbo.draw()
 
         fbo.bind()
         data = glReadPixels(0, 0, source.native_size[0], source.native_size[1],
-                            GL_RGB, GL_UNSIGNED_BYTE)
+                            GL_RGBA, GL_UNSIGNED_BYTE)
 
         fbo.release()
 
+        effect_widget.remove_widget(source.container)
+
         # reattach to the parent
         if parent:
-            effect_widget.remove_widget(source)
-            parent.add_widget(source)
+            parent.add_display_source(source)
 
         if not first:
             # for some reasons we got garbage in the first buffer. we just skip it for now
@@ -106,10 +119,14 @@ class McDisplayLightPlayer(BcpConfigPlayer):
             for x, y, name in settings['light_map']:
                 x_pixel = int(x * width)
                 y_pixel = height - int(y * height)
-                value = (
-                    data[width * y_pixel * 3 + x_pixel * 3],
-                    data[width * y_pixel * 3 + x_pixel * 3 + 1],
-                    data[width * y_pixel * 3 + x_pixel * 3 + 2])
+                if (data[width * y_pixel * 4 + x_pixel * 4 + 3]) == 0:
+                    # pixel is transparent
+                    value = -1
+                else:
+                    value = (
+                        data[width * y_pixel * 4 + x_pixel * 4],
+                        data[width * y_pixel * 4 + x_pixel * 4 + 1],
+                        data[width * y_pixel * 4 + x_pixel * 4 + 2])
 
                 if name not in self._last_color or self._last_color[name] != value:
                     self._last_color[name] = value
@@ -123,6 +140,9 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         fbo.release()
 
     def clear_context(self, context):
+        context_dict = self._get_instance_dict(context)
+        for _, instance in context_dict.items():
+            instance[2].canvas.remove(instance[7])
         self._reset_instance_dict(context)
 
 

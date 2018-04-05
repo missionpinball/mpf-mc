@@ -16,7 +16,7 @@ class ImageWidget(Widget):
     merge_settings = ('height', 'width')
     animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'opacity')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
         self.size = (0, 0)
 
@@ -120,7 +120,7 @@ class ImageWidget(Widget):
             Scale(self.scale).origin = anchor
             Rectangle(pos=self.pos, size=self.size, texture=self.texture)
 
-    def play(self, start_frame: Optional[int]=None):
+    def play(self, start_frame: Optional[int] = None):
         """Play the image animation (if images supports it)."""
         if start_frame:
             self.current_frame = start_frame
@@ -142,7 +142,7 @@ class ImageWidget(Widget):
 
     texture = ObjectProperty(None, allownone=True)
     '''Texture object of the image. The texture represents the original, loaded
-    image texture. 
+    image texture.
 
     Depending of the texture creation, the value will be a
     :class:`~kivy.graphics.texture.Texture` or a
@@ -169,7 +169,7 @@ class ImageWidget(Widget):
             self._image.image.anim_delay = -1
 
     fps = AliasProperty(_get_fps, _set_fps)
-    '''The frames per second rate for the animation if the image is sequenced 
+    '''The frames per second rate for the animation if the image is sequenced
     (like an animated gif). If fps is set to 0, the animation will be stopped.
     '''
 

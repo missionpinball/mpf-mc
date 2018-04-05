@@ -1,9 +1,11 @@
 from kivy.core.image import Image
-from mpf.core.assets import Asset, AssetPool
+from mpf.core.assets import AssetPool
 
+from mpfmc.assets.mc_asset import McAsset
 
 # This module has extra comments since it's what we tell people to use as an
 # example of an Asset implementation.
+
 
 class ImagePool(AssetPool):
 
@@ -19,7 +21,7 @@ class ImagePool(AssetPool):
         return self.asset
 
 
-class ImageAsset(Asset):
+class ImageAsset(McAsset):
 
     attribute = 'images'  # attribute in MC, e.g. self.mc.images
     path_string = 'images'  # entry from mpf-mc:paths: for asset folder name

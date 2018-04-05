@@ -1,3 +1,4 @@
+"""A slide which can show widgets."""
 from bisect import bisect
 from typing import List, Optional
 
@@ -13,22 +14,26 @@ from mpfmc.uix.widget import (WidgetContainer, Widget,
 from mpfmc.core.mc import MpfMc
 
 
+# pylint: disable-msg=too-many-instance-attributes
 class Slide(Screen, StencilView):
+
+    """A slide on a display."""
+
     next_id = 0
 
     @classmethod
     def get_next_id(cls) -> int:
+        """Return the next slide id."""
         Slide.next_id += 1
         return Slide.next_id
 
     # pylint: disable-msg=too-many-arguments
-    def __init__(self, mc: "MpfMc", name: Optional[str], config: Optional[dict]=None,
-                 target: str='default', key: Optional[str]=None,
-                 priority: int=0, play_kwargs: Optional[dict]=None) -> None:
-
+    def __init__(self, mc: "MpfMc", name: Optional[str], config: Optional[dict] = None,
+                 target: str = 'default', key: Optional[str] = None,
+                 priority: int = 0, play_kwargs: Optional[dict] = None) -> None:
+        """Initialise slide."""
         # config is a dict. widgets will be in a key
         # assumes config, if present, is validated.
-
         self.creation_order = Slide.get_next_id()
 
         if not name:
@@ -39,6 +44,7 @@ class Slide(Screen, StencilView):
         self.priority = priority
         self.pending_widgets = set()
         self.key = key
+        self.mc.track_leak_reference(self)
 
         if not config:
             config = self.mc.config_validator.validate_config('slides', dict())
@@ -100,20 +106,20 @@ class Slide(Screen, StencilView):
                                                             self.priority,
                                                             self.creation_order)
 
-    def add_widgets_from_library(self, name: str, key: Optional[str]=None,
-                                 widget_settings: Optional[dict]=None,
-                                 play_kwargs: Optional[dict]=None,
+    def add_widgets_from_library(self, name: str, key: Optional[str] = None,
+                                 widget_settings: Optional[dict] = None,
+                                 play_kwargs: Optional[dict] = None,
                                  **kwargs) -> List["Widget"]:
-        """
-        Adds a widget to the slide by name from the library of pre-defined widgets.
+        """Add a widget to the slide by name from the library of pre-defined widgets.
+
         Args:
             name: The name of the widget to add.
             key: An optional key.
             widget_settings: An optional dictionary of widget settings to override those in
                 the library.
-            play_kwargs: An optional dictionary of play settings to override those in 
+            play_kwargs: An optional dictionary of play settings to override those in
                 the library.
-            **kwargs:  Additional arguments. 
+            **kwargs:  Additional arguments.
 
         Returns:
             A list of widgets (MpfWidget objects) added to the slide.
@@ -128,17 +134,17 @@ class Slide(Screen, StencilView):
                                             widget_settings=widget_settings,
                                             play_kwargs=play_kwargs)
 
-    def add_widgets_from_config(self, config: dict, key: Optional[str]=None,
-                                widget_settings: Optional[dict]=None,
+    def add_widgets_from_config(self, config: dict, key: Optional[str] = None,
+                                widget_settings: Optional[dict] = None,
                                 play_kwargs: Optional[dict] = None) -> List["Widget"]:
-        """
-        Adds one or more widgets to the slide from a config dictionary.
+        """Add one or more widgets to the slide from a config dictionary.
+
         Args:
             config: The configuration dictionary for the widgets to be added.
             key: An optional key.
             widget_settings: An optional dictionary of widget settings to override those in
                 the config.
-            play_kwargs: An optional dictionary of play settings to override those in 
+            play_kwargs: An optional dictionary of play settings to override those in
                 the config.
 
         Returns:
@@ -196,25 +202,24 @@ class Slide(Screen, StencilView):
 
     # pylint: disable-msg=arguments-differ
     def add_widget(self, widget: "Widget", **kwargs) -> None:
-        """Adds a widget to this slide.
+        """Add a widget to this slide.
 
         Args:
             widget: An MPF-enhanced widget (which will include details like z
                 order and removal keys.)
 
         Notes:
-            Widgets are drawn in order from the end of the children list to the 
+            Widgets are drawn in order from the end of the children list to the
             beginning, meaning the first item in the child list is draw last so
             it will appear on top of all other items.
-            
+
             This method respects the z-order of the widget it's adding and inserts
             it into the proper position in the widget tree. Higher numbered z order
             values will be inserted after (so they draw on top) of existing ones.
-    
+
             If the new widget has the same priority of existing widgets, the new
             one is inserted after the widgets of that priority, to maintain the
             drawing order of the configuration file.
-
         """
         del kwargs
         if widget.get_display() == self.display:
@@ -232,7 +237,7 @@ class Slide(Screen, StencilView):
         """Removes all widgets from this slide with the specified key value."""
         for widget in self.find_widgets_by_key(key):
             if isinstance(widget, Widget):
-                self.remove_widget(widget.container)
+                widget.remove()
             else:
                 self.remove_widget(widget)
 
@@ -240,7 +245,7 @@ class Slide(Screen, StencilView):
         """Return a list of widgets with the matching key value by searching
         the tree of children belonging to this slide."""
         return [w for child in self.children
-                for w in child.walk(restrict=True, loopback=False) if w.key == key]
+                for w in child.walk(restrict=True, loopback=False) if hasattr(w, "key") and w.key == key]
 
     def add_widget_to_parent_frame(self, widget: "KivyWidget"):
         """Adds this widget to this slide's parent instead of to this slide.
@@ -254,7 +259,7 @@ class Slide(Screen, StencilView):
             if the slide in the frame changes.
         """
         # TODO: Determine proper z-order for negative z-order values
-        self.manager.parent.add_widget(widget)
+        self.manager.container.add_widget(widget)
 
     def schedule_removal(self, secs: float) -> None:
         """Schedules the removal of this slide after the specified number of seconds elapse."""
@@ -271,7 +276,6 @@ class Slide(Screen, StencilView):
         except AttributeError:
             # looks like slide was already removed, but let's clean it up just
             # in case
-
             self.prepare_for_removal()
             self.mc.active_slides.pop(self.name, None)
 
@@ -344,11 +348,11 @@ class Slide(Screen, StencilView):
 
     parent_widgets = AliasProperty(_get_parent_widgets, None)
     '''List of all the :class:`MpfWidget` widgets that belong to the slide
-    manager of this slide (read-only).  You should not change this list 
-    manually. Use the :meth:`add_widget <mpfmc.uix.widget.MpfWidget.add_widget>` 
+    manager of this slide (read-only).  You should not change this list
+    manually. Use the :meth:`add_widget <mpfmc.uix.widget.MpfWidget.add_widget>`
     method instead.
 
-    Use this property rather than the 'self.manager.parent.children' property in 
+    Use this property rather than the 'self.manager.parent.children' property in
     case the slide architecture changes in the future.
     '''
 
@@ -357,10 +361,10 @@ class Slide(Screen, StencilView):
         return self.children
 
     widgets = AliasProperty(_get_widgets, None, bind=('children', ))
-    '''List of all the :class:`MpfWidget` children widgets of this slide (read-only). 
+    '''List of all the :class:`MpfWidget` children widgets of this slide (read-only).
     You should not change this list manually. Use the
     :meth:`add_widget <mpfmc.uix.widget.MpfWidget.add_widget>` method instead.
-    
+
     Use this property rather than the 'children' property in case the slide
     architecture changes in the future.
     '''

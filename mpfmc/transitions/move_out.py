@@ -10,7 +10,6 @@ class MoveOutTransition(MpfTransition):
     direction = OptionProperty('left', options=('left', 'right', 'top',
                                                 'bottom'))
 
-
     def start(self, manager):
 
         super().start(manager)

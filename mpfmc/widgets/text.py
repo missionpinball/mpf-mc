@@ -14,20 +14,27 @@ if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 
-class CustomLabel(Label):
+# pylint: disable-msg=too-many-instance-attributes
+class McFontLabel(Label):
 
-    def __init__(self, mc: "MpfMc", config: dict, **kwargs):
+    """Normal label."""
+
+    def get_label(self):
+        """Return the label."""
+        return self._label
+
+
+# pylint: disable-msg=too-many-instance-attributes
+class BitmapFontLabel(Label):
+
+    """Injects a font or bitmap font into a text widget."""
+
+    def __init__(self, mc: "MpfMc", font_name, **kwargs):
 
         self.mc = mc
-
-        if 'bitmap_font' in config:
-            self.bitmap_font = config['bitmap_font']
-
-        if self.bitmap_font:
-            if 'font_name' not in config:
-                raise ValueError("Text widget: font_name is required when bitmap_font is True.")
-            kwargs.setdefault('font_name', config['font_name'])
-            kwargs.setdefault('font_kerning', True)
+        self.mc.track_leak_reference(self)
+        kwargs.setdefault('font_name', font_name)
+        kwargs.setdefault('font_kerning', True)
 
         super().__init__(**kwargs)
 
@@ -36,22 +43,20 @@ class CustomLabel(Label):
         return self._label
 
     def _create_label(self):
-        if self.bitmap_font:
-            d = Label._font_properties
-            dkw = dict(list(zip(d, [getattr(self, x) for x in d])))
-            self._label = LabelBitmapFont(self.mc, **dkw)
-        else:
-            super()._create_label()
+        d = Label._font_properties
+        dkw = dict(list(zip(d, [getattr(self, x) for x in d])))
+        self._label = LabelBitmapFont(self.mc, **dkw)
 
-    bitmap_font = BooleanProperty(False)
-    '''Flag indicating whether or not the font_name attribute refers to a 
-    bitmap font.'''
+
+var_finder = re.compile(r"(?<=\()[a-zA-Z_0-9|]+(?=\))")
+string_finder = re.compile(r"(?<=\$)[a-zA-Z_0-9]+")
 
 
 class Text(Widget):
+
+    """A text widget on a slide."""
+
     widget_type_name = 'Text'
-    var_finder = re.compile("(?<=\()[a-zA-Z_0-9|]+(?=\))")
-    string_finder = re.compile("(?<=\$)[a-zA-Z_0-9]+")
     merge_settings = ('font_name', 'font_size', 'bold', 'italic', 'halign',
                       'valign', 'padding_x', 'padding_y', 'text_size',
                       'shorten', 'mipmap', 'markup', 'line_height',
@@ -59,9 +64,14 @@ class Text(Widget):
                       'unicode_errors', 'color', 'casing')
     animation_properties = ('x', 'y', 'font_size', 'color', 'opacity', 'rotation', 'scale')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None,
-                 play_kwargs: Optional[dict]=None, **kwargs) -> None:
-        self._label = CustomLabel(mc, config)
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None,
+                 play_kwargs: Optional[dict] = None, **kwargs) -> None:
+        if 'bitmap_font' in config and config['bitmap_font']:
+            if 'font_name' not in config or not config['font_name']:
+                raise ValueError("Text widget: font_name is required when bitmap_font is True.")
+            self._label = BitmapFontLabel(mc, config['font_name'])
+        else:
+            self._label = McFontLabel()
         self._label.fbind('texture', self.on_label_texture)
 
         super().__init__(mc=mc, config=config, key=key)
@@ -128,7 +138,7 @@ class Text(Widget):
         if '$' not in text:
             return text
 
-        for text_string in Text.string_finder.findall(text):
+        for text_string in string_finder.findall(text):
             text = text.replace('${}'.format(text_string),
                                 self._do_get_text_string(text_string))
 
@@ -141,8 +151,9 @@ class Text(Widget):
             # if the text string is not found, put the $ back on
             return '${}'.format(text_string)
 
-    def _get_text_vars(self, text: str):
-        return Text.var_finder.findall(text)
+    @staticmethod
+    def _get_text_vars(text: str):
+        return var_finder.findall(text)
 
     def _process_text(self, text: str) -> None:
         for var_string in self._get_text_vars(text):
@@ -161,20 +172,17 @@ class Text(Widget):
             if var_string.startswith('machine|'):
                 try:
                     text = text.replace('(' + var_string + ')',
-                                        str(self.mc.machine_vars[
-                                                var_string.split('|')[1]]))
+                                        str(self.mc.machine_vars[var_string.split('|')[1]]))
                 except KeyError:
                     text = text.replace('(' + var_string + ')', '')
 
             elif self.mc.player:
                 if var_string.startswith('player|'):
                     text = text.replace('(' + var_string + ')',
-                                        str(self.mc.player[
-                                                var_string.split('|')[1]]))
+                                        str(self.mc.player[var_string.split('|')[1]]))
                     continue
                 elif var_string.startswith('player') and '|' in var_string:
-                    player_num, var_name = var_string.lstrip('player').split(
-                            '|')
+                    player_num, var_name = var_string.lstrip('player').split('|')
                     try:
                         value = self.mc.player_list[int(player_num) - 1][
                             var_name]
@@ -194,7 +202,7 @@ class Text(Widget):
 
             if var_string in self.event_replacements:
                 text = text.replace('({})'.format(var_string),
-                    str(self.event_replacements[var_string]))
+                                    str(self.event_replacements[var_string]))
 
         self.update_text(text)
 
@@ -257,13 +265,13 @@ class Text(Widget):
                                    self._machine_var_change)
 
     def prepare_for_removal(self) -> None:
+        super().prepare_for_removal()
         self.mc.events.remove_handler(self._player_var_change)
         self.mc.events.remove_handler(self._machine_var_change)
 
     @staticmethod
-    def group_digits(text: str, separator: str=',', group_size: int=3) -> str:
-        """Enables digit grouping (i.e. adds comma separators between
-        thousands digits).
+    def group_digits(text: str, separator: str = ',', group_size: int = 3) -> str:
+        """Enable digit grouping (i.e. adds comma separators between thousands digits).
 
         Args:
             text: The incoming string of text
@@ -393,7 +401,7 @@ class Text(Widget):
         self._label.line_height = line_height
 
     bitmap_font = BooleanProperty(False)
-    '''Flag indicating whether or not the font_name attribute refers to a 
+    '''Flag indicating whether or not the font_name attribute refers to a
     bitmap font.'''
 
     line_height = AliasProperty(_get_line_height, _set_line_height)
@@ -507,7 +515,7 @@ class Text(Widget):
         self._label.halign = halign
 
     halign = AliasProperty(_get_halign, _set_halign)
-    '''Horizontal alignment of the text. Available options are : left, center, 
+    '''Horizontal alignment of the text. Available options are : left, center,
     right and justify.
 
     .. warning::

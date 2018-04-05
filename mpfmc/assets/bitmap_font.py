@@ -1,13 +1,11 @@
-"""Contains bitmap_font-related asset class used to display bitmap fonts in text widgets"""
-
 from os import path
 
-from mpf.core.assets import Asset
 from mpfmc.uix.bitmap_font.bitmap_font import BitmapFont
 
+from mpfmc.assets.mc_asset import McAsset
 
-class BitmapFontAsset(Asset):
-    """Bitmap font class used to display bitmap font images in text widgets"""
+
+class BitmapFontAsset(McAsset):
 
     attribute = 'bitmap_fonts'
     path_string = 'bitmap_fonts'
@@ -32,41 +30,36 @@ class BitmapFontAsset(Asset):
         if isinstance(self.config['descriptor'], str):
             if not path.isfile(self.config['descriptor']):
                 raise FileNotFoundError('Could not locate the bitmap font descriptor file {}'.format(
-                    self.config['descriptor']))
+                                        self.config['descriptor']))
 
         elif not isinstance(self.config['descriptor'], list):
             raise ValueError('Bitmap font descriptor must contain either a list or file name.')
 
     @property
     def bitmap_font(self):
-        """The bitmap_font image and font info"""
         return self._bitmap_font
 
     def get_extents(self, text, font_kerning=True):
-        """The width and height of the font image for the specified text"""
         if self._bitmap_font:
             return self.bitmap_font.get_extents(text, font_kerning)
 
         return 0, 0
 
     def get_descent(self):
-        """The font descent value"""
         if self._bitmap_font:
             return self.bitmap_font.get_descent()
 
         return 0
 
     def get_ascent(self):
-        """The font ascent value"""
         if self._bitmap_font:
             return self.bitmap_font.get_ascent()
 
         return 0
 
     def do_load(self):
-        """Load the bitmap font image atlas in memory"""
+        # Load the bitmap font image atlas
         self._bitmap_font = BitmapFont(self.config['file'], self.config['descriptor'])
 
     def _do_unload(self):
-        """Unload the bitmap font"""
         self._bitmap_font = None

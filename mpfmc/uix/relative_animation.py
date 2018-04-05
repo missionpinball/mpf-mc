@@ -2,13 +2,17 @@ from kivy.animation import Animation
 
 
 class RelativeAnimation(Animation):
-    """Class that extends the Kivy Animation base class to add relative animation 
-    property target values that are calculated when the animation starts."""
+
+    """Class that extends the Kivy Animation base class to add relative animation property target values.
+
+    Those are calculated when the animation starts.
+    """
 
     def _initialize(self, widget):
-        """Initializes the animation and calculates the property target value
-        based on the current value plus the desired delta.
-        
+        """Initializes the animation and calculates the property target value.
+
+        Based on the current value plus the desired delta.
+
         Notes: Do not call the base class _initialize method as this override
         completely replaces the base class method."""
         d = self._widgets[widget.uid] = {

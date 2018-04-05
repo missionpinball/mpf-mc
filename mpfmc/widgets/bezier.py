@@ -14,10 +14,13 @@ if MYPY:   # pragma: no cover
 
 class Bezier(Widget):
 
+    """A bezier curve."""
+
     widget_type_name = 'Bezier'
     animation_properties = ('color', 'thickness', 'opacity', 'points', 'rotation', 'scale')
 
-    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str]=None, **kwargs) -> None:
+    def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
+        """Initialise bezier."""
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 
@@ -78,11 +81,10 @@ class Bezier(Widget):
     '''
 
     close = BooleanProperty(False)
-    '''If True, the line will be closed.
-    '''
+    '''If True, the line will be closed.'''
 
     joint = OptionProperty("round", options=["none", "round", "bevel", "miter"])
-    '''The join of the line, defaults to 'round'. Can be one of 'none', 'round', 
+    '''The join of the line, defaults to 'round'. Can be one of 'none', 'round',
     'bevel', 'miter'.
     '''
 
@@ -92,7 +94,7 @@ class Bezier(Widget):
     '''
 
     precision = NumericProperty(180)
-    '''Number of iteration for drawing the bezier between 2 segments, defaults to 
+    '''Number of iteration for drawing the bezier between 2 segments, defaults to
     180. The precision must be at least 1.
     '''
 

@@ -9,8 +9,7 @@ from mpfmc.core.audio.audio_exception import AudioException
 
 __all__ = ('SoundSystem',
            'AudioInterface',
-           'AudioException',
-          )
+           'AudioException')
 
 # ---------------------------------------------------------------------------
 #    Default sound system and track values

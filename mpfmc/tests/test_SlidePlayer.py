@@ -37,6 +37,26 @@ class TestSlidePlayer(MpfMcTestCase):
         self.assertEqual(self.mc.displays['display1'].current_slide_name,
                          'machine_slide_2')
 
+    def test_animation(self):
+        self.mc.events.post("show_slide_with_animations")
+        self.advance_time()
+        self.assertEqual(self.mc.displays['display1'].current_slide_name,
+                         'my_slide')
+        slide = weakref.ref(self.mc.targets['display1'].current_slide)
+        self.assertTrue(slide())
+
+        self.mc.events.post("remove_slide_with_animations")
+        self.advance_time()
+        self.assertEqual(self.mc.displays['display1'].current_slide_name,
+                         'display1_blank')
+
+        self.mc.events.post('show_slide_1')
+        self.advance_time()
+
+        gc.collect()
+        self.advance_time()
+        self.assertFalse(slide())
+
     def test_slide_on_second_display(self):
         self.mc.events.post('show_slide_3')
         self.advance_time()
@@ -103,7 +123,8 @@ class TestSlidePlayer(MpfMcTestCase):
         self.advance_time()
         self.assertEqual(self.mc.targets['display1'].current_slide_name,
                          'mode1_slide')
-
+        slide = weakref.ref(self.mc.targets['display1'].current_slide)
+        self.assertTrue(slide())
         # stop the mode and make sure the slide is removed
         num_slides = len(self.mc.targets['display1'].slides)
         self.mc.modes['mode1'].stop()
@@ -111,6 +132,9 @@ class TestSlidePlayer(MpfMcTestCase):
                          'machine_slide_1')
         self.assertEqual(len(self.mc.targets['display1'].slides),
                          num_slides - 1)
+
+        gc.collect()
+        self.assertFalse(slide())
 
         # post the slide_player event from the mode. Should not show the slide
         # since the mode is not running
@@ -176,6 +200,18 @@ class TestSlidePlayer(MpfMcTestCase):
 
         self.mc.events.post('anon_slide_widgets')
         self.advance_time()
+
+        slide = weakref.ref(self.mc.targets['display1'].current_slide)
+        self.assertTrue(slide())
+
+        self.mc.events.post('anon_slide_widgets2')
+        self.advance_time(1)
+        slide2 = weakref.ref(self.mc.targets['display1'].current_slide)
+
+        gc.collect()
+
+        self.assertFalse(slide())
+        self.assertTrue(slide2())
 
     def test_expire_in_slide(self):
         # tests that slide expire time works when configured in a slide
@@ -518,15 +554,15 @@ class TestSlidePlayer(MpfMcTestCase):
         self.advance_time()
 
     def test_animation_triggers(self):
-        bcp_command = ('register_trigger', None, {'event': 'flash_widget_1'})
-        self.assertNotIn(bcp_command, self.sent_bcp_commands)
+        bcp_command1 = ('register_trigger', None, {'event': 'flash_widget_1'})
+        bcp_command2 = ('register_trigger', None, {'event': 'flash_widget_2'})
+        self.assertNotIn(bcp_command1, self.sent_bcp_commands)
+        self.assertNotIn(bcp_command2, self.sent_bcp_commands)
 
         self.mc.events.post("client_connected")
         self.advance_time()
-        self.assertIn(bcp_command, self.sent_bcp_commands)
-
-        bcp_command = ('register_trigger', None, {'event': 'flash_widget_2'})
-        self.assertIn(bcp_command, self.sent_bcp_commands)
+        self.assertIn(bcp_command1, self.sent_bcp_commands)
+        self.assertIn(bcp_command2, self.sent_bcp_commands)
 
     def test_play_multiple_times(self):
         # set a baseline slide

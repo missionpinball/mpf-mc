@@ -1,4 +1,8 @@
 """Test widgets."""
+import weakref
+
+import gc
+
 from mpfmc.uix.widget import WidgetContainer, Widget
 from mpfmc.widgets.rectangle import Rectangle
 from mpfmc.widgets.text import Text
@@ -651,16 +655,16 @@ class TestWidget(MpfMcTestCase):
 
         # verify box11 is in the parent frame
         self.assertTrue(isinstance(self.mc.targets[
-            'default'].current_slide.parent_widgets[0], WidgetContainer))
+            'default'].parent_widgets[0], WidgetContainer))
 
         self.assertEqual('box11', self.mc.targets[
-            'default'].current_slide.parent_widgets[0].widget.text)
+            'default'].parent_widgets[0].widget.text)
 
         # switch the slide
         self.mc.events.post('show_new_slide')
         self.advance_time()
         self.assertEqual('box11', self.mc.targets[
-            'default'].current_slide.parent_widgets[0].widget.text)
+            'default'].parent_widgets[0].widget.text)
         self.assertEqual('NEW SLIDE', self.mc.targets[
             'default'].current_slide.widgets[0].widget.text)
 
@@ -749,6 +753,9 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('add_widget1_to_current')
         self.mc.events.post('add_widget7')
         self.advance_time()
+        widget7 = weakref.ref([x.widget for x in self.mc.targets['default'].current_slide.widgets
+                               if x.widget.key == '_global-widget7'][0])
+        self.assertTrue(widget7())
 
         self.assertIn('_global-widget1', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
@@ -761,6 +768,9 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.widgets])
         self.assertNotIn('_global-widget7', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
+
+        gc.collect()
+        self.assertFalse(widget7())
 
     def test_widget_player_expire(self):
         self.mc.targets['default'].add_slide(name='slide1')
@@ -777,12 +787,19 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('_global-widget8', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
 
+        widget8 = weakref.ref([x.widget for x in self.mc.targets['default'].current_slide.widgets
+                               if x.widget.key == '_global-widget8'][0])
+        self.assertTrue(widget8())
+
         self.advance_time(1)
 
         self.assertIn('_global-widget1', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
         self.assertNotIn('_global-widget8', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
+
+        gc.collect()
+        self.assertFalse(widget8())
 
     def test_widget_player_expire_in_parent_frame(self):
         self.mc.targets['default'].add_slide(name='slide1')
@@ -799,12 +816,19 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('_global-widget8', [x.widget.key for x in self.mc.targets[
             'default'].parent_widgets])
 
+        widget8 = weakref.ref(self.mc.targets[
+            'default'].parent_widgets[0])
+        self.assertTrue(widget8())
+
         self.advance_time(1)
 
         self.assertIn('_global-widget1', [x.widget.key for x in self.mc.targets[
             'default'].current_slide.widgets])
-        self.assertNotIn('_global-widget8', [x.widget.key for x in self.mc.targets[
-            'default'].parent_widgets])
+        self.assertNotIn('_global-widget8', [x.key for x in self.mc.targets[
+            'default'].parent.walk()])
+
+        gc.collect()
+        self.assertFalse(widget8())
 
     def test_widget_player_custom_widget_settings(self):
         self.mc.targets['default'].add_slide(name='slide1')
@@ -836,6 +860,10 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('WIDGET NO KEY', [x.widget.text for x in self.mc.targets[
             'default'].current_slide.widgets])
 
+        widget = weakref.ref([x.widget for x in self.mc.targets['default'].current_slide.widgets
+                               if x.widget.text == 'WIDGET WITH KEY'][0])
+        self.assertTrue(widget())
+
         self.mc.events.post('remove_widget1_by_key')
         self.advance_time()
 
@@ -844,6 +872,9 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.widgets])
         self.assertIn('WIDGET NO KEY', [x.widget.text for x in self.mc.targets[
             'default'].current_slide.widgets])
+
+        gc.collect()
+        self.assertFalse(widget())
 
     def test_widget_expire_from_slide_player(self):
         # tests that we can remove a widget by key that was shown via the
@@ -857,6 +888,10 @@ class TestWidget(MpfMcTestCase):
         self.assertIn('WIDGET NO EXPIRE', [x.widget.text for x in self.mc.targets[
             'default'].current_slide.widgets])
 
+        widget = weakref.ref([x.widget for x in self.mc.targets['default'].current_slide.widgets
+                               if x.widget.text == 'WIDGET EXPIRE 1s'][0])
+        self.assertTrue(widget())
+
         self.advance_time(1)
 
         # make sure the one with key is gone but the other is there
@@ -864,6 +899,9 @@ class TestWidget(MpfMcTestCase):
             'default'].current_slide.widgets])
         self.assertIn('WIDGET NO EXPIRE', [x.widget.text for x in self.mc.targets[
             'default'].current_slide.widgets])
+
+        gc.collect()
+        self.assertFalse(widget())
 
     def test_opacity(self):
         self.mc.targets['default'].add_slide(name='slide1')
@@ -894,6 +932,8 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('event_s')
         self.advance_time()
 
+        old_widget = weakref.ref(widget)
+
         widget = self.mc.targets['default'].current_slide.find_widgets_by_key(
             '_global-widget1')[0]
         self.assertEqual(widget.text, 'S')
@@ -902,10 +942,18 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('event_d')
         self.advance_time()
 
+        gc.collect()
+        self.assertFalse(old_widget())
+
+        old_widget = weakref.ref(widget)
+
         widget = self.mc.targets['default'].current_slide.find_widgets_by_key(
             '_global-widget1')[0]
         self.assertEqual(widget.text, 'D')
         self.assertEqual(widget.color, [0.0, 0.0, 1.0, 1.0])
+
+        gc.collect()
+        self.assertFalse(old_widget())
 
     def test_widget_updating(self):
         self.mc.events.post('show_slide_3')
