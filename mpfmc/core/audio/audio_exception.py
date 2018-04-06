@@ -1,3 +1,4 @@
+"""General audio exception class for exceptions thrown in the audio module."""
 
 
 # ---------------------------------------------------------------------------

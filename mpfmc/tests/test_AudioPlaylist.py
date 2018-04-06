@@ -67,9 +67,14 @@ class TestAudioPlaylist(MpfMcTestCase):
         # Create a PlaylistInstance to manipulate directly for testing
         attract_music_playlist = PlaylistInstance('attract_music',
                                                   self.mc.playlists['attract_music'],
-                                                  playlist_controller.crossfade_time)
+                                                  playlist_controller.crossfade_time,
+                                                  settings={
+                                                      "crossfade_mode": "override",
+                                                      "crossfade_time": 1.5
+                                                  })
         self.assertIsNotNone(attract_music_playlist)
         self.assertFalse(attract_music_playlist.repeat)
+        self.assertEqual(1.5, attract_music_playlist.crossfade_time)
 
         # Advance through the playlist
         current_sound = attract_music_playlist.get_next_sound_name()
@@ -214,3 +219,125 @@ class TestAudioPlaylist(MpfMcTestCase):
         status = track_playlist.get_status()
         self.assertEqual("idle", status[0]['status'])
         self.assertEqual("idle", status[1]['status'])
+
+    def test_playlist_context(self):
+        """ Tests clearing Playlist context"""
+
+        if SoundSystem is None or self.mc.sound_system is None:
+            log = logging.getLogger('TestAudioPlaylist')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        if interface is None:
+            log = logging.getLogger('TestAudioPlaylist')
+            log.warning("Sound system audio interface could not be loaded - skipping audio tests")
+            self.skipTest("Sound system audio interface could not be loaded")
+
+        self.assertIsNotNone(interface)
+
+        # Check playlist track
+        track_playlist = interface.get_track_by_name("playlist")
+        self.assertIsNotNone(track_playlist)
+        self.assertEqual("playlist", track_playlist.name)
+
+        playlist_controller = interface.get_playlist_controller("playlist")
+        self.assertIsNotNone(playlist_controller)
+        self.assertEqual("playlist", playlist_controller.name)
+
+        # Start the playlist playing with a specified context name
+        playlist_instance = playlist_controller.play("attract_music",
+                                                     "test_playlist_context",
+                                                     {
+                                                         "crossfade_time": 0.5,
+                                                         "crossfade_mode": "override"
+                                                     })
+        self.assertIsNotNone(playlist_instance)
+        self.assertEqual(0.5, playlist_instance.crossfade_time)
+        self.advance_real_time()
+
+        status = track_playlist.get_status()
+        self.assertEqual("playing", status[0]['status'])
+        self.assertEqual(self.mc.sounds["drumbeat_7"].id, status[0]['sound_id'])
+
+        # Call clear context for an unknown context (playlist should keep playing)
+        playlist_controller.clear_context("unknown_context")
+        self.advance_real_time()
+        status = track_playlist.get_status()
+        self.assertEqual("playing", status[0]['status'])
+        self.assertEqual(self.mc.sounds["drumbeat_7"].id, status[0]['sound_id'])
+
+        # Call clear context using the context we started it playing (playlist should stop)
+        playlist_controller.clear_context("test_playlist_context")
+        self.advance_real_time()
+        status = track_playlist.get_status()
+        self.assertEqual("stopping", status[0]['status'])
+        self.assertEqual(self.mc.sounds["drumbeat_7"].id, status[0]['sound_id'])
+
+        # Allow time for playlist to fully stop
+        self.advance_real_time(0.5)
+        status = track_playlist.get_status()
+        self.assertEqual("idle", status[0]['status'])
+        self.assertEqual("idle", status[1]['status'])
+
+        # Start the playlist playing again
+        playlist_instance = playlist_controller.play("attract_music",
+                                                     "ignore",
+                                                     {
+                                                         "crossfade_time": 0.5,
+                                                         "crossfade_mode": "override"
+                                                     })
+        self.assertIsNotNone(playlist_instance)
+        self.assertEqual(0.5, playlist_instance.crossfade_time)
+        self.advance_real_time()
+
+        status = track_playlist.get_status()
+        self.assertEqual("playing", status[0]['status'])
+        self.assertEqual(self.mc.sounds["drumbeat_7"].id, status[0]['sound_id'])
+
+        # Start second playlist
+        other_playlist_instance = playlist_controller.play("other_playlist",
+                                                           "ignore",
+                                                           {
+                                                               "crossfade_time": 0.5,
+                                                               "crossfade_mode": "override"
+                                                           })
+        self.assertIsNotNone(other_playlist_instance)
+        self.assertEqual(0.5, other_playlist_instance.crossfade_time)
+        self.advance_real_time()
+
+        status = track_playlist.get_status()
+        self.assertEqual("stopping", status[0]['status'])
+        self.assertEqual(self.mc.sounds["drumbeat_7"].id, status[0]['sound_id'])
+        self.assertEqual("playing", status[1]['status'])
+        self.assertEqual(self.mc.sounds["hippie_ahead"].id, status[1]['sound_id'])
+
+        # Start third playlist with a specific context (will be pending while other two playlists
+        # are fading)
+        third_playlist_instance = playlist_controller.play("third_playlist",
+                                                           "test_pending_context",
+                                                           {
+                                                               "crossfade_time": 0.5,
+                                                               "crossfade_mode": "override"
+                                                           })
+        self.assertIsNone(third_playlist_instance)
+        self.assertTrue(playlist_controller.has_pending_request)
+        self.advance_real_time()
+
+        status = track_playlist.get_status()
+        self.assertEqual("stopping", status[0]['status'])
+        self.assertEqual(self.mc.sounds["drumbeat_7"].id, status[0]['sound_id'])
+        self.assertEqual("playing", status[1]['status'])
+        self.assertEqual(self.mc.sounds["hippie_ahead"].id, status[1]['sound_id'])
+
+        # Call clear context using the context for the pending request (pending request should be cleared)
+        playlist_controller.clear_context("test_pending_context")
+        self.assertFalse(playlist_controller.has_pending_request)
+        self.advance_real_time()
+
+        status = track_playlist.get_status()
+        self.assertEqual("stopping", status[0]['status'])
+        self.assertEqual(self.mc.sounds["drumbeat_7"].id, status[0]['sound_id'])
+        self.assertEqual("playing", status[1]['status'])
+        self.assertEqual(self.mc.sounds["hippie_ahead"].id, status[1]['sound_id'])

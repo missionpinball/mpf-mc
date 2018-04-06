@@ -773,6 +773,11 @@ cdef class TrackStandard(Track):
         """
         self.log.debug("Clearing context %s", context)
 
+        # If this track is managed by a playlist controller, do not clear the context as that
+        # will be handled by the playlist controller.
+        if self.mc.sound_system.audio_interface.get_playlist_controller(self._name):
+            return
+
         SDL_LockAudio()
 
         # Clear any instances in the queue with the given context value
@@ -1010,6 +1015,7 @@ cdef class TrackStandard(Track):
             sound_settings.ducking_settings.attack_duration = 0
             sound_settings.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME
             sound_settings.ducking_settings.release_duration = 0
+            sound_settings.ducking_settings.release_start_pos = 0
 
         # Special handling is needed to start streaming for the specified sound at the correct location
         if sound_container.sample.type == sound_type_streaming:
@@ -1455,6 +1461,7 @@ cdef class TrackStandard(Track):
 
                         if player.next.sound_has_ducking:
                             player.current.sound_has_ducking = True
+                            player.current.ducking_stage = ducking_stage_delay
                             player.current.ducking_settings.track_bit_mask = player.next.ducking_settings.track_bit_mask
                             player.current.ducking_settings.attack_start_pos = player.next.ducking_settings.attack_start_pos
                             player.current.ducking_settings.attack_duration = player.next.ducking_settings.attack_duration
@@ -1463,6 +1470,13 @@ cdef class TrackStandard(Track):
                             player.current.ducking_settings.release_duration = player.next.ducking_settings.release_duration
                         else:
                             player.current.sound_has_ducking = False
+                            player.current.ducking_stage = ducking_stage_idle
+                            player.current.ducking_settings.track_bit_mask = 0
+                            player.current.ducking_settings.attack_start_pos = 0
+                            player.current.ducking_settings.attack_duration = 0
+                            player.current.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME
+                            player.current.ducking_settings.release_start_pos = 0
+                            player.current.ducking_settings.release_duration = 0
 
                         # Send sound started notification
                         send_sound_started_notification(player_num, player.current.sound_id, player.current.sound_instance_id, track)

@@ -94,7 +94,7 @@ Here are several various examples:
 
             elif player_settings['action'].lower() == 'play_layer':
                 player_settings.setdefault('volume', None)
-                track.play_layer(player_settings['layer'], player_settings['fade_in'], player_settings['queue'],
+                track.play_layer(player_settings['layer'], player_settings['fade_in'], player_settings['timing'],
                                  volume=player_settings['volume'])
 
             elif player_settings['action'].lower() == 'stop_layer':

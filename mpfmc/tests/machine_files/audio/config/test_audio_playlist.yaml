@@ -46,6 +46,14 @@ playlists:
     events_when_looping: attract_music_looping
     events_when_sound_changed: attract_music_sound_changed
     events_when_sound_stopped: attract_music_sound_stopped
+  other_playlist:
+    sounds: hippie_ahead, rainbow_disco_bears
+    events_when_played: other_playlist_played
+    events_when_stopped: other_playlist_stopped
+  third_playlist:
+    sounds: dirty_grinding_beat_loop, drumbeat_7
+    events_when_played: third_playlist_played
+    events_when_stopped: third_playlist_stopped
 
 playlist_player:
   play_attract_music:

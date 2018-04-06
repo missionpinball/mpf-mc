@@ -72,6 +72,11 @@ class PlaylistController:
         """The time (secs) to use when fading between sounds"""
         return self._crossfade_time
 
+    @property
+    def has_pending_request(self):
+        """Whether the playlist controller has a pending request queued until it is not busy"""
+        return self._pending_request is not None
+
     def stop_all_sounds(self, float fade_out_seconds = 0.0):
         """
         Stops all playing sounds immediately on the playlist track.
@@ -100,15 +105,16 @@ class PlaylistController:
         if playlist not in self.mc.playlists:
             self.log.error("PlaylistController (%s track): Could not play specified playlist "
                            "(%s) as it does not exist", self.name, playlist)
-            return
+            return None
 
         # Is there already a previous playlist that is still active (fading)?
         if self._is_busy():
             # Delay play playlist until track is finished with current crossfade (too busy)
             self._pending_request = partial(self.play, playlist=playlist, context=context,
                                             player_settings=player_settings)
+
             self.log.debug("play - Playlist track is too busy. Delaying play playlist call.")
-            return
+            return None
 
         # Determine settings (override playlist with player settings)
         playlist_instance = PlaylistInstance(playlist,
@@ -134,6 +140,8 @@ class PlaylistController:
         # Get the next sound to play from playlist
         sound_name = self._current_playlist.get_next_sound_name()
         self._play_playlist_sound(sound_name, self._current_playlist)
+
+        return playlist_instance
 
     def _is_busy(self):
         """Returns whether or not all the sound players for the playlist track are currently busy"""
@@ -305,3 +313,21 @@ class PlaylistController:
 
         # Advance to the next sound in the playlist
         self.advance()
+
+    def clear_context(self, context):
+        """
+        Stops the current playlist if it was played from the specified context.
+
+        Args:
+            context: The context to clear
+        """
+        self.log.debug("Clearing context %s", context)
+
+        if self._current_playlist.context == context:
+            self.stop()
+
+        # Also need to check if there is a pending request to play another playlist with
+        # the specified context.  If so, delete the pending request.
+        if self._pending_request and "context" in self._pending_request.keywords and \
+                self._pending_request.keywords["context"] == context:
+            self._pending_request = None
