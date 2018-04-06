@@ -184,6 +184,12 @@ slides:
     - type: text
       text: TEST CASING capitalize
       y: 200
+  text_line_break:
+    - type: text
+      text: "line\nbreak"
+  text_bad_line_break:
+    - type: text
+      text: no line\nbreak
 
   mpfmc_font:
     - type: text
@@ -247,6 +253,8 @@ slide_player:
   mpfmc_font: mpfmc_font
   machine_font: machine_font
   baseline: baseline
+  text_line_break: text_line_break
+  text_bad_line_break: text_bad_line_break
 
 text_strings:
   greeting: HELLO

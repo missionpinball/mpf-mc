@@ -419,3 +419,15 @@ class TestText(MpfMcTestCase):
         self.assertEqual(widget1[1], 96)
         self.assertEqual(widget2[1], 100)
         self.assertEqual(widget3[1], 96)
+
+    def test_line_break(self):
+        """Tests line break in text (multiple lines)"""
+        self.mc.events.post('text_line_break')
+        self.advance_time()
+        self.assertGreater(self.get_widget().height, 40)
+
+    def test_no_multiline(self):
+        """Tests poorly formatted YAML line break in text"""
+        self.mc.events.post('text_bad_line_break')
+        self.advance_time()
+        self.assertLess(self.get_widget().height, 30)
