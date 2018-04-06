@@ -163,6 +163,7 @@ cdef class TrackSoundLoop(Track):
         Args:
             sound: The Sound to stop looping
         """
+        pass
 
     def stop_sound_instance_looping(self, sound_instance not None):
         """
@@ -174,8 +175,9 @@ cdef class TrackSoundLoop(Track):
         """
         pass
 
-    def process(self):
+    def process(self, dt):
         """Processes track messages each tick."""
+        del dt
 
         # Lock the mutex to ensure no audio data is changed during the playback processing
         # (multi-threaded protection)
@@ -263,12 +265,13 @@ cdef class TrackSoundLoop(Track):
 
         SDL_UnlockAudio()
 
-    def play_sound_loop_set(self, dict sound_loop_set not None, dict player_settings):
+    def play_sound_loop_set(self, dict sound_loop_set not None, str context=None, dict player_settings=None):
         """
         Immediately play a sound loop set.
 
         Args:
             sound_loop_set: The sound_loop_set asset object to play.
+            context: The context from which the sound loop set is played.
             player_settings: Settings to use for playback
         """
         cdef SoundLoopSetPlayer *player
@@ -297,6 +300,7 @@ cdef class TrackSoundLoop(Track):
         player_settings.setdefault('interval', 1)
         player_settings.setdefault('synchronize', False)
         player_settings['sound'] = sound_loop_set['sound']
+        player_settings['context'] = context
 
         # print("play_sound_loop_set - player_settings:", player_settings)
 
