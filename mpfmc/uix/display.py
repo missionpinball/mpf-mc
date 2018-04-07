@@ -641,7 +641,7 @@ class DisplayOutput(Scatter):
         if widget.parents:
             previous_parent = widget.parents[-1]
             previous_parent.canvas.after.clear()
-            with self.canvas.after:
+            with self.canvas.after:  # pylint: disable=not-context-manager
                 Callback(self.on_draw_display_source)
 
         widget.parent = self
