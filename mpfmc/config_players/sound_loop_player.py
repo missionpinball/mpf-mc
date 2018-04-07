@@ -73,7 +73,7 @@ Here are several various examples:
                     return
                 try:
                     loop_set = self.machine.sound_loop_sets[player_settings['sound_loop_set']]
-                    track.play_sound_loop_set(loop_set, player_settings)
+                    track.play_sound_loop_set(loop_set, context, player_settings)
                 except Exception as ex:
                     raise Exception(ex)
 
