@@ -175,9 +175,8 @@ cdef class TrackSoundLoop(Track):
         """
         pass
 
-    def process(self, dt):
+    def process(self):
         """Processes track messages each tick."""
-        del dt
 
         # Lock the mutex to ensure no audio data is changed during the playback processing
         # (multi-threaded protection)
