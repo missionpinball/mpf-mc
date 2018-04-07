@@ -2,10 +2,10 @@
 import logging
 
 from kivy.clock import Clock
-from mpfmc.core.audio.audio_interface import AudioInterface
-from mpfmc.core.audio.audio_exception import AudioException
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
+from mpfmc.core.audio.audio_interface import AudioInterface
+from mpfmc.core.audio.audio_exception import AudioException
 
 __all__ = ('SoundSystem',
            'AudioInterface',

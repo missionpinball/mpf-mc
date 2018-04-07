@@ -158,9 +158,9 @@ cdef class AudioInterface:
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
         self.audio_callback_data.c_log_file = NULL
-        #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
-        #fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
-        #fflush(self.audio_callback_data.c_log_file)
+        # self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+        # fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
+        # fflush(self.audio_callback_data.c_log_file)
 
         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
                        rate, channels, buffer_samples)
@@ -774,7 +774,7 @@ cdef class AudioInterface:
 
         # Note: There are three separate loops over the tracks that must remain separate due
         # to various track parameters than can be set for any track during each loop.  Difficult
-        # to debug logic errors will occur if these track loops are combined.
+        # to debug logic errors can occur when these track loops are combined.
 
         # Loop over tracks, initializing the status, track buffer, and track ducking.
         for track_num in range(callback_data.track_count):

@@ -73,7 +73,7 @@ Here are several various examples:
                     return
                 try:
                     loop_set = self.machine.sound_loop_sets[player_settings['sound_loop_set']]
-                    track.play_sound_loop_set(loop_set, player_settings)
+                    track.play_sound_loop_set(loop_set, context, player_settings)
                 except Exception as ex:
                     raise Exception(ex)
 
@@ -94,7 +94,7 @@ Here are several various examples:
 
             elif player_settings['action'].lower() == 'play_layer':
                 player_settings.setdefault('volume', None)
-                track.play_layer(player_settings['layer'], player_settings['fade_in'], player_settings['queue'],
+                track.play_layer(player_settings['layer'], player_settings['fade_in'], player_settings['timing'],
                                  volume=player_settings['volume'])
 
             elif player_settings['action'].lower() == 'stop_layer':

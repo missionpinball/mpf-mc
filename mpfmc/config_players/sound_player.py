@@ -237,8 +237,6 @@ Here are several various examples:
 
     def clear_context(self, context):
         """Stop all sounds from this context."""
-        # Iterate over a copy of the dictionary values since it may be modified
-        # during the iteration process.
         self.machine.log.debug("SoundPlayer: Clearing context - applying mode_end_action for all active sounds")
 
         for index in range(self.machine.sound_system.audio_interface.get_track_count()):

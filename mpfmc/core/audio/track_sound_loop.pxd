@@ -8,6 +8,8 @@ from mpfmc.core.audio.notification_message cimport *
 # ---------------------------------------------------------------------------
 #    Sound Loop Track types
 # ---------------------------------------------------------------------------
+cdef enum:
+    do_not_stop_loop = 0xFFFFFFFF
 
 cdef enum LayerStatus:
     layer_stopped = 0
@@ -43,6 +45,8 @@ ctypedef struct SoundLoopSetPlayer:
     SoundLoopLayerSettings master_sound_layer
     GSList *layers     # An array of SoundLoopLayerSettings objects
     Uint32 sample_pos
+    Uint32 stop_loop_at_pos
+    float tempo
 
 ctypedef struct TrackSoundLoopState:
     # State variables for TrackSoundLoop tracks
@@ -71,6 +75,7 @@ cdef class TrackSoundLoop(Track):
     cdef _apply_layer_settings(self, SoundLoopLayerSettings *layer, dict layer_settings)
     cdef _reset_layer(self, SoundLoopLayerSettings *layer)
     cdef _reset_player_layers(self, SoundLoopSetPlayer *player)
+    cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval)
 
     @staticmethod
     cdef void mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil

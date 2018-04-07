@@ -1185,8 +1185,19 @@ typedef struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer
 struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopState;
 typedef struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopState __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopState;
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":12
+/* "mpfmc/core/audio/track_sound_loop.pxd":11
+ * #    Sound Loop Track types
  * # ---------------------------------------------------------------------------
+ * cdef enum:             # <<<<<<<<<<<<<<
+ *     do_not_stop_loop = 0xFFFFFFFF
+ * 
+ */
+enum  {
+  __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_do_not_stop_loop = 0xFFFFFFFF
+};
+
+/* "mpfmc/core/audio/track_sound_loop.pxd":14
+ *     do_not_stop_loop = 0xFFFFFFFF
  * 
  * cdef enum LayerStatus:             # <<<<<<<<<<<<<<
  *     layer_stopped = 0
@@ -1200,7 +1211,7 @@ enum __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus {
   __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out = 4
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":32
+/* "mpfmc/core/audio/track_sound_loop.pxd":34
  *     GArray *markers
  * 
  * cdef enum SoundLoopSetPlayerStatus:             # <<<<<<<<<<<<<<
@@ -1215,7 +1226,7 @@ enum __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus {
   __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_playing = 4
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":19
+/* "mpfmc/core/audio/track_sound_loop.pxd":21
  *     layer_fading_out = 4
  * 
  * ctypedef struct SoundLoopLayerSettings:             # <<<<<<<<<<<<<<
@@ -1236,7 +1247,7 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings {
   GArray *markers;
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":40
+/* "mpfmc/core/audio/track_sound_loop.pxd":42
  *     player_playing = 4
  * 
  * ctypedef struct SoundLoopSetPlayer:             # <<<<<<<<<<<<<<
@@ -1249,10 +1260,12 @@ struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer {
   __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings master_sound_layer;
   GSList *layers;
   Uint32 sample_pos;
+  Uint32 stop_loop_at_pos;
+  float tempo;
 };
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":47
- *     Uint32 sample_pos
+/* "mpfmc/core/audio/track_sound_loop.pxd":51
+ *     float tempo
  * 
  * ctypedef struct TrackSoundLoopState:             # <<<<<<<<<<<<<<
  *     # State variables for TrackSoundLoop tracks
@@ -1351,7 +1364,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_14track_standard_TrackStandard {
 };
 
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":58
+/* "mpfmc/core/audio/track_sound_loop.pxd":62
  * #    TrackSoundLoop class
  * # ---------------------------------------------------------------------------
  * cdef class TrackSoundLoop(Track):             # <<<<<<<<<<<<<<
@@ -1535,7 +1548,7 @@ struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard {
 static struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard *__pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard;
 
 
-/* "mpfmc/core/audio/track_sound_loop.pxd":58
+/* "mpfmc/core/audio/track_sound_loop.pxd":62
  * #    TrackSoundLoop class
  * # ---------------------------------------------------------------------------
  * cdef class TrackSoundLoop(Track):             # <<<<<<<<<<<<<<
@@ -1550,6 +1563,7 @@ struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop {
   PyObject *(*_apply_layer_settings)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *, PyObject *);
   PyObject *(*_reset_layer)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *);
   PyObject *(*_reset_player_layers)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *);
+  Uint32 (*_round_sample_pos_up_to_interval)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, Uint32, Uint32);
   void (*mix_playing_sounds)(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *, Uint32, __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData *);
 };
 static struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop;
@@ -4151,7 +4165,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
  *         self.audio_callback_data.track_count = 0
  *         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))             # <<<<<<<<<<<<<<
  *         self.audio_callback_data.c_log_file = NULL
- *         #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+ *         # self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
  */
   __pyx_v_self->audio_callback_data.tracks = ((void **)PyMem_Malloc((8 * (sizeof(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *)))));
 
@@ -4159,13 +4173,13 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
  *         self.audio_callback_data.track_count = 0
  *         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
  *         self.audio_callback_data.c_log_file = NULL             # <<<<<<<<<<<<<<
- *         #self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
- *         #fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
+ *         # self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
+ *         # fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
  */
   __pyx_v_self->audio_callback_data.c_log_file = NULL;
 
   /* "mpfmc/core/audio/audio_interface.pyx":165
- *         #fflush(self.audio_callback_data.c_log_file)
+ *         # fflush(self.audio_callback_data.c_log_file)
  * 
  *         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',             # <<<<<<<<<<<<<<
  *                        rate, channels, buffer_samples)
@@ -13900,6 +13914,143 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface
   return __pyx_r;
 }
 
+/* "mpfmc/core/audio/track_standard.pxd":122
+ * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
+ *                                       TrackState *track, int player_num) nogil
+ * cdef inline void end_of_sound_processing(SoundPlayer* player,             # <<<<<<<<<<<<<<
+ *                                          TrackState *track) nogil:
+ *     """
+ */
+
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_14track_standard_end_of_sound_processing(__pyx_t_5mpfmc_4core_5audio_14track_standard_SoundPlayer *__pyx_v_player, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+  int __pyx_t_1;
+
+  /* "mpfmc/core/audio/track_standard.pxd":133
+ *     """
+ *     # Check if we are at the end of the source sample buffer (loop if applicable)
+ *     if player.current.loops_remaining > 0:             # <<<<<<<<<<<<<<
+ *         # At the end and still loops remaining, loop back to the beginning
+ *         player.current.loops_remaining -= 1
+ */
+  __pyx_t_1 = ((__pyx_v_player->current.loops_remaining > 0) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/track_standard.pxd":135
+ *     if player.current.loops_remaining > 0:
+ *         # At the end and still loops remaining, loop back to the beginning
+ *         player.current.loops_remaining -= 1             # <<<<<<<<<<<<<<
+ *         player.current.sample_pos = 0
+ *         player.current.current_loop += 1
+ */
+    __pyx_v_player->current.loops_remaining = (__pyx_v_player->current.loops_remaining - 1);
+
+    /* "mpfmc/core/audio/track_standard.pxd":136
+ *         # At the end and still loops remaining, loop back to the beginning
+ *         player.current.loops_remaining -= 1
+ *         player.current.sample_pos = 0             # <<<<<<<<<<<<<<
+ *         player.current.current_loop += 1
+ *         send_sound_looping_notification(player.number,
+ */
+    __pyx_v_player->current.sample_pos = 0;
+
+    /* "mpfmc/core/audio/track_standard.pxd":137
+ *         player.current.loops_remaining -= 1
+ *         player.current.sample_pos = 0
+ *         player.current.current_loop += 1             # <<<<<<<<<<<<<<
+ *         send_sound_looping_notification(player.number,
+ *                                  player.current.sound_id, player.current.sound_instance_id,
+ */
+    __pyx_v_player->current.current_loop = (__pyx_v_player->current.current_loop + 1);
+
+    /* "mpfmc/core/audio/track_standard.pxd":138
+ *         player.current.sample_pos = 0
+ *         player.current.current_loop += 1
+ *         send_sound_looping_notification(player.number,             # <<<<<<<<<<<<<<
+ *                                  player.current.sound_id, player.current.sound_instance_id,
+ *                                  track)
+ */
+    __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(__pyx_v_player->number, __pyx_v_player->current.sound_id, __pyx_v_player->current.sound_instance_id, __pyx_v_track);
+
+    /* "mpfmc/core/audio/track_standard.pxd":133
+ *     """
+ *     # Check if we are at the end of the source sample buffer (loop if applicable)
+ *     if player.current.loops_remaining > 0:             # <<<<<<<<<<<<<<
+ *         # At the end and still loops remaining, loop back to the beginning
+ *         player.current.loops_remaining -= 1
+ */
+    goto __pyx_L3;
+  }
+
+  /* "mpfmc/core/audio/track_standard.pxd":142
+ *                                  track)
+ * 
+ *     elif player.current.loops_remaining == 0:             # <<<<<<<<<<<<<<
+ *         # At the end and not looping, the sample has finished playing
+ *         player.status = player_finished
+ */
+  __pyx_t_1 = ((__pyx_v_player->current.loops_remaining == 0) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/track_standard.pxd":144
+ *     elif player.current.loops_remaining == 0:
+ *         # At the end and not looping, the sample has finished playing
+ *         player.status = player_finished             # <<<<<<<<<<<<<<
+ * 
+ *     else:
+ */
+    __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_14track_standard_player_finished;
+
+    /* "mpfmc/core/audio/track_standard.pxd":142
+ *                                  track)
+ * 
+ *     elif player.current.loops_remaining == 0:             # <<<<<<<<<<<<<<
+ *         # At the end and not looping, the sample has finished playing
+ *         player.status = player_finished
+ */
+    goto __pyx_L3;
+  }
+
+  /* "mpfmc/core/audio/track_standard.pxd":148
+ *     else:
+ *         # Looping infinitely, loop back to the beginning
+ *         player.current.sample_pos = 0             # <<<<<<<<<<<<<<
+ *         player.current.current_loop += 1
+ *         send_sound_looping_notification(player.number,
+ */
+  /*else*/ {
+    __pyx_v_player->current.sample_pos = 0;
+
+    /* "mpfmc/core/audio/track_standard.pxd":149
+ *         # Looping infinitely, loop back to the beginning
+ *         player.current.sample_pos = 0
+ *         player.current.current_loop += 1             # <<<<<<<<<<<<<<
+ *         send_sound_looping_notification(player.number,
+ *                                  player.current.sound_id, player.current.sound_instance_id,
+ */
+    __pyx_v_player->current.current_loop = (__pyx_v_player->current.current_loop + 1);
+
+    /* "mpfmc/core/audio/track_standard.pxd":150
+ *         player.current.sample_pos = 0
+ *         player.current.current_loop += 1
+ *         send_sound_looping_notification(player.number,             # <<<<<<<<<<<<<<
+ *                                  player.current.sound_id, player.current.sound_instance_id,
+ *                                  track)
+ */
+    __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(__pyx_v_player->number, __pyx_v_player->current.sound_id, __pyx_v_player->current.sound_instance_id, __pyx_v_track);
+  }
+  __pyx_L3:;
+
+  /* "mpfmc/core/audio/track_standard.pxd":122
+ * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
+ *                                       TrackState *track, int player_num) nogil
+ * cdef inline void end_of_sound_processing(SoundPlayer* player,             # <<<<<<<<<<<<<<
+ *                                          TrackState *track) nogil:
+ *     """
+ */
+
+  /* function exit code */
+}
+
 /* "mpfmc/core/audio/notification_message.pxd":50
  * # ---------------------------------------------------------------------------
  * 
@@ -14870,143 +15021,6 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
  * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
  *     Sends a sound_loop_set looping notification
- */
-
-  /* function exit code */
-}
-
-/* "mpfmc/core/audio/track_standard.pxd":122
- * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
- *                                       TrackState *track, int player_num) nogil
- * cdef inline void end_of_sound_processing(SoundPlayer* player,             # <<<<<<<<<<<<<<
- *                                          TrackState *track) nogil:
- *     """
- */
-
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_14track_standard_end_of_sound_processing(__pyx_t_5mpfmc_4core_5audio_14track_standard_SoundPlayer *__pyx_v_player, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
-  int __pyx_t_1;
-
-  /* "mpfmc/core/audio/track_standard.pxd":133
- *     """
- *     # Check if we are at the end of the source sample buffer (loop if applicable)
- *     if player.current.loops_remaining > 0:             # <<<<<<<<<<<<<<
- *         # At the end and still loops remaining, loop back to the beginning
- *         player.current.loops_remaining -= 1
- */
-  __pyx_t_1 = ((__pyx_v_player->current.loops_remaining > 0) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/track_standard.pxd":135
- *     if player.current.loops_remaining > 0:
- *         # At the end and still loops remaining, loop back to the beginning
- *         player.current.loops_remaining -= 1             # <<<<<<<<<<<<<<
- *         player.current.sample_pos = 0
- *         player.current.current_loop += 1
- */
-    __pyx_v_player->current.loops_remaining = (__pyx_v_player->current.loops_remaining - 1);
-
-    /* "mpfmc/core/audio/track_standard.pxd":136
- *         # At the end and still loops remaining, loop back to the beginning
- *         player.current.loops_remaining -= 1
- *         player.current.sample_pos = 0             # <<<<<<<<<<<<<<
- *         player.current.current_loop += 1
- *         send_sound_looping_notification(player.number,
- */
-    __pyx_v_player->current.sample_pos = 0;
-
-    /* "mpfmc/core/audio/track_standard.pxd":137
- *         player.current.loops_remaining -= 1
- *         player.current.sample_pos = 0
- *         player.current.current_loop += 1             # <<<<<<<<<<<<<<
- *         send_sound_looping_notification(player.number,
- *                                  player.current.sound_id, player.current.sound_instance_id,
- */
-    __pyx_v_player->current.current_loop = (__pyx_v_player->current.current_loop + 1);
-
-    /* "mpfmc/core/audio/track_standard.pxd":138
- *         player.current.sample_pos = 0
- *         player.current.current_loop += 1
- *         send_sound_looping_notification(player.number,             # <<<<<<<<<<<<<<
- *                                  player.current.sound_id, player.current.sound_instance_id,
- *                                  track)
- */
-    __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(__pyx_v_player->number, __pyx_v_player->current.sound_id, __pyx_v_player->current.sound_instance_id, __pyx_v_track);
-
-    /* "mpfmc/core/audio/track_standard.pxd":133
- *     """
- *     # Check if we are at the end of the source sample buffer (loop if applicable)
- *     if player.current.loops_remaining > 0:             # <<<<<<<<<<<<<<
- *         # At the end and still loops remaining, loop back to the beginning
- *         player.current.loops_remaining -= 1
- */
-    goto __pyx_L3;
-  }
-
-  /* "mpfmc/core/audio/track_standard.pxd":142
- *                                  track)
- * 
- *     elif player.current.loops_remaining == 0:             # <<<<<<<<<<<<<<
- *         # At the end and not looping, the sample has finished playing
- *         player.status = player_finished
- */
-  __pyx_t_1 = ((__pyx_v_player->current.loops_remaining == 0) != 0);
-  if (__pyx_t_1) {
-
-    /* "mpfmc/core/audio/track_standard.pxd":144
- *     elif player.current.loops_remaining == 0:
- *         # At the end and not looping, the sample has finished playing
- *         player.status = player_finished             # <<<<<<<<<<<<<<
- * 
- *     else:
- */
-    __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_14track_standard_player_finished;
-
-    /* "mpfmc/core/audio/track_standard.pxd":142
- *                                  track)
- * 
- *     elif player.current.loops_remaining == 0:             # <<<<<<<<<<<<<<
- *         # At the end and not looping, the sample has finished playing
- *         player.status = player_finished
- */
-    goto __pyx_L3;
-  }
-
-  /* "mpfmc/core/audio/track_standard.pxd":148
- *     else:
- *         # Looping infinitely, loop back to the beginning
- *         player.current.sample_pos = 0             # <<<<<<<<<<<<<<
- *         player.current.current_loop += 1
- *         send_sound_looping_notification(player.number,
- */
-  /*else*/ {
-    __pyx_v_player->current.sample_pos = 0;
-
-    /* "mpfmc/core/audio/track_standard.pxd":149
- *         # Looping infinitely, loop back to the beginning
- *         player.current.sample_pos = 0
- *         player.current.current_loop += 1             # <<<<<<<<<<<<<<
- *         send_sound_looping_notification(player.number,
- *                                  player.current.sound_id, player.current.sound_instance_id,
- */
-    __pyx_v_player->current.current_loop = (__pyx_v_player->current.current_loop + 1);
-
-    /* "mpfmc/core/audio/track_standard.pxd":150
- *         player.current.sample_pos = 0
- *         player.current.current_loop += 1
- *         send_sound_looping_notification(player.number,             # <<<<<<<<<<<<<<
- *                                  player.current.sound_id, player.current.sound_instance_id,
- *                                  track)
- */
-    __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(__pyx_v_player->number, __pyx_v_player->current.sound_id, __pyx_v_player->current.sound_instance_id, __pyx_v_track);
-  }
-  __pyx_L3:;
-
-  /* "mpfmc/core/audio/track_standard.pxd":122
- * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
- *                                       TrackState *track, int player_num) nogil
- * cdef inline void end_of_sound_processing(SoundPlayer* player,             # <<<<<<<<<<<<<<
- *                                          TrackState *track) nogil:
- *     """
  */
 
   /* function exit code */
@@ -16626,8 +16640,8 @@ static int __pyx_pymod_exec_audio_interface(PyObject *__pyx_pyinit_module)
   __pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile = __Pyx_ImportType("mpfmc.core.audio.sound_file", "SoundStreamingFile", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile)) __PYX_ERR(3, 47, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard = __Pyx_ImportType("mpfmc.core.audio.track_standard", "TrackStandard", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_14track_standard_TrackStandard), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard)) __PYX_ERR(4, 87, __pyx_L1_error)
   __pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_14track_standard_TrackStandard*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_14track_standard_TrackStandard->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_14track_standard_TrackStandard)) __PYX_ERR(4, 87, __pyx_L1_error)
-  __pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = __Pyx_ImportType("mpfmc.core.audio.track_sound_loop", "TrackSoundLoop", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(5, 58, __pyx_L1_error)
-  __pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(5, 58, __pyx_L1_error)
+  __pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = __Pyx_ImportType("mpfmc.core.audio.track_sound_loop", "TrackSoundLoop", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), 1); if (unlikely(!__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(5, 62, __pyx_L1_error)
+  __pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop = (struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop*)__Pyx_GetVtable(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict); if (unlikely(!__pyx_vtabptr_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop)) __PYX_ERR(5, 62, __pyx_L1_error)
   /*--- Variable import code ---*/
   /*--- Function import code ---*/
   /*--- Execution code ---*/
@@ -17087,12 +17101,12 @@ static int __pyx_pymod_exec_audio_interface(PyObject *__pyx_pyinit_module)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_2) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_standard.pxd":122
- * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
- *                                       TrackState *track, int player_num) nogil
- * cdef inline void end_of_sound_processing(SoundPlayer* player,             # <<<<<<<<<<<<<<
- *                                          TrackState *track) nogil:
+  /* "mpfmc/core/audio/notification_message.pxd":213
+ *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
+ * 
+ * cdef inline void send_sound_loop_set_looping_notification(int sound_loop_set_id, Uint64 sound_id, TrackState *track) nogil:             # <<<<<<<<<<<<<<
  *     """
+ *     Sends a sound_loop_set looping notification
  */
 
   /*--- Wrapped vars code ---*/

@@ -106,7 +106,7 @@ class PlaylistInstance(object):
         if playlist is None:
             raise ValueError("Cannot create playlist instance: playlist parameter is None")
 
-        self.context = context
+        self._context = context
 
         if settings is None:
             settings = {}
@@ -214,6 +214,11 @@ class PlaylistInstance(object):
     def fading_sound_instance(self, value):
         """Set the fading sound instance"""
         self._fading_sound_instance = value
+
+    @property
+    def context(self):
+        """The context under which this playlist was created/played."""
+        return self._context
 
     def get_next_sound_name(self):
         """Return the name of the next sound in the playlist (advance iterator)"""

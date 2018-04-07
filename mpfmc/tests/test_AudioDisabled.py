@@ -17,16 +17,5 @@ class TestAudioDisabled(MpfMcTestCase):
         """ Tests the sound system and audio interface with when the config settings
         disable the sound system. """
 
-        if self.mc.sound_system is None:
-            log = logging.getLogger('TestAudio')
-            log.warning("Sound system is not enabled - unable to run audio tests")
-            self.skipTest("Sound system is not enabled")
-
-        self.assertIsNotNone(self.mc.sound_system)
-
-        if self.mc.sound_system.audio_interface is None:
-            log = logging.getLogger('TestAudio')
-            log.warning("Sound system audio interface could not be loaded - skipping audio tests")
-            self.skipTest("Sound system audio interface could not be loaded")
-
-        self.assertIsNone(self.mc.sound_system.audio_interface)
+        self.assertFalse(self.mc.machine_config['sound_system']['enabled'])
+        self.assertIsNone(self.mc.sound_system)

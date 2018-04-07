@@ -193,12 +193,13 @@ Here are several various examples:
 
     def clear_context(self, context):
         """Stop all sounds from this context."""
-        # Iterate over a copy of the dictionary values since it may be modified
-        # during the iteration process.
-        self.machine.log.debug("PlaylistPlayer: Clearing context")
-        # TODO: clear context on playlist track(s)
+        self.machine.log.debug("PlaylistPlayer: Clearing context - "
+                               "stopping any active playlists started from this context")
 
-        self._reset_instance_dict(context)
+        for name in self.machine.sound_system.audio_interface.get_playlist_controller_names():
+            playlist_controller = self.machine.sound_system.audio_interface.get_playlist_controller(name)
+            if playlist_controller:
+                playlist_controller.clear_context(context)
 
 
 mc_player_cls = McPlaylistPlayer
