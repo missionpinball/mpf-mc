@@ -7,7 +7,6 @@ from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
 from kivy.graphics.opengl import glReadPixels, GL_RGBA, GL_UNSIGNED_BYTE
 from kivy.graphics.texture import Texture
-from kivy.uix.effectwidget import EffectWidget
 
 from mpfmc.core.bcp_config_player import BcpConfigPlayer
 

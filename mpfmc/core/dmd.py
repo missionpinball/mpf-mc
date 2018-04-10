@@ -2,13 +2,13 @@
 import struct
 
 from kivy.graphics.instructions import Callback
+from kivy.uix.effectwidget import EffectWidget
 
 from kivy.clock import Clock
 from kivy.graphics.fbo import Fbo
 from kivy.graphics.opengl import glReadPixels, GL_RGB, GL_UNSIGNED_BYTE
 from kivy.graphics.texture import Texture
 
-from mpfmc.widgets.effect_widget import EffectWidget
 from mpfmc.effects.gain import GainEffect
 from mpfmc.effects.flip_vertical import FlipVerticalEffect
 from mpfmc.effects.gamma import GammaEffect
