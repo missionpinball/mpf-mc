@@ -256,7 +256,10 @@ class MpfMc(App):
             # audio-related config_player modules and config collections
             del self.machine_config['mpf-mc']['config_players']['sound']
             del self.machine_config['mpf-mc']['config_players']['track']
+            del self.machine_config['mpf-mc']['config_players']['sound_loop']
+            del self.machine_config['mpf-mc']['config_players']['playlist']
             del self.machine_config['mpf-mc']['config_collections']['sound_loop_set']
+            del self.machine_config['mpf-mc']['config_collections']['playlist']
 
     def get_system_config(self):
         return self.machine_config['mpf-mc']
