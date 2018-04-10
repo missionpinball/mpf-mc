@@ -4,6 +4,7 @@
 import logging
 import sys
 import uuid
+import weakref
 from enum import Enum, unique
 from typing import Optional, Union
 
@@ -212,6 +213,11 @@ class SoundAsset(McAsset):
     def __init__(self, mc, name, file, config):     # noqa
         """ Constructor"""
         super().__init__(mc, name, file, config)
+
+        # Create a weakref dictionary to store all sound objects by id
+        if not hasattr(self.machine, "sounds_by_id"):
+            self.machine.sounds_by_id = weakref.WeakValueDictionary()
+        self.machine.sounds_by_id[self.id] = self
 
         self._track = None
         self._streaming = False
@@ -505,6 +511,11 @@ class SoundAsset(McAsset):
     def markers(self):
         """List of marker dictionary objects containing markers for this sound (optional)"""
         return self._markers
+
+    @property
+    def marker_count(self):
+        """Return the number of markers specified for the sound"""
+        return len(self._markers)
 
     @property
     def container(self):
