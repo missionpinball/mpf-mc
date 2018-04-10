@@ -1,7 +1,7 @@
 import logging
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, ANY
 
 try:
     from mpfmc.core.audio import SoundSystem
@@ -54,6 +54,9 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.assertIn('clap', self.mc.sounds)
         self.assertIn('bass_synth', self.mc.sounds)
 
+        self.assertEqual(1, self.mc.sounds["kick"].marker_count)
+        self.assertEqual(2, self.mc.sounds["hihat"].marker_count)
+
         # Sound loop sets
         self.assertTrue(hasattr(self.mc, 'sound_loop_sets'))
         self.assertIn('basic_beat', self.mc.sound_loop_sets)
@@ -82,6 +85,11 @@ class TestAudioSoundLoop(MpfMcTestCase):
 
         # Ensure sound_loop_set.events_when_looping is working properly (send event when a sound_loop_set loops)
         self.mc.bcp_processor.send.assert_any_call('trigger', name='basic_beat_looping')
+
+        # Ensure sound marker events are working properly for underlying sounds
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='kick_marker_1', sound_instance=ANY, marker_id=0)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='hihat_marker_1', sound_instance=ANY, marker_id=0)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='hihat_marker_2', sound_instance=ANY, marker_id=1)
 
         status = track_loops.get_status()
         self.assertEqual(status[0]['status'], "playing")

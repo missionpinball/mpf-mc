@@ -40,6 +40,18 @@ assets:
       load: on_demand
       track: sfx
 
+sounds:
+  kick:
+    markers:
+      - time: 1.0s
+        events: kick_marker_1
+  hihat:
+    markers:
+      - time: 0.5s
+        events: hihat_marker_1
+      - time: 1.5s
+        events: hihat_marker_2
+
 sound_loop_sets:
   basic_beat:
     sound: kick
