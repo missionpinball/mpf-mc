@@ -1,9 +1,9 @@
 from enum import Enum, unique
-from typing import Optional, Union
+from typing import Optional
 
+from mpf.core.randomizer import Randomizer
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.core.audio.audio_exception import AudioException
-from mpf.core.randomizer import Randomizer
 
 
 class PlaylistCollection(ConfigCollection):
