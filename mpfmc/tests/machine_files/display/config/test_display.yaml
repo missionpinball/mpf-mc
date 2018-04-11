@@ -1,8 +1,8 @@
 #config_version=5
 
 window:
-  width: 600
-  height: 200
+  width: 800
+  height: 600
   title: Mission Pinball Framework - Demo Man
   resizable: true
   fullscreen: false
@@ -52,7 +52,7 @@ widget_styles:
 slides:
   window_slide_1:
   - type: display
-    width: 512
+    width: 516
     height: 128
     source_display: dmd
     effects:
@@ -63,11 +63,11 @@ slides:
     style: tall title
     text: MISSION PINBALL FRAMEWORK
     anchor_y: top
-    y: top-3
+    y: top-2
     font_size: 30
     color: white
   - type: rectangle
-    width: 514
+    width: 518
     height: 130
     color: 444444
   - type: text
@@ -75,7 +75,7 @@ slides:
     text: DEMO MAN
     anchor_x: right
     anchor_y: bottom
-    y: bottom+3
+    y: bottom+2
     x: right-42
     font_size: 30
     color: red

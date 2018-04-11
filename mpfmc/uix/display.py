@@ -1,5 +1,6 @@
 """Contains the Display base class, which is a logical display in the mpf-mc."""
 from typing import List, Union, Optional
+from math import floor
 
 from kivy.uix.floatlayout import FloatLayout
 
@@ -592,8 +593,6 @@ class DisplayOutput(Scatter):
     """Show a display as a widget."""
 
     def __init__(self, parent: "KivyWidget", display: "Display", **kwargs):
-        kwargs.setdefault('size', parent.size)
-        kwargs.setdefault('size_hint', (1, 1))
         kwargs.setdefault('do_scale', False)
         kwargs.setdefault('do_translation', False)
         kwargs.setdefault('do_rotation', False)
@@ -664,9 +663,12 @@ class DisplayOutput(Scatter):
         self._fit_to_parent()
 
     def _fit_to_parent(self, *args):
+        """Center and scale display output in parent display widget"""
         del args
         if self.parent:
-            self.size = self.parent.size
             self.scale = min(self.parent.width / float(self.display.width),
                              self.parent.height / float(self.display.height))
-            self.pos = (0, 0)
+            self.width = floor(self.scale * self.display.width)
+            self.height = floor(self.scale * self.display.height)
+            self.x = (self.parent.width - self.width) // 2
+            self.y = (self.parent.height - self.height) // 2
