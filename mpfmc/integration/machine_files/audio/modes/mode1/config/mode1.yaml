@@ -23,7 +23,7 @@ sound_loop_player:
     loops:
       action: play
       sound_loop_set: basic_beat
-      queue: True
+      timing: loop_end
   stop_current_loop:
     loops:
       action: stop
