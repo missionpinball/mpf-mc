@@ -383,6 +383,7 @@ class Display(ScreenManager):
                            slide_name: Optional[str] = None,
                            transition: Optional[str] = None, priority: int = 0,
                            key: Optional[str] = None, force: bool = False,
+                           background_color = None,
                            expire: Optional[float] = None, play_kwargs=None,
                            **kwargs) -> bool:
         """Create and show the slide.
@@ -411,7 +412,7 @@ class Display(ScreenManager):
             play_kwargs.update(kwargs)
 
         slide_obj = self.add_slide(name=slide_name,
-                                   config=dict(widgets=widgets),
+                                   config=dict(widgets=widgets, background_color=background_color),
                                    priority=priority, key=key)
 
         return self.show_slide(slide_name=slide_obj.name, transition=transition,
