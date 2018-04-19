@@ -226,6 +226,7 @@ class Text(Widget):
 
         self._label.text = text
         self._label.texture_update()
+        self._draw_widget()
 
     def _player_var_change(self, **kwargs) -> None:
         del kwargs
