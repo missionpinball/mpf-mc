@@ -383,7 +383,7 @@ class Display(ScreenManager):
                            slide_name: Optional[str] = None,
                            transition: Optional[str] = None, priority: int = 0,
                            key: Optional[str] = None, force: bool = False,
-                           background_color = None,
+                           background_color=None,
                            expire: Optional[float] = None, play_kwargs=None,
                            **kwargs) -> bool:
         """Create and show the slide.
