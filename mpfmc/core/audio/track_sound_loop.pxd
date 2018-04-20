@@ -75,7 +75,7 @@ cdef class TrackSoundLoop(Track):
     cdef _apply_layer_settings(self, SoundLoopLayerSettings *layer, dict layer_settings)
     cdef _reset_layer(self, SoundLoopLayerSettings *layer)
     cdef _reset_player_layers(self, SoundLoopSetPlayer *player)
-    cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval)
+    cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval, int bytes_per_sample_frame)
 
     @staticmethod
     cdef void mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil

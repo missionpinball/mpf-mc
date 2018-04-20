@@ -389,7 +389,8 @@ cdef class TrackSoundLoop(Track):
                 player.status = player_pending
                 self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(
                     self.type_state.current.sample_pos,
-                    <Uint32>(self.state.callback_data.seconds_to_bytes_factor * player_settings['interval']))
+                    <Uint32>(self.state.callback_data.seconds_to_bytes_factor * player_settings['interval']),
+                    self.state.callback_data.bytes_per_sample * self.state.callback_data.channels)
 
                 # Adjust currently playing sample end position to ensure it is within the sample
                 while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:
@@ -407,8 +408,9 @@ cdef class TrackSoundLoop(Track):
                 player.status = player_pending
                 self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(
                     self.type_state.current.sample_pos,
-                    <Uint32>(self.state.callback_data.seconds_to_bytes_factor * (
-                                player_settings['interval'] * 60.0 / self.type_state.current.tempo)))
+                    <Uint32> (self.state.callback_data.seconds_to_bytes_factor * (
+                            player_settings['interval'] * 60.0 / self.type_state.current.tempo)),
+                    self.state.callback_data.bytes_per_sample * self.state.callback_data.channels)
 
                 # Adjust currently playing sample end position to ensure it is within the sample
                 while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:
@@ -908,18 +910,25 @@ cdef class TrackSoundLoop(Track):
         except KeyError:
             return "unknown"
 
-    cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval):
+    cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval, int bytes_per_sample_frame):
         """
         Rounds sample position up to the nearest specified interval.
         
         Args:
             sample_pos: The sample position value to round up. 
             interval: The interval to round up to.
+            bytes_per_sample_frame: The number of bytes per sample frame (a frame includes a single sample
+                for each channel in the audio).
 
         Returns:
             Sample position rounded up to the nearest specified interval.
+            
+        Notes:
+            The number of audio channels is important in this function so we do not split a sample frame in
+            the middle of its bytes (would cause unwanted audio artifacts). Buffers are only split on
+            a whole sample frame boundary.
         """
-        return interval * ceil(sample_pos / interval)
+        return bytes_per_sample_frame * ceil((interval * ceil(sample_pos / interval)) / bytes_per_sample_frame)
 
 
     # ---------------------------------------------------------------------------
