@@ -141,6 +141,12 @@ cdef class AudioInterface:
                       &self.audio_callback_data.format,
                       &self.audio_callback_data.channels)
 
+        # Ensure system is little endian (big endian not supported)
+        if not SDL_AUDIO_ISLITTLEENDIAN(self.audio_callback_data.format):
+            self.log.error("The audio interface only supports little endian systems in this release. "
+                           "Audio features will not be available.")
+            raise AudioException("The audio interface only supports little endian systems in this release.")
+
         # The requested values used to initialize the audio interface.  A pointer to the audio_callback_data
         # structure is passed to the SDL audio callback function and is the source of all audio state
         # and mixing data needed to generate the output signal.
@@ -811,4 +817,4 @@ cdef class AudioInterface:
                                           buffer_length)
 
         # Apply master volume to output buffer
-        SDL_MixAudioFormat(output_buffer, output_buffer, callback_data.format, buffer_length, callback_data.master_volume)
+        Track.apply_volume(output_buffer, output_buffer, buffer_length, callback_data.master_volume)

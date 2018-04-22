@@ -52,6 +52,8 @@ cdef enum FadingStatus:
 ctypedef struct SoundSettings:
     SoundSample *sample
     Uint8 volume
+    Uint8 volume_left
+    Uint8 volume_right
     int loops_remaining
     int current_loop
     Uint32 sample_pos
@@ -115,10 +117,11 @@ cdef class TrackStandard(Track):
 #    function (these functions do not use the GIL).
 # ---------------------------------------------------------------------------
 
-cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
-                                   TrackState *track, int player_num) nogil
-cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, Uint8 volume,
-                                      TrackState *track, int player_num) nogil
+cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,
+                                   Uint8 volume, TrackState *track, int player_num) nogil
+cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,
+                                      Uint8 volume, TrackState *track, int player_num) nogil
+
 cdef inline void end_of_sound_processing(SoundPlayer* player,
                                          TrackState *track) nogil:
     """
