@@ -73,3 +73,17 @@ cdef class Track:
     @staticmethod
     cdef void mix_track_to_output(TrackState *track, AudioCallbackData* callback_data,
                                   Uint8 *output_buffer, Uint32 buffer_length) nogil
+
+    @staticmethod
+    cdef void mix_audio(Uint8* output_buffer, const Uint8* input_buffer, Uint32 buffer_length, int volume) nogil
+
+    @staticmethod
+    cdef void mix_audio_stereo(Uint8* output_buffer, const Uint8* input_buffer, Uint32 buffer_length,
+                               int volume_left, int volume_right) nogil
+
+    @staticmethod
+    cdef void apply_volume(Uint8* output_buffer, const Uint8* input_buffer, Uint32 buffer_length, int volume) nogil
+
+    @staticmethod
+    cdef void apply_volume_stereo(Uint8* output_buffer, const Uint8* input_buffer, Uint32 buffer_length,
+                                  int volume_left, int volume_right) nogil
