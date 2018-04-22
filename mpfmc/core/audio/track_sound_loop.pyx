@@ -297,6 +297,7 @@ cdef class TrackSoundLoop(Track):
         """
         cdef SoundLoopSetPlayer *player
         cdef SoundLoopLayerSettings *layer
+        cdef int bytes_per_sample_frame
         cdef bint player_already_playing = False
 
         self.log.debug("play_sound_loop_set - Preparing sound_loop_set '%s' for playback.", sound_loop_set)
@@ -380,9 +381,13 @@ cdef class TrackSoundLoop(Track):
                 # Queue until the end of the current loop
                 player.status = player_pending
                 player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
-                self.type_state.current.stop_loop_at_pos = self.type_state.current.length
 
-                # print("play_sound_loop_set - loop_end")
+                # Ensure sample position starts on a sample frame boundary (audio distortion may occur if starting
+                # in the middle of a sample frame)
+                bytes_per_sample_frame = self.state.callback_data.bytes_per_sample * self.state.callback_data.channels
+                player.sample_pos = bytes_per_sample_frame * ceil(player.sample_pos / bytes_per_sample_frame)
+
+                self.type_state.current.stop_loop_at_pos = self.type_state.current.length
 
             elif player_settings['timing'] == 'next_time_interval':
                 # Set currently playing sample to end at the next specified time interval multiple
