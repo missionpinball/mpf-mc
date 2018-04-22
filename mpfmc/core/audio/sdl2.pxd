@@ -211,6 +211,8 @@ cdef extern from "SDL_mixer.h" nogil:
         Uint32 alen
         Uint8 volume
 
+    int MIX_MAX_VOLUME
+
     void Mix_Quit()
     int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
     void Mix_CloseAudio()
@@ -220,6 +222,29 @@ cdef extern from "SDL_mixer.h" nogil:
     void Mix_HookMusic(void (*mix_func)(void *udata, Uint8 *stream, int len), void *arg)
     void *Mix_GetMusicHookData()
     Mix_Chunk *Mix_LoadWAV(char *file)
+
+
+# ---------------------------------------------------------------------------
+#    Helper structures
+# ---------------------------------------------------------------------------
+
+# The following declarations are not from SDL/SDL_Mixer, but are application-
+# specific data structures used in the MPF media controller audio library:
+
+cdef struct Sample16Bytes:
+    # Structure that represents two bytes of a 16-bit sample.  This is used in
+    # the union below (nested structs are not permitted in Cython so it is
+    # declared separately here).
+    Uint8 byte0
+    Uint8 byte1
+
+cdef union Sample16:
+    # Union structure that represents a single 16-bit sample value.  A union is
+    # utilized to make it easy to access the individual bytes in the sample.
+    # This is needed since all samples are streamed as individual 8-bit (byte)
+    # values.
+    Sint16 value
+    Sample16Bytes bytes
 
 
 # ---------------------------------------------------------------------------
