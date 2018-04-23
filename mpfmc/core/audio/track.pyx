@@ -12,6 +12,11 @@ from mpfmc.core.audio.notification_message cimport *
 from mpfmc.core.audio.track cimport *
 
 
+# Max and min 16-bit audio sample values (used in audio mixing functions)
+DEF MAX_AUDIO_VALUE_S16 = ((1 << (16 - 1)) - 1)
+DEF MIN_AUDIO_VALUE_S16 = -(1 << (16 - 1))
+
+
 # ---------------------------------------------------------------------------
 #    Track base class
 # ---------------------------------------------------------------------------
@@ -391,8 +396,191 @@ cdef class Track:
 
             track_volume = ducking_volume * track.fade_volume_current // SDL_MIX_MAXVOLUME
 
-            SDL_MixAudioFormat(output_buffer + buffer_pos, track_buffer + buffer_pos, callback_data.format, current_chunk_bytes, track_volume)
+            Track.mix_audio(output_buffer + buffer_pos, track_buffer + buffer_pos, current_chunk_bytes, track_volume)
 
             output_buffer_bytes_remaining -= current_chunk_bytes
             buffer_pos += current_chunk_bytes
             control_point += 1
+
+    @staticmethod
+    cdef void mix_audio(Uint8* output_buffer, const Uint8* input_buffer, Uint32 buffer_length, int volume) nogil:
+        """
+        Mixes input buffer samples into existing output buffer samples applying the specified volume setting.
+        
+        Args:
+            output_buffer: Output audio buffer
+            input_buffer: Input audio buffer
+            buffer_length: Length of audio buffers to process (input and output)
+            volume: Volume level to apply to input buffer samples 
+
+        """
+        cdef Sample16 input_sample, output_sample
+        cdef int temp_sample
+        cdef Uint32 buffer_pos = 0
+
+        while buffer_pos < buffer_length:
+
+            # Get sample (2 bytes) from the input buffer and combine into 16-bit value
+            input_sample.bytes.byte0 = input_buffer[buffer_pos]
+            input_sample.bytes.byte1 = input_buffer[buffer_pos + 1]
+
+            # Get sample (2 bytes) from the output buffer and combine into 16-bit value
+            output_sample.bytes.byte0 = output_buffer[buffer_pos]
+            output_sample.bytes.byte1 = output_buffer[buffer_pos + 1]
+
+            # Calculate the new output sample (mix the input sample multiplied by the volume with the existing output
+            # sample). The temporary output sample is a 32-bit value to avoid overflow.
+            temp_sample = output_sample.value + ((input_sample.value * volume) // SDL_MIX_MAXVOLUME)
+
+            # Clip the temp sample back to a 16-bit value (will cause distortion if samples
+            # on channel are outside of the allowable 16-bit int range)
+            if temp_sample > MAX_AUDIO_VALUE_S16:
+                temp_sample = MAX_AUDIO_VALUE_S16
+            elif temp_sample < MIN_AUDIO_VALUE_S16:
+                temp_sample = MIN_AUDIO_VALUE_S16
+
+            # Write the new output sample back to the output buffer (from
+            # a 32-bit value back to a 16-bit value that we know is in 16-bit value range)
+            output_sample.value = temp_sample
+            output_buffer[buffer_pos] = output_sample.bytes.byte0
+            output_buffer[buffer_pos + 1] = output_sample.bytes.byte1
+
+            buffer_pos += 2
+
+    @staticmethod
+    cdef void mix_audio_stereo(Uint8* output_buffer, const Uint8* input_buffer, Uint32 buffer_length,
+                               int volume_left, int volume_right) nogil:
+        """
+        Mixes input buffer samples into existing output buffer samples applying the specified volume setting
+        to the left and right channels.
+        
+        Args:
+            output_buffer: Output audio buffer
+            input_buffer: Input audio buffer
+            buffer_length: Length of audio buffers to process (input and output)
+            volume_left: Volume level to apply to the input buffer left channel samples 
+            volume_right: Volume level to apply to the input buffer right channel samples
+            
+        Notes:
+            SDL audio buffers are in interleaved format with the left channel first in stereo buffers.
+
+        """
+        cdef Sample16 input_sample, output_sample
+        cdef int temp_sample
+        cdef Uint32 buffer_pos = 0
+
+        while buffer_pos < buffer_length:
+
+            # Process left channel
+
+            # Get sample (2 bytes) from the input buffer and combine into 16-bit value
+            input_sample.bytes.byte0 = input_buffer[buffer_pos]
+            input_sample.bytes.byte1 = input_buffer[buffer_pos + 1]
+
+            # Get sample (2 bytes) from the output buffer and combine into 16-bit value
+            output_sample.bytes.byte0 = output_buffer[buffer_pos]
+            output_sample.bytes.byte1 = output_buffer[buffer_pos + 1]
+
+            # Calculate the new output sample (mix the input sample multiplied by the volume with the existing output
+            # sample). The temporary output sample is a 32-bit value to avoid overflow.
+            temp_sample = output_sample.value + ((input_sample.value * volume_left) // SDL_MIX_MAXVOLUME)
+
+            # Clip the temp sample back to a 16-bit value (will cause distortion if samples
+            # on channel are outside of the allowable 16-bit int range)
+            if temp_sample > MAX_AUDIO_VALUE_S16:
+                temp_sample = MAX_AUDIO_VALUE_S16
+            elif temp_sample < MIN_AUDIO_VALUE_S16:
+                temp_sample = MIN_AUDIO_VALUE_S16
+
+            # Write the new output sample back to the output buffer (from
+            # a 32-bit value back to a 16-bit value that we know is in 16-bit value range)
+            output_sample.value = temp_sample
+            output_buffer[buffer_pos] = output_sample.bytes.byte0
+            output_buffer[buffer_pos + 1] = output_sample.bytes.byte1
+
+            buffer_pos += 2
+
+            # Process right channel
+
+            # Get sample (2 bytes) from the input buffer and combine into 16-bit value
+            input_sample.bytes.byte0 = input_buffer[buffer_pos]
+            input_sample.bytes.byte1 = input_buffer[buffer_pos + 1]
+
+            # Get sample (2 bytes) from the output buffer and combine into 16-bit value
+            output_sample.bytes.byte0 = output_buffer[buffer_pos]
+            output_sample.bytes.byte1 = output_buffer[buffer_pos + 1]
+
+            # Calculate the new output sample (mix the input sample multiplied by the volume with the existing output
+            # sample). The temporary output sample is a 32-bit value to avoid overflow.
+            temp_sample = output_sample.value + ((input_sample.value * volume_right) // SDL_MIX_MAXVOLUME)
+
+            # Clip the temp sample back to a 16-bit value (will cause distortion if samples
+            # on channel are outside of the allowable 16-bit int range)
+            if temp_sample > MAX_AUDIO_VALUE_S16:
+                temp_sample = MAX_AUDIO_VALUE_S16
+            elif temp_sample < MIN_AUDIO_VALUE_S16:
+                temp_sample = MIN_AUDIO_VALUE_S16
+
+            # Write the new output sample back to the output buffer (from
+            # a 32-bit value back to a 16-bit value that we know is in 16-bit value range)
+            output_sample.value = temp_sample
+            output_buffer[buffer_pos] = output_sample.bytes.byte0
+            output_buffer[buffer_pos + 1] = output_sample.bytes.byte1
+
+            buffer_pos += 2
+
+    @staticmethod
+    cdef void apply_volume(Uint8* output_buffer, const Uint8* input_buffer, Uint32 buffer_length, int volume) nogil:
+        """
+        Applies a volume level to the input buffer samples and copies them to the output buffer.
+        Args:
+            output_buffer: Output audio buffer
+            input_buffer: Input audio buffer
+            buffer_length: Length of audio buffers to process (input and output)
+            volume: Volume level to apply to input buffer samples 
+
+        """
+        cdef Sint16* output_samples = <Sint16*>output_buffer
+        cdef Sint16* input_samples = <Sint16*>input_buffer
+        cdef Uint32 buffer_pos = 0
+
+        # We will be iterating over the audio buffers two bytes at a time (16-bit sample values) so
+        # effectively the buffer is half the length since we are casting the buffer pointer to 16-bit
+        buffer_length = buffer_length // 2
+
+        while buffer_pos < buffer_length:
+            output_samples[buffer_pos] = (input_samples[buffer_pos] * volume) // SDL_MIX_MAXVOLUME
+            buffer_pos += 1
+
+    @staticmethod
+    cdef void apply_volume_stereo(Uint8* output_buffer, const Uint8* input_buffer, Uint32 buffer_length,
+                                  int volume_left, int volume_right) nogil:
+        """
+        Applies a volume level to the left and right channel of the input buffer samples and copies them 
+        to the output buffer.
+        
+        Args:
+            output_buffer: Output audio buffer
+            input_buffer: Input audio buffer
+            buffer_length: Length of audio buffers to process (input and output)
+            volume_left: Volume level to apply to input buffer left channel samples 
+            volume_right: Volume level to apply to input buffer right channel samples
+
+        Notes:
+            SDL audio buffers are in interleaved format with the left channel first in stereo buffers.
+
+        """
+        cdef Sint16* output_samples = <Sint16*>output_buffer
+        cdef Sint16* input_samples = <Sint16*>input_buffer
+        cdef Uint32 buffer_pos = 0
+
+        # We will be iterating over the audio buffers two bytes at a time (16-bit sample values) so
+        # effectively the buffer is half the length since we are casting the buffer pointer to 16-bit
+        buffer_length = buffer_length // 2
+
+        while buffer_pos < buffer_length:
+            output_samples[buffer_pos] = (input_samples[buffer_pos] * volume_left) // SDL_MIX_MAXVOLUME
+            buffer_pos += 1
+
+            output_samples[buffer_pos] = (input_samples[buffer_pos] * volume_right) // SDL_MIX_MAXVOLUME
+            buffer_pos += 1

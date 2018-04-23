@@ -750,10 +750,36 @@ static const char *__pyx_f[] = {
 struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundFile;
 struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundMemoryFile;
 struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile;
+struct __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16Bytes;
+union __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16;
 struct __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData;
 typedef struct __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData;
 
-/* "mpfmc/core/audio/sdl2.pxd":229
+/* "mpfmc/core/audio/sdl2.pxd":234
+ * # specific data structures used in the MPF media controller audio library:
+ * 
+ * cdef struct Sample16Bytes:             # <<<<<<<<<<<<<<
+ *     # Structure that represents two bytes of a 16-bit sample.  This is used in
+ *     # the union below (nested structs are not permitted in Cython so it is
+ */
+struct __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16Bytes {
+  Uint8 byte0;
+  Uint8 byte1;
+};
+
+/* "mpfmc/core/audio/sdl2.pxd":241
+ *     Uint8 byte1
+ * 
+ * cdef union Sample16:             # <<<<<<<<<<<<<<
+ *     # Union structure that represents a single 16-bit sample value.  A union is
+ *     # utilized to make it easy to access the individual bytes in the sample.
+ */
+union __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16 {
+  Sint16 value;
+  struct __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16Bytes bytes;
+};
+
+/* "mpfmc/core/audio/sdl2.pxd":254
  * # ---------------------------------------------------------------------------
  * 
  * ctypedef struct AudioCallbackData:             # <<<<<<<<<<<<<<

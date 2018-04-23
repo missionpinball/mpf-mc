@@ -736,10 +736,36 @@ static const char *__pyx_f[] = {
 
 /*--- Type declarations ---*/
 struct __pyx_obj_5mpfmc_4core_5audio_5track_Track;
+struct __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16Bytes;
+union __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16;
 struct __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData;
 typedef struct __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData;
 
-/* "mpfmc/core/audio/sdl2.pxd":229
+/* "mpfmc/core/audio/sdl2.pxd":234
+ * # specific data structures used in the MPF media controller audio library:
+ * 
+ * cdef struct Sample16Bytes:             # <<<<<<<<<<<<<<
+ *     # Structure that represents two bytes of a 16-bit sample.  This is used in
+ *     # the union below (nested structs are not permitted in Cython so it is
+ */
+struct __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16Bytes {
+  Uint8 byte0;
+  Uint8 byte1;
+};
+
+/* "mpfmc/core/audio/sdl2.pxd":241
+ *     Uint8 byte1
+ * 
+ * cdef union Sample16:             # <<<<<<<<<<<<<<
+ *     # Union structure that represents a single 16-bit sample value.  A union is
+ *     # utilized to make it easy to access the individual bytes in the sample.
+ */
+union __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16 {
+  Sint16 value;
+  struct __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16Bytes bytes;
+};
+
+/* "mpfmc/core/audio/sdl2.pxd":254
  * # ---------------------------------------------------------------------------
  * 
  * ctypedef struct AudioCallbackData:             # <<<<<<<<<<<<<<
@@ -866,6 +892,10 @@ struct __pyx_obj_5mpfmc_4core_5audio_5track_Track {
 struct __pyx_vtabstruct_5mpfmc_4core_5audio_5track_Track {
   __pyx_t_5mpfmc_4core_5audio_5track_TrackState *(*get_state)(struct __pyx_obj_5mpfmc_4core_5audio_5track_Track *);
   void (*mix_track_to_output)(__pyx_t_5mpfmc_4core_5audio_5track_TrackState *, __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData *, Uint8 *, Uint32);
+  void (*mix_audio)(Uint8 *, Uint8 const *, Uint32, int);
+  void (*mix_audio_stereo)(Uint8 *, Uint8 const *, Uint32, int, int);
+  void (*apply_volume)(Uint8 *, Uint8 const *, Uint32, int);
+  void (*apply_volume_stereo)(Uint8 *, Uint8 const *, Uint32, int, int);
 };
 static struct __pyx_vtabstruct_5mpfmc_4core_5audio_5track_Track *__pyx_vtabptr_5mpfmc_4core_5audio_5track_Track;
 

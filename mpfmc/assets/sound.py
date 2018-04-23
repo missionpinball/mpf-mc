@@ -707,6 +707,7 @@ class SoundInstance(object):
             self._context = None
 
         self._status = SoundInstanceStatus.pending
+        self._pan = 0
         self._played = False
         self._loop_count = 0
         self._registered_finished_handlers = list()
@@ -760,6 +761,9 @@ class SoundInstance(object):
 
         if 'volume' in settings and settings['volume'] is not None:
             self._volume = settings['volume']
+
+        if 'pan' in settings and settings['pan'] is not None:
+            self._pan = settings['pan']
 
         if 'priority' in settings and settings['priority'] is not None:
             self._priority = settings['priority']
@@ -893,6 +897,11 @@ class SoundInstance(object):
     def volume(self):
         """Return the volume of the sound (float 0.0 to 1.0)"""
         return self._volume
+
+    @property
+    def pan(self):
+        """Return the pan setting of the sound (float -1.0 to 1.0)"""
+        return self._pan
 
     @property
     def priority(self):
