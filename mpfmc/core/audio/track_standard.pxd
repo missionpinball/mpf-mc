@@ -117,9 +117,10 @@ cdef class TrackStandard(Track):
 #    function (these functions do not use the GIL).
 # ---------------------------------------------------------------------------
 
-cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,
+cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer,
                                    Uint8 volume, TrackState *track, int player_num) nogil
-cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,
+
+cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer,
                                       Uint8 volume, TrackState *track, int player_num) nogil
 
 cdef inline void end_of_sound_processing(SoundPlayer* player,
@@ -139,8 +140,9 @@ cdef inline void end_of_sound_processing(SoundPlayer* player,
         player.current.sample_pos = 0
         player.current.current_loop += 1
         send_sound_looping_notification(player.number,
-                                 player.current.sound_id, player.current.sound_instance_id,
-                                 track)
+                                        player.current.sound_id,
+                                        player.current.sound_instance_id,
+                                        track)
 
     elif player.current.loops_remaining == 0:
         # At the end and not looping, the sample has finished playing
@@ -151,5 +153,6 @@ cdef inline void end_of_sound_processing(SoundPlayer* player,
         player.current.sample_pos = 0
         player.current.current_loop += 1
         send_sound_looping_notification(player.number,
-                                 player.current.sound_id, player.current.sound_instance_id,
-                                 track)
+                                        player.current.sound_id,
+                                        player.current.sound_instance_id,
+                                        track)

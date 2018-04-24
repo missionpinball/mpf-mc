@@ -1342,11 +1342,11 @@ cdef class TrackStandard(Track):
                 # Copy samples for chunk to output buffer and apply volume
                 if player.current.sample.type == sound_type_memory:
                     end_of_sound = get_memory_sound_samples(cython.address(player.current), current_chunk_bytes,
-                                                            track.buffer + track_buffer_pos, callback_data.channels,
+                                                            track.buffer + track_buffer_pos,
                                                             volume, track, player_num)
                 elif player.current.sample.type == sound_type_streaming:
                     end_of_sound = get_streaming_sound_samples(cython.address(player.current), current_chunk_bytes,
-                                                               track.buffer + track_buffer_pos, callback_data.channels,
+                                                               track.buffer + track_buffer_pos,
                                                                volume, track, player_num)
 
                 # Process sound ducking (if applicable)
@@ -1515,7 +1515,7 @@ cdef class TrackStandard(Track):
                 track_buffer_pos += current_chunk_bytes
                 control_point += 1
 
-cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,
+cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer,
                                    Uint8 volume, TrackState *track, int player_num) nogil:
     """
     Retrieves the specified number of bytes from the source sound memory buffer and mixes them into
@@ -1525,7 +1525,6 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
         sound: A pointer to a SoundSettings struct (contains all sound state and settings to play the sound)
         length: The number of samples to retrieve and place in the output buffer
         output_buffer: The output buffer
-        channels: The number of channels in the output buffer (1 = mono, 2 = stereo)
         volume: The volume to apply to the output buffer (fixed for the duration of this method)
         track: A pointer to the TrackState struct for the current track
         player_num: The sound player number currently playing the sound (used for notification messages)
@@ -1552,14 +1551,7 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
         if samples_remaining_to_output < samples_remaining_in_sound:
 
             # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
-            if channels == 2:
-                Track.mix_audio_stereo(output_buffer + buffer_pos,
-                                       <Uint8*>sound.sample.data.memory.data + sound.sample_pos,
-                                       samples_remaining_to_output,
-                                       sound.volume_left,
-                                       sound.volume_right)
-            else:
-                SDL_MixAudioFormat(output_buffer + buffer_pos, <Uint8*>sound.sample.data.memory.data + sound.sample_pos, track.callback_data.format, samples_remaining_to_output, volume)
+            SDL_MixAudioFormat(output_buffer + buffer_pos, <Uint8*>sound.sample.data.memory.data + sound.sample_pos, track.callback_data.format, samples_remaining_to_output, volume)
 
             # Update buffer position pointers
             sound.sample_pos += samples_remaining_to_output
@@ -1568,14 +1560,7 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
             return False
         else:
             # Entire sound buffer consumed. Mix in remaining samples
-            if channels == 2:
-                Track.mix_audio_stereo(output_buffer + buffer_pos,
-                                       <Uint8*>sound.sample.data.memory.data + sound.sample_pos,
-                                       samples_remaining_to_output,
-                                       sound.volume_left,
-                                       sound.volume_right)
-            else:
-                SDL_MixAudioFormat(output_buffer + buffer_pos, <Uint8*>sound.sample.data.memory.data + sound.sample_pos, track.callback_data.format, samples_remaining_in_sound, volume)
+            SDL_MixAudioFormat(output_buffer + buffer_pos, <Uint8*>sound.sample.data.memory.data + sound.sample_pos, track.callback_data.format, samples_remaining_in_sound, volume)
 
             # Update buffer position pointers/samples remaining to place in the output buffer
             samples_remaining_to_output -= samples_remaining_in_sound
@@ -1603,7 +1588,7 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
 
     return False
 
-cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,
+cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer,
                                       Uint8 volume, TrackState *track, int player_num) nogil:
     """
     Retrieves the specified number of bytes from the source sound streaming buffer and mixes them
@@ -1613,7 +1598,6 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
         sound: A pointer to a SoundSettings struct (contains all sound state and settings to play the sound)
         length: The number of samples to retrieve and place in the output buffer
         output_buffer: The output buffer
-        channels: The number of channels in the output buffer (1 = mono, 2 = stereo)
         volume: The volume to apply to the output buffer (fixed for the duration of this method)
         track: A pointer to the TrackState struct for the current track
         player_num: The sound player number currently playing the sound (used for notification messages)
@@ -1644,16 +1628,9 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
             # Determine if we are consuming the entire buffer of streaming samples, or just a portion of it
             if samples_remaining_to_output < samples_remaining_in_map:
                 # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
-                if channels == 2:
-                    Track.mix_audio_stereo(output_buffer + buffer_pos,
-                                           sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
-                                           samples_remaining_to_output,
-                                           sound.volume_left,
-                                           sound.volume_right)
-                else:
-                    SDL_MixAudioFormat(output_buffer + buffer_pos,
-                                       sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
-                                       track.callback_data.format, samples_remaining_to_output, volume)
+                SDL_MixAudioFormat(output_buffer + buffer_pos,
+                                   sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
+                                   track.callback_data.format, samples_remaining_to_output, volume)
 
                 # Update buffer position pointers
                 sound.sample.data.stream.map_buffer_pos += samples_remaining_to_output
@@ -1663,16 +1640,9 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
                 return False
             else:
                 # Entire buffer of leftover samples consumed.  Free the buffer resources to prepare for next call
-                if channels == 2:
-                    Track.mix_audio_stereo(output_buffer + buffer_pos,
-                                           sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
-                                           samples_remaining_to_output,
-                                           sound.volume_left,
-                                           sound.volume_right)
-                else:
-                    SDL_MixAudioFormat(output_buffer + buffer_pos,
-                                       sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
-                                       track.callback_data.format, samples_remaining_in_map, volume)
+                SDL_MixAudioFormat(output_buffer + buffer_pos,
+                                   sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
+                                   track.callback_data.format, samples_remaining_in_map, volume)
 
                 # Update buffer position pointers/samples remaining to place in the output buffer
                 samples_remaining_to_output -= samples_remaining_in_map
