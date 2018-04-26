@@ -141,6 +141,8 @@ kivy_config:
     width: 800
     minimum_width: 100
     minimum_height: 100
+  input:
+    mouse: mouse,multitouch_on_demand  # disable multi-touch mouse simulation
 
 widget_styles:
   text_default:
