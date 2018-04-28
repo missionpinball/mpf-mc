@@ -534,7 +534,13 @@ class MpfMc(App):
 
     def receive_machine_var_update(self, name, value, change, prev_value):
         """Update a machine var received via BCP."""
-        self.machine_vars[name] = value
+        if value is None:
+            try:
+                del self.machine_vars[name]
+            except IndexError:
+                pass
+        else:
+            self.machine_vars[name] = value
 
         if change:
             self.log.debug("Setting machine_var '%s' to: %s, (prior: %s, "
@@ -545,11 +551,6 @@ class MpfMc(App):
                              prev_value=prev_value,
                              change=change)
             # no events docstring as this event is also in mpf
-
-        if self.machine_var_monitor:
-            for callback in self.monitors['machine_var']:
-                callback(name=name, value=self.vars[name],
-                         prev_value=prev_value, change=change)
 
     def tick(self, dt):
         """Process event queue."""
