@@ -1,0 +1,9 @@
+#config_version=5
+slide_player:
+  play_slide_last_game_score: slide_last_game_score
+
+
+slides:
+  slide_last_game_score:
+  - type: text
+    text: "Player1: (machine|player1_score) Player2: (machine|player2_score)"
