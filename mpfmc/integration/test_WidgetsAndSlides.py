@@ -12,6 +12,10 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         return 'integration/machine_files/widgets_and_slides/'
 
     def test_placeholders(self):
+        self.post_event("play_slide_last_game_score")
+        self.advance_time_and_run(.1)
+        self.assertTextInSlide('Player1:  Player2: ', "slide_last_game_score")
+
         self.start_game()
         self.add_player()
         self.post_event("start_mode4")
@@ -24,6 +28,7 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.machine.game.player["test_int"] = 42
         self.machine.game.player["test_float"] = 42.23
         self.machine.game.player["test_str"] = "1337"
+        self.machine.game.player["score"] = 1337
         self.machine.set_machine_var("test1", "l33t")
         self.advance_time_and_run(.1)
         self.assertTextInSlide('MAIN TEXT 1:1337 2:42 3:42.23 4:l33t', "variable_slide")
