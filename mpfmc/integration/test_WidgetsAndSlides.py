@@ -17,6 +17,7 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.assertTextInSlide('Player1:  Player2: ', "slide_last_game_score")
 
         self.start_game()
+        self.add_player()
         self.post_event("start_mode4")
         self.advance_time_and_run(.1)
         self.post_event("show_variable_slide")
@@ -31,12 +32,30 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.machine.set_machine_var("test1", "l33t")
         self.advance_time_and_run(.1)
         self.assertTextInSlide('MAIN TEXT 1:1337 2:42 3:42.23 4:l33t', "variable_slide")
-        self.stop_game()
-
+        self.drain_ball()
         self.advance_time_and_run(.1)
+        self.machine.game.player["score"] = 42
+        self.post_event("start_mode4")
+        self.advance_time_and_run(.1)
+        self.post_event("show_variable_slide")
+        self.advance_time_and_run(.1)
+        self.assertTextInSlide('MAIN TEXT 1:Test 2:7 3:1.75 4:l33t', "variable_slide")
+        self.stop_game()
+        self.advance_time_and_run(.1)
+
         self.post_event("play_slide_last_game_score")
         self.advance_time_and_run(.1)
-        self.assertTextInSlide('Player1: 1337 Player2: ', "slide_last_game_score")
+        self.assertTextInSlide('Player1: 1337 Player2: 42', "slide_last_game_score")
+
+        self.start_game()
+        self.advance_time_and_run(.1)
+        self.machine.game.player["score"] = 23
+        self.advance_time_and_run(.1)
+        self.stop_game()
+
+        self.post_event("play_slide_last_game_score")
+        self.advance_time_and_run(.1)
+        self.assertTextInSlide('Player1: 23 Player2: ', "slide_last_game_score")
 
     def test_widget_on_slide_of_another_mode(self):
         self.post_event("start_mode1")
