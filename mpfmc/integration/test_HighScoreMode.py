@@ -17,6 +17,26 @@ class TestHighScoreMode(MpfIntegrationTestCase, MpfSlideTestCase, MpfFakeGameTes
     def getMachinePath(self):
         return 'integration/machine_files/high_score/'
 
+    def test_empty_name(self):
+        self.start_game()
+        self.machine.game.player_list[0].score = 10000
+        self.machine.game.player_list[0].loops = 100
+        self.machine.game.end_game()
+        self.advance_time_and_run()
+        self.assertTrue(self.machine.modes.high_score.active)
+        self.hit_and_release_switch("s_left_flipper")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("PLAYER 1")
+        self.assertTextOnTopSlide("GRAND CHAMPION")
+        self.assertTextOnTopSlide("END")
+        self.hit_and_release_switch("s_start")
+        self.advance_time_and_run(.5)
+        self.assertTextOnTopSlide("GRAND CHAMPION")
+        self.assertTextOnTopSlide("")
+        self.advance_time_and_run(5)
+        self.assertTextOnTopSlide("LOOP CHAMP")
+        self.assertTextOnTopSlide("")
+
     def test_no_high_scores(self):
         self.start_game()
         self.machine.game.player_list[0].score = 10000
