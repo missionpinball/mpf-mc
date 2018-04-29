@@ -14,11 +14,11 @@ matrix:
      sudo: required
      language: python
      python: "3.5"
-#   - os: linux
-#     env: LINUX=ubuntu:17.10
-#     sudo: required
-#     language: python
-#     python: "3.6"
+   - os: linux
+     env: LINUX=ubuntu:18.04
+     sudo: required
+     language: python
+     python: "3.6"
    - os: linux
      env: LINUX=debian:jessie
      sudo: required
