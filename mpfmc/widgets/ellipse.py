@@ -32,6 +32,8 @@ class Ellipse(Widget):
                   angle_start=self._draw_widget,
                   angle_end=self._draw_widget)
 
+        self._draw_widget()
+
     def _draw_widget(self, *args) -> None:
         del args
 

@@ -32,6 +32,8 @@ class Point(Widget):
                   rotation=self._draw_widget,
                   scale=self._draw_widget)
 
+        self._draw_widget()
+
     def _draw_widget(self, *args) -> None:
         """Establish the drawing instructions for the widget."""
         del args
