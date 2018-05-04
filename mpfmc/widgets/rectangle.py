@@ -30,6 +30,8 @@ class Rectangle(Widget):
                   corner_radius=self._draw_widget,
                   corner_segments=self._draw_widget)
 
+        self._draw_widget()
+
     def _draw_widget(self, *args) -> None:
         """Establish the drawing instructions for the widget."""
         del args
