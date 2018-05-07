@@ -652,7 +652,9 @@ class TestAudio(MpfMcTestCase):
         instance_id = status[0]['sound_instance_id']
         text_sound_instance = track_sfx.get_playing_sound_instance_by_id(instance_id)
         self.assertIsNotNone(text_sound_instance)
-        self.assertEqual(text_sound_instance.volume, 0.67)
+
+        # Volume is multiplied by sound_player setting (0.5 * 0.67 = 0.335)
+        self.assertEqual(text_sound_instance.volume, 0.335)
         self.assertEqual(text_sound_instance.loops, 2)
         self.assertEqual(text_sound_instance.priority, 1000)
         self.assertEqual(text_sound_instance.start_at, 0.05)
