@@ -118,7 +118,7 @@ class DmdBase(object):
 
         # detach the widget from the parent
         parent = widget.parent
-        if parent:
+        if parent and hasattr(parent, "remove_display_source"):
             parent.remove_display_source(widget)
 
         # clear the fbo background
@@ -138,7 +138,7 @@ class DmdBase(object):
         self.effect_widget.remove_widget(widget.container)
 
         # reattach to the parent
-        if parent:
+        if parent and hasattr(parent, "add_display_source"):
             parent.add_display_source(widget)
 
         if not self.config['only_send_changes'] or self.prev_data != data:
