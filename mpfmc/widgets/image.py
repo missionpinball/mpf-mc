@@ -120,11 +120,12 @@ class ImageWidget(Widget):
             Scale(self.scale).origin = anchor
             Rectangle(pos=self.pos, size=self.size, texture=self.texture)
 
-    def play(self, start_frame: Optional[int] = None):
+    def play(self, start_frame: Optional[int] = 0):
         """Play the image animation (if images supports it)."""
         if start_frame:
             self.current_frame = start_frame
 
+        self._image.image._anim_index = start_frame
         self._image.image.anim_reset(True)
 
     def stop(self) -> None:
