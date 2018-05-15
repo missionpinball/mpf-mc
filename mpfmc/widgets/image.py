@@ -130,6 +130,7 @@ class ImageWidget(Widget):
         if start_frame:
             self.current_frame = start_frame
 
+        # pylint: disable-msg=protected-access
         self._image.image._anim_index = start_frame
         self._image.image.anim_reset(True)
 
