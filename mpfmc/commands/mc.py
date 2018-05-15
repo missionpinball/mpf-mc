@@ -10,7 +10,7 @@ from datetime import datetime
 import time
 import errno
 import psutil
-from mpfmc.commands.loggingFormatters import JSONFormatter
+from mpfmc.commands.logging_formatters import JSONFormatter
 
 
 # Note, other imports are done deeper in this file, which we need to do there
