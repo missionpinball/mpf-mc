@@ -100,12 +100,17 @@ class ImageWidget(Widget):
 
         # Handle animation looping (when applicable)
         ci = self._image.image
-        if ci.anim_available:
-            if self.loops > -1 and ci.anim_index == len(ci.image.textures) - 1:
-                self._current_loop += 1
-                if self._current_loop == self.loops:
-                    ci.anim_reset(False)
-                    self._current_loop = 0
+        if ci.anim_available and self.loops > -1 and ci.anim_index == len(ci.image.textures) - 1:
+            self._current_loop += 1
+            if self._current_loop > self.loops:
+                ci.anim_reset(False)
+                self._current_loop = 0
+
+    def prepare_for_removal(self) -> None:
+        """Prepare the widget to be removed."""
+        super().prepare_for_removal()
+        # stop any animations
+        self._image.image.anim_reset(False)
 
     def _draw_widget(self, *args):
         """Draws the image (draws a rectangle using the image texture)"""
@@ -120,11 +125,13 @@ class ImageWidget(Widget):
             Scale(self.scale).origin = anchor
             Rectangle(pos=self.pos, size=self.size, texture=self.texture)
 
-    def play(self, start_frame: Optional[int] = None):
+    def play(self, start_frame: Optional[int] = 0):
         """Play the image animation (if images supports it)."""
         if start_frame:
             self.current_frame = start_frame
 
+        # pylint: disable-msg=protected-access
+        self._image.image._anim_index = start_frame
         self._image.image.anim_reset(True)
 
     def stop(self) -> None:
