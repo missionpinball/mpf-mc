@@ -10,6 +10,8 @@ from datetime import datetime
 import time
 import errno
 import psutil
+from mpfmc.commands.loggingFormatters import JSONFormatter
+
 
 # Note, other imports are done deeper in this file, which we need to do there
 # since Kivy does so much with singletons and we don't want MPF to import
@@ -83,6 +85,11 @@ class Command(object):
                             default=None,
                             help="The name (and path) of the log file")
 
+        parser.add_argument("-j",
+                            action="store_true", dest="jsonlogging",
+                            default=False,
+                            help="Enables json logging to file. ")
+
         parser.add_argument("-p",
                             action="store_true", dest="pause", default=False,
                             help="Pause the terminal window on exit. Useful "
@@ -153,10 +160,17 @@ class Command(object):
         except OSError:
             pass
 
-        logging.basicConfig(level=args.loglevel,
-                            format='%(asctime)s : %(name)s : %(message)s',
-                            filename=full_logfile_path,
-                            filemode='a')
+        # initialise file log
+        if args.jsonlogging:
+            formatter = JSONFormatter()
+            file_log = logging.FileHandler(full_logfile_path)
+            file_log.setFormatter(formatter)
+            logging.getLogger('').addHandler(file_log)
+        else:
+            logging.basicConfig(level=args.loglevel,
+                                format='%(asctime)s : %(name)s : %(message)s',
+                                filename=full_logfile_path,
+                                filemode='a')
 
         # define a Handler which writes INFO messages or higher to the
         # sys.stderr
