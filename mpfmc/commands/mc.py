@@ -85,7 +85,7 @@ class Command(object):
                             default=None,
                             help="The name (and path) of the log file")
 
-        parser.add_argument("-j",
+        parser.add_argument("--json-logging",
                             action="store_true", dest="jsonlogging",
                             default=False,
                             help="Enables json logging to file. ")
