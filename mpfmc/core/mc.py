@@ -91,7 +91,8 @@ class MpfMc(App):
         # load machine into path to load modules
         if machine_path not in sys.path:
             sys.path.append(machine_path)
-        self.mpf_config_processor = MpfConfigProcessor()
+        self.config_validator = ConfigValidator(self)
+        self.mpf_config_processor = MpfConfigProcessor(self.config_validator)
         self.machine_config = self._load_config()
 
         self.clock = Clock
@@ -138,11 +139,9 @@ class MpfMc(App):
             self.thread_stopper = threading.Event()
 
         # Core components
-        self.config_validator = ConfigValidator(self)
         self.events = EventManager(self)
         self.mode_controller = ModeController(self)
         create_config_collections(self, self.machine_config['mpf-mc']['config_collections'])
-        ConfigValidator.load_config_spec()
 
         self.config_processor = ConfigProcessor(self)
         self.transition_manager = TransitionManager(self)
@@ -265,7 +264,8 @@ class MpfMc(App):
         return self.machine_config['mpf-mc']
 
     def validate_machine_config_section(self, section):
-        if section not in ConfigValidator.config_spec:
+        """Validate machine config."""
+        if section not in self.config_validator.get_config_spec():
             return
 
         if section not in self.machine_config:
@@ -397,7 +397,6 @@ class MpfMc(App):
 
     def init_done(self):
         self.is_init_done.set()
-        ConfigValidator.unload_config_spec()
         self.events.post("init_done")
         # no events docstring as this event is also in mpf
         self.events.process_event_queue()

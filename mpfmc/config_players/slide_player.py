@@ -244,7 +244,7 @@ class McSlidePlayer(McConfigPlayer):
                                                                         slide))
 
                 for key in slide_settings:
-                    if key not in ConfigValidator.config_spec['slide_player']:
+                    if key not in self.machine.config_validator.get_config_spec()['slide_player']:
                         dict_is_widgets = True
                         break
 
