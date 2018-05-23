@@ -1,6 +1,8 @@
 """Interactive Media Controller"""
-
+import asyncio
 import os
+
+from ruamel import yaml
 
 from kivy.app import App
 from kivy.core.window import Window
@@ -25,6 +27,13 @@ import mpfmc
 from mpfmc.config_players.plugins.slide_player import MpfSlidePlayer
 
 
+class Settings(object):
+
+    """Empty settings."""
+
+    def get_settings(self):
+        return {}
+
 class InteractiveMc(App):
 
     def __init__(self, mpf_path, machine_path, args, **kwargs):
@@ -42,21 +51,26 @@ class InteractiveMc(App):
         self.options = dict(bcp=True)
         self.clock = ClockBase(self)
 
+        # needed for bcp
+        self.settings = Settings()
+        self.machine_vars = {}
+        self.modes = []
+
         self.events = EventManager(self)
         self.mode_controller = ModeController(self)
         self.bcp = Bcp(self)
         self.slide_player = MpfSlidePlayer(self)
         self.slide_player.instances['imc'] = dict()
 
-        self.events.post("init_phase_1")
+        self.clock.loop.run_until_complete(self.events.post_queue_async("init_phase_1"))
         self.events.process_event_queue()
-        self.events.post("init_phase_2")
+        self.clock.loop.run_until_complete(self.events.post_queue_async("init_phase_2"))
         self.events.process_event_queue()
-        self.events.post("init_phase_3")
+        self.clock.loop.run_until_complete(self.events.post_queue_async("init_phase_3"))
         self.events.process_event_queue()
-        self.events.post("init_phase_4")
+        self.clock.loop.run_until_complete(self.events.post_queue_async("init_phase_4"))
         self.events.process_event_queue()
-        self.events.post("init_phase_5")
+        self.clock.loop.run_until_complete(self.events.post_queue_async("init_phase_5"))
 
         self.sm = ScreenManager()
         self.slide_screen = Screen(name="Slide Player")
@@ -105,12 +119,21 @@ class InteractiveMc(App):
     def send_slide_to_mc(self, value):
         del value
 
-        settings = YamlInterface.process(self.slide_player_code.text)
+        try:
+            settings = YamlInterface.process(self.slide_player_code.text)
+        except Exception as e:
+            msg = str(e).replace('"', '\n')
+            Popup(title='Error in your config',
+                  content=Label(text=msg, size=(750, 350)),
+                  size_hint=(None, None),
+                  size=(Window.width, 400)).open()
+            return
+
 
         try:
             settings = (self.slide_player.validate_config_entry(settings,
                                                                 'slides'))
-        except AssertionError as e:
+        except Exception as e:
             msg = str(e).replace('"', '\n')
             Popup(title='Error in your config',
                   content=Label(text=msg, size=(750, 350)),
@@ -122,8 +145,11 @@ class InteractiveMc(App):
             self.slide_player.clear_context('imc')
         else:
             self._initialized = True
+        self.slide_player.play(settings, 'imc', 100)
+        self.clock.loop.run_until_complete(asyncio.sleep(.1, loop=self.clock.loop))
 
-        self.slide_player.play(settings, 'imc', None, force=True)
+    def set_machine_var(self, name, value):
+        pass
 
 
 class YamlCodeInput(CodeInput):
