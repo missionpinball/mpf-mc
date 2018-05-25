@@ -1,3 +1,4 @@
+"""A triangle widget."""
 from typing import Optional
 
 from kivy.graphics import Triangle as KivyTriangle
@@ -76,5 +77,6 @@ class Triangle(Widget):
     :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
     1.0.
     '''
+
 
 widget_classes = [Triangle]

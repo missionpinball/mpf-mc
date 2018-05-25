@@ -1,15 +1,15 @@
-"""Contains the sound config player class"""
-
+"""Contains the sound config player class."""
 # WARNING: Do not import kivy's logger here since that will trigger Kivy to
 # load in the mpf process when MPF processes the MpfSoundPlayer
 from copy import deepcopy
 
-from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
 
 
 class McTrackPlayer(McConfigPlayer):
+
     """Base class for the Track Player that runs on the mpf-mc side of things.
+
     It receives all of its instructions via BCP from a MpfTrackPlayer instance
     running as part of MPF.
 
@@ -32,7 +32,7 @@ class McTrackPlayer(McConfigPlayer):
                 action: pause
                 fade: 0.5 sec
 
-Here are several various examples:
+    Here are several various examples:
 
     track_player:
         some_event:
@@ -47,6 +47,7 @@ Here are several various examples:
                 fade: 0.75 sec
 
     """
+
     config_file_section = 'track_player'
     show_section = 'tracks'
     machine_collection_name = None
@@ -158,7 +159,7 @@ Here are several various examples:
                 # sound settings. If not, assume it's a single sound settings.
                 if isinstance(track_settings, dict):
                     for key in track_settings:
-                        if key not in ConfigValidator.config_spec['track_player']:
+                        if key not in self.machine.config_validator.get_config_spec()['track_player']:
                             break
 
                     validated_config[event]['tracks'].update(
@@ -188,5 +189,6 @@ Here are several various examples:
         to clear when the context ends. No new track instances are created using the
         track_player."""
         del context
+
 
 mc_player_cls = McTrackPlayer

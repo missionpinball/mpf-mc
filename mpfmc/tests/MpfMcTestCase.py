@@ -132,8 +132,8 @@ class MpfMcTestCase(unittest.TestCase):
 
         # prevent sleep in clock
         Clock._max_fps = 0
-        Clock._events = [[] for i in range(256)]
-        self._test_started = self._start_time
+        # reset clock
+        Clock._root_event = None
 
         from mpf.core.player import Player
         Player.monitor_enabled = False
@@ -191,8 +191,13 @@ class MpfMcTestCase(unittest.TestCase):
         runTouchApp(slave=True)  # change is here
 
         # Perform init process
+        tries = 0
         while not self.mc.is_init_done.is_set() and not self.mc.thread_stopper.is_set():
             self.advance_time()
+            sleep(.001)
+            tries += 1
+            if tries > 1000:
+                self.fail("Test init took too long")
 
         # set a nice title
         window.set_title(self.__class__.__name__ + "::" + self._testMethodName)
@@ -200,9 +205,10 @@ class MpfMcTestCase(unittest.TestCase):
     def dump_clock(self):
         print("---------")
         events = []
-        for slot in Clock._events:
-            for event in slot:
-                events.append(event)
+        event = Clock._root_event
+        while event:
+            events.append(event)
+            event = event.next
 
         events.sort(key=lambda x: str(x.get_callback()))
 

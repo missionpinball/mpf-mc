@@ -1,3 +1,4 @@
+"""Widget showing a bezier curve."""
 from typing import Optional
 from kivy.graphics import Line as KivyLine
 from kivy.graphics.context_instructions import Color, Rotate, Scale
@@ -14,7 +15,7 @@ if MYPY:   # pragma: no cover
 
 class Bezier(Widget):
 
-    """A bezier curve."""
+    """Widget showing a bezier curve."""
 
     widget_type_name = 'Bezier'
     animation_properties = ('color', 'thickness', 'opacity', 'points', 'rotation', 'scale')
@@ -120,5 +121,6 @@ class Bezier(Widget):
     :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
     1.0.
     '''
+
 
 widget_classes = [Bezier]

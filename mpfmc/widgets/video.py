@@ -1,3 +1,4 @@
+"""Widget showing a video."""
 from typing import Optional
 
 from kivy.uix.video import Video
@@ -14,6 +15,9 @@ if MYPY:   # pragma: no cover
 
 
 class VideoWidget(Widget, Video):
+
+    """Widget showing a video."""
+
     widget_type_name = 'Video'
     merge_settings = ('height', 'width')
     animation_properties = ('x', 'y')
@@ -25,7 +29,7 @@ class VideoWidget(Widget, Video):
 
         try:
             self.video = self.mc.videos[self.config['video']]
-        except:
+        except Exception:
             raise ValueError("Cannot add Video widget. Video '{}' is not a "
                              "valid video name.".format(self.config['video']))
 

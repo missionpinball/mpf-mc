@@ -84,7 +84,7 @@ class Display(ScreenManager):
         self.container.z = 0
         self.container.add_widget(self)
 
-        Clock.schedule_once(self._display_created, 0)
+        self._display_created()
 
     def __repr__(self):
         return '<Display name={}{}, current slide={}, total slides={}>'.format(

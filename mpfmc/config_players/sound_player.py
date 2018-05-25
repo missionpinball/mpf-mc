@@ -180,7 +180,7 @@ Here are several various examples:
                 # sound settings. If not, assume it's a single sound settings.
                 if isinstance(sound_settings, dict):
                     for key in sound_settings:
-                        if key not in ConfigValidator.config_spec['sound_player']:
+                        if key not in self.machine.config_validator.get_config_spec()['sound_player']:
                             break
 
                     validated_config[event]['sounds'].update(
