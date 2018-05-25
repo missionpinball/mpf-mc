@@ -1,3 +1,4 @@
+"""An ellipse widget."""
 from typing import Optional
 from kivy.graphics.vertex_instructions import Ellipse as KivyEllipse
 from kivy.graphics.context_instructions import Color, Rotate, Scale
@@ -11,6 +12,8 @@ if MYPY:   # pragma: no cover
 
 
 class Ellipse(Widget):
+
+    """An ellipse widget."""
 
     widget_type_name = 'Ellipse'
     animation_properties = ('x', 'y', 'width', 'pos', 'height', 'size', 'color',
@@ -73,5 +76,6 @@ class Ellipse(Widget):
 
     rotation = NumericProperty(0)
     scale = NumericProperty(1.0)
+
 
 widget_classes = [Ellipse]

@@ -1,3 +1,4 @@
+"""Widget showing a line."""
 from typing import Optional
 
 from kivy.graphics import Line as KivyLine
@@ -14,6 +15,8 @@ if MYPY:   # pragma: no cover
 
 
 class Line(Widget):
+
+    """Widget showing a line."""
 
     widget_type_name = 'Line'
     animation_properties = ('color', 'thickness', 'opacity', 'points', 'rotation', 'scale')
@@ -113,5 +116,6 @@ class Line(Widget):
     :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
     1.0.
     '''
+
 
 widget_classes = [Line]

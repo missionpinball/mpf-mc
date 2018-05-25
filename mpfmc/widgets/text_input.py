@@ -1,6 +1,4 @@
-"""
-Text Input widget
-=================
+"""Text Input widget.
 
 The :class:`MpfTextInput` widget is used to all the player (or an operator) to
 enter text. It can be linked to a :class:`Text` widget which displays the text
@@ -20,6 +18,9 @@ if MYPY:   # pragma: no cover
 
 
 class MpfTextInput(Text):
+
+    """Text input widget."""
+
     widget_type_name = 'text_input'
     animation_properties = list()
 
@@ -232,5 +233,6 @@ class MpfTextInput(Text):
     def prepare_for_removal(self) -> None:
         self.done()
         super().prepare_for_removal()
+
 
 widget_classes = [MpfTextInput]

@@ -1,3 +1,4 @@
+"""Widget showing a point."""
 from typing import Optional
 
 from kivy.graphics import Point as KivyPoint
@@ -13,6 +14,8 @@ if MYPY:   # pragma: no cover
 
 
 class Point(Widget):
+
+    """Widget showing a point."""
 
     widget_type_name = 'Point'
     animation_properties = ('points', 'pointsize', 'color', 'opacity', 'rotation', 'scale')
@@ -84,5 +87,6 @@ class Point(Widget):
     :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
     1.0.
     '''
+
 
 widget_classes = [Point]

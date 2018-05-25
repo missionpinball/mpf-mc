@@ -1,3 +1,4 @@
+"""Widget showing a rectangle."""
 from typing import Optional
 from kivy.graphics import Rectangle as KivyRectangle, RoundedRectangle
 from kivy.graphics.context_instructions import Color, Rotate, Scale
@@ -11,6 +12,8 @@ if MYPY:   # pragma: no cover
 
 
 class Rectangle(Widget):
+
+    """Widget showing a rectangle."""
 
     widget_type_name = 'Rectangle'
     animation_properties = ('x', 'y', 'width', 'height', 'color', 'opacity', 'corner_radius',
@@ -82,5 +85,6 @@ class Rectangle(Widget):
     :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
     1.0.
     '''
+
 
 widget_classes = [Rectangle]

@@ -1,3 +1,4 @@
+"""Widget showing an image."""
 from typing import Optional, Union
 
 from kivy.properties import ObjectProperty, NumericProperty, AliasProperty
@@ -12,6 +13,9 @@ if MYPY:   # pragma: no cover
 
 
 class ImageWidget(Widget):
+
+    """Widget showing an image."""
+
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
     animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'opacity')
@@ -211,5 +215,6 @@ class ImageWidget(Widget):
     :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
     1.0.
     '''
+
 
 widget_classes = [ImageWidget]

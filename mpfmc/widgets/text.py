@@ -1,3 +1,4 @@
+"""A text widget on a slide."""
 import re
 from typing import Optional
 
@@ -824,5 +825,6 @@ class Text(Widget):
     :attr:`scale` is an :class:`~kivy.properties.NumericProperty` and defaults to
     1.0.
     '''
+
 
 widget_classes = [Text]

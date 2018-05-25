@@ -1,3 +1,4 @@
+"""Widget showing a quad."""
 from typing import Optional
 
 from kivy.graphics import Quad as KivyQuad
@@ -13,6 +14,8 @@ if MYPY:   # pragma: no cover
 
 
 class Quad(Widget):
+
+    """Widget showing a quad."""
 
     widget_type_name = 'Quad'
     animation_properties = ('points', 'color', 'opacity', 'rotation', 'scale')
