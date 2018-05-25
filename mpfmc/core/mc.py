@@ -7,7 +7,6 @@ import sys
 import threading
 import time
 import logging
-import asyncio
 
 import gc
 import weakref
@@ -99,8 +98,7 @@ class MpfMc(App):
         # pylint: disable-msg=protected-access
         self.log.info("Starting clock at %sHz", Clock._max_fps)
         self._boot_holds = set()
-        self.is_init_done = asyncio.Event(loop=self.clock)
-        self.is_init_done.clear()
+        self.is_init_done = threading.Event()
         self.mpf_path = os.path.dirname(mpf.__file__)
         self.modes = CaseInsensitiveDict()
         self.player_list = list()
