@@ -1,5 +1,5 @@
-from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.core.audio.audio_exception import AudioException
+from mpfmc.core.config_collection import ConfigCollection
 
 
 class SoundLoopSetCollection(ConfigCollection):
@@ -8,8 +8,8 @@ class SoundLoopSetCollection(ConfigCollection):
     collection = 'sound_loop_sets'
     class_label = 'SoundLoopSets'
 
-    def __init__(self, mc):
-        super().__init__(mc)
+    def __init__(self, mc, collection, config_section):
+        super().__init__(mc, collection, config_section)
 
         self._validate_handler = None
 

@@ -2,8 +2,8 @@ from enum import Enum, unique
 from typing import Optional
 
 from mpf.core.randomizer import Randomizer
-from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.core.audio.audio_exception import AudioException
+from mpfmc.core.config_collection import ConfigCollection
 
 
 class PlaylistCollection(ConfigCollection):
@@ -12,8 +12,8 @@ class PlaylistCollection(ConfigCollection):
     collection = 'playlists'
     class_label = 'Playlists'
 
-    def __init__(self, mc):
-        super().__init__(mc)
+    def __init__(self, mc, collection, config_section):
+        super().__init__(mc, collection, config_section)
 
         self._validate_handler = None
 

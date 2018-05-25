@@ -25,7 +25,7 @@ class McWidgetPlayer(McConfigPlayer):
 
     config_file_section = 'widget_player'
     show_section = 'widgets'
-    machine_collection_name = 'widgets'
+    machine_collection_name = None  # widgets are not real devices currently
 
     def _get_slide(self, s):
         slide = None

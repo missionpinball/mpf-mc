@@ -1,5 +1,4 @@
 from copy import deepcopy
-from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
 
 
@@ -96,7 +95,7 @@ class McSlidePlayer(McConfigPlayer):
     """
     config_file_section = 'slide_player'
     show_section = 'slides'
-    machine_collection_name = 'slides'
+    machine_collection_name = None  # slides are not real devices currently
 
     def play(self, settings, context, calling_context, priority=0, **kwargs):
         """Process a slide_player event."""
