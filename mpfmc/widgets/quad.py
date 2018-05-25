@@ -78,4 +78,5 @@ class Quad(Widget):
     1.0.
     '''
 
+
 widget_classes = [Quad]
