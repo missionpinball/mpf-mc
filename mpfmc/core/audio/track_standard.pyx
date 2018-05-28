@@ -772,12 +772,13 @@ cdef class TrackStandard(Track):
         Args:
             context: The context to clear
         """
-        self.log.debug("Clearing context %s", context)
-
         # If this track is managed by a playlist controller, do not clear the context as that
         # will be handled by the playlist controller.
         if self.mc.sound_system.audio_interface.get_playlist_controller(self._name):
+            self.log.debug("Skip clearing context %s (playlist controller will handle it)", context)
             return
+
+        self.log.debug("Clearing context %s", context)
 
         SDL_LockAudio()
 
