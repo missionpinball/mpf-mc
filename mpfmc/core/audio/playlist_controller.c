@@ -6864,7 +6864,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         """
  *         self.log.debug("Clearing context %s", context)             # <<<<<<<<<<<<<<
  * 
- *         if self._current_playlist.context == context:
+ *         if self._current_playlist and self._current_playlist.context == context:
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 324, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -6921,10 +6921,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   /* "mpfmc/core/audio/playlist_controller.pyx":326
  *         self.log.debug("Clearing context %s", context)
  * 
- *         if self._current_playlist.context == context:             # <<<<<<<<<<<<<<
+ *         if self._current_playlist and self._current_playlist.context == context:             # <<<<<<<<<<<<<<
  *             self.stop()
  * 
  */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 326, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_7) {
+  } else {
+    __pyx_t_6 = __pyx_t_7;
+    goto __pyx_L4_bool_binop_done;
+  }
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_context); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 326, __pyx_L1_error)
@@ -6932,13 +6941,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_1 = PyObject_RichCompare(__pyx_t_3, __pyx_v_context, Py_EQ); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 326, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 326, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  __pyx_t_6 = __pyx_t_7;
+  __pyx_L4_bool_binop_done:;
   if (__pyx_t_6) {
 
     /* "mpfmc/core/audio/playlist_controller.pyx":327
  * 
- *         if self._current_playlist.context == context:
+ *         if self._current_playlist and self._current_playlist.context == context:
  *             self.stop()             # <<<<<<<<<<<<<<
  * 
  *         # Also need to check if there is a pending request to play another playlist with
@@ -6968,7 +6979,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     /* "mpfmc/core/audio/playlist_controller.pyx":326
  *         self.log.debug("Clearing context %s", context)
  * 
- *         if self._current_playlist.context == context:             # <<<<<<<<<<<<<<
+ *         if self._current_playlist and self._current_playlist.context == context:             # <<<<<<<<<<<<<<
  *             self.stop()
  * 
  */
@@ -6988,7 +6999,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   if (__pyx_t_7) {
   } else {
     __pyx_t_6 = __pyx_t_7;
-    goto __pyx_L5_bool_binop_done;
+    goto __pyx_L7_bool_binop_done;
   }
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_pending_request); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 331, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -7001,7 +7012,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   if (__pyx_t_8) {
   } else {
     __pyx_t_6 = __pyx_t_8;
-    goto __pyx_L5_bool_binop_done;
+    goto __pyx_L7_bool_binop_done;
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":332
@@ -7023,7 +7034,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __pyx_t_8 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_8 < 0)) __PYX_ERR(0, 332, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_6 = __pyx_t_8;
-  __pyx_L5_bool_binop_done:;
+  __pyx_L7_bool_binop_done:;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":331
  *         # Also need to check if there is a pending request to play another playlist with

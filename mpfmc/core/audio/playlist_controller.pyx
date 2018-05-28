@@ -323,7 +323,7 @@ class PlaylistController:
         """
         self.log.debug("Clearing context %s", context)
 
-        if self._current_playlist.context == context:
+        if self._current_playlist and self._current_playlist.context == context:
             self.stop()
 
         # Also need to check if there is a pending request to play another playlist with
