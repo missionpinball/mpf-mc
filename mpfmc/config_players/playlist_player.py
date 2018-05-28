@@ -163,12 +163,20 @@ Here are several various examples:
         # playlist_player config section (only want to override settings explicitly
         # and not with any default values).  The default values for these items are not
         # legal values and therefore we know the user did not provide them.
+        if 'crossfade_mode' in validated_settings and validated_settings['crossfade_mode'] == 'use_playlist_setting':
+            del validated_settings['crossfade_mode']
         if 'crossfade_time' in validated_settings and validated_settings['crossfade_time'] is None:
             del validated_settings['crossfade_time']
         if 'volume' in validated_settings and validated_settings['volume'] is None:
             del validated_settings['volume']
         if 'fade_in' in validated_settings and validated_settings['fade_in'] is None:
             del validated_settings['fade_in']
+        if 'shuffle' in validated_settings and validated_settings['shuffle'] is None:
+            del validated_settings['shuffle']
+        if 'repeat' in validated_settings and validated_settings['repeat'] is None:
+            del validated_settings['repeat']
+        if 'scope' in validated_settings and validated_settings['scope'] == 'use_playlist_setting':
+            del validated_settings['scope']
         if 'events_when_played' in validated_settings and len(validated_settings['events_when_played']) == 1 and \
                 validated_settings['events_when_played'][0] == 'use_playlist_setting':
             del validated_settings['events_when_played']
