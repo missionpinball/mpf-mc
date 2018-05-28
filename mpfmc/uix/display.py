@@ -552,6 +552,7 @@ class Display(ScreenManager):
     def remove_widgets_by_key(self, key: str) -> None:
         """Removes all widgets with the specified key."""
         for widget in self.find_widgets_by_key(key):
+            widget.prepare_for_removal()
             if isinstance(widget, Widget) and widget.container and widget.container.parent:
                 widget.container.parent.remove_widget(widget.container)
             elif widget.parent:
