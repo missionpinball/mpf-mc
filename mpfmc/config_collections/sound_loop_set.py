@@ -19,7 +19,7 @@ class SoundLoopSetCollection(ConfigCollection):
 
         # No need to create entries if sound system is not enabled
         if self.mc.sound_system is None or self.mc.sound_system.audio_interface is None:
-            self.log.info("Unable to create sound_loop_sets - sound system is not available")
+            self.machine.log.info("Unable to create sound_loop_sets - sound system is not available")
             return
 
         for name, settings in config.items():
