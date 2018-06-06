@@ -35,9 +35,6 @@ class McConfigPlayer(DeviceConfigPlayer, metaclass=abc.ABCMeta):
                 self.validate_config(
                     self.machine.machine_config[self.config_file_section]))
 
-            self.register_player_events(
-                self.machine.machine_config[self.config_file_section])
-
         self.machine.events.add_handler(
             event='{}_play'.format(self.show_section),
             handler=self.play_from_trigger)
@@ -45,6 +42,10 @@ class McConfigPlayer(DeviceConfigPlayer, metaclass=abc.ABCMeta):
         self.machine.events.add_handler(
             event='{}_clear'.format(self.show_section),
             handler=self.clear_from_trigger)
+
+    def _initialize_in_mode(self, **kwargs):
+        """Nothing to do here since everything is triggered via BCP."""
+        pass
 
     def play_from_trigger(self, settings, context, priority, **kwargs):
         """Call play from BCP trigger."""

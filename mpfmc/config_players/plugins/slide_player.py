@@ -1,9 +1,10 @@
+"""Slide player in MPF."""
 from mpf.config_players.plugin_player import PluginPlayer
-from mpf.core.config_validator import ConfigValidator
 from mpf.core.utility_functions import Util
 
 
 class MpfSlidePlayer(PluginPlayer):
+
     """Base class for part of the slide player which runs as part of MPF.
 
     Note: This class is loaded by MPF and everything in it is in the context of
@@ -13,6 +14,7 @@ class MpfSlidePlayer(PluginPlayer):
         slide_player=mpfmc.config_players.slide_player:register_with_mpf
 
     """
+
     config_file_section = 'slide_player'
     show_section = 'slides'
 
