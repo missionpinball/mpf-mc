@@ -105,6 +105,9 @@ class Command(object):
                             action="store_false", dest='text_ui', default=True,
                             help="Use the ASCII text-based UI")
 
+        parser.add_argument("--both",
+                            action="store_true", dest='mpf_both', default=False)
+
         parser.add_argument("-v",
                             action="store_const", dest="loglevel", const=logging.DEBUG,
                             default=logging.INFO, help="Enables verbose logging to the"
@@ -175,7 +178,7 @@ class Command(object):
         # define a Handler which writes INFO messages or higher to the
         # sys.stderr
 
-        if args.text_ui:
+        if args.text_ui and args.mpf_both:
             console = logging.NullHandler()
             console.setLevel(logging.ERROR)
         else:
