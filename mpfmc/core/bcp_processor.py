@@ -37,6 +37,7 @@ class BcpProcessor(object):
                              'machine_variable': self._bcp_machine_variable,
                              'mode_start': self._bcp_mode_start,
                              'mode_stop': self._bcp_mode_stop,
+                             'mode_list': self._bcp_mode_list,
                              'ball_start': self._bcp_ball_start,
                              'ball_end': self._bcp_ball_end,
                              'player_added': self._bcp_player_add,
@@ -193,6 +194,9 @@ class BcpProcessor(object):
 
         if name in self.mc.modes:
             self.mc.modes[name].start(mode_priority=int(priority))
+
+    def _bcp_mode_list(self, **kwargs):
+        pass
 
     def _bcp_mode_stop(self, name, **kwargs):
         """Processes an incoming BCP 'mode_stop' command."""
