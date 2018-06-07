@@ -469,8 +469,9 @@ class TestWidget(MpfMcTestCase):
 
         self.mc.events.post('add_widget2_to_slide1')
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(Exception) as e:
             self.advance_time()
+        self.assertIsInstance(e.exception.__cause__, KeyError)
 
     def test_widget_player_with_different_key_than_named_widget(self):
         self.mc.targets['default'].add_slide(name='slide1')
@@ -484,9 +485,11 @@ class TestWidget(MpfMcTestCase):
 
         self.mc.events.post('show_widget9')
 
-        with self.assertRaises(KeyError, msg="Widget has incoming key 'wigdet9_wp_key' which does not "
-                                             "match the key in the widget's config 'widget9_key'."):
+        with self.assertRaises(Exception) as e:
             self.advance_time()
+        self.assertIsInstance(e.exception.__cause__, KeyError)
+        self.assertEqual(str(e.exception.__cause__), "\"Widget has incoming key 'wigdet9_wp_key' which does not "
+                                                     "match the key in the widget's config 'widget9_key'.\"")
 
     def test_removing_mode_widget_on_mode_stop(self):
         # create a slide and add some base widgets

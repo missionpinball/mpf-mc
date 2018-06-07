@@ -38,8 +38,10 @@ class TestWidgetStyles(MpfMcTestCase):
     def test_invalid_style(self):
         self.mc.events.post('slide4')
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception) as e:
             self.advance_time()
+
+        self.assertIsInstance(e.exception.__cause__, ValueError)
 
     def test_local_setting_overrides_style(self):
         self.mc.events.post('slide5')
