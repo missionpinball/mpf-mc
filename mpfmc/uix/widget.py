@@ -432,7 +432,7 @@ class Widget(KivyWidget):
         self.on_remove_from_slide()
 
     def _convert_animation_value_to_float(self, prop: str,
-                                          val: Union[str, int, float]) -> Union[float, int]:
+                                          val: Union[str, int, float], event_args) -> Union[float, int]:
         """
         Convert an animation property value to a numeric value.
         Args:
@@ -442,6 +442,12 @@ class Widget(KivyWidget):
         Returns:
             Numeric value (float or int).
         """
+        if val.startswith("(") and val.endswith(")"):
+            try:
+                val = event_args[val[1:-1]]
+            except KeyError:
+                raise AssertionError("Excepted an event parameter {}".format(val[1:-1]))
+
         try:
             val = percent_to_float(val, self._percent_prop_dicts[prop])
         except KeyError:
@@ -470,7 +476,7 @@ class Widget(KivyWidget):
         return animation_list
 
     # pylint: disable-msg=too-many-branches
-    def build_animation_from_config(self, config_list: list) -> Animation:
+    def build_animation_from_config(self, config_list: list, event_args) -> Animation:
         """Build animation object from config."""
         if not isinstance(config_list, list):
             raise TypeError('build_animation_from_config requires a list')
@@ -519,11 +525,11 @@ class Widget(KivyWidget):
 
                 # Convert target value(s) to numeric types
                 if values_needed[prop] > 1:
-                    val = [self._convert_animation_value_to_float(prop, x)
+                    val = [self._convert_animation_value_to_float(prop, x, event_args)
                            for x in values[:values_needed[prop]]]
                     del values[:values_needed[prop]]
                 else:
-                    val = self._convert_animation_value_to_float(prop, values[0])
+                    val = self._convert_animation_value_to_float(prop, values[0], event_args)
                     del values[0]
 
                 prop_dict[prop] = val
@@ -590,14 +596,12 @@ class Widget(KivyWidget):
     def start_animation_from_event(self, event_name: str, **kwargs) -> None:
         """Starts an animation based on an event name that has previously
         been registered."""
-        del kwargs
-
         if event_name not in self.config['animations']:
             return
 
         self.stop_animation()
         self.animation = self.build_animation_from_config(
-            self.config['animations'][event_name])
+            self.config['animations'][event_name], kwargs)
         self.animation.start(self)
 
     def _remove_animation_events(self) -> None:
