@@ -164,4 +164,16 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
 
         self.assertAlmostEqual(-134.0, self.mc.active_slides['top_slide'].widgets[0].widget.y)
 
+    def test_dynamic_widget_width(self):
+        self.start_game()
+        self.start_mode("mode5")
+        self.post_event("show_green_slide")
+        self.advance_time_and_run(.1)
+        self.assertEqual(0, self.mc.active_slides['green_slide'].widgets[0].widget.width)
+        self.machine.game.player.greenness = 30
+        self.advance_time_and_run(1.1)
+        self.assertEqual(30, self.mc.active_slides['green_slide'].widgets[0].widget.width)
+        self.machine.game.player.greenness = 100
+        self.advance_time_and_run(1.1)
+        self.assertEqual(100, self.mc.active_slides['green_slide'].widgets[0].widget.width)
 
