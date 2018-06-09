@@ -476,6 +476,7 @@ class Widget(KivyWidget):
         return animation_list
 
     # pylint: disable-msg=too-many-branches
+    # pylint: disable-msg=too-many-locals
     def build_animation_from_config(self, config_list: list, event_args) -> Animation:
         """Build animation object from config."""
         if not isinstance(config_list, list):
