@@ -1,0 +1,23 @@
+#config_version=5
+slide_player:
+  show_green_slide:
+    green_slide:
+      target: window
+
+slides:
+  green_slide:
+    widgets:
+      - type: rectangle
+        y: 50
+        z: 20
+        anchor_x: left
+        anchor_y: center
+        width: 0
+        height: 16
+        corner_radius: 3
+        corner_segments: 3
+        color: 00FF00
+        animations:
+            player_greenness:
+                - property: width
+                  value: (value)

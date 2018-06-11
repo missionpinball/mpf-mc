@@ -64,6 +64,10 @@ class PlaylistCollection(ConfigCollection):
         if self._validate_handler:
             self.mc.events.remove_handler(self._validate_handler)
 
+        # bail out if there is no sound system
+        if not hasattr(self.mc, "sounds"):
+            return
+
         for name, config in self.items():
             # Validate sound settings in sounds (make sure only valid sound assets are referenced and
             # at least one sound is referenced)

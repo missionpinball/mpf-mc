@@ -6,6 +6,7 @@ modes:
     - mode2
     - mode3
     - mode4
+    - mode5
 
 dmds:
   default:
@@ -20,6 +21,7 @@ window:
   fullscreen: false
   borderless: false
   exit_on_escape: true
+  source_display: window
 
 player_vars:
   test_int:
