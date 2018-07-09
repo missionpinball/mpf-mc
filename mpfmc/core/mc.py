@@ -151,7 +151,7 @@ class MpfMc(App):
 
         # Initialize the sound system (must be done prior to creating the AssetManager).
         # If the sound system is not available, do not load any other sound-related modules.
-        if SoundSystem is None or self.options["no_sound"]:
+        if SoundSystem is None or self.options.get("no_sound"):
             self.sound_system = None
         else:
             self.sound_system = SoundSystem(self)

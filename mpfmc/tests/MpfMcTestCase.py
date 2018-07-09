@@ -48,6 +48,7 @@ class MpfMcTestCase(unittest.TestCase):
                     configfile=Util.string_to_list(self.get_config_file()),
                     no_load_cache=False,
                     create_config_cache=True,
+                    no_sound=False,
                     bcp=False)
 
     def getAbsoluteMachinePath(self):
