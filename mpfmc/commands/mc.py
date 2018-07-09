@@ -139,6 +139,9 @@ class Command(object):
                             action="store_const", dest="force_platform",
                             const='smart_virtual', help=argparse.SUPPRESS)
 
+        parser.add_argument("--no-sound",
+                            action="store_true", dest="no_sound", default=False)
+
         args = parser.parse_args(args)
 
         args.configfile = Util.string_to_list(args.configfile)
