@@ -74,6 +74,10 @@ class Text(Widget):
         else:
             self._label = McFontLabel()
         self._label.fbind('texture', self.on_label_texture)
+        self.color_instruction = None
+        self.rectangle = None
+        self.rotate = None
+        self.scale_instruction = None
 
         super().__init__(mc=mc, config=config, key=key)
 
@@ -99,6 +103,15 @@ class Text(Widget):
                   rotation=self._draw_widget,
                   scale=self._draw_widget)
 
+    def get_text_width(self):
+        """Return the text width."""
+        if self._label.text:
+            # this only makes sense if there is a text
+            return self.width
+        else:
+            # otherwise text width is 0
+            return 0
+
     def __repr__(self) -> str:
         if hasattr(self, '_label') and self._label:
             return '<Text Widget text={}>'.format(self._label.text)
@@ -106,9 +119,8 @@ class Text(Widget):
             return '<Text Widget text=None>'
 
     def _draw_widget(self, *args):
-        """Draws the image (draws a rectangle using the image texture)"""
+        """Draws the image (draws a rectangle using the image texture)."""
         del args
-        self.canvas.clear()
 
         # Redrawing the widget doesn't reposition, so update manually
         anchor = (self.x - self.anchor_offset_pos[0], self.y - self.anchor_offset_pos[1])
@@ -116,12 +128,33 @@ class Text(Widget):
         # changes don't introduce gradual shifts in position.
         pos = self.calculate_rounded_position(anchor)
 
-        if self._label.text:
+        if (self._label.text and not self.rectangle) or (self.rectangle and not self._label.text):
+            # only create instructions once
+            # unfortunately, we also have to redo it when the text becomes empty or non-empty
+            self.canvas.clear()
             with self.canvas:
-                Color(*self.color)
-                Rotate(angle=self.rotation, origin=anchor)
-                Scale(self.scale).origin = anchor
-                Rectangle(pos=pos, size=self.size, texture=self._label.texture)
+                self.color_instruction = Color(*self.color)
+                self.rotate = Rotate(angle=self.rotation, origin=anchor)
+                self.scale_instruction = Scale(self.scale)
+                self.scale_instruction.origin = anchor
+
+                if self._label.text:
+                    self.rectangle = Rectangle(pos=pos, size=self.size, texture=self._label.texture)
+                else:
+                    self.rectangle = None
+
+        if self.rotate:
+            self.rotate.origin = anchor
+            self.rotate.angle = self.rotation
+        if self.scale_instruction:
+            self.scale_instruction.scale = self.scale
+            self.scale_instruction.origin = anchor
+        if self.rectangle:
+            self.rectangle.pos = pos
+            self.rectangle.size = self.size
+            self.rectangle.texture = self._label.texture
+        if self.color_instruction:
+            self.color_instruction.rgba = self.color
 
     def on_label_texture(self, instance, texture):
         del instance
