@@ -45,6 +45,10 @@ class MpfTextInput(Text):
         self.char_list.extend(self.config['char_list'])
         self.char_list.append('back')
         self.char_list.append('end')
+        self.current_list = self.char_list
+        self.final_list = deque()
+        self.final_list.append('back')
+        self.final_list.append('end')
 
         Clock.schedule_once(self.find_linked_text_widget)
 
@@ -74,9 +78,9 @@ class MpfTextInput(Text):
                 # bind() is weak meth, so we don't have to unbind
                 self.linked_text_widget.bind(size=self.set_relative_position)
                 self.linked_text_widget_right_edge = (
-                    self.linked_text_widget.width + self.linked_text_widget.x)
+                    self.linked_text_widget.get_text_width() + self.linked_text_widget.x)
 
-                self.jump(self.config['initial_char'])
+        self.jump(self.config['initial_char'])
 
     def _register_events(self) -> None:
         if not self.config['shift_left_event']:
@@ -122,12 +126,12 @@ class MpfTextInput(Text):
         # Unfortunately deque.index() is Python 3.5+, so we have to do it this
         # way.
 
-        if not self.char_list:
+        if not self.current_list:
             return
 
-        counts_remaining = len(self.char_list)
-        while self.char_list[0] != char:
-            self.char_list.rotate(1)
+        counts_remaining = len(self.current_list)
+        while self.current_list[0] != char:
+            self.current_list.rotate(1)
             counts_remaining -= 1
 
             if not counts_remaining:
@@ -140,20 +144,20 @@ class MpfTextInput(Text):
     def shift(self, places: int = 1, force: bool = False, **kwargs) -> None:
         del kwargs
         if self.active or force:
-            self.char_list.rotate(-places)
+            self.current_list.rotate(-places)
 
-            if self.char_list[0] == 'end':
+            if self.current_list[0] == 'end':
                 self.font_size = self.config['font_size'] / 2
                 self.update_text('END')
-            elif self.char_list[0] == ' ':
+            elif self.current_list[0] == ' ':
                 self.font_size = self.config['font_size'] / 2
                 self.update_text('SPACE')
-            elif self.char_list[0] == 'back':
+            elif self.current_list[0] == 'back':
                 self.font_size = self.config['font_size'] / 2
                 self.update_text('BACK')
             else:
                 self.font_size = self.config['font_size']
-                self.update_text(self.char_list[0])
+                self.update_text(self.current_list[0])
 
             if self.config['dynamic_x'] and self.linked_text_widget:
                 self.set_relative_position()
@@ -163,29 +167,36 @@ class MpfTextInput(Text):
         if not self.active:
             return
 
-        if self.char_list[0] == 'back':
+        if self.current_list[0] == 'back':
 
             if self.linked_text_widget.text:
                 # set the text_entry text to whatever the last char was
+                self.current_list = self.char_list
                 self.jump(self.linked_text_widget.text[-1:])
                 # remove the last char from the associated widget
                 self.linked_text_widget.update_text(
                     self.linked_text_widget.text[:-1])
 
-        elif self.char_list[0] == 'end':
+        elif self.current_list[0] == 'end':
             self.complete()
 
         else:
             self.linked_text_widget.update_text(
-                self.linked_text_widget.text + self.char_list[0])
+                self.linked_text_widget.text + self.current_list[0])
 
-            if len(self.linked_text_widget.text) == self.config['max_chars']:
+            if len(self.linked_text_widget.text) >= self.config['max_chars']:
+                # only show back and end
+                self.current_list = self.final_list
+                self.jump("end")
+
+            if len(self.linked_text_widget.text) > self.config['max_chars']:
+                # we are done
                 self.complete()
 
     def set_relative_position(self, *args) -> None:
         del args
 
-        new_right_edge = (self.linked_text_widget.width +
+        new_right_edge = (self.linked_text_widget.get_text_width() +
                           self.linked_text_widget.x)
 
         self.x += new_right_edge - self.linked_text_widget_right_edge
