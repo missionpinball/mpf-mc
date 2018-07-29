@@ -203,5 +203,7 @@ class TestText(MpfMcTestCase):
         self.mc.events.post('sw_start')
         self.advance_time()
 
-        self.assertEqual(text_input_widget.text, '')
+        self.assertEqual(text_input_widget.text, 'END')
+        self.mc.events.post('sw_start')
+        self.advance_time()
         self.assertEqual(text_display_widget.text, 'MPF')
