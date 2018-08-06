@@ -288,12 +288,12 @@ class Text(Widget):
                     self.add_machine_var_handler(name=variable_name)
 
     def add_player_var_handler(self, name: str) -> None:
-        self.mc.events.add_handler('player_{}'.format(name),
-                                   self._player_var_change)
+        self.mc.events.replace_handler('player_{}'.format(name),
+                                       self._player_var_change)
 
     def add_current_player_handler(self) -> None:
-        self.mc.events.add_handler('player_turn_start',
-                                   self._player_var_change)
+        self.mc.events.replace_handler('player_turn_start',
+                                       self._player_var_change)
 
     def add_machine_var_handler(self, name: str) -> None:
         self.mc.events.add_handler('machine_var_{}'.format(name),
