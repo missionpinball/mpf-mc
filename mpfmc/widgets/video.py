@@ -210,7 +210,7 @@ class VideoWidget(Widget, Video):
         else:
             self.state = 'stop'
 
-        # pylint: disable=E0203
+        # pylint: disable-msg=access-member-before-definition
         # Disable the error about accessing an attribute before its defined.
         # self._video is defined in the base class, but not in a direct way, so
         # pylint doesn't see it.

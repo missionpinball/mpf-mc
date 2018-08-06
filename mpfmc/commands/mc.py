@@ -18,7 +18,7 @@ from mpf.commands.logging_formatters import JSONFormatter
 # them when it reads this command
 
 
-class Command(object):
+class Command:
 
     # pylint: disable-msg=too-many-locals
     # pylint: disable-msg=too-many-statements

@@ -24,7 +24,7 @@ DEFAULT_TRACK_VOLUME = 0.5
 
 
 # pylint: disable=too-many-instance-attributes
-class SoundSystem(object):
+class SoundSystem:
 
     """Sound system for MPF.
 

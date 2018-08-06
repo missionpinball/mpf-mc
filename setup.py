@@ -258,6 +258,7 @@ def _check_and_fix_sdl2_mixer(f_path_to_check):
     else:
         print("WARNING: Unable to apply the changes, sorry.")
 
+
 gst_flags = {}
 
 if platform == 'darwin':

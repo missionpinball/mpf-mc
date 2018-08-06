@@ -14,7 +14,7 @@ if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 
-class EffectsManager(object):
+class EffectsManager:
     def __init__(self, mc: "MpfMc") -> None:
         self.mc = mc
         self._effects = dict()

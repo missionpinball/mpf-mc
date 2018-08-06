@@ -1,7 +1,7 @@
 """Contains the parent class for Scriptlets used in MPF-MC."""
 
 
-class Scriptlet(object):
+class Scriptlet:
 
     def __init__(self, mc, name):
         self.mc = mc

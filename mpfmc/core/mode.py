@@ -12,7 +12,7 @@ be called on mode_start or mode_stop.
 
 
 # pylint: disable-msg=too-many-instance-attributes
-class Mode(object):
+class Mode:
     """Parent class for in-game mode code."""
 
     def __init__(self, mc, config, name, path):

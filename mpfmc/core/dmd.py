@@ -18,7 +18,7 @@ if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 
-class DmdBase(object):
+class DmdBase:
     """Base class for DMD devices."""
 
     dmd_name_string = 'DMD'

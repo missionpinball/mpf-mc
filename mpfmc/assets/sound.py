@@ -687,7 +687,7 @@ class SoundInstanceStatus(Enum):
 
 
 # pylint: disable=too-many-public-methods
-class SoundInstance(object):
+class SoundInstance:
     """An instance of a playing sound asset. This class is essentially a wrapper container
     for sound assets that contains all the overridden parameter values for playback."""
 
@@ -1212,7 +1212,7 @@ class SoundInstance(object):
         return self._loop_count
 
 
-class DuckingSettings(object):
+class DuckingSettings:
     """ DuckingSettings contains the parameters needed to control audio ducking
     for a sound.
     """

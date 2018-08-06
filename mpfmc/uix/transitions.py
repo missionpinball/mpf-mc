@@ -9,7 +9,7 @@ from kivy.uix.screenmanager import (WipeTransition, SwapTransition,
                                     NoTransition)
 
 
-class TransitionManager(object):
+class TransitionManager:
     def __init__(self, mc):
         self.mc = mc
         self._transitions = dict()

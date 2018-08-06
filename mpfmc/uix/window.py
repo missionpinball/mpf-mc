@@ -8,7 +8,7 @@ if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
 
-class Window(object):
+class Window:
 
     @staticmethod
     def set_source_display(display: "DisplayWidget") -> None:

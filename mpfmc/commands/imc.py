@@ -12,7 +12,7 @@ def _start_imc(mpf_path, machine_path, args):
     InteractiveMc(mpf_path, machine_path, args).run()
 
 
-class Command(object):
+class Command:
 
     """Command which runs imc and mc."""
 

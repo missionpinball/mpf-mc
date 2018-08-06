@@ -12,7 +12,7 @@ from mpfmc._version import __bcp_version__
 from mpfmc.core.bcp_server import BCPServer
 
 
-class BcpProcessor(object):
+class BcpProcessor:
     def __init__(self, mc):
         self.mc = mc
         self.log = logging.getLogger('BcpProcessor')

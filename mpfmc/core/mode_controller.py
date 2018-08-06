@@ -19,7 +19,7 @@ be called on mode_start or mode_stop.
 # todo create a single ModeController base class for MPF and MPF-MC
 
 
-class ModeController(object):
+class ModeController:
     """Parent class for the Mode Controller. There is one instance of this in
     MPF and it's responsible for loading, unloading, and managing all game
     modes.

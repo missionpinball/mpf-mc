@@ -97,7 +97,7 @@ class PlaylistInstanceStatus(Enum):
 #    PlaylistInstance class
 # ---------------------------------------------------------------------------
 # pylint: disable=too-many-public-methods
-class PlaylistInstance(object):
+class PlaylistInstance:
     """
     PlaylistInstance class represents an instance of a playlist asset.
     """
