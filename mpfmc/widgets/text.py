@@ -147,7 +147,9 @@ class Text(Widget):
             self.rotate.origin = anchor
             self.rotate.angle = self.rotation
         if self.scale_instruction:
-            self.scale_instruction.scale = self.scale
+            self.scale_instruction.x = self.scale # Kivy 1.6.0 requires explicit per-axis scale args
+            self.scale_instruction.y = self.scale
+            self.scale_instruction.z = self.scale
             self.scale_instruction.origin = anchor
         if self.rectangle:
             self.rectangle.pos = pos
