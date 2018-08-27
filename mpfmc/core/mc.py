@@ -534,7 +534,7 @@ class MpfMc(App):
         if value is None:
             try:
                 del self.machine_vars[name]
-            except IndexError:
+            except KeyError:
                 pass
         else:
             self.machine_vars[name] = value
