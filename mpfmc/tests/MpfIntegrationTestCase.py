@@ -11,6 +11,7 @@ from kivy.clock import Clock
 from kivy.uix.widget import Widget as KivyWidget
 
 import mpfmc
+import mpfmc.core
 from mpf.tests.MpfBcpTestCase import MockBcpClient
 from mpf.tests.MpfTestCase import MpfTestCase, patch
 
