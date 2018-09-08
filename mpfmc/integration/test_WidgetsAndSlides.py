@@ -11,6 +11,13 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
     def getMachinePath(self):
         return 'integration/machine_files/widgets_and_slides/'
 
+    def test_mode_start_from_mc(self):
+        self.start_game()
+        self.mc.post_mc_native_event("start_mode6")
+        self.advance_time_and_run()
+        self.assertModeRunning("mode6")
+        self.assertTextOnTopSlide('Slide Mode 6')
+
     def test_placeholders(self):
         self.post_event("play_slide_last_game_score")
         self.advance_time_and_run(.1)

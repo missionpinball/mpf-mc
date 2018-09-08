@@ -1,0 +1,13 @@
+#config_version=5
+
+mode:
+  start_events: start_mode6
+  stop_events: stop_mode6
+
+slide_player:
+  mode_mode6_started: test
+
+slides:
+  test:
+  - type: text
+    text: Slide Mode 6

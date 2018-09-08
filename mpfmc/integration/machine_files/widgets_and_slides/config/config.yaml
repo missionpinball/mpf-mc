@@ -7,6 +7,7 @@ modes:
     - mode3
     - mode4
     - mode5
+    - mode6
 
 dmds:
   default:
