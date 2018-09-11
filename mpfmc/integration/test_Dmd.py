@@ -1,0 +1,29 @@
+"""Test high score mode."""
+from collections import OrderedDict
+import time
+
+from mpf.tests.MpfFakeGameTestCase import MpfFakeGameTestCase
+
+from mpfmc.tests.MpfSlideTestCase import MpfSlideTestCase
+
+from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
+
+
+class TestDMDs(MpfIntegrationTestCase, MpfSlideTestCase):
+
+    def getConfigFile(self):
+        return 'config.yaml'
+
+    def getMachinePath(self):
+        return 'integration/machine_files/dmd/'
+
+    def test_empty_name(self):
+        default = self.machine.rgb_dmds["default"]
+        grb = self.machine.rgb_dmds["grb_dmd"]
+        self.advance_time_and_run(.1)
+        self.assertEqual(bytearray([00] * 128 * 32 * 3), default.hw_device.data)
+        self.assertEqual(bytearray([00] * 128 * 32 * 3), grb.hw_device.data)
+        self.post_event("show_dmd_slide_1")
+        self.advance_time_and_run(.1)
+        self.assertEqual(bytearray([0x3, 0xe, 0x22] * 128 * 32), default.hw_device.data)
+        self.assertEqual(bytearray([0xe, 0x3, 0x22] * 128 * 32), grb.hw_device.data)
