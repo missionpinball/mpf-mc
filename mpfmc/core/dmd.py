@@ -189,6 +189,23 @@ class RgbDmd(DmdBase):
     def _get_validated_config(self, config: dict) -> dict:
         return self.mc.config_validator.validate_config('rgb_dmds', config)
 
+    def _reorder_channels(self, data, order):
+        new_data = bytearray()
+        for r, g, b in struct.iter_unpack('BBB', data):
+            for channel in order:
+                if channel == "r":
+                    new_data.append(r)
+                elif channel == "g":
+                    new_data.append(g)
+                elif channel == "b":
+                    new_data.append(b)
+                else:
+                    raise ValueError("Unknown channel {}".format(channel))
+
+        return bytes(new_data)
+
     def send(self, data: bytes) -> None:
         """Send data to RGB DMD via BCP."""
+        if self.config['channel_order'] != 'rgb':
+            data = self._reorder_channels(data, self.config['channel_order'])
         self.mc.bcp_processor.send('rgb_dmd_frame', rawbytes=data, name=self.name)
