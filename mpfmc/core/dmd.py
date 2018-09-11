@@ -189,7 +189,8 @@ class RgbDmd(DmdBase):
     def _get_validated_config(self, config: dict) -> dict:
         return self.mc.config_validator.validate_config('rgb_dmds', config)
 
-    def _reorder_channels(self, data, order):
+    @staticmethod
+    def _reorder_channels(data, order):
         new_data = bytearray()
         for r, g, b in struct.iter_unpack('BBB', data):
             for channel in order:
