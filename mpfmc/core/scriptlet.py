@@ -1,7 +1,13 @@
 """Contains the parent class for Scriptlets used in MPF-MC."""
 
+MYPY = False
+if MYPY:    # pragma: no cover
+    from mpfmc.core.mc import MpfMc
+
 
 class Scriptlet:
+
+    """DEPRECATED scriptlet in MPF-MC."""
 
     def __init__(self, mc, name):
         self.mc = mc
