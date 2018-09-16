@@ -110,7 +110,7 @@ class MpfMc(App):
 
         self.animation_configs = dict()
         self.active_slides = dict()
-        self.scriptlets = list()
+        self.custom_code = list()
 
         self.register_boot_hold('init')
         self.displays = DeviceCollection(self, "displays", "displays")
@@ -379,7 +379,7 @@ class MpfMc(App):
         self.events.post("init_phase_3")
         # no events docstring as this event is also in mpf
         self.events.process_event_queue()
-        self._load_scriptlets()
+        self._load_custom_code()
         self.events.post("init_phase_4")
         # no events docstring as this event is also in mpf
         self.events.process_event_queue()
@@ -555,23 +555,37 @@ class MpfMc(App):
         self.ticks += 1
         self.events.process_event_queue()
 
-    def _load_scriptlets(self):
+    def _load_custom_code(self):
         if 'mc_scriptlets' in self.machine_config:
             self.machine_config['mc_scriptlets'] = (
                 self.machine_config['mc_scriptlets'].split(' '))
 
-            self.log.debug("Loading scriptlets...")
+            self.log.debug("Loading scriptlets... (deprecated)")
 
             for scriptlet in self.machine_config['mc_scriptlets']:
 
-                self.log.debug("Loading '%s' scriptlet", scriptlet)
+                self.log.debug("Loading '%s' scriptlet (deprecated)", scriptlet)
 
                 scriptlet_obj = Util.string_to_class(
                     self.machine_config['mpf-mc']['paths']['scriptlets'] +
                     "." + scriptlet)(mc=self,
                                      name=scriptlet.split('.')[1])
 
-                self.scriptlets.append(scriptlet_obj)
+                self.custom_code.append(scriptlet_obj)
+
+        if 'mc_custom_code' in self.machine_config:
+            self.log.debug("Loading custom_code...")
+
+            for custom_code in self.machine_config['mc_custom_code']:
+
+                self.log.debug("Loading '%s' custom_code", custom_code)
+
+                custom_code_obj = Util.string_to_class(
+                    self.machine_config['mpf-mc']['paths']['scriptlets'] +
+                    "." + custom_code)(mc=self,
+                                     name=custom_code.split('.')[1])
+
+                self.custom_code.append(custom_code_obj)
 
     def _check_crash_queue(self, dt):
         del dt
