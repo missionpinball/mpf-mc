@@ -12,6 +12,7 @@ class McCustomCode(LogMixin):
     """Custom code in MPF-MC."""
 
     def __init__(self, mc, name):
+        super().__init__()
         self.mc = mc        # type: MpfMc
         self.name = name    # type: str
         self.configure_logging('McCustomCode.' + name, 'basic', 'full')
@@ -37,7 +38,7 @@ class McCustomCode(LogMixin):
 
     def on_load(self):  # pragma: no cover
         """Automatically called when this custom code class loads.
-        
+
         It's the intention that the custom code writer will overwrite this method.
         """
         pass
