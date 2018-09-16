@@ -1,9 +1,4 @@
 """Test high score mode."""
-from collections import OrderedDict
-import time
-
-from mpf.tests.MpfFakeGameTestCase import MpfFakeGameTestCase
-
 from mpfmc.tests.MpfSlideTestCase import MpfSlideTestCase
 
 from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
