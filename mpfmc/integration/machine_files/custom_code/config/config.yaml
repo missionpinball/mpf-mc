@@ -1,0 +1,4 @@
+#config_version=5
+
+mc_custom_code:
+- my_code.MyCode
