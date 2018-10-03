@@ -23,18 +23,6 @@ widget_styles:
     font_size: 10
     adjust_top: 2
     adjust_bottom: 3
-  space title huge:
-    font_name: DEADJIM
-    font_size: 29
-    antialias: true
-    adjust_top: 3
-    adjust_bottom: 3
-  space title:
-    font_name: DEADJIM
-    font_size: 21
-    antialias: true
-    adjust_top: 2
-    adjust_bottom: 3
   medium:
     font_name: pixelmix
     font_size: 8
@@ -45,7 +33,7 @@ widget_styles:
     font_size: 9
     adjust_top: 2
     adjust_bottom: 3
-  tall title:
+  tall_title:
     font_name: big_noodle_titling
     font_size: 20
 
@@ -60,7 +48,7 @@ slides:
         dot_color: ff5500
         background_color: 220000
   - type: text
-    style: tall title
+    style: tall_title
     text: MISSION PINBALL FRAMEWORK
     anchor_y: top
     y: top-2
@@ -71,7 +59,7 @@ slides:
     height: 130
     color: 444444
   - type: text
-    style: tall title
+    style: tall_title
     text: DEMO MAN
     anchor_x: right
     anchor_y: bottom

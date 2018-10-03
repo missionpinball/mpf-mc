@@ -375,15 +375,20 @@ class Widget(KivyWidget):
         """Apply any style to the widget that is specified in the config."""
         if not self.config['style'] or force_default:
             if self._default_style:
-                style = self._default_style
+                styles = [self._default_style]
             else:
                 return
         else:
             try:
-                style = self.mc.machine_config['widget_styles'][self.config['style']]
-            except KeyError:
+                styles = [self.mc.machine_config['widget_styles'][s] for s in self.config['style']]
+            except KeyError as e:
+                # TOOD: After sufficient time post-0.51, remove this breaking-change-related message
+                if " ".join(self.config['style']) in self.mc.machine_config['widget_styles']:
+                    raise ValueError("{} has an invalid style name: {}. ".format(self, e) +
+                        "Please note that as of MPF 0.51, spaces are no longer valid " +
+                        "in widget style names (see '{}')".format(" ".join(self.config['style'])))
                 raise ValueError("{} has an invalid style name: {}".format(
-                    self, self.config['style']))
+                    self, e))
 
         found = False
 
@@ -394,9 +399,10 @@ class Widget(KivyWidget):
 
             # Then it sets the attributes directly since the config was already
             # processed.
-            for attr in [x for x in style if
-                         x not in self.config['_default_settings']]:
-                self.config[attr] = style[attr]
+            for style in styles:
+                for attr in [x for x in style if
+                             x not in self.config['_default_settings']]:
+                    self.config[attr] = style[attr]
 
             found = True
 

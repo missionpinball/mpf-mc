@@ -49,6 +49,18 @@ class TestWidgetStyles(MpfMcTestCase):
 
         self.assertEqual(self.get_widget().font_size, 50)
 
+    def test_stacked_styles(self):
+        self.mc.events.post('slide6')
+        self.advance_time()
+        self.assertEqual(self.get_widget().font_size, 100)
+        self.assertEqual(self.get_widget().color, [0.0, 0.0, 1.0, 1]);
+
+    def test_stacked_order_overrides(self):
+        self.mc.events.post('slide7')
+        self.advance_time()
+        self.assertEqual(self.get_widget().font_size, 21)
+        self.assertEqual(self.get_widget().color, [0.0, 0.0, 1.0, 1]);
+
     # todo some future release
 
     # def test_mode_style(self):
