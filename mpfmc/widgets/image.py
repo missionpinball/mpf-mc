@@ -41,8 +41,13 @@ class ImageWidget(Widget):
                 pass
 
         if not self._image:
-            raise ValueError("Cannot add Image widget. Image '{}' is not a "
-                             "valid image name.".format(self.config['image']))
+            if not self.mc.asset_manager.initial_assets_loaded:
+                raise ValueError("Tried to use an image '{}' when the initial asset loading run has not yet been "
+                                 "completed. Try to use 'init_done' as event to show your slides if you want to "
+                                 "use images.".format(self.config['image']))
+            else:
+                raise ValueError("Cannot add Image widget. Image '{}' is not a "
+                                 "valid image name.".format(self.config['image']))
 
         # Updates the config for this widget to pull in any defaults that were
         # in the asset config
