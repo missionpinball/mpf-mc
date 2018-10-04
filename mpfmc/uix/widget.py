@@ -82,13 +82,6 @@ class Widget(KivyWidget):
         self.mc = mc
         self.mc.track_leak_reference(self)
 
-        # Create a container widget as this widget's parent.  The container will adjust
-        # the coordinate system for this widget so that all positional properties are
-        # based on the widget's anchor rather than the lower left corner.
-        self._container = WidgetContainer(self, z=self.config['z'])
-        self._container.add_widget(self)
-        self._container.fbind('parent', self.on_container_parent)
-
         self.animation = None
         self._animation_event_keys = set()
         # MPF event keys for event handlers that have been registered for
@@ -106,6 +99,13 @@ class Widget(KivyWidget):
         self._default_style = None
         self._set_default_style()
         self._apply_style()
+
+        # Create a container widget as this widget's parent.  The container will adjust
+        # the coordinate system for this widget so that all positional properties are
+        # based on the widget's anchor rather than the lower left corner.
+        self._container = WidgetContainer(self, z=self.config['z'])
+        self._container.add_widget(self)
+        self._container.fbind('parent', self.on_container_parent)
 
         if 'color' in self.config and not isinstance(self.config['color'], RGBAColor):
             self.config['color'] = RGBAColor(self.config['color'])
