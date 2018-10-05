@@ -129,69 +129,13 @@ class Slide(Screen, StencilView):
         if name not in self.mc.widgets:
             raise ValueError("Widget {} not found".format(name))
 
-        return self.add_widgets_from_config(config=self.mc.widgets[name],
+        widgets_added = create_widget_objects_from_config(config=self.mc.widgets[name],
+                                            mc=self.mc,
                                             key=key,
                                             widget_settings=widget_settings,
                                             play_kwargs=play_kwargs)
-
-    def add_widgets_from_config(self, config: dict, key: Optional[str] = None,
-                                widget_settings: Optional[dict] = None,
-                                play_kwargs: Optional[dict] = None) -> List["Widget"]:
-        """Add one or more widgets to the slide from a config dictionary.
-
-        Args:
-            config: The configuration dictionary for the widgets to be added.
-            key: An optional key.
-            widget_settings: An optional dictionary of widget settings to override those in
-                the config.
-            play_kwargs: An optional dictionary of play settings to override those in
-                the config.
-
-        Returns:
-            A list of widgets (MpfWidget objects) added to the slide.
-        """
-
-        if not isinstance(config, list):
-            config = [config]
-        widgets_added = list()
-
-        if not play_kwargs:
-            play_kwargs = dict()  # todo
-
-        for widget in config:
-            if widget_settings:
-                widget_settings = self.mc.config_validator.validate_config(
-                    'widgets:{}'.format(widget['type']), widget_settings,
-                    base_spec='widgets:common', add_missing_keys=False)
-
-                widget.update(widget_settings)
-
-            configured_key = widget.get('key', None)
-
-            if (configured_key and key and "." not in key and
-                    configured_key != key):
-                raise KeyError("Widget has incoming key '{}' which does not "
-                               "match the key in the widget's config "
-                               "'{}'.".format(key, configured_key))
-
-            if configured_key:
-                this_key = configured_key
-            else:
-                this_key = key
-
-            # Create the new widget
-            widget_obj = self.mc.widgets.type_map[widget['type']](
-                mc=self.mc, config=widget, slide=self, key=this_key, play_kwargs=play_kwargs)
-
-            top_widget = widget_obj
-
-            # some widgets (like slide frames) have parents, so we need to make
-            # sure that we add the parent widget to the slide
-            while top_widget.parent:
-                top_widget = top_widget.parent
-
-            self.add_widget(top_widget)
-            widgets_added.append(widget_obj)
+        for widget in widgets_added:
+            self.add_widget(widget)
 
         return widgets_added
 

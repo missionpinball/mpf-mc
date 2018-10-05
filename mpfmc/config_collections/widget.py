@@ -38,6 +38,12 @@ class WidgetCollection(ConfigCollection):
         return widget_list
 
     def process_widget(self, config: dict) -> dict:
+        if config.get('widget'):
+            try:
+                widget = self.mc.widgets[config.get('widget')]
+                return config
+            except KeyError:
+                raise ValueError('"{}" is not a valid widget name.'.format(config.get('widget')))
         # config is localized widget settings
         try:
             widget_cls = WidgetCollection.type_map[config['type']]
