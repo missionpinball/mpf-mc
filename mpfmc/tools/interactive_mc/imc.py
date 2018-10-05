@@ -41,14 +41,14 @@ class InteractiveMc(App):
         super().__init__(**kwargs)
 
         self.config_validator = ConfigValidator(self)
-        self.mpf_config_processor = MpfConfigProcessor()
+        self.mpf_config_processor = MpfConfigProcessor(self.config_validator)
         files = [os.path.join(mpfmc.__path__[0], 'tools/interactive_mc/imcconfig.yaml')]
         self.machine_config = self.mpf_config_processor.load_config_files_with_cache(files, "machine")
         self.machine_config['mpf'] = dict()
         self.machine_config['mpf']['allow_invalid_config_sections'] = True
         self.config = self.machine_config
         self._initialized = False
-        self.options = dict(bcp=True)
+        self.options = dict(bcp=True, production=False)
         self.clock = ClockBase(self)
 
         # needed for bcp
