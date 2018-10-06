@@ -924,6 +924,11 @@ def create_widget_objects_from_library(mc: "MpfMc", name: str,
         A list of the MpfWidget objects created.
     """
     del kwargs
+
+    # If the name is a placeholder template, evaluate it against the args
+    if name and hasattr(name, "evaluate"):
+        name = name.evaluate(play_kwargs)
+
     if name not in mc.widgets:
         raise ValueError("Widget {} not found".format(name))
 

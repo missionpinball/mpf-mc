@@ -5,6 +5,7 @@ from importlib import import_module
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
 from mpfmc.core.config_collection import ConfigCollection
+from mpf.core.placeholder_manager import TextTemplate
 from mpfmc.uix.widget import magic_events
 
 MYPY = False
@@ -38,12 +39,17 @@ class WidgetCollection(ConfigCollection):
         return widget_list
 
     def process_widget(self, config: dict) -> dict:
-        if config.get('widget'):
+        name = config.get('widget')
+        if name:
             try:
-                widget = self.mc.widgets[config.get('widget')]
+                widget = self.mc.widgets[name]
                 return config
             except KeyError:
-                raise ValueError('"{}" is not a valid widget name.'.format(config.get('widget')))
+                # If there's a placeholder, accept that there's no widget by that name
+                if "(" in name and ")" in name:
+                    config["widget"] = TextTemplate(self.machine, name.replace("(", "{").replace(")", "}"))
+                    return config
+                raise ValueError('"{}" is not a valid widget name.'.format(name))
         # config is localized widget settings
         try:
             widget_cls = WidgetCollection.type_map[config['type']]
