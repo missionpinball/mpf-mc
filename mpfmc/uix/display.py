@@ -473,13 +473,13 @@ class Display(ScreenManager):
         else:
             new_slide = None
 
+        # Set the new slide first, so we can transition out of the old before removing
+        if new_slide:
+            self._set_current_slide(new_slide)
         try:
             self.remove_widget(slide)
         except ScreenManagerException:
             return False
-        finally:
-            if new_slide:
-                self._set_current_slide(new_slide)
 
         return True
 
