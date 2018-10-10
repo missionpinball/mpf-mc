@@ -247,6 +247,15 @@ widgets:
             value: 0.75
             duration: 1s
             easing: out_quint
+  widget_reusable:
+    - type: text
+      text: Reusable Widget
+  widget_placeholder_value1:
+    - type: text
+      text: Value One
+  widget_placeholder_value2:
+    - type: text
+      text: Value Two
 
 widget_player:
   add_widget1_to_current: widget1
