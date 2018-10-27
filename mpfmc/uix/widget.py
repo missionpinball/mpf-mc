@@ -1,3 +1,4 @@
+# pylint: disable-msg=too-many-lines
 """A widget on a slide."""
 from typing import Union, Optional, List, Tuple
 from copy import deepcopy

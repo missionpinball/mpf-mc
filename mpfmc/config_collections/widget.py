@@ -4,8 +4,8 @@ from importlib import import_module
 
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
-from mpfmc.core.config_collection import ConfigCollection
 from mpf.core.placeholder_manager import TextTemplate
+from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.uix.widget import magic_events
 
 MYPY = False
@@ -38,18 +38,21 @@ class WidgetCollection(ConfigCollection):
 
         return widget_list
 
+    def _load_widget_by_name(self, config) -> dict:
+        # Replace placeholders
+        if "(" in config['name'] and ")" in config['name']:
+            config = dict(config)
+            config["widget"] = TextTemplate(self.machine, config['name'].replace("(", "{").replace(")", "}"))
+
+        if config['name'] not in self.mc.widgets:
+            raise ValueError('"{}" is not a valid widget name.'.format(config['name']))
+
+        return config
+
     def process_widget(self, config: dict) -> dict:
-        name = config.get('widget')
-        if name:
-            try:
-                widget = self.mc.widgets[name]
-                return config
-            except KeyError:
-                # If there's a placeholder, accept that there's no widget by that name
-                if "(" in name and ")" in name:
-                    config["widget"] = TextTemplate(self.machine, name.replace("(", "{").replace(")", "}"))
-                    return config
-                raise ValueError('"{}" is not a valid widget name.'.format(name))
+        if "name" in config:
+            return self._load_widget_by_name(config)
+
         # config is localized widget settings
         try:
             widget_cls = WidgetCollection.type_map[config['type']]
