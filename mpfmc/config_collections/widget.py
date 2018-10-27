@@ -40,17 +40,17 @@ class WidgetCollection(ConfigCollection):
 
     def _load_widget_by_name(self, config) -> dict:
         # Replace placeholders
-        if "(" in config['name'] and ")" in config['name']:
+        if "(" in config['widget'] and ")" in config['widget']:
             config = dict(config)
-            config["widget"] = TextTemplate(self.machine, config['name'].replace("(", "{").replace(")", "}"))
+            config["widget"] = TextTemplate(self.machine, config['widget'].replace("(", "{").replace(")", "}"))
 
-        if config['name'] not in self.mc.widgets:
-            raise ValueError('"{}" is not a valid widget name.'.format(config['name']))
+        elif config['widget'] not in self.mc.widgets:
+            raise ValueError('"{}" is not a valid widget name.'.format(config['widget']))
 
         return config
 
     def process_widget(self, config: dict) -> dict:
-        if "name" in config:
+        if config.get("widget"):
             return self._load_widget_by_name(config)
 
         # config is localized widget settings
