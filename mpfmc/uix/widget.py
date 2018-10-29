@@ -1,3 +1,4 @@
+# pylint: disable-msg=too-many-lines
 """A widget on a slide."""
 from typing import Union, Optional, List, Tuple
 from copy import deepcopy
@@ -844,11 +845,13 @@ def create_widget_objects_from_config(mc: "MpfMc", config: Union[dict, list],
     Creates one or more widgets from config settings.
 
     Args:
-        mc:
-        config:
-        key:
-        play_kwargs:
-        widget_settings:
+        mc: An instance of MC
+        config: The configuration dictionary for the widgets to be created.
+        key: An optional key.
+        play_kwargs: An optional dictionary of play settings to override those in
+            the config.
+        widget_settings: An optional dictionary of widget settings to override those in
+            the config.
 
     Returns:
         A list of the WidgetContainer objects created.
@@ -861,6 +864,14 @@ def create_widget_objects_from_config(mc: "MpfMc", config: Union[dict, list],
         play_kwargs = dict()  # todo
 
     for widget in config:
+        # Lookup a pre-defined widget based on a name
+        name = widget.get('widget', None)
+        if name:
+            widgets_added += create_widget_objects_from_library(name=name,
+                                                                mc=mc,
+                                                                play_kwargs=play_kwargs,
+                                                                widget_settings=widget_settings)
+            continue
         if widget_settings:
             widget_settings = mc.config_validator.validate_config(
                 'widgets:{}'.format(widget['type']), widget_settings,
@@ -914,6 +925,11 @@ def create_widget_objects_from_library(mc: "MpfMc", name: str,
         A list of the MpfWidget objects created.
     """
     del kwargs
+
+    # If the name is a placeholder template, evaluate it against the args
+    if name and hasattr(name, "evaluate"):
+        name = name.evaluate(play_kwargs)
+
     if name not in mc.widgets:
         raise ValueError("Widget {} not found".format(name))
 

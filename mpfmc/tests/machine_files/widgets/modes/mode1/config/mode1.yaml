@@ -18,3 +18,19 @@ widget_player:
       key: newton_crosby
       widget_settings:
         text: UPDATED TEXT
+  show_widget_with_placeholder: widget_with_placeholder
+
+widgets:
+  widget_with_placeholder:
+    - type: text
+      text: Placeholder widget
+    - widget: widget_placeholder_(value)
+
+slide_player:
+  show_slide_with_named_widget: slide_with_named_widget
+
+slides:
+  slide_with_named_widget:
+    - type: text
+      text: One Use Widget
+    - widget: widget_reusable

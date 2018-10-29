@@ -470,18 +470,25 @@ class Display(ScreenManager):
                     self.current_slide.transition_out)
             else:
                 self.transition = NoTransition()
+
+            self.transition.bind(on_complete=self._remove_transition)
         else:
             new_slide = None
 
+        # Set the new slide first, so we can transition out of the old before removing
+        if new_slide:
+            self._set_current_slide(new_slide)
         try:
             self.remove_widget(slide)
         except ScreenManagerException:
             return False
-        finally:
-            if new_slide:
-                self._set_current_slide(new_slide)
 
         return True
+
+    def _remove_transition(self, transition):
+        """Remove transition if done."""
+        if self.transition == transition:
+            self.transition = NoTransition()
 
     def _set_current_slide(self, slide: "Slide"):
         # slide frame requires at least one slide, so if you try to set current

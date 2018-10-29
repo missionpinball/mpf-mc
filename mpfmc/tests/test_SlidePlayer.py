@@ -133,6 +133,8 @@ class TestSlidePlayer(MpfMcTestCase):
         self.assertEqual(len(self.mc.targets['display1'].slides),
                          num_slides - 1)
 
+        self.advance_time(.1)
+
         gc.collect()
         self.assertFalse(slide())
 

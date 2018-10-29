@@ -324,6 +324,38 @@ class TestWidget(MpfMcTestCase):
         # List with multiple items and custom z orders
         self.assertIn('widget4', self.mc.widgets)
 
+    def test_widget_reused_by_name(self):
+        self.assertIn('widget_reusable', self.mc.widgets)
+
+        # Named widgets can only be used in modes
+        self.mc.modes['mode1'].start()
+        self.mc.events.post('show_slide_with_named_widget')
+        self.advance_time()
+        current_slide = self.mc.targets['default'].current_slide
+
+        self.assertEqual(self.mc.targets['default'].current_slide.name, 'slide_with_named_widget')
+        self.assertIn("One Use Widget", [x.widget.text for x in current_slide.widgets])
+        self.assertIn("Reusable Widget", [x.widget.text for x in current_slide.widgets])
+
+    def test_widget_with_placeholder(self):
+        self.assertIn('widget_placeholder_value1', self.mc.widgets)
+        self.assertIn('widget_placeholder_value2', self.mc.widgets)
+        self.mc.targets['default'].add_slide(name='blank_slide_one')
+        self.mc.targets['default'].add_slide(name='blank_slide_two')
+        self.mc.modes['mode1'].start()
+
+        self.mc.targets['default'].show_slide('blank_slide_one')
+        self.mc.events.post('show_widget_with_placeholder', value="value1")
+        self.advance_time()
+        self.assertEqual(["Placeholder widget", "Value One"],
+                         [x.widget.text for x in self.mc.targets['default'].current_slide.widgets])
+
+        self.mc.targets['default'].show_slide('blank_slide_two')
+        self.mc.events.post('show_widget_with_placeholder', value="value2")
+        self.advance_time()
+        self.assertEqual(["Placeholder widget", "Value Two"],
+                         [x.widget.text for x in self.mc.targets['default'].current_slide.widgets])
+
     def test_widget_z_order_from_named_widget(self):
         self.mc.targets['default'].add_slide(name='slide1')
         self.mc.targets['default'].show_slide('slide1')
