@@ -533,11 +533,11 @@ cdef class TrackSoundLoop(Track):
         # By default, all layers will continue to loop when played
         layer.looping = True
 
-        # Layer volume (use layer settings or sound setting if None)
+        # Layer volume (multiply layer setting by sound setting or use sound setting if None)
         if layer_settings['volume']:
-            layer.volume = <Uint8>(layer_settings['volume'] * SDL_MIX_MAXVOLUME)
+            layer.volume = <Uint8>(min(layer_settings['volume'] * sound.volume * SDL_MIX_MAXVOLUME), SDL_MIX_MAXVOLUME)
         else:
-            layer.volume = <Uint8>(sound.volume * SDL_MIX_MAXVOLUME)
+            layer.volume = <Uint8>(min(sound.volume * SDL_MIX_MAXVOLUME), SDL_MIX_MAXVOLUME)
 
         # Markers (copy from source sound)
         layer.marker_count = sound.marker_count

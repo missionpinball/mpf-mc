@@ -752,15 +752,18 @@ class SoundInstance:
 
         # TODO: Implement parameter validation for overridden parameters
 
+        # Volume is handled differently than most other settings.  The supplied parameter value is multiplied
+        # by the original sound asset value rather than simply overriding it. Volume must be clamped to the
+        # range 0.0 to 1.0.
+        if 'volume' in settings and settings['volume'] is not None:
+            self._volume = min(max(float(settings['volume'] * self._sound.volume), 0.0), 1.0)
+
         # Assign any overridden parameter values
         if 'track' in settings and settings['track'] is not None:
             self._track = settings['track']
 
         if 'loops' in settings and settings['loops'] is not None:
             self._loops = settings['loops']
-
-        if 'volume' in settings and settings['volume'] is not None:
-            self._volume = settings['volume']
 
         if 'pan' in settings and settings['pan'] is not None:
             self._pan = settings['pan']
