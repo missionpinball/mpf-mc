@@ -39,10 +39,10 @@ matrix:
      osx_image: xcode8.3  # OS 10.12
    - os: osx
      language: generic
-     osx_image: xcode8  # OS 10.11
+     osx_image: xcode9.4
    - os: osx
      language: generic
-     osx_image: xcode6.4  # OS 10.10
+     osx_image: xcode10.1
 
 services:
   - docker
@@ -53,21 +53,16 @@ before_install:
 
 install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      mkdir /tmp/downloads;
-      cd /tmp/downloads;
-      wget --retry-connrefused --waitretry=1 -O mac_frameworks.zip https://mpf.kantert.net/mpf_mac_frameworks.zip;
-      unzip -q mac_frameworks.zip;
-      sudo cp -r frameworks/*.* /Library/Frameworks;
-    fi;
-  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      curl --progress-bar -S https://www.python.org/ftp/python/3.5.4/python-3.5.4-macosx10.6.pkg -o python-3.5.4-macosx10.6.pkg;
-      sudo installer -pkg python-3.5.4-macosx10.6.pkg -target /;
+      curl --progress-bar -S https://www.python.org/ftp/python/3.6.7/python-3.6.7-macosx10.6.pkg -o python-3.6.7-macosx10.6.pkg;
+      sudo installer -pkg python-3.6.7-macosx10.6.pkg -target /;
       curl -sS https://bootstrap.pypa.io/get-pip.py > get-pip.py;
       sudo python3 get-pip.py;
     fi;
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       cd ${TRAVIS_BUILD_DIR};
-      pip3 install setuptools Cython==0.25.2 --upgrade;
+      pip3 install setuptools Cython==0.26.1 --upgrade;
+      brew update;
+      brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
       git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
       pip3 install -e _mpf/;
       pip3 install .;
