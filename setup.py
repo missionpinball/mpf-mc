@@ -578,10 +578,10 @@ install_requires = ['ruamel.yaml>=0.10,<0.11',  # better YAML library
                     'pygments',  # YAML syntax formatting for the iMC
                     'pypiwin32>=223;platform_system=="Windows" and python_version>"3.4"',
                     'pypiwin32<=219;platform_system=="Windows" and python_version=="3.4"',
-                    'kivy.deps.sdl2==0.1.17;platform_system=="Windows" and python_version=="3.4',
-                    'kivy.deps.sdl2==0.1.18;platform_system=="Windows" and python_version>"3.4',
-                    'kivy.deps.sdl2_dev==0.1.17;platform_system=="Windows" and python_version=="3.4',
-                    'kivy.deps.sdl2_dev==0.1.18;platform_system=="Windows" and python_version>"3.4',
+                    'kivy.deps.sdl2==0.1.18;platform_system=="Windows" and python_version>"3.4"',
+                    'kivy.deps.sdl2==0.1.17;platform_system=="Windows" and python_version=="3.4"',
+                    'kivy.deps.sdl2_dev==0.1.18;platform_system=="Windows" and python_version>"3.4"',
+                    'kivy.deps.sdl2_dev==0.1.17;platform_system=="Windows" and python_version=="3.4"',
                     'kivy.deps.glew==0.1.10;platform_system=="Windows"',
                     'kivy.deps.gstreamer==0.1.13;platform_system=="Windows"',
                     ]
