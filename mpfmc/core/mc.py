@@ -177,6 +177,11 @@ class MpfMc(App):
         # force setting it here so we have it before MPF connects
         self.receive_machine_var_update('mpfmc_ver', __version__, 0, True)
 
+    @staticmethod
+    def load_external_platform_config_specs():
+        """Load config spec for external platforms."""
+        return
+
     def track_leak_reference(self, element):
         """Track elements to find leaks."""
         if not self.options["production"]:
