@@ -408,7 +408,7 @@ cdef class TrackStandard(Track):
         """Return the number of currently playing instances of the given sound id"""
         cdef int count = 0
         SDL_LockAudio()
-        
+
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle and \
                             self.type_state.sound_players[i].current.sound_id == sound_id:
@@ -423,7 +423,7 @@ cdef class TrackStandard(Track):
         cdef Uint64 instance_id
 
         SDL_LockAudio()
-        
+
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle and \
                             self.type_state.sound_players[i].current.sound_id == sound_id:
@@ -432,7 +432,7 @@ cdef class TrackStandard(Track):
                     instance_id = self.type_state.sound_players[i].next.sound_instance_id
                 else:
                     instance_id = self.type_state.sound_players[i].current.sound_instance_id
-                
+
                 if instance_id in self._playing_instances_by_id:
                     instances.append(self._playing_instances_by_id[instance_id])
 
@@ -442,7 +442,7 @@ cdef class TrackStandard(Track):
     def _get_oldest_playing_sound_instance(self, Uint64 sound_id):
         """Return the oldest sound instance currently playing"""
         cdef list playing_instances = self._get_playing_sound_instances(sound_id)
-        
+
         if not playing_instances:
             return None
 
@@ -456,7 +456,7 @@ cdef class TrackStandard(Track):
     def _get_newest_playing_sound_instance(self, Uint64 sound_id):
         """Return the newest sound instance currently playing"""
         cdef list playing_instances = self._get_playing_sound_instances(sound_id)
-        
+
         if not playing_instances:
             return None
 
@@ -1417,7 +1417,7 @@ cdef class TrackStandard(Track):
                 # Process markers (do any markers fall in the current chunk?)
                 # Note: the current sample position has already been incremented when the sample data was received so
                 # we need to look backwards from the current position to determine if marker falls in chunk window.
-                
+
                 # About to finish marker
                 if player.current.about_to_finish_marker != no_marker:
                     if player.current.sample_pos - current_chunk_bytes <= player.current.about_to_finish_marker < player.current.sample_pos:
@@ -1433,7 +1433,7 @@ cdef class TrackStandard(Track):
                                                                 player.current.sound_id,
                                                                 player.current.sound_instance_id,
                                                                 track)
-                
+
                 # User-defined markers
                 for marker_id in range(player.current.marker_count):
                     if player.current.sample_pos - current_chunk_bytes <= g_array_index_uint(player.current.markers, marker_id) < player.current.sample_pos:
@@ -1553,7 +1553,8 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
         if samples_remaining_to_output < samples_remaining_in_sound:
 
             # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
-            if channels == 2:
+            if channels == 2 and False:
+                # disabled for now
                 Track.mix_audio_stereo(output_buffer + buffer_pos,
                                        <Uint8*>sound.sample.data.memory.data + sound.sample_pos,
                                        samples_remaining_to_output,
@@ -1569,7 +1570,8 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
             return False
         else:
             # Entire sound buffer consumed. Mix in remaining samples
-            if channels == 2:
+            if channels == 2 and False:
+                # disabled for now
                 Track.mix_audio_stereo(output_buffer + buffer_pos,
                                        <Uint8*>sound.sample.data.memory.data + sound.sample_pos,
                                        samples_remaining_to_output,
@@ -1645,7 +1647,8 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
             # Determine if we are consuming the entire buffer of streaming samples, or just a portion of it
             if samples_remaining_to_output < samples_remaining_in_map:
                 # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
-                if channels == 2:
+                if channels == 2 and False:
+                    # disabled for now
                     Track.mix_audio_stereo(output_buffer + buffer_pos,
                                            sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
                                            samples_remaining_to_output,
@@ -1664,7 +1667,8 @@ cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8
                 return False
             else:
                 # Entire buffer of leftover samples consumed.  Free the buffer resources to prepare for next call
-                if channels == 2:
+                if channels == 2 and False:
+                    # disabled for now
                     Track.mix_audio_stereo(output_buffer + buffer_pos,
                                            sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
                                            samples_remaining_to_output,

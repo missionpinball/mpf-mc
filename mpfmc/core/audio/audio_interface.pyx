@@ -817,4 +817,5 @@ cdef class AudioInterface:
                                           buffer_length)
 
         # Apply master volume to output buffer
-        Track.apply_volume(output_buffer, output_buffer, buffer_length, callback_data.master_volume)
+        # Track.apply_volume(output_buffer, output_buffer, buffer_length, callback_data.master_volume)
+        SDL_MixAudioFormat(output_buffer, output_buffer, callback_data.format, buffer_length, callback_data.master_volume)
