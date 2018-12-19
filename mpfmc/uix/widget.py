@@ -122,7 +122,7 @@ class Widget(KivyWidget):
         # Build animations
         if 'animations' in self.config and self.config['animations']:
             for k, v in self.config['animations'].items():
-                if k == 'add_to_slide':
+                if k.split("{")[0] == 'add_to_slide':
                     # needed because the initial properties of the widget
                     # aren't set yet
                     Clock.schedule_once(self.on_add_to_slide, -1)
@@ -628,7 +628,11 @@ class Widget(KivyWidget):
         if 'add_to_slide' in self.config['reset_animations_events']:
             self.reset_animations()
 
-        self.start_animation_from_event('add_to_slide')
+        for k in self.config['animations'].keys():
+            event, placeholder = self.mc.events.get_event_and_condition_from_string(k);
+            if event == 'add_to_slide' and (not placeholder or placeholder.evaluate({})):
+                self.start_animation_from_event(k)
+                break
 
     def on_remove_from_slide(self) -> None:
         """Automatically called when this widget is removed from a slide.
