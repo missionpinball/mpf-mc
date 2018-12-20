@@ -37,10 +37,7 @@ class Window:
         try:
             display = mc.displays[mc.machine_config['window']['source_display']]
         except KeyError:
-            if 'window' in mc.targets:
-                display = mc.targets['window']
-            else:
-                display = mc.targets['default']
+            display = mc.targets['default']
 
         # We need the window to map to a Display instance, so no matter what
         # we're passed, we keep on moving up until we find the actual display.
