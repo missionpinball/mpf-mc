@@ -11,6 +11,32 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
     def getMachinePath(self):
         return 'integration/machine_files/widgets_and_slides/'
 
+    def test_anonymous_slides(self):
+        self.post_event("start_mode1")
+        self.advance_time_and_run(.1)
+        self.post_event("show_anonymous_slide1")
+        self.advance_time_and_run(.1)
+
+        # anonymous slide1 is on top (mode1)
+        self.assertTextOnTopSlide("Anonymous Slide1")
+        self.assertSlideOnTop("mode1.slide_player-show_anonymous_slide1")
+
+        self.post_event("start_mode2")
+        self.advance_time_and_run(.1)
+        self.post_event("show_anonymous_slide2")
+        self.advance_time_and_run(.1)
+
+        # anonymous slide2 is on top (mode2)
+        self.assertTextOnTopSlide("Anonymous Slide2")
+        self.assertSlideOnTop("mode2.slide_player-show_anonymous_slide2")
+
+        self.post_event("stop_mode2")
+        self.advance_time_and_run(.1)
+
+        # anonymous slide1 is on top again (mode1)
+        self.assertTextOnTopSlide("Anonymous Slide1")
+        self.assertSlideOnTop("mode1.slide_player-show_anonymous_slide1")
+
     def test_mode_start_from_mc(self):
         self.start_game()
         self.mc.post_mc_native_event("start_mode6")
@@ -39,7 +65,7 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.machine.set_machine_var("test1", "l33t")
         self.advance_time_and_run(.1)
         self.assertTextInSlide('MAIN TEXT 1:1337 2:42 3:42.23 4:l33t', "variable_slide")
-        self.drain_ball()
+        self.drain_all_balls()
         self.advance_time_and_run(.1)
         self.machine.game.player["score"] = 42
         self.post_event("start_mode4")

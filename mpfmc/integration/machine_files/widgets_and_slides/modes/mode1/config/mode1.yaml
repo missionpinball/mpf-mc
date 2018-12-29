@@ -24,6 +24,11 @@ slide_player:
     slide_mode1:
       action: remove
       target: frame_mode2
+  show_anonymous_slide1:
+    widgets:
+        - type: text
+          text: Anonymous Slide1
+
 
 slides:
   slide_mode1:

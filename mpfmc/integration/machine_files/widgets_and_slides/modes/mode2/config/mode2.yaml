@@ -16,6 +16,10 @@ slide_player:
   remove_slide_mode2_frame:
     slide_mode2_frame:
       action: remove
+  show_anonymous_slide2:
+    widgets:
+        - type: text
+          text: Anonymous Slide2
 
 slides:
   slide_mode2:
