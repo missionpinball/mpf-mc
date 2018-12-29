@@ -416,7 +416,7 @@ class Display(ScreenManager):
                                    priority=priority, key=key)
 
         return self.show_slide(slide_name=slide_obj.name, transition=transition,
-                               priority=priority, force=force,
+                               priority=priority, force=force, key=key,
                                expire=expire, play_kwargs=play_kwargs)
 
     def remove_slide(self, slide: Union["Slide", str],

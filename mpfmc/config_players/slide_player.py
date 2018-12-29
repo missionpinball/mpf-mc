@@ -99,7 +99,6 @@ class McSlidePlayer(McConfigPlayer):
 
     def play(self, settings, context, calling_context, priority=0, **kwargs):
         """Process a slide_player event."""
-        del calling_context
         instance_dict = self._get_instance_dict(context)
         full_context = self._get_full_context(context)
         settings = deepcopy(settings)
@@ -119,6 +118,9 @@ class McSlidePlayer(McConfigPlayer):
 
             if s["slide"]:
                 slide = s['slide']
+            elif slide == "widgets":
+                # name of anonymous slides depends on context + event name
+                slide = "{}-{}".format(full_context, calling_context)
 
             try:
                 s['priority'] += priority
