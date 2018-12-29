@@ -263,6 +263,13 @@ widget_player:
   add_widget2_to_slide1:
     widget2:
       slide: slide1
+  update_widget2:
+    widget2:
+      action: update
+      slide: slide1
+  remove_widget2:
+    widget2:
+      action: remove
   add_widget6:
     widget6:
       widget_settings:

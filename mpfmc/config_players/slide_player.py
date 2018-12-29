@@ -117,7 +117,7 @@ class McSlidePlayer(McConfigPlayer):
 
             s.update(kwargs)
 
-            if s["slide"]:
+            if s.get("slide"):
                 slide = s['slide']
 
             try:

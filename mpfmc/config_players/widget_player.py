@@ -29,15 +29,13 @@ class McWidgetPlayer(McConfigPlayer):
 
     def _get_slide(self, s):
         slide = None
-
-        if 'slide' in s and s['slide']:
-            slide_name = s.pop('slide')
+        if s.get('slide'):
+            slide_name = s['slide']
             try:
                 slide = self.machine.active_slides[slide_name]
             except KeyError:
                 # check if slide does exist
                 if slide_name not in self.machine.slides:
-                    s['slide'] = slide_name
                     raise KeyError(
                         "Widget Player Error: Slide name '{}' is not valid "
                         "slide. Widget config that caused this: "
