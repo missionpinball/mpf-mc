@@ -46,6 +46,7 @@ class BcpProcessor:
                              'reset': self._bcp_reset,
                              'settings': self._bcp_settings,
                              'status_request': self._bcp_status_request,
+                             'evaluate_placeholder': self._evaluate_placeholder,
                              'switch': self._bcp_switch,
                              'trigger': self._bcp_trigger,
                              }
@@ -54,6 +55,12 @@ class BcpProcessor:
         self.mc.events.add_handler('mc_reset_complete', self._reset_complete)
 
         Clock.schedule_interval(self._get_from_queue, 0)
+
+    def _evaluate_placeholder(self, value=None, error=False, id=None, **kwargs):
+        del kwargs
+        print(value, error, id)
+        if id is not None:
+            self.mc.events.post("placeholder_{}".format(id), value=value)
 
     def _client_connected(self, **kwargs):
         del kwargs

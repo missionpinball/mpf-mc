@@ -14,6 +14,8 @@ MYPY = False
 if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
 
+text_id = 0
+
 
 # pylint: disable-msg=too-many-instance-attributes
 class McFontLabel(Label):
@@ -65,6 +67,8 @@ class Text(Widget):
                       'unicode_errors', 'color', 'casing')
     animation_properties = ('x', 'y', 'font_size', 'color', 'opacity', 'rotation', 'scale')
 
+    text_id = 0
+
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None,
                  play_kwargs: Optional[dict] = None, **kwargs) -> None:
         if 'bitmap_font' in config and config['bitmap_font']:
@@ -78,6 +82,8 @@ class Text(Widget):
         self.rectangle = None
         self.rotate = None
         self.scale_instruction = None
+        Text.text_id += 1
+        self.id = str(Text.text_id)
 
         super().__init__(mc=mc, config=config, key=key)
 
@@ -201,7 +207,16 @@ class Text(Widget):
             # monitors won't be added twice, so it's ok to blindly call this
             self._setup_variable_monitors(text)
 
+        if "{" not in text and "(" not in text:
+            self.update_text(text)
+        else:
+            self.mc.bcp_processor.send("subscribe_placeholder_text", placeholder=text, id=self.id)
+            self.mc.events.add_handler("placeholder_{}".format(self.id), self._update_placeholder)
+
         self.update_vars_in_text(text)
+
+    def _update_placeholder(self, value, **kwargs):
+        self.update_vars_in_text(value)
 
     def update_vars_in_text(self, text: str) -> None:
         for var_string in self._get_text_vars(text):

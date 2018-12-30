@@ -1,5 +1,5 @@
+from copy import deepcopy
 from mpf.config_players.plugin_player import PluginPlayer
-from mpf.core.config_validator import ConfigValidator
 from mpf.core.utility_functions import Util
 
 
@@ -15,6 +15,90 @@ class MpfSlidePlayer(PluginPlayer):
     """
     config_file_section = 'slide_player'
     show_section = 'slides'
+
+    __slots__ = ["slides"]
+
+    def __init__(self, machine):
+        """Initialise slide player."""
+        super().__init__(machine)
+        self.slides = None
+
+    def play(self, settings, context, calling_context, priority=0, **kwargs):
+        """Process a slide_player event."""
+        instance_dict = self._get_instance_dict(context)
+        full_context = self._get_full_context(context)
+        settings = deepcopy(settings)
+
+        self.machine.log.info("SlidePlayer: Play called with settings=%s", settings)
+
+        settings = settings['slides'] if 'slides' in settings else settings
+
+        for slide, s in settings.items():
+            slide_dict = self.machine.placeholder_manager.parse_conditional_template(slide)
+
+            if slide_dict["condition"] and not slide_dict["condition"].evaluate(kwargs):
+                continue
+            slide = slide_dict["name"]
+
+            s.update(kwargs)
+
+            if s["slide"]:
+                slide = s['slide']
+            elif slide == "widgets":
+                # name of anonymous slides depends on context + event name
+                slide = "{}-{}".format(full_context, calling_context)
+
+            try:
+                s['priority'] += priority
+            except (KeyError, TypeError):
+                s['priority'] = priority
+
+            if s['target']:
+                target_name = s['target']
+            else:
+                target_name = 'default'
+
+            if target_name not in self.machine.targets or not self.machine.targets[target_name].ready:
+                # Target does not exist yet or is not ready. Perform action when it is ready
+                raise AssertionError("Target {} not ready".format(target_name))
+
+            #target = self.machine.targets[target_name]
+
+            # remove target
+            s.pop("target")
+
+            if target_name not in instance_dict:
+                instance_dict[target_name] = {}
+
+            if s['action'] == 'play':
+                # remove slide if it already exists
+                if slide in instance_dict[target_name]:
+                    instance_dict[target_name][slide].remove()
+                    del instance_dict[target_name][slide]
+
+                self.machine.log.debug("SlidePlayer: Playing slide '%s' on target '%s' (Args=%s)",
+                                       slide,
+                                       target_name,
+                                       s)
+                # is this a named slide, or a new slide?
+                if 'widgets' in s:
+                    self.bcp_client.send("slide_create", key=full_context,
+                                              slide_name=slide, config=s["widgets"])
+                    self.bcp_client.send("slide_show", key=full_context,
+                                         slide_name=slide, config=s)
+                else:
+                    self.bcp_client.send("slide_show", key=full_context,
+                                         slide_name=slide, config=s)
+
+                # TODO: move to MC
+                #target.get_screen(slide).on_slide_play()
+
+                instance_dict[target_name][slide] = target.get_slide(slide)
+
+            elif s['action'] == 'remove' and slide in instance_dict[target_name]:
+                del instance_dict[target_name][slide]
+                self.bcp_client.send("slide_remove", slide=slide,
+                                    transition_config=s['transition'] if 'transition' in s else [])
 
     def _validate_config_item(self, device, device_settings):
         # device is slide name, device_settings
