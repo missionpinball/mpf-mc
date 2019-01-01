@@ -116,7 +116,7 @@ class McSlidePlayer(McConfigPlayer):
 
             s.update(kwargs)
 
-            if s["slide"]:
+            if s.get("slide"):
                 slide = s['slide']
             elif slide == "widgets":
                 # name of anonymous slides depends on context + event name

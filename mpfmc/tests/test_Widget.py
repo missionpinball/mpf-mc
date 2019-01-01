@@ -475,7 +475,30 @@ class TestWidget(MpfMcTestCase):
         self.mc.events.post('add_widget2_to_slide1')
         self.advance_time()
 
-        # widget1 should be in slide1, not slide2, not current slide
+        # widget2 should be in slide1, not slide2, not current slide
+        self.assertIn('widget2',
+                      [x.widget.text for x in
+                       self.mc.active_slides['slide1'].widgets])
+        self.assertNotIn('widget2',
+                         [x.widget.text for x in
+                          self.mc.active_slides['slide2'].widgets])
+        self.assertNotIn('widget2', [x.widget.text for x in self.mc.targets[
+            'default'].current_slide.widgets])
+
+        # Remove widget2
+        self.mc.events.post('remove_widget2')
+        self.advance_time()
+
+        # widget2 should not be present in slide1
+        self.assertNotIn('widget2',
+                         [x.widget.text for x in
+                          self.mc.active_slides['slide1'].widgets])
+
+        # Update widget2 on slide1
+        self.mc.events.post('update_widget2')
+        self.advance_time()
+
+        # widget2 should be in slide1, not slide2, not current slide
         self.assertIn('widget2',
                       [x.widget.text for x in
                        self.mc.active_slides['slide1'].widgets])
