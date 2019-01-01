@@ -92,7 +92,7 @@ class MpfMc(App):
         # load machine into path to load modules
         if machine_path not in sys.path:
             sys.path.append(machine_path)
-        self.config_validator = ConfigValidator(self)
+        self.config_validator = ConfigValidator(self, not options["no_load_cache"], options["create_config_cache"])
         self.mpf_config_processor = MpfConfigProcessor(self.config_validator)
         self.machine_config = self._load_config()
 
@@ -178,15 +178,6 @@ class MpfMc(App):
         self.create_machine_var('mpfmc_ver', __version__)
         # force setting it here so we have it before MPF connects
         self.receive_machine_var_update('mpfmc_ver', __version__, 0, True)
-
-    def load_external_platform_config_specs(self):
-        """Load config spec for external platforms."""
-        for platform_entry in iter_entry_points(group='mpf.platforms'):
-            config_spec = platform_entry.load().get_config_spec()
-
-            if config_spec:
-                # add specific config spec if platform has any
-                self.config_validator.load_device_config_spec(config_spec[0], config_spec[1])
 
     def track_leak_reference(self, element):
         """Track elements to find leaks."""
