@@ -37,10 +37,12 @@ class Settings(object):
 class InteractiveMc(App):
 
     def __init__(self, mpf_path, machine_path, args, **kwargs):
-
+        del mpf_path
+        del machine_path
+        del args
         super().__init__(**kwargs)
 
-        self.config_validator = ConfigValidator(self)
+        self.config_validator = ConfigValidator(self, True, False)
         self.mpf_config_processor = MpfConfigProcessor(self.config_validator)
         files = [os.path.join(mpfmc.__path__[0], 'tools/interactive_mc/imcconfig.yaml')]
         self.machine_config = self.mpf_config_processor.load_config_files_with_cache(files, "machine")
