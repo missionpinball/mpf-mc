@@ -1,0 +1,27 @@
+#config_version=5
+mode:
+ priority: 400
+ game_mode: False
+
+slide_player:
+  show_random_slide: random_slide
+
+slides:
+   random_slide:
+     expire: 2s
+     background_color: black
+     widgets:
+     - type: text
+       text: Ball Saved
+       color: white
+       y: 60%
+       anchor_x: center
+       anchor_y: bottom
+       font_size: 80
+     - type: text
+       text: Default
+       color: blue
+       y: 20%
+       anchor_x: center
+       anchor_y: bottom
+       font_size: 20

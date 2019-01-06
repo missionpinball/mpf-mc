@@ -37,6 +37,15 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.assertTextOnTopSlide("Anonymous Slide1")
         self.assertSlideOnTop("mode1.slide_player-show_anonymous_slide1")
 
+    def test_upper_case_mode(self):
+        """This used to crash."""
+        self.start_mode("Upper_Case_Mode")
+        self.post_event("show_random_slide")
+        self.advance_time_and_run(.1)
+        self.assertSlideOnTop("random_slide")
+        self.stop_mode("Upper_Case_Mode")
+        self.advance_time_and_run(.1)
+
     def test_mode_start_from_mc(self):
         self.start_game()
         self.mc.post_mc_native_event("start_mode6")
