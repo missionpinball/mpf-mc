@@ -46,14 +46,14 @@ class McConfigPlayer(DeviceConfigPlayer, metaclass=abc.ABCMeta):
             event='{}_clear'.format(self.show_section),
             handler=self.clear_from_trigger)
 
-    def play_from_trigger(self, settings, context, priority, **kwargs):
+    def play_from_trigger(self, settings, context, priority, calling_context, **kwargs):
         """Call play from BCP trigger."""
         if context not in self.instances:
             self.instances[context] = dict()
         if self.config_file_section not in self.instances[context]:
             self.instances[context][self.config_file_section] = dict()
 
-        self.play(settings=settings, context=context, calling_context="", priority=priority, **kwargs)
+        self.play(settings=settings, context=context, calling_context=calling_context, priority=priority, **kwargs)
 
     def clear_from_trigger(self, context, **kwargs):
         """Call clear_context from BCP trigger."""

@@ -185,7 +185,7 @@ class TestSlidePlayer(MpfMcTestCase):
         show_slide_section = player._validate_config_item('slide1', show_slide_section)
 
         bcp_string = encode_command_string('trigger', name='slides_play', context='test_context', priority=1,
-                                           settings=show_slide_section)
+                                           settings=show_slide_section, calling_context='event2')
 
         self.mc.bcp_processor.receive_bcp_message(bcp_string)
         self.advance_time()

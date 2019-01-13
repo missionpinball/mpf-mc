@@ -8,6 +8,7 @@ modes:
     - mode4
     - mode5
     - mode6
+    - Upper_Case_Mode
 
 dmds:
   default:
