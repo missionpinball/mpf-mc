@@ -571,7 +571,7 @@ else:
     raise RuntimeError("Unable to find MPF version string in %s." % (
         version_file,))
 
-install_requires = ['ruamel.yaml>=0.10,<0.11',  # better YAML library
+install_requires = ['ruamel.yaml==0.15.37',  # better YAML library
                     'mpf>={}'.format(mpf_version),
                     'kivy>=1.10.1',
                     'psutil',
