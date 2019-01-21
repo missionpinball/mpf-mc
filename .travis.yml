@@ -53,19 +53,15 @@ before_install:
 
 install:
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-      curl --progress-bar -S https://www.python.org/ftp/python/3.6.7/python-3.6.7-macosx10.6.pkg -o python-3.6.7-macosx10.6.pkg;
-      sudo installer -pkg python-3.6.7-macosx10.6.pkg -target /;
-      curl -sS https://bootstrap.pypa.io/get-pip.py > get-pip.py;
-      sudo python3 get-pip.py;
+      curl --progress-bar -S https://kivy.org/downloads/1.10.1/Kivy-1.10.1_osx10.13.5_packaged_python3.6.5_r1.dmg kivy.dmg;
+      hdiutil attach kivy.dmg;
+      sudo installer -pkg /Volumes/Kivy3/Kivy3.app;
+      hdiutil detach -force kivy.dmg;
     fi;
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       cd ${TRAVIS_BUILD_DIR};
-      pip3 install setuptools Cython==0.26.1 --upgrade;
-      brew update;
-      brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
-      git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
-      pip3 install -e _mpf/;
-      pip3 install .;
+      kivy3 -m pip install -e _mpf/;
+      kivy3 -m pip install -e .;
     fi;
 
 env:
