@@ -60,7 +60,7 @@ install:
     fi;
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
       cd ${TRAVIS_BUILD_DIR};
-      pip3 install setuptools Cython==0.26.1 --upgrade;
+      pip3 install setuptools Cython==0.27.3 --upgrade;
       brew update;
       brew install pkg-config sdl2 sdl2_image sdl2_ttf sdl2_mixer gstreamer;
       git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
