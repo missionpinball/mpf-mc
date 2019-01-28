@@ -102,8 +102,7 @@ Here are several various examples:
             action = s['action'].lower()
             del s['action']
 
-            s.setdefault('track', sound.track)
-            track = self.machine.sound_system.audio_interface.get_track_by_name(s['track'])
+            track = self.machine.sound_system.audio_interface.get_track_by_name(s.get('track') or sound.track)
             if track is None:
                 self.machine.log.error("SoundPlayer: The specified track ('{}') "
                                        "does not exist. Unable to perform '{}' action "
