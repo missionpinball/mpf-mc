@@ -11,7 +11,7 @@ from mpfmc.core.mode import Mode
 
 RemoteMethod = namedtuple('RemoteMethod',
                           'method config_section kwargs priority',
-                          verbose=False)
+                          )
 """RemotedMethod is used by other modules that want to register a method to
 be called on mode_start or mode_stop.
 """
