@@ -78,12 +78,14 @@ class McWidgetPlayer(McConfigPlayer):
 
             return
 
+        priority = s.pop("priority", 1)
+
         if 'slide' in s and s['slide']:
             if s['key'] in instance_dict and isinstance(instance_dict[s['key']], EventHandlerKey):
                 self.machine.events.remove_handler_by_key(instance_dict[s['key']])
             handler = self.machine.events.add_handler(
                 "slide_{}_created".format(s['slide']), self._add_widget_to_slide_when_active,
-                slide_name=s['slide'], widget=widget, s=s, play_kwargs=play_kwargs)
+                slide_name=s['slide'], widget=widget, s=s, priority=priority, play_kwargs=play_kwargs)
             instance_dict[s['key']] = handler
 
         try:
@@ -138,7 +140,6 @@ class McWidgetPlayer(McConfigPlayer):
             settings = settings['widgets']
 
         for widget, s in settings.items():
-            s.pop('priority', None)
             action = s.pop('action')
             assert action in ('add', 'remove', 'update')
 
