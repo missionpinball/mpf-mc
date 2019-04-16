@@ -13,7 +13,7 @@ from mpfmc.widgets.quad import Quad
 from mpfmc.widgets.point import Point
 from mpfmc.widgets.triangle import Triangle
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
-from unittest.mock import MagicMock, call, ANY
+from unittest.mock import MagicMock
 
 
 class TestWidget(MpfMcTestCase):
@@ -1279,5 +1279,3 @@ class TestWidget(MpfMcTestCase):
         self.advance_real_time()
         self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events2_removed')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events2_removed_again')
-
-
