@@ -256,6 +256,20 @@ widgets:
   widget_placeholder_value2:
     - type: text
       text: Value Two
+  widget_custom_events1:
+    - type: text
+      text: Testing events
+      events_when_added: custom_events1_added
+      events_when_removed: custom_events1_removed
+  widget_custom_events2:
+    - type: rectangle
+      x: 600
+      y: 300
+      width: 100
+      height: 200
+      color: gold
+      events_when_added: custom_events2_added, custom_events2_added_again
+      events_when_removed: custom_events2_removed, custom_events2_removed_again
 
 widget_player:
   add_widget1_to_current: widget1
@@ -387,6 +401,10 @@ widget_player:
   show_triangle_widget: widget_triangle
   show_points_widget: widget_points
   show_text_widget: widget_text
+  show_custom_events1_widget: widget_custom_events1
+  show_custom_events2_widget: widget_custom_events2
+  remove_custom_events1_widget: widget_custom_events1
+  remove_custom_events2_widget: widget_custom_events2
 
 slide_player:
   show_slide_1:

@@ -143,6 +143,11 @@ class Widget(KivyWidget):
         if self.expire:
             self.schedule_removal(self.expire)
 
+        # Send custom user events when widget is added (if any are configured)
+        if self.config['events_when_added'] is not None:
+            for event in self.config['events_when_added']:
+                self.mc.post_mc_native_event(event)
+
     def __repr__(self) -> str:  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
@@ -437,6 +442,11 @@ class Widget(KivyWidget):
             pass
 
         self.on_remove_from_slide()
+
+        # Send custom user events when widget is removed (if any are configured)
+        if self.config['events_when_removed'] is not None:
+            for event in self.config['events_when_removed']:
+                self.mc.post_mc_native_event(event)
 
     def _convert_animation_value_to_float(self, prop: str,
                                           val: Union[str, int, float], event_args) -> Union[float, int]:
