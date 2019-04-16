@@ -13,6 +13,7 @@ from mpfmc.widgets.quad import Quad
 from mpfmc.widgets.point import Point
 from mpfmc.widgets.triangle import Triangle
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
+from unittest.mock import MagicMock, call, ANY
 
 
 class TestWidget(MpfMcTestCase):
