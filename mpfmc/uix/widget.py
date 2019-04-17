@@ -424,6 +424,11 @@ class Widget(KivyWidget):
         self.stop_animation()
         self._remove_animation_events()
 
+        # Send custom user events when widget is removed (if any are configured)
+        if self.config['events_when_removed'] is not None:
+            for event in self.config['events_when_removed']:
+                self.mc.post_mc_native_event(event)
+
     def schedule_removal(self, secs: float) -> None:
         """Schedule the widget to be removed after the specified number
         of seconds have elapsed."""
@@ -442,11 +447,6 @@ class Widget(KivyWidget):
             pass
 
         self.on_remove_from_slide()
-
-        # Send custom user events when widget is removed (if any are configured)
-        if self.config['events_when_removed'] is not None:
-            for event in self.config['events_when_removed']:
-                self.mc.post_mc_native_event(event)
 
     def _convert_animation_value_to_float(self, prop: str,
                                           val: Union[str, int, float], event_args) -> Union[float, int]:
