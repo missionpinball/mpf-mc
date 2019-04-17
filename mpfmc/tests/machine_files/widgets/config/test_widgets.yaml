@@ -403,8 +403,12 @@ widget_player:
   show_text_widget: widget_text
   show_custom_events1_widget: widget_custom_events1
   show_custom_events2_widget: widget_custom_events2
-  remove_custom_events1_widget: widget_custom_events1
-  remove_custom_events2_widget: widget_custom_events2
+  remove_custom_events1_widget:
+    widget_custom_events1:
+      action: remove
+  remove_custom_events2_widget:
+    widget_custom_events2:
+      action: remove
 
 slide_player:
   show_slide_1:
@@ -490,6 +494,11 @@ slide_player:
         text: NEW SLIDE
         y: 0
         anchor_y: bottom
+        events_when_added: text_on_new_slide2_added
+        events_when_removed: text_on_new_slide2_removed
+  remove_new_slide:
+    new_slide2:
+      action: remove
 
 slides:
     slide_with_lots_of_widgets:

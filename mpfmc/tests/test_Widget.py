@@ -1272,10 +1272,22 @@ class TestWidget(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events2_added_again')
 
         self.mc.events.post('remove_custom_events1_widget')
-        self.advance_real_time()
+        self.advance_real_time(0.1)
         self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events1_removed')
 
         self.mc.events.post('remove_custom_events2_widget')
         self.advance_real_time()
         self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events2_removed')
         self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events2_removed_again')
+
+        self.mc.bcp_processor.send.reset_mock()
+        self.mc.events.post('show_new_slide')
+        self.advance_real_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_on_new_slide2_added')
+
+        self.mc.events.post('show_slide_1')
+        self.mc.events.post('remove_new_slide')
+        self.advance_real_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_on_new_slide2_removed')
+
+
