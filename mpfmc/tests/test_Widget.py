@@ -13,6 +13,7 @@ from mpfmc.widgets.quad import Quad
 from mpfmc.widgets.point import Point
 from mpfmc.widgets.triangle import Triangle
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
+from unittest.mock import MagicMock
 
 
 class TestWidget(MpfMcTestCase):
@@ -1253,3 +1254,40 @@ class TestWidget(MpfMcTestCase):
         self.assertEqual(triangle_widget.rotation, -900)
         self.assertEqual(triangle_widget.scale, 1.5)
         self.assertEqual(triangle_widget.points, [100, 450, 100, 550, 200, 450])
+
+    def test_events_when_removed(self):
+        """Test events_when_removed property to ensure custom events are posted."""
+
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
+
+        self.mc.events.post('show_custom_events1_widget')
+        self.advance_real_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events1_added')
+
+        self.mc.events.post('show_custom_events2_widget')
+        self.advance_real_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events2_added')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events2_added_again')
+
+        self.mc.events.post('remove_custom_events1_widget')
+        self.advance_real_time(0.1)
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events1_removed')
+
+        self.mc.events.post('remove_custom_events2_widget')
+        self.advance_real_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events2_removed')
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='custom_events2_removed_again')
+
+        self.mc.bcp_processor.send.reset_mock()
+        self.mc.events.post('show_new_slide')
+        self.advance_real_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_on_new_slide2_added')
+
+        self.mc.events.post('show_slide_1')
+        self.mc.events.post('remove_new_slide')
+        self.advance_real_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', name='text_on_new_slide2_removed')
+
+

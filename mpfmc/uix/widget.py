@@ -143,6 +143,11 @@ class Widget(KivyWidget):
         if self.expire:
             self.schedule_removal(self.expire)
 
+        # Send custom user events when widget is added (if any are configured)
+        if self.config['events_when_added'] is not None:
+            for event in self.config['events_when_added']:
+                self.mc.post_mc_native_event(event)
+
     def __repr__(self) -> str:  # pragma: no cover
         return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
 
@@ -418,6 +423,11 @@ class Widget(KivyWidget):
         self.mc.clock.unschedule(self.remove)
         self.stop_animation()
         self._remove_animation_events()
+
+        # Send custom user events when widget is removed (if any are configured)
+        if self.config['events_when_removed'] is not None:
+            for event in self.config['events_when_removed']:
+                self.mc.post_mc_native_event(event)
 
     def schedule_removal(self, secs: float) -> None:
         """Schedule the widget to be removed after the specified number
