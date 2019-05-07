@@ -345,7 +345,6 @@ cdef class TrackSoundLoop(Track):
             player = self.type_state.current
             self._reset_player_layers(player)
             player_already_playing = False
-            player.stop_loop_at_pos = do_not_stop_loop
 
         elif self.type_state.next.status in (player_idle, player_pending):
 
@@ -458,6 +457,7 @@ cdef class TrackSoundLoop(Track):
                 player.status = player_playing
 
         player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
+        player.stop_loop_at_pos = do_not_stop_loop
 
         # Save current sound loop set so it can be referred to again while it is active (event notifications)
         self._sound_loop_set_counter += 1
@@ -595,7 +595,7 @@ cdef class TrackSoundLoop(Track):
 
         SDL_LockAudio()
 
-        self.log.debug("Jumping to %f seconds playback position in current sound loop set")
+        self.log.debug("Jumping to %f seconds playback position in current sound loop set", time)
 
         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
             self.log.info("Unable to jump to specified playback position - "
