@@ -135,6 +135,10 @@ class Command:
                             action="store_const", dest="force_platform",
                             const='virtual', help=argparse.SUPPRESS)
 
+        parser.add_argument("--vpx",
+                            action="store_const", dest="force_platform",
+                            const='virtual_pinball', help=argparse.SUPPRESS)
+
         parser.add_argument("-X",
                             action="store_const", dest="force_platform",
                             const='smart_virtual', help=argparse.SUPPRESS)
