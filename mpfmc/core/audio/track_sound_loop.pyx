@@ -380,6 +380,7 @@ cdef class TrackSoundLoop(Track):
                 # Queue until the end of the current loop
                 player.status = player_pending
                 player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
+                player.stop_loop_at_pos = do_not_stop_loop
 
                 # Ensure sample position starts on a sample frame boundary (audio distortion may occur if starting
                 # in the middle of a sample frame)
@@ -391,6 +392,9 @@ cdef class TrackSoundLoop(Track):
             elif player_settings['timing'] == 'next_time_interval':
                 # Set currently playing sample to end at the next specified time interval multiple
                 player.status = player_pending
+                player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
+                player.stop_loop_at_pos = do_not_stop_loop
+
                 self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(
                     self.type_state.current.sample_pos,
                     <Uint32>(self.state.callback_data.seconds_to_bytes_factor * player_settings['interval']),
@@ -410,6 +414,9 @@ cdef class TrackSoundLoop(Track):
             elif player_settings['timing'] == 'next_beat_interval':
                 # Set currently playing sample to end at the next specified beat interval multiple
                 player.status = player_pending
+                player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
+                player.stop_loop_at_pos = do_not_stop_loop
+
                 self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(
                     self.type_state.current.sample_pos,
                     <Uint32> (self.state.callback_data.seconds_to_bytes_factor * (
@@ -438,7 +445,8 @@ cdef class TrackSoundLoop(Track):
                         player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
                         player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
                 else:
-                    player.sample_pos = 0
+                    player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
+                    player.stop_loop_at_pos = do_not_stop_loop
                     # TODO: Add a quick fade out to current player then start new one
 
                 if player.master_sound_layer.fade_steps_remaining > 0:
@@ -451,13 +459,13 @@ cdef class TrackSoundLoop(Track):
                     player.status = player_playing
 
         else:
+            player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
+            player.stop_loop_at_pos = do_not_stop_loop
+
             if player.master_sound_layer.fade_steps_remaining > 0:
                 player.status = player_fading_in
             else:
                 player.status = player_playing
-
-        player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
-        player.stop_loop_at_pos = do_not_stop_loop
 
         # Save current sound loop set so it can be referred to again while it is active (event notifications)
         self._sound_loop_set_counter += 1
@@ -988,8 +996,10 @@ cdef class TrackSoundLoop(Track):
                                                         buffer_length, track_buffer_pos,
                                                         callback_data)
 
-            # Determine if we have reached the stop position for the loop (might not be at the end).
-            if sound_loop_track.current.sample_pos == sound_loop_track.current.stop_loop_at_pos:
+            # Determine if we have reached the stop position for the loop (might not be at the end) or the
+            # loop has finished fading out and is now idle.
+            if sound_loop_track.current.sample_pos == sound_loop_track.current.stop_loop_at_pos or \
+                    sound_loop_track.current.status == player_idle:
 
                 sound_loop_track.current.status = player_idle
 
