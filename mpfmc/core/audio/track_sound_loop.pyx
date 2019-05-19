@@ -108,22 +108,9 @@ cdef class TrackSoundLoop(Track):
     cdef _initialize_player(self, SoundLoopSetPlayer *player):
         """Initializes a SoundLoopSetPlayer struct."""
         if player != NULL:
-            player.status = player_idle
-            player.length = 0
-            player.master_sound_layer.status = layer_playing
-            player.master_sound_layer.sound = NULL
-            player.master_sound_layer.volume = 0
-            player.master_sound_layer.sound_loop_set_id = 0
-            player.master_sound_layer.sound_id = 0
-            player.master_sound_layer.fade_in_steps = 0
-            player.master_sound_layer.fade_out_steps = 0
-            player.master_sound_layer.fade_steps_remaining = 0
-            player.master_sound_layer.looping = True
-            player.master_sound_layer.marker_count = 0
-            player.master_sound_layer.markers = NULL
             player.layers = NULL
-            player.sample_pos = 0
-            player.stop_loop_at_pos = do_not_stop_loop
+            player.master_sound_layer.markers = NULL
+            self._reset_player(player)
 
     def stop_all_sounds(self, float fade_out_seconds = 0.0):
         """
@@ -343,7 +330,7 @@ cdef class TrackSoundLoop(Track):
             # synchronize settings can be ignored as we simply start playing the requested
             # loop set immediately on the current player.
             player = self.type_state.current
-            self._reset_player_layers(player)
+            self._reset_player(player)
             player_already_playing = False
 
         elif self.type_state.next.status in (player_idle, player_pending):
@@ -352,12 +339,13 @@ cdef class TrackSoundLoop(Track):
             # synchronize settings are important and dictate how the requested loop set
             # will be played.
             player = self.type_state.next
-            self._reset_player_layers(player)
             player_already_playing = True
 
             # Remove the previously pending sound_loop_set from the active sound loop set dict (if exists)
-            if self.type_state.next.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:
+            if player.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:
                 del self._active_sound_loop_sets[player.master_sound_layer.sound_loop_set_id]
+
+            self._reset_player(player)
 
         else:
             # TODO: Handle case when both players are busy (i.e. during a cross-fade)
@@ -439,15 +427,15 @@ cdef class TrackSoundLoop(Track):
                 if player_settings['synchronize']:
                     player.sample_pos = self.type_state.current.sample_pos
 
-                    # If no fade is set, use a quick cross-fade when synchronizing
-                    # (avoids pops & clicks)
-                    if player.master_sound_layer.fade_steps_remaining == 0:
-                        player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
-                        player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
                 else:
                     player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
                     player.stop_loop_at_pos = do_not_stop_loop
-                    # TODO: Add a quick fade out to current player then start new one
+
+                # If no fade is set, use a quick cross-fade when synchronizing
+                # (avoids pops & clicks)
+                if player.master_sound_layer.fade_steps_remaining == 0:
+                    player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
+                    player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
 
                 if player.master_sound_layer.fade_steps_remaining > 0:
                     player.status = player_fading_in
@@ -790,6 +778,25 @@ cdef class TrackSoundLoop(Track):
         layer_settings.looping = False
 
         SDL_UnlockAudio()
+
+    cdef _reset_player(self, SoundLoopSetPlayer *player):
+        """Reset player back to defaults (frees any allocated layer memory)."""
+        if player != NULL:
+            self._reset_player_layers(player)
+            player.status = player_idle
+            player.length = 0
+            player.master_sound_layer.status = layer_playing
+            player.master_sound_layer.sound = NULL
+            player.master_sound_layer.volume = 0
+            player.master_sound_layer.sound_loop_set_id = 0
+            player.master_sound_layer.sound_id = 0
+            player.master_sound_layer.fade_in_steps = 0
+            player.master_sound_layer.fade_out_steps = 0
+            player.master_sound_layer.fade_steps_remaining = 0
+            player.master_sound_layer.looping = True
+            player.master_sound_layer.marker_count = 0
+            player.sample_pos = 0
+            player.stop_loop_at_pos = do_not_stop_loop
 
     cdef _reset_layer(self, SoundLoopLayerSettings *layer):
         """Reset (free memory) for a single sound loop set layer."""

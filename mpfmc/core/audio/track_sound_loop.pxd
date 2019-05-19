@@ -73,6 +73,7 @@ cdef class TrackSoundLoop(Track):
 
     cdef _initialize_player(self, SoundLoopSetPlayer *player)
     cdef _apply_layer_settings(self, SoundLoopLayerSettings *layer, dict layer_settings)
+    cdef _reset_player(self, SoundLoopSetPlayer *player)
     cdef _reset_layer(self, SoundLoopLayerSettings *layer)
     cdef _reset_player_layers(self, SoundLoopSetPlayer *player)
     cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval, int bytes_per_sample_frame)

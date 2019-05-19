@@ -1311,6 +1311,7 @@ struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop {
   PyObject *(*process_notification_message)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *);
   PyObject *(*_initialize_player)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *);
   PyObject *(*_apply_layer_settings)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *, PyObject *);
+  PyObject *(*_reset_player)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *);
   PyObject *(*_reset_layer)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *);
   PyObject *(*_reset_player_layers)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *);
   Uint32 (*_round_sample_pos_up_to_interval)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, Uint32, Uint32, int);
@@ -1819,9 +1820,10 @@ static PyTypeObject *__Pyx_ImportType(const char *module_name, const char *class
 /* InitStrings.proto */
 static int __Pyx_InitStrings(__Pyx_StringTabEntry *t);
 
-static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__initialize_player(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *__pyx_v_player); /* proto*/
+static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__initialize_player(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *__pyx_v_player); /* proto*/
 static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_process_notification_message(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message); /* proto*/
 static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__apply_layer_settings(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *__pyx_v_layer, PyObject *__pyx_v_layer_settings); /* proto*/
+static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__reset_player(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *__pyx_v_player); /* proto*/
 static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__reset_layer(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *__pyx_v_layer); /* proto*/
 static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__reset_player_layers(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *__pyx_v_player); /* proto*/
 static CYTHON_INLINE Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__round_sample_pos_up_to_interval(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, Uint32 __pyx_v_sample_pos, Uint32 __pyx_v_interval, int __pyx_v_bytes_per_sample_frame); /* proto*/
@@ -3224,18 +3226,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  *         if player != NULL:
  */
 
-static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__initialize_player(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *__pyx_v_player) {
+static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__initialize_player(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *__pyx_v_player) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("_initialize_player", 0);
 
   /* "mpfmc/core/audio/track_sound_loop.pyx":110
  *     cdef _initialize_player(self, SoundLoopSetPlayer *player):
  *         """Initializes a SoundLoopSetPlayer struct."""
  *         if player != NULL:             # <<<<<<<<<<<<<<
- *             player.status = player_idle
- *             player.length = 0
+ *             player.layers = NULL
+ *             player.master_sound_layer.markers = NULL
  */
   __pyx_t_1 = ((__pyx_v_player != NULL) != 0);
   if (__pyx_t_1) {
@@ -3243,153 +3246,38 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     /* "mpfmc/core/audio/track_sound_loop.pyx":111
  *         """Initializes a SoundLoopSetPlayer struct."""
  *         if player != NULL:
- *             player.status = player_idle             # <<<<<<<<<<<<<<
- *             player.length = 0
- *             player.master_sound_layer.status = layer_playing
- */
-    __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":112
- *         if player != NULL:
- *             player.status = player_idle
- *             player.length = 0             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.status = layer_playing
- *             player.master_sound_layer.sound = NULL
- */
-    __pyx_v_player->length = 0;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":113
- *             player.status = player_idle
- *             player.length = 0
- *             player.master_sound_layer.status = layer_playing             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.sound = NULL
- *             player.master_sound_layer.volume = 0
- */
-    __pyx_v_player->master_sound_layer.status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":114
- *             player.length = 0
- *             player.master_sound_layer.status = layer_playing
- *             player.master_sound_layer.sound = NULL             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.volume = 0
- *             player.master_sound_layer.sound_loop_set_id = 0
- */
-    __pyx_v_player->master_sound_layer.sound = NULL;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":115
- *             player.master_sound_layer.status = layer_playing
- *             player.master_sound_layer.sound = NULL
- *             player.master_sound_layer.volume = 0             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.sound_loop_set_id = 0
- *             player.master_sound_layer.sound_id = 0
- */
-    __pyx_v_player->master_sound_layer.volume = 0;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":116
- *             player.master_sound_layer.sound = NULL
- *             player.master_sound_layer.volume = 0
- *             player.master_sound_layer.sound_loop_set_id = 0             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.sound_id = 0
- *             player.master_sound_layer.fade_in_steps = 0
- */
-    __pyx_v_player->master_sound_layer.sound_loop_set_id = 0;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":117
- *             player.master_sound_layer.volume = 0
- *             player.master_sound_layer.sound_loop_set_id = 0
- *             player.master_sound_layer.sound_id = 0             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.fade_in_steps = 0
- *             player.master_sound_layer.fade_out_steps = 0
- */
-    __pyx_v_player->master_sound_layer.sound_id = 0;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":118
- *             player.master_sound_layer.sound_loop_set_id = 0
- *             player.master_sound_layer.sound_id = 0
- *             player.master_sound_layer.fade_in_steps = 0             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.fade_out_steps = 0
- *             player.master_sound_layer.fade_steps_remaining = 0
- */
-    __pyx_v_player->master_sound_layer.fade_in_steps = 0;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":119
- *             player.master_sound_layer.sound_id = 0
- *             player.master_sound_layer.fade_in_steps = 0
- *             player.master_sound_layer.fade_out_steps = 0             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.fade_steps_remaining = 0
- *             player.master_sound_layer.looping = True
- */
-    __pyx_v_player->master_sound_layer.fade_out_steps = 0;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":120
- *             player.master_sound_layer.fade_in_steps = 0
- *             player.master_sound_layer.fade_out_steps = 0
- *             player.master_sound_layer.fade_steps_remaining = 0             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.looping = True
- *             player.master_sound_layer.marker_count = 0
- */
-    __pyx_v_player->master_sound_layer.fade_steps_remaining = 0;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":121
- *             player.master_sound_layer.fade_out_steps = 0
- *             player.master_sound_layer.fade_steps_remaining = 0
- *             player.master_sound_layer.looping = True             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.marker_count = 0
- *             player.master_sound_layer.markers = NULL
- */
-    __pyx_v_player->master_sound_layer.looping = 1;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":122
- *             player.master_sound_layer.fade_steps_remaining = 0
- *             player.master_sound_layer.looping = True
- *             player.master_sound_layer.marker_count = 0             # <<<<<<<<<<<<<<
- *             player.master_sound_layer.markers = NULL
- *             player.layers = NULL
- */
-    __pyx_v_player->master_sound_layer.marker_count = 0;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":123
- *             player.master_sound_layer.looping = True
- *             player.master_sound_layer.marker_count = 0
- *             player.master_sound_layer.markers = NULL             # <<<<<<<<<<<<<<
- *             player.layers = NULL
- *             player.sample_pos = 0
- */
-    __pyx_v_player->master_sound_layer.markers = NULL;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":124
- *             player.master_sound_layer.marker_count = 0
- *             player.master_sound_layer.markers = NULL
  *             player.layers = NULL             # <<<<<<<<<<<<<<
- *             player.sample_pos = 0
- *             player.stop_loop_at_pos = do_not_stop_loop
+ *             player.master_sound_layer.markers = NULL
+ *             self._reset_player(player)
  */
     __pyx_v_player->layers = NULL;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":125
- *             player.master_sound_layer.markers = NULL
+    /* "mpfmc/core/audio/track_sound_loop.pyx":112
+ *         if player != NULL:
  *             player.layers = NULL
- *             player.sample_pos = 0             # <<<<<<<<<<<<<<
- *             player.stop_loop_at_pos = do_not_stop_loop
+ *             player.master_sound_layer.markers = NULL             # <<<<<<<<<<<<<<
+ *             self._reset_player(player)
  * 
  */
-    __pyx_v_player->sample_pos = 0;
+    __pyx_v_player->master_sound_layer.markers = NULL;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":126
+    /* "mpfmc/core/audio/track_sound_loop.pyx":113
  *             player.layers = NULL
- *             player.sample_pos = 0
- *             player.stop_loop_at_pos = do_not_stop_loop             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.markers = NULL
+ *             self._reset_player(player)             # <<<<<<<<<<<<<<
  * 
  *     def stop_all_sounds(self, float fade_out_seconds = 0.0):
  */
-    __pyx_v_player->stop_loop_at_pos = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_do_not_stop_loop;
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_player(__pyx_v_self, __pyx_v_player); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 113, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
     /* "mpfmc/core/audio/track_sound_loop.pyx":110
  *     cdef _initialize_player(self, SoundLoopSetPlayer *player):
  *         """Initializes a SoundLoopSetPlayer struct."""
  *         if player != NULL:             # <<<<<<<<<<<<<<
- *             player.status = player_idle
- *             player.length = 0
+ *             player.layers = NULL
+ *             player.master_sound_layer.markers = NULL
  */
   }
 
@@ -3403,13 +3291,19 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
 
   /* function exit code */
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop._initialize_player", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":128
- *             player.stop_loop_at_pos = do_not_stop_loop
+/* "mpfmc/core/audio/track_sound_loop.pyx":115
+ *             self._reset_player(player)
  * 
  *     def stop_all_sounds(self, float fade_out_seconds = 0.0):             # <<<<<<<<<<<<<<
  *         """
@@ -3445,7 +3339,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_all_sounds") < 0)) __PYX_ERR(0, 128, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_all_sounds") < 0)) __PYX_ERR(0, 115, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3456,14 +3350,14 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       }
     }
     if (values[0]) {
-      __pyx_v_fade_out_seconds = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_fade_out_seconds == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 128, __pyx_L3_error)
+      __pyx_v_fade_out_seconds = __pyx_PyFloat_AsFloat(values[0]); if (unlikely((__pyx_v_fade_out_seconds == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 115, __pyx_L3_error)
     } else {
       __pyx_v_fade_out_seconds = ((float)0.0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("stop_all_sounds", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 128, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("stop_all_sounds", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 115, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.stop_all_sounds", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -3488,7 +3382,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":136
+/* "mpfmc/core/audio/track_sound_loop.pyx":123
  *         pass
  * 
  *     def stop_sound(self, sound not None, fade_out=None):             # <<<<<<<<<<<<<<
@@ -3533,7 +3427,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_sound") < 0)) __PYX_ERR(0, 136, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_sound") < 0)) __PYX_ERR(0, 123, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3549,14 +3443,14 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("stop_sound", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 136, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("stop_sound", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 123, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.stop_sound", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(((PyObject *)__pyx_v_sound) == Py_None)) {
-    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound"); __PYX_ERR(0, 136, __pyx_L1_error)
+    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound"); __PYX_ERR(0, 123, __pyx_L1_error)
   }
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_8stop_sound(((struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self), __pyx_v_sound, __pyx_v_fade_out);
 
@@ -3581,7 +3475,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":147
+/* "mpfmc/core/audio/track_sound_loop.pyx":134
  *         pass
  * 
  *     def stop_sound_instance(self, sound_instance not None, fade_out=None):             # <<<<<<<<<<<<<<
@@ -3626,7 +3520,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_sound_instance") < 0)) __PYX_ERR(0, 147, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_sound_instance") < 0)) __PYX_ERR(0, 134, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -3642,14 +3536,14 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("stop_sound_instance", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 147, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("stop_sound_instance", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 134, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.stop_sound_instance", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(((PyObject *)__pyx_v_sound_instance) == Py_None)) {
-    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound_instance"); __PYX_ERR(0, 147, __pyx_L1_error)
+    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound_instance"); __PYX_ERR(0, 134, __pyx_L1_error)
   }
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_10stop_sound_instance(((struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self), __pyx_v_sound_instance, __pyx_v_fade_out);
 
@@ -3674,7 +3568,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":158
+/* "mpfmc/core/audio/track_sound_loop.pyx":145
  *         pass
  * 
  *     def stop_sound_looping(self, sound not None):             # <<<<<<<<<<<<<<
@@ -3690,7 +3584,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("stop_sound_looping (wrapper)", 0);
   if (unlikely(((PyObject *)__pyx_v_sound) == Py_None)) {
-    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound"); __PYX_ERR(0, 158, __pyx_L1_error)
+    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound"); __PYX_ERR(0, 145, __pyx_L1_error)
   }
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_12stop_sound_looping(((struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self), ((PyObject *)__pyx_v_sound));
 
@@ -3715,7 +3609,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":168
+/* "mpfmc/core/audio/track_sound_loop.pyx":155
  *         pass
  * 
  *     def stop_sound_instance_looping(self, sound_instance not None):             # <<<<<<<<<<<<<<
@@ -3731,7 +3625,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("stop_sound_instance_looping (wrapper)", 0);
   if (unlikely(((PyObject *)__pyx_v_sound_instance) == Py_None)) {
-    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound_instance"); __PYX_ERR(0, 168, __pyx_L1_error)
+    PyErr_Format(PyExc_TypeError, "Argument '%.200s' must not be None", "sound_instance"); __PYX_ERR(0, 155, __pyx_L1_error)
   }
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_14stop_sound_instance_looping(((struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self), ((PyObject *)__pyx_v_sound_instance));
 
@@ -3756,7 +3650,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":178
+/* "mpfmc/core/audio/track_sound_loop.pyx":165
  *         pass
  * 
  *     def process(self):             # <<<<<<<<<<<<<<
@@ -3787,7 +3681,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("process", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":183
+  /* "mpfmc/core/audio/track_sound_loop.pyx":170
  *         # Lock the mutex to ensure no audio data is changed during the playback processing
  *         # (multi-threaded protection)
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -3796,7 +3690,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":186
+  /* "mpfmc/core/audio/track_sound_loop.pyx":173
  * 
  *         # Process track notification messages
  *         if self.state.notification_messages != NULL:             # <<<<<<<<<<<<<<
@@ -3806,7 +3700,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_self->__pyx_base.state->notification_messages != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":187
+    /* "mpfmc/core/audio/track_sound_loop.pyx":174
  *         # Process track notification messages
  *         if self.state.notification_messages != NULL:
  *             self.state.notification_messages = g_slist_reverse(self.state.notification_messages)             # <<<<<<<<<<<<<<
@@ -3815,7 +3709,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_self->__pyx_base.state->notification_messages = g_slist_reverse(__pyx_v_self->__pyx_base.state->notification_messages);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":188
+    /* "mpfmc/core/audio/track_sound_loop.pyx":175
  *         if self.state.notification_messages != NULL:
  *             self.state.notification_messages = g_slist_reverse(self.state.notification_messages)
  *             iterator = self.state.notification_messages             # <<<<<<<<<<<<<<
@@ -3825,7 +3719,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_2 = __pyx_v_self->__pyx_base.state->notification_messages;
     __pyx_v_iterator = __pyx_t_2;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":189
+    /* "mpfmc/core/audio/track_sound_loop.pyx":176
  *             self.state.notification_messages = g_slist_reverse(self.state.notification_messages)
  *             iterator = self.state.notification_messages
  *             while iterator != NULL:             # <<<<<<<<<<<<<<
@@ -3836,18 +3730,18 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_t_1 = ((__pyx_v_iterator != NULL) != 0);
       if (!__pyx_t_1) break;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":190
+      /* "mpfmc/core/audio/track_sound_loop.pyx":177
  *             iterator = self.state.notification_messages
  *             while iterator != NULL:
  *                 self.process_notification_message(<NotificationMessageContainer*>iterator.data)             # <<<<<<<<<<<<<<
  *                 g_slice_free1(sizeof(NotificationMessageContainer), iterator.data)
  *                 iterator = iterator.next
  */
-      __pyx_t_3 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->process_notification_message(__pyx_v_self, ((__pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *)__pyx_v_iterator->data)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 190, __pyx_L1_error)
+      __pyx_t_3 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->process_notification_message(__pyx_v_self, ((__pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *)__pyx_v_iterator->data)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 177, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":191
+      /* "mpfmc/core/audio/track_sound_loop.pyx":178
  *             while iterator != NULL:
  *                 self.process_notification_message(<NotificationMessageContainer*>iterator.data)
  *                 g_slice_free1(sizeof(NotificationMessageContainer), iterator.data)             # <<<<<<<<<<<<<<
@@ -3856,7 +3750,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       g_slice_free1((sizeof(__pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer)), __pyx_v_iterator->data);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":192
+      /* "mpfmc/core/audio/track_sound_loop.pyx":179
  *                 self.process_notification_message(<NotificationMessageContainer*>iterator.data)
  *                 g_slice_free1(sizeof(NotificationMessageContainer), iterator.data)
  *                 iterator = iterator.next             # <<<<<<<<<<<<<<
@@ -3867,7 +3761,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_v_iterator = __pyx_t_2;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":194
+    /* "mpfmc/core/audio/track_sound_loop.pyx":181
  *                 iterator = iterator.next
  * 
  *             g_slist_free(self.state.notification_messages)             # <<<<<<<<<<<<<<
@@ -3876,7 +3770,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     g_slist_free(__pyx_v_self->__pyx_base.state->notification_messages);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":195
+    /* "mpfmc/core/audio/track_sound_loop.pyx":182
  * 
  *             g_slist_free(self.state.notification_messages)
  *             self.state.notification_messages = NULL             # <<<<<<<<<<<<<<
@@ -3885,7 +3779,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_self->__pyx_base.state->notification_messages = NULL;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":186
+    /* "mpfmc/core/audio/track_sound_loop.pyx":173
  * 
  *         # Process track notification messages
  *         if self.state.notification_messages != NULL:             # <<<<<<<<<<<<<<
@@ -3894,7 +3788,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":198
+  /* "mpfmc/core/audio/track_sound_loop.pyx":185
  * 
  *         # Unlock the mutex since we are done accessing the audio data
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -3903,7 +3797,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":178
+  /* "mpfmc/core/audio/track_sound_loop.pyx":165
  *         pass
  * 
  *     def process(self):             # <<<<<<<<<<<<<<
@@ -3924,7 +3818,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":200
+/* "mpfmc/core/audio/track_sound_loop.pyx":187
  *         SDL_UnlockAudio()
  * 
  *     cdef process_notification_message(self, NotificationMessageContainer *notification_message):             # <<<<<<<<<<<<<<
@@ -3951,7 +3845,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   PyObject *(*__pyx_t_11)(PyObject *);
   __Pyx_RefNannySetupContext("process_notification_message", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":203
+  /* "mpfmc/core/audio/track_sound_loop.pyx":190
  *         """Process a notification message to this track"""
  * 
  *         if notification_message == NULL:             # <<<<<<<<<<<<<<
@@ -3961,7 +3855,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   __pyx_t_1 = ((__pyx_v_notification_message == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":204
+    /* "mpfmc/core/audio/track_sound_loop.pyx":191
  * 
  *         if notification_message == NULL:
  *             return             # <<<<<<<<<<<<<<
@@ -3972,7 +3866,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":203
+    /* "mpfmc/core/audio/track_sound_loop.pyx":190
  *         """Process a notification message to this track"""
  * 
  *         if notification_message == NULL:             # <<<<<<<<<<<<<<
@@ -3981,7 +3875,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":206
+  /* "mpfmc/core/audio/track_sound_loop.pyx":193
  *             return
  * 
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -3990,7 +3884,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":209
+  /* "mpfmc/core/audio/track_sound_loop.pyx":196
  * 
  *         # Check for track notification messages first (they do not need sound instance information)
  *         if notification_message.message in (notification_track_stopped, notification_track_paused):             # <<<<<<<<<<<<<<
@@ -4001,7 +3895,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_stopped:
     case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_paused:
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":210
+    /* "mpfmc/core/audio/track_sound_loop.pyx":197
  *         # Check for track notification messages first (they do not need sound instance information)
  *         if notification_message.message in (notification_track_stopped, notification_track_paused):
  *             if notification_message.message == notification_track_stopped:             # <<<<<<<<<<<<<<
@@ -4011,7 +3905,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     switch (__pyx_v_notification_message->message) {
       case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_stopped:
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":212
+      /* "mpfmc/core/audio/track_sound_loop.pyx":199
  *             if notification_message.message == notification_track_stopped:
  *                 # Trigger any events
  *                 if self._events_when_stopped is not None:             # <<<<<<<<<<<<<<
@@ -4022,7 +3916,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       __pyx_t_2 = (__pyx_t_1 != 0);
       if (__pyx_t_2) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":213
+        /* "mpfmc/core/audio/track_sound_loop.pyx":200
  *                 # Trigger any events
  *                 if self._events_when_stopped is not None:
  *                     for event in self._events_when_stopped:             # <<<<<<<<<<<<<<
@@ -4031,45 +3925,45 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
         if (unlikely(__pyx_v_self->__pyx_base._events_when_stopped == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-          __PYX_ERR(0, 213, __pyx_L1_error)
+          __PYX_ERR(0, 200, __pyx_L1_error)
         }
         __pyx_t_3 = __pyx_v_self->__pyx_base._events_when_stopped; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
         for (;;) {
           if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 213, __pyx_L1_error)
+          __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 200, __pyx_L1_error)
           #else
-          __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 213, __pyx_L1_error)
+          __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 200, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           #endif
           __Pyx_XDECREF_SET(__pyx_v_event, __pyx_t_5);
           __pyx_t_5 = 0;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":214
+          /* "mpfmc/core/audio/track_sound_loop.pyx":201
  *                 if self._events_when_stopped is not None:
  *                     for event in self._events_when_stopped:
  *                         self.mc.post_mc_native_event(event, track=self._name)             # <<<<<<<<<<<<<<
  * 
  *             elif notification_message.message == notification_track_paused:
  */
-          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 214, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 201, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 214, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_New(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 201, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           __Pyx_INCREF(__pyx_v_event);
           __Pyx_GIVEREF(__pyx_v_event);
           PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_v_event);
-          __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 214, __pyx_L1_error)
+          __pyx_t_7 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 201, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
-          if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_track, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
-          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 214, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_7, __pyx_n_s_track, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 201, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 201, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":213
+          /* "mpfmc/core/audio/track_sound_loop.pyx":200
  *                 # Trigger any events
  *                 if self._events_when_stopped is not None:
  *                     for event in self._events_when_stopped:             # <<<<<<<<<<<<<<
@@ -4079,7 +3973,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":212
+        /* "mpfmc/core/audio/track_sound_loop.pyx":199
  *             if notification_message.message == notification_track_stopped:
  *                 # Trigger any events
  *                 if self._events_when_stopped is not None:             # <<<<<<<<<<<<<<
@@ -4088,7 +3982,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":210
+      /* "mpfmc/core/audio/track_sound_loop.pyx":197
  *         # Check for track notification messages first (they do not need sound instance information)
  *         if notification_message.message in (notification_track_stopped, notification_track_paused):
  *             if notification_message.message == notification_track_stopped:             # <<<<<<<<<<<<<<
@@ -4097,7 +3991,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       break;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":216
+      /* "mpfmc/core/audio/track_sound_loop.pyx":203
  *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  *             elif notification_message.message == notification_track_paused:             # <<<<<<<<<<<<<<
@@ -4106,7 +4000,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_track_paused:
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":218
+      /* "mpfmc/core/audio/track_sound_loop.pyx":205
  *             elif notification_message.message == notification_track_paused:
  *                 # Trigger any events
  *                 if self._events_when_paused is not None:             # <<<<<<<<<<<<<<
@@ -4117,7 +4011,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       __pyx_t_1 = (__pyx_t_2 != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":219
+        /* "mpfmc/core/audio/track_sound_loop.pyx":206
  *                 # Trigger any events
  *                 if self._events_when_paused is not None:
  *                     for event in self._events_when_paused:             # <<<<<<<<<<<<<<
@@ -4126,45 +4020,45 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
         if (unlikely(__pyx_v_self->__pyx_base._events_when_paused == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-          __PYX_ERR(0, 219, __pyx_L1_error)
+          __PYX_ERR(0, 206, __pyx_L1_error)
         }
         __pyx_t_3 = __pyx_v_self->__pyx_base._events_when_paused; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
         for (;;) {
           if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_8 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_8); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __pyx_t_8 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_8); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 206, __pyx_L1_error)
           #else
-          __pyx_t_8 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 219, __pyx_L1_error)
+          __pyx_t_8 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 206, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           #endif
           __Pyx_XDECREF_SET(__pyx_v_event, __pyx_t_8);
           __pyx_t_8 = 0;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":220
+          /* "mpfmc/core/audio/track_sound_loop.pyx":207
  *                 if self._events_when_paused is not None:
  *                     for event in self._events_when_paused:
  *                         self.mc.post_mc_native_event(event, track=self._name)             # <<<<<<<<<<<<<<
  *                 pass
  * 
  */
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 220, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 207, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
-          __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 220, __pyx_L1_error)
+          __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 207, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_INCREF(__pyx_v_event);
           __Pyx_GIVEREF(__pyx_v_event);
           PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v_event);
-          __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 220, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyDict_NewPresized(1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 207, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_track, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 220, __pyx_L1_error)
-          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_track, __pyx_v_self->__pyx_base._name) < 0) __PYX_ERR(0, 207, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 207, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":219
+          /* "mpfmc/core/audio/track_sound_loop.pyx":206
  *                 # Trigger any events
  *                 if self._events_when_paused is not None:
  *                     for event in self._events_when_paused:             # <<<<<<<<<<<<<<
@@ -4174,7 +4068,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":218
+        /* "mpfmc/core/audio/track_sound_loop.pyx":205
  *             elif notification_message.message == notification_track_paused:
  *                 # Trigger any events
  *                 if self._events_when_paused is not None:             # <<<<<<<<<<<<<<
@@ -4183,7 +4077,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":216
+      /* "mpfmc/core/audio/track_sound_loop.pyx":203
  *                         self.mc.post_mc_native_event(event, track=self._name)
  * 
  *             elif notification_message.message == notification_track_paused:             # <<<<<<<<<<<<<<
@@ -4194,7 +4088,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       default: break;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":223
+    /* "mpfmc/core/audio/track_sound_loop.pyx":210
  *                 pass
  * 
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -4203,7 +4097,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":224
+    /* "mpfmc/core/audio/track_sound_loop.pyx":211
  * 
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -4214,7 +4108,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":209
+    /* "mpfmc/core/audio/track_sound_loop.pyx":196
  * 
  *         # Check for track notification messages first (they do not need sound instance information)
  *         if notification_message.message in (notification_track_stopped, notification_track_paused):             # <<<<<<<<<<<<<<
@@ -4225,26 +4119,26 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     default: break;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":226
+  /* "mpfmc/core/audio/track_sound_loop.pyx":213
  *             return
  * 
  *         self.log.debug("Processing notification message %d for sound instance (id: %d)",             # <<<<<<<<<<<<<<
  *                        notification_message.message, notification_message.sound_instance_id)
  * 
  */
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 213, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":227
+  /* "mpfmc/core/audio/track_sound_loop.pyx":214
  * 
  *         self.log.debug("Processing notification message %d for sound instance (id: %d)",
  *                        notification_message.message, notification_message.sound_instance_id)             # <<<<<<<<<<<<<<
  * 
  *         if notification_message.message in (notification_sound_loop_set_started, notification_sound_loop_set_stopped,
  */
-  __pyx_t_6 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessage(__pyx_v_notification_message->message); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessage(__pyx_v_notification_message->message); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 214, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyInt_From_Uint64(__pyx_v_notification_message->sound_instance_id); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 227, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyInt_From_Uint64(__pyx_v_notification_message->sound_instance_id); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 214, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_8 = NULL;
   __pyx_t_9 = 0;
@@ -4261,7 +4155,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_5)) {
     PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_kp_u_Processing_notification_message, __pyx_t_6, __pyx_t_7};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 3+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 3+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -4271,7 +4165,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
     PyObject *__pyx_temp[4] = {__pyx_t_8, __pyx_kp_u_Processing_notification_message, __pyx_t_6, __pyx_t_7};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 3+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 3+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -4279,7 +4173,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   } else
   #endif
   {
-    __pyx_t_10 = PyTuple_New(3+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __pyx_t_10 = PyTuple_New(3+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 213, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     if (__pyx_t_8) {
       __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -4293,14 +4187,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     PyTuple_SET_ITEM(__pyx_t_10, 2+__pyx_t_9, __pyx_t_7);
     __pyx_t_6 = 0;
     __pyx_t_7 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
   }
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":229
+  /* "mpfmc/core/audio/track_sound_loop.pyx":216
  *                        notification_message.message, notification_message.sound_instance_id)
  * 
  *         if notification_message.message in (notification_sound_loop_set_started, notification_sound_loop_set_stopped,             # <<<<<<<<<<<<<<
@@ -4311,7 +4205,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_started:
     case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_stopped:
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":230
+    /* "mpfmc/core/audio/track_sound_loop.pyx":217
  * 
  *         if notification_message.message in (notification_sound_loop_set_started, notification_sound_loop_set_stopped,
  *                                             notification_sound_loop_set_looping):             # <<<<<<<<<<<<<<
@@ -4320,45 +4214,45 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_looping:
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":232
+    /* "mpfmc/core/audio/track_sound_loop.pyx":219
  *                                             notification_sound_loop_set_looping):
  * 
  *             if notification_message.data.sound_loop_set.id not in self._active_sound_loop_sets.keys():             # <<<<<<<<<<<<<<
  *                 self.log.warning("Received a notification message for a sound loop set (id: %d) "
  *                                  "that is no longer active. Notification will be discarded.",
  */
-    __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     if (unlikely(__pyx_v_self->_active_sound_loop_sets == Py_None)) {
       PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "keys");
-      __PYX_ERR(0, 232, __pyx_L1_error)
+      __PYX_ERR(0, 219, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_Keys(__pyx_v_self->_active_sound_loop_sets); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_Keys(__pyx_v_self->_active_sound_loop_sets); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_t_3, __pyx_t_5, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 232, __pyx_L1_error)
+    __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_t_3, __pyx_t_5, Py_NE)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_t_2 = (__pyx_t_1 != 0);
     if (__pyx_t_2) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":233
+      /* "mpfmc/core/audio/track_sound_loop.pyx":220
  * 
  *             if notification_message.data.sound_loop_set.id not in self._active_sound_loop_sets.keys():
  *                 self.log.warning("Received a notification message for a sound loop set (id: %d) "             # <<<<<<<<<<<<<<
  *                                  "that is no longer active. Notification will be discarded.",
  *                                  notification_message.data.sound_loop_set.id)
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 233, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":235
+      /* "mpfmc/core/audio/track_sound_loop.pyx":222
  *                 self.log.warning("Received a notification message for a sound loop set (id: %d) "
  *                                  "that is no longer active. Notification will be discarded.",
  *                                  notification_message.data.sound_loop_set.id)             # <<<<<<<<<<<<<<
  *                 SDL_UnlockAudio()
  *                 return
  */
-      __pyx_t_10 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 235, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 222, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_10);
       __pyx_t_7 = NULL;
       __pyx_t_9 = 0;
@@ -4375,7 +4269,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_kp_u_Received_a_notification_message, __pyx_t_10};
-        __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 233, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
@@ -4384,14 +4278,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_kp_u_Received_a_notification_message, __pyx_t_10};
-        __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 233, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
       } else
       #endif
       {
-        __pyx_t_6 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 233, __pyx_L1_error)
+        __pyx_t_6 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 220, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
         if (__pyx_t_7) {
           __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -4402,14 +4296,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         __Pyx_GIVEREF(__pyx_t_10);
         PyTuple_SET_ITEM(__pyx_t_6, 1+__pyx_t_9, __pyx_t_10);
         __pyx_t_10 = 0;
-        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 233, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 220, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":236
+      /* "mpfmc/core/audio/track_sound_loop.pyx":223
  *                                  "that is no longer active. Notification will be discarded.",
  *                                  notification_message.data.sound_loop_set.id)
  *                 SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -4418,7 +4312,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       SDL_UnlockAudio();
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":237
+      /* "mpfmc/core/audio/track_sound_loop.pyx":224
  *                                  notification_message.data.sound_loop_set.id)
  *                 SDL_UnlockAudio()
  *                 return             # <<<<<<<<<<<<<<
@@ -4429,7 +4323,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       __pyx_r = Py_None; __Pyx_INCREF(Py_None);
       goto __pyx_L0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":232
+      /* "mpfmc/core/audio/track_sound_loop.pyx":219
  *                                             notification_sound_loop_set_looping):
  * 
  *             if notification_message.data.sound_loop_set.id not in self._active_sound_loop_sets.keys():             # <<<<<<<<<<<<<<
@@ -4438,7 +4332,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":239
+    /* "mpfmc/core/audio/track_sound_loop.pyx":226
  *                 return
  * 
  *             sound_loop_set_settings = self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]             # <<<<<<<<<<<<<<
@@ -4447,45 +4341,45 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     if (unlikely(__pyx_v_self->_active_sound_loop_sets == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 239, __pyx_L1_error)
+      __PYX_ERR(0, 226, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->_active_sound_loop_sets, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_self->_active_sound_loop_sets, __pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_sound_loop_set_settings = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":240
+    /* "mpfmc/core/audio/track_sound_loop.pyx":227
  * 
  *             sound_loop_set_settings = self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
  *             if not sound_loop_set_settings:             # <<<<<<<<<<<<<<
  *                 self.log.warning("Could not retrieve settings for a sound loop set (id: %d) "
  *                                  "Notification will be discarded.",
  */
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_sound_loop_set_settings); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 240, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_sound_loop_set_settings); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 227, __pyx_L1_error)
     __pyx_t_1 = ((!__pyx_t_2) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":241
+      /* "mpfmc/core/audio/track_sound_loop.pyx":228
  *             sound_loop_set_settings = self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
  *             if not sound_loop_set_settings:
  *                 self.log.warning("Could not retrieve settings for a sound loop set (id: %d) "             # <<<<<<<<<<<<<<
  *                                  "Notification will be discarded.",
  *                                  notification_message.data.sound_loop_set.id)
  */
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 228, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":243
+      /* "mpfmc/core/audio/track_sound_loop.pyx":230
  *                 self.log.warning("Could not retrieve settings for a sound loop set (id: %d) "
  *                                  "Notification will be discarded.",
  *                                  notification_message.data.sound_loop_set.id)             # <<<<<<<<<<<<<<
  *                 SDL_UnlockAudio()
  *                 return
  */
-      __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 243, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 230, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_10 = NULL;
       __pyx_t_9 = 0;
@@ -4502,7 +4396,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_kp_u_Could_not_retrieve_settings_for, __pyx_t_6};
-        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 241, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -4511,14 +4405,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_kp_u_Could_not_retrieve_settings_for, __pyx_t_6};
-        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 241, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       } else
       #endif
       {
-        __pyx_t_7 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 241, __pyx_L1_error)
+        __pyx_t_7 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 228, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         if (__pyx_t_10) {
           __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_10); __pyx_t_10 = NULL;
@@ -4529,14 +4423,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_9, __pyx_t_6);
         __pyx_t_6 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 241, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       }
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":244
+      /* "mpfmc/core/audio/track_sound_loop.pyx":231
  *                                  "Notification will be discarded.",
  *                                  notification_message.data.sound_loop_set.id)
  *                 SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -4545,7 +4439,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       SDL_UnlockAudio();
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":245
+      /* "mpfmc/core/audio/track_sound_loop.pyx":232
  *                                  notification_message.data.sound_loop_set.id)
  *                 SDL_UnlockAudio()
  *                 return             # <<<<<<<<<<<<<<
@@ -4556,7 +4450,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       __pyx_r = Py_None; __Pyx_INCREF(Py_None);
       goto __pyx_L0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":240
+      /* "mpfmc/core/audio/track_sound_loop.pyx":227
  * 
  *             sound_loop_set_settings = self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
  *             if not sound_loop_set_settings:             # <<<<<<<<<<<<<<
@@ -4565,7 +4459,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":247
+    /* "mpfmc/core/audio/track_sound_loop.pyx":234
  *                 return
  * 
  *             if notification_message.message == notification_sound_loop_set_started:             # <<<<<<<<<<<<<<
@@ -4575,14 +4469,404 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     switch (__pyx_v_notification_message->message) {
       case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_started:
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":248
+      /* "mpfmc/core/audio/track_sound_loop.pyx":235
  * 
  *             if notification_message.message == notification_sound_loop_set_started:
  *                 if sound_loop_set_settings['events_when_played'] is not None:             # <<<<<<<<<<<<<<
  *                     for event in sound_loop_set_settings['events_when_played']:
  *                         self.mc.post_mc_native_event(event)
  */
-      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_played); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 248, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_played); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 235, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_1 = (__pyx_t_3 != Py_None);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __pyx_t_2 = (__pyx_t_1 != 0);
+      if (__pyx_t_2) {
+
+        /* "mpfmc/core/audio/track_sound_loop.pyx":236
+ *             if notification_message.message == notification_sound_loop_set_started:
+ *                 if sound_loop_set_settings['events_when_played'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_played']:             # <<<<<<<<<<<<<<
+ *                         self.mc.post_mc_native_event(event)
+ * 
+ */
+        __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_played); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
+          __pyx_t_5 = __pyx_t_3; __Pyx_INCREF(__pyx_t_5); __pyx_t_4 = 0;
+          __pyx_t_11 = NULL;
+        } else {
+          __pyx_t_4 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 236, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_t_11 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 236, __pyx_L1_error)
+        }
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+        for (;;) {
+          if (likely(!__pyx_t_11)) {
+            if (likely(PyList_CheckExact(__pyx_t_5))) {
+              if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_5)) break;
+              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+              __pyx_t_3 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 236, __pyx_L1_error)
+              #else
+              __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              #endif
+            } else {
+              if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_5)) break;
+              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+              __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 236, __pyx_L1_error)
+              #else
+              __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 236, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              #endif
+            }
+          } else {
+            __pyx_t_3 = __pyx_t_11(__pyx_t_5);
+            if (unlikely(!__pyx_t_3)) {
+              PyObject* exc_type = PyErr_Occurred();
+              if (exc_type) {
+                if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+                else __PYX_ERR(0, 236, __pyx_L1_error)
+              }
+              break;
+            }
+            __Pyx_GOTREF(__pyx_t_3);
+          }
+          __Pyx_XDECREF_SET(__pyx_v_event, __pyx_t_3);
+          __pyx_t_3 = 0;
+
+          /* "mpfmc/core/audio/track_sound_loop.pyx":237
+ *                 if sound_loop_set_settings['events_when_played'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_played']:
+ *                         self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
+ * 
+ *             elif notification_message.message == notification_sound_loop_set_stopped:
+ */
+          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 237, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_7);
+          __pyx_t_6 = NULL;
+          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+            __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_7);
+            if (likely(__pyx_t_6)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+              __Pyx_INCREF(__pyx_t_6);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_7, function);
+            }
+          }
+          if (!__pyx_t_6) {
+            __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_3);
+          } else {
+            #if CYTHON_FAST_PYCALL
+            if (PyFunction_Check(__pyx_t_7)) {
+              PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_v_event};
+              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_GOTREF(__pyx_t_3);
+            } else
+            #endif
+            #if CYTHON_FAST_PYCCALL
+            if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+              PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_v_event};
+              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+              __Pyx_GOTREF(__pyx_t_3);
+            } else
+            #endif
+            {
+              __pyx_t_10 = PyTuple_New(1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 237, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_10);
+              __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_6); __pyx_t_6 = NULL;
+              __Pyx_INCREF(__pyx_v_event);
+              __Pyx_GIVEREF(__pyx_v_event);
+              PyTuple_SET_ITEM(__pyx_t_10, 0+1, __pyx_v_event);
+              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 237, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_3);
+              __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+            }
+          }
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+          /* "mpfmc/core/audio/track_sound_loop.pyx":236
+ *             if notification_message.message == notification_sound_loop_set_started:
+ *                 if sound_loop_set_settings['events_when_played'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_played']:             # <<<<<<<<<<<<<<
+ *                         self.mc.post_mc_native_event(event)
+ * 
+ */
+        }
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+        /* "mpfmc/core/audio/track_sound_loop.pyx":235
+ * 
+ *             if notification_message.message == notification_sound_loop_set_started:
+ *                 if sound_loop_set_settings['events_when_played'] is not None:             # <<<<<<<<<<<<<<
+ *                     for event in sound_loop_set_settings['events_when_played']:
+ *                         self.mc.post_mc_native_event(event)
+ */
+      }
+
+      /* "mpfmc/core/audio/track_sound_loop.pyx":234
+ *                 return
+ * 
+ *             if notification_message.message == notification_sound_loop_set_started:             # <<<<<<<<<<<<<<
+ *                 if sound_loop_set_settings['events_when_played'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_played']:
+ */
+      break;
+
+      /* "mpfmc/core/audio/track_sound_loop.pyx":239
+ *                         self.mc.post_mc_native_event(event)
+ * 
+ *             elif notification_message.message == notification_sound_loop_set_stopped:             # <<<<<<<<<<<<<<
+ *                 if sound_loop_set_settings['events_when_stopped'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_stopped']:
+ */
+      case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_stopped:
+
+      /* "mpfmc/core/audio/track_sound_loop.pyx":240
+ * 
+ *             elif notification_message.message == notification_sound_loop_set_stopped:
+ *                 if sound_loop_set_settings['events_when_stopped'] is not None:             # <<<<<<<<<<<<<<
+ *                     for event in sound_loop_set_settings['events_when_stopped']:
+ *                         self.mc.post_mc_native_event(event)
+ */
+      __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_stopped); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 240, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_2 = (__pyx_t_5 != Py_None);
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __pyx_t_1 = (__pyx_t_2 != 0);
+      if (__pyx_t_1) {
+
+        /* "mpfmc/core/audio/track_sound_loop.pyx":241
+ *             elif notification_message.message == notification_sound_loop_set_stopped:
+ *                 if sound_loop_set_settings['events_when_stopped'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_stopped']:             # <<<<<<<<<<<<<<
+ *                         self.mc.post_mc_native_event(event)
+ * 
+ */
+        __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_stopped); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        if (likely(PyList_CheckExact(__pyx_t_5)) || PyTuple_CheckExact(__pyx_t_5)) {
+          __pyx_t_3 = __pyx_t_5; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
+          __pyx_t_11 = NULL;
+        } else {
+          __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 241, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_3);
+          __pyx_t_11 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 241, __pyx_L1_error)
+        }
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        for (;;) {
+          if (likely(!__pyx_t_11)) {
+            if (likely(PyList_CheckExact(__pyx_t_3))) {
+              if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
+              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+              __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 241, __pyx_L1_error)
+              #else
+              __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              #endif
+            } else {
+              if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
+              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
+              __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 241, __pyx_L1_error)
+              #else
+              __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 241, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              #endif
+            }
+          } else {
+            __pyx_t_5 = __pyx_t_11(__pyx_t_3);
+            if (unlikely(!__pyx_t_5)) {
+              PyObject* exc_type = PyErr_Occurred();
+              if (exc_type) {
+                if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
+                else __PYX_ERR(0, 241, __pyx_L1_error)
+              }
+              break;
+            }
+            __Pyx_GOTREF(__pyx_t_5);
+          }
+          __Pyx_XDECREF_SET(__pyx_v_event, __pyx_t_5);
+          __pyx_t_5 = 0;
+
+          /* "mpfmc/core/audio/track_sound_loop.pyx":242
+ *                 if sound_loop_set_settings['events_when_stopped'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_stopped']:
+ *                         self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
+ * 
+ *                 self.log.debug("Removing sound_loop_set settings %d from active list", notification_message.data.sound_loop_set.id)
+ */
+          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 242, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_7);
+          __pyx_t_10 = NULL;
+          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
+            __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_7);
+            if (likely(__pyx_t_10)) {
+              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
+              __Pyx_INCREF(__pyx_t_10);
+              __Pyx_INCREF(function);
+              __Pyx_DECREF_SET(__pyx_t_7, function);
+            }
+          }
+          if (!__pyx_t_10) {
+            __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_event); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
+            __Pyx_GOTREF(__pyx_t_5);
+          } else {
+            #if CYTHON_FAST_PYCALL
+            if (PyFunction_Check(__pyx_t_7)) {
+              PyObject *__pyx_temp[2] = {__pyx_t_10, __pyx_v_event};
+              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+              __Pyx_GOTREF(__pyx_t_5);
+            } else
+            #endif
+            #if CYTHON_FAST_PYCCALL
+            if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
+              PyObject *__pyx_temp[2] = {__pyx_t_10, __pyx_v_event};
+              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
+              __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
+              __Pyx_GOTREF(__pyx_t_5);
+            } else
+            #endif
+            {
+              __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 242, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_6);
+              __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_10); __pyx_t_10 = NULL;
+              __Pyx_INCREF(__pyx_v_event);
+              __Pyx_GIVEREF(__pyx_v_event);
+              PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_v_event);
+              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 242, __pyx_L1_error)
+              __Pyx_GOTREF(__pyx_t_5);
+              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+            }
+          }
+          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+          /* "mpfmc/core/audio/track_sound_loop.pyx":241
+ *             elif notification_message.message == notification_sound_loop_set_stopped:
+ *                 if sound_loop_set_settings['events_when_stopped'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_stopped']:             # <<<<<<<<<<<<<<
+ *                         self.mc.post_mc_native_event(event)
+ * 
+ */
+        }
+        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+        /* "mpfmc/core/audio/track_sound_loop.pyx":240
+ * 
+ *             elif notification_message.message == notification_sound_loop_set_stopped:
+ *                 if sound_loop_set_settings['events_when_stopped'] is not None:             # <<<<<<<<<<<<<<
+ *                     for event in sound_loop_set_settings['events_when_stopped']:
+ *                         self.mc.post_mc_native_event(event)
+ */
+      }
+
+      /* "mpfmc/core/audio/track_sound_loop.pyx":244
+ *                         self.mc.post_mc_native_event(event)
+ * 
+ *                 self.log.debug("Removing sound_loop_set settings %d from active list", notification_message.data.sound_loop_set.id)             # <<<<<<<<<<<<<<
+ *                 del self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
+ * 
+ */
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 244, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_5);
+      __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 244, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_7);
+      __pyx_t_6 = NULL;
+      __pyx_t_9 = 0;
+      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
+        __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_5);
+        if (likely(__pyx_t_6)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
+          __Pyx_INCREF(__pyx_t_6);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_5, function);
+          __pyx_t_9 = 1;
+        }
+      }
+      #if CYTHON_FAST_PYCALL
+      if (PyFunction_Check(__pyx_t_5)) {
+        PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_kp_u_Removing_sound_loop_set_settings, __pyx_t_7};
+        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_GOTREF(__pyx_t_3);
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      } else
+      #endif
+      #if CYTHON_FAST_PYCCALL
+      if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
+        PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_kp_u_Removing_sound_loop_set_settings, __pyx_t_7};
+        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
+        __Pyx_GOTREF(__pyx_t_3);
+        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
+      } else
+      #endif
+      {
+        __pyx_t_10 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_10);
+        if (__pyx_t_6) {
+          __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_6); __pyx_t_6 = NULL;
+        }
+        __Pyx_INCREF(__pyx_kp_u_Removing_sound_loop_set_settings);
+        __Pyx_GIVEREF(__pyx_kp_u_Removing_sound_loop_set_settings);
+        PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_kp_u_Removing_sound_loop_set_settings);
+        __Pyx_GIVEREF(__pyx_t_7);
+        PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_t_7);
+        __pyx_t_7 = 0;
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 244, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_3);
+        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
+      }
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+      /* "mpfmc/core/audio/track_sound_loop.pyx":245
+ * 
+ *                 self.log.debug("Removing sound_loop_set settings %d from active list", notification_message.data.sound_loop_set.id)
+ *                 del self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]             # <<<<<<<<<<<<<<
+ * 
+ *             elif notification_message.message == notification_sound_loop_set_looping:
+ */
+      if (unlikely(__pyx_v_self->_active_sound_loop_sets == Py_None)) {
+        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+        __PYX_ERR(0, 245, __pyx_L1_error)
+      }
+      __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      if (unlikely(PyDict_DelItem(__pyx_v_self->_active_sound_loop_sets, __pyx_t_3) < 0)) __PYX_ERR(0, 245, __pyx_L1_error)
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+      /* "mpfmc/core/audio/track_sound_loop.pyx":239
+ *                         self.mc.post_mc_native_event(event)
+ * 
+ *             elif notification_message.message == notification_sound_loop_set_stopped:             # <<<<<<<<<<<<<<
+ *                 if sound_loop_set_settings['events_when_stopped'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_stopped']:
+ */
+      break;
+
+      /* "mpfmc/core/audio/track_sound_loop.pyx":247
+ *                 del self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
+ * 
+ *             elif notification_message.message == notification_sound_loop_set_looping:             # <<<<<<<<<<<<<<
+ *                 if sound_loop_set_settings['events_when_looping'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_looping']:
+ */
+      case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_looping:
+
+      /* "mpfmc/core/audio/track_sound_loop.pyx":248
+ * 
+ *             elif notification_message.message == notification_sound_loop_set_looping:
+ *                 if sound_loop_set_settings['events_when_looping'] is not None:             # <<<<<<<<<<<<<<
+ *                     for event in sound_loop_set_settings['events_when_looping']:
+ *                         self.mc.post_mc_native_event(event)
+ */
+      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_looping); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 248, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __pyx_t_1 = (__pyx_t_3 != Py_None);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -4590,13 +4874,13 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       if (__pyx_t_2) {
 
         /* "mpfmc/core/audio/track_sound_loop.pyx":249
- *             if notification_message.message == notification_sound_loop_set_started:
- *                 if sound_loop_set_settings['events_when_played'] is not None:
- *                     for event in sound_loop_set_settings['events_when_played']:             # <<<<<<<<<<<<<<
+ *             elif notification_message.message == notification_sound_loop_set_looping:
+ *                 if sound_loop_set_settings['events_when_looping'] is not None:
+ *                     for event in sound_loop_set_settings['events_when_looping']:             # <<<<<<<<<<<<<<
  *                         self.mc.post_mc_native_event(event)
  * 
  */
-        __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_played); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_looping); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
           __pyx_t_5 = __pyx_t_3; __Pyx_INCREF(__pyx_t_5); __pyx_t_4 = 0;
@@ -4642,403 +4926,13 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
           __pyx_t_3 = 0;
 
           /* "mpfmc/core/audio/track_sound_loop.pyx":250
- *                 if sound_loop_set_settings['events_when_played'] is not None:
- *                     for event in sound_loop_set_settings['events_when_played']:
- *                         self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
- * 
- *             elif notification_message.message == notification_sound_loop_set_stopped:
- */
-          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 250, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_6 = NULL;
-          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
-            __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_7);
-            if (likely(__pyx_t_6)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-              __Pyx_INCREF(__pyx_t_6);
-              __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_7, function);
-            }
-          }
-          if (!__pyx_t_6) {
-            __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_3);
-          } else {
-            #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_7)) {
-              PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_v_event};
-              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __Pyx_GOTREF(__pyx_t_3);
-            } else
-            #endif
-            #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
-              PyObject *__pyx_temp[2] = {__pyx_t_6, __pyx_v_event};
-              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-              __Pyx_GOTREF(__pyx_t_3);
-            } else
-            #endif
-            {
-              __pyx_t_10 = PyTuple_New(1+1); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 250, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_10);
-              __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_6); __pyx_t_6 = NULL;
-              __Pyx_INCREF(__pyx_v_event);
-              __Pyx_GIVEREF(__pyx_v_event);
-              PyTuple_SET_ITEM(__pyx_t_10, 0+1, __pyx_v_event);
-              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_3);
-              __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-            }
-          }
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-          /* "mpfmc/core/audio/track_sound_loop.pyx":249
- *             if notification_message.message == notification_sound_loop_set_started:
- *                 if sound_loop_set_settings['events_when_played'] is not None:
- *                     for event in sound_loop_set_settings['events_when_played']:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event)
- * 
- */
-        }
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-        /* "mpfmc/core/audio/track_sound_loop.pyx":248
- * 
- *             if notification_message.message == notification_sound_loop_set_started:
- *                 if sound_loop_set_settings['events_when_played'] is not None:             # <<<<<<<<<<<<<<
- *                     for event in sound_loop_set_settings['events_when_played']:
- *                         self.mc.post_mc_native_event(event)
- */
-      }
-
-      /* "mpfmc/core/audio/track_sound_loop.pyx":247
- *                 return
- * 
- *             if notification_message.message == notification_sound_loop_set_started:             # <<<<<<<<<<<<<<
- *                 if sound_loop_set_settings['events_when_played'] is not None:
- *                     for event in sound_loop_set_settings['events_when_played']:
- */
-      break;
-
-      /* "mpfmc/core/audio/track_sound_loop.pyx":252
- *                         self.mc.post_mc_native_event(event)
- * 
- *             elif notification_message.message == notification_sound_loop_set_stopped:             # <<<<<<<<<<<<<<
- *                 if sound_loop_set_settings['events_when_stopped'] is not None:
- *                     for event in sound_loop_set_settings['events_when_stopped']:
- */
-      case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_stopped:
-
-      /* "mpfmc/core/audio/track_sound_loop.pyx":253
- * 
- *             elif notification_message.message == notification_sound_loop_set_stopped:
- *                 if sound_loop_set_settings['events_when_stopped'] is not None:             # <<<<<<<<<<<<<<
- *                     for event in sound_loop_set_settings['events_when_stopped']:
- *                         self.mc.post_mc_native_event(event)
- */
-      __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_stopped); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 253, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_2 = (__pyx_t_5 != Py_None);
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_1 = (__pyx_t_2 != 0);
-      if (__pyx_t_1) {
-
-        /* "mpfmc/core/audio/track_sound_loop.pyx":254
- *             elif notification_message.message == notification_sound_loop_set_stopped:
- *                 if sound_loop_set_settings['events_when_stopped'] is not None:
- *                     for event in sound_loop_set_settings['events_when_stopped']:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event)
- * 
- */
-        __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_stopped); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 254, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_5);
-        if (likely(PyList_CheckExact(__pyx_t_5)) || PyTuple_CheckExact(__pyx_t_5)) {
-          __pyx_t_3 = __pyx_t_5; __Pyx_INCREF(__pyx_t_3); __pyx_t_4 = 0;
-          __pyx_t_11 = NULL;
-        } else {
-          __pyx_t_4 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_11 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 254, __pyx_L1_error)
-        }
-        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-        for (;;) {
-          if (likely(!__pyx_t_11)) {
-            if (likely(PyList_CheckExact(__pyx_t_3))) {
-              if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_3)) break;
-              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 254, __pyx_L1_error)
-              #else
-              __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 254, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              #endif
-            } else {
-              if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
-              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_4); __Pyx_INCREF(__pyx_t_5); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 254, __pyx_L1_error)
-              #else
-              __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 254, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              #endif
-            }
-          } else {
-            __pyx_t_5 = __pyx_t_11(__pyx_t_3);
-            if (unlikely(!__pyx_t_5)) {
-              PyObject* exc_type = PyErr_Occurred();
-              if (exc_type) {
-                if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                else __PYX_ERR(0, 254, __pyx_L1_error)
-              }
-              break;
-            }
-            __Pyx_GOTREF(__pyx_t_5);
-          }
-          __Pyx_XDECREF_SET(__pyx_v_event, __pyx_t_5);
-          __pyx_t_5 = 0;
-
-          /* "mpfmc/core/audio/track_sound_loop.pyx":255
- *                 if sound_loop_set_settings['events_when_stopped'] is not None:
- *                     for event in sound_loop_set_settings['events_when_stopped']:
- *                         self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
- * 
- *                 self.log.debug("Removing sound_loop_set settings %d from active list", notification_message.data.sound_loop_set.id)
- */
-          __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 255, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_7);
-          __pyx_t_10 = NULL;
-          if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
-            __pyx_t_10 = PyMethod_GET_SELF(__pyx_t_7);
-            if (likely(__pyx_t_10)) {
-              PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_7);
-              __Pyx_INCREF(__pyx_t_10);
-              __Pyx_INCREF(function);
-              __Pyx_DECREF_SET(__pyx_t_7, function);
-            }
-          }
-          if (!__pyx_t_10) {
-            __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_7, __pyx_v_event); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 255, __pyx_L1_error)
-            __Pyx_GOTREF(__pyx_t_5);
-          } else {
-            #if CYTHON_FAST_PYCALL
-            if (PyFunction_Check(__pyx_t_7)) {
-              PyObject *__pyx_temp[2] = {__pyx_t_10, __pyx_v_event};
-              __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_7, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 255, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-            } else
-            #endif
-            #if CYTHON_FAST_PYCCALL
-            if (__Pyx_PyFastCFunction_Check(__pyx_t_7)) {
-              PyObject *__pyx_temp[2] = {__pyx_t_10, __pyx_v_event};
-              __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_7, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 255, __pyx_L1_error)
-              __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-              __Pyx_GOTREF(__pyx_t_5);
-            } else
-            #endif
-            {
-              __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 255, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_6);
-              __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_10); __pyx_t_10 = NULL;
-              __Pyx_INCREF(__pyx_v_event);
-              __Pyx_GIVEREF(__pyx_v_event);
-              PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_v_event);
-              __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_7, __pyx_t_6, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 255, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_5);
-              __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-            }
-          }
-          __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-
-          /* "mpfmc/core/audio/track_sound_loop.pyx":254
- *             elif notification_message.message == notification_sound_loop_set_stopped:
- *                 if sound_loop_set_settings['events_when_stopped'] is not None:
- *                     for event in sound_loop_set_settings['events_when_stopped']:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event)
- * 
- */
-        }
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-        /* "mpfmc/core/audio/track_sound_loop.pyx":253
- * 
- *             elif notification_message.message == notification_sound_loop_set_stopped:
- *                 if sound_loop_set_settings['events_when_stopped'] is not None:             # <<<<<<<<<<<<<<
- *                     for event in sound_loop_set_settings['events_when_stopped']:
- *                         self.mc.post_mc_native_event(event)
- */
-      }
-
-      /* "mpfmc/core/audio/track_sound_loop.pyx":257
- *                         self.mc.post_mc_native_event(event)
- * 
- *                 self.log.debug("Removing sound_loop_set settings %d from active list", notification_message.data.sound_loop_set.id)             # <<<<<<<<<<<<<<
- *                 del self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
- * 
- */
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 257, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __pyx_t_7 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 257, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_6 = NULL;
-      __pyx_t_9 = 0;
-      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_5))) {
-        __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_5);
-        if (likely(__pyx_t_6)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_5);
-          __Pyx_INCREF(__pyx_t_6);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_5, function);
-          __pyx_t_9 = 1;
-        }
-      }
-      #if CYTHON_FAST_PYCALL
-      if (PyFunction_Check(__pyx_t_5)) {
-        PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_kp_u_Removing_sound_loop_set_settings, __pyx_t_7};
-        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
-        __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __Pyx_GOTREF(__pyx_t_3);
-        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      } else
-      #endif
-      #if CYTHON_FAST_PYCCALL
-      if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
-        PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_kp_u_Removing_sound_loop_set_settings, __pyx_t_7};
-        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
-        __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
-        __Pyx_GOTREF(__pyx_t_3);
-        __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      } else
-      #endif
-      {
-        __pyx_t_10 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 257, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_10);
-        if (__pyx_t_6) {
-          __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_6); __pyx_t_6 = NULL;
-        }
-        __Pyx_INCREF(__pyx_kp_u_Removing_sound_loop_set_settings);
-        __Pyx_GIVEREF(__pyx_kp_u_Removing_sound_loop_set_settings);
-        PyTuple_SET_ITEM(__pyx_t_10, 0+__pyx_t_9, __pyx_kp_u_Removing_sound_loop_set_settings);
-        __Pyx_GIVEREF(__pyx_t_7);
-        PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_9, __pyx_t_7);
-        __pyx_t_7 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 257, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-      }
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-      /* "mpfmc/core/audio/track_sound_loop.pyx":258
- * 
- *                 self.log.debug("Removing sound_loop_set settings %d from active list", notification_message.data.sound_loop_set.id)
- *                 del self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]             # <<<<<<<<<<<<<<
- * 
- *             elif notification_message.message == notification_sound_loop_set_looping:
- */
-      if (unlikely(__pyx_v_self->_active_sound_loop_sets == Py_None)) {
-        PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 258, __pyx_L1_error)
-      }
-      __pyx_t_3 = __Pyx_PyInt_From_long(__pyx_v_notification_message->data.sound_loop_set.id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 258, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      if (unlikely(PyDict_DelItem(__pyx_v_self->_active_sound_loop_sets, __pyx_t_3) < 0)) __PYX_ERR(0, 258, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-
-      /* "mpfmc/core/audio/track_sound_loop.pyx":252
- *                         self.mc.post_mc_native_event(event)
- * 
- *             elif notification_message.message == notification_sound_loop_set_stopped:             # <<<<<<<<<<<<<<
- *                 if sound_loop_set_settings['events_when_stopped'] is not None:
- *                     for event in sound_loop_set_settings['events_when_stopped']:
- */
-      break;
-
-      /* "mpfmc/core/audio/track_sound_loop.pyx":260
- *                 del self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
- * 
- *             elif notification_message.message == notification_sound_loop_set_looping:             # <<<<<<<<<<<<<<
- *                 if sound_loop_set_settings['events_when_looping'] is not None:
- *                     for event in sound_loop_set_settings['events_when_looping']:
- */
-      case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_loop_set_looping:
-
-      /* "mpfmc/core/audio/track_sound_loop.pyx":261
- * 
- *             elif notification_message.message == notification_sound_loop_set_looping:
- *                 if sound_loop_set_settings['events_when_looping'] is not None:             # <<<<<<<<<<<<<<
- *                     for event in sound_loop_set_settings['events_when_looping']:
- *                         self.mc.post_mc_native_event(event)
- */
-      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_looping); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 261, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_1 = (__pyx_t_3 != Py_None);
-      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_2 = (__pyx_t_1 != 0);
-      if (__pyx_t_2) {
-
-        /* "mpfmc/core/audio/track_sound_loop.pyx":262
- *             elif notification_message.message == notification_sound_loop_set_looping:
- *                 if sound_loop_set_settings['events_when_looping'] is not None:
- *                     for event in sound_loop_set_settings['events_when_looping']:             # <<<<<<<<<<<<<<
- *                         self.mc.post_mc_native_event(event)
- * 
- */
-        __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_v_sound_loop_set_settings, __pyx_n_u_events_when_looping); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 262, __pyx_L1_error)
-        __Pyx_GOTREF(__pyx_t_3);
-        if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
-          __pyx_t_5 = __pyx_t_3; __Pyx_INCREF(__pyx_t_5); __pyx_t_4 = 0;
-          __pyx_t_11 = NULL;
-        } else {
-          __pyx_t_4 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 262, __pyx_L1_error)
-          __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_11 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 262, __pyx_L1_error)
-        }
-        __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        for (;;) {
-          if (likely(!__pyx_t_11)) {
-            if (likely(PyList_CheckExact(__pyx_t_5))) {
-              if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_5)) break;
-              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_3 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 262, __pyx_L1_error)
-              #else
-              __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 262, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_3);
-              #endif
-            } else {
-              if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_5)) break;
-              #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 262, __pyx_L1_error)
-              #else
-              __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 262, __pyx_L1_error)
-              __Pyx_GOTREF(__pyx_t_3);
-              #endif
-            }
-          } else {
-            __pyx_t_3 = __pyx_t_11(__pyx_t_5);
-            if (unlikely(!__pyx_t_3)) {
-              PyObject* exc_type = PyErr_Occurred();
-              if (exc_type) {
-                if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                else __PYX_ERR(0, 262, __pyx_L1_error)
-              }
-              break;
-            }
-            __Pyx_GOTREF(__pyx_t_3);
-          }
-          __Pyx_XDECREF_SET(__pyx_v_event, __pyx_t_3);
-          __pyx_t_3 = 0;
-
-          /* "mpfmc/core/audio/track_sound_loop.pyx":263
  *                 if sound_loop_set_settings['events_when_looping'] is not None:
  *                     for event in sound_loop_set_settings['events_when_looping']:
  *                         self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
  * 
  *         elif notification_message.message == notification_sound_marker:
  */
-          __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 263, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 250, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_10);
           __pyx_t_7 = NULL;
           if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_10))) {
@@ -5051,13 +4945,13 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
             }
           }
           if (!__pyx_t_7) {
-            __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_v_event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+            __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_10, __pyx_v_event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_3);
           } else {
             #if CYTHON_FAST_PYCALL
             if (PyFunction_Check(__pyx_t_10)) {
               PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_v_event};
-              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+              __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_10, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
               __Pyx_GOTREF(__pyx_t_3);
             } else
@@ -5065,19 +4959,19 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
             #if CYTHON_FAST_PYCCALL
             if (__Pyx_PyFastCFunction_Check(__pyx_t_10)) {
               PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_v_event};
-              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+              __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_10, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
               __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
               __Pyx_GOTREF(__pyx_t_3);
             } else
             #endif
             {
-              __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 263, __pyx_L1_error)
+              __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 250, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_6);
               __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_7); __pyx_t_7 = NULL;
               __Pyx_INCREF(__pyx_v_event);
               __Pyx_GIVEREF(__pyx_v_event);
               PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_v_event);
-              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 263, __pyx_L1_error)
+              __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_10, __pyx_t_6, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 250, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_3);
               __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
             }
@@ -5085,7 +4979,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":262
+          /* "mpfmc/core/audio/track_sound_loop.pyx":249
  *             elif notification_message.message == notification_sound_loop_set_looping:
  *                 if sound_loop_set_settings['events_when_looping'] is not None:
  *                     for event in sound_loop_set_settings['events_when_looping']:             # <<<<<<<<<<<<<<
@@ -5095,7 +4989,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         }
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":261
+        /* "mpfmc/core/audio/track_sound_loop.pyx":248
  * 
  *             elif notification_message.message == notification_sound_loop_set_looping:
  *                 if sound_loop_set_settings['events_when_looping'] is not None:             # <<<<<<<<<<<<<<
@@ -5104,7 +4998,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":260
+      /* "mpfmc/core/audio/track_sound_loop.pyx":247
  *                 del self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
  * 
  *             elif notification_message.message == notification_sound_loop_set_looping:             # <<<<<<<<<<<<<<
@@ -5115,7 +5009,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       default: break;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":229
+    /* "mpfmc/core/audio/track_sound_loop.pyx":216
  *                        notification_message.message, notification_message.sound_instance_id)
  * 
  *         if notification_message.message in (notification_sound_loop_set_started, notification_sound_loop_set_stopped,             # <<<<<<<<<<<<<<
@@ -5124,7 +5018,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     break;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":265
+    /* "mpfmc/core/audio/track_sound_loop.pyx":252
  *                         self.mc.post_mc_native_event(event)
  * 
  *         elif notification_message.message == notification_sound_marker:             # <<<<<<<<<<<<<<
@@ -5133,18 +5027,18 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     case __pyx_e_5mpfmc_4core_5audio_20notification_message_notification_sound_marker:
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":267
+    /* "mpfmc/core/audio/track_sound_loop.pyx":254
  *         elif notification_message.message == notification_sound_marker:
  * 
  *             if notification_message.sound_id not in self.mc.sounds_by_id.keys():             # <<<<<<<<<<<<<<
  *                 self.log.warning("Received a notification message for a sound (id: %d) "
  *                                  "that does not exist. Notification will be discarded.",
  */
-    __pyx_t_5 = __Pyx_PyInt_From_Uint64(__pyx_v_notification_message->sound_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_Uint64(__pyx_v_notification_message->sound_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 254, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds_by_id); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds_by_id); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 254, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
-    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_keys); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_10, __pyx_n_s_keys); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 254, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     __pyx_t_10 = NULL;
@@ -5158,37 +5052,37 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       }
     }
     if (__pyx_t_10) {
-      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
     } else {
-      __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_CallNoArg(__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 254, __pyx_L1_error)
     }
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_t_5, __pyx_t_3, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 267, __pyx_L1_error)
+    __pyx_t_2 = (__Pyx_PySequence_ContainsTF(__pyx_t_5, __pyx_t_3, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 254, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_1 = (__pyx_t_2 != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":268
+      /* "mpfmc/core/audio/track_sound_loop.pyx":255
  * 
  *             if notification_message.sound_id not in self.mc.sounds_by_id.keys():
  *                 self.log.warning("Received a notification message for a sound (id: %d) "             # <<<<<<<<<<<<<<
  *                                  "that does not exist. Notification will be discarded.",
  *                                  notification_message.sound_id)
  */
-      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 268, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 255, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":270
+      /* "mpfmc/core/audio/track_sound_loop.pyx":257
  *                 self.log.warning("Received a notification message for a sound (id: %d) "
  *                                  "that does not exist. Notification will be discarded.",
  *                                  notification_message.sound_id)             # <<<<<<<<<<<<<<
  *                 SDL_UnlockAudio()
  *                 return
  */
-      __pyx_t_6 = __Pyx_PyInt_From_Uint64(__pyx_v_notification_message->sound_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 270, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyInt_From_Uint64(__pyx_v_notification_message->sound_id); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 257, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __pyx_t_10 = NULL;
       __pyx_t_9 = 0;
@@ -5205,7 +5099,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_kp_u_Received_a_notification_message_2, __pyx_t_6};
-        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 268, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 255, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -5214,14 +5108,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_5)) {
         PyObject *__pyx_temp[3] = {__pyx_t_10, __pyx_kp_u_Received_a_notification_message_2, __pyx_t_6};
-        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 268, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_5, __pyx_temp+1-__pyx_t_9, 2+__pyx_t_9); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 255, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       } else
       #endif
       {
-        __pyx_t_7 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 268, __pyx_L1_error)
+        __pyx_t_7 = PyTuple_New(2+__pyx_t_9); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 255, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         if (__pyx_t_10) {
           __Pyx_GIVEREF(__pyx_t_10); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_10); __pyx_t_10 = NULL;
@@ -5232,14 +5126,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         __Pyx_GIVEREF(__pyx_t_6);
         PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_9, __pyx_t_6);
         __pyx_t_6 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 268, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_5, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 255, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       }
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":271
+      /* "mpfmc/core/audio/track_sound_loop.pyx":258
  *                                  "that does not exist. Notification will be discarded.",
  *                                  notification_message.sound_id)
  *                 SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -5248,7 +5142,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       SDL_UnlockAudio();
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":272
+      /* "mpfmc/core/audio/track_sound_loop.pyx":259
  *                                  notification_message.sound_id)
  *                 SDL_UnlockAudio()
  *                 return             # <<<<<<<<<<<<<<
@@ -5259,7 +5153,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       __pyx_r = Py_None; __Pyx_INCREF(Py_None);
       goto __pyx_L0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":267
+      /* "mpfmc/core/audio/track_sound_loop.pyx":254
  *         elif notification_message.message == notification_sound_marker:
  * 
  *             if notification_message.sound_id not in self.mc.sounds_by_id.keys():             # <<<<<<<<<<<<<<
@@ -5268,64 +5162,64 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":277
+    /* "mpfmc/core/audio/track_sound_loop.pyx":264
  *             # asset is used directly and therefore we need to reference the sound asset by sound_id to
  *             # retrieve the marker events to send.
  *             sound = self.mc.sounds_by_id[notification_message.sound_id]             # <<<<<<<<<<<<<<
  * 
  *             # Send marker event(s)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds_by_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 277, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds_by_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 264, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_notification_message->sound_id, Uint64, 0, __Pyx_PyInt_From_Uint64, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 277, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_notification_message->sound_id, Uint64, 0, __Pyx_PyInt_From_Uint64, 0, 0, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 264, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_sound = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":280
+    /* "mpfmc/core/audio/track_sound_loop.pyx":267
  * 
  *             # Send marker event(s)
  *             if sound and 0 <= notification_message.data.marker.id < sound.marker_count:             # <<<<<<<<<<<<<<
  *                 if sound.markers[notification_message.data.marker.id]['events'] is not None:
  *                     for event in sound.markers[notification_message.data.marker.id]['events']:
  */
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_sound); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 280, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_v_sound); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 267, __pyx_L1_error)
     if (__pyx_t_2) {
     } else {
       __pyx_t_1 = __pyx_t_2;
       goto __pyx_L23_bool_binop_done;
     }
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_notification_message->data.marker.id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 280, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_notification_message->data.marker.id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 267, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
-    __pyx_t_3 = PyObject_RichCompare(__pyx_int_0, __pyx_t_5, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 280, __pyx_L1_error)
+    __pyx_t_3 = PyObject_RichCompare(__pyx_int_0, __pyx_t_5, Py_LE); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
     if (__Pyx_PyObject_IsTrue(__pyx_t_3)) {
       __Pyx_DECREF(__pyx_t_3);
-      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_marker_count); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 280, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_marker_count); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 267, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_3 = PyObject_RichCompare(__pyx_t_5, __pyx_t_7, Py_LT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 280, __pyx_L1_error)
+      __pyx_t_3 = PyObject_RichCompare(__pyx_t_5, __pyx_t_7, Py_LT); __Pyx_XGOTREF(__pyx_t_3); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 280, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_3); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 267, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_t_1 = __pyx_t_2;
     __pyx_L23_bool_binop_done:;
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":281
+      /* "mpfmc/core/audio/track_sound_loop.pyx":268
  *             # Send marker event(s)
  *             if sound and 0 <= notification_message.data.marker.id < sound.marker_count:
  *                 if sound.markers[notification_message.data.marker.id]['events'] is not None:             # <<<<<<<<<<<<<<
  *                     for event in sound.markers[notification_message.data.marker.id]['events']:
  *                         self.mc.post_mc_native_event(event,
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_markers); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 281, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_markers); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 268, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_notification_message->data.marker.id, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 281, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_notification_message->data.marker.id, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 268, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_events); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 281, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_events); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 268, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       __pyx_t_1 = (__pyx_t_3 != Py_None);
@@ -5333,28 +5227,28 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       __pyx_t_2 = (__pyx_t_1 != 0);
       if (__pyx_t_2) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":282
+        /* "mpfmc/core/audio/track_sound_loop.pyx":269
  *             if sound and 0 <= notification_message.data.marker.id < sound.marker_count:
  *                 if sound.markers[notification_message.data.marker.id]['events'] is not None:
  *                     for event in sound.markers[notification_message.data.marker.id]['events']:             # <<<<<<<<<<<<<<
  *                         self.mc.post_mc_native_event(event,
  *                                                      sound_instance=sound,
  */
-        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_markers); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 282, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_markers); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 269, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_notification_message->data.marker.id, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 282, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_GetItemInt(__pyx_t_3, __pyx_v_notification_message->data.marker.id, int, 1, __Pyx_PyInt_From_int, 0, 1, 1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 269, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_events); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 282, __pyx_L1_error)
+        __pyx_t_3 = __Pyx_PyObject_Dict_GetItem(__pyx_t_5, __pyx_n_u_events); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 269, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
         if (likely(PyList_CheckExact(__pyx_t_3)) || PyTuple_CheckExact(__pyx_t_3)) {
           __pyx_t_5 = __pyx_t_3; __Pyx_INCREF(__pyx_t_5); __pyx_t_4 = 0;
           __pyx_t_11 = NULL;
         } else {
-          __pyx_t_4 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 282, __pyx_L1_error)
+          __pyx_t_4 = -1; __pyx_t_5 = PyObject_GetIter(__pyx_t_3); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 269, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
-          __pyx_t_11 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 282, __pyx_L1_error)
+          __pyx_t_11 = Py_TYPE(__pyx_t_5)->tp_iternext; if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 269, __pyx_L1_error)
         }
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         for (;;) {
@@ -5362,17 +5256,17 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
             if (likely(PyList_CheckExact(__pyx_t_5))) {
               if (__pyx_t_4 >= PyList_GET_SIZE(__pyx_t_5)) break;
               #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_3 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 282, __pyx_L1_error)
+              __pyx_t_3 = PyList_GET_ITEM(__pyx_t_5, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 269, __pyx_L1_error)
               #else
-              __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 282, __pyx_L1_error)
+              __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 269, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_3);
               #endif
             } else {
               if (__pyx_t_4 >= PyTuple_GET_SIZE(__pyx_t_5)) break;
               #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-              __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 282, __pyx_L1_error)
+              __pyx_t_3 = PyTuple_GET_ITEM(__pyx_t_5, __pyx_t_4); __Pyx_INCREF(__pyx_t_3); __pyx_t_4++; if (unlikely(0 < 0)) __PYX_ERR(0, 269, __pyx_L1_error)
               #else
-              __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 282, __pyx_L1_error)
+              __pyx_t_3 = PySequence_ITEM(__pyx_t_5, __pyx_t_4); __pyx_t_4++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 269, __pyx_L1_error)
               __Pyx_GOTREF(__pyx_t_3);
               #endif
             }
@@ -5382,7 +5276,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
               PyObject* exc_type = PyErr_Occurred();
               if (exc_type) {
                 if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-                else __PYX_ERR(0, 282, __pyx_L1_error)
+                else __PYX_ERR(0, 269, __pyx_L1_error)
               }
               break;
             }
@@ -5391,59 +5285,59 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
           __Pyx_XDECREF_SET(__pyx_v_event, __pyx_t_3);
           __pyx_t_3 = 0;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":283
+          /* "mpfmc/core/audio/track_sound_loop.pyx":270
  *                 if sound.markers[notification_message.data.marker.id]['events'] is not None:
  *                     for event in sound.markers[notification_message.data.marker.id]['events']:
  *                         self.mc.post_mc_native_event(event,             # <<<<<<<<<<<<<<
  *                                                      sound_instance=sound,
  *                                                      marker_id=notification_message.data.marker.id)
  */
-          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 283, __pyx_L1_error)
+          __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_post_mc_native_event); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 270, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
-          __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
+          __pyx_t_7 = PyTuple_New(1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 270, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_INCREF(__pyx_v_event);
           __Pyx_GIVEREF(__pyx_v_event);
           PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_v_event);
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":284
+          /* "mpfmc/core/audio/track_sound_loop.pyx":271
  *                     for event in sound.markers[notification_message.data.marker.id]['events']:
  *                         self.mc.post_mc_native_event(event,
  *                                                      sound_instance=sound,             # <<<<<<<<<<<<<<
  *                                                      marker_id=notification_message.data.marker.id)
  * 
  */
-          __pyx_t_6 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 284, __pyx_L1_error)
+          __pyx_t_6 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 271, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
-          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_sound_instance, __pyx_v_sound) < 0) __PYX_ERR(0, 284, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_sound_instance, __pyx_v_sound) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":285
+          /* "mpfmc/core/audio/track_sound_loop.pyx":272
  *                         self.mc.post_mc_native_event(event,
  *                                                      sound_instance=sound,
  *                                                      marker_id=notification_message.data.marker.id)             # <<<<<<<<<<<<<<
  * 
  *         SDL_UnlockAudio()
  */
-          __pyx_t_10 = __Pyx_PyInt_From_int(__pyx_v_notification_message->data.marker.id); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 285, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyInt_From_int(__pyx_v_notification_message->data.marker.id); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 272, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_10);
-          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_marker_id, __pyx_t_10) < 0) __PYX_ERR(0, 284, __pyx_L1_error)
+          if (PyDict_SetItem(__pyx_t_6, __pyx_n_s_marker_id, __pyx_t_10) < 0) __PYX_ERR(0, 271, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":283
+          /* "mpfmc/core/audio/track_sound_loop.pyx":270
  *                 if sound.markers[notification_message.data.marker.id]['events'] is not None:
  *                     for event in sound.markers[notification_message.data.marker.id]['events']:
  *                         self.mc.post_mc_native_event(event,             # <<<<<<<<<<<<<<
  *                                                      sound_instance=sound,
  *                                                      marker_id=notification_message.data.marker.id)
  */
-          __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 283, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 270, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":282
+          /* "mpfmc/core/audio/track_sound_loop.pyx":269
  *             if sound and 0 <= notification_message.data.marker.id < sound.marker_count:
  *                 if sound.markers[notification_message.data.marker.id]['events'] is not None:
  *                     for event in sound.markers[notification_message.data.marker.id]['events']:             # <<<<<<<<<<<<<<
@@ -5453,7 +5347,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         }
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":281
+        /* "mpfmc/core/audio/track_sound_loop.pyx":268
  *             # Send marker event(s)
  *             if sound and 0 <= notification_message.data.marker.id < sound.marker_count:
  *                 if sound.markers[notification_message.data.marker.id]['events'] is not None:             # <<<<<<<<<<<<<<
@@ -5462,7 +5356,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":280
+      /* "mpfmc/core/audio/track_sound_loop.pyx":267
  * 
  *             # Send marker event(s)
  *             if sound and 0 <= notification_message.data.marker.id < sound.marker_count:             # <<<<<<<<<<<<<<
@@ -5471,7 +5365,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":265
+    /* "mpfmc/core/audio/track_sound_loop.pyx":252
  *                         self.mc.post_mc_native_event(event)
  * 
  *         elif notification_message.message == notification_sound_marker:             # <<<<<<<<<<<<<<
@@ -5482,7 +5376,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     default: break;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":287
+  /* "mpfmc/core/audio/track_sound_loop.pyx":274
  *                                                      marker_id=notification_message.data.marker.id)
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -5491,7 +5385,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":200
+  /* "mpfmc/core/audio/track_sound_loop.pyx":187
  *         SDL_UnlockAudio()
  * 
  *     cdef process_notification_message(self, NotificationMessageContainer *notification_message):             # <<<<<<<<<<<<<<
@@ -5520,7 +5414,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":289
+/* "mpfmc/core/audio/track_sound_loop.pyx":276
  *         SDL_UnlockAudio()
  * 
  *     def play_sound_loop_set(self, dict sound_loop_set not None, str context=None, dict player_settings=None):             # <<<<<<<<<<<<<<
@@ -5575,7 +5469,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "play_sound_loop_set") < 0)) __PYX_ERR(0, 289, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "play_sound_loop_set") < 0)) __PYX_ERR(0, 276, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -5594,15 +5488,15 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("play_sound_loop_set", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 289, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("play_sound_loop_set", 0, 1, 3, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 276, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.play_sound_loop_set", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_sound_loop_set), (&PyDict_Type), 0, "sound_loop_set", 1))) __PYX_ERR(0, 289, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_context), (&PyUnicode_Type), 1, "context", 1))) __PYX_ERR(0, 289, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_player_settings), (&PyDict_Type), 1, "player_settings", 1))) __PYX_ERR(0, 289, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_sound_loop_set), (&PyDict_Type), 0, "sound_loop_set", 1))) __PYX_ERR(0, 276, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_context), (&PyUnicode_Type), 1, "context", 1))) __PYX_ERR(0, 276, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_player_settings), (&PyDict_Type), 1, "player_settings", 1))) __PYX_ERR(0, 276, __pyx_L1_error)
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_18play_sound_loop_set(((struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self), __pyx_v_sound_loop_set, __pyx_v_context, __pyx_v_player_settings);
 
   /* function exit code */
@@ -5642,7 +5536,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __Pyx_RefNannySetupContext("play_sound_loop_set", 0);
   __Pyx_INCREF(__pyx_v_player_settings);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":301
+  /* "mpfmc/core/audio/track_sound_loop.pyx":288
  *         cdef SoundLoopLayerSettings *layer
  *         cdef int bytes_per_sample_frame
  *         cdef bint player_already_playing = False             # <<<<<<<<<<<<<<
@@ -5651,14 +5545,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_player_already_playing = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":303
+  /* "mpfmc/core/audio/track_sound_loop.pyx":290
  *         cdef bint player_already_playing = False
  * 
  *         self.log.debug("play_sound_loop_set - Preparing sound_loop_set '%s' for playback.", sound_loop_set)             # <<<<<<<<<<<<<<
  * 
  *         if player_settings is None:
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 303, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_4 = 0;
@@ -5675,7 +5569,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_kp_u_play_sound_loop_set_Preparing_so, __pyx_v_sound_loop_set};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
@@ -5683,13 +5577,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_kp_u_play_sound_loop_set_Preparing_so, __pyx_v_sound_loop_set};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 303, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 290, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -5700,14 +5594,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __Pyx_INCREF(__pyx_v_sound_loop_set);
     __Pyx_GIVEREF(__pyx_v_sound_loop_set);
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, __pyx_v_sound_loop_set);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":305
+  /* "mpfmc/core/audio/track_sound_loop.pyx":292
  *         self.log.debug("play_sound_loop_set - Preparing sound_loop_set '%s' for playback.", sound_loop_set)
  * 
  *         if player_settings is None:             # <<<<<<<<<<<<<<
@@ -5718,19 +5612,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_7 = (__pyx_t_6 != 0);
   if (__pyx_t_7) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":306
+    /* "mpfmc/core/audio/track_sound_loop.pyx":293
  * 
  *         if player_settings is None:
  *             player_settings = dict()             # <<<<<<<<<<<<<<
  * 
  *         # Determine settings (override sound loop set with player settings)
  */
-    __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 306, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 293, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF_SET(__pyx_v_player_settings, ((PyObject*)__pyx_t_1));
     __pyx_t_1 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":305
+    /* "mpfmc/core/audio/track_sound_loop.pyx":292
  *         self.log.debug("play_sound_loop_set - Preparing sound_loop_set '%s' for playback.", sound_loop_set)
  * 
  *         if player_settings is None:             # <<<<<<<<<<<<<<
@@ -5739,7 +5633,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":309
+  /* "mpfmc/core/audio/track_sound_loop.pyx":296
  * 
  *         # Determine settings (override sound loop set with player settings)
  *         player_settings.setdefault('fade_in', sound_loop_set['fade_in'])             # <<<<<<<<<<<<<<
@@ -5748,16 +5642,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 309, __pyx_L1_error)
+    __PYX_ERR(0, 296, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_fade_in); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_fade_in); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_fade_in, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 309, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_fade_in, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 296, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":310
+  /* "mpfmc/core/audio/track_sound_loop.pyx":297
  *         # Determine settings (override sound loop set with player settings)
  *         player_settings.setdefault('fade_in', sound_loop_set['fade_in'])
  *         player_settings.setdefault('fade_out', sound_loop_set['fade_out'])             # <<<<<<<<<<<<<<
@@ -5766,16 +5660,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 310, __pyx_L1_error)
+    __PYX_ERR(0, 297, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_fade_out); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 310, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_fade_out); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_fade_out, __pyx_t_2, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 310, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_fade_out, __pyx_t_2, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":311
+  /* "mpfmc/core/audio/track_sound_loop.pyx":298
  *         player_settings.setdefault('fade_in', sound_loop_set['fade_in'])
  *         player_settings.setdefault('fade_out', sound_loop_set['fade_out'])
  *         player_settings.setdefault('start_at', 0)             # <<<<<<<<<<<<<<
@@ -5784,13 +5678,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 311, __pyx_L1_error)
+    __PYX_ERR(0, 298, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_start_at, __pyx_int_0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 311, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_start_at, __pyx_int_0, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 298, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":312
+  /* "mpfmc/core/audio/track_sound_loop.pyx":299
  *         player_settings.setdefault('fade_out', sound_loop_set['fade_out'])
  *         player_settings.setdefault('start_at', 0)
  *         player_settings.setdefault('events_when_played', sound_loop_set['events_when_played'])             # <<<<<<<<<<<<<<
@@ -5799,16 +5693,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 312, __pyx_L1_error)
+    __PYX_ERR(0, 299, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_events_when_played); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 312, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_events_when_played); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_events_when_played, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 312, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_events_when_played, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 299, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":313
+  /* "mpfmc/core/audio/track_sound_loop.pyx":300
  *         player_settings.setdefault('start_at', 0)
  *         player_settings.setdefault('events_when_played', sound_loop_set['events_when_played'])
  *         player_settings.setdefault('events_when_stopped', sound_loop_set['events_when_stopped'])             # <<<<<<<<<<<<<<
@@ -5817,16 +5711,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 313, __pyx_L1_error)
+    __PYX_ERR(0, 300, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_events_when_stopped); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_events_when_stopped); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_events_when_stopped, __pyx_t_2, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 313, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_events_when_stopped, __pyx_t_2, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 300, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":314
+  /* "mpfmc/core/audio/track_sound_loop.pyx":301
  *         player_settings.setdefault('events_when_played', sound_loop_set['events_when_played'])
  *         player_settings.setdefault('events_when_stopped', sound_loop_set['events_when_stopped'])
  *         player_settings.setdefault('events_when_looping', sound_loop_set['events_when_looping'])             # <<<<<<<<<<<<<<
@@ -5835,16 +5729,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 314, __pyx_L1_error)
+    __PYX_ERR(0, 301, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_events_when_looping); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_events_when_looping); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_events_when_looping, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 314, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_events_when_looping, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 301, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":315
+  /* "mpfmc/core/audio/track_sound_loop.pyx":302
  *         player_settings.setdefault('events_when_stopped', sound_loop_set['events_when_stopped'])
  *         player_settings.setdefault('events_when_looping', sound_loop_set['events_when_looping'])
  *         player_settings.setdefault('mode_end_action', sound_loop_set['mode_end_action'])             # <<<<<<<<<<<<<<
@@ -5853,16 +5747,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 315, __pyx_L1_error)
+    __PYX_ERR(0, 302, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_mode_end_action); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 315, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_mode_end_action); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_mode_end_action, __pyx_t_2, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 315, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_mode_end_action, __pyx_t_2, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 302, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":316
+  /* "mpfmc/core/audio/track_sound_loop.pyx":303
  *         player_settings.setdefault('events_when_looping', sound_loop_set['events_when_looping'])
  *         player_settings.setdefault('mode_end_action', sound_loop_set['mode_end_action'])
  *         player_settings.setdefault('tempo', sound_loop_set['tempo'])             # <<<<<<<<<<<<<<
@@ -5871,16 +5765,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 316, __pyx_L1_error)
+    __PYX_ERR(0, 303, __pyx_L1_error)
   }
-  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_tempo); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 316, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_tempo); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_tempo, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 316, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_tempo, __pyx_t_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 303, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":317
+  /* "mpfmc/core/audio/track_sound_loop.pyx":304
  *         player_settings.setdefault('mode_end_action', sound_loop_set['mode_end_action'])
  *         player_settings.setdefault('tempo', sound_loop_set['tempo'])
  *         player_settings.setdefault('timing', 'loop_end')             # <<<<<<<<<<<<<<
@@ -5889,13 +5783,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 317, __pyx_L1_error)
+    __PYX_ERR(0, 304, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_timing, __pyx_n_u_loop_end, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_timing, __pyx_n_u_loop_end, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 304, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":318
+  /* "mpfmc/core/audio/track_sound_loop.pyx":305
  *         player_settings.setdefault('tempo', sound_loop_set['tempo'])
  *         player_settings.setdefault('timing', 'loop_end')
  *         player_settings.setdefault('interval', 1)             # <<<<<<<<<<<<<<
@@ -5904,13 +5798,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 318, __pyx_L1_error)
+    __PYX_ERR(0, 305, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_interval, __pyx_int_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_interval, __pyx_int_1, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 305, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":319
+  /* "mpfmc/core/audio/track_sound_loop.pyx":306
  *         player_settings.setdefault('timing', 'loop_end')
  *         player_settings.setdefault('interval', 1)
  *         player_settings.setdefault('synchronize', False)             # <<<<<<<<<<<<<<
@@ -5919,29 +5813,29 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
-    __PYX_ERR(0, 319, __pyx_L1_error)
+    __PYX_ERR(0, 306, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_synchronize, Py_False, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_SetDefault(__pyx_v_player_settings, __pyx_n_u_synchronize, Py_False, 1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 306, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":320
+  /* "mpfmc/core/audio/track_sound_loop.pyx":307
  *         player_settings.setdefault('interval', 1)
  *         player_settings.setdefault('synchronize', False)
  *         player_settings['sound'] = sound_loop_set['sound']             # <<<<<<<<<<<<<<
  *         player_settings['context'] = context
  * 
  */
-  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_sound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 320, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_sound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 307, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 320, __pyx_L1_error)
+    __PYX_ERR(0, 307, __pyx_L1_error)
   }
-  if (unlikely(PyDict_SetItem(__pyx_v_player_settings, __pyx_n_u_sound, __pyx_t_2) < 0)) __PYX_ERR(0, 320, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_player_settings, __pyx_n_u_sound, __pyx_t_2) < 0)) __PYX_ERR(0, 307, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":321
+  /* "mpfmc/core/audio/track_sound_loop.pyx":308
  *         player_settings.setdefault('synchronize', False)
  *         player_settings['sound'] = sound_loop_set['sound']
  *         player_settings['context'] = context             # <<<<<<<<<<<<<<
@@ -5950,11 +5844,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 321, __pyx_L1_error)
+    __PYX_ERR(0, 308, __pyx_L1_error)
   }
-  if (unlikely(PyDict_SetItem(__pyx_v_player_settings, __pyx_n_u_context, __pyx_v_context) < 0)) __PYX_ERR(0, 321, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_player_settings, __pyx_n_u_context, __pyx_v_context) < 0)) __PYX_ERR(0, 308, __pyx_L1_error)
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":325
+  /* "mpfmc/core/audio/track_sound_loop.pyx":312
  *         # print("play_sound_loop_set - player_settings:", player_settings)
  * 
  *         if player_settings['sound'] not in self.mc.sounds:             # <<<<<<<<<<<<<<
@@ -5963,29 +5857,29 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 325, __pyx_L1_error)
+    __PYX_ERR(0, 312, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 325, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 312, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 325, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 312, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_t_2, __pyx_t_1, Py_NE)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 325, __pyx_L1_error)
+  __pyx_t_7 = (__Pyx_PySequence_ContainsTF(__pyx_t_2, __pyx_t_1, Py_NE)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 312, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_t_6 = (__pyx_t_7 != 0);
   if (__pyx_t_6) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":326
+    /* "mpfmc/core/audio/track_sound_loop.pyx":313
  * 
  *         if player_settings['sound'] not in self.mc.sounds:
  *             self.log.error("play_sound_loop_set - sound %s in sound_loop_set could "             # <<<<<<<<<<<<<<
  *                            "not be located, could not play loop set", player_settings['sound'])
  *             return
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_error); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 326, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_error); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 313, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":327
+    /* "mpfmc/core/audio/track_sound_loop.pyx":314
  *         if player_settings['sound'] not in self.mc.sounds:
  *             self.log.error("play_sound_loop_set - sound %s in sound_loop_set could "
  *                            "not be located, could not play loop set", player_settings['sound'])             # <<<<<<<<<<<<<<
@@ -5994,9 +5888,9 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     if (unlikely(__pyx_v_player_settings == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 327, __pyx_L1_error)
+      __PYX_ERR(0, 314, __pyx_L1_error)
     }
-    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 327, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 314, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_3 = NULL;
     __pyx_t_4 = 0;
@@ -6013,7 +5907,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_kp_u_play_sound_loop_set_sound_s_in_s, __pyx_t_5};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 313, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -6022,14 +5916,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_kp_u_play_sound_loop_set_sound_s_in_s, __pyx_t_5};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 313, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else
     #endif
     {
-      __pyx_t_8 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 326, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 313, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       if (__pyx_t_3) {
         __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -6040,14 +5934,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __Pyx_GIVEREF(__pyx_t_5);
       PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_4, __pyx_t_5);
       __pyx_t_5 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 313, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":328
+    /* "mpfmc/core/audio/track_sound_loop.pyx":315
  *             self.log.error("play_sound_loop_set - sound %s in sound_loop_set could "
  *                            "not be located, could not play loop set", player_settings['sound'])
  *             return             # <<<<<<<<<<<<<<
@@ -6058,7 +5952,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":325
+    /* "mpfmc/core/audio/track_sound_loop.pyx":312
  *         # print("play_sound_loop_set - player_settings:", player_settings)
  * 
  *         if player_settings['sound'] not in self.mc.sounds:             # <<<<<<<<<<<<<<
@@ -6067,44 +5961,44 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":330
+  /* "mpfmc/core/audio/track_sound_loop.pyx":317
  *             return
  * 
  *         if not self.mc.sounds[player_settings['sound']].loaded:             # <<<<<<<<<<<<<<
  *             self.log.error("play_sound_loop_set - sound %s in sound_loop_set was "
  *                            "not loaded, could not play loop set", player_settings['sound'])
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 330, __pyx_L1_error)
+    __PYX_ERR(0, 317, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyObject_GetItem(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_loaded); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_8, __pyx_n_s_loaded); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 330, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 317, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_t_7 = ((!__pyx_t_6) != 0);
   if (__pyx_t_7) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":331
+    /* "mpfmc/core/audio/track_sound_loop.pyx":318
  * 
  *         if not self.mc.sounds[player_settings['sound']].loaded:
  *             self.log.error("play_sound_loop_set - sound %s in sound_loop_set was "             # <<<<<<<<<<<<<<
  *                            "not loaded, could not play loop set", player_settings['sound'])
  *             return
  */
-    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_error); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 331, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_error); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 318, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":332
+    /* "mpfmc/core/audio/track_sound_loop.pyx":319
  *         if not self.mc.sounds[player_settings['sound']].loaded:
  *             self.log.error("play_sound_loop_set - sound %s in sound_loop_set was "
  *                            "not loaded, could not play loop set", player_settings['sound'])             # <<<<<<<<<<<<<<
@@ -6113,9 +6007,9 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     if (unlikely(__pyx_v_player_settings == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 332, __pyx_L1_error)
+      __PYX_ERR(0, 319, __pyx_L1_error)
     }
-    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 332, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 319, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_t_5 = NULL;
     __pyx_t_4 = 0;
@@ -6132,7 +6026,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_kp_u_play_sound_loop_set_sound_s_in_s_2, __pyx_t_1};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6141,14 +6035,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
       PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_kp_u_play_sound_loop_set_sound_s_in_s_2, __pyx_t_1};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     } else
     #endif
     {
-      __pyx_t_3 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 331, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 318, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       if (__pyx_t_5) {
         __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -6159,14 +6053,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __Pyx_GIVEREF(__pyx_t_1);
       PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_4, __pyx_t_1);
       __pyx_t_1 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 331, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_3, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":333
+    /* "mpfmc/core/audio/track_sound_loop.pyx":320
  *             self.log.error("play_sound_loop_set - sound %s in sound_loop_set was "
  *                            "not loaded, could not play loop set", player_settings['sound'])
  *             return             # <<<<<<<<<<<<<<
@@ -6177,7 +6071,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":330
+    /* "mpfmc/core/audio/track_sound_loop.pyx":317
  *             return
  * 
  *         if not self.mc.sounds[player_settings['sound']].loaded:             # <<<<<<<<<<<<<<
@@ -6186,7 +6080,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":335
+  /* "mpfmc/core/audio/track_sound_loop.pyx":322
  *             return
  * 
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -6195,7 +6089,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":340
+  /* "mpfmc/core/audio/track_sound_loop.pyx":327
  *         # taken to play the requested loop set.  There should never be a situation where the
  *         # current player is idle while the next one is playing.
  *         if self.type_state.current.status == player_idle:             # <<<<<<<<<<<<<<
@@ -6205,37 +6099,37 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_7 = ((__pyx_v_self->type_state->current->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle) != 0);
   if (__pyx_t_7) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":345
+    /* "mpfmc/core/audio/track_sound_loop.pyx":332
  *             # synchronize settings can be ignored as we simply start playing the requested
  *             # loop set immediately on the current player.
  *             player = self.type_state.current             # <<<<<<<<<<<<<<
- *             self._reset_player_layers(player)
+ *             self._reset_player(player)
  *             player_already_playing = False
  */
     __pyx_t_9 = __pyx_v_self->type_state->current;
     __pyx_v_player = __pyx_t_9;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":346
+    /* "mpfmc/core/audio/track_sound_loop.pyx":333
  *             # loop set immediately on the current player.
  *             player = self.type_state.current
- *             self._reset_player_layers(player)             # <<<<<<<<<<<<<<
+ *             self._reset_player(player)             # <<<<<<<<<<<<<<
  *             player_already_playing = False
  * 
  */
-    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_player_layers(__pyx_v_self, __pyx_v_player); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_player(__pyx_v_self, __pyx_v_player); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 333, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":347
+    /* "mpfmc/core/audio/track_sound_loop.pyx":334
  *             player = self.type_state.current
- *             self._reset_player_layers(player)
+ *             self._reset_player(player)
  *             player_already_playing = False             # <<<<<<<<<<<<<<
  * 
  *         elif self.type_state.next.status in (player_idle, player_pending):
  */
     __pyx_v_player_already_playing = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":340
+    /* "mpfmc/core/audio/track_sound_loop.pyx":327
  *         # taken to play the requested loop set.  There should never be a situation where the
  *         # current player is idle while the next one is playing.
  *         if self.type_state.current.status == player_idle:             # <<<<<<<<<<<<<<
@@ -6245,7 +6139,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L6;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":349
+  /* "mpfmc/core/audio/track_sound_loop.pyx":336
  *             player_already_playing = False
  * 
  *         elif self.type_state.next.status in (player_idle, player_pending):             # <<<<<<<<<<<<<<
@@ -6264,88 +6158,88 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_6 = (__pyx_t_7 != 0);
   if (__pyx_t_6) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":354
+    /* "mpfmc/core/audio/track_sound_loop.pyx":341
  *             # synchronize settings are important and dictate how the requested loop set
  *             # will be played.
  *             player = self.type_state.next             # <<<<<<<<<<<<<<
- *             self._reset_player_layers(player)
  *             player_already_playing = True
+ * 
  */
     __pyx_t_9 = __pyx_v_self->type_state->next;
     __pyx_v_player = __pyx_t_9;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":355
+    /* "mpfmc/core/audio/track_sound_loop.pyx":342
  *             # will be played.
  *             player = self.type_state.next
- *             self._reset_player_layers(player)             # <<<<<<<<<<<<<<
- *             player_already_playing = True
- * 
- */
-    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_player_layers(__pyx_v_self, __pyx_v_player); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 355, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-
-    /* "mpfmc/core/audio/track_sound_loop.pyx":356
- *             player = self.type_state.next
- *             self._reset_player_layers(player)
  *             player_already_playing = True             # <<<<<<<<<<<<<<
  * 
  *             # Remove the previously pending sound_loop_set from the active sound loop set dict (if exists)
  */
     __pyx_v_player_already_playing = 1;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":359
+    /* "mpfmc/core/audio/track_sound_loop.pyx":345
  * 
  *             # Remove the previously pending sound_loop_set from the active sound loop set dict (if exists)
- *             if self.type_state.next.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:             # <<<<<<<<<<<<<<
+ *             if player.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:             # <<<<<<<<<<<<<<
  *                 del self._active_sound_loop_sets[player.master_sound_layer.sound_loop_set_id]
  * 
  */
-    __pyx_t_7 = ((__pyx_v_self->type_state->next->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_pending) != 0);
+    __pyx_t_7 = ((__pyx_v_player->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_pending) != 0);
     if (__pyx_t_7) {
     } else {
       __pyx_t_6 = __pyx_t_7;
       goto __pyx_L8_bool_binop_done;
     }
-    __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_player->master_sound_layer.sound_loop_set_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 359, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_player->master_sound_layer.sound_loop_set_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 345, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     if (unlikely(__pyx_v_self->_active_sound_loop_sets == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-      __PYX_ERR(0, 359, __pyx_L1_error)
+      __PYX_ERR(0, 345, __pyx_L1_error)
     }
-    __pyx_t_7 = (__Pyx_PyDict_ContainsTF(__pyx_t_2, __pyx_v_self->_active_sound_loop_sets, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 359, __pyx_L1_error)
+    __pyx_t_7 = (__Pyx_PyDict_ContainsTF(__pyx_t_2, __pyx_v_self->_active_sound_loop_sets, Py_EQ)); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 345, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_t_10 = (__pyx_t_7 != 0);
     __pyx_t_6 = __pyx_t_10;
     __pyx_L8_bool_binop_done:;
     if (__pyx_t_6) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":360
+      /* "mpfmc/core/audio/track_sound_loop.pyx":346
  *             # Remove the previously pending sound_loop_set from the active sound loop set dict (if exists)
- *             if self.type_state.next.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:
+ *             if player.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:
  *                 del self._active_sound_loop_sets[player.master_sound_layer.sound_loop_set_id]             # <<<<<<<<<<<<<<
  * 
- *         else:
+ *             self._reset_player(player)
  */
       if (unlikely(__pyx_v_self->_active_sound_loop_sets == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 360, __pyx_L1_error)
+        __PYX_ERR(0, 346, __pyx_L1_error)
       }
-      __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_player->master_sound_layer.sound_loop_set_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_player->master_sound_layer.sound_loop_set_id); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      if (unlikely(PyDict_DelItem(__pyx_v_self->_active_sound_loop_sets, __pyx_t_2) < 0)) __PYX_ERR(0, 360, __pyx_L1_error)
+      if (unlikely(PyDict_DelItem(__pyx_v_self->_active_sound_loop_sets, __pyx_t_2) < 0)) __PYX_ERR(0, 346, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":359
+      /* "mpfmc/core/audio/track_sound_loop.pyx":345
  * 
  *             # Remove the previously pending sound_loop_set from the active sound loop set dict (if exists)
- *             if self.type_state.next.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:             # <<<<<<<<<<<<<<
+ *             if player.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:             # <<<<<<<<<<<<<<
  *                 del self._active_sound_loop_sets[player.master_sound_layer.sound_loop_set_id]
  * 
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":349
+    /* "mpfmc/core/audio/track_sound_loop.pyx":348
+ *                 del self._active_sound_loop_sets[player.master_sound_layer.sound_loop_set_id]
+ * 
+ *             self._reset_player(player)             # <<<<<<<<<<<<<<
+ * 
+ *         else:
+ */
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_player(__pyx_v_self, __pyx_v_player); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 348, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":336
  *             player_already_playing = False
  * 
  *         elif self.type_state.next.status in (player_idle, player_pending):             # <<<<<<<<<<<<<<
@@ -6355,7 +6249,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L6;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":364
+  /* "mpfmc/core/audio/track_sound_loop.pyx":352
  *         else:
  *             # TODO: Handle case when both players are busy (i.e. during a cross-fade)
  *             self.log.info("Unable to play sound - both sound loop players are currently busy.")             # <<<<<<<<<<<<<<
@@ -6363,14 +6257,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  *             SDL_UnlockAudio()
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 352, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 364, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 352, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":366
+    /* "mpfmc/core/audio/track_sound_loop.pyx":354
  *             self.log.info("Unable to play sound - both sound loop players are currently busy.")
  *             # print("Unable to play sound - both sound loop players are currently busy.")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -6379,7 +6273,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":367
+    /* "mpfmc/core/audio/track_sound_loop.pyx":355
  *             # print("Unable to play sound - both sound loop players are currently busy.")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -6392,7 +6286,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   __pyx_L6:;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":372
+  /* "mpfmc/core/audio/track_sound_loop.pyx":360
  * 
  *         # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
  *         player.master_sound_layer.fade_in_steps = player_settings['fade_in'] * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point             # <<<<<<<<<<<<<<
@@ -6401,27 +6295,27 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 372, __pyx_L1_error)
+    __PYX_ERR(0, 360, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_fade_in); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_fade_in); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_From_Uint16(__pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_Uint16(__pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_8 = PyNumber_FloorDivide(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_8 = PyNumber_FloorDivide(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_8); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 372, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_8); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 360, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_v_player->master_sound_layer.fade_in_steps = __pyx_t_11;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":373
+  /* "mpfmc/core/audio/track_sound_loop.pyx":361
  *         # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
  *         player.master_sound_layer.fade_in_steps = player_settings['fade_in'] * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
  *         player.master_sound_layer.fade_out_steps = player_settings['fade_out'] * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point             # <<<<<<<<<<<<<<
@@ -6430,27 +6324,27 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_player_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 373, __pyx_L1_error)
+    __PYX_ERR(0, 361, __pyx_L1_error)
   }
-  __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_fade_out); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_fade_out); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyInt_From_Uint16(__pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_Uint16(__pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_8 = PyNumber_FloorDivide(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_8 = PyNumber_FloorDivide(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_8); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 373, __pyx_L1_error)
+  __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_8); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 361, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   __pyx_v_player->master_sound_layer.fade_out_steps = __pyx_t_11;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":374
+  /* "mpfmc/core/audio/track_sound_loop.pyx":362
  *         player.master_sound_layer.fade_in_steps = player_settings['fade_in'] * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
  *         player.master_sound_layer.fade_out_steps = player_settings['fade_out'] * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
  *         player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps             # <<<<<<<<<<<<<<
@@ -6460,7 +6354,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_11 = __pyx_v_player->master_sound_layer.fade_in_steps;
   __pyx_v_player->master_sound_layer.fade_steps_remaining = __pyx_t_11;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":376
+  /* "mpfmc/core/audio/track_sound_loop.pyx":364
  *         player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
  * 
  *         if player_already_playing:             # <<<<<<<<<<<<<<
@@ -6470,7 +6364,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_6 = (__pyx_v_player_already_playing != 0);
   if (__pyx_t_6) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":379
+    /* "mpfmc/core/audio/track_sound_loop.pyx":367
  * 
  *             # Determine if playing immediately or queuing until next loop
  *             if player_settings['timing'] == 'loop_end':             # <<<<<<<<<<<<<<
@@ -6479,15 +6373,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     if (unlikely(__pyx_v_player_settings == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 379, __pyx_L1_error)
+      __PYX_ERR(0, 367, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_timing); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 379, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_timing); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_8, __pyx_n_u_loop_end, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 379, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_8, __pyx_n_u_loop_end, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_6) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":381
+      /* "mpfmc/core/audio/track_sound_loop.pyx":369
  *             if player_settings['timing'] == 'loop_end':
  *                 # Queue until the end of the current loop
  *                 player.status = player_pending             # <<<<<<<<<<<<<<
@@ -6496,7 +6390,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_pending;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":382
+      /* "mpfmc/core/audio/track_sound_loop.pyx":370
  *                 # Queue until the end of the current loop
  *                 player.status = player_pending
  *                 player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
@@ -6505,21 +6399,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       if (unlikely(__pyx_v_player_settings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 382, __pyx_L1_error)
+        __PYX_ERR(0, 370, __pyx_L1_error)
       }
-      __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 382, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 370, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 382, __pyx_L1_error)
+      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 370, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 382, __pyx_L1_error)
+      __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 370, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 382, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 370, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_player->sample_pos = __pyx_t_11;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":383
+      /* "mpfmc/core/audio/track_sound_loop.pyx":371
  *                 player.status = player_pending
  *                 player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
  *                 player.stop_loop_at_pos = do_not_stop_loop             # <<<<<<<<<<<<<<
@@ -6528,7 +6422,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_player->stop_loop_at_pos = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_do_not_stop_loop;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":387
+      /* "mpfmc/core/audio/track_sound_loop.pyx":375
  *                 # Ensure sample position starts on a sample frame boundary (audio distortion may occur if starting
  *                 # in the middle of a sample frame)
  *                 bytes_per_sample_frame = self.state.callback_data.bytes_per_sample * self.state.callback_data.channels             # <<<<<<<<<<<<<<
@@ -6537,22 +6431,22 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_bytes_per_sample_frame = (__pyx_v_self->__pyx_base.state->callback_data->bytes_per_sample * __pyx_v_self->__pyx_base.state->callback_data->channels);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":388
+      /* "mpfmc/core/audio/track_sound_loop.pyx":376
  *                 # in the middle of a sample frame)
  *                 bytes_per_sample_frame = self.state.callback_data.bytes_per_sample * self.state.callback_data.channels
  *                 player.sample_pos = bytes_per_sample_frame * ceil(player.sample_pos / bytes_per_sample_frame)             # <<<<<<<<<<<<<<
  * 
  *                 self.type_state.current.stop_loop_at_pos = self.type_state.current.length
  */
-      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_bytes_per_sample_frame); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 388, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyInt_From_int(__pyx_v_bytes_per_sample_frame); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 376, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_8 = __Pyx_GetModuleGlobalName(__pyx_n_s_ceil); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 388, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_GetModuleGlobalName(__pyx_n_s_ceil); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 376, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       if (unlikely(__pyx_v_bytes_per_sample_frame == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 388, __pyx_L1_error)
+        __PYX_ERR(0, 376, __pyx_L1_error)
       }
-      __pyx_t_1 = PyFloat_FromDouble((((double)__pyx_v_player->sample_pos) / ((double)__pyx_v_bytes_per_sample_frame))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 388, __pyx_L1_error)
+      __pyx_t_1 = PyFloat_FromDouble((((double)__pyx_v_player->sample_pos) / ((double)__pyx_v_bytes_per_sample_frame))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 376, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __pyx_t_5 = NULL;
       if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_8))) {
@@ -6565,14 +6459,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (!__pyx_t_5) {
-        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __Pyx_GOTREF(__pyx_t_2);
       } else {
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_8)) {
           PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_1};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6581,34 +6475,34 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
           PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_1};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         } else
         #endif
         {
-          __pyx_t_12 = PyTuple_New(1+1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_12 = PyTuple_New(1+1); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 376, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_12);
           __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_12, 0, __pyx_t_5); __pyx_t_5 = NULL;
           __Pyx_GIVEREF(__pyx_t_1);
           PyTuple_SET_ITEM(__pyx_t_12, 0+1, __pyx_t_1);
           __pyx_t_1 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 376, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
-      __pyx_t_8 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 388, __pyx_L1_error)
+      __pyx_t_8 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 376, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_8); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 388, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_8); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 376, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __pyx_v_player->sample_pos = __pyx_t_11;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":390
+      /* "mpfmc/core/audio/track_sound_loop.pyx":378
  *                 player.sample_pos = bytes_per_sample_frame * ceil(player.sample_pos / bytes_per_sample_frame)
  * 
  *                 self.type_state.current.stop_loop_at_pos = self.type_state.current.length             # <<<<<<<<<<<<<<
@@ -6618,7 +6512,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_t_11 = __pyx_v_self->type_state->current->length;
       __pyx_v_self->type_state->current->stop_loop_at_pos = __pyx_t_11;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":379
+      /* "mpfmc/core/audio/track_sound_loop.pyx":367
  * 
  *             # Determine if playing immediately or queuing until next loop
  *             if player_settings['timing'] == 'loop_end':             # <<<<<<<<<<<<<<
@@ -6628,7 +6522,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       goto __pyx_L11;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":392
+    /* "mpfmc/core/audio/track_sound_loop.pyx":380
  *                 self.type_state.current.stop_loop_at_pos = self.type_state.current.length
  * 
  *             elif player_settings['timing'] == 'next_time_interval':             # <<<<<<<<<<<<<<
@@ -6637,15 +6531,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     if (unlikely(__pyx_v_player_settings == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 392, __pyx_L1_error)
+      __PYX_ERR(0, 380, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_timing); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 392, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_timing); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 380, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_8, __pyx_n_u_next_time_interval, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 392, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_8, __pyx_n_u_next_time_interval, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 380, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_6) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":394
+      /* "mpfmc/core/audio/track_sound_loop.pyx":382
  *             elif player_settings['timing'] == 'next_time_interval':
  *                 # Set currently playing sample to end at the next specified time interval multiple
  *                 player.status = player_pending             # <<<<<<<<<<<<<<
@@ -6654,7 +6548,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_pending;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":395
+      /* "mpfmc/core/audio/track_sound_loop.pyx":383
  *                 # Set currently playing sample to end at the next specified time interval multiple
  *                 player.status = player_pending
  *                 player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
@@ -6663,21 +6557,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       if (unlikely(__pyx_v_player_settings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 395, __pyx_L1_error)
+        __PYX_ERR(0, 383, __pyx_L1_error)
       }
-      __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 395, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 383, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 395, __pyx_L1_error)
+      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 383, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 395, __pyx_L1_error)
+      __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 383, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 395, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 383, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_player->sample_pos = __pyx_t_11;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":396
+      /* "mpfmc/core/audio/track_sound_loop.pyx":384
  *                 player.status = player_pending
  *                 player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
  *                 player.stop_loop_at_pos = do_not_stop_loop             # <<<<<<<<<<<<<<
@@ -6686,29 +6580,29 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_player->stop_loop_at_pos = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_do_not_stop_loop;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":400
+      /* "mpfmc/core/audio/track_sound_loop.pyx":388
  *                 self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(
  *                     self.type_state.current.sample_pos,
  *                     <Uint32>(self.state.callback_data.seconds_to_bytes_factor * player_settings['interval']),             # <<<<<<<<<<<<<<
  *                     self.state.callback_data.bytes_per_sample * self.state.callback_data.channels)
  * 
  */
-      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       if (unlikely(__pyx_v_player_settings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 400, __pyx_L1_error)
+        __PYX_ERR(0, 388, __pyx_L1_error)
       }
-      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_interval); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_interval); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_8 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_8 = PyNumber_Multiply(__pyx_t_3, __pyx_t_2); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_8); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 400, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_8); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":398
+      /* "mpfmc/core/audio/track_sound_loop.pyx":386
  *                 player.stop_loop_at_pos = do_not_stop_loop
  * 
  *                 self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(             # <<<<<<<<<<<<<<
@@ -6717,7 +6611,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_self->type_state->current->stop_loop_at_pos = __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__round_sample_pos_up_to_interval(__pyx_v_self, __pyx_v_self->type_state->current->sample_pos, ((Uint32)__pyx_t_11), (__pyx_v_self->__pyx_base.state->callback_data->bytes_per_sample * __pyx_v_self->__pyx_base.state->callback_data->channels));
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":404
+      /* "mpfmc/core/audio/track_sound_loop.pyx":392
  * 
  *                 # Adjust currently playing sample end position to ensure it is within the sample
  *                 while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:             # <<<<<<<<<<<<<<
@@ -6728,7 +6622,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_t_6 = ((__pyx_v_self->type_state->current->stop_loop_at_pos > __pyx_v_self->type_state->current->length) != 0);
         if (!__pyx_t_6) break;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":405
+        /* "mpfmc/core/audio/track_sound_loop.pyx":393
  *                 # Adjust currently playing sample end position to ensure it is within the sample
  *                 while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:
  *                     self.type_state.current.stop_loop_at_pos -= self.type_state.current.length             # <<<<<<<<<<<<<<
@@ -6738,7 +6632,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_v_self->type_state->current->stop_loop_at_pos = (__pyx_v_self->type_state->current->stop_loop_at_pos - __pyx_v_self->type_state->current->length);
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":409
+      /* "mpfmc/core/audio/track_sound_loop.pyx":397
  *                 # If stop position is at beginning of loop (first 10ms), set it to be the end so it won't start
  *                 # another iteration of the loop (probably a rounding error anyway)
  *                 if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):             # <<<<<<<<<<<<<<
@@ -6748,7 +6642,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_t_6 = ((__pyx_v_self->type_state->current->stop_loop_at_pos < ((Uint32)(0.01 * __pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor))) != 0);
       if (__pyx_t_6) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":410
+        /* "mpfmc/core/audio/track_sound_loop.pyx":398
  *                 # another iteration of the loop (probably a rounding error anyway)
  *                 if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):
  *                     self.type_state.current.stop_loop_at_pos = self.type_state.current.length             # <<<<<<<<<<<<<<
@@ -6758,7 +6652,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_t_11 = __pyx_v_self->type_state->current->length;
         __pyx_v_self->type_state->current->stop_loop_at_pos = __pyx_t_11;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":409
+        /* "mpfmc/core/audio/track_sound_loop.pyx":397
  *                 # If stop position is at beginning of loop (first 10ms), set it to be the end so it won't start
  *                 # another iteration of the loop (probably a rounding error anyway)
  *                 if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):             # <<<<<<<<<<<<<<
@@ -6767,7 +6661,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":392
+      /* "mpfmc/core/audio/track_sound_loop.pyx":380
  *                 self.type_state.current.stop_loop_at_pos = self.type_state.current.length
  * 
  *             elif player_settings['timing'] == 'next_time_interval':             # <<<<<<<<<<<<<<
@@ -6777,7 +6671,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       goto __pyx_L11;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":414
+    /* "mpfmc/core/audio/track_sound_loop.pyx":402
  *                 # print("play_sound_loop_set - next_time_interval - sample_pos, stop_loop_at_pos, length:", self.type_state.current.sample_pos, self.type_state.current.stop_loop_at_pos, self.type_state.current.length)
  * 
  *             elif player_settings['timing'] == 'next_beat_interval':             # <<<<<<<<<<<<<<
@@ -6786,15 +6680,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     if (unlikely(__pyx_v_player_settings == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 414, __pyx_L1_error)
+      __PYX_ERR(0, 402, __pyx_L1_error)
     }
-    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_timing); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 414, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_timing); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 402, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
-    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_8, __pyx_n_u_next_beat_interval, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 414, __pyx_L1_error)
+    __pyx_t_6 = (__Pyx_PyUnicode_Equals(__pyx_t_8, __pyx_n_u_next_beat_interval, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 402, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     if (__pyx_t_6) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":416
+      /* "mpfmc/core/audio/track_sound_loop.pyx":404
  *             elif player_settings['timing'] == 'next_beat_interval':
  *                 # Set currently playing sample to end at the next specified beat interval multiple
  *                 player.status = player_pending             # <<<<<<<<<<<<<<
@@ -6803,7 +6697,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_pending;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":417
+      /* "mpfmc/core/audio/track_sound_loop.pyx":405
  *                 # Set currently playing sample to end at the next specified beat interval multiple
  *                 player.status = player_pending
  *                 player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
@@ -6812,21 +6706,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       if (unlikely(__pyx_v_player_settings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 417, __pyx_L1_error)
+        __PYX_ERR(0, 405, __pyx_L1_error)
       }
-      __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 417, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 405, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
-      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 417, __pyx_L1_error)
+      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 405, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 417, __pyx_L1_error)
+      __pyx_t_3 = PyNumber_Multiply(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 405, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 417, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 405, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __pyx_v_player->sample_pos = __pyx_t_11;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":418
+      /* "mpfmc/core/audio/track_sound_loop.pyx":406
  *                 player.status = player_pending
  *                 player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
  *                 player.stop_loop_at_pos = do_not_stop_loop             # <<<<<<<<<<<<<<
@@ -6835,17 +6729,17 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_player->stop_loop_at_pos = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_do_not_stop_loop;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":422
+      /* "mpfmc/core/audio/track_sound_loop.pyx":410
  *                 self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(
  *                     self.type_state.current.sample_pos,
  *                     <Uint32> (self.state.callback_data.seconds_to_bytes_factor * (             # <<<<<<<<<<<<<<
  *                             player_settings['interval'] * 60.0 / self.type_state.current.tempo)),
  *                     self.state.callback_data.bytes_per_sample * self.state.callback_data.channels)
  */
-      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 422, __pyx_L1_error)
+      __pyx_t_3 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 410, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":423
+      /* "mpfmc/core/audio/track_sound_loop.pyx":411
  *                     self.type_state.current.sample_pos,
  *                     <Uint32> (self.state.callback_data.seconds_to_bytes_factor * (
  *                             player_settings['interval'] * 60.0 / self.type_state.current.tempo)),             # <<<<<<<<<<<<<<
@@ -6854,35 +6748,35 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       if (unlikely(__pyx_v_player_settings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 423, __pyx_L1_error)
+        __PYX_ERR(0, 411, __pyx_L1_error)
       }
-      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_interval); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 423, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_interval); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 411, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_8 = PyNumber_Multiply(__pyx_t_2, __pyx_float_60_0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 423, __pyx_L1_error)
+      __pyx_t_8 = PyNumber_Multiply(__pyx_t_2, __pyx_float_60_0); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 411, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->type_state->current->tempo); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 423, __pyx_L1_error)
+      __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->type_state->current->tempo); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 411, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_12 = __Pyx_PyNumber_Divide(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 423, __pyx_L1_error)
+      __pyx_t_12 = __Pyx_PyNumber_Divide(__pyx_t_8, __pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 411, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_12);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":422
+      /* "mpfmc/core/audio/track_sound_loop.pyx":410
  *                 self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(
  *                     self.type_state.current.sample_pos,
  *                     <Uint32> (self.state.callback_data.seconds_to_bytes_factor * (             # <<<<<<<<<<<<<<
  *                             player_settings['interval'] * 60.0 / self.type_state.current.tempo)),
  *                     self.state.callback_data.bytes_per_sample * self.state.callback_data.channels)
  */
-      __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 422, __pyx_L1_error)
+      __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 410, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_2); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 422, __pyx_L1_error)
+      __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_2); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 410, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":420
+      /* "mpfmc/core/audio/track_sound_loop.pyx":408
  *                 player.stop_loop_at_pos = do_not_stop_loop
  * 
  *                 self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(             # <<<<<<<<<<<<<<
@@ -6891,7 +6785,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_self->type_state->current->stop_loop_at_pos = __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__round_sample_pos_up_to_interval(__pyx_v_self, __pyx_v_self->type_state->current->sample_pos, ((Uint32)__pyx_t_11), (__pyx_v_self->__pyx_base.state->callback_data->bytes_per_sample * __pyx_v_self->__pyx_base.state->callback_data->channels));
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":427
+      /* "mpfmc/core/audio/track_sound_loop.pyx":415
  * 
  *                 # Adjust currently playing sample end position to ensure it is within the sample
  *                 while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:             # <<<<<<<<<<<<<<
@@ -6902,7 +6796,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_t_6 = ((__pyx_v_self->type_state->current->stop_loop_at_pos > __pyx_v_self->type_state->current->length) != 0);
         if (!__pyx_t_6) break;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":428
+        /* "mpfmc/core/audio/track_sound_loop.pyx":416
  *                 # Adjust currently playing sample end position to ensure it is within the sample
  *                 while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:
  *                     self.type_state.current.stop_loop_at_pos -= self.type_state.current.length             # <<<<<<<<<<<<<<
@@ -6912,7 +6806,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_v_self->type_state->current->stop_loop_at_pos = (__pyx_v_self->type_state->current->stop_loop_at_pos - __pyx_v_self->type_state->current->length);
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":432
+      /* "mpfmc/core/audio/track_sound_loop.pyx":420
  *                 # If stop position is at beginning of loop (first 10ms), set it to be the end so it won't start
  *                 # another iteration of the loop (probably a rounding error anyway)
  *                 if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):             # <<<<<<<<<<<<<<
@@ -6922,7 +6816,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_t_6 = ((__pyx_v_self->type_state->current->stop_loop_at_pos < ((Uint32)(0.01 * __pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor))) != 0);
       if (__pyx_t_6) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":433
+        /* "mpfmc/core/audio/track_sound_loop.pyx":421
  *                 # another iteration of the loop (probably a rounding error anyway)
  *                 if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):
  *                     self.type_state.current.stop_loop_at_pos = self.type_state.current.length             # <<<<<<<<<<<<<<
@@ -6932,7 +6826,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_t_11 = __pyx_v_self->type_state->current->length;
         __pyx_v_self->type_state->current->stop_loop_at_pos = __pyx_t_11;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":432
+        /* "mpfmc/core/audio/track_sound_loop.pyx":420
  *                 # If stop position is at beginning of loop (first 10ms), set it to be the end so it won't start
  *                 # another iteration of the loop (probably a rounding error anyway)
  *                 if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):             # <<<<<<<<<<<<<<
@@ -6941,7 +6835,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":414
+      /* "mpfmc/core/audio/track_sound_loop.pyx":402
  *                 # print("play_sound_loop_set - next_time_interval - sample_pos, stop_loop_at_pos, length:", self.type_state.current.sample_pos, self.type_state.current.stop_loop_at_pos, self.type_state.current.length)
  * 
  *             elif player_settings['timing'] == 'next_beat_interval':             # <<<<<<<<<<<<<<
@@ -6951,7 +6845,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       goto __pyx_L11;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":439
+    /* "mpfmc/core/audio/track_sound_loop.pyx":427
  * 
  *                 # Synchronize the loop set to the current player (if flag is set)
  *                 if player_settings['synchronize']:             # <<<<<<<<<<<<<<
@@ -6961,64 +6855,25 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     /*else*/ {
       if (unlikely(__pyx_v_player_settings == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-        __PYX_ERR(0, 439, __pyx_L1_error)
+        __PYX_ERR(0, 427, __pyx_L1_error)
       }
-      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_synchronize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 439, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_synchronize); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 427, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
-      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 439, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 427, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
       if (__pyx_t_6) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":440
+        /* "mpfmc/core/audio/track_sound_loop.pyx":428
  *                 # Synchronize the loop set to the current player (if flag is set)
  *                 if player_settings['synchronize']:
  *                     player.sample_pos = self.type_state.current.sample_pos             # <<<<<<<<<<<<<<
  * 
- *                     # If no fade is set, use a quick cross-fade when synchronizing
+ *                 else:
  */
         __pyx_t_11 = __pyx_v_self->type_state->current->sample_pos;
         __pyx_v_player->sample_pos = __pyx_t_11;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":444
- *                     # If no fade is set, use a quick cross-fade when synchronizing
- *                     # (avoids pops & clicks)
- *                     if player.master_sound_layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
- *                         player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
- *                         player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
- */
-        __pyx_t_6 = ((__pyx_v_player->master_sound_layer.fade_steps_remaining == 0) != 0);
-        if (__pyx_t_6) {
-
-          /* "mpfmc/core/audio/track_sound_loop.pyx":445
- *                     # (avoids pops & clicks)
- *                     if player.master_sound_layer.fade_steps_remaining == 0:
- *                         player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps             # <<<<<<<<<<<<<<
- *                         player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
- *                 else:
- */
-          __pyx_t_13 = __pyx_v_self->__pyx_base.state->callback_data->quick_fade_steps;
-          __pyx_v_player->master_sound_layer.fade_in_steps = __pyx_t_13;
-
-          /* "mpfmc/core/audio/track_sound_loop.pyx":446
- *                     if player.master_sound_layer.fade_steps_remaining == 0:
- *                         player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
- *                         player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps             # <<<<<<<<<<<<<<
- *                 else:
- *                     player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
- */
-          __pyx_t_11 = __pyx_v_player->master_sound_layer.fade_in_steps;
-          __pyx_v_player->master_sound_layer.fade_steps_remaining = __pyx_t_11;
-
-          /* "mpfmc/core/audio/track_sound_loop.pyx":444
- *                     # If no fade is set, use a quick cross-fade when synchronizing
- *                     # (avoids pops & clicks)
- *                     if player.master_sound_layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
- *                         player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
- *                         player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
- */
-        }
-
-        /* "mpfmc/core/audio/track_sound_loop.pyx":439
+        /* "mpfmc/core/audio/track_sound_loop.pyx":427
  * 
  *                 # Synchronize the loop set to the current player (if flag is set)
  *                 if player_settings['synchronize']:             # <<<<<<<<<<<<<<
@@ -7028,43 +6883,82 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         goto __pyx_L18;
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":448
- *                         player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
+      /* "mpfmc/core/audio/track_sound_loop.pyx":431
+ * 
  *                 else:
  *                     player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
  *                     player.stop_loop_at_pos = do_not_stop_loop
- *                     # TODO: Add a quick fade out to current player then start new one
+ * 
  */
       /*else*/ {
         if (unlikely(__pyx_v_player_settings == Py_None)) {
           PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-          __PYX_ERR(0, 448, __pyx_L1_error)
+          __PYX_ERR(0, 431, __pyx_L1_error)
         }
-        __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 448, __pyx_L1_error)
+        __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 431, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
-        __pyx_t_12 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 448, __pyx_L1_error)
+        __pyx_t_12 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 431, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_12);
-        __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 448, __pyx_L1_error)
+        __pyx_t_3 = PyNumber_Multiply(__pyx_t_2, __pyx_t_12); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 431, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-        __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 448, __pyx_L1_error)
+        __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 431, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __pyx_v_player->sample_pos = __pyx_t_11;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":449
+        /* "mpfmc/core/audio/track_sound_loop.pyx":432
  *                 else:
  *                     player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
  *                     player.stop_loop_at_pos = do_not_stop_loop             # <<<<<<<<<<<<<<
- *                     # TODO: Add a quick fade out to current player then start new one
  * 
+ *                 # If no fade is set, use a quick cross-fade when synchronizing
  */
         __pyx_v_player->stop_loop_at_pos = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_do_not_stop_loop;
       }
       __pyx_L18:;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":452
- *                     # TODO: Add a quick fade out to current player then start new one
+      /* "mpfmc/core/audio/track_sound_loop.pyx":436
+ *                 # If no fade is set, use a quick cross-fade when synchronizing
+ *                 # (avoids pops & clicks)
+ *                 if player.master_sound_layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
+ *                     player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
+ *                     player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
+ */
+      __pyx_t_6 = ((__pyx_v_player->master_sound_layer.fade_steps_remaining == 0) != 0);
+      if (__pyx_t_6) {
+
+        /* "mpfmc/core/audio/track_sound_loop.pyx":437
+ *                 # (avoids pops & clicks)
+ *                 if player.master_sound_layer.fade_steps_remaining == 0:
+ *                     player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps             # <<<<<<<<<<<<<<
+ *                     player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
+ * 
+ */
+        __pyx_t_13 = __pyx_v_self->__pyx_base.state->callback_data->quick_fade_steps;
+        __pyx_v_player->master_sound_layer.fade_in_steps = __pyx_t_13;
+
+        /* "mpfmc/core/audio/track_sound_loop.pyx":438
+ *                 if player.master_sound_layer.fade_steps_remaining == 0:
+ *                     player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
+ *                     player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps             # <<<<<<<<<<<<<<
+ * 
+ *                 if player.master_sound_layer.fade_steps_remaining > 0:
+ */
+        __pyx_t_11 = __pyx_v_player->master_sound_layer.fade_in_steps;
+        __pyx_v_player->master_sound_layer.fade_steps_remaining = __pyx_t_11;
+
+        /* "mpfmc/core/audio/track_sound_loop.pyx":436
+ *                 # If no fade is set, use a quick cross-fade when synchronizing
+ *                 # (avoids pops & clicks)
+ *                 if player.master_sound_layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
+ *                     player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
+ *                     player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
+ */
+      }
+
+      /* "mpfmc/core/audio/track_sound_loop.pyx":440
+ *                     player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
  * 
  *                 if player.master_sound_layer.fade_steps_remaining > 0:             # <<<<<<<<<<<<<<
  *                     player.status = player_fading_in
@@ -7073,7 +6967,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_t_6 = ((__pyx_v_player->master_sound_layer.fade_steps_remaining > 0) != 0);
       if (__pyx_t_6) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":453
+        /* "mpfmc/core/audio/track_sound_loop.pyx":441
  * 
  *                 if player.master_sound_layer.fade_steps_remaining > 0:
  *                     player.status = player_fading_in             # <<<<<<<<<<<<<<
@@ -7082,7 +6976,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
         __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_in;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":454
+        /* "mpfmc/core/audio/track_sound_loop.pyx":442
  *                 if player.master_sound_layer.fade_steps_remaining > 0:
  *                     player.status = player_fading_in
  *                     self.type_state.current.status = player_fading_out             # <<<<<<<<<<<<<<
@@ -7091,7 +6985,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
         __pyx_v_self->type_state->current->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_out;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":455
+        /* "mpfmc/core/audio/track_sound_loop.pyx":443
  *                     player.status = player_fading_in
  *                     self.type_state.current.status = player_fading_out
  *                     self.type_state.current.master_sound_layer.fade_out_steps = player.master_sound_layer.fade_in_steps             # <<<<<<<<<<<<<<
@@ -7101,7 +6995,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_t_11 = __pyx_v_player->master_sound_layer.fade_in_steps;
         __pyx_v_self->type_state->current->master_sound_layer.fade_out_steps = __pyx_t_11;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":456
+        /* "mpfmc/core/audio/track_sound_loop.pyx":444
  *                     self.type_state.current.status = player_fading_out
  *                     self.type_state.current.master_sound_layer.fade_out_steps = player.master_sound_layer.fade_in_steps
  *                     self.type_state.current.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_steps_remaining             # <<<<<<<<<<<<<<
@@ -7111,8 +7005,8 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_t_11 = __pyx_v_player->master_sound_layer.fade_steps_remaining;
         __pyx_v_self->type_state->current->master_sound_layer.fade_steps_remaining = __pyx_t_11;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":452
- *                     # TODO: Add a quick fade out to current player then start new one
+        /* "mpfmc/core/audio/track_sound_loop.pyx":440
+ *                     player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
  * 
  *                 if player.master_sound_layer.fade_steps_remaining > 0:             # <<<<<<<<<<<<<<
  *                     player.status = player_fading_in
@@ -7121,7 +7015,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         goto __pyx_L20;
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":459
+      /* "mpfmc/core/audio/track_sound_loop.pyx":447
  * 
  *                 else:
  *                     player.status = player_playing             # <<<<<<<<<<<<<<
@@ -7135,7 +7029,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     }
     __pyx_L11:;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":376
+    /* "mpfmc/core/audio/track_sound_loop.pyx":364
  *         player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
  * 
  *         if player_already_playing:             # <<<<<<<<<<<<<<
@@ -7145,7 +7039,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L10;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":462
+  /* "mpfmc/core/audio/track_sound_loop.pyx":450
  * 
  *         else:
  *             player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
@@ -7155,21 +7049,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   /*else*/ {
     if (unlikely(__pyx_v_player_settings == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 462, __pyx_L1_error)
+      __PYX_ERR(0, 450, __pyx_L1_error)
     }
-    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 462, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_start_at); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 450, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_12 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 462, __pyx_L1_error)
+    __pyx_t_12 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 450, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 462, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_t_3, __pyx_t_12); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 450, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-    __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_2); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 462, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyInt_As_Uint32(__pyx_t_2); if (unlikely((__pyx_t_11 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 450, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_player->sample_pos = __pyx_t_11;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":463
+    /* "mpfmc/core/audio/track_sound_loop.pyx":451
  *         else:
  *             player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
  *             player.stop_loop_at_pos = do_not_stop_loop             # <<<<<<<<<<<<<<
@@ -7178,7 +7072,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_player->stop_loop_at_pos = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_do_not_stop_loop;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":465
+    /* "mpfmc/core/audio/track_sound_loop.pyx":453
  *             player.stop_loop_at_pos = do_not_stop_loop
  * 
  *             if player.master_sound_layer.fade_steps_remaining > 0:             # <<<<<<<<<<<<<<
@@ -7188,7 +7082,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_6 = ((__pyx_v_player->master_sound_layer.fade_steps_remaining > 0) != 0);
     if (__pyx_t_6) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":466
+      /* "mpfmc/core/audio/track_sound_loop.pyx":454
  * 
  *             if player.master_sound_layer.fade_steps_remaining > 0:
  *                 player.status = player_fading_in             # <<<<<<<<<<<<<<
@@ -7197,7 +7091,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_in;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":465
+      /* "mpfmc/core/audio/track_sound_loop.pyx":453
  *             player.stop_loop_at_pos = do_not_stop_loop
  * 
  *             if player.master_sound_layer.fade_steps_remaining > 0:             # <<<<<<<<<<<<<<
@@ -7207,7 +7101,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       goto __pyx_L21;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":468
+    /* "mpfmc/core/audio/track_sound_loop.pyx":456
  *                 player.status = player_fading_in
  *             else:
  *                 player.status = player_playing             # <<<<<<<<<<<<<<
@@ -7221,7 +7115,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   __pyx_L10:;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":471
+  /* "mpfmc/core/audio/track_sound_loop.pyx":459
  * 
  *         # Save current sound loop set so it can be referred to again while it is active (event notifications)
  *         self._sound_loop_set_counter += 1             # <<<<<<<<<<<<<<
@@ -7230,7 +7124,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_self->_sound_loop_set_counter = (__pyx_v_self->_sound_loop_set_counter + 1);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":472
+  /* "mpfmc/core/audio/track_sound_loop.pyx":460
  *         # Save current sound loop set so it can be referred to again while it is active (event notifications)
  *         self._sound_loop_set_counter += 1
  *         self._active_sound_loop_sets[self._sound_loop_set_counter] = player_settings             # <<<<<<<<<<<<<<
@@ -7239,66 +7133,66 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   if (unlikely(__pyx_v_self->_active_sound_loop_sets == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 472, __pyx_L1_error)
+    __PYX_ERR(0, 460, __pyx_L1_error)
   }
-  __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_self->_sound_loop_set_counter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 472, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_long(__pyx_v_self->_sound_loop_set_counter); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 460, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (unlikely(PyDict_SetItem(__pyx_v_self->_active_sound_loop_sets, __pyx_t_2, __pyx_v_player_settings) < 0)) __PYX_ERR(0, 472, __pyx_L1_error)
+  if (unlikely(PyDict_SetItem(__pyx_v_self->_active_sound_loop_sets, __pyx_t_2, __pyx_v_player_settings) < 0)) __PYX_ERR(0, 460, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":475
+  /* "mpfmc/core/audio/track_sound_loop.pyx":463
  * 
  *         master_layer_settings = {
  *             "sound_loop_set_id": self._sound_loop_set_counter,             # <<<<<<<<<<<<<<
  *             "sound": sound_loop_set['sound'],
  *             "volume": sound_loop_set['volume'],
  */
-  __pyx_t_2 = __Pyx_PyDict_NewPresized(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_NewPresized(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 463, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_12 = __Pyx_PyInt_From_long(__pyx_v_self->_sound_loop_set_counter); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyInt_From_long(__pyx_v_self->_sound_loop_set_counter); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 463, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_sound_loop_set_id, __pyx_t_12) < 0) __PYX_ERR(0, 475, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_sound_loop_set_id, __pyx_t_12) < 0) __PYX_ERR(0, 463, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":476
+  /* "mpfmc/core/audio/track_sound_loop.pyx":464
  *         master_layer_settings = {
  *             "sound_loop_set_id": self._sound_loop_set_counter,
  *             "sound": sound_loop_set['sound'],             # <<<<<<<<<<<<<<
  *             "volume": sound_loop_set['volume'],
  *             "initial_state": "play"
  */
-  __pyx_t_12 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_sound); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 476, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_sound); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 464, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_sound, __pyx_t_12) < 0) __PYX_ERR(0, 475, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_sound, __pyx_t_12) < 0) __PYX_ERR(0, 463, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":477
+  /* "mpfmc/core/audio/track_sound_loop.pyx":465
  *             "sound_loop_set_id": self._sound_loop_set_counter,
  *             "sound": sound_loop_set['sound'],
  *             "volume": sound_loop_set['volume'],             # <<<<<<<<<<<<<<
  *             "initial_state": "play"
  *         }
  */
-  __pyx_t_12 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_volume); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 477, __pyx_L1_error)
+  __pyx_t_12 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_volume); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 465, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_12);
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_volume, __pyx_t_12) < 0) __PYX_ERR(0, 475, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_volume, __pyx_t_12) < 0) __PYX_ERR(0, 463, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
-  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_initial_state, __pyx_n_u_play) < 0) __PYX_ERR(0, 475, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_2, __pyx_n_u_initial_state, __pyx_n_u_play) < 0) __PYX_ERR(0, 463, __pyx_L1_error)
   __pyx_v_master_layer_settings = ((PyObject*)__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":481
+  /* "mpfmc/core/audio/track_sound_loop.pyx":469
  *         }
  * 
  *         self._apply_layer_settings(&player.master_sound_layer, master_layer_settings)             # <<<<<<<<<<<<<<
  * 
  *         # Determine master sound length
  */
-  __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_apply_layer_settings(__pyx_v_self, (&__pyx_v_player->master_sound_layer), __pyx_v_master_layer_settings); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 481, __pyx_L1_error)
+  __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_apply_layer_settings(__pyx_v_self, (&__pyx_v_player->master_sound_layer), __pyx_v_master_layer_settings); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 469, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":484
+  /* "mpfmc/core/audio/track_sound_loop.pyx":472
  * 
  *         # Determine master sound length
  *         if player.master_sound_layer.sound != NULL:             # <<<<<<<<<<<<<<
@@ -7308,7 +7202,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_6 = ((__pyx_v_player->master_sound_layer.sound != NULL) != 0);
   if (__pyx_t_6) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":485
+    /* "mpfmc/core/audio/track_sound_loop.pyx":473
  *         # Determine master sound length
  *         if player.master_sound_layer.sound != NULL:
  *             player.length = <Uint32>player.master_sound_layer.sound.data.memory.size             # <<<<<<<<<<<<<<
@@ -7317,7 +7211,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_player->length = ((Uint32)__pyx_v_player->master_sound_layer.sound->data.memory->size);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":486
+    /* "mpfmc/core/audio/track_sound_loop.pyx":474
  *         if player.master_sound_layer.sound != NULL:
  *             player.length = <Uint32>player.master_sound_layer.sound.data.memory.size
  *             player.tempo = player_settings['tempo']             # <<<<<<<<<<<<<<
@@ -7326,15 +7220,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     if (unlikely(__pyx_v_player_settings == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 486, __pyx_L1_error)
+      __PYX_ERR(0, 474, __pyx_L1_error)
     }
-    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_tempo); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 486, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_player_settings, __pyx_n_u_tempo); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 474, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_14 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_14 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 486, __pyx_L1_error)
+    __pyx_t_14 = __pyx_PyFloat_AsFloat(__pyx_t_2); if (unlikely((__pyx_t_14 == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 474, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_player->tempo = __pyx_t_14;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":489
+    /* "mpfmc/core/audio/track_sound_loop.pyx":477
  * 
  *             # Adjust sample position to ensure it is within the sample
  *             while player.sample_pos >= player.length:             # <<<<<<<<<<<<<<
@@ -7345,7 +7239,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_t_6 = ((__pyx_v_player->sample_pos >= __pyx_v_player->length) != 0);
       if (!__pyx_t_6) break;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":490
+      /* "mpfmc/core/audio/track_sound_loop.pyx":478
  *             # Adjust sample position to ensure it is within the sample
  *             while player.sample_pos >= player.length:
  *                 player.sample_pos -= player.length             # <<<<<<<<<<<<<<
@@ -7355,7 +7249,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_v_player->sample_pos = (__pyx_v_player->sample_pos - __pyx_v_player->length);
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":484
+    /* "mpfmc/core/audio/track_sound_loop.pyx":472
  * 
  *         # Determine master sound length
  *         if player.master_sound_layer.sound != NULL:             # <<<<<<<<<<<<<<
@@ -7365,7 +7259,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L22;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":492
+  /* "mpfmc/core/audio/track_sound_loop.pyx":480
  *                 player.sample_pos -= player.length
  *         else:
  *             player.length = 0             # <<<<<<<<<<<<<<
@@ -7375,7 +7269,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   /*else*/ {
     __pyx_v_player->length = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":493
+    /* "mpfmc/core/audio/track_sound_loop.pyx":481
  *         else:
  *             player.length = 0
  *             player.sample_pos = 0             # <<<<<<<<<<<<<<
@@ -7384,7 +7278,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_player->sample_pos = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":494
+    /* "mpfmc/core/audio/track_sound_loop.pyx":482
  *             player.length = 0
  *             player.sample_pos = 0
  *             player.status = player_idle             # <<<<<<<<<<<<<<
@@ -7395,22 +7289,22 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   __pyx_L22:;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":497
+  /* "mpfmc/core/audio/track_sound_loop.pyx":485
  * 
  *         # Setup sound loop set layers
  *         for layer_settings in sound_loop_set['layers']:             # <<<<<<<<<<<<<<
  *             layer = _create_sound_loop_layer_settings()
  *             self._apply_layer_settings(layer, layer_settings)
  */
-  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_layers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 497, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_sound_loop_set, __pyx_n_u_layers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 485, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (likely(PyList_CheckExact(__pyx_t_2)) || PyTuple_CheckExact(__pyx_t_2)) {
     __pyx_t_12 = __pyx_t_2; __Pyx_INCREF(__pyx_t_12); __pyx_t_15 = 0;
     __pyx_t_16 = NULL;
   } else {
-    __pyx_t_15 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 497, __pyx_L1_error)
+    __pyx_t_15 = -1; __pyx_t_12 = PyObject_GetIter(__pyx_t_2); if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 485, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_12);
-    __pyx_t_16 = Py_TYPE(__pyx_t_12)->tp_iternext; if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 497, __pyx_L1_error)
+    __pyx_t_16 = Py_TYPE(__pyx_t_12)->tp_iternext; if (unlikely(!__pyx_t_16)) __PYX_ERR(0, 485, __pyx_L1_error)
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   for (;;) {
@@ -7418,17 +7312,17 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       if (likely(PyList_CheckExact(__pyx_t_12))) {
         if (__pyx_t_15 >= PyList_GET_SIZE(__pyx_t_12)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_15); __Pyx_INCREF(__pyx_t_2); __pyx_t_15++; if (unlikely(0 < 0)) __PYX_ERR(0, 497, __pyx_L1_error)
+        __pyx_t_2 = PyList_GET_ITEM(__pyx_t_12, __pyx_t_15); __Pyx_INCREF(__pyx_t_2); __pyx_t_15++; if (unlikely(0 < 0)) __PYX_ERR(0, 485, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_12, __pyx_t_15); __pyx_t_15++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 497, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_12, __pyx_t_15); __pyx_t_15++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 485, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       } else {
         if (__pyx_t_15 >= PyTuple_GET_SIZE(__pyx_t_12)) break;
         #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_15); __Pyx_INCREF(__pyx_t_2); __pyx_t_15++; if (unlikely(0 < 0)) __PYX_ERR(0, 497, __pyx_L1_error)
+        __pyx_t_2 = PyTuple_GET_ITEM(__pyx_t_12, __pyx_t_15); __Pyx_INCREF(__pyx_t_2); __pyx_t_15++; if (unlikely(0 < 0)) __PYX_ERR(0, 485, __pyx_L1_error)
         #else
-        __pyx_t_2 = PySequence_ITEM(__pyx_t_12, __pyx_t_15); __pyx_t_15++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 497, __pyx_L1_error)
+        __pyx_t_2 = PySequence_ITEM(__pyx_t_12, __pyx_t_15); __pyx_t_15++; if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 485, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         #endif
       }
@@ -7438,7 +7332,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else __PYX_ERR(0, 497, __pyx_L1_error)
+          else __PYX_ERR(0, 485, __pyx_L1_error)
         }
         break;
       }
@@ -7447,7 +7341,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __Pyx_XDECREF_SET(__pyx_v_layer_settings, __pyx_t_2);
     __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":498
+    /* "mpfmc/core/audio/track_sound_loop.pyx":486
  *         # Setup sound loop set layers
  *         for layer_settings in sound_loop_set['layers']:
  *             layer = _create_sound_loop_layer_settings()             # <<<<<<<<<<<<<<
@@ -7456,19 +7350,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_layer = __pyx_f_5mpfmc_4core_5audio_16track_sound_loop__create_sound_loop_layer_settings();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":499
+    /* "mpfmc/core/audio/track_sound_loop.pyx":487
  *         for layer_settings in sound_loop_set['layers']:
  *             layer = _create_sound_loop_layer_settings()
  *             self._apply_layer_settings(layer, layer_settings)             # <<<<<<<<<<<<<<
  * 
  *             # Layer fading is only set by events using the sound_loop_player
  */
-    if (!(likely(PyDict_CheckExact(__pyx_v_layer_settings))||((__pyx_v_layer_settings) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "dict", Py_TYPE(__pyx_v_layer_settings)->tp_name), 0))) __PYX_ERR(0, 499, __pyx_L1_error)
-    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_apply_layer_settings(__pyx_v_self, __pyx_v_layer, ((PyObject*)__pyx_v_layer_settings)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 499, __pyx_L1_error)
+    if (!(likely(PyDict_CheckExact(__pyx_v_layer_settings))||((__pyx_v_layer_settings) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "dict", Py_TYPE(__pyx_v_layer_settings)->tp_name), 0))) __PYX_ERR(0, 487, __pyx_L1_error)
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_apply_layer_settings(__pyx_v_self, __pyx_v_layer, ((PyObject*)__pyx_v_layer_settings)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 487, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":502
+    /* "mpfmc/core/audio/track_sound_loop.pyx":490
  * 
  *             # Layer fading is only set by events using the sound_loop_player
  *             layer.fade_in_steps = 0             # <<<<<<<<<<<<<<
@@ -7477,7 +7371,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_layer->fade_in_steps = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":503
+    /* "mpfmc/core/audio/track_sound_loop.pyx":491
  *             # Layer fading is only set by events using the sound_loop_player
  *             layer.fade_in_steps = 0
  *             layer.fade_out_steps = 0             # <<<<<<<<<<<<<<
@@ -7486,7 +7380,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_layer->fade_out_steps = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":504
+    /* "mpfmc/core/audio/track_sound_loop.pyx":492
  *             layer.fade_in_steps = 0
  *             layer.fade_out_steps = 0
  *             layer.fade_steps_remaining = 0             # <<<<<<<<<<<<<<
@@ -7495,7 +7389,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_layer->fade_steps_remaining = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":507
+    /* "mpfmc/core/audio/track_sound_loop.pyx":495
  * 
  *             # Append layer
  *             player.layers = g_slist_append(player.layers, layer)             # <<<<<<<<<<<<<<
@@ -7504,7 +7398,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_player->layers = g_slist_append(__pyx_v_player->layers, __pyx_v_layer);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":497
+    /* "mpfmc/core/audio/track_sound_loop.pyx":485
  * 
  *         # Setup sound loop set layers
  *         for layer_settings in sound_loop_set['layers']:             # <<<<<<<<<<<<<<
@@ -7514,7 +7408,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   __Pyx_DECREF(__pyx_t_12); __pyx_t_12 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":510
+  /* "mpfmc/core/audio/track_sound_loop.pyx":498
  * 
  *         # Send sound_loop_set started notification (if not pending/queued)
  *         if player.status not in (player_idle, player_pending):             # <<<<<<<<<<<<<<
@@ -7533,7 +7427,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_10 = (__pyx_t_6 != 0);
   if (__pyx_t_10) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":511
+    /* "mpfmc/core/audio/track_sound_loop.pyx":499
  *         # Send sound_loop_set started notification (if not pending/queued)
  *         if player.status not in (player_idle, player_pending):
  *             send_sound_loop_set_started_notification(player.master_sound_layer.sound_loop_set_id,             # <<<<<<<<<<<<<<
@@ -7542,7 +7436,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_started_notification(__pyx_v_player->master_sound_layer.sound_loop_set_id, __pyx_v_player->master_sound_layer.sound_id, __pyx_v_self->__pyx_base.state);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":510
+    /* "mpfmc/core/audio/track_sound_loop.pyx":498
  * 
  *         # Send sound_loop_set started notification (if not pending/queued)
  *         if player.status not in (player_idle, player_pending):             # <<<<<<<<<<<<<<
@@ -7551,7 +7445,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":516
+  /* "mpfmc/core/audio/track_sound_loop.pyx":504
  *             # send_sound_started_notification(0, player.master_sound_layer.sound_id, 0, self.state)
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -7560,7 +7454,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":289
+  /* "mpfmc/core/audio/track_sound_loop.pyx":276
  *         SDL_UnlockAudio()
  * 
  *     def play_sound_loop_set(self, dict sound_loop_set not None, str context=None, dict player_settings=None):             # <<<<<<<<<<<<<<
@@ -7589,7 +7483,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":518
+/* "mpfmc/core/audio/track_sound_loop.pyx":506
  *         SDL_UnlockAudio()
  * 
  *     cdef _apply_layer_settings(self, SoundLoopLayerSettings *layer, dict layer_settings):             # <<<<<<<<<<<<<<
@@ -7619,7 +7513,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   guint __pyx_t_14;
   __Pyx_RefNannySetupContext("_apply_layer_settings", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":521
+  /* "mpfmc/core/audio/track_sound_loop.pyx":509
  *         cdef SoundFile sound_container
  * 
  *         if 'initial_state' not in layer_settings or layer_settings['initial_state'] == 'play':             # <<<<<<<<<<<<<<
@@ -7628,9 +7522,9 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   if (unlikely(__pyx_v_layer_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 521, __pyx_L1_error)
+    __PYX_ERR(0, 509, __pyx_L1_error)
   }
-  __pyx_t_2 = (__Pyx_PyDict_ContainsTF(__pyx_n_u_initial_state, __pyx_v_layer_settings, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 521, __pyx_L1_error)
+  __pyx_t_2 = (__Pyx_PyDict_ContainsTF(__pyx_n_u_initial_state, __pyx_v_layer_settings, Py_NE)); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 509, __pyx_L1_error)
   __pyx_t_3 = (__pyx_t_2 != 0);
   if (!__pyx_t_3) {
   } else {
@@ -7639,17 +7533,17 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   }
   if (unlikely(__pyx_v_layer_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 521, __pyx_L1_error)
+    __PYX_ERR(0, 509, __pyx_L1_error)
   }
-  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_initial_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 521, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_initial_state); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 509, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_t_4, __pyx_n_u_play, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 521, __pyx_L1_error)
+  __pyx_t_3 = (__Pyx_PyUnicode_Equals(__pyx_t_4, __pyx_n_u_play, Py_EQ)); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 509, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __pyx_t_1 = __pyx_t_3;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":522
+    /* "mpfmc/core/audio/track_sound_loop.pyx":510
  * 
  *         if 'initial_state' not in layer_settings or layer_settings['initial_state'] == 'play':
  *             layer.status = layer_playing             # <<<<<<<<<<<<<<
@@ -7658,7 +7552,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     __pyx_v_layer->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":521
+    /* "mpfmc/core/audio/track_sound_loop.pyx":509
  *         cdef SoundFile sound_container
  * 
  *         if 'initial_state' not in layer_settings or layer_settings['initial_state'] == 'play':             # <<<<<<<<<<<<<<
@@ -7668,7 +7562,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     goto __pyx_L3;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":524
+  /* "mpfmc/core/audio/track_sound_loop.pyx":512
  *             layer.status = layer_playing
  *         else:
  *             layer.status = layer_stopped             # <<<<<<<<<<<<<<
@@ -7680,7 +7574,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   }
   __pyx_L3:;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":526
+  /* "mpfmc/core/audio/track_sound_loop.pyx":514
  *             layer.status = layer_stopped
  * 
  *         if 'sound_loop_set_id' in layer_settings:             # <<<<<<<<<<<<<<
@@ -7689,13 +7583,13 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   if (unlikely(__pyx_v_layer_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 526, __pyx_L1_error)
+    __PYX_ERR(0, 514, __pyx_L1_error)
   }
-  __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_n_u_sound_loop_set_id, __pyx_v_layer_settings, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 526, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyDict_ContainsTF(__pyx_n_u_sound_loop_set_id, __pyx_v_layer_settings, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 514, __pyx_L1_error)
   __pyx_t_3 = (__pyx_t_1 != 0);
   if (__pyx_t_3) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":527
+    /* "mpfmc/core/audio/track_sound_loop.pyx":515
  * 
  *         if 'sound_loop_set_id' in layer_settings:
  *             layer.sound_loop_set_id = layer_settings['sound_loop_set_id']             # <<<<<<<<<<<<<<
@@ -7704,15 +7598,15 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     if (unlikely(__pyx_v_layer_settings == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 527, __pyx_L1_error)
+      __PYX_ERR(0, 515, __pyx_L1_error)
     }
-    __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_sound_loop_set_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 527, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_sound_loop_set_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 515, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyInt_As_long(__pyx_t_4); if (unlikely((__pyx_t_5 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 527, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_As_long(__pyx_t_4); if (unlikely((__pyx_t_5 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 515, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_layer->sound_loop_set_id = __pyx_t_5;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":526
+    /* "mpfmc/core/audio/track_sound_loop.pyx":514
  *             layer.status = layer_stopped
  * 
  *         if 'sound_loop_set_id' in layer_settings:             # <<<<<<<<<<<<<<
@@ -7722,7 +7616,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     goto __pyx_L6;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":529
+  /* "mpfmc/core/audio/track_sound_loop.pyx":517
  *             layer.sound_loop_set_id = layer_settings['sound_loop_set_id']
  *         else:
  *             layer.sound_loop_set_id = 0             # <<<<<<<<<<<<<<
@@ -7734,42 +7628,42 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   }
   __pyx_L6:;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":532
+  /* "mpfmc/core/audio/track_sound_loop.pyx":520
  * 
  *         # Set layer sound
  *         sound = self.mc.sounds[layer_settings['sound']]             # <<<<<<<<<<<<<<
  * 
  *         # TODO: What to do when sound is not loaded?
  */
-  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 532, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.mc, __pyx_n_s_sounds); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 520, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   if (unlikely(__pyx_v_layer_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 532, __pyx_L1_error)
+    __PYX_ERR(0, 520, __pyx_L1_error)
   }
-  __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 532, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_sound); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 520, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 532, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetItem(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 520, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __pyx_v_sound = __pyx_t_7;
   __pyx_t_7 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":537
+  /* "mpfmc/core/audio/track_sound_loop.pyx":525
  *         # TODO: Perhaps load sounds and delay play until loaded?
  * 
  *         sound_container = sound.container             # <<<<<<<<<<<<<<
  *         layer.sound = cython.address(sound_container.sample)
  *         layer.sound_id = sound.id
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_container); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 537, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_container); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 525, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundFile))))) __PYX_ERR(0, 537, __pyx_L1_error)
+  if (!(likely(((__pyx_t_7) == Py_None) || likely(__Pyx_TypeTest(__pyx_t_7, __pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundFile))))) __PYX_ERR(0, 525, __pyx_L1_error)
   __pyx_v_sound_container = ((struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundFile *)__pyx_t_7);
   __pyx_t_7 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":538
+  /* "mpfmc/core/audio/track_sound_loop.pyx":526
  * 
  *         sound_container = sound.container
  *         layer.sound = cython.address(sound_container.sample)             # <<<<<<<<<<<<<<
@@ -7778,20 +7672,20 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   __pyx_v_layer->sound = (&__pyx_v_sound_container->sample);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":539
+  /* "mpfmc/core/audio/track_sound_loop.pyx":527
  *         sound_container = sound.container
  *         layer.sound = cython.address(sound_container.sample)
  *         layer.sound_id = sound.id             # <<<<<<<<<<<<<<
  * 
  *         # By default, all layers will continue to loop when played
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_id); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 539, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_id); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 527, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_8 = __Pyx_PyInt_As_Uint64(__pyx_t_7); if (unlikely((__pyx_t_8 == ((Uint64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 539, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_Uint64(__pyx_t_7); if (unlikely((__pyx_t_8 == ((Uint64)-1)) && PyErr_Occurred())) __PYX_ERR(0, 527, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_v_layer->sound_id = __pyx_t_8;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":542
+  /* "mpfmc/core/audio/track_sound_loop.pyx":530
  * 
  *         # By default, all layers will continue to loop when played
  *         layer.looping = True             # <<<<<<<<<<<<<<
@@ -7800,7 +7694,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   __pyx_v_layer->looping = 1;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":545
+  /* "mpfmc/core/audio/track_sound_loop.pyx":533
  * 
  *         # Layer volume (use layer settings or sound setting if None)
  *         if layer_settings['volume']:             # <<<<<<<<<<<<<<
@@ -7809,15 +7703,15 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   if (unlikely(__pyx_v_layer_settings == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-    __PYX_ERR(0, 545, __pyx_L1_error)
+    __PYX_ERR(0, 533, __pyx_L1_error)
   }
-  __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_volume); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 545, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_volume); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 533, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 545, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_7); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 533, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   if (__pyx_t_3) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":546
+    /* "mpfmc/core/audio/track_sound_loop.pyx":534
  *         # Layer volume (use layer settings or sound setting if None)
  *         if layer_settings['volume']:
  *             layer.volume = <Uint8>(layer_settings['volume'] * SDL_MIX_MAXVOLUME)             # <<<<<<<<<<<<<<
@@ -7826,21 +7720,21 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     if (unlikely(__pyx_v_layer_settings == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 546, __pyx_L1_error)
+      __PYX_ERR(0, 534, __pyx_L1_error)
     }
-    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_volume); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 546, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyDict_GetItem(__pyx_v_layer_settings, __pyx_n_u_volume); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = __Pyx_PyInt_From_int(SDL_MIX_MAXVOLUME); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 546, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(SDL_MIX_MAXVOLUME); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_4 = PyNumber_Multiply(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 546, __pyx_L1_error)
+    __pyx_t_4 = PyNumber_Multiply(__pyx_t_7, __pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 534, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_9 = __Pyx_PyInt_As_Uint8(__pyx_t_4); if (unlikely((__pyx_t_9 == ((Uint8)-1)) && PyErr_Occurred())) __PYX_ERR(0, 546, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_Uint8(__pyx_t_4); if (unlikely((__pyx_t_9 == ((Uint8)-1)) && PyErr_Occurred())) __PYX_ERR(0, 534, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_layer->volume = ((Uint8)__pyx_t_9);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":545
+    /* "mpfmc/core/audio/track_sound_loop.pyx":533
  * 
  *         # Layer volume (use layer settings or sound setting if None)
  *         if layer_settings['volume']:             # <<<<<<<<<<<<<<
@@ -7850,7 +7744,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     goto __pyx_L7;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":548
+  /* "mpfmc/core/audio/track_sound_loop.pyx":536
  *             layer.volume = <Uint8>(layer_settings['volume'] * SDL_MIX_MAXVOLUME)
  *         else:
  *             layer.volume = <Uint8>(sound.volume * SDL_MIX_MAXVOLUME)             # <<<<<<<<<<<<<<
@@ -7858,34 +7752,34 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  *         # Markers (copy from source sound)
  */
   /*else*/ {
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_volume); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 548, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_volume); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 536, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_6 = __Pyx_PyInt_From_int(SDL_MIX_MAXVOLUME); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 548, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_From_int(SDL_MIX_MAXVOLUME); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 536, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
-    __pyx_t_7 = PyNumber_Multiply(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 548, __pyx_L1_error)
+    __pyx_t_7 = PyNumber_Multiply(__pyx_t_4, __pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 536, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-    __pyx_t_9 = __Pyx_PyInt_As_Uint8(__pyx_t_7); if (unlikely((__pyx_t_9 == ((Uint8)-1)) && PyErr_Occurred())) __PYX_ERR(0, 548, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_Uint8(__pyx_t_7); if (unlikely((__pyx_t_9 == ((Uint8)-1)) && PyErr_Occurred())) __PYX_ERR(0, 536, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_v_layer->volume = ((Uint8)__pyx_t_9);
   }
   __pyx_L7:;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":551
+  /* "mpfmc/core/audio/track_sound_loop.pyx":539
  * 
  *         # Markers (copy from source sound)
  *         layer.marker_count = sound.marker_count             # <<<<<<<<<<<<<<
  * 
  *         if layer.marker_count > 0:
  */
-  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_marker_count); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 551, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_marker_count); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 539, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
-  __pyx_t_9 = __Pyx_PyInt_As_Uint8(__pyx_t_7); if (unlikely((__pyx_t_9 == ((Uint8)-1)) && PyErr_Occurred())) __PYX_ERR(0, 551, __pyx_L1_error)
+  __pyx_t_9 = __Pyx_PyInt_As_Uint8(__pyx_t_7); if (unlikely((__pyx_t_9 == ((Uint8)-1)) && PyErr_Occurred())) __PYX_ERR(0, 539, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   __pyx_v_layer->marker_count = __pyx_t_9;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":553
+  /* "mpfmc/core/audio/track_sound_loop.pyx":541
  *         layer.marker_count = sound.marker_count
  * 
  *         if layer.marker_count > 0:             # <<<<<<<<<<<<<<
@@ -7895,7 +7789,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   __pyx_t_3 = ((__pyx_v_layer->marker_count > 0) != 0);
   if (__pyx_t_3) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":554
+    /* "mpfmc/core/audio/track_sound_loop.pyx":542
  * 
  *         if layer.marker_count > 0:
  *             layer.markers = g_array_new(False, False, sizeof(guint))             # <<<<<<<<<<<<<<
@@ -7904,38 +7798,38 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     __pyx_v_layer->markers = g_array_new(0, 0, (sizeof(guint)));
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":555
+    /* "mpfmc/core/audio/track_sound_loop.pyx":543
  *         if layer.marker_count > 0:
  *             layer.markers = g_array_new(False, False, sizeof(guint))
  *             g_array_set_size(layer.markers, sound.marker_count)             # <<<<<<<<<<<<<<
  *             for index in range(sound.marker_count):
  *                 g_array_insert_val_uint(layer.markers,
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_marker_count); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 555, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_marker_count); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 543, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_10 = __Pyx_PyInt_As_guint(__pyx_t_7); if (unlikely((__pyx_t_10 == ((guint)-1)) && PyErr_Occurred())) __PYX_ERR(0, 555, __pyx_L1_error)
+    __pyx_t_10 = __Pyx_PyInt_As_guint(__pyx_t_7); if (unlikely((__pyx_t_10 == ((guint)-1)) && PyErr_Occurred())) __PYX_ERR(0, 543, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     (void)(g_array_set_size(__pyx_v_layer->markers, __pyx_t_10));
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":556
+    /* "mpfmc/core/audio/track_sound_loop.pyx":544
  *             layer.markers = g_array_new(False, False, sizeof(guint))
  *             g_array_set_size(layer.markers, sound.marker_count)
  *             for index in range(sound.marker_count):             # <<<<<<<<<<<<<<
  *                 g_array_insert_val_uint(layer.markers,
  *                                         index,
  */
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_marker_count); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 556, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_marker_count); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 544, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 556, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_CallOneArg(__pyx_builtin_range, __pyx_t_7); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 544, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_6);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     if (likely(PyList_CheckExact(__pyx_t_6)) || PyTuple_CheckExact(__pyx_t_6)) {
       __pyx_t_7 = __pyx_t_6; __Pyx_INCREF(__pyx_t_7); __pyx_t_11 = 0;
       __pyx_t_12 = NULL;
     } else {
-      __pyx_t_11 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 556, __pyx_L1_error)
+      __pyx_t_11 = -1; __pyx_t_7 = PyObject_GetIter(__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 544, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
-      __pyx_t_12 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 556, __pyx_L1_error)
+      __pyx_t_12 = Py_TYPE(__pyx_t_7)->tp_iternext; if (unlikely(!__pyx_t_12)) __PYX_ERR(0, 544, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     for (;;) {
@@ -7943,17 +7837,17 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         if (likely(PyList_CheckExact(__pyx_t_7))) {
           if (__pyx_t_11 >= PyList_GET_SIZE(__pyx_t_7)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_11); __Pyx_INCREF(__pyx_t_6); __pyx_t_11++; if (unlikely(0 < 0)) __PYX_ERR(0, 556, __pyx_L1_error)
+          __pyx_t_6 = PyList_GET_ITEM(__pyx_t_7, __pyx_t_11); __Pyx_INCREF(__pyx_t_6); __pyx_t_11++; if (unlikely(0 < 0)) __PYX_ERR(0, 544, __pyx_L1_error)
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_7, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 556, __pyx_L1_error)
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_7, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 544, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           #endif
         } else {
           if (__pyx_t_11 >= PyTuple_GET_SIZE(__pyx_t_7)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_11); __Pyx_INCREF(__pyx_t_6); __pyx_t_11++; if (unlikely(0 < 0)) __PYX_ERR(0, 556, __pyx_L1_error)
+          __pyx_t_6 = PyTuple_GET_ITEM(__pyx_t_7, __pyx_t_11); __Pyx_INCREF(__pyx_t_6); __pyx_t_11++; if (unlikely(0 < 0)) __PYX_ERR(0, 544, __pyx_L1_error)
           #else
-          __pyx_t_6 = PySequence_ITEM(__pyx_t_7, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 556, __pyx_L1_error)
+          __pyx_t_6 = PySequence_ITEM(__pyx_t_7, __pyx_t_11); __pyx_t_11++; if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 544, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_6);
           #endif
         }
@@ -7963,7 +7857,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(__Pyx_PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 556, __pyx_L1_error)
+            else __PYX_ERR(0, 544, __pyx_L1_error)
           }
           break;
         }
@@ -7972,40 +7866,40 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       __Pyx_XDECREF_SET(__pyx_v_index, __pyx_t_6);
       __pyx_t_6 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":558
+      /* "mpfmc/core/audio/track_sound_loop.pyx":546
  *             for index in range(sound.marker_count):
  *                 g_array_insert_val_uint(layer.markers,
  *                                         index,             # <<<<<<<<<<<<<<
  *                                         <guint>(sound.markers[index]['time'] * self.state.callback_data.seconds_to_bytes_factor))
  * 
  */
-      __pyx_t_10 = __Pyx_PyInt_As_guint(__pyx_v_index); if (unlikely((__pyx_t_10 == ((guint)-1)) && PyErr_Occurred())) __PYX_ERR(0, 558, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyInt_As_guint(__pyx_v_index); if (unlikely((__pyx_t_10 == ((guint)-1)) && PyErr_Occurred())) __PYX_ERR(0, 546, __pyx_L1_error)
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":559
+      /* "mpfmc/core/audio/track_sound_loop.pyx":547
  *                 g_array_insert_val_uint(layer.markers,
  *                                         index,
  *                                         <guint>(sound.markers[index]['time'] * self.state.callback_data.seconds_to_bytes_factor))             # <<<<<<<<<<<<<<
  * 
  *     def stop_current_sound_loop_set(self, fade_out=None):
  */
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_markers); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 559, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_markers); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 547, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_v_index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 559, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetItem(__pyx_t_6, __pyx_v_index); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 547, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_4, __pyx_n_u_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 559, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_Dict_GetItem(__pyx_t_4, __pyx_n_u_time); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 547, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 559, __pyx_L1_error)
+      __pyx_t_4 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 547, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_13 = PyNumber_Multiply(__pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 559, __pyx_L1_error)
+      __pyx_t_13 = PyNumber_Multiply(__pyx_t_6, __pyx_t_4); if (unlikely(!__pyx_t_13)) __PYX_ERR(0, 547, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_13);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_14 = __Pyx_PyInt_As_guint(__pyx_t_13); if (unlikely((__pyx_t_14 == ((guint)-1)) && PyErr_Occurred())) __PYX_ERR(0, 559, __pyx_L1_error)
+      __pyx_t_14 = __Pyx_PyInt_As_guint(__pyx_t_13); if (unlikely((__pyx_t_14 == ((guint)-1)) && PyErr_Occurred())) __PYX_ERR(0, 547, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_13); __pyx_t_13 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":557
+      /* "mpfmc/core/audio/track_sound_loop.pyx":545
  *             g_array_set_size(layer.markers, sound.marker_count)
  *             for index in range(sound.marker_count):
  *                 g_array_insert_val_uint(layer.markers,             # <<<<<<<<<<<<<<
@@ -8014,7 +7908,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       g_array_insert_val_uint(__pyx_v_layer->markers, __pyx_t_10, ((guint)__pyx_t_14));
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":556
+      /* "mpfmc/core/audio/track_sound_loop.pyx":544
  *             layer.markers = g_array_new(False, False, sizeof(guint))
  *             g_array_set_size(layer.markers, sound.marker_count)
  *             for index in range(sound.marker_count):             # <<<<<<<<<<<<<<
@@ -8024,7 +7918,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     }
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":553
+    /* "mpfmc/core/audio/track_sound_loop.pyx":541
  *         layer.marker_count = sound.marker_count
  * 
  *         if layer.marker_count > 0:             # <<<<<<<<<<<<<<
@@ -8033,7 +7927,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":518
+  /* "mpfmc/core/audio/track_sound_loop.pyx":506
  *         SDL_UnlockAudio()
  * 
  *     cdef _apply_layer_settings(self, SoundLoopLayerSettings *layer, dict layer_settings):             # <<<<<<<<<<<<<<
@@ -8060,7 +7954,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":561
+/* "mpfmc/core/audio/track_sound_loop.pyx":549
  *                                         <guint>(sound.markers[index]['time'] * self.state.callback_data.seconds_to_bytes_factor))
  * 
  *     def stop_current_sound_loop_set(self, fade_out=None):             # <<<<<<<<<<<<<<
@@ -8098,7 +7992,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_current_sound_loop_set") < 0)) __PYX_ERR(0, 561, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_current_sound_loop_set") < 0)) __PYX_ERR(0, 549, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -8112,7 +8006,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("stop_current_sound_loop_set", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 561, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("stop_current_sound_loop_set", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 549, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.stop_current_sound_loop_set", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -8137,7 +8031,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   Uint8 __pyx_t_7;
   __Pyx_RefNannySetupContext("stop_current_sound_loop_set", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":568
+  /* "mpfmc/core/audio/track_sound_loop.pyx":556
  *                       sound loop set before stopping.
  *         """
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -8146,21 +8040,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":570
+  /* "mpfmc/core/audio/track_sound_loop.pyx":558
  *         SDL_LockAudio()
  * 
  *         self.log.debug("Stopping current sound loop set")             # <<<<<<<<<<<<<<
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 570, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 558, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 570, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 558, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":572
+  /* "mpfmc/core/audio/track_sound_loop.pyx":560
  *         self.log.debug("Stopping current sound loop set")
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):             # <<<<<<<<<<<<<<
@@ -8180,21 +8074,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_4 = (__pyx_t_3 != 0);
   if (__pyx_t_4) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":573
+    /* "mpfmc/core/audio/track_sound_loop.pyx":561
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  *             self.log.info("Unable to stop sound loop set - no sound loop set is currently playing.")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 573, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 561, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 573, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 561, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":574
+    /* "mpfmc/core/audio/track_sound_loop.pyx":562
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  *             self.log.info("Unable to stop sound loop set - no sound loop set is currently playing.")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -8203,7 +8097,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":575
+    /* "mpfmc/core/audio/track_sound_loop.pyx":563
  *             self.log.info("Unable to stop sound loop set - no sound loop set is currently playing.")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -8214,7 +8108,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":572
+    /* "mpfmc/core/audio/track_sound_loop.pyx":560
  *         self.log.debug("Stopping current sound loop set")
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):             # <<<<<<<<<<<<<<
@@ -8223,39 +8117,39 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":578
+  /* "mpfmc/core/audio/track_sound_loop.pyx":566
  * 
  *         # Calculate new fade out if specified (overriding current setting)
  *         if fade_out:             # <<<<<<<<<<<<<<
  *             self.type_state.current.master_sound_layer.fade_out_steps = fade_out * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
  * 
  */
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_fade_out); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 578, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_fade_out); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 566, __pyx_L1_error)
   if (__pyx_t_4) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":579
+    /* "mpfmc/core/audio/track_sound_loop.pyx":567
  *         # Calculate new fade out if specified (overriding current setting)
  *         if fade_out:
  *             self.type_state.current.master_sound_layer.fade_out_steps = fade_out * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point             # <<<<<<<<<<<<<<
  * 
  *         # If no fade out is specified, perform quick fade out
  */
-    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 579, __pyx_L1_error)
+    __pyx_t_1 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 567, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = PyNumber_Multiply(__pyx_v_fade_out, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 579, __pyx_L1_error)
+    __pyx_t_2 = PyNumber_Multiply(__pyx_v_fade_out, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 567, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyInt_From_Uint16(__pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 579, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyInt_From_Uint16(__pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 567, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_5 = PyNumber_FloorDivide(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 579, __pyx_L1_error)
+    __pyx_t_5 = PyNumber_FloorDivide(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 567, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_6 = __Pyx_PyInt_As_Uint32(__pyx_t_5); if (unlikely((__pyx_t_6 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 579, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyInt_As_Uint32(__pyx_t_5); if (unlikely((__pyx_t_6 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 567, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     __pyx_v_self->type_state->current->master_sound_layer.fade_out_steps = __pyx_t_6;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":578
+    /* "mpfmc/core/audio/track_sound_loop.pyx":566
  * 
  *         # Calculate new fade out if specified (overriding current setting)
  *         if fade_out:             # <<<<<<<<<<<<<<
@@ -8264,7 +8158,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":582
+  /* "mpfmc/core/audio/track_sound_loop.pyx":570
  * 
  *         # If no fade out is specified, perform quick fade out
  *         if self.type_state.current.master_sound_layer.fade_out_steps == 0:             # <<<<<<<<<<<<<<
@@ -8274,7 +8168,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_4 = ((__pyx_v_self->type_state->current->master_sound_layer.fade_out_steps == 0) != 0);
   if (__pyx_t_4) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":583
+    /* "mpfmc/core/audio/track_sound_loop.pyx":571
  *         # If no fade out is specified, perform quick fade out
  *         if self.type_state.current.master_sound_layer.fade_out_steps == 0:
  *             self.type_state.current.master_sound_layer.fade_out_steps = self.state.callback_data.quick_fade_steps             # <<<<<<<<<<<<<<
@@ -8284,7 +8178,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_7 = __pyx_v_self->__pyx_base.state->callback_data->quick_fade_steps;
     __pyx_v_self->type_state->current->master_sound_layer.fade_out_steps = __pyx_t_7;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":582
+    /* "mpfmc/core/audio/track_sound_loop.pyx":570
  * 
  *         # If no fade out is specified, perform quick fade out
  *         if self.type_state.current.master_sound_layer.fade_out_steps == 0:             # <<<<<<<<<<<<<<
@@ -8293,7 +8187,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":585
+  /* "mpfmc/core/audio/track_sound_loop.pyx":573
  *             self.type_state.current.master_sound_layer.fade_out_steps = self.state.callback_data.quick_fade_steps
  * 
  *         self.type_state.current.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_out_steps             # <<<<<<<<<<<<<<
@@ -8303,7 +8197,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_6 = __pyx_v_self->type_state->current->master_sound_layer.fade_out_steps;
   __pyx_v_self->type_state->current->master_sound_layer.fade_steps_remaining = __pyx_t_6;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":586
+  /* "mpfmc/core/audio/track_sound_loop.pyx":574
  * 
  *         self.type_state.current.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_out_steps
  *         self.type_state.current.status = player_fading_out             # <<<<<<<<<<<<<<
@@ -8312,7 +8206,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_self->type_state->current->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_out;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":589
+  /* "mpfmc/core/audio/track_sound_loop.pyx":577
  * 
  *         # Need to check if the next sound player has a loop set queued for playback and if so, cancel it
  *         if self.type_state.next.status == player_pending:             # <<<<<<<<<<<<<<
@@ -8322,7 +8216,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   switch (__pyx_v_self->type_state->next->status) {
     case __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_pending:
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":590
+    /* "mpfmc/core/audio/track_sound_loop.pyx":578
  *         # Need to check if the next sound player has a loop set queued for playback and if so, cancel it
  *         if self.type_state.next.status == player_pending:
  *             self.type_state.next.status = player_idle             # <<<<<<<<<<<<<<
@@ -8331,7 +8225,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_self->type_state->next->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":591
+    /* "mpfmc/core/audio/track_sound_loop.pyx":579
  *         if self.type_state.next.status == player_pending:
  *             self.type_state.next.status = player_idle
  *             self.type_state.next.master_sound_layer.sound_loop_set_id = 0             # <<<<<<<<<<<<<<
@@ -8340,7 +8234,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_self->type_state->next->master_sound_layer.sound_loop_set_id = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":592
+    /* "mpfmc/core/audio/track_sound_loop.pyx":580
  *             self.type_state.next.status = player_idle
  *             self.type_state.next.master_sound_layer.sound_loop_set_id = 0
  *             self.type_state.next.master_sound_layer.sound_id = 0             # <<<<<<<<<<<<<<
@@ -8349,7 +8243,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_self->type_state->next->master_sound_layer.sound_id = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":589
+    /* "mpfmc/core/audio/track_sound_loop.pyx":577
  * 
  *         # Need to check if the next sound player has a loop set queued for playback and if so, cancel it
  *         if self.type_state.next.status == player_pending:             # <<<<<<<<<<<<<<
@@ -8358,7 +8252,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     break;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":594
+    /* "mpfmc/core/audio/track_sound_loop.pyx":582
  *             self.type_state.next.master_sound_layer.sound_id = 0
  * 
  *         elif self.type_state.next.status == player_fading_out:             # <<<<<<<<<<<<<<
@@ -8367,7 +8261,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     case __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_out:
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":596
+    /* "mpfmc/core/audio/track_sound_loop.pyx":584
  *         elif self.type_state.next.status == player_fading_out:
  *             # Do we need to shorted the current fade-out?
  *             if self.type_state.next.master_sound_layer.fade_steps_remaining > self.type_state.current.master_sound_layer.fade_steps_remaining:             # <<<<<<<<<<<<<<
@@ -8377,7 +8271,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_4 = ((__pyx_v_self->type_state->next->master_sound_layer.fade_steps_remaining > __pyx_v_self->type_state->current->master_sound_layer.fade_steps_remaining) != 0);
     if (__pyx_t_4) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":597
+      /* "mpfmc/core/audio/track_sound_loop.pyx":585
  *             # Do we need to shorted the current fade-out?
  *             if self.type_state.next.master_sound_layer.fade_steps_remaining > self.type_state.current.master_sound_layer.fade_steps_remaining:
  *                 self.type_state.next.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_steps_remaining             # <<<<<<<<<<<<<<
@@ -8387,7 +8281,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_t_6 = __pyx_v_self->type_state->current->master_sound_layer.fade_steps_remaining;
       __pyx_v_self->type_state->next->master_sound_layer.fade_steps_remaining = __pyx_t_6;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":596
+      /* "mpfmc/core/audio/track_sound_loop.pyx":584
  *         elif self.type_state.next.status == player_fading_out:
  *             # Do we need to shorted the current fade-out?
  *             if self.type_state.next.master_sound_layer.fade_steps_remaining > self.type_state.current.master_sound_layer.fade_steps_remaining:             # <<<<<<<<<<<<<<
@@ -8396,7 +8290,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":594
+    /* "mpfmc/core/audio/track_sound_loop.pyx":582
  *             self.type_state.next.master_sound_layer.sound_id = 0
  * 
  *         elif self.type_state.next.status == player_fading_out:             # <<<<<<<<<<<<<<
@@ -8407,7 +8301,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     default: break;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":599
+  /* "mpfmc/core/audio/track_sound_loop.pyx":587
  *                 self.type_state.next.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_steps_remaining
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -8416,7 +8310,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":561
+  /* "mpfmc/core/audio/track_sound_loop.pyx":549
  *                                         <guint>(sound.markers[index]['time'] * self.state.callback_data.seconds_to_bytes_factor))
  * 
  *     def stop_current_sound_loop_set(self, fade_out=None):             # <<<<<<<<<<<<<<
@@ -8439,7 +8333,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":601
+/* "mpfmc/core/audio/track_sound_loop.pyx":589
  *         SDL_UnlockAudio()
  * 
  *     def jump_to_time_current_sound_loop_set(self, time=0.0):             # <<<<<<<<<<<<<<
@@ -8477,7 +8371,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "jump_to_time_current_sound_loop_set") < 0)) __PYX_ERR(0, 601, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "jump_to_time_current_sound_loop_set") < 0)) __PYX_ERR(0, 589, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -8491,7 +8385,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("jump_to_time_current_sound_loop_set", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 601, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("jump_to_time_current_sound_loop_set", 0, 0, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 589, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.jump_to_time_current_sound_loop_set", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -8517,7 +8411,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   Uint32 __pyx_t_8;
   __Pyx_RefNannySetupContext("jump_to_time_current_sound_loop_set", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":604
+  /* "mpfmc/core/audio/track_sound_loop.pyx":592
  *         """Immediately jumps the loop playback position to the specified time."""
  * 
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -8526,14 +8420,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":606
+  /* "mpfmc/core/audio/track_sound_loop.pyx":594
  *         SDL_LockAudio()
  * 
  *         self.log.debug("Jumping to %f seconds playback position in current sound loop set", time)             # <<<<<<<<<<<<<<
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 606, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 594, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   __pyx_t_4 = 0;
@@ -8550,7 +8444,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_kp_u_Jumping_to_f_seconds_playback_po, __pyx_v_time};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 606, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 594, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
@@ -8558,13 +8452,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_3, __pyx_kp_u_Jumping_to_f_seconds_playback_po, __pyx_v_time};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 606, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_4, 2+__pyx_t_4); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 594, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_GOTREF(__pyx_t_1);
   } else
   #endif
   {
-    __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 606, __pyx_L1_error)
+    __pyx_t_5 = PyTuple_New(2+__pyx_t_4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 594, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     if (__pyx_t_3) {
       __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_3); __pyx_t_3 = NULL;
@@ -8575,14 +8469,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __Pyx_INCREF(__pyx_v_time);
     __Pyx_GIVEREF(__pyx_v_time);
     PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_4, __pyx_v_time);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 606, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 594, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":608
+  /* "mpfmc/core/audio/track_sound_loop.pyx":596
  *         self.log.debug("Jumping to %f seconds playback position in current sound loop set", time)
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):             # <<<<<<<<<<<<<<
@@ -8602,21 +8496,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_7 = (__pyx_t_6 != 0);
   if (__pyx_t_7) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":609
+    /* "mpfmc/core/audio/track_sound_loop.pyx":597
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  *             self.log.info("Unable to jump to specified playback position - "             # <<<<<<<<<<<<<<
  *                           "no sound loop set is currently playing.")
  *             SDL_UnlockAudio()
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 609, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 597, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 609, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 597, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":611
+    /* "mpfmc/core/audio/track_sound_loop.pyx":599
  *             self.log.info("Unable to jump to specified playback position - "
  *                           "no sound loop set is currently playing.")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -8625,7 +8519,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":612
+    /* "mpfmc/core/audio/track_sound_loop.pyx":600
  *                           "no sound loop set is currently playing.")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -8636,7 +8530,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":608
+    /* "mpfmc/core/audio/track_sound_loop.pyx":596
  *         self.log.debug("Jumping to %f seconds playback position in current sound loop set", time)
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):             # <<<<<<<<<<<<<<
@@ -8645,23 +8539,23 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":615
+  /* "mpfmc/core/audio/track_sound_loop.pyx":603
  * 
  *         # Set new playback position (make sure it is within the current sample length)
  *         self.type_state.current.sample_pos = time * self.state.callback_data.seconds_to_bytes_factor             # <<<<<<<<<<<<<<
  *         while self.type_state.current.sample_pos >= self.type_state.current.length:
  *             self.type_state.current.sample_pos -= self.type_state.current.length
  */
-  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 615, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble(__pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = PyNumber_Multiply(__pyx_v_time, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 615, __pyx_L1_error)
+  __pyx_t_1 = PyNumber_Multiply(__pyx_v_time, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_8 = __Pyx_PyInt_As_Uint32(__pyx_t_1); if (unlikely((__pyx_t_8 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 615, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyInt_As_Uint32(__pyx_t_1); if (unlikely((__pyx_t_8 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 603, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_self->type_state->current->sample_pos = __pyx_t_8;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":616
+  /* "mpfmc/core/audio/track_sound_loop.pyx":604
  *         # Set new playback position (make sure it is within the current sample length)
  *         self.type_state.current.sample_pos = time * self.state.callback_data.seconds_to_bytes_factor
  *         while self.type_state.current.sample_pos >= self.type_state.current.length:             # <<<<<<<<<<<<<<
@@ -8672,7 +8566,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_7 = ((__pyx_v_self->type_state->current->sample_pos >= __pyx_v_self->type_state->current->length) != 0);
     if (!__pyx_t_7) break;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":617
+    /* "mpfmc/core/audio/track_sound_loop.pyx":605
  *         self.type_state.current.sample_pos = time * self.state.callback_data.seconds_to_bytes_factor
  *         while self.type_state.current.sample_pos >= self.type_state.current.length:
  *             self.type_state.current.sample_pos -= self.type_state.current.length             # <<<<<<<<<<<<<<
@@ -8682,7 +8576,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_v_self->type_state->current->sample_pos = (__pyx_v_self->type_state->current->sample_pos - __pyx_v_self->type_state->current->length);
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":619
+  /* "mpfmc/core/audio/track_sound_loop.pyx":607
  *             self.type_state.current.sample_pos -= self.type_state.current.length
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -8691,7 +8585,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":601
+  /* "mpfmc/core/audio/track_sound_loop.pyx":589
  *         SDL_UnlockAudio()
  * 
  *     def jump_to_time_current_sound_loop_set(self, time=0.0):             # <<<<<<<<<<<<<<
@@ -8715,7 +8609,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":621
+/* "mpfmc/core/audio/track_sound_loop.pyx":609
  *         SDL_UnlockAudio()
  * 
  *     def stop_looping_current_sound_loop_set(self):             # <<<<<<<<<<<<<<
@@ -8747,7 +8641,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   Uint32 __pyx_t_5;
   __Pyx_RefNannySetupContext("stop_looping_current_sound_loop_set", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":626
+  /* "mpfmc/core/audio/track_sound_loop.pyx":614
  *         after the current loop iteration).
  *         """
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -8756,21 +8650,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":628
+  /* "mpfmc/core/audio/track_sound_loop.pyx":616
  *         SDL_LockAudio()
  * 
  *         self.log.debug("Stopping looping current sound loop set")             # <<<<<<<<<<<<<<
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 628, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 616, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 628, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_1, __pyx_tuple__5, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 616, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":630
+  /* "mpfmc/core/audio/track_sound_loop.pyx":618
  *         self.log.debug("Stopping looping current sound loop set")
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):             # <<<<<<<<<<<<<<
@@ -8790,21 +8684,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_4 = (__pyx_t_3 != 0);
   if (__pyx_t_4) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":631
+    /* "mpfmc/core/audio/track_sound_loop.pyx":619
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  *             self.log.info("Unable to stop looping sound loop set - no sound loop set is currently playing.")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 631, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__6, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 619, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":632
+    /* "mpfmc/core/audio/track_sound_loop.pyx":620
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  *             self.log.info("Unable to stop looping sound loop set - no sound loop set is currently playing.")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -8813,7 +8707,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":633
+    /* "mpfmc/core/audio/track_sound_loop.pyx":621
  *             self.log.info("Unable to stop looping sound loop set - no sound loop set is currently playing.")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -8824,7 +8718,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":630
+    /* "mpfmc/core/audio/track_sound_loop.pyx":618
  *         self.log.debug("Stopping looping current sound loop set")
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):             # <<<<<<<<<<<<<<
@@ -8833,7 +8727,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":635
+  /* "mpfmc/core/audio/track_sound_loop.pyx":623
  *             return
  * 
  *         self.type_state.current.master_sound_layer.looping = False             # <<<<<<<<<<<<<<
@@ -8842,7 +8736,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_self->type_state->current->master_sound_layer.looping = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":636
+  /* "mpfmc/core/audio/track_sound_loop.pyx":624
  * 
  *         self.type_state.current.master_sound_layer.looping = False
  *         self.type_state.current.stop_loop_at_pos = self.type_state.current.length             # <<<<<<<<<<<<<<
@@ -8852,7 +8746,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_5 = __pyx_v_self->type_state->current->length;
   __pyx_v_self->type_state->current->stop_loop_at_pos = __pyx_t_5;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":638
+  /* "mpfmc/core/audio/track_sound_loop.pyx":626
  *         self.type_state.current.stop_loop_at_pos = self.type_state.current.length
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -8861,7 +8755,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":621
+  /* "mpfmc/core/audio/track_sound_loop.pyx":609
  *         SDL_UnlockAudio()
  * 
  *     def stop_looping_current_sound_loop_set(self):             # <<<<<<<<<<<<<<
@@ -8883,7 +8777,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":640
+/* "mpfmc/core/audio/track_sound_loop.pyx":628
  *         SDL_UnlockAudio()
  * 
  *     def play_layer(self, int layer, float fade_in=0.0, str timing="loop_end", volume=None):             # <<<<<<<<<<<<<<
@@ -8947,7 +8841,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "play_layer") < 0)) __PYX_ERR(0, 640, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "play_layer") < 0)) __PYX_ERR(0, 628, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -8962,9 +8856,9 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_layer = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_layer == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 640, __pyx_L3_error)
+    __pyx_v_layer = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_layer == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 628, __pyx_L3_error)
     if (values[1]) {
-      __pyx_v_fade_in = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_fade_in == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 640, __pyx_L3_error)
+      __pyx_v_fade_in = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_fade_in == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 628, __pyx_L3_error)
     } else {
       __pyx_v_fade_in = ((float)0.0);
     }
@@ -8973,13 +8867,13 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("play_layer", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 640, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("play_layer", 0, 1, 4, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 628, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.play_layer", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_timing), (&PyUnicode_Type), 1, "timing", 1))) __PYX_ERR(0, 640, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_timing), (&PyUnicode_Type), 1, "timing", 1))) __PYX_ERR(0, 628, __pyx_L1_error)
   __pyx_r = __pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_26play_layer(((struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self), __pyx_v_layer, __pyx_v_fade_in, __pyx_v_timing, __pyx_v_volume);
 
   /* function exit code */
@@ -9008,7 +8902,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   int __pyx_t_11;
   __Pyx_RefNannySetupContext("play_layer", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":653
+  /* "mpfmc/core/audio/track_sound_loop.pyx":641
  *         cdef SoundLoopLayerSettings *layer_settings
  * 
  *         if layer < 1:             # <<<<<<<<<<<<<<
@@ -9018,21 +8912,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_layer < 1) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":654
+    /* "mpfmc/core/audio/track_sound_loop.pyx":642
  * 
  *         if layer < 1:
  *             self.log.warning("Illegal layer value in call to play_layer (must be > 0).")             # <<<<<<<<<<<<<<
  *             return
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 654, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 642, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 654, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 642, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":655
+    /* "mpfmc/core/audio/track_sound_loop.pyx":643
  *         if layer < 1:
  *             self.log.warning("Illegal layer value in call to play_layer (must be > 0).")
  *             return             # <<<<<<<<<<<<<<
@@ -9043,7 +8937,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":653
+    /* "mpfmc/core/audio/track_sound_loop.pyx":641
  *         cdef SoundLoopLayerSettings *layer_settings
  * 
  *         if layer < 1:             # <<<<<<<<<<<<<<
@@ -9052,7 +8946,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":657
+  /* "mpfmc/core/audio/track_sound_loop.pyx":645
  *             return
  * 
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -9061,26 +8955,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":659
+  /* "mpfmc/core/audio/track_sound_loop.pyx":647
  *         SDL_LockAudio()
  * 
  *         self.log.debug("play_layer - Play layer %d of the currently playing sound_loop_set (fade-in = %f sec).",             # <<<<<<<<<<<<<<
  *                        layer, fade_in)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 659, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 647, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":660
+  /* "mpfmc/core/audio/track_sound_loop.pyx":648
  * 
  *         self.log.debug("play_layer - Play layer %d of the currently playing sound_loop_set (fade-in = %f sec).",
  *                        layer, fade_in)             # <<<<<<<<<<<<<<
  * 
  *         # Retrieve the layer
  */
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_layer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 660, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_layer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 648, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_fade_in); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 660, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_fade_in); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 648, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   __pyx_t_7 = 0;
@@ -9097,7 +8991,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_kp_u_play_layer_Play_layer_d_of_the_c, __pyx_t_4, __pyx_t_5};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 659, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -9107,7 +9001,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_kp_u_play_layer_Play_layer_d_of_the_c, __pyx_t_4, __pyx_t_5};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 659, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -9115,7 +9009,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   } else
   #endif
   {
-    __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 659, __pyx_L1_error)
+    __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     if (__pyx_t_6) {
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -9129,14 +9023,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_7, __pyx_t_5);
     __pyx_t_4 = 0;
     __pyx_t_5 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 659, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 647, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":663
+  /* "mpfmc/core/audio/track_sound_loop.pyx":651
  * 
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:             # <<<<<<<<<<<<<<
@@ -9146,21 +9040,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_self->type_state->current->layers == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":664
+    /* "mpfmc/core/audio/track_sound_loop.pyx":652
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:
  *             self.log.info("There are no layers defined in the current sound loop set: play_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 664, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 652, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 664, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 652, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":665
+    /* "mpfmc/core/audio/track_sound_loop.pyx":653
  *         if self.type_state.current.layers == NULL:
  *             self.log.info("There are no layers defined in the current sound loop set: play_layers has no effect")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -9169,7 +9063,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":666
+    /* "mpfmc/core/audio/track_sound_loop.pyx":654
  *             self.log.info("There are no layers defined in the current sound loop set: play_layers has no effect")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -9180,7 +9074,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":663
+    /* "mpfmc/core/audio/track_sound_loop.pyx":651
  * 
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:             # <<<<<<<<<<<<<<
@@ -9189,7 +9083,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":668
+  /* "mpfmc/core/audio/track_sound_loop.pyx":656
  *             return
  * 
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)             # <<<<<<<<<<<<<<
@@ -9198,7 +9092,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_layer_settings = ((__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *)g_slist_nth_data(__pyx_v_self->type_state->current->layers, (__pyx_v_layer - 1)));
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":669
+  /* "mpfmc/core/audio/track_sound_loop.pyx":657
  * 
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:             # <<<<<<<<<<<<<<
@@ -9208,21 +9102,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_layer_settings == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":670
+    /* "mpfmc/core/audio/track_sound_loop.pyx":658
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:
  *             self.log.info("The specified layer could not be found in the current sound loop set: play_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 670, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 658, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 670, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 658, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":671
+    /* "mpfmc/core/audio/track_sound_loop.pyx":659
  *         if layer_settings == NULL:
  *             self.log.info("The specified layer could not be found in the current sound loop set: play_layers has no effect")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -9231,7 +9125,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":672
+    /* "mpfmc/core/audio/track_sound_loop.pyx":660
  *             self.log.info("The specified layer could not be found in the current sound loop set: play_layers has no effect")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -9242,7 +9136,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":669
+    /* "mpfmc/core/audio/track_sound_loop.pyx":657
  * 
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:             # <<<<<<<<<<<<<<
@@ -9251,7 +9145,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":674
+  /* "mpfmc/core/audio/track_sound_loop.pyx":662
  *             return
  * 
  *         if layer_settings.status != layer_stopped:             # <<<<<<<<<<<<<<
@@ -9261,21 +9155,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_layer_settings->status != __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_stopped) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":675
+    /* "mpfmc/core/audio/track_sound_loop.pyx":663
  * 
  *         if layer_settings.status != layer_stopped:
  *             self.log.info("The current sound loop set layer is already playing: play_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 675, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 663, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 675, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 663, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":676
+    /* "mpfmc/core/audio/track_sound_loop.pyx":664
  *         if layer_settings.status != layer_stopped:
  *             self.log.info("The current sound loop set layer is already playing: play_layers has no effect")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -9284,7 +9178,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":677
+    /* "mpfmc/core/audio/track_sound_loop.pyx":665
  *             self.log.info("The current sound loop set layer is already playing: play_layers has no effect")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -9295,7 +9189,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":674
+    /* "mpfmc/core/audio/track_sound_loop.pyx":662
  *             return
  * 
  *         if layer_settings.status != layer_stopped:             # <<<<<<<<<<<<<<
@@ -9304,33 +9198,33 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":680
+  /* "mpfmc/core/audio/track_sound_loop.pyx":668
  * 
  *         # Layer volume (use layer settings or sound setting if None)
  *         if volume:             # <<<<<<<<<<<<<<
  *             layer_settings.volume = <Uint8>(volume * SDL_MIX_MAXVOLUME)
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_volume); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 680, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_volume); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 668, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":681
+    /* "mpfmc/core/audio/track_sound_loop.pyx":669
  *         # Layer volume (use layer settings or sound setting if None)
  *         if volume:
  *             layer_settings.volume = <Uint8>(volume * SDL_MIX_MAXVOLUME)             # <<<<<<<<<<<<<<
  * 
  *         # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
  */
-    __pyx_t_2 = __Pyx_PyInt_From_int(SDL_MIX_MAXVOLUME); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 681, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyInt_From_int(SDL_MIX_MAXVOLUME); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 669, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyNumber_Multiply(__pyx_v_volume, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 681, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Multiply(__pyx_v_volume, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 669, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_9 = __Pyx_PyInt_As_Uint8(__pyx_t_3); if (unlikely((__pyx_t_9 == ((Uint8)-1)) && PyErr_Occurred())) __PYX_ERR(0, 681, __pyx_L1_error)
+    __pyx_t_9 = __Pyx_PyInt_As_Uint8(__pyx_t_3); if (unlikely((__pyx_t_9 == ((Uint8)-1)) && PyErr_Occurred())) __PYX_ERR(0, 669, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_layer_settings->volume = ((Uint8)__pyx_t_9);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":680
+    /* "mpfmc/core/audio/track_sound_loop.pyx":668
  * 
  *         # Layer volume (use layer settings or sound setting if None)
  *         if volume:             # <<<<<<<<<<<<<<
@@ -9339,7 +9233,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":684
+  /* "mpfmc/core/audio/track_sound_loop.pyx":672
  * 
  *         # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
  *         if fade_in > 0.0:             # <<<<<<<<<<<<<<
@@ -9349,7 +9243,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_fade_in > 0.0) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":685
+    /* "mpfmc/core/audio/track_sound_loop.pyx":673
  *         # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
  *         if fade_in > 0.0:
  *             layer_settings.fade_in_steps = <Uint32>(fade_in * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point             # <<<<<<<<<<<<<<
@@ -9359,11 +9253,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_10 = ((Uint32)(__pyx_v_fade_in * __pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor));
     if (unlikely(__pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "integer division or modulo by zero");
-      __PYX_ERR(0, 685, __pyx_L1_error)
+      __PYX_ERR(0, 673, __pyx_L1_error)
     }
     __pyx_v_layer_settings->fade_in_steps = (__pyx_t_10 / __pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":686
+    /* "mpfmc/core/audio/track_sound_loop.pyx":674
  *         if fade_in > 0.0:
  *             layer_settings.fade_in_steps = <Uint32>(fade_in * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
  *             layer_settings.fade_steps_remaining = layer_settings.fade_in_steps             # <<<<<<<<<<<<<<
@@ -9373,7 +9267,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_10 = __pyx_v_layer_settings->fade_in_steps;
     __pyx_v_layer_settings->fade_steps_remaining = __pyx_t_10;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":684
+    /* "mpfmc/core/audio/track_sound_loop.pyx":672
  * 
  *         # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
  *         if fade_in > 0.0:             # <<<<<<<<<<<<<<
@@ -9382,18 +9276,18 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":688
+  /* "mpfmc/core/audio/track_sound_loop.pyx":676
  *             layer_settings.fade_steps_remaining = layer_settings.fade_in_steps
  * 
  *         if timing == 'loop_end':             # <<<<<<<<<<<<<<
  *             layer_settings.status = layer_queued
  * 
  */
-  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_timing, __pyx_n_u_loop_end, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 688, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PyUnicode_Equals(__pyx_v_timing, __pyx_n_u_loop_end, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 676, __pyx_L1_error)
   __pyx_t_11 = (__pyx_t_1 != 0);
   if (__pyx_t_11) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":689
+    /* "mpfmc/core/audio/track_sound_loop.pyx":677
  * 
  *         if timing == 'loop_end':
  *             layer_settings.status = layer_queued             # <<<<<<<<<<<<<<
@@ -9402,7 +9296,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_layer_settings->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_queued;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":688
+    /* "mpfmc/core/audio/track_sound_loop.pyx":676
  *             layer_settings.fade_steps_remaining = layer_settings.fade_in_steps
  * 
  *         if timing == 'loop_end':             # <<<<<<<<<<<<<<
@@ -9412,18 +9306,18 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L9;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":691
+  /* "mpfmc/core/audio/track_sound_loop.pyx":679
  *             layer_settings.status = layer_queued
  * 
  *         elif timing == 'now':             # <<<<<<<<<<<<<<
  *             if layer_settings.fade_in_steps > 0:
  *                 layer_settings.status = layer_fading_in
  */
-  __pyx_t_11 = (__Pyx_PyUnicode_Equals(__pyx_v_timing, __pyx_n_u_now, Py_EQ)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 691, __pyx_L1_error)
+  __pyx_t_11 = (__Pyx_PyUnicode_Equals(__pyx_v_timing, __pyx_n_u_now, Py_EQ)); if (unlikely(__pyx_t_11 < 0)) __PYX_ERR(0, 679, __pyx_L1_error)
   __pyx_t_1 = (__pyx_t_11 != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":692
+    /* "mpfmc/core/audio/track_sound_loop.pyx":680
  * 
  *         elif timing == 'now':
  *             if layer_settings.fade_in_steps > 0:             # <<<<<<<<<<<<<<
@@ -9433,7 +9327,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_1 = ((__pyx_v_layer_settings->fade_in_steps > 0) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":693
+      /* "mpfmc/core/audio/track_sound_loop.pyx":681
  *         elif timing == 'now':
  *             if layer_settings.fade_in_steps > 0:
  *                 layer_settings.status = layer_fading_in             # <<<<<<<<<<<<<<
@@ -9442,7 +9336,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_layer_settings->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_in;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":692
+      /* "mpfmc/core/audio/track_sound_loop.pyx":680
  * 
  *         elif timing == 'now':
  *             if layer_settings.fade_in_steps > 0:             # <<<<<<<<<<<<<<
@@ -9452,7 +9346,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       goto __pyx_L10;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":695
+    /* "mpfmc/core/audio/track_sound_loop.pyx":683
  *                 layer_settings.status = layer_fading_in
  *             else:
  *                 layer_settings.status = layer_playing             # <<<<<<<<<<<<<<
@@ -9464,7 +9358,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     }
     __pyx_L10:;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":691
+    /* "mpfmc/core/audio/track_sound_loop.pyx":679
  *             layer_settings.status = layer_queued
  * 
  *         elif timing == 'now':             # <<<<<<<<<<<<<<
@@ -9474,7 +9368,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L9;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":697
+  /* "mpfmc/core/audio/track_sound_loop.pyx":685
  *                 layer_settings.status = layer_playing
  *         else:
  *             self.log.error("Unknown timing value specified: %s", timing)             # <<<<<<<<<<<<<<
@@ -9482,7 +9376,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  *             return
  */
   /*else*/ {
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_error); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 697, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_error); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 685, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_8 = NULL;
     __pyx_t_7 = 0;
@@ -9499,7 +9393,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_kp_u_Unknown_timing_value_specified_s, __pyx_v_timing};
-      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 697, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else
@@ -9507,13 +9401,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
       PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_kp_u_Unknown_timing_value_specified_s, __pyx_v_timing};
-      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 697, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GOTREF(__pyx_t_3);
     } else
     #endif
     {
-      __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 697, __pyx_L1_error)
+      __pyx_t_5 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       if (__pyx_t_8) {
         __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -9524,14 +9418,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __Pyx_INCREF(__pyx_v_timing);
       __Pyx_GIVEREF(__pyx_v_timing);
       PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_7, __pyx_v_timing);
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 697, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_5, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 685, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":698
+    /* "mpfmc/core/audio/track_sound_loop.pyx":686
  *         else:
  *             self.log.error("Unknown timing value specified: %s", timing)
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -9540,7 +9434,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":699
+    /* "mpfmc/core/audio/track_sound_loop.pyx":687
  *             self.log.error("Unknown timing value specified: %s", timing)
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -9553,7 +9447,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   __pyx_L9:;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":701
+  /* "mpfmc/core/audio/track_sound_loop.pyx":689
  *             return
  * 
  *         layer_settings.looping = True             # <<<<<<<<<<<<<<
@@ -9562,7 +9456,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_layer_settings->looping = 1;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":703
+  /* "mpfmc/core/audio/track_sound_loop.pyx":691
  *         layer_settings.looping = True
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -9571,7 +9465,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":640
+  /* "mpfmc/core/audio/track_sound_loop.pyx":628
  *         SDL_UnlockAudio()
  * 
  *     def play_layer(self, int layer, float fade_in=0.0, str timing="loop_end", volume=None):             # <<<<<<<<<<<<<<
@@ -9597,7 +9491,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":705
+/* "mpfmc/core/audio/track_sound_loop.pyx":693
  *         SDL_UnlockAudio()
  * 
  *     def stop_layer(self, int layer, float fade_out=0.0):             # <<<<<<<<<<<<<<
@@ -9641,7 +9535,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_layer") < 0)) __PYX_ERR(0, 705, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "stop_layer") < 0)) __PYX_ERR(0, 693, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -9652,16 +9546,16 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_layer = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_layer == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 705, __pyx_L3_error)
+    __pyx_v_layer = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_layer == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 693, __pyx_L3_error)
     if (values[1]) {
-      __pyx_v_fade_out = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_fade_out == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 705, __pyx_L3_error)
+      __pyx_v_fade_out = __pyx_PyFloat_AsFloat(values[1]); if (unlikely((__pyx_v_fade_out == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 693, __pyx_L3_error)
     } else {
       __pyx_v_fade_out = ((float)0.0);
     }
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("stop_layer", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 705, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("stop_layer", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 693, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.stop_layer", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -9689,7 +9583,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   Uint32 __pyx_t_9;
   __Pyx_RefNannySetupContext("stop_layer", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":715
+  /* "mpfmc/core/audio/track_sound_loop.pyx":703
  *         cdef SoundLoopLayerSettings *layer_settings
  * 
  *         if layer < 1:             # <<<<<<<<<<<<<<
@@ -9699,21 +9593,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_layer < 1) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":716
+    /* "mpfmc/core/audio/track_sound_loop.pyx":704
  * 
  *         if layer < 1:
  *             self.log.warning("Illegal layer value in call to stop_layer (must be > 0).")             # <<<<<<<<<<<<<<
  *             return
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 716, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 704, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 716, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 704, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":717
+    /* "mpfmc/core/audio/track_sound_loop.pyx":705
  *         if layer < 1:
  *             self.log.warning("Illegal layer value in call to stop_layer (must be > 0).")
  *             return             # <<<<<<<<<<<<<<
@@ -9724,7 +9618,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":715
+    /* "mpfmc/core/audio/track_sound_loop.pyx":703
  *         cdef SoundLoopLayerSettings *layer_settings
  * 
  *         if layer < 1:             # <<<<<<<<<<<<<<
@@ -9733,7 +9627,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":719
+  /* "mpfmc/core/audio/track_sound_loop.pyx":707
  *             return
  * 
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -9742,26 +9636,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":721
+  /* "mpfmc/core/audio/track_sound_loop.pyx":709
  *         SDL_LockAudio()
  * 
  *         self.log.debug("stop_layer - Stop layer %d of the currently playing sound_loop_set (fade-out = %f sec).",             # <<<<<<<<<<<<<<
  *                        layer, fade_out)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 721, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 709, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":722
+  /* "mpfmc/core/audio/track_sound_loop.pyx":710
  * 
  *         self.log.debug("stop_layer - Stop layer %d of the currently playing sound_loop_set (fade-out = %f sec).",
  *                        layer, fade_out)             # <<<<<<<<<<<<<<
  * 
  *         # Retrieve the layer
  */
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_layer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 722, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_layer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 710, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_fade_out); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 722, __pyx_L1_error)
+  __pyx_t_5 = PyFloat_FromDouble(__pyx_v_fade_out); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 710, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_6 = NULL;
   __pyx_t_7 = 0;
@@ -9778,7 +9672,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_kp_u_stop_layer_Stop_layer_d_of_the_c, __pyx_t_4, __pyx_t_5};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 721, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 709, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -9788,7 +9682,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_kp_u_stop_layer_Stop_layer_d_of_the_c, __pyx_t_4, __pyx_t_5};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 721, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 709, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -9796,7 +9690,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   } else
   #endif
   {
-    __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 721, __pyx_L1_error)
+    __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 709, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_8);
     if (__pyx_t_6) {
       __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -9810,14 +9704,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_7, __pyx_t_5);
     __pyx_t_4 = 0;
     __pyx_t_5 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 721, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 709, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":725
+  /* "mpfmc/core/audio/track_sound_loop.pyx":713
  * 
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:             # <<<<<<<<<<<<<<
@@ -9827,21 +9721,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_self->type_state->current->layers == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":726
+    /* "mpfmc/core/audio/track_sound_loop.pyx":714
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:
  *             self.log.info("There are no layers defined in the current sound loop set: stop_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 726, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 714, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 726, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 714, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":727
+    /* "mpfmc/core/audio/track_sound_loop.pyx":715
  *         if self.type_state.current.layers == NULL:
  *             self.log.info("There are no layers defined in the current sound loop set: stop_layers has no effect")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -9850,7 +9744,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":728
+    /* "mpfmc/core/audio/track_sound_loop.pyx":716
  *             self.log.info("There are no layers defined in the current sound loop set: stop_layers has no effect")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -9861,7 +9755,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":725
+    /* "mpfmc/core/audio/track_sound_loop.pyx":713
  * 
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:             # <<<<<<<<<<<<<<
@@ -9870,7 +9764,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":730
+  /* "mpfmc/core/audio/track_sound_loop.pyx":718
  *             return
  * 
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)             # <<<<<<<<<<<<<<
@@ -9879,7 +9773,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_layer_settings = ((__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *)g_slist_nth_data(__pyx_v_self->type_state->current->layers, (__pyx_v_layer - 1)));
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":731
+  /* "mpfmc/core/audio/track_sound_loop.pyx":719
  * 
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:             # <<<<<<<<<<<<<<
@@ -9889,21 +9783,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_layer_settings == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":732
+    /* "mpfmc/core/audio/track_sound_loop.pyx":720
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:
  *             self.log.info("The specified layer could not be found in the current sound loop set: stop_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 732, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 720, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 732, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 720, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":733
+    /* "mpfmc/core/audio/track_sound_loop.pyx":721
  *         if layer_settings == NULL:
  *             self.log.info("The specified layer could not be found in the current sound loop set: stop_layers has no effect")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -9912,7 +9806,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":734
+    /* "mpfmc/core/audio/track_sound_loop.pyx":722
  *             self.log.info("The specified layer could not be found in the current sound loop set: stop_layers has no effect")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -9923,7 +9817,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":731
+    /* "mpfmc/core/audio/track_sound_loop.pyx":719
  * 
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:             # <<<<<<<<<<<<<<
@@ -9932,7 +9826,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":736
+  /* "mpfmc/core/audio/track_sound_loop.pyx":724
  *             return
  * 
  *         if layer_settings.status == layer_stopped:             # <<<<<<<<<<<<<<
@@ -9942,21 +9836,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_layer_settings->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_stopped) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":737
+    /* "mpfmc/core/audio/track_sound_loop.pyx":725
  * 
  *         if layer_settings.status == layer_stopped:
  *             self.log.info("The current sound loop set layer is already stopped: stop_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 737, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 725, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 737, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 725, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":738
+    /* "mpfmc/core/audio/track_sound_loop.pyx":726
  *         if layer_settings.status == layer_stopped:
  *             self.log.info("The current sound loop set layer is already stopped: stop_layers has no effect")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -9965,7 +9859,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":739
+    /* "mpfmc/core/audio/track_sound_loop.pyx":727
  *             self.log.info("The current sound loop set layer is already stopped: stop_layers has no effect")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -9976,7 +9870,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":736
+    /* "mpfmc/core/audio/track_sound_loop.pyx":724
  *             return
  * 
  *         if layer_settings.status == layer_stopped:             # <<<<<<<<<<<<<<
@@ -9985,7 +9879,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":742
+  /* "mpfmc/core/audio/track_sound_loop.pyx":730
  * 
  *         # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
  *         if fade_out > 0.0:             # <<<<<<<<<<<<<<
@@ -9995,7 +9889,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_fade_out > 0.0) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":743
+    /* "mpfmc/core/audio/track_sound_loop.pyx":731
  *         # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
  *         if fade_out > 0.0:
  *             layer_settings.fade_out_steps = <Uint32>(fade_out * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point             # <<<<<<<<<<<<<<
@@ -10005,11 +9899,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_9 = ((Uint32)(__pyx_v_fade_out * __pyx_v_self->__pyx_base.state->callback_data->seconds_to_bytes_factor));
     if (unlikely(__pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "integer division or modulo by zero");
-      __PYX_ERR(0, 743, __pyx_L1_error)
+      __PYX_ERR(0, 731, __pyx_L1_error)
     }
     __pyx_v_layer_settings->fade_out_steps = (__pyx_t_9 / __pyx_v_self->__pyx_base.state->callback_data->bytes_per_control_point);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":744
+    /* "mpfmc/core/audio/track_sound_loop.pyx":732
  *         if fade_out > 0.0:
  *             layer_settings.fade_out_steps = <Uint32>(fade_out * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
  *             layer_settings.fade_steps_remaining = layer_settings.fade_out_steps             # <<<<<<<<<<<<<<
@@ -10019,7 +9913,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_9 = __pyx_v_layer_settings->fade_out_steps;
     __pyx_v_layer_settings->fade_steps_remaining = __pyx_t_9;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":745
+    /* "mpfmc/core/audio/track_sound_loop.pyx":733
  *             layer_settings.fade_out_steps = <Uint32>(fade_out * self.state.callback_data.seconds_to_bytes_factor) // self.state.callback_data.bytes_per_control_point
  *             layer_settings.fade_steps_remaining = layer_settings.fade_out_steps
  *             layer_settings.status = layer_fading_out             # <<<<<<<<<<<<<<
@@ -10028,7 +9922,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     __pyx_v_layer_settings->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":742
+    /* "mpfmc/core/audio/track_sound_loop.pyx":730
  * 
  *         # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
  *         if fade_out > 0.0:             # <<<<<<<<<<<<<<
@@ -10038,7 +9932,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L7;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":748
+  /* "mpfmc/core/audio/track_sound_loop.pyx":736
  *         else:
  *             # TODO: Could perform a quick fade out rather than an abrupt stop
  *             layer_settings.status = layer_stopped             # <<<<<<<<<<<<<<
@@ -10050,7 +9944,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   }
   __pyx_L7:;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":750
+  /* "mpfmc/core/audio/track_sound_loop.pyx":738
  *             layer_settings.status = layer_stopped
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -10059,7 +9953,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":705
+  /* "mpfmc/core/audio/track_sound_loop.pyx":693
  *         SDL_UnlockAudio()
  * 
  *     def stop_layer(self, int layer, float fade_out=0.0):             # <<<<<<<<<<<<<<
@@ -10085,7 +9979,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":752
+/* "mpfmc/core/audio/track_sound_loop.pyx":740
  *         SDL_UnlockAudio()
  * 
  *     def stop_looping_layer(self, int layer):             # <<<<<<<<<<<<<<
@@ -10102,7 +9996,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("stop_looping_layer (wrapper)", 0);
   assert(__pyx_arg_layer); {
-    __pyx_v_layer = __Pyx_PyInt_As_int(__pyx_arg_layer); if (unlikely((__pyx_v_layer == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 752, __pyx_L3_error)
+    __pyx_v_layer = __Pyx_PyInt_As_int(__pyx_arg_layer); if (unlikely((__pyx_v_layer == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 740, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -10130,7 +10024,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("stop_looping_layer", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":762
+  /* "mpfmc/core/audio/track_sound_loop.pyx":750
  *         cdef SoundLoopLayerSettings *layer_settings
  * 
  *         if layer < 1:             # <<<<<<<<<<<<<<
@@ -10140,21 +10034,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_layer < 1) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":763
+    /* "mpfmc/core/audio/track_sound_loop.pyx":751
  * 
  *         if layer < 1:
  *             self.log.warning("Illegal layer value in call to stop_looping_layer (must be > 0).")             # <<<<<<<<<<<<<<
  *             return
  * 
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 763, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_warning); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 751, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 763, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 751, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":764
+    /* "mpfmc/core/audio/track_sound_loop.pyx":752
  *         if layer < 1:
  *             self.log.warning("Illegal layer value in call to stop_looping_layer (must be > 0).")
  *             return             # <<<<<<<<<<<<<<
@@ -10165,7 +10059,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":762
+    /* "mpfmc/core/audio/track_sound_loop.pyx":750
  *         cdef SoundLoopLayerSettings *layer_settings
  * 
  *         if layer < 1:             # <<<<<<<<<<<<<<
@@ -10174,7 +10068,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":766
+  /* "mpfmc/core/audio/track_sound_loop.pyx":754
  *             return
  * 
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -10183,16 +10077,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":768
+  /* "mpfmc/core/audio/track_sound_loop.pyx":756
  *         SDL_LockAudio()
  * 
  *         self.log.debug("stop_looping_layer - Stop looping layer %d of the currently playing sound_loop_set.", layer)             # <<<<<<<<<<<<<<
  * 
  *         # Retrieve the layer
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 768, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 756, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_layer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 768, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_layer); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 756, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __pyx_t_5 = NULL;
   __pyx_t_6 = 0;
@@ -10209,7 +10103,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_kp_u_stop_looping_layer_Stop_looping, __pyx_t_4};
-    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 768, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 756, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -10218,14 +10112,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
     PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_kp_u_stop_looping_layer_Stop_looping, __pyx_t_4};
-    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 768, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 756, __pyx_L1_error)
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 768, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 756, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     if (__pyx_t_5) {
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -10236,14 +10130,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_4);
     __pyx_t_4 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 768, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 756, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":771
+  /* "mpfmc/core/audio/track_sound_loop.pyx":759
  * 
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:             # <<<<<<<<<<<<<<
@@ -10253,21 +10147,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_self->type_state->current->layers == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":772
+    /* "mpfmc/core/audio/track_sound_loop.pyx":760
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:
  *             self.log.info("There are no layers defined in the current sound loop set: "             # <<<<<<<<<<<<<<
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 772, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 772, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 760, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":774
+    /* "mpfmc/core/audio/track_sound_loop.pyx":762
  *             self.log.info("There are no layers defined in the current sound loop set: "
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -10276,7 +10170,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":775
+    /* "mpfmc/core/audio/track_sound_loop.pyx":763
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -10287,7 +10181,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":771
+    /* "mpfmc/core/audio/track_sound_loop.pyx":759
  * 
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:             # <<<<<<<<<<<<<<
@@ -10296,7 +10190,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":777
+  /* "mpfmc/core/audio/track_sound_loop.pyx":765
  *             return
  * 
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)             # <<<<<<<<<<<<<<
@@ -10305,7 +10199,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_layer_settings = ((__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *)g_slist_nth_data(__pyx_v_self->type_state->current->layers, (__pyx_v_layer - 1)));
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":778
+  /* "mpfmc/core/audio/track_sound_loop.pyx":766
  * 
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:             # <<<<<<<<<<<<<<
@@ -10315,21 +10209,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_layer_settings == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":779
+    /* "mpfmc/core/audio/track_sound_loop.pyx":767
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:
  *             self.log.info("The specified layer could not be found in the current sound loop set: "             # <<<<<<<<<<<<<<
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()
  */
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 779, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 767, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 779, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 767, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":781
+    /* "mpfmc/core/audio/track_sound_loop.pyx":769
  *             self.log.info("The specified layer could not be found in the current sound loop set: "
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -10338,7 +10232,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":782
+    /* "mpfmc/core/audio/track_sound_loop.pyx":770
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -10349,7 +10243,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":778
+    /* "mpfmc/core/audio/track_sound_loop.pyx":766
  * 
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:             # <<<<<<<<<<<<<<
@@ -10358,7 +10252,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":784
+  /* "mpfmc/core/audio/track_sound_loop.pyx":772
  *             return
  * 
  *         if layer_settings.status == layer_stopped:             # <<<<<<<<<<<<<<
@@ -10368,21 +10262,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_t_1 = ((__pyx_v_layer_settings->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_stopped) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":785
+    /* "mpfmc/core/audio/track_sound_loop.pyx":773
  * 
  *         if layer_settings.status == layer_stopped:
  *             self.log.info("The current sound loop set layer is already stopped: "             # <<<<<<<<<<<<<<
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 785, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->__pyx_base.log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 773, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 785, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 773, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":787
+    /* "mpfmc/core/audio/track_sound_loop.pyx":775
  *             self.log.info("The current sound loop set layer is already stopped: "
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -10391,7 +10285,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
     SDL_UnlockAudio();
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":788
+    /* "mpfmc/core/audio/track_sound_loop.pyx":776
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()
  *             return             # <<<<<<<<<<<<<<
@@ -10402,7 +10296,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_r = Py_None; __Pyx_INCREF(Py_None);
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":784
+    /* "mpfmc/core/audio/track_sound_loop.pyx":772
  *             return
  * 
  *         if layer_settings.status == layer_stopped:             # <<<<<<<<<<<<<<
@@ -10411,7 +10305,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":790
+  /* "mpfmc/core/audio/track_sound_loop.pyx":778
  *             return
  * 
  *         layer_settings.looping = False             # <<<<<<<<<<<<<<
@@ -10420,16 +10314,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_layer_settings->looping = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":792
+  /* "mpfmc/core/audio/track_sound_loop.pyx":780
  *         layer_settings.looping = False
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
  * 
- *     cdef _reset_layer(self, SoundLoopLayerSettings *layer):
+ *     cdef _reset_player(self, SoundLoopSetPlayer *player):
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":752
+  /* "mpfmc/core/audio/track_sound_loop.pyx":740
  *         SDL_UnlockAudio()
  * 
  *     def stop_looping_layer(self, int layer):             # <<<<<<<<<<<<<<
@@ -10454,8 +10348,200 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":794
+/* "mpfmc/core/audio/track_sound_loop.pyx":782
  *         SDL_UnlockAudio()
+ * 
+ *     cdef _reset_player(self, SoundLoopSetPlayer *player):             # <<<<<<<<<<<<<<
+ *         """Reset player back to defaults (frees any allocated layer memory)."""
+ *         if player != NULL:
+ */
+
+static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__reset_player(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *__pyx_v_self, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *__pyx_v_player) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  PyObject *__pyx_t_2 = NULL;
+  __Pyx_RefNannySetupContext("_reset_player", 0);
+
+  /* "mpfmc/core/audio/track_sound_loop.pyx":784
+ *     cdef _reset_player(self, SoundLoopSetPlayer *player):
+ *         """Reset player back to defaults (frees any allocated layer memory)."""
+ *         if player != NULL:             # <<<<<<<<<<<<<<
+ *             self._reset_player_layers(player)
+ *             player.status = player_idle
+ */
+  __pyx_t_1 = ((__pyx_v_player != NULL) != 0);
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":785
+ *         """Reset player back to defaults (frees any allocated layer memory)."""
+ *         if player != NULL:
+ *             self._reset_player_layers(player)             # <<<<<<<<<<<<<<
+ *             player.status = player_idle
+ *             player.length = 0
+ */
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_player_layers(__pyx_v_self, __pyx_v_player); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 785, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":786
+ *         if player != NULL:
+ *             self._reset_player_layers(player)
+ *             player.status = player_idle             # <<<<<<<<<<<<<<
+ *             player.length = 0
+ *             player.master_sound_layer.status = layer_playing
+ */
+    __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":787
+ *             self._reset_player_layers(player)
+ *             player.status = player_idle
+ *             player.length = 0             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.status = layer_playing
+ *             player.master_sound_layer.sound = NULL
+ */
+    __pyx_v_player->length = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":788
+ *             player.status = player_idle
+ *             player.length = 0
+ *             player.master_sound_layer.status = layer_playing             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.sound = NULL
+ *             player.master_sound_layer.volume = 0
+ */
+    __pyx_v_player->master_sound_layer.status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":789
+ *             player.length = 0
+ *             player.master_sound_layer.status = layer_playing
+ *             player.master_sound_layer.sound = NULL             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.volume = 0
+ *             player.master_sound_layer.sound_loop_set_id = 0
+ */
+    __pyx_v_player->master_sound_layer.sound = NULL;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":790
+ *             player.master_sound_layer.status = layer_playing
+ *             player.master_sound_layer.sound = NULL
+ *             player.master_sound_layer.volume = 0             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.sound_loop_set_id = 0
+ *             player.master_sound_layer.sound_id = 0
+ */
+    __pyx_v_player->master_sound_layer.volume = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":791
+ *             player.master_sound_layer.sound = NULL
+ *             player.master_sound_layer.volume = 0
+ *             player.master_sound_layer.sound_loop_set_id = 0             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.sound_id = 0
+ *             player.master_sound_layer.fade_in_steps = 0
+ */
+    __pyx_v_player->master_sound_layer.sound_loop_set_id = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":792
+ *             player.master_sound_layer.volume = 0
+ *             player.master_sound_layer.sound_loop_set_id = 0
+ *             player.master_sound_layer.sound_id = 0             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.fade_in_steps = 0
+ *             player.master_sound_layer.fade_out_steps = 0
+ */
+    __pyx_v_player->master_sound_layer.sound_id = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":793
+ *             player.master_sound_layer.sound_loop_set_id = 0
+ *             player.master_sound_layer.sound_id = 0
+ *             player.master_sound_layer.fade_in_steps = 0             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.fade_out_steps = 0
+ *             player.master_sound_layer.fade_steps_remaining = 0
+ */
+    __pyx_v_player->master_sound_layer.fade_in_steps = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":794
+ *             player.master_sound_layer.sound_id = 0
+ *             player.master_sound_layer.fade_in_steps = 0
+ *             player.master_sound_layer.fade_out_steps = 0             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.fade_steps_remaining = 0
+ *             player.master_sound_layer.looping = True
+ */
+    __pyx_v_player->master_sound_layer.fade_out_steps = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":795
+ *             player.master_sound_layer.fade_in_steps = 0
+ *             player.master_sound_layer.fade_out_steps = 0
+ *             player.master_sound_layer.fade_steps_remaining = 0             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.looping = True
+ *             player.master_sound_layer.marker_count = 0
+ */
+    __pyx_v_player->master_sound_layer.fade_steps_remaining = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":796
+ *             player.master_sound_layer.fade_out_steps = 0
+ *             player.master_sound_layer.fade_steps_remaining = 0
+ *             player.master_sound_layer.looping = True             # <<<<<<<<<<<<<<
+ *             player.master_sound_layer.marker_count = 0
+ *             player.sample_pos = 0
+ */
+    __pyx_v_player->master_sound_layer.looping = 1;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":797
+ *             player.master_sound_layer.fade_steps_remaining = 0
+ *             player.master_sound_layer.looping = True
+ *             player.master_sound_layer.marker_count = 0             # <<<<<<<<<<<<<<
+ *             player.sample_pos = 0
+ *             player.stop_loop_at_pos = do_not_stop_loop
+ */
+    __pyx_v_player->master_sound_layer.marker_count = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":798
+ *             player.master_sound_layer.looping = True
+ *             player.master_sound_layer.marker_count = 0
+ *             player.sample_pos = 0             # <<<<<<<<<<<<<<
+ *             player.stop_loop_at_pos = do_not_stop_loop
+ * 
+ */
+    __pyx_v_player->sample_pos = 0;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":799
+ *             player.master_sound_layer.marker_count = 0
+ *             player.sample_pos = 0
+ *             player.stop_loop_at_pos = do_not_stop_loop             # <<<<<<<<<<<<<<
+ * 
+ *     cdef _reset_layer(self, SoundLoopLayerSettings *layer):
+ */
+    __pyx_v_player->stop_loop_at_pos = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_do_not_stop_loop;
+
+    /* "mpfmc/core/audio/track_sound_loop.pyx":784
+ *     cdef _reset_player(self, SoundLoopSetPlayer *player):
+ *         """Reset player back to defaults (frees any allocated layer memory)."""
+ *         if player != NULL:             # <<<<<<<<<<<<<<
+ *             self._reset_player_layers(player)
+ *             player.status = player_idle
+ */
+  }
+
+  /* "mpfmc/core/audio/track_sound_loop.pyx":782
+ *         SDL_UnlockAudio()
+ * 
+ *     cdef _reset_player(self, SoundLoopSetPlayer *player):             # <<<<<<<<<<<<<<
+ *         """Reset player back to defaults (frees any allocated layer memory)."""
+ *         if player != NULL:
+ */
+
+  /* function exit code */
+  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop._reset_player", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = 0;
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/core/audio/track_sound_loop.pyx":801
+ *             player.stop_loop_at_pos = do_not_stop_loop
  * 
  *     cdef _reset_layer(self, SoundLoopLayerSettings *layer):             # <<<<<<<<<<<<<<
  *         """Reset (free memory) for a single sound loop set layer."""
@@ -10468,7 +10554,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("_reset_layer", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":796
+  /* "mpfmc/core/audio/track_sound_loop.pyx":803
  *     cdef _reset_layer(self, SoundLoopLayerSettings *layer):
  *         """Reset (free memory) for a single sound loop set layer."""
  *         if layer != NULL:             # <<<<<<<<<<<<<<
@@ -10478,7 +10564,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   __pyx_t_1 = ((__pyx_v_layer != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":797
+    /* "mpfmc/core/audio/track_sound_loop.pyx":804
  *         """Reset (free memory) for a single sound loop set layer."""
  *         if layer != NULL:
  *             if layer.markers != NULL:             # <<<<<<<<<<<<<<
@@ -10488,7 +10574,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     __pyx_t_1 = ((__pyx_v_layer->markers != NULL) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":798
+      /* "mpfmc/core/audio/track_sound_loop.pyx":805
  *         if layer != NULL:
  *             if layer.markers != NULL:
  *                 g_array_free(layer.markers, True)             # <<<<<<<<<<<<<<
@@ -10497,7 +10583,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       (void)(g_array_free(__pyx_v_layer->markers, 1));
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":799
+      /* "mpfmc/core/audio/track_sound_loop.pyx":806
  *             if layer.markers != NULL:
  *                 g_array_free(layer.markers, True)
  *                 layer.markers = NULL             # <<<<<<<<<<<<<<
@@ -10506,7 +10592,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       __pyx_v_layer->markers = NULL;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":797
+      /* "mpfmc/core/audio/track_sound_loop.pyx":804
  *         """Reset (free memory) for a single sound loop set layer."""
  *         if layer != NULL:
  *             if layer.markers != NULL:             # <<<<<<<<<<<<<<
@@ -10515,7 +10601,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":796
+    /* "mpfmc/core/audio/track_sound_loop.pyx":803
  *     cdef _reset_layer(self, SoundLoopLayerSettings *layer):
  *         """Reset (free memory) for a single sound loop set layer."""
  *         if layer != NULL:             # <<<<<<<<<<<<<<
@@ -10524,8 +10610,8 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":794
- *         SDL_UnlockAudio()
+  /* "mpfmc/core/audio/track_sound_loop.pyx":801
+ *             player.stop_loop_at_pos = do_not_stop_loop
  * 
  *     cdef _reset_layer(self, SoundLoopLayerSettings *layer):             # <<<<<<<<<<<<<<
  *         """Reset (free memory) for a single sound loop set layer."""
@@ -10539,7 +10625,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":801
+/* "mpfmc/core/audio/track_sound_loop.pyx":808
  *                 layer.markers = NULL
  * 
  *     cdef _reset_player_layers(self, SoundLoopSetPlayer *player):             # <<<<<<<<<<<<<<
@@ -10557,7 +10643,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   GSList *__pyx_t_3;
   __Pyx_RefNannySetupContext("_reset_player_layers", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":803
+  /* "mpfmc/core/audio/track_sound_loop.pyx":810
  *     cdef _reset_player_layers(self, SoundLoopSetPlayer *player):
  *         """Reset (free memory) for sound loop set player layers."""
  *         if player != NULL:             # <<<<<<<<<<<<<<
@@ -10567,18 +10653,18 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   __pyx_t_1 = ((__pyx_v_player != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":804
+    /* "mpfmc/core/audio/track_sound_loop.pyx":811
  *         """Reset (free memory) for sound loop set player layers."""
  *         if player != NULL:
  *             self._reset_layer(&player.master_sound_layer)             # <<<<<<<<<<<<<<
  * 
  *             if player.layers != NULL:
  */
-    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_layer(__pyx_v_self, (&__pyx_v_player->master_sound_layer)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 804, __pyx_L1_error)
+    __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_layer(__pyx_v_self, (&__pyx_v_player->master_sound_layer)); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 811, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":806
+    /* "mpfmc/core/audio/track_sound_loop.pyx":813
  *             self._reset_layer(&player.master_sound_layer)
  * 
  *             if player.layers != NULL:             # <<<<<<<<<<<<<<
@@ -10588,7 +10674,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
     __pyx_t_1 = ((__pyx_v_player->layers != NULL) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":807
+      /* "mpfmc/core/audio/track_sound_loop.pyx":814
  * 
  *             if player.layers != NULL:
  *                 iterator = player.layers             # <<<<<<<<<<<<<<
@@ -10598,7 +10684,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
       __pyx_t_3 = __pyx_v_player->layers;
       __pyx_v_iterator = __pyx_t_3;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":808
+      /* "mpfmc/core/audio/track_sound_loop.pyx":815
  *             if player.layers != NULL:
  *                 iterator = player.layers
  *                 while iterator != NULL:             # <<<<<<<<<<<<<<
@@ -10609,7 +10695,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         __pyx_t_1 = ((__pyx_v_iterator != NULL) != 0);
         if (!__pyx_t_1) break;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":809
+        /* "mpfmc/core/audio/track_sound_loop.pyx":816
  *                 iterator = player.layers
  *                 while iterator != NULL:
  *                     layer = <SoundLoopLayerSettings*>iterator.data             # <<<<<<<<<<<<<<
@@ -10618,18 +10704,18 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
         __pyx_v_layer = ((__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *)__pyx_v_iterator->data);
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":810
+        /* "mpfmc/core/audio/track_sound_loop.pyx":817
  *                 while iterator != NULL:
  *                     layer = <SoundLoopLayerSettings*>iterator.data
  *                     self._reset_layer(layer)             # <<<<<<<<<<<<<<
  *                     g_slice_free1(sizeof(SoundLoopLayerSettings), layer)
  *                     iterator = iterator.next
  */
-        __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_layer(__pyx_v_self, __pyx_v_layer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 810, __pyx_L1_error)
+        __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *)__pyx_v_self->__pyx_base.__pyx_vtab)->_reset_layer(__pyx_v_self, __pyx_v_layer); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 817, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":811
+        /* "mpfmc/core/audio/track_sound_loop.pyx":818
  *                     layer = <SoundLoopLayerSettings*>iterator.data
  *                     self._reset_layer(layer)
  *                     g_slice_free1(sizeof(SoundLoopLayerSettings), layer)             # <<<<<<<<<<<<<<
@@ -10638,7 +10724,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
         g_slice_free1((sizeof(__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings)), __pyx_v_layer);
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":812
+        /* "mpfmc/core/audio/track_sound_loop.pyx":819
  *                     self._reset_layer(layer)
  *                     g_slice_free1(sizeof(SoundLoopLayerSettings), layer)
  *                     iterator = iterator.next             # <<<<<<<<<<<<<<
@@ -10649,7 +10735,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
         __pyx_v_iterator = __pyx_t_3;
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":814
+      /* "mpfmc/core/audio/track_sound_loop.pyx":821
  *                     iterator = iterator.next
  * 
  *                 g_slist_free(player.layers)             # <<<<<<<<<<<<<<
@@ -10658,7 +10744,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       g_slist_free(__pyx_v_player->layers);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":815
+      /* "mpfmc/core/audio/track_sound_loop.pyx":822
  * 
  *                 g_slist_free(player.layers)
  *                 player.layers = NULL             # <<<<<<<<<<<<<<
@@ -10667,7 +10753,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
       __pyx_v_player->layers = NULL;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":806
+      /* "mpfmc/core/audio/track_sound_loop.pyx":813
  *             self._reset_layer(&player.master_sound_layer)
  * 
  *             if player.layers != NULL:             # <<<<<<<<<<<<<<
@@ -10676,7 +10762,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":803
+    /* "mpfmc/core/audio/track_sound_loop.pyx":810
  *     cdef _reset_player_layers(self, SoundLoopSetPlayer *player):
  *         """Reset (free memory) for sound loop set player layers."""
  *         if player != NULL:             # <<<<<<<<<<<<<<
@@ -10685,7 +10771,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":801
+  /* "mpfmc/core/audio/track_sound_loop.pyx":808
  *                 layer.markers = NULL
  * 
  *     cdef _reset_player_layers(self, SoundLoopSetPlayer *player):             # <<<<<<<<<<<<<<
@@ -10706,7 +10792,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":817
+/* "mpfmc/core/audio/track_sound_loop.pyx":824
  *                 player.layers = NULL
  * 
  *     def get_status(self):             # <<<<<<<<<<<<<<
@@ -10749,7 +10835,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   int __pyx_t_10;
   __Pyx_RefNannySetupContext("get_status", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":827
+  /* "mpfmc/core/audio/track_sound_loop.pyx":834
  *         cdef SoundLoopSetPlayer *player
  *         cdef SoundLoopLayerSettings *layer
  *         cdef int index = 0             # <<<<<<<<<<<<<<
@@ -10758,7 +10844,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   __pyx_v_index = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":829
+  /* "mpfmc/core/audio/track_sound_loop.pyx":836
  *         cdef int index = 0
  * 
  *         SDL_LockAudio()             # <<<<<<<<<<<<<<
@@ -10767,19 +10853,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_LockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":830
+  /* "mpfmc/core/audio/track_sound_loop.pyx":837
  * 
  *         SDL_LockAudio()
  *         status = []             # <<<<<<<<<<<<<<
  *         for player_num in range(2):
  *             if player_num == 0:
  */
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 830, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 837, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_status = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":831
+  /* "mpfmc/core/audio/track_sound_loop.pyx":838
  *         SDL_LockAudio()
  *         status = []
  *         for player_num in range(2):             # <<<<<<<<<<<<<<
@@ -10789,7 +10875,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   for (__pyx_t_2 = 0; __pyx_t_2 < 2; __pyx_t_2+=1) {
     __pyx_v_player_num = __pyx_t_2;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":832
+    /* "mpfmc/core/audio/track_sound_loop.pyx":839
  *         status = []
  *         for player_num in range(2):
  *             if player_num == 0:             # <<<<<<<<<<<<<<
@@ -10799,7 +10885,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_3 = ((__pyx_v_player_num == 0) != 0);
     if (__pyx_t_3) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":833
+      /* "mpfmc/core/audio/track_sound_loop.pyx":840
  *         for player_num in range(2):
  *             if player_num == 0:
  *                 player = self.type_state.current             # <<<<<<<<<<<<<<
@@ -10809,7 +10895,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       __pyx_t_4 = __pyx_v_self->type_state->current;
       __pyx_v_player = __pyx_t_4;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":832
+      /* "mpfmc/core/audio/track_sound_loop.pyx":839
  *         status = []
  *         for player_num in range(2):
  *             if player_num == 0:             # <<<<<<<<<<<<<<
@@ -10819,7 +10905,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       goto __pyx_L5;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":835
+    /* "mpfmc/core/audio/track_sound_loop.pyx":842
  *                 player = self.type_state.current
  *             else:
  *                 player = self.type_state.next             # <<<<<<<<<<<<<<
@@ -10832,7 +10918,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     }
     __pyx_L5:;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":837
+    /* "mpfmc/core/audio/track_sound_loop.pyx":844
  *                 player = self.type_state.next
  * 
  *             if player == NULL:             # <<<<<<<<<<<<<<
@@ -10842,18 +10928,18 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_3 = ((__pyx_v_player == NULL) != 0);
     if (__pyx_t_3) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":839
+      /* "mpfmc/core/audio/track_sound_loop.pyx":846
  *             if player == NULL:
  *                 status.append({
  *                     "status": TrackSoundLoop.player_status_to_text(player_idle),             # <<<<<<<<<<<<<<
  *                     "length": 0
  *                 })
  */
-      __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 839, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyDict_NewPresized(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 846, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 839, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 846, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_7 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 839, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 846, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_t_8 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
@@ -10866,14 +10952,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (!__pyx_t_8) {
-        __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 839, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 846, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_GOTREF(__pyx_t_5);
       } else {
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_t_7};
-          __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 839, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 846, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -10882,40 +10968,40 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_t_7};
-          __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 839, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 846, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         } else
         #endif
         {
-          __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 839, __pyx_L1_error)
+          __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 846, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_9);
           __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_8); __pyx_t_8 = NULL;
           __Pyx_GIVEREF(__pyx_t_7);
           PyTuple_SET_ITEM(__pyx_t_9, 0+1, __pyx_t_7);
           __pyx_t_7 = 0;
-          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 839, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 846, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_status, __pyx_t_5) < 0) __PYX_ERR(0, 839, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_status, __pyx_t_5) < 0) __PYX_ERR(0, 846, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_length, __pyx_int_0) < 0) __PYX_ERR(0, 839, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_length, __pyx_int_0) < 0) __PYX_ERR(0, 846, __pyx_L1_error)
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":838
+      /* "mpfmc/core/audio/track_sound_loop.pyx":845
  * 
  *             if player == NULL:
  *                 status.append({             # <<<<<<<<<<<<<<
  *                     "status": TrackSoundLoop.player_status_to_text(player_idle),
  *                     "length": 0
  */
-      __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_status, __pyx_t_1); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 838, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_status, __pyx_t_1); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 845, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":837
+      /* "mpfmc/core/audio/track_sound_loop.pyx":844
  *                 player = self.type_state.next
  * 
  *             if player == NULL:             # <<<<<<<<<<<<<<
@@ -10925,7 +11011,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
       goto __pyx_L6;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":843
+    /* "mpfmc/core/audio/track_sound_loop.pyx":850
  *                 })
  *             else:
  *                 layers = []             # <<<<<<<<<<<<<<
@@ -10933,12 +11019,12 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  *                 while layer != NULL:
  */
     /*else*/ {
-      __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 843, __pyx_L1_error)
+      __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 850, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_XDECREF_SET(__pyx_v_layers, ((PyObject*)__pyx_t_1));
       __pyx_t_1 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":844
+      /* "mpfmc/core/audio/track_sound_loop.pyx":851
  *             else:
  *                 layers = []
  *                 layer = <SoundLoopLayerSettings*>g_slist_nth_data(player.layers, index)             # <<<<<<<<<<<<<<
@@ -10947,7 +11033,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
       __pyx_v_layer = ((__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *)g_slist_nth_data(__pyx_v_player->layers, __pyx_v_index));
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":845
+      /* "mpfmc/core/audio/track_sound_loop.pyx":852
  *                 layers = []
  *                 layer = <SoundLoopLayerSettings*>g_slist_nth_data(player.layers, index)
  *                 while layer != NULL:             # <<<<<<<<<<<<<<
@@ -10958,18 +11044,18 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_t_3 = ((__pyx_v_layer != NULL) != 0);
         if (!__pyx_t_3) break;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":847
+        /* "mpfmc/core/audio/track_sound_loop.pyx":854
  *                 while layer != NULL:
  *                     layers.append({
  *                         "status": TrackSoundLoop.layer_status_to_text(layer.status),             # <<<<<<<<<<<<<<
  *                         "sound_id": layer.sound_id,
  *                         "sound_length": layer.sound.data.memory.size,
  */
-        __pyx_t_1 = __Pyx_PyDict_NewPresized(9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 847, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyDict_NewPresized(9); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
-        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), __pyx_n_s_layer_status_to_text); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 847, __pyx_L1_error)
+        __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), __pyx_n_s_layer_status_to_text); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_9 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_v_layer->status); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 847, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_v_layer->status); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_9);
         __pyx_t_7 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
@@ -10982,14 +11068,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
           }
         }
         if (!__pyx_t_7) {
-          __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 847, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_9); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 854, __pyx_L1_error)
           __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_GOTREF(__pyx_t_5);
         } else {
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_6)) {
             PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_t_9};
-            __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 847, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 854, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
@@ -10998,135 +11084,135 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
             PyObject *__pyx_temp[2] = {__pyx_t_7, __pyx_t_9};
-            __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 847, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 854, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           } else
           #endif
           {
-            __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 847, __pyx_L1_error)
+            __pyx_t_8 = PyTuple_New(1+1); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 854, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_8);
             __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_7); __pyx_t_7 = NULL;
             __Pyx_GIVEREF(__pyx_t_9);
             PyTuple_SET_ITEM(__pyx_t_8, 0+1, __pyx_t_9);
             __pyx_t_9 = 0;
-            __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_8, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 847, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_8, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 854, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           }
         }
         __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_status, __pyx_t_5) < 0) __PYX_ERR(0, 847, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_status, __pyx_t_5) < 0) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":848
+        /* "mpfmc/core/audio/track_sound_loop.pyx":855
  *                     layers.append({
  *                         "status": TrackSoundLoop.layer_status_to_text(layer.status),
  *                         "sound_id": layer.sound_id,             # <<<<<<<<<<<<<<
  *                         "sound_length": layer.sound.data.memory.size,
  *                         "volume": layer.volume,
  */
-        __pyx_t_5 = __Pyx_PyInt_From_Uint64(__pyx_v_layer->sound_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 848, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_Uint64(__pyx_v_layer->sound_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 855, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_id, __pyx_t_5) < 0) __PYX_ERR(0, 847, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_id, __pyx_t_5) < 0) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":849
+        /* "mpfmc/core/audio/track_sound_loop.pyx":856
  *                         "status": TrackSoundLoop.layer_status_to_text(layer.status),
  *                         "sound_id": layer.sound_id,
  *                         "sound_length": layer.sound.data.memory.size,             # <<<<<<<<<<<<<<
  *                         "volume": layer.volume,
  *                         "fade_in_steps": layer.fade_in_steps,
  */
-        __pyx_t_5 = __Pyx_PyInt_From_gsize(__pyx_v_layer->sound->data.memory->size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 849, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_gsize(__pyx_v_layer->sound->data.memory->size); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 856, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_length, __pyx_t_5) < 0) __PYX_ERR(0, 847, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_length, __pyx_t_5) < 0) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":850
+        /* "mpfmc/core/audio/track_sound_loop.pyx":857
  *                         "sound_id": layer.sound_id,
  *                         "sound_length": layer.sound.data.memory.size,
  *                         "volume": layer.volume,             # <<<<<<<<<<<<<<
  *                         "fade_in_steps": layer.fade_in_steps,
  *                         "fade_out_steps": layer.fade_out_steps,
  */
-        __pyx_t_5 = __Pyx_PyInt_From_Uint8(__pyx_v_layer->volume); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 850, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_Uint8(__pyx_v_layer->volume); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 857, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_volume, __pyx_t_5) < 0) __PYX_ERR(0, 847, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_volume, __pyx_t_5) < 0) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":851
+        /* "mpfmc/core/audio/track_sound_loop.pyx":858
  *                         "sound_length": layer.sound.data.memory.size,
  *                         "volume": layer.volume,
  *                         "fade_in_steps": layer.fade_in_steps,             # <<<<<<<<<<<<<<
  *                         "fade_out_steps": layer.fade_out_steps,
  *                         "fade_steps_remaining": layer.fade_steps_remaining,
  */
-        __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_layer->fade_in_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 851, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_layer->fade_in_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 858, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_in_steps, __pyx_t_5) < 0) __PYX_ERR(0, 847, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_in_steps, __pyx_t_5) < 0) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":852
+        /* "mpfmc/core/audio/track_sound_loop.pyx":859
  *                         "volume": layer.volume,
  *                         "fade_in_steps": layer.fade_in_steps,
  *                         "fade_out_steps": layer.fade_out_steps,             # <<<<<<<<<<<<<<
  *                         "fade_steps_remaining": layer.fade_steps_remaining,
  *                         "looping": layer.looping,
  */
-        __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_layer->fade_out_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 852, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_layer->fade_out_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 859, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_out_steps, __pyx_t_5) < 0) __PYX_ERR(0, 847, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_out_steps, __pyx_t_5) < 0) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":853
+        /* "mpfmc/core/audio/track_sound_loop.pyx":860
  *                         "fade_in_steps": layer.fade_in_steps,
  *                         "fade_out_steps": layer.fade_out_steps,
  *                         "fade_steps_remaining": layer.fade_steps_remaining,             # <<<<<<<<<<<<<<
  *                         "looping": layer.looping,
  *                         "marker_count": layer.marker_count,
  */
-        __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_layer->fade_steps_remaining); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 853, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_layer->fade_steps_remaining); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 860, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_steps_remaining, __pyx_t_5) < 0) __PYX_ERR(0, 847, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_steps_remaining, __pyx_t_5) < 0) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":854
+        /* "mpfmc/core/audio/track_sound_loop.pyx":861
  *                         "fade_out_steps": layer.fade_out_steps,
  *                         "fade_steps_remaining": layer.fade_steps_remaining,
  *                         "looping": layer.looping,             # <<<<<<<<<<<<<<
  *                         "marker_count": layer.marker_count,
  *                     })
  */
-        __pyx_t_5 = __Pyx_PyBool_FromLong(__pyx_v_layer->looping); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 854, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyBool_FromLong(__pyx_v_layer->looping); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 861, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_looping, __pyx_t_5) < 0) __PYX_ERR(0, 847, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_looping, __pyx_t_5) < 0) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":855
+        /* "mpfmc/core/audio/track_sound_loop.pyx":862
  *                         "fade_steps_remaining": layer.fade_steps_remaining,
  *                         "looping": layer.looping,
  *                         "marker_count": layer.marker_count,             # <<<<<<<<<<<<<<
  *                     })
  *                     index += 1
  */
-        __pyx_t_5 = __Pyx_PyInt_From_Uint8(__pyx_v_layer->marker_count); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 855, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_Uint8(__pyx_v_layer->marker_count); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 862, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_marker_count, __pyx_t_5) < 0) __PYX_ERR(0, 847, __pyx_L1_error)
+        if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_marker_count, __pyx_t_5) < 0) __PYX_ERR(0, 854, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":846
+        /* "mpfmc/core/audio/track_sound_loop.pyx":853
  *                 layer = <SoundLoopLayerSettings*>g_slist_nth_data(player.layers, index)
  *                 while layer != NULL:
  *                     layers.append({             # <<<<<<<<<<<<<<
  *                         "status": TrackSoundLoop.layer_status_to_text(layer.status),
  *                         "sound_id": layer.sound_id,
  */
-        __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_layers, __pyx_t_1); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 846, __pyx_L1_error)
+        __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_layers, __pyx_t_1); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 853, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":857
+        /* "mpfmc/core/audio/track_sound_loop.pyx":864
  *                         "marker_count": layer.marker_count,
  *                     })
  *                     index += 1             # <<<<<<<<<<<<<<
@@ -11135,7 +11221,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
         __pyx_v_index = (__pyx_v_index + 1);
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":858
+        /* "mpfmc/core/audio/track_sound_loop.pyx":865
  *                     })
  *                     index += 1
  *                     layer = <SoundLoopLayerSettings*>g_slist_nth_data(player.layers, index)             # <<<<<<<<<<<<<<
@@ -11145,18 +11231,18 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         __pyx_v_layer = ((__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *)g_slist_nth_data(__pyx_v_player->layers, __pyx_v_index));
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":861
+      /* "mpfmc/core/audio/track_sound_loop.pyx":868
  * 
  *                 status.append({
  *                     "status": TrackSoundLoop.player_status_to_text(<int>player.status),             # <<<<<<<<<<<<<<
  *                     "length": player.length,
  *                     "sound_id": player.master_sound_layer.sound_id,
  */
-      __pyx_t_1 = __Pyx_PyDict_NewPresized(11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 861, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyDict_NewPresized(11); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 861, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop), __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
-      __pyx_t_8 = __Pyx_PyInt_From_int(((int)__pyx_v_player->status)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 861, __pyx_L1_error)
+      __pyx_t_8 = __Pyx_PyInt_From_int(((int)__pyx_v_player->status)); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       __pyx_t_9 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_6))) {
@@ -11169,14 +11255,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         }
       }
       if (!__pyx_t_9) {
-        __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 861, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_8); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 868, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         __Pyx_GOTREF(__pyx_t_5);
       } else {
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[2] = {__pyx_t_9, __pyx_t_8};
-          __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 861, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 868, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -11185,159 +11271,159 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
           PyObject *__pyx_temp[2] = {__pyx_t_9, __pyx_t_8};
-          __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 861, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 868, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         } else
         #endif
         {
-          __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 861, __pyx_L1_error)
+          __pyx_t_7 = PyTuple_New(1+1); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 868, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_9); __pyx_t_9 = NULL;
           __Pyx_GIVEREF(__pyx_t_8);
           PyTuple_SET_ITEM(__pyx_t_7, 0+1, __pyx_t_8);
           __pyx_t_8 = 0;
-          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 861, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_7, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 868, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
         }
       }
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_status, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_status, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":862
+      /* "mpfmc/core/audio/track_sound_loop.pyx":869
  *                 status.append({
  *                     "status": TrackSoundLoop.player_status_to_text(<int>player.status),
  *                     "length": player.length,             # <<<<<<<<<<<<<<
  *                     "sound_id": player.master_sound_layer.sound_id,
  *                     "volume": player.master_sound_layer.volume,
  */
-      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->length); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 862, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->length); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 869, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_length, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_length, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":863
+      /* "mpfmc/core/audio/track_sound_loop.pyx":870
  *                     "status": TrackSoundLoop.player_status_to_text(<int>player.status),
  *                     "length": player.length,
  *                     "sound_id": player.master_sound_layer.sound_id,             # <<<<<<<<<<<<<<
  *                     "volume": player.master_sound_layer.volume,
  *                     "layers": layers,
  */
-      __pyx_t_5 = __Pyx_PyInt_From_Uint64(__pyx_v_player->master_sound_layer.sound_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 863, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_Uint64(__pyx_v_player->master_sound_layer.sound_id); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 870, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_id, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sound_id, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":864
+      /* "mpfmc/core/audio/track_sound_loop.pyx":871
  *                     "length": player.length,
  *                     "sound_id": player.master_sound_layer.sound_id,
  *                     "volume": player.master_sound_layer.volume,             # <<<<<<<<<<<<<<
  *                     "layers": layers,
  *                     "sample_pos": player.sample_pos,
  */
-      __pyx_t_5 = __Pyx_PyInt_From_Uint8(__pyx_v_player->master_sound_layer.volume); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 864, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_Uint8(__pyx_v_player->master_sound_layer.volume); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 871, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_volume, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_volume, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":865
+      /* "mpfmc/core/audio/track_sound_loop.pyx":872
  *                     "sound_id": player.master_sound_layer.sound_id,
  *                     "volume": player.master_sound_layer.volume,
  *                     "layers": layers,             # <<<<<<<<<<<<<<
  *                     "sample_pos": player.sample_pos,
  *                     "stop_loop_at_pos": player.stop_loop_at_pos,
  */
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_layers, __pyx_v_layers) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_layers, __pyx_v_layers) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":866
+      /* "mpfmc/core/audio/track_sound_loop.pyx":873
  *                     "volume": player.master_sound_layer.volume,
  *                     "layers": layers,
  *                     "sample_pos": player.sample_pos,             # <<<<<<<<<<<<<<
  *                     "stop_loop_at_pos": player.stop_loop_at_pos,
  *                     "fade_in_steps": player.master_sound_layer.fade_in_steps,
  */
-      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->sample_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 866, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->sample_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 873, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sample_pos, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_sample_pos, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":867
+      /* "mpfmc/core/audio/track_sound_loop.pyx":874
  *                     "layers": layers,
  *                     "sample_pos": player.sample_pos,
  *                     "stop_loop_at_pos": player.stop_loop_at_pos,             # <<<<<<<<<<<<<<
  *                     "fade_in_steps": player.master_sound_layer.fade_in_steps,
  *                     "fade_out_steps": player.master_sound_layer.fade_out_steps,
  */
-      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->stop_loop_at_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 867, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->stop_loop_at_pos); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 874, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_stop_loop_at_pos, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_stop_loop_at_pos, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":868
+      /* "mpfmc/core/audio/track_sound_loop.pyx":875
  *                     "sample_pos": player.sample_pos,
  *                     "stop_loop_at_pos": player.stop_loop_at_pos,
  *                     "fade_in_steps": player.master_sound_layer.fade_in_steps,             # <<<<<<<<<<<<<<
  *                     "fade_out_steps": player.master_sound_layer.fade_out_steps,
  *                     "fade_steps_remaining": player.master_sound_layer.fade_steps_remaining,
  */
-      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->master_sound_layer.fade_in_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 868, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->master_sound_layer.fade_in_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 875, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_in_steps, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_in_steps, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":869
+      /* "mpfmc/core/audio/track_sound_loop.pyx":876
  *                     "stop_loop_at_pos": player.stop_loop_at_pos,
  *                     "fade_in_steps": player.master_sound_layer.fade_in_steps,
  *                     "fade_out_steps": player.master_sound_layer.fade_out_steps,             # <<<<<<<<<<<<<<
  *                     "fade_steps_remaining": player.master_sound_layer.fade_steps_remaining,
  *                     "looping": player.master_sound_layer.looping,
  */
-      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->master_sound_layer.fade_out_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 869, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->master_sound_layer.fade_out_steps); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 876, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_out_steps, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_out_steps, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":870
+      /* "mpfmc/core/audio/track_sound_loop.pyx":877
  *                     "fade_in_steps": player.master_sound_layer.fade_in_steps,
  *                     "fade_out_steps": player.master_sound_layer.fade_out_steps,
  *                     "fade_steps_remaining": player.master_sound_layer.fade_steps_remaining,             # <<<<<<<<<<<<<<
  *                     "looping": player.master_sound_layer.looping,
  *                 })
  */
-      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->master_sound_layer.fade_steps_remaining); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 870, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_Uint32(__pyx_v_player->master_sound_layer.fade_steps_remaining); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 877, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_steps_remaining, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_fade_steps_remaining, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":871
+      /* "mpfmc/core/audio/track_sound_loop.pyx":878
  *                     "fade_out_steps": player.master_sound_layer.fade_out_steps,
  *                     "fade_steps_remaining": player.master_sound_layer.fade_steps_remaining,
  *                     "looping": player.master_sound_layer.looping,             # <<<<<<<<<<<<<<
  *                 })
  * 
  */
-      __pyx_t_5 = __Pyx_PyBool_FromLong(__pyx_v_player->master_sound_layer.looping); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 871, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyBool_FromLong(__pyx_v_player->master_sound_layer.looping); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 878, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_looping, __pyx_t_5) < 0) __PYX_ERR(0, 861, __pyx_L1_error)
+      if (PyDict_SetItem(__pyx_t_1, __pyx_n_u_looping, __pyx_t_5) < 0) __PYX_ERR(0, 868, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":860
+      /* "mpfmc/core/audio/track_sound_loop.pyx":867
  *                     layer = <SoundLoopLayerSettings*>g_slist_nth_data(player.layers, index)
  * 
  *                 status.append({             # <<<<<<<<<<<<<<
  *                     "status": TrackSoundLoop.player_status_to_text(<int>player.status),
  *                     "length": player.length,
  */
-      __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_status, __pyx_t_1); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 860, __pyx_L1_error)
+      __pyx_t_10 = __Pyx_PyList_Append(__pyx_v_status, __pyx_t_1); if (unlikely(__pyx_t_10 == ((int)-1))) __PYX_ERR(0, 867, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     }
     __pyx_L6:;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":874
+  /* "mpfmc/core/audio/track_sound_loop.pyx":881
  *                 })
  * 
  *         SDL_UnlockAudio()             # <<<<<<<<<<<<<<
@@ -11346,7 +11432,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  */
   SDL_UnlockAudio();
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":876
+  /* "mpfmc/core/audio/track_sound_loop.pyx":883
  *         SDL_UnlockAudio()
  * 
  *         return status             # <<<<<<<<<<<<<<
@@ -11358,7 +11444,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   __pyx_r = __pyx_v_status;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":817
+  /* "mpfmc/core/audio/track_sound_loop.pyx":824
  *                 player.layers = NULL
  * 
  *     def get_status(self):             # <<<<<<<<<<<<<<
@@ -11384,7 +11470,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":879
+/* "mpfmc/core/audio/track_sound_loop.pyx":886
  * 
  *     @staticmethod
  *     def player_status_to_text(int status):             # <<<<<<<<<<<<<<
@@ -11420,18 +11506,18 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "player_status_to_text") < 0)) __PYX_ERR(0, 879, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "player_status_to_text") < 0)) __PYX_ERR(0, 886, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_status = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_status == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 879, __pyx_L3_error)
+    __pyx_v_status = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_status == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 886, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("player_status_to_text", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 879, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("player_status_to_text", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 886, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.player_status_to_text", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -11457,71 +11543,71 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("player_status_to_text", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":890
+  /* "mpfmc/core/audio/track_sound_loop.pyx":897
  *         """
  *         status_values = {
  *             player_idle: "idle",             # <<<<<<<<<<<<<<
  *             player_pending: "pending",
  *             player_playing: "playing",
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 890, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 897, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 890, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 897, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_idle) < 0) __PYX_ERR(0, 890, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_idle) < 0) __PYX_ERR(0, 897, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":891
+  /* "mpfmc/core/audio/track_sound_loop.pyx":898
  *         status_values = {
  *             player_idle: "idle",
  *             player_pending: "pending",             # <<<<<<<<<<<<<<
  *             player_playing: "playing",
  *             player_fading_in: "fading in",
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_pending); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 891, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_pending); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 898, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_pending) < 0) __PYX_ERR(0, 890, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_pending) < 0) __PYX_ERR(0, 897, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":892
+  /* "mpfmc/core/audio/track_sound_loop.pyx":899
  *             player_idle: "idle",
  *             player_pending: "pending",
  *             player_playing: "playing",             # <<<<<<<<<<<<<<
  *             player_fading_in: "fading in",
  *             player_fading_out: "fading out",
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_playing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 892, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_playing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 899, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_playing) < 0) __PYX_ERR(0, 890, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_playing) < 0) __PYX_ERR(0, 897, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":893
+  /* "mpfmc/core/audio/track_sound_loop.pyx":900
  *             player_pending: "pending",
  *             player_playing: "playing",
  *             player_fading_in: "fading in",             # <<<<<<<<<<<<<<
  *             player_fading_out: "fading out",
  *         }
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_in); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 893, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_in); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 900, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fading_in) < 0) __PYX_ERR(0, 890, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fading_in) < 0) __PYX_ERR(0, 897, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":894
+  /* "mpfmc/core/audio/track_sound_loop.pyx":901
  *             player_playing: "playing",
  *             player_fading_in: "fading in",
  *             player_fading_out: "fading out",             # <<<<<<<<<<<<<<
  *         }
  * 
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_out); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 894, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_out); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 901, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fading_out) < 0) __PYX_ERR(0, 890, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fading_out) < 0) __PYX_ERR(0, 897, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_status_values = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":897
+  /* "mpfmc/core/audio/track_sound_loop.pyx":904
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11537,7 +11623,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __Pyx_XGOTREF(__pyx_t_5);
     /*try:*/ {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":898
+      /* "mpfmc/core/audio/track_sound_loop.pyx":905
  * 
  *         try:
  *             return status_values.get(status)             # <<<<<<<<<<<<<<
@@ -11545,16 +11631,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  *             return "unknown"
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_status); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 898, __pyx_L3_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_status); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 905, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_status_values, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 898, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_status_values, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 905, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_r = __pyx_t_2;
       __pyx_t_2 = 0;
       goto __pyx_L7_try_return;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":897
+      /* "mpfmc/core/audio/track_sound_loop.pyx":904
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11566,7 +11652,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":899
+    /* "mpfmc/core/audio/track_sound_loop.pyx":906
  *         try:
  *             return status_values.get(status)
  *         except KeyError:             # <<<<<<<<<<<<<<
@@ -11576,12 +11662,12 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_6 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_KeyError);
     if (__pyx_t_6) {
       __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.player_status_to_text", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_7) < 0) __PYX_ERR(0, 899, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_7) < 0) __PYX_ERR(0, 906, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":900
+      /* "mpfmc/core/audio/track_sound_loop.pyx":907
  *             return status_values.get(status)
  *         except KeyError:
  *             return "unknown"             # <<<<<<<<<<<<<<
@@ -11599,7 +11685,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":897
+    /* "mpfmc/core/audio/track_sound_loop.pyx":904
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11625,7 +11711,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L0;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":879
+  /* "mpfmc/core/audio/track_sound_loop.pyx":886
  * 
  *     @staticmethod
  *     def player_status_to_text(int status):             # <<<<<<<<<<<<<<
@@ -11647,7 +11733,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":903
+/* "mpfmc/core/audio/track_sound_loop.pyx":910
  * 
  *     @staticmethod
  *     def layer_status_to_text(int status):             # <<<<<<<<<<<<<<
@@ -11683,18 +11769,18 @@ static PyObject *__pyx_pw_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "layer_status_to_text") < 0)) __PYX_ERR(0, 903, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "layer_status_to_text") < 0)) __PYX_ERR(0, 910, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_status = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_status == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 903, __pyx_L3_error)
+    __pyx_v_status = __Pyx_PyInt_As_int(values[0]); if (unlikely((__pyx_v_status == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 910, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("layer_status_to_text", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 903, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("layer_status_to_text", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 910, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.layer_status_to_text", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -11720,71 +11806,71 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("layer_status_to_text", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":914
+  /* "mpfmc/core/audio/track_sound_loop.pyx":921
  *         """
  *         status_values = {
  *             layer_stopped: "stopped",             # <<<<<<<<<<<<<<
  *             layer_queued: "queued",
  *             layer_playing: "playing",
  */
-  __pyx_t_1 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 914, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyDict_NewPresized(5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_stopped); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 914, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_stopped); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_stopped) < 0) __PYX_ERR(0, 914, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_stopped) < 0) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":915
+  /* "mpfmc/core/audio/track_sound_loop.pyx":922
  *         status_values = {
  *             layer_stopped: "stopped",
  *             layer_queued: "queued",             # <<<<<<<<<<<<<<
  *             layer_playing: "playing",
  *             layer_fading_in: "fading in",
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_queued); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 915, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_queued); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 922, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_queued) < 0) __PYX_ERR(0, 914, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_queued) < 0) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":916
+  /* "mpfmc/core/audio/track_sound_loop.pyx":923
  *             layer_stopped: "stopped",
  *             layer_queued: "queued",
  *             layer_playing: "playing",             # <<<<<<<<<<<<<<
  *             layer_fading_in: "fading in",
  *             layer_fading_out: "fading out",
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 916, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 923, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_playing) < 0) __PYX_ERR(0, 914, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_n_u_playing) < 0) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":917
+  /* "mpfmc/core/audio/track_sound_loop.pyx":924
  *             layer_queued: "queued",
  *             layer_playing: "playing",
  *             layer_fading_in: "fading in",             # <<<<<<<<<<<<<<
  *             layer_fading_out: "fading out",
  *         }
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_in); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 917, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_in); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 924, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fading_in) < 0) __PYX_ERR(0, 914, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fading_in) < 0) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":918
+  /* "mpfmc/core/audio/track_sound_loop.pyx":925
  *             layer_playing: "playing",
  *             layer_fading_in: "fading in",
  *             layer_fading_out: "fading out",             # <<<<<<<<<<<<<<
  *         }
  * 
  */
-  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 918, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_enum____pyx_t_5mpfmc_4core_5audio_16track_sound_loop_LayerStatus(__pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 925, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fading_out) < 0) __PYX_ERR(0, 914, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_t_1, __pyx_t_2, __pyx_kp_u_fading_out) < 0) __PYX_ERR(0, 921, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_status_values = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":921
+  /* "mpfmc/core/audio/track_sound_loop.pyx":928
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11800,7 +11886,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __Pyx_XGOTREF(__pyx_t_5);
     /*try:*/ {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":922
+      /* "mpfmc/core/audio/track_sound_loop.pyx":929
  * 
  *         try:
  *             return status_values.get(status)             # <<<<<<<<<<<<<<
@@ -11808,16 +11894,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
  *             return "unknown"
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_status); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 922, __pyx_L3_error)
+      __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_status); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 929, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_1);
-      __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_status_values, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 922, __pyx_L3_error)
+      __pyx_t_2 = __Pyx_PyDict_GetItemDefault(__pyx_v_status_values, __pyx_t_1, Py_None); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 929, __pyx_L3_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       __pyx_r = __pyx_t_2;
       __pyx_t_2 = 0;
       goto __pyx_L7_try_return;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":921
+      /* "mpfmc/core/audio/track_sound_loop.pyx":928
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11829,7 +11915,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":923
+    /* "mpfmc/core/audio/track_sound_loop.pyx":930
  *         try:
  *             return status_values.get(status)
  *         except KeyError:             # <<<<<<<<<<<<<<
@@ -11839,12 +11925,12 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     __pyx_t_6 = __Pyx_PyErr_ExceptionMatches(__pyx_builtin_KeyError);
     if (__pyx_t_6) {
       __Pyx_AddTraceback("mpfmc.core.audio.track_sound_loop.TrackSoundLoop.layer_status_to_text", __pyx_clineno, __pyx_lineno, __pyx_filename);
-      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_7) < 0) __PYX_ERR(0, 923, __pyx_L5_except_error)
+      if (__Pyx_GetException(&__pyx_t_2, &__pyx_t_1, &__pyx_t_7) < 0) __PYX_ERR(0, 930, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_GOTREF(__pyx_t_7);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":924
+      /* "mpfmc/core/audio/track_sound_loop.pyx":931
  *             return status_values.get(status)
  *         except KeyError:
  *             return "unknown"             # <<<<<<<<<<<<<<
@@ -11862,7 +11948,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L5_except_error;
     __pyx_L5_except_error:;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":921
+    /* "mpfmc/core/audio/track_sound_loop.pyx":928
  *         }
  * 
  *         try:             # <<<<<<<<<<<<<<
@@ -11888,7 +11974,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
     goto __pyx_L0;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":903
+  /* "mpfmc/core/audio/track_sound_loop.pyx":910
  * 
  *     @staticmethod
  *     def layer_status_to_text(int status):             # <<<<<<<<<<<<<<
@@ -11910,7 +11996,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":926
+/* "mpfmc/core/audio/track_sound_loop.pyx":933
  *             return "unknown"
  * 
  *     cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval, int bytes_per_sample_frame):             # <<<<<<<<<<<<<<
@@ -11933,26 +12019,26 @@ static CYTHON_INLINE Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14Tra
   Uint32 __pyx_t_10;
   __Pyx_RefNannySetupContext("_round_sample_pos_up_to_interval", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":944
+  /* "mpfmc/core/audio/track_sound_loop.pyx":951
  *             a whole sample frame boundary.
  *         """
  *         return bytes_per_sample_frame * ceil((interval * ceil(sample_pos / interval)) / bytes_per_sample_frame)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_bytes_per_sample_frame); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_int(__pyx_v_bytes_per_sample_frame); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_ceil); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_GetModuleGlobalName(__pyx_n_s_ceil); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_Uint32(__pyx_v_interval); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_Uint32(__pyx_v_interval); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_ceil); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_GetModuleGlobalName(__pyx_n_s_ceil); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   if (unlikely(__pyx_v_interval == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 944, __pyx_L1_error)
+    __PYX_ERR(0, 951, __pyx_L1_error)
   }
-  __pyx_t_7 = PyFloat_FromDouble((((double)__pyx_v_sample_pos) / ((double)__pyx_v_interval))); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_7 = PyFloat_FromDouble((((double)__pyx_v_sample_pos) / ((double)__pyx_v_interval))); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_7);
   __pyx_t_8 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_6))) {
@@ -11965,14 +12051,14 @@ static CYTHON_INLINE Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14Tra
     }
   }
   if (!__pyx_t_8) {
-    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 944, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_7); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 951, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __Pyx_GOTREF(__pyx_t_5);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_6)) {
       PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_t_7};
-      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -11981,32 +12067,32 @@ static CYTHON_INLINE Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14Tra
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_6)) {
       PyObject *__pyx_temp[2] = {__pyx_t_8, __pyx_t_7};
-      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_6, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     } else
     #endif
     {
-      __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_9);
       __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_8); __pyx_t_8 = NULL;
       __Pyx_GIVEREF(__pyx_t_7);
       PyTuple_SET_ITEM(__pyx_t_9, 0+1, __pyx_t_7);
       __pyx_t_7 = 0;
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_6, __pyx_t_9, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyNumber_Multiply(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_6 = PyNumber_Multiply(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_bytes_per_sample_frame); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_bytes_per_sample_frame); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_6, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyNumber_Divide(__pyx_t_6, __pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -12021,14 +12107,14 @@ static CYTHON_INLINE Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14Tra
     }
   }
   if (!__pyx_t_5) {
-    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 944, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 951, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_GOTREF(__pyx_t_2);
   } else {
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -12037,35 +12123,35 @@ static CYTHON_INLINE Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14Tra
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[2] = {__pyx_t_5, __pyx_t_4};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-1, 1+1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_6 = PyTuple_New(1+1); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_6, 0, __pyx_t_5); __pyx_t_5 = NULL;
       __Pyx_GIVEREF(__pyx_t_4);
       PyTuple_SET_ITEM(__pyx_t_6, 0+1, __pyx_t_4);
       __pyx_t_4 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 944, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_6, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 951, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
     }
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_10 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_10 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 944, __pyx_L1_error)
+  __pyx_t_10 = __Pyx_PyInt_As_Uint32(__pyx_t_3); if (unlikely((__pyx_t_10 == ((Uint32)-1)) && PyErr_Occurred())) __PYX_ERR(0, 951, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_r = __pyx_t_10;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":926
+  /* "mpfmc/core/audio/track_sound_loop.pyx":933
  *             return "unknown"
  * 
  *     cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval, int bytes_per_sample_frame):             # <<<<<<<<<<<<<<
@@ -12091,7 +12177,7 @@ static CYTHON_INLINE Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14Tra
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":958
+/* "mpfmc/core/audio/track_sound_loop.pyx":965
  * 
  *     @staticmethod
  *     cdef void mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil:             # <<<<<<<<<<<<<<
@@ -12111,7 +12197,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
   int __pyx_t_3;
   __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *__pyx_t_4;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":970
+  /* "mpfmc/core/audio/track_sound_loop.pyx":977
  *         cdef TrackState *target_track
  *         cdef TrackSoundLoopState *sound_loop_track
  *         cdef bint first_layer = True             # <<<<<<<<<<<<<<
@@ -12120,7 +12206,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   __pyx_v_first_layer = 1;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":971
+  /* "mpfmc/core/audio/track_sound_loop.pyx":978
  *         cdef TrackSoundLoopState *sound_loop_track
  *         cdef bint first_layer = True
  *         cdef bint switch_players = False             # <<<<<<<<<<<<<<
@@ -12129,7 +12215,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   __pyx_v_switch_players = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":972
+  /* "mpfmc/core/audio/track_sound_loop.pyx":979
  *         cdef bint first_layer = True
  *         cdef bint switch_players = False
  *         cdef bint reset_track_buffer_pos = True             # <<<<<<<<<<<<<<
@@ -12138,7 +12224,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   __pyx_v_reset_track_buffer_pos = 1;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":975
+  /* "mpfmc/core/audio/track_sound_loop.pyx":982
  *         cdef SoundLoopSetPlayer *player
  * 
  *         if track == NULL or track.type_state == NULL:             # <<<<<<<<<<<<<<
@@ -12156,7 +12242,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":976
+    /* "mpfmc/core/audio/track_sound_loop.pyx":983
  * 
  *         if track == NULL or track.type_state == NULL:
  *             return             # <<<<<<<<<<<<<<
@@ -12165,7 +12251,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":975
+    /* "mpfmc/core/audio/track_sound_loop.pyx":982
  *         cdef SoundLoopSetPlayer *player
  * 
  *         if track == NULL or track.type_state == NULL:             # <<<<<<<<<<<<<<
@@ -12174,7 +12260,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":978
+  /* "mpfmc/core/audio/track_sound_loop.pyx":985
  *             return
  * 
  *         sound_loop_track = <TrackSoundLoopState*>track.type_state             # <<<<<<<<<<<<<<
@@ -12183,7 +12269,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   __pyx_v_sound_loop_track = ((__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoopState *)__pyx_v_track->type_state);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":984
+  /* "mpfmc/core/audio/track_sound_loop.pyx":991
  * 
  *         # If the current player is idle, the track is not active so there is nothing to do
  *         if sound_loop_track.current == NULL or sound_loop_track.current.status == player_idle:             # <<<<<<<<<<<<<<
@@ -12201,7 +12287,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
   __pyx_L7_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":985
+    /* "mpfmc/core/audio/track_sound_loop.pyx":992
  *         # If the current player is idle, the track is not active so there is nothing to do
  *         if sound_loop_track.current == NULL or sound_loop_track.current.status == player_idle:
  *             return             # <<<<<<<<<<<<<<
@@ -12210,7 +12296,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":984
+    /* "mpfmc/core/audio/track_sound_loop.pyx":991
  * 
  *         # If the current player is idle, the track is not active so there is nothing to do
  *         if sound_loop_track.current == NULL or sound_loop_track.current.status == player_idle:             # <<<<<<<<<<<<<<
@@ -12219,7 +12305,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":988
+  /* "mpfmc/core/audio/track_sound_loop.pyx":995
  * 
  *         # Set flag indicating there is at least some activity on the track (it is active)
  *         track.active = True             # <<<<<<<<<<<<<<
@@ -12228,7 +12314,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   __pyx_v_track->active = 1;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":991
+  /* "mpfmc/core/audio/track_sound_loop.pyx":998
  * 
  *         # Process the current loop player (fill the track buffer with samples)
  *         track_buffer_pos = 0             # <<<<<<<<<<<<<<
@@ -12237,7 +12323,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   __pyx_v_track_buffer_pos = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":992
+  /* "mpfmc/core/audio/track_sound_loop.pyx":999
  *         # Process the current loop player (fill the track buffer with samples)
  *         track_buffer_pos = 0
  *         while track_buffer_pos < buffer_length and sound_loop_track.current.status \             # <<<<<<<<<<<<<<
@@ -12252,7 +12338,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
       goto __pyx_L11_bool_binop_done;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":993
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1000
  *         track_buffer_pos = 0
  *         while track_buffer_pos < buffer_length and sound_loop_track.current.status \
  *                 in (player_playing, player_fading_in, player_fading_out):             # <<<<<<<<<<<<<<
@@ -12274,7 +12360,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     __pyx_L11_bool_binop_done:;
     if (!__pyx_t_1) break;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":995
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1002
  *                 in (player_playing, player_fading_in, player_fading_out):
  * 
  *             track_buffer_pos = get_player_sound_samples(track, sound_loop_track.current,             # <<<<<<<<<<<<<<
@@ -12283,7 +12369,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
     __pyx_v_track_buffer_pos = __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_samples(__pyx_v_track, __pyx_v_sound_loop_track->current, __pyx_v_buffer_length, __pyx_v_track_buffer_pos, __pyx_v_callback_data);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1001
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1008
  *             # Determine if we have reached the stop position for the loop (might not be at the end) or the
  *             # loop has finished fading out and is now idle.
  *             if sound_loop_track.current.sample_pos == sound_loop_track.current.stop_loop_at_pos or \             # <<<<<<<<<<<<<<
@@ -12297,7 +12383,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
       goto __pyx_L14_bool_binop_done;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1002
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1009
  *             # loop has finished fading out and is now idle.
  *             if sound_loop_track.current.sample_pos == sound_loop_track.current.stop_loop_at_pos or \
  *                     sound_loop_track.current.status == player_idle:             # <<<<<<<<<<<<<<
@@ -12308,7 +12394,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     __pyx_t_1 = __pyx_t_3;
     __pyx_L14_bool_binop_done:;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1001
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1008
  *             # Determine if we have reached the stop position for the loop (might not be at the end) or the
  *             # loop has finished fading out and is now idle.
  *             if sound_loop_track.current.sample_pos == sound_loop_track.current.stop_loop_at_pos or \             # <<<<<<<<<<<<<<
@@ -12317,7 +12403,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1004
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1011
  *                     sound_loop_track.current.status == player_idle:
  * 
  *                 sound_loop_track.current.status = player_idle             # <<<<<<<<<<<<<<
@@ -12326,7 +12412,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
       __pyx_v_sound_loop_track->current->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1007
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1014
  * 
  *                 # Send stopped notification
  *                 send_sound_loop_set_stopped_notification(sound_loop_track.current.master_sound_layer.sound_loop_set_id,             # <<<<<<<<<<<<<<
@@ -12335,7 +12421,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
       __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_stopped_notification(__pyx_v_sound_loop_track->current->master_sound_layer.sound_loop_set_id, __pyx_v_sound_loop_track->current->master_sound_layer.sound_id, __pyx_v_track);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1012
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1019
  * 
  *                 # This player has finished, switch the other player to current at the end of this method
  *                 switch_players = True             # <<<<<<<<<<<<<<
@@ -12344,7 +12430,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
       __pyx_v_switch_players = 1;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1015
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1022
  * 
  *                 # If the other player has a sound loop pending, set the variables to start it playing
  *                 if sound_loop_track.next.status == player_pending:             # <<<<<<<<<<<<<<
@@ -12354,7 +12440,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
       __pyx_t_1 = ((__pyx_v_sound_loop_track->next->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_pending) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1016
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1023
  *                 # If the other player has a sound loop pending, set the variables to start it playing
  *                 if sound_loop_track.next.status == player_pending:
  *                     reset_track_buffer_pos = False             # <<<<<<<<<<<<<<
@@ -12363,7 +12449,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
         __pyx_v_reset_track_buffer_pos = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1017
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1024
  *                 if sound_loop_track.next.status == player_pending:
  *                     reset_track_buffer_pos = False
  *                     sound_loop_track.next.status = player_playing             # <<<<<<<<<<<<<<
@@ -12372,7 +12458,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
         __pyx_v_sound_loop_track->next->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_playing;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1018
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1025
  *                     reset_track_buffer_pos = False
  *                     sound_loop_track.next.status = player_playing
  *                     send_sound_loop_set_started_notification(sound_loop_track.next.master_sound_layer.sound_loop_set_id,             # <<<<<<<<<<<<<<
@@ -12381,7 +12467,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
         __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_started_notification(__pyx_v_sound_loop_track->next->master_sound_layer.sound_loop_set_id, __pyx_v_sound_loop_track->next->master_sound_layer.sound_id, __pyx_v_track);
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1015
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1022
  * 
  *                 # If the other player has a sound loop pending, set the variables to start it playing
  *                 if sound_loop_track.next.status == player_pending:             # <<<<<<<<<<<<<<
@@ -12390,7 +12476,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1001
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1008
  *             # Determine if we have reached the stop position for the loop (might not be at the end) or the
  *             # loop has finished fading out and is now idle.
  *             if sound_loop_track.current.sample_pos == sound_loop_track.current.stop_loop_at_pos or \             # <<<<<<<<<<<<<<
@@ -12400,7 +12486,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
       goto __pyx_L13;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1023
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1030
  * 
  *             # Determine if sound should continue to loop
  *             elif sound_loop_track.current.sample_pos >= sound_loop_track.current.length:             # <<<<<<<<<<<<<<
@@ -12410,7 +12496,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     __pyx_t_1 = ((__pyx_v_sound_loop_track->current->sample_pos >= __pyx_v_sound_loop_track->current->length) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1026
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1033
  * 
  *                     # Send looping notification
  *                     send_sound_loop_set_looping_notification(sound_loop_track.current.master_sound_layer.sound_loop_set_id,             # <<<<<<<<<<<<<<
@@ -12419,7 +12505,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
       __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_looping_notification(__pyx_v_sound_loop_track->current->master_sound_layer.sound_loop_set_id, __pyx_v_sound_loop_track->current->master_sound_layer.sound_id, __pyx_v_track);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1029
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1036
  *                                                              sound_loop_track.current.master_sound_layer.sound_id,
  *                                                              track)
  *                     sound_loop_track.current.sample_pos = 0             # <<<<<<<<<<<<<<
@@ -12428,7 +12514,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
       __pyx_v_sound_loop_track->current->sample_pos = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1023
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1030
  * 
  *             # Determine if sound should continue to loop
  *             elif sound_loop_track.current.sample_pos >= sound_loop_track.current.length:             # <<<<<<<<<<<<<<
@@ -12439,7 +12525,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     __pyx_L13:;
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":1031
+  /* "mpfmc/core/audio/track_sound_loop.pyx":1038
  *                     sound_loop_track.current.sample_pos = 0
  * 
  *         if reset_track_buffer_pos:             # <<<<<<<<<<<<<<
@@ -12449,7 +12535,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
   __pyx_t_1 = (__pyx_v_reset_track_buffer_pos != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1032
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1039
  * 
  *         if reset_track_buffer_pos:
  *             track_buffer_pos = 0             # <<<<<<<<<<<<<<
@@ -12458,7 +12544,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
     __pyx_v_track_buffer_pos = 0;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1031
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1038
  *                     sound_loop_track.current.sample_pos = 0
  * 
  *         if reset_track_buffer_pos:             # <<<<<<<<<<<<<<
@@ -12467,7 +12553,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":1035
+  /* "mpfmc/core/audio/track_sound_loop.pyx":1042
  * 
  *         # Now process the next player
  *         while track_buffer_pos < buffer_length and sound_loop_track.next.status \             # <<<<<<<<<<<<<<
@@ -12482,7 +12568,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
       goto __pyx_L20_bool_binop_done;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1036
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1043
  *         # Now process the next player
  *         while track_buffer_pos < buffer_length and sound_loop_track.next.status \
  *                 in (player_playing, player_fading_in, player_fading_out):             # <<<<<<<<<<<<<<
@@ -12504,7 +12590,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     __pyx_L20_bool_binop_done:;
     if (!__pyx_t_1) break;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1038
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1045
  *                 in (player_playing, player_fading_in, player_fading_out):
  * 
  *             track_buffer_pos = get_player_sound_samples(track, sound_loop_track.next,             # <<<<<<<<<<<<<<
@@ -12513,7 +12599,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
     __pyx_v_track_buffer_pos = __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_samples(__pyx_v_track, __pyx_v_sound_loop_track->next, __pyx_v_buffer_length, __pyx_v_track_buffer_pos, __pyx_v_callback_data);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1047
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1054
  * 
  *             # Check if we have reached the end of the sound loop.
  *             if sound_loop_track.next.sample_pos >= sound_loop_track.next.length:             # <<<<<<<<<<<<<<
@@ -12523,7 +12609,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     __pyx_t_1 = ((__pyx_v_sound_loop_track->next->sample_pos >= __pyx_v_sound_loop_track->next->length) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1049
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1056
  *             if sound_loop_track.next.sample_pos >= sound_loop_track.next.length:
  *                 # End of sound loop reached, the next player will always loop
  *                 send_sound_loop_set_looping_notification(sound_loop_track.next.master_sound_layer.sound_loop_set_id,             # <<<<<<<<<<<<<<
@@ -12532,7 +12618,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
       __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_looping_notification(__pyx_v_sound_loop_track->next->master_sound_layer.sound_loop_set_id, __pyx_v_sound_loop_track->next->master_sound_layer.sound_id, __pyx_v_track);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1052
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1059
  *                                                          sound_loop_track.next.master_sound_layer.sound_id,
  *                                                          track)
  *                 sound_loop_track.next.sample_pos = 0             # <<<<<<<<<<<<<<
@@ -12541,7 +12627,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
       __pyx_v_sound_loop_track->next->sample_pos = 0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1047
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1054
  * 
  *             # Check if we have reached the end of the sound loop.
  *             if sound_loop_track.next.sample_pos >= sound_loop_track.next.length:             # <<<<<<<<<<<<<<
@@ -12550,7 +12636,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1055
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1062
  * 
  *             # Check if sound loop has finished playing/fading out
  *             if sound_loop_track.next.status == player_idle:             # <<<<<<<<<<<<<<
@@ -12560,7 +12646,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     __pyx_t_1 = ((__pyx_v_sound_loop_track->next->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1057
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1064
  *             if sound_loop_track.next.status == player_idle:
  *                 # Sound stopped, send notification
  *                 send_sound_loop_set_stopped_notification(sound_loop_track.next.master_sound_layer.sound_loop_set_id,             # <<<<<<<<<<<<<<
@@ -12569,7 +12655,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
       __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_loop_set_stopped_notification(__pyx_v_sound_loop_track->next->master_sound_layer.sound_loop_set_id, __pyx_v_sound_loop_track->next->master_sound_layer.sound_id, __pyx_v_track);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1055
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1062
  * 
  *             # Check if sound loop has finished playing/fading out
  *             if sound_loop_track.next.status == player_idle:             # <<<<<<<<<<<<<<
@@ -12579,7 +12665,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     }
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":1062
+  /* "mpfmc/core/audio/track_sound_loop.pyx":1069
  * 
  *         # Switch current and next players (if necessary)
  *         if switch_players:             # <<<<<<<<<<<<<<
@@ -12589,7 +12675,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
   __pyx_t_1 = (__pyx_v_switch_players != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1063
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1070
  *         # Switch current and next players (if necessary)
  *         if switch_players:
  *             player = sound_loop_track.current             # <<<<<<<<<<<<<<
@@ -12599,7 +12685,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     __pyx_t_4 = __pyx_v_sound_loop_track->current;
     __pyx_v_player = __pyx_t_4;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1064
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1071
  *         if switch_players:
  *             player = sound_loop_track.current
  *             sound_loop_track.current = sound_loop_track.next             # <<<<<<<<<<<<<<
@@ -12609,7 +12695,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
     __pyx_t_4 = __pyx_v_sound_loop_track->next;
     __pyx_v_sound_loop_track->current = __pyx_t_4;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1065
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1072
  *             player = sound_loop_track.current
  *             sound_loop_track.current = sound_loop_track.next
  *             sound_loop_track.next = player             # <<<<<<<<<<<<<<
@@ -12618,7 +12704,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
     __pyx_v_sound_loop_track->next = __pyx_v_player;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1062
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1069
  * 
  *         # Switch current and next players (if necessary)
  *         if switch_players:             # <<<<<<<<<<<<<<
@@ -12627,7 +12713,7 @@ static void __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_mix_
  */
   }
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":958
+  /* "mpfmc/core/audio/track_sound_loop.pyx":965
  * 
  *     @staticmethod
  *     cdef void mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil:             # <<<<<<<<<<<<<<
@@ -12748,7 +12834,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoo
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":1067
+/* "mpfmc/core/audio/track_sound_loop.pyx":1074
  *             sound_loop_track.next = player
  * 
  * cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *player,             # <<<<<<<<<<<<<<
@@ -12782,7 +12868,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
   int __pyx_t_11;
   GSList *__pyx_t_12;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":1096
+  /* "mpfmc/core/audio/track_sound_loop.pyx":1103
  *     cdef Uint32 layer_sample_pos, layer_bytes_remaining, layer_chunk_bytes, current_chunk_bytes, temp_chunk_bytes
  *     cdef Uint32 layer_track_buffer_pos_offset
  *     cdef Uint32 buffer_bytes_remaining = buffer_length - track_buffer_pos             # <<<<<<<<<<<<<<
@@ -12791,7 +12877,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
   __pyx_v_buffer_bytes_remaining = (__pyx_v_buffer_length - __pyx_v_track_buffer_pos);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":1099
+  /* "mpfmc/core/audio/track_sound_loop.pyx":1106
  * 
  *     # Loop over the output buffer
  *     while buffer_bytes_remaining > 0:             # <<<<<<<<<<<<<<
@@ -12802,7 +12888,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
     __pyx_t_1 = ((__pyx_v_buffer_bytes_remaining > 0) != 0);
     if (!__pyx_t_1) break;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1105
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1112
  * 
  *         # Calculate the size and volume of chunk (handle fading)
  *         if player.status == player_fading_in:             # <<<<<<<<<<<<<<
@@ -12812,7 +12898,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
     switch (__pyx_v_player->status) {
       case __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_in:
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1107
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1114
  *         if player.status == player_fading_in:
  *             current_chunk_bytes = min(buffer_bytes_remaining,
  *                                       player.length - player.sample_pos,             # <<<<<<<<<<<<<<
@@ -12821,7 +12907,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       __pyx_t_2 = (__pyx_v_player->length - __pyx_v_player->sample_pos);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1108
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1115
  *             current_chunk_bytes = min(buffer_bytes_remaining,
  *                                       player.length - player.sample_pos,
  *                                       callback_data.bytes_per_control_point)             # <<<<<<<<<<<<<<
@@ -12830,7 +12916,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       __pyx_t_3 = __pyx_v_callback_data->bytes_per_control_point;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1106
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1113
  *         # Calculate the size and volume of chunk (handle fading)
  *         if player.status == player_fading_in:
  *             current_chunk_bytes = min(buffer_bytes_remaining,             # <<<<<<<<<<<<<<
@@ -12839,7 +12925,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       __pyx_t_4 = __pyx_v_buffer_bytes_remaining;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1107
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1114
  *         if player.status == player_fading_in:
  *             current_chunk_bytes = min(buffer_bytes_remaining,
  *                                       player.length - player.sample_pos,             # <<<<<<<<<<<<<<
@@ -12853,7 +12939,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       }
       __pyx_t_4 = __pyx_t_5;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1108
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1115
  *             current_chunk_bytes = min(buffer_bytes_remaining,
  *                                       player.length - player.sample_pos,
  *                                       callback_data.bytes_per_control_point)             # <<<<<<<<<<<<<<
@@ -12867,7 +12953,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       }
       __pyx_v_current_chunk_bytes = __pyx_t_5;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1109
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1116
  *                                       player.length - player.sample_pos,
  *                                       callback_data.bytes_per_control_point)
  *             player_volume = <Uint8> (in_out_quad((player.master_sound_layer.fade_in_steps - player.master_sound_layer.fade_steps_remaining) / player.master_sound_layer.fade_in_steps) * SDL_MIX_MAXVOLUME)             # <<<<<<<<<<<<<<
@@ -12883,11 +12969,11 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
         #ifdef WITH_THREAD
         __Pyx_PyGILState_Release(__pyx_gilstate_save);
         #endif
-        __PYX_ERR(0, 1109, __pyx_L1_error)
+        __PYX_ERR(0, 1116, __pyx_L1_error)
       }
       __pyx_v_player_volume = ((Uint8)(__pyx_f_5mpfmc_4core_5audio_6inline_in_out_quad((((double)__pyx_t_5) / ((double)__pyx_v_player->master_sound_layer.fade_in_steps))) * SDL_MIX_MAXVOLUME));
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1110
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1117
  *                                       callback_data.bytes_per_control_point)
  *             player_volume = <Uint8> (in_out_quad((player.master_sound_layer.fade_in_steps - player.master_sound_layer.fade_steps_remaining) / player.master_sound_layer.fade_in_steps) * SDL_MIX_MAXVOLUME)
  *             player.master_sound_layer.fade_steps_remaining -= 1             # <<<<<<<<<<<<<<
@@ -12896,7 +12982,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       __pyx_v_player->master_sound_layer.fade_steps_remaining = (__pyx_v_player->master_sound_layer.fade_steps_remaining - 1);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1111
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1118
  *             player_volume = <Uint8> (in_out_quad((player.master_sound_layer.fade_in_steps - player.master_sound_layer.fade_steps_remaining) / player.master_sound_layer.fade_in_steps) * SDL_MIX_MAXVOLUME)
  *             player.master_sound_layer.fade_steps_remaining -= 1
  *             if player.master_sound_layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
@@ -12906,7 +12992,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       __pyx_t_1 = ((__pyx_v_player->master_sound_layer.fade_steps_remaining == 0) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1112
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1119
  *             player.master_sound_layer.fade_steps_remaining -= 1
  *             if player.master_sound_layer.fade_steps_remaining == 0:
  *                 player.status = player_playing             # <<<<<<<<<<<<<<
@@ -12915,7 +13001,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
         __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_playing;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1111
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1118
  *             player_volume = <Uint8> (in_out_quad((player.master_sound_layer.fade_in_steps - player.master_sound_layer.fade_steps_remaining) / player.master_sound_layer.fade_in_steps) * SDL_MIX_MAXVOLUME)
  *             player.master_sound_layer.fade_steps_remaining -= 1
  *             if player.master_sound_layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
@@ -12924,7 +13010,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1105
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1112
  * 
  *         # Calculate the size and volume of chunk (handle fading)
  *         if player.status == player_fading_in:             # <<<<<<<<<<<<<<
@@ -12933,7 +13019,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       break;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1114
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1121
  *                 player.status = player_playing
  * 
  *         elif player.status == player_fading_out:             # <<<<<<<<<<<<<<
@@ -12942,7 +13028,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       case __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_fading_out:
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1116
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1123
  *         elif player.status == player_fading_out:
  *             current_chunk_bytes = min(buffer_bytes_remaining,
  *                                       player.length - player.sample_pos,             # <<<<<<<<<<<<<<
@@ -12951,7 +13037,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       __pyx_t_5 = (__pyx_v_player->length - __pyx_v_player->sample_pos);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1117
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1124
  *             current_chunk_bytes = min(buffer_bytes_remaining,
  *                                       player.length - player.sample_pos,
  *                                       callback_data.bytes_per_control_point)             # <<<<<<<<<<<<<<
@@ -12960,7 +13046,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       __pyx_t_3 = __pyx_v_callback_data->bytes_per_control_point;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1115
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1122
  * 
  *         elif player.status == player_fading_out:
  *             current_chunk_bytes = min(buffer_bytes_remaining,             # <<<<<<<<<<<<<<
@@ -12969,7 +13055,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       __pyx_t_2 = __pyx_v_buffer_bytes_remaining;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1116
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1123
  *         elif player.status == player_fading_out:
  *             current_chunk_bytes = min(buffer_bytes_remaining,
  *                                       player.length - player.sample_pos,             # <<<<<<<<<<<<<<
@@ -12983,7 +13069,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       }
       __pyx_t_2 = __pyx_t_4;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1117
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1124
  *             current_chunk_bytes = min(buffer_bytes_remaining,
  *                                       player.length - player.sample_pos,
  *                                       callback_data.bytes_per_control_point)             # <<<<<<<<<<<<<<
@@ -12997,7 +13083,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       }
       __pyx_v_current_chunk_bytes = __pyx_t_4;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1118
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1125
  *                                       player.length - player.sample_pos,
  *                                       callback_data.bytes_per_control_point)
  *             player_volume = <Uint8> (in_out_quad(player.master_sound_layer.fade_steps_remaining / player.master_sound_layer.fade_out_steps) * SDL_MIX_MAXVOLUME)             # <<<<<<<<<<<<<<
@@ -13012,11 +13098,11 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
         #ifdef WITH_THREAD
         __Pyx_PyGILState_Release(__pyx_gilstate_save);
         #endif
-        __PYX_ERR(0, 1118, __pyx_L1_error)
+        __PYX_ERR(0, 1125, __pyx_L1_error)
       }
       __pyx_v_player_volume = ((Uint8)(__pyx_f_5mpfmc_4core_5audio_6inline_in_out_quad((((double)__pyx_v_player->master_sound_layer.fade_steps_remaining) / ((double)__pyx_v_player->master_sound_layer.fade_out_steps))) * SDL_MIX_MAXVOLUME));
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1119
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1126
  *                                       callback_data.bytes_per_control_point)
  *             player_volume = <Uint8> (in_out_quad(player.master_sound_layer.fade_steps_remaining / player.master_sound_layer.fade_out_steps) * SDL_MIX_MAXVOLUME)
  *             player.master_sound_layer.fade_steps_remaining -= 1             # <<<<<<<<<<<<<<
@@ -13025,7 +13111,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       __pyx_v_player->master_sound_layer.fade_steps_remaining = (__pyx_v_player->master_sound_layer.fade_steps_remaining - 1);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1120
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1127
  *             player_volume = <Uint8> (in_out_quad(player.master_sound_layer.fade_steps_remaining / player.master_sound_layer.fade_out_steps) * SDL_MIX_MAXVOLUME)
  *             player.master_sound_layer.fade_steps_remaining -= 1
  *             if player.master_sound_layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
@@ -13035,7 +13121,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       __pyx_t_1 = ((__pyx_v_player->master_sound_layer.fade_steps_remaining == 0) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1121
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1128
  *             player.master_sound_layer.fade_steps_remaining -= 1
  *             if player.master_sound_layer.fade_steps_remaining == 0:
  *                 player.status = player_idle             # <<<<<<<<<<<<<<
@@ -13044,7 +13130,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
         __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1120
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1127
  *             player_volume = <Uint8> (in_out_quad(player.master_sound_layer.fade_steps_remaining / player.master_sound_layer.fade_out_steps) * SDL_MIX_MAXVOLUME)
  *             player.master_sound_layer.fade_steps_remaining -= 1
  *             if player.master_sound_layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
@@ -13053,7 +13139,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1114
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1121
  *                 player.status = player_playing
  * 
  *         elif player.status == player_fading_out:             # <<<<<<<<<<<<<<
@@ -13063,7 +13149,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       break;
       default:
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1123
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1130
  *                 player.status = player_idle
  *         else:
  *             current_chunk_bytes = min(buffer_bytes_remaining, player.length - player.sample_pos)             # <<<<<<<<<<<<<<
@@ -13079,7 +13165,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       }
       __pyx_v_current_chunk_bytes = __pyx_t_2;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1124
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1131
  *         else:
  *             current_chunk_bytes = min(buffer_bytes_remaining, player.length - player.sample_pos)
  *             player_volume = SDL_MIX_MAXVOLUME             # <<<<<<<<<<<<<<
@@ -13090,7 +13176,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       break;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1127
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1134
  * 
  *         # Adjust chunk size if the loop is set to stop early (if not the chunk size will remain unchanged)
  *         if player.sample_pos < player.stop_loop_at_pos:             # <<<<<<<<<<<<<<
@@ -13100,7 +13186,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
     __pyx_t_1 = ((__pyx_v_player->sample_pos < __pyx_v_player->stop_loop_at_pos) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1128
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1135
  *         # Adjust chunk size if the loop is set to stop early (if not the chunk size will remain unchanged)
  *         if player.sample_pos < player.stop_loop_at_pos:
  *             current_chunk_bytes = min(current_chunk_bytes, player.stop_loop_at_pos - player.sample_pos)             # <<<<<<<<<<<<<<
@@ -13116,7 +13202,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       }
       __pyx_v_current_chunk_bytes = __pyx_t_5;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1127
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1134
  * 
  *         # Adjust chunk size if the loop is set to stop early (if not the chunk size will remain unchanged)
  *         if player.sample_pos < player.stop_loop_at_pos:             # <<<<<<<<<<<<<<
@@ -13125,7 +13211,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1130
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1137
  *             current_chunk_bytes = min(current_chunk_bytes, player.stop_loop_at_pos - player.sample_pos)
  * 
  *         if player.status == player_idle:             # <<<<<<<<<<<<<<
@@ -13135,7 +13221,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
     __pyx_t_1 = ((__pyx_v_player->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_player_idle) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1131
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1138
  * 
  *         if player.status == player_idle:
  *             return buffer_length             # <<<<<<<<<<<<<<
@@ -13145,7 +13231,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       __pyx_r = __pyx_v_buffer_length;
       goto __pyx_L0;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1130
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1137
  *             current_chunk_bytes = min(current_chunk_bytes, player.stop_loop_at_pos - player.sample_pos)
  * 
  *         if player.status == player_idle:             # <<<<<<<<<<<<<<
@@ -13154,7 +13240,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1138
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1145
  *                            track.callback_data.format,
  *                            current_chunk_bytes,
  *                            player_volume * player.master_sound_layer.volume // SDL_MIX_MAXVOLUME)             # <<<<<<<<<<<<<<
@@ -13170,7 +13256,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       #ifdef WITH_THREAD
       __Pyx_PyGILState_Release(__pyx_gilstate_save);
       #endif
-      __PYX_ERR(0, 1138, __pyx_L1_error)
+      __PYX_ERR(0, 1145, __pyx_L1_error)
     }
     else if (sizeof(int) == sizeof(long) && (!(((int)-1) > 0)) && unlikely(SDL_MIX_MAXVOLUME == (int)-1)  && unlikely(UNARY_NEG_WOULD_OVERFLOW(__pyx_t_6))) {
       #ifdef WITH_THREAD
@@ -13180,10 +13266,10 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       #ifdef WITH_THREAD
       __Pyx_PyGILState_Release(__pyx_gilstate_save);
       #endif
-      __PYX_ERR(0, 1138, __pyx_L1_error)
+      __PYX_ERR(0, 1145, __pyx_L1_error)
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1134
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1141
  * 
  *         # Get master layer samples
  *         SDL_MixAudioFormat(track.buffer + track_buffer_pos,             # <<<<<<<<<<<<<<
@@ -13192,7 +13278,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
     SDL_MixAudioFormat((__pyx_v_track->buffer + __pyx_v_track_buffer_pos), (((Uint8 *)__pyx_v_player->master_sound_layer.sound->data.memory->data) + __pyx_v_player->sample_pos), __pyx_v_track->callback_data->format, __pyx_v_current_chunk_bytes, __Pyx_div_int(__pyx_t_6, SDL_MIX_MAXVOLUME));
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1143
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1150
  *         # Note: the current sample position has already been incremented when the sample data was received so
  *         # we need to look backwards from the current position to determine if marker falls in chunk window.
  *         for marker_id in range(player.master_sound_layer.marker_count):             # <<<<<<<<<<<<<<
@@ -13204,7 +13290,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
     for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
       __pyx_v_marker_id = __pyx_t_9;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1144
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1151
  *         # we need to look backwards from the current position to determine if marker falls in chunk window.
  *         for marker_id in range(player.master_sound_layer.marker_count):
  *             if player.sample_pos - current_chunk_bytes <= g_array_index_uint(player.master_sound_layer.markers, marker_id) < player.sample_pos:             # <<<<<<<<<<<<<<
@@ -13219,7 +13305,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       __pyx_t_11 = (__pyx_t_1 != 0);
       if (__pyx_t_11) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1146
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1153
  *             if player.sample_pos - current_chunk_bytes <= g_array_index_uint(player.master_sound_layer.markers, marker_id) < player.sample_pos:
  *                 # Marker is in window, send notification
  *                 send_sound_marker_notification(0,             # <<<<<<<<<<<<<<
@@ -13228,7 +13314,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
         __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_marker_notification(0, __pyx_v_player->master_sound_layer.sound_id, __pyx_v_player->master_sound_layer.sound_loop_set_id, __pyx_v_track, __pyx_v_marker_id);
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1144
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1151
  *         # we need to look backwards from the current position to determine if marker falls in chunk window.
  *         for marker_id in range(player.master_sound_layer.marker_count):
  *             if player.sample_pos - current_chunk_bytes <= g_array_index_uint(player.master_sound_layer.markers, marker_id) < player.sample_pos:             # <<<<<<<<<<<<<<
@@ -13238,7 +13324,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       }
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1153
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1160
  * 
  *         # Now mix any additional loop layers
  *         layer_iterator = player.layers             # <<<<<<<<<<<<<<
@@ -13248,7 +13334,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
     __pyx_t_12 = __pyx_v_player->layers;
     __pyx_v_layer_iterator = __pyx_t_12;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1154
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1161
  *         # Now mix any additional loop layers
  *         layer_iterator = player.layers
  *         while layer_iterator != NULL:             # <<<<<<<<<<<<<<
@@ -13259,7 +13345,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       __pyx_t_11 = ((__pyx_v_layer_iterator != NULL) != 0);
       if (!__pyx_t_11) break;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1155
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1162
  *         layer_iterator = player.layers
  *         while layer_iterator != NULL:
  *             layer = <SoundLoopLayerSettings*>layer_iterator.data             # <<<<<<<<<<<<<<
@@ -13268,7 +13354,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       __pyx_v_layer = ((__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *)__pyx_v_layer_iterator->data);
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1157
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1164
  *             layer = <SoundLoopLayerSettings*>layer_iterator.data
  * 
  *             if player.sample_pos == 0:             # <<<<<<<<<<<<<<
@@ -13278,7 +13364,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       __pyx_t_11 = ((__pyx_v_player->sample_pos == 0) != 0);
       if (__pyx_t_11) {
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1159
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1166
  *             if player.sample_pos == 0:
  * 
  *                 if layer.status == layer_queued:             # <<<<<<<<<<<<<<
@@ -13288,7 +13374,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
         __pyx_t_11 = ((__pyx_v_layer->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_queued) != 0);
         if (__pyx_t_11) {
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1160
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1167
  * 
  *                 if layer.status == layer_queued:
  *                     layer.status = layer_playing             # <<<<<<<<<<<<<<
@@ -13297,7 +13383,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
           __pyx_v_layer->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1159
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1166
  *             if player.sample_pos == 0:
  * 
  *                 if layer.status == layer_queued:             # <<<<<<<<<<<<<<
@@ -13306,7 +13392,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
         }
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1162
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1169
  *                     layer.status = layer_playing
  * 
  *                 if not layer.looping:             # <<<<<<<<<<<<<<
@@ -13316,7 +13402,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
         __pyx_t_11 = ((!(__pyx_v_layer->looping != 0)) != 0);
         if (__pyx_t_11) {
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1163
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1170
  * 
  *                 if not layer.looping:
  *                     layer.status = layer_stopped             # <<<<<<<<<<<<<<
@@ -13325,7 +13411,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
           __pyx_v_layer->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_stopped;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1162
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1169
  *                     layer.status = layer_playing
  * 
  *                 if not layer.looping:             # <<<<<<<<<<<<<<
@@ -13334,7 +13420,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
         }
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1157
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1164
  *             layer = <SoundLoopLayerSettings*>layer_iterator.data
  * 
  *             if player.sample_pos == 0:             # <<<<<<<<<<<<<<
@@ -13343,7 +13429,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1165
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1172
  *                     layer.status = layer_stopped
  * 
  *             if layer.status in (layer_playing, layer_fading_in, layer_fading_out):             # <<<<<<<<<<<<<<
@@ -13355,7 +13441,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
         case __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_in:
         case __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out:
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1166
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1173
  * 
  *             if layer.status in (layer_playing, layer_fading_in, layer_fading_out):
  *                 layer_track_buffer_pos_offset = 0             # <<<<<<<<<<<<<<
@@ -13364,7 +13450,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
         __pyx_v_layer_track_buffer_pos_offset = 0;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1167
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1174
  *             if layer.status in (layer_playing, layer_fading_in, layer_fading_out):
  *                 layer_track_buffer_pos_offset = 0
  *                 layer_sample_pos = player.sample_pos             # <<<<<<<<<<<<<<
@@ -13374,7 +13460,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
         __pyx_t_5 = __pyx_v_player->sample_pos;
         __pyx_v_layer_sample_pos = __pyx_t_5;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1168
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1175
  *                 layer_track_buffer_pos_offset = 0
  *                 layer_sample_pos = player.sample_pos
  *                 layer_bytes_remaining = current_chunk_bytes             # <<<<<<<<<<<<<<
@@ -13383,7 +13469,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
         __pyx_v_layer_bytes_remaining = __pyx_v_current_chunk_bytes;
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1170
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1177
  *                 layer_bytes_remaining = current_chunk_bytes
  * 
  *                 while layer_bytes_remaining > 0:             # <<<<<<<<<<<<<<
@@ -13394,7 +13480,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
           __pyx_t_11 = ((__pyx_v_layer_bytes_remaining > 0) != 0);
           if (!__pyx_t_11) break;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1171
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1178
  * 
  *                 while layer_bytes_remaining > 0:
  *                     if layer.status == layer_playing:             # <<<<<<<<<<<<<<
@@ -13404,7 +13490,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
           __pyx_t_11 = ((__pyx_v_layer->status == __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing) != 0);
           if (__pyx_t_11) {
 
-            /* "mpfmc/core/audio/track_sound_loop.pyx":1172
+            /* "mpfmc/core/audio/track_sound_loop.pyx":1179
  *                 while layer_bytes_remaining > 0:
  *                     if layer.status == layer_playing:
  *                         layer_chunk_bytes = layer_bytes_remaining             # <<<<<<<<<<<<<<
@@ -13413,7 +13499,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
             __pyx_v_layer_chunk_bytes = __pyx_v_layer_bytes_remaining;
 
-            /* "mpfmc/core/audio/track_sound_loop.pyx":1173
+            /* "mpfmc/core/audio/track_sound_loop.pyx":1180
  *                     if layer.status == layer_playing:
  *                         layer_chunk_bytes = layer_bytes_remaining
  *                         layer_volume = layer.volume             # <<<<<<<<<<<<<<
@@ -13423,7 +13509,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
             __pyx_t_7 = __pyx_v_layer->volume;
             __pyx_v_layer_volume = __pyx_t_7;
 
-            /* "mpfmc/core/audio/track_sound_loop.pyx":1171
+            /* "mpfmc/core/audio/track_sound_loop.pyx":1178
  * 
  *                 while layer_bytes_remaining > 0:
  *                     if layer.status == layer_playing:             # <<<<<<<<<<<<<<
@@ -13433,7 +13519,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
             goto __pyx_L19;
           }
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1176
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1183
  *                     else:
  *                         # Calculate layer volume (handle fading)
  *                         layer_chunk_bytes = min(callback_data.bytes_per_control_point, layer_bytes_remaining)             # <<<<<<<<<<<<<<
@@ -13450,7 +13536,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
             }
             __pyx_v_layer_chunk_bytes = __pyx_t_2;
 
-            /* "mpfmc/core/audio/track_sound_loop.pyx":1177
+            /* "mpfmc/core/audio/track_sound_loop.pyx":1184
  *                         # Calculate layer volume (handle fading)
  *                         layer_chunk_bytes = min(callback_data.bytes_per_control_point, layer_bytes_remaining)
  *                         if layer.status == layer_fading_in:             # <<<<<<<<<<<<<<
@@ -13460,7 +13546,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
             switch (__pyx_v_layer->status) {
               case __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_in:
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1178
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1185
  *                         layer_chunk_bytes = min(callback_data.bytes_per_control_point, layer_bytes_remaining)
  *                         if layer.status == layer_fading_in:
  *                             layer_volume = <Uint8> (in_out_quad((layer.fade_in_steps - layer.fade_steps_remaining) / layer.fade_in_steps) * layer.volume)             # <<<<<<<<<<<<<<
@@ -13476,11 +13562,11 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
                 #ifdef WITH_THREAD
                 __Pyx_PyGILState_Release(__pyx_gilstate_save);
                 #endif
-                __PYX_ERR(0, 1178, __pyx_L1_error)
+                __PYX_ERR(0, 1185, __pyx_L1_error)
               }
               __pyx_v_layer_volume = ((Uint8)(__pyx_f_5mpfmc_4core_5audio_6inline_in_out_quad((((double)__pyx_t_2) / ((double)__pyx_v_layer->fade_in_steps))) * __pyx_v_layer->volume));
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1179
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1186
  *                         if layer.status == layer_fading_in:
  *                             layer_volume = <Uint8> (in_out_quad((layer.fade_in_steps - layer.fade_steps_remaining) / layer.fade_in_steps) * layer.volume)
  *                             layer.fade_steps_remaining -= 1             # <<<<<<<<<<<<<<
@@ -13489,7 +13575,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
               __pyx_v_layer->fade_steps_remaining = (__pyx_v_layer->fade_steps_remaining - 1);
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1180
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1187
  *                             layer_volume = <Uint8> (in_out_quad((layer.fade_in_steps - layer.fade_steps_remaining) / layer.fade_in_steps) * layer.volume)
  *                             layer.fade_steps_remaining -= 1
  *                             if layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
@@ -13499,7 +13585,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
               __pyx_t_11 = ((__pyx_v_layer->fade_steps_remaining == 0) != 0);
               if (__pyx_t_11) {
 
-                /* "mpfmc/core/audio/track_sound_loop.pyx":1181
+                /* "mpfmc/core/audio/track_sound_loop.pyx":1188
  *                             layer.fade_steps_remaining -= 1
  *                             if layer.fade_steps_remaining == 0:
  *                                 layer.status = layer_playing             # <<<<<<<<<<<<<<
@@ -13508,7 +13594,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
                 __pyx_v_layer->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_playing;
 
-                /* "mpfmc/core/audio/track_sound_loop.pyx":1180
+                /* "mpfmc/core/audio/track_sound_loop.pyx":1187
  *                             layer_volume = <Uint8> (in_out_quad((layer.fade_in_steps - layer.fade_steps_remaining) / layer.fade_in_steps) * layer.volume)
  *                             layer.fade_steps_remaining -= 1
  *                             if layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
@@ -13517,7 +13603,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
               }
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1177
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1184
  *                         # Calculate layer volume (handle fading)
  *                         layer_chunk_bytes = min(callback_data.bytes_per_control_point, layer_bytes_remaining)
  *                         if layer.status == layer_fading_in:             # <<<<<<<<<<<<<<
@@ -13526,7 +13612,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
               break;
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1182
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1189
  *                             if layer.fade_steps_remaining == 0:
  *                                 layer.status = layer_playing
  *                         elif layer.status == layer_fading_out:             # <<<<<<<<<<<<<<
@@ -13535,7 +13621,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
               case __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_fading_out:
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1183
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1190
  *                                 layer.status = layer_playing
  *                         elif layer.status == layer_fading_out:
  *                             layer_volume = <Uint8> (in_out_quad(layer.fade_steps_remaining / layer.fade_out_steps) * layer.volume)             # <<<<<<<<<<<<<<
@@ -13550,11 +13636,11 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
                 #ifdef WITH_THREAD
                 __Pyx_PyGILState_Release(__pyx_gilstate_save);
                 #endif
-                __PYX_ERR(0, 1183, __pyx_L1_error)
+                __PYX_ERR(0, 1190, __pyx_L1_error)
               }
               __pyx_v_layer_volume = ((Uint8)(__pyx_f_5mpfmc_4core_5audio_6inline_in_out_quad((((double)__pyx_v_layer->fade_steps_remaining) / ((double)__pyx_v_layer->fade_out_steps))) * __pyx_v_layer->volume));
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1184
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1191
  *                         elif layer.status == layer_fading_out:
  *                             layer_volume = <Uint8> (in_out_quad(layer.fade_steps_remaining / layer.fade_out_steps) * layer.volume)
  *                             layer.fade_steps_remaining -= 1             # <<<<<<<<<<<<<<
@@ -13563,7 +13649,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
               __pyx_v_layer->fade_steps_remaining = (__pyx_v_layer->fade_steps_remaining - 1);
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1185
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1192
  *                             layer_volume = <Uint8> (in_out_quad(layer.fade_steps_remaining / layer.fade_out_steps) * layer.volume)
  *                             layer.fade_steps_remaining -= 1
  *                             if layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
@@ -13573,7 +13659,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
               __pyx_t_11 = ((__pyx_v_layer->fade_steps_remaining == 0) != 0);
               if (__pyx_t_11) {
 
-                /* "mpfmc/core/audio/track_sound_loop.pyx":1186
+                /* "mpfmc/core/audio/track_sound_loop.pyx":1193
  *                             layer.fade_steps_remaining -= 1
  *                             if layer.fade_steps_remaining == 0:
  *                                 layer.status = layer_stopped             # <<<<<<<<<<<<<<
@@ -13582,7 +13668,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
                 __pyx_v_layer->status = __pyx_e_5mpfmc_4core_5audio_16track_sound_loop_layer_stopped;
 
-                /* "mpfmc/core/audio/track_sound_loop.pyx":1187
+                /* "mpfmc/core/audio/track_sound_loop.pyx":1194
  *                             if layer.fade_steps_remaining == 0:
  *                                 layer.status = layer_stopped
  *                                 layer_bytes_remaining = 0             # <<<<<<<<<<<<<<
@@ -13591,7 +13677,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
                 __pyx_v_layer_bytes_remaining = 0;
 
-                /* "mpfmc/core/audio/track_sound_loop.pyx":1185
+                /* "mpfmc/core/audio/track_sound_loop.pyx":1192
  *                             layer_volume = <Uint8> (in_out_quad(layer.fade_steps_remaining / layer.fade_out_steps) * layer.volume)
  *                             layer.fade_steps_remaining -= 1
  *                             if layer.fade_steps_remaining == 0:             # <<<<<<<<<<<<<<
@@ -13600,7 +13686,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
               }
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1182
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1189
  *                             if layer.fade_steps_remaining == 0:
  *                                 layer.status = layer_playing
  *                         elif layer.status == layer_fading_out:             # <<<<<<<<<<<<<<
@@ -13613,7 +13699,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
           }
           __pyx_L19:;
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1189
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1196
  *                                 layer_bytes_remaining = 0
  * 
  *                     if layer_sample_pos < layer.sound.data.memory.size:             # <<<<<<<<<<<<<<
@@ -13623,7 +13709,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
           __pyx_t_11 = ((__pyx_v_layer_sample_pos < __pyx_v_layer->sound->data.memory->size) != 0);
           if (__pyx_t_11) {
 
-            /* "mpfmc/core/audio/track_sound_loop.pyx":1193
+            /* "mpfmc/core/audio/track_sound_loop.pyx":1200
  *                                            <Uint8*>layer.sound.data.memory.data + layer_sample_pos,
  *                                            callback_data.format,
  *                                            min(layer_chunk_bytes, layer.sound.data.memory.size - layer_sample_pos),             # <<<<<<<<<<<<<<
@@ -13638,7 +13724,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
               __pyx_t_4 = __pyx_t_5;
             }
 
-            /* "mpfmc/core/audio/track_sound_loop.pyx":1194
+            /* "mpfmc/core/audio/track_sound_loop.pyx":1201
  *                                            callback_data.format,
  *                                            min(layer_chunk_bytes, layer.sound.data.memory.size - layer_sample_pos),
  *                                            player_volume * layer_volume // SDL_MIX_MAXVOLUME)             # <<<<<<<<<<<<<<
@@ -13654,7 +13740,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
               #ifdef WITH_THREAD
               __Pyx_PyGILState_Release(__pyx_gilstate_save);
               #endif
-              __PYX_ERR(0, 1194, __pyx_L1_error)
+              __PYX_ERR(0, 1201, __pyx_L1_error)
             }
             else if (sizeof(int) == sizeof(long) && (!(((int)-1) > 0)) && unlikely(SDL_MIX_MAXVOLUME == (int)-1)  && unlikely(UNARY_NEG_WOULD_OVERFLOW(__pyx_t_6))) {
               #ifdef WITH_THREAD
@@ -13664,10 +13750,10 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
               #ifdef WITH_THREAD
               __Pyx_PyGILState_Release(__pyx_gilstate_save);
               #endif
-              __PYX_ERR(0, 1194, __pyx_L1_error)
+              __PYX_ERR(0, 1201, __pyx_L1_error)
             }
 
-            /* "mpfmc/core/audio/track_sound_loop.pyx":1190
+            /* "mpfmc/core/audio/track_sound_loop.pyx":1197
  * 
  *                     if layer_sample_pos < layer.sound.data.memory.size:
  *                         SDL_MixAudioFormat(track.buffer + track_buffer_pos + layer_track_buffer_pos_offset,             # <<<<<<<<<<<<<<
@@ -13676,7 +13762,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
             SDL_MixAudioFormat(((__pyx_v_track->buffer + __pyx_v_track_buffer_pos) + __pyx_v_layer_track_buffer_pos_offset), (((Uint8 *)__pyx_v_layer->sound->data.memory->data) + __pyx_v_layer_sample_pos), __pyx_v_callback_data->format, __pyx_t_4, __Pyx_div_int(__pyx_t_6, SDL_MIX_MAXVOLUME));
 
-            /* "mpfmc/core/audio/track_sound_loop.pyx":1199
+            /* "mpfmc/core/audio/track_sound_loop.pyx":1206
  *                         # Note: the current sample position has already been incremented when the sample data was received so
  *                         # we need to look backwards from the current position to determine if marker falls in chunk window.
  *                         for marker_id in range(layer.marker_count):             # <<<<<<<<<<<<<<
@@ -13688,7 +13774,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
             for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
               __pyx_v_marker_id = __pyx_t_9;
 
-              /* "mpfmc/core/audio/track_sound_loop.pyx":1200
+              /* "mpfmc/core/audio/track_sound_loop.pyx":1207
  *                         # we need to look backwards from the current position to determine if marker falls in chunk window.
  *                         for marker_id in range(layer.marker_count):
  *                             if layer_sample_pos - layer_chunk_bytes <= g_array_index_uint(layer.markers, marker_id) < layer_sample_pos:             # <<<<<<<<<<<<<<
@@ -13703,7 +13789,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
               __pyx_t_1 = (__pyx_t_11 != 0);
               if (__pyx_t_1) {
 
-                /* "mpfmc/core/audio/track_sound_loop.pyx":1202
+                /* "mpfmc/core/audio/track_sound_loop.pyx":1209
  *                             if layer_sample_pos - layer_chunk_bytes <= g_array_index_uint(layer.markers, marker_id) < layer_sample_pos:
  *                                 # Marker is in window, send notification
  *                                 send_sound_marker_notification(0,             # <<<<<<<<<<<<<<
@@ -13712,7 +13798,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
                 __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_marker_notification(0, __pyx_v_layer->sound_id, __pyx_v_layer->sound_loop_set_id, __pyx_v_track, __pyx_v_marker_id);
 
-                /* "mpfmc/core/audio/track_sound_loop.pyx":1200
+                /* "mpfmc/core/audio/track_sound_loop.pyx":1207
  *                         # we need to look backwards from the current position to determine if marker falls in chunk window.
  *                         for marker_id in range(layer.marker_count):
  *                             if layer_sample_pos - layer_chunk_bytes <= g_array_index_uint(layer.markers, marker_id) < layer_sample_pos:             # <<<<<<<<<<<<<<
@@ -13722,7 +13808,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
               }
             }
 
-            /* "mpfmc/core/audio/track_sound_loop.pyx":1189
+            /* "mpfmc/core/audio/track_sound_loop.pyx":1196
  *                                 layer_bytes_remaining = 0
  * 
  *                     if layer_sample_pos < layer.sound.data.memory.size:             # <<<<<<<<<<<<<<
@@ -13731,7 +13817,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
           }
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1208
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1215
  *                                                                marker_id)
  * 
  *                     layer_track_buffer_pos_offset += layer_chunk_bytes             # <<<<<<<<<<<<<<
@@ -13740,7 +13826,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
           __pyx_v_layer_track_buffer_pos_offset = (__pyx_v_layer_track_buffer_pos_offset + __pyx_v_layer_chunk_bytes);
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1209
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1216
  * 
  *                     layer_track_buffer_pos_offset += layer_chunk_bytes
  *                     layer_sample_pos += layer_chunk_bytes             # <<<<<<<<<<<<<<
@@ -13749,7 +13835,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
           __pyx_v_layer_sample_pos = (__pyx_v_layer_sample_pos + __pyx_v_layer_chunk_bytes);
 
-          /* "mpfmc/core/audio/track_sound_loop.pyx":1210
+          /* "mpfmc/core/audio/track_sound_loop.pyx":1217
  *                     layer_track_buffer_pos_offset += layer_chunk_bytes
  *                     layer_sample_pos += layer_chunk_bytes
  *                     layer_bytes_remaining -= layer_chunk_bytes             # <<<<<<<<<<<<<<
@@ -13759,7 +13845,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
           __pyx_v_layer_bytes_remaining = (__pyx_v_layer_bytes_remaining - __pyx_v_layer_chunk_bytes);
         }
 
-        /* "mpfmc/core/audio/track_sound_loop.pyx":1165
+        /* "mpfmc/core/audio/track_sound_loop.pyx":1172
  *                     layer.status = layer_stopped
  * 
  *             if layer.status in (layer_playing, layer_fading_in, layer_fading_out):             # <<<<<<<<<<<<<<
@@ -13770,7 +13856,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
         default: break;
       }
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1213
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1220
  * 
  *             # Move to next layer
  *             layer_iterator = layer_iterator.next             # <<<<<<<<<<<<<<
@@ -13781,7 +13867,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       __pyx_v_layer_iterator = __pyx_t_12;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1216
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1223
  * 
  *         # Advance buffer pointers
  *         player.sample_pos += current_chunk_bytes             # <<<<<<<<<<<<<<
@@ -13790,7 +13876,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
     __pyx_v_player->sample_pos = (__pyx_v_player->sample_pos + __pyx_v_current_chunk_bytes);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1217
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1224
  *         # Advance buffer pointers
  *         player.sample_pos += current_chunk_bytes
  *         track_buffer_pos += current_chunk_bytes             # <<<<<<<<<<<<<<
@@ -13799,7 +13885,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
     __pyx_v_track_buffer_pos = (__pyx_v_track_buffer_pos + __pyx_v_current_chunk_bytes);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1218
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1225
  *         player.sample_pos += current_chunk_bytes
  *         track_buffer_pos += current_chunk_bytes
  *         buffer_bytes_remaining -= current_chunk_bytes             # <<<<<<<<<<<<<<
@@ -13808,7 +13894,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
     __pyx_v_buffer_bytes_remaining = (__pyx_v_buffer_bytes_remaining - __pyx_v_current_chunk_bytes);
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1222
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1229
  *         # Stop looping and generating samples if we have reached the end of the sound or
  *         # the player is now idle (due to reaching end of a fade out)
  *         if player.status == player_idle or \             # <<<<<<<<<<<<<<
@@ -13822,7 +13908,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       goto __pyx_L27_bool_binop_done;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1223
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1230
  *         # the player is now idle (due to reaching end of a fade out)
  *         if player.status == player_idle or \
  *                 player.sample_pos >= player.length or \             # <<<<<<<<<<<<<<
@@ -13836,7 +13922,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
       goto __pyx_L27_bool_binop_done;
     }
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1224
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1231
  *         if player.status == player_idle or \
  *                 player.sample_pos >= player.length or \
  *                 player.sample_pos == player.stop_loop_at_pos:             # <<<<<<<<<<<<<<
@@ -13847,7 +13933,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
     __pyx_t_1 = __pyx_t_11;
     __pyx_L27_bool_binop_done:;
 
-    /* "mpfmc/core/audio/track_sound_loop.pyx":1222
+    /* "mpfmc/core/audio/track_sound_loop.pyx":1229
  *         # Stop looping and generating samples if we have reached the end of the sound or
  *         # the player is now idle (due to reaching end of a fade out)
  *         if player.status == player_idle or \             # <<<<<<<<<<<<<<
@@ -13856,7 +13942,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1225
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1232
  *                 player.sample_pos >= player.length or \
  *                 player.sample_pos == player.stop_loop_at_pos:
  *             break             # <<<<<<<<<<<<<<
@@ -13865,7 +13951,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
  */
       goto __pyx_L4_break;
 
-      /* "mpfmc/core/audio/track_sound_loop.pyx":1222
+      /* "mpfmc/core/audio/track_sound_loop.pyx":1229
  *         # Stop looping and generating samples if we have reached the end of the sound or
  *         # the player is now idle (due to reaching end of a fade out)
  *         if player.status == player_idle or \             # <<<<<<<<<<<<<<
@@ -13876,7 +13962,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
   }
   __pyx_L4_break:;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":1227
+  /* "mpfmc/core/audio/track_sound_loop.pyx":1234
  *             break
  * 
  *     return track_buffer_pos             # <<<<<<<<<<<<<<
@@ -13886,7 +13972,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
   __pyx_r = __pyx_v_track_buffer_pos;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":1067
+  /* "mpfmc/core/audio/track_sound_loop.pyx":1074
  *             sound_loop_track.next = player
  * 
  * cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *player,             # <<<<<<<<<<<<<<
@@ -13902,7 +13988,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_sound_loop.pyx":1230
+/* "mpfmc/core/audio/track_sound_loop.pyx":1237
  * 
  * 
  * cdef inline SoundLoopLayerSettings *_create_sound_loop_layer_settings() nogil:             # <<<<<<<<<<<<<<
@@ -13913,7 +13999,7 @@ static Uint32 __pyx_f_5mpfmc_4core_5audio_16track_sound_loop_get_player_sound_sa
 static CYTHON_INLINE __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *__pyx_f_5mpfmc_4core_5audio_16track_sound_loop__create_sound_loop_layer_settings(void) {
   __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *__pyx_r;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":1235
+  /* "mpfmc/core/audio/track_sound_loop.pyx":1242
  *     :return: A pointer to the new settings struct.
  *     """
  *     return <SoundLoopLayerSettings*>g_slice_alloc0(sizeof(SoundLoopLayerSettings))             # <<<<<<<<<<<<<<
@@ -13921,7 +14007,7 @@ static CYTHON_INLINE __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLay
   __pyx_r = ((__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *)g_slice_alloc0((sizeof(__pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings))));
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":1230
+  /* "mpfmc/core/audio/track_sound_loop.pyx":1237
  * 
  * 
  * cdef inline SoundLoopLayerSettings *_create_sound_loop_layer_settings() nogil:             # <<<<<<<<<<<<<<
@@ -15364,10 +15450,10 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_n_s_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(0, 878, __pyx_L1_error)
+  __pyx_builtin_staticmethod = __Pyx_GetBuiltinName(__pyx_n_s_staticmethod); if (!__pyx_builtin_staticmethod) __PYX_ERR(0, 885, __pyx_L1_error)
   __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 44, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 556, __pyx_L1_error)
-  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) __PYX_ERR(0, 899, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 544, __pyx_L1_error)
+  __pyx_builtin_KeyError = __Pyx_GetBuiltinName(__pyx_n_s_KeyError); if (!__pyx_builtin_KeyError) __PYX_ERR(0, 906, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -15378,201 +15464,201 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":364
+  /* "mpfmc/core/audio/track_sound_loop.pyx":352
  *         else:
  *             # TODO: Handle case when both players are busy (i.e. during a cross-fade)
  *             self.log.info("Unable to play sound - both sound loop players are currently busy.")             # <<<<<<<<<<<<<<
  *             # print("Unable to play sound - both sound loop players are currently busy.")
  *             SDL_UnlockAudio()
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_u_Unable_to_play_sound_both_sound); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 364, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_u_Unable_to_play_sound_both_sound); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 352, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":570
+  /* "mpfmc/core/audio/track_sound_loop.pyx":558
  *         SDL_LockAudio()
  * 
  *         self.log.debug("Stopping current sound loop set")             # <<<<<<<<<<<<<<
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_Stopping_current_sound_loop_set); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 570, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_Stopping_current_sound_loop_set); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 558, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":573
+  /* "mpfmc/core/audio/track_sound_loop.pyx":561
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  *             self.log.info("Unable to stop sound loop set - no sound loop set is currently playing.")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_Unable_to_stop_sound_loop_set_no); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 573, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_Unable_to_stop_sound_loop_set_no); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 561, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":609
+  /* "mpfmc/core/audio/track_sound_loop.pyx":597
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  *             self.log.info("Unable to jump to specified playback position - "             # <<<<<<<<<<<<<<
  *                           "no sound loop set is currently playing.")
  *             SDL_UnlockAudio()
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_u_Unable_to_jump_to_specified_play); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 609, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_u_Unable_to_jump_to_specified_play); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 597, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":628
+  /* "mpfmc/core/audio/track_sound_loop.pyx":616
  *         SDL_LockAudio()
  * 
  *         self.log.debug("Stopping looping current sound loop set")             # <<<<<<<<<<<<<<
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  */
-  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_u_Stopping_looping_current_sound_l); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 628, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(1, __pyx_kp_u_Stopping_looping_current_sound_l); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 616, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":631
+  /* "mpfmc/core/audio/track_sound_loop.pyx":619
  * 
  *         if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
  *             self.log.info("Unable to stop looping sound loop set - no sound loop set is currently playing.")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_Unable_to_stop_looping_sound_loo); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 631, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(1, __pyx_kp_u_Unable_to_stop_looping_sound_loo); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 619, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":654
+  /* "mpfmc/core/audio/track_sound_loop.pyx":642
  * 
  *         if layer < 1:
  *             self.log.warning("Illegal layer value in call to play_layer (must be > 0).")             # <<<<<<<<<<<<<<
  *             return
  * 
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_Illegal_layer_value_in_call_to_p); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 654, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_u_Illegal_layer_value_in_call_to_p); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 642, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":664
+  /* "mpfmc/core/audio/track_sound_loop.pyx":652
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:
  *             self.log.info("There are no layers defined in the current sound loop set: play_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_There_are_no_layers_defined_in_t); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 664, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_u_There_are_no_layers_defined_in_t); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 652, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":670
+  /* "mpfmc/core/audio/track_sound_loop.pyx":658
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:
  *             self.log.info("The specified layer could not be found in the current sound loop set: play_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_The_specified_layer_could_not_be); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 670, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_The_specified_layer_could_not_be); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 658, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":675
+  /* "mpfmc/core/audio/track_sound_loop.pyx":663
  * 
  *         if layer_settings.status != layer_stopped:
  *             self.log.info("The current sound loop set layer is already playing: play_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_The_current_sound_loop_set_layer); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 675, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_The_current_sound_loop_set_layer); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 663, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":716
+  /* "mpfmc/core/audio/track_sound_loop.pyx":704
  * 
  *         if layer < 1:
  *             self.log.warning("Illegal layer value in call to stop_layer (must be > 0).")             # <<<<<<<<<<<<<<
  *             return
  * 
  */
-  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_u_Illegal_layer_value_in_call_to_s); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 716, __pyx_L1_error)
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_u_Illegal_layer_value_in_call_to_s); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 704, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":726
+  /* "mpfmc/core/audio/track_sound_loop.pyx":714
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:
  *             self.log.info("There are no layers defined in the current sound loop set: stop_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_u_There_are_no_layers_defined_in_t_2); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 726, __pyx_L1_error)
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_u_There_are_no_layers_defined_in_t_2); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(0, 714, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__12);
   __Pyx_GIVEREF(__pyx_tuple__12);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":732
+  /* "mpfmc/core/audio/track_sound_loop.pyx":720
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:
  *             self.log.info("The specified layer could not be found in the current sound loop set: stop_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_u_The_specified_layer_could_not_be_2); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 732, __pyx_L1_error)
+  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_u_The_specified_layer_could_not_be_2); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(0, 720, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__13);
   __Pyx_GIVEREF(__pyx_tuple__13);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":737
+  /* "mpfmc/core/audio/track_sound_loop.pyx":725
  * 
  *         if layer_settings.status == layer_stopped:
  *             self.log.info("The current sound loop set layer is already stopped: stop_layers has no effect")             # <<<<<<<<<<<<<<
  *             SDL_UnlockAudio()
  *             return
  */
-  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_u_The_current_sound_loop_set_layer_2); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 737, __pyx_L1_error)
+  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_u_The_current_sound_loop_set_layer_2); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(0, 725, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__14);
   __Pyx_GIVEREF(__pyx_tuple__14);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":763
+  /* "mpfmc/core/audio/track_sound_loop.pyx":751
  * 
  *         if layer < 1:
  *             self.log.warning("Illegal layer value in call to stop_looping_layer (must be > 0).")             # <<<<<<<<<<<<<<
  *             return
  * 
  */
-  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_u_Illegal_layer_value_in_call_to_s_2); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 763, __pyx_L1_error)
+  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_u_Illegal_layer_value_in_call_to_s_2); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(0, 751, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__15);
   __Pyx_GIVEREF(__pyx_tuple__15);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":772
+  /* "mpfmc/core/audio/track_sound_loop.pyx":760
  *         # Retrieve the layer
  *         if self.type_state.current.layers == NULL:
  *             self.log.info("There are no layers defined in the current sound loop set: "             # <<<<<<<<<<<<<<
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()
  */
-  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_u_There_are_no_layers_defined_in_t_3); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 772, __pyx_L1_error)
+  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_u_There_are_no_layers_defined_in_t_3); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(0, 760, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__16);
   __Pyx_GIVEREF(__pyx_tuple__16);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":779
+  /* "mpfmc/core/audio/track_sound_loop.pyx":767
  *         layer_settings = <SoundLoopLayerSettings*>g_slist_nth_data(self.type_state.current.layers, layer - 1)
  *         if layer_settings == NULL:
  *             self.log.info("The specified layer could not be found in the current sound loop set: "             # <<<<<<<<<<<<<<
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()
  */
-  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_u_The_specified_layer_could_not_be_3); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 779, __pyx_L1_error)
+  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_u_The_specified_layer_could_not_be_3); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(0, 767, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__17);
   __Pyx_GIVEREF(__pyx_tuple__17);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":785
+  /* "mpfmc/core/audio/track_sound_loop.pyx":773
  * 
  *         if layer_settings.status == layer_stopped:
  *             self.log.info("The current sound loop set layer is already stopped: "             # <<<<<<<<<<<<<<
  *                           "stop_looping_layers has no effect")
  *             SDL_UnlockAudio()
  */
-  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_u_The_current_sound_loop_set_layer_3); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 785, __pyx_L1_error)
+  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_u_The_current_sound_loop_set_layer_3); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(0, 773, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__18);
   __Pyx_GIVEREF(__pyx_tuple__18);
 
@@ -15595,29 +15681,29 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__20);
   __Pyx_GIVEREF(__pyx_tuple__20);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":879
+  /* "mpfmc/core/audio/track_sound_loop.pyx":886
  * 
  *     @staticmethod
  *     def player_status_to_text(int status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound loop player status value into an equivalent text string.  Used for testing
  */
-  __pyx_tuple__21 = PyTuple_Pack(2, __pyx_n_s_status, __pyx_n_s_status_values); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 879, __pyx_L1_error)
+  __pyx_tuple__21 = PyTuple_Pack(2, __pyx_n_s_status, __pyx_n_s_status_values); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(0, 886, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__21);
   __Pyx_GIVEREF(__pyx_tuple__21);
-  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_audio_track_sound_loo, __pyx_n_s_player_status_to_text, 879, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 879, __pyx_L1_error)
+  __pyx_codeobj__22 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__21, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_audio_track_sound_loo, __pyx_n_s_player_status_to_text, 886, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__22)) __PYX_ERR(0, 886, __pyx_L1_error)
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":903
+  /* "mpfmc/core/audio/track_sound_loop.pyx":910
  * 
  *     @staticmethod
  *     def layer_status_to_text(int status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound loop set layer status value into an equivalent text string.  Used for testing
  */
-  __pyx_tuple__23 = PyTuple_Pack(2, __pyx_n_s_status, __pyx_n_s_status_values); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 903, __pyx_L1_error)
+  __pyx_tuple__23 = PyTuple_Pack(2, __pyx_n_s_status, __pyx_n_s_status_values); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(0, 910, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__23);
   __Pyx_GIVEREF(__pyx_tuple__23);
-  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_audio_track_sound_loo, __pyx_n_s_layer_status_to_text, 903, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 903, __pyx_L1_error)
+  __pyx_codeobj__24 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__23, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_audio_track_sound_loo, __pyx_n_s_layer_status_to_text, 910, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__24)) __PYX_ERR(0, 910, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -15686,6 +15772,7 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop.process_notification_message = (PyObject *(*)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *))__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_process_notification_message;
   __pyx_vtable_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop._initialize_player = (PyObject *(*)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *))__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__initialize_player;
   __pyx_vtable_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop._apply_layer_settings = (PyObject *(*)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *, PyObject *))__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__apply_layer_settings;
+  __pyx_vtable_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop._reset_player = (PyObject *(*)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *))__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__reset_player;
   __pyx_vtable_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop._reset_layer = (PyObject *(*)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings *))__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__reset_layer;
   __pyx_vtable_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop._reset_player_layers = (PyObject *(*)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopSetPlayer *))__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__reset_player_layers;
   __pyx_vtable_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop._round_sample_pos_up_to_interval = (Uint32 (*)(struct __pyx_obj_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop *, Uint32, Uint32, int))__pyx_f_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop__round_sample_pos_up_to_interval;
@@ -15982,61 +16069,61 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":879
+  /* "mpfmc/core/audio/track_sound_loop.pyx":886
  * 
  *     @staticmethod
  *     def player_status_to_text(int status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound loop player status value into an equivalent text string.  Used for testing
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_35player_status_to_text, NULL, __pyx_n_s_mpfmc_core_audio_track_sound_loo_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 879, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_35player_status_to_text, NULL, __pyx_n_s_mpfmc_core_audio_track_sound_loo_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 886, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict, __pyx_n_s_player_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 879, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict, __pyx_n_s_player_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 886, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":878
+  /* "mpfmc/core/audio/track_sound_loop.pyx":885
  *         return status
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def player_status_to_text(int status):
  *         """
  */
-  __pyx_t_1 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop, __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 879, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop, __pyx_n_s_player_status_to_text); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 886, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_staticmethod, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 878, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_CallOneArg(__pyx_builtin_staticmethod, __pyx_t_1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 885, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict, __pyx_n_s_player_status_to_text, __pyx_t_2) < 0) __PYX_ERR(0, 879, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict, __pyx_n_s_player_status_to_text, __pyx_t_2) < 0) __PYX_ERR(0, 886, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":903
+  /* "mpfmc/core/audio/track_sound_loop.pyx":910
  * 
  *     @staticmethod
  *     def layer_status_to_text(int status):             # <<<<<<<<<<<<<<
  *         """
  *         Converts a sound loop set layer status value into an equivalent text string.  Used for testing
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_37layer_status_to_text, NULL, __pyx_n_s_mpfmc_core_audio_track_sound_loo_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 903, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5audio_16track_sound_loop_14TrackSoundLoop_37layer_status_to_text, NULL, __pyx_n_s_mpfmc_core_audio_track_sound_loo_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 910, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict, __pyx_n_s_layer_status_to_text, __pyx_t_2) < 0) __PYX_ERR(0, 903, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict, __pyx_n_s_layer_status_to_text, __pyx_t_2) < 0) __PYX_ERR(0, 910, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   PyType_Modified(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop);
 
-  /* "mpfmc/core/audio/track_sound_loop.pyx":902
+  /* "mpfmc/core/audio/track_sound_loop.pyx":909
  *             return "unknown"
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
  *     def layer_status_to_text(int status):
  *         """
  */
-  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop, __pyx_n_s_layer_status_to_text); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 903, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop, __pyx_n_s_layer_status_to_text); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 910, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_staticmethod, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 902, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_builtin_staticmethod, __pyx_t_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 909, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict, __pyx_n_s_layer_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 903, __pyx_L1_error)
+  if (PyDict_SetItem((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop->tp_dict, __pyx_n_s_layer_status_to_text, __pyx_t_1) < 0) __PYX_ERR(0, 910, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   PyType_Modified(__pyx_ptype_5mpfmc_4core_5audio_16track_sound_loop_TrackSoundLoop);
 
