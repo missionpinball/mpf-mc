@@ -166,19 +166,18 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_any_call('trigger', name='hihat_marker_2', sound_instance=ANY, marker_id=1)
 
         status = track_loops.get_status()
+        self.assertEqual(1, len(status))
         self.assertEqual(status[0]['status'], "playing")
         self.assertEqual(status[0]['sound_id'], self.mc.sounds["kick"].id)
-        self.assertTrue(status[0]['looping'])
         self.assertEqual(len(status[0]['layers']), 3)
-        self.assertEqual(status[1]['status'], "idle")
         self.advance_real_time(2)
 
         self.mc.events.post('play_basic_beat_layers2')
         self.advance_real_time(4)
         status = track_loops.get_status()
+        self.assertEqual(1, len(status))
         self.assertEqual(status[0]['status'], "playing")
         self.assertEqual(status[0]['sound_id'], self.mc.sounds["kick2"].id)
-        self.assertTrue(status[0]['looping'])
         self.assertEqual(len(status[0]['layers']), 4)
 
         # Ensure sound_loop_set.events_when_stopped is working properly (send event when a sound_loop_set stops)
@@ -206,7 +205,7 @@ class TestAudioSoundLoop(MpfMcTestCase):
 
         # Make sure next pending sound_loop_set is cancelled with stop action
         status = track_loops.get_status()
-        self.assertEqual(status[1]['status'], "idle")
+        self.assertEqual(0, len(status))
 
     def test_sound_loop_fades(self):
         """ Tests Sound Loop fading"""
@@ -247,8 +246,8 @@ class TestAudioSoundLoop(MpfMcTestCase):
         track_loops.play_sound_loop_set(self.mc.sound_loop_sets['hi_hat'])
         self.advance_real_time(0.1)
         status = track_loops.get_status()
+        self.assertEqual(1, len(status))
         self.assertEqual('playing', status[0]['status'])
-        self.assertEqual('idle', status[1]['status'])
         self.assertEqual(status[0]['sound_id'], self.mc.sounds['hihat'].id)
 
         # Now play kick loop and recheck status (both loops should be cross-fading and in sync)
@@ -257,19 +256,19 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.advance_real_time(0.1)
 
         status = track_loops.get_status()
-        self.assertEqual('fading out', status[0]['status'])
-        self.assertEqual('fading in', status[1]['status'])
-        self.assertGreater(status[0]['fade_out_steps'], 0)
-        self.assertGreater(status[1]['fade_in_steps'], 1)
-        self.assertEqual(status[0]['sample_pos'], status[1]['sample_pos'])
-        self.assertEqual(status[0]['sound_id'], self.mc.sounds['hihat'].id)
-        self.assertEqual(status[1]['sound_id'], self.mc.sounds['kick'].id)
+        self.assertEqual('fading out', status[1]['status'])
+        self.assertEqual('fading in', status[0]['status'])
+        self.assertGreater(status[1]['fade_out_steps'], 0)
+        self.assertGreater(status[0]['fade_in_steps'], 1)
+        self.assertEqual(status[1]['sample_pos'], status[0]['sample_pos'])
+        self.assertEqual(status[1]['sound_id'], self.mc.sounds['hihat'].id)
+        self.assertEqual(status[0]['sound_id'], self.mc.sounds['kick'].id)
 
         # Recheck status (hi-hat loop should be finished and kick loop should be playing)
         self.advance_real_time(1.1)
         status = track_loops.get_status()
+        self.assertEqual(1, len(status))
         self.assertEqual('playing', status[0]['status'])
-        self.assertEqual('idle', status[1]['status'])
         self.assertEqual(status[0]['sound_id'], self.mc.sounds['kick'].id)
 
     def test_sound_loop_timing_settings(self):
@@ -311,8 +310,8 @@ class TestAudioSoundLoop(MpfMcTestCase):
         track_loops.play_sound_loop_set(self.mc.sound_loop_sets['hi_hat'])
         self.advance_real_time(0.1)
         status = track_loops.get_status()
+        self.assertEqual(1, len(status))
         self.assertEqual('playing', status[0]['status'])
-        self.assertEqual('idle', status[1]['status'])
         self.assertEqual(status[0]['sound_id'], self.mc.sounds['hihat'].id)
         self.advance_real_time(0.5)
 
@@ -321,8 +320,8 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.advance_real_time(0.2)
 
         status = track_loops.get_status()
+        self.assertEqual(1, len(status))
         self.assertEqual('playing', status[0]['status'])
-        self.assertEqual('idle', status[1]['status'])
         self.assertEqual(status[0]['sound_id'], self.mc.sounds['kick'].id)
         self.advance_real_time(0.3)
 
@@ -331,7 +330,7 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.advance_real_time(0.2)
 
         status = track_loops.get_status()
+        self.assertEqual(1, len(status))
         self.assertEqual('playing', status[0]['status'])
-        self.assertEqual('idle', status[1]['status'])
         self.assertEqual(status[0]['sound_id'], self.mc.sounds['kick2'].id)
         self.advance_real_time(0.3)
