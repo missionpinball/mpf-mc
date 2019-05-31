@@ -166,6 +166,7 @@ cdef extern from 'glib.h':
         GSList *next
     GSList* g_slist_append(GSList *list, gpointer data) nogil
     GSList* g_slist_prepend(GSList *list, gpointer data) nogil
+    GSList* g_slist_remove(GSList *list, gconstpointer data) nogil
     void g_slist_free (GSList *list) nogil
     guint g_slist_length (GSList *list) nogil
     GSList *g_slist_reverse(GSList *list) nogil
