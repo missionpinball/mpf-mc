@@ -581,8 +581,8 @@ install_requires = ['ruamel.yaml==0.15.37',  # better YAML library
                     'kivy-deps.sdl2;platform_system=="Windows"',
                     'kivy-deps.sdl2-dev;platform_system=="Windows"',
                     'kivy-deps.glew;platform_system=="Windows"',
-                    'kivy-deps.gstreamer==0.1.13;platform_system=="Windows"',
-                    'kivy-deps.gstreamer-dev==0.1.13;platform_system=="Windows"',
+                    'kivy-deps.gstreamer;platform_system=="Windows"',
+                    'kivy-deps.gstreamer-dev;platform_system=="Windows"',
                     ]
 
 # If we're running on Read The Docs, then we just need to copy the files
