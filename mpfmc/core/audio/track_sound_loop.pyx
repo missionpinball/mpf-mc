@@ -398,6 +398,7 @@ cdef class TrackSoundLoop(Track):
                 player.sample_pos = bytes_per_sample_frame * ceil(player.sample_pos / bytes_per_sample_frame)
 
                 self.type_state.current.stop_loop_samples_remaining = self.type_state.current.length - self.type_state.current.sample_pos
+                player.start_delay_samples_remaining = self.type_state.current.stop_loop_samples_remaining
 
             elif player_settings['timing'] == 'next_time_interval':
                 # Set currently playing sample to end at the next specified time interval multiple
@@ -408,6 +409,8 @@ cdef class TrackSoundLoop(Track):
                     <Uint32> (self.state.callback_data.seconds_to_bytes_factor * player_settings['interval']),
                     self.state.callback_data.bytes_per_sample * self.state.callback_data.channels) - self.type_state.current.sample_pos
 
+                player.start_delay_samples_remaining = self.type_state.current.stop_loop_samples_remaining
+
             elif player_settings['timing'] == 'next_beat_interval':
                 # Set currently playing sample to end at the next specified beat interval multiple
                 player.status = player_delayed
@@ -417,6 +420,8 @@ cdef class TrackSoundLoop(Track):
                     <Uint32> (self.state.callback_data.seconds_to_bytes_factor * (
                             player_settings['interval'] * 60.0 / self.type_state.current.tempo)),
                     self.state.callback_data.bytes_per_sample * self.state.callback_data.channels) - self.type_state.current.sample_pos
+
+                player.start_delay_samples_remaining = self.type_state.current.stop_loop_samples_remaining
 
             else:
                 # 'timing' == 'now'
