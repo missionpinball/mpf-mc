@@ -450,6 +450,44 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.assertEqual('playing', status[0]['status'])
         self.assertEqual(status[0]['sound_id'], self.mc.sounds['kick'].id)
 
+        # Now play hi hat loop and recheck status (both loops should be cross-fading and in sync)
+        track_loops.play_sound_loop_set(self.mc.sound_loop_sets['hi_hat'], None,
+                                        {'fade_in': 2.0, 'timing': 'now', 'synchronize': True})
+        self.advance_real_time(0.1)
+
+        status = track_loops.get_status()
+        self.assertEqual(2, len(status))
+        self.assertEqual('fading out', status[1]['status'])
+        self.assertEqual('fading in', status[0]['status'])
+        self.assertGreater(status[1]['fade_out_steps'], 0)
+        self.assertGreater(status[0]['fade_in_steps'], 0)
+        self.assertEqual(status[1]['sample_pos'], status[0]['sample_pos'])
+        self.assertEqual(status[1]['sound_id'], self.mc.sounds['kick'].id)
+        self.assertEqual(status[0]['sound_id'], self.mc.sounds['hihat'].id)
+
+        self.advance_real_time(0.3)
+
+        # Now play kick 2 and recheck status (new loop should be fading in and other two loops fading out)
+        track_loops.play_sound_loop_set(self.mc.sound_loop_sets['basic_beat2'], None,
+                                        {'fade_in': 1.0, 'timing': 'now', 'synchronize': False})
+        self.advance_real_time(0.1)
+
+        status = track_loops.get_status()
+        self.assertEqual(3, len(status))
+        self.assertEqual('fading in', status[0]['status'])
+        self.assertEqual('fading out', status[1]['status'])
+        self.assertEqual('fading out', status[2]['status'])
+        self.assertGreater(status[0]['fade_in_steps'], 0)
+        self.assertGreater(status[1]['fade_out_steps'], 0)
+        self.assertGreater(status[1]['fade_out_steps'], 0)
+        self.assertEqual(status[0]['fade_steps_remaining'], status[1]['fade_steps_remaining'])
+        self.assertEqual(status[0]['fade_steps_remaining'], status[2]['fade_steps_remaining'])
+        self.assertEqual(status[1]['sample_pos'], status[2]['sample_pos'])
+        self.assertEqual(status[0]['sound_id'], self.mc.sounds['kick2'].id)
+        self.assertEqual(status[1]['sound_id'], self.mc.sounds['hihat'].id)
+        self.assertEqual(status[2]['sound_id'], self.mc.sounds['kick'].id)
+
+
     def test_sound_loop_timing_settings(self):
         """ Tests Sound Loop fading"""
 
