@@ -149,7 +149,7 @@ class Widget(KivyWidget):
                 self.mc.post_mc_native_event(event)
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
+        return '<{} Widget>'.format(self.widget_type_name)
 
     @staticmethod
     def get_display():
@@ -967,7 +967,7 @@ class WidgetContainer(RelativeLayout):
         self._widget = widget
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<WidgetContainer id={} z={} key={}>'.format(self.id, self.z, self.key)
+        return '<WidgetContainer z={} key={}>'.format(self.z, self.key)
 
     def __lt__(self, other: "KivyWidget") -> bool:
         """Less than comparison operator (based on z-order value).
