@@ -573,7 +573,7 @@ else:
 
 install_requires = ['ruamel.yaml==0.15.37',  # better YAML library
                     'mpf>={}'.format(mpf_version),
-                    'kivy>=1.10.1',
+                    'kivy~=1.10',
                     'psutil',
                     'pygments',  # YAML syntax formatting for the iMC
                     'pypiwin32>=223;platform_system=="Windows" and python_version>"3.4"',
