@@ -436,6 +436,7 @@ cdef class TrackSoundLoop(Track):
                 if player.master_sound_layer.fade_steps_remaining > 0:
                     player.status = player_fading_in
                     self._fade_out_all_players(player.master_sound_layer.fade_in_steps)
+                    # TODO: Should layers fade out as well? (Probably)
 
             # Cancel and remove all existing delayed players
             self._cancel_all_delayed_players()
@@ -1159,10 +1160,7 @@ cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *play
         # Adjust chunk size if the loop is set to stop early (if not the chunk size will remain unchanged)
         current_chunk_bytes = min(current_chunk_bytes, player.stop_loop_samples_remaining)
 
-        if current_chunk_bytes == 0:
-            return buffer_length
-
-        if player.status == player_idle:
+        if player.status == player_idle or current_chunk_bytes == 0:
             return buffer_length
 
         # Get master layer samples
