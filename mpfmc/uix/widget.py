@@ -149,7 +149,7 @@ class Widget(KivyWidget):
                 self.mc.post_mc_native_event(event)
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<{} Widget>'.format(self.widget_type_name)
+        return '<{} Widget id={}>'.format(self.widget_type_name, id(self))
 
     @staticmethod
     def get_display():
