@@ -144,7 +144,7 @@ class Widget(KivyWidget):
             self.schedule_removal(self.expire)
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
+        return '<{} Widget id={}>'.format(self.widget_type_name, id(self))
 
     @staticmethod
     def get_display():
