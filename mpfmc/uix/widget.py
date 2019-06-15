@@ -386,8 +386,8 @@ class Widget(KivyWidget):
                 # TOOD: After sufficient time post-0.51, remove this breaking-change-related message
                 if " ".join(self.config['style']) in self.mc.machine_config['widget_styles']:
                     raise ValueError("{} has an invalid style name: {}. ".format(self, e) +
-                        "Please note that as of MPF 0.51, spaces are no longer valid " +
-                        "in widget style names (see '{}')".format(" ".join(self.config['style'])))
+                                     "Please note that as of MPF 0.51, spaces are no longer valid " +
+                                     "in widget style names (see '{}')".format(" ".join(self.config['style'])))
                 raise ValueError("{} has an invalid style name: {}".format(
                     self, e))
 
