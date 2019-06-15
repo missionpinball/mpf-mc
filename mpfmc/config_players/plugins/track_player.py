@@ -14,6 +14,7 @@ class MpfTrackPlayer(PluginPlayer):
     config_file_section = 'track_player'
     show_section = 'tracks'
 
+
 player_cls = MpfTrackPlayer
 
 

@@ -30,6 +30,7 @@ class MonochromeEffect(EffectBase):
                                            float(self.luminosity[1]),
                                            float(self.luminosity[2]))
 
+
 monochrome_glsl = '''
 vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
 {{

@@ -14,6 +14,7 @@ class MpfSoundPlayer(PluginPlayer):
     config_file_section = 'sound_player'
     show_section = 'sounds'
 
+
 player_cls = MpfSoundPlayer
 
 

@@ -34,6 +34,7 @@ class Settings(object):
     def get_settings(self):
         return {}
 
+
 class InteractiveMc(App):
 
     def __init__(self, mpf_path, machine_path, args, **kwargs):
@@ -80,7 +81,7 @@ class InteractiveMc(App):
         self.sm.add_widget(self.slide_screen)
         self.sm.add_widget(self.widget_screen)
         self.slide_player_code = YamlCodeInput(lexer=YamlLexer(),
-                                         tab_width=4)
+                                               tab_width=4)
         self.slide_player_code.bind(on_triple_tap=self.send_slide_to_mc)
 
         self.slide_player_code.text = '''my_test_slide:
@@ -130,7 +131,6 @@ class InteractiveMc(App):
                   size_hint=(None, None),
                   size=(Window.width, 400)).open()
             return
-
 
         try:
             settings = (self.slide_player.validate_config_entry(settings,
