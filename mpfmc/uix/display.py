@@ -150,7 +150,7 @@ class Display(ScreenManager):
                     self.mc.targets['default'] = self
                 else:
                     raise AssertionError('Multiple displays have been set as the default. Please choose a single \
-						display to default to (\"{}\" is currently set as the default).'.format(self.mc.targets['default'].name))
+                        display to default to (\"{}\" is currently set as the default).'.format(self.mc.targets['default'].name))
         except KeyError:
             pass
 
