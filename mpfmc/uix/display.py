@@ -139,7 +139,6 @@ class Display(ScreenManager):
             self.size = self.native_size
             Clock.schedule_once(self._display_created, 0)
             return
-    
         # Add this display to the list of all available displays
         self.mc.displays[self.name] = self
 
@@ -149,8 +148,9 @@ class Display(ScreenManager):
             if self.config['default']:
                 if 'default' not in self.mc.targets:
                     self.mc.targets['default'] = self
-                elif 'default' in self.mc.targets:
-                    raise AssertionError('Multiple displays have been set as the default. Please choose a single display to default to (\"{}\" is currently set as the default).'.format(self.mc.targets['default'].name))
+                else:
+                    raise AssertionError('Multiple displays have been set as the default. Please choose a single \
+						display to default to (\"{}\" is currently set as the default).'.format(self.mc.targets['default'].name))
         except KeyError:
             pass
 
