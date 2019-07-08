@@ -11,6 +11,11 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
     def getMachinePath(self):
         return 'integration/machine_files/widgets_and_slides/'
 
+    def test_slide_with_vars(self):
+        self.post_event("play_show_with_var")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("SLIDE WITH VAR Test123")
+
     def test_anonymous_slides(self):
         self.post_event("start_mode1")
         self.advance_time_and_run(.1)

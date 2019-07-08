@@ -11,6 +11,9 @@ displays:
     width: 300
 
 slides:
+  slide_with_var:
+    - type: text
+      text: SLIDE WITH VAR (test)
   machine_slide_1:
     - type: text
       text: TEST SLIDE PLAYER - SLIDE 1
@@ -240,3 +243,7 @@ slide_player:
             repeat: yes
   remove_slide_with_animations:
     my_slide: remove
+  show_slide_with_var:
+    slide_with_var:
+      tokens:
+        test: asd

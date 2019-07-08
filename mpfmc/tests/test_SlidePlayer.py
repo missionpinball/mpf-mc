@@ -19,6 +19,11 @@ class TestSlidePlayer(MpfMcTestCase):
     def get_config_file(self):
         return 'test_slide_player.yaml'
 
+    def test_slide_with_vars(self):
+        self.mc.events.post('show_slide_with_var')
+        self.advance_time()
+        self.assertEqual("SLIDE WITH VAR asd", self.mc.targets["default"].current_slide.children[0].children[0].text)
+
     def test_slide_on_default_display(self):
         self.mc.events.post('show_slide_1')
         self.advance_time()

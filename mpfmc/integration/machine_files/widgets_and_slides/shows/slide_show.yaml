@@ -1,0 +1,6 @@
+#show_version=5
+- duration: -1
+  slides:
+    slide_with_var:
+      tokens:
+        test: (my_show_var)
