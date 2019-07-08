@@ -52,6 +52,9 @@ displays:
     height: 300
 
 slides:
+  slide_with_var:
+  - type: text
+    text: SLIDE WITH VAR (test)
   window_slide_1:
   - type: display
     width: 512
@@ -101,3 +104,9 @@ widget_styles:
     font_size: 9
     adjust_top: 2
     adjust_bottom: 3
+
+show_player:
+  play_show_with_var:
+    slide_show:
+      show_tokens:
+        my_show_var: Test123

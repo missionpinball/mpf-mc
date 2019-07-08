@@ -157,9 +157,9 @@ class McSlidePlayer(McConfigPlayer):
                                        s)
                 if 'widgets' in s:
                     target.add_and_show_slide(key=full_context,
-                                              slide_name=slide, **s)
+                                              slide_name=slide, play_kwargs=s['tokens'], **s)
                 else:
-                    target.show_slide(slide_name=slide, key=full_context, **s)
+                    target.show_slide(slide_name=slide, key=full_context, play_kwargs=s['tokens'], **s)
 
                 target.get_screen(slide).on_slide_play()
 
