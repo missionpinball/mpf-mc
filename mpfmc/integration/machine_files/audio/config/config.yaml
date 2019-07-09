@@ -14,6 +14,9 @@ sound_system:
   channels: 2
   master_volume: 0.9
   tracks:
+    sfx:
+      type: standard
+      volume: 0.6
     loops:
       type: sound_loop
       volume: 0.6
@@ -22,7 +25,41 @@ assets:
   sounds:
     default:
       load: preload
+    sfx:
+      load: preload
+      track: sfx
     loops:
       load: preload
       track: loops
 
+sounds:
+  264828_text:
+    events_when_played: text_sound_played
+
+shows:
+  sound_test_1:
+    - time: 0
+      sounds:
+        264828_text:
+          action: play
+          events_when_played: text_sound_played_from_show
+
+  sound_test_2:
+    - time: 0
+      sounds:
+        264828_text:
+          action: play
+
+show_player:
+  play_sound_test_1_show: sound_test_1
+  play_sound_test_2_show: sound_test_2
+
+sound_player:
+  play_sound_1:
+    264828_text:
+      action: play
+      events_when_played: text_sound_played_from_sound_player
+
+  play_sound_2:
+    264828_text:
+      action: play
