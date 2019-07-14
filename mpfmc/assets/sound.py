@@ -777,22 +777,22 @@ class SoundInstance:
         if 'fade_out' in settings and settings['fade_out'] is not None:
             self._fade_out = settings['fade_out']
 
-        if 'about_to_finish_time' in settings:
+        if settings.get('about_to_finish_time'):
             self._about_to_finish_time = settings['about_to_finish_time']
 
-        if 'max_queue_time' in settings:
+        if settings.get('max_queue_time'):
             self._max_queue_time = settings['max_queue_time']
 
-        if 'events_when_played' in settings:
+        if settings.get('events_when_played'):
             self._events_when_played = settings['events_when_played']
 
-        if 'events_when_stopped' in settings:
+        if settings.get('events_when_stopped'):
             self._events_when_stopped = settings['events_when_stopped']
 
-        if 'events_when_looping' in settings:
+        if settings.get('events_when_looping'):
             self._events_when_looping = settings['events_when_looping']
 
-        if 'events_when_about_to_finish' in settings:
+        if settings.get('events_when_about_to_finish'):
             self._events_when_about_to_finish = settings['events_when_about_to_finish']
 
         if 'mode_end_action' in settings and settings['mode_end_action'] is not None:
