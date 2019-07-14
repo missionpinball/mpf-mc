@@ -60,6 +60,10 @@ sound_player:
       action: play
       events_when_played: text_sound_played_from_sound_player
 
+  stop_sound_1:
+    264828_text: stop
+
+
   play_sound_2:
     264828_text:
       action: play

@@ -89,12 +89,18 @@ class TestAudio(MpfIntegrationTestCase):
         self.assertEventCalled("text_sound_played_from_sound_player")
         self.reset_mock_events()
 
+        self.post_event("stop_sound_1")
+        self.advance_time_and_run(0.1)
+
         self.post_event('play_sound_2')
         self.advance_time_and_run(0.1)
         self.assertEventNotCalled("use_sound_setting")
         self.assertEventNotCalled("text_sound_played_from_sound_player")
         self.assertEventCalled("text_sound_played")
         self.reset_mock_events()
+
+        self.post_event("stop_sound_1")
+        self.advance_time_and_run(0.1)
 
         # Play first show
         self.post_event('play_sound_test_1_show')
@@ -103,6 +109,9 @@ class TestAudio(MpfIntegrationTestCase):
         self.assertEventNotCalled("text_sound_played")
         self.assertEventCalled("text_sound_played_from_show")
         self.reset_mock_events()
+
+        self.post_event("stop_sound_1")
+        self.advance_time_and_run(0.1)
 
         # Play second show
         self.post_event('play_sound_test_2_show')
