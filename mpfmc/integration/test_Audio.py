@@ -80,6 +80,9 @@ class TestAudio(MpfIntegrationTestCase):
         self.mock_event("text_sound_played")
         self.mock_event("text_sound_played_from_show")
         self.mock_event("text_sound_played_from_sound_player")
+        self.mock_event("text_sound_stopped")
+        self.mock_event("text_sound_stopped_from_show")
+        self.mock_event("text_sound_stopped_from_sound_player")
 
         # Play sound using sound player
         self.post_event('play_sound_1')
@@ -87,20 +90,39 @@ class TestAudio(MpfIntegrationTestCase):
         self.assertEventNotCalled("use_sound_setting")
         self.assertEventNotCalled("text_sound_played")
         self.assertEventCalled("text_sound_played_from_sound_player")
-        self.reset_mock_events()
 
-        self.post_event("stop_sound_1")
+        self.post_event("stop_sound")
         self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_stopped")
+        self.assertEventCalled("text_sound_stopped_from_sound_player")
+        self.reset_mock_events()
 
         self.post_event('play_sound_2')
         self.advance_time_and_run(0.1)
         self.assertEventNotCalled("use_sound_setting")
         self.assertEventNotCalled("text_sound_played_from_sound_player")
         self.assertEventCalled("text_sound_played")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventCalled("text_sound_stopped")
+        self.assertEventNotCalled("text_sound_stopped_from_sound_player")
         self.reset_mock_events()
 
-        self.post_event("stop_sound_1")
+        self.post_event('play_sound_3')
         self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_played_from_sound_player")
+        self.assertEventNotCalled("text_sound_played")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventCalled("text_sound_stopped")
+        self.assertEventNotCalled("text_sound_stopped_from_sound_player")
+        self.reset_mock_events()
 
         # Play first show
         self.post_event('play_sound_test_1_show')
@@ -108,10 +130,13 @@ class TestAudio(MpfIntegrationTestCase):
         self.assertEventNotCalled("use_sound_setting")
         self.assertEventNotCalled("text_sound_played")
         self.assertEventCalled("text_sound_played_from_show")
-        self.reset_mock_events()
 
-        self.post_event("stop_sound_1")
+        self.post_event("stop_sound")
         self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_stopped")
+        self.assertEventCalled("text_sound_stopped_from_show")
+        self.reset_mock_events()
 
         # Play second show
         self.post_event('play_sound_test_2_show')
@@ -119,4 +144,23 @@ class TestAudio(MpfIntegrationTestCase):
         self.assertEventNotCalled("use_sound_setting")
         self.assertEventNotCalled("text_sound_played_from_show")
         self.assertEventCalled("text_sound_played")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventCalled("text_sound_stopped")
+        self.assertEventNotCalled("text_sound_stopped_from_show")
         self.reset_mock_events()
+
+        # Play third show
+        self.post_event('play_sound_test_3_show')
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_played_from_show")
+        self.assertEventNotCalled("text_sound_played")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventCalled("text_sound_stopped")
+        self.assertEventNotCalled("text_sound_stopped_from_show")
