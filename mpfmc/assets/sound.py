@@ -776,33 +776,32 @@ class SoundInstance:
         if settings.get('fade_out'):
             self._fade_out = settings['fade_out']
 
-        if 'about_to_finish_time' in settings and settings['about_to_finish_time'] != -1:
+        if settings.get('about_to_finish_time', -1) != -1:
             self._about_to_finish_time = settings['about_to_finish_time']
 
-        if 'max_queue_time' in settings and settings['max_queue_time'] != -1:
+        if settings.get('max_queue_time', -1) != -1:
             self._max_queue_time = settings['max_queue_time']
 
-        if 'events_when_played' in settings and settings['events_when_played'] != ['use_sound_setting']:
+        if settings.get('events_when_played', ['use_sound_setting']) != ['use_sound_setting']:
             self._events_when_played = settings['events_when_played']
 
-        if 'events_when_stopped' in settings and settings['events_when_stopped'] != ['use_sound_setting']:
+        if settings.get('events_when_stopped', ['use_sound_setting']) != ['use_sound_setting']:
             self._events_when_stopped = settings['events_when_stopped']
 
-        if 'events_when_looping' in settings and settings['events_when_looping'] != ['use_sound_setting']:
+        if settings.get('events_when_looping', ['use_sound_setting']) != ['use_sound_setting']:
             self._events_when_looping = settings['events_when_looping']
 
-        if 'events_when_about_to_finish' in settings and \
-                settings['events_when_about_to_finish'] != ['use_sound_setting']:
+        if settings.get('events_when_about_to_finish', ['use_sound_setting']) != ['use_sound_setting']:
             self._events_when_about_to_finish = settings['events_when_about_to_finish']
 
-        if 'mode_end_action' in settings and settings['mode_end_action'] != 'use_sound_setting':
+        if settings.get('mode_end_action', 'use_sound_setting') != 'use_sound_setting':
             action = str(settings['mode_end_action']).lower()
             if action == 'stop':
                 self._mode_end_action = ModeEndAction.stop
             elif action == 'stop_looping':
                 self._mode_end_action = ModeEndAction.stop_looping
 
-        if 'key' in settings and settings['key'] != 'use_sound_setting':
+        if settings.get('key', 'use_sound_setting') != 'use_sound_setting':
             self._key = settings['key']
 
     def __repr__(self):
