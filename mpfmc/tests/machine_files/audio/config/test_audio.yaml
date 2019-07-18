@@ -74,9 +74,11 @@ sounds:
               name: verse_1
               events: moron_next_marker, last_marker
     210871_synthping:
+        priority: 1
         simultaneous_limit: 3
         stealing_method: oldest
         events_when_played: synthping_played
+        max_queue_time: 2s
     198361_sfx-028:
         simultaneous_limit: 3
         stealing_method: newest

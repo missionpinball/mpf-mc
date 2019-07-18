@@ -14,6 +14,10 @@ class MpfSoundPlayer(PluginPlayer):
     config_file_section = 'sound_player'
     show_section = 'sounds'
 
+    def get_express_config(self, value):
+        """Parse express config."""
+        return {"action": value}
+
 
 player_cls = MpfSoundPlayer
 
