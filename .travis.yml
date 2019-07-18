@@ -129,7 +129,7 @@ script:
     done;
 
     ls ../wheelhouse/;
-    python$pyver_short -m twine upload -u brianmadden -p $PYPI_PASS --skip-existing ../wheelhouse/*;
+    python$pyver_short -m twine upload -u jabdoa -p $PYPI_PASS --skip-existing ../wheelhouse/*;
 
     fi;
 
