@@ -106,21 +106,21 @@ script:
       ls dist/$zip_dir;
       rm dist/$zip_dir/mpfmc/.dylibs/libg*;
       rm dist/$zip_dir/mpfmc/.dylibs/GStreamer;
-      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/FLAC.framework/Versions/A/FLAC dist/$zip_dir/kivy/.dylibs/;
-      cp /Library/Frameworks/SDL2_ttf.framework/Versions/A/Frameworks/FreeType.framework/Versions/A/FreeType dist/$zip_dir/kivy/.dylibs/;
-      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/Ogg.framework/Versions/A/Ogg dist/$zip_dir/kivy/.dylibs/;
-      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/Vorbis.framework/Versions/A/Vorbis dist/$zip_dir/kivy/.dylibs/;
-      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/modplug.framework/Versions/A/modplug dist/$zip_dir/kivy/.dylibs/;
-      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/mpg123.framework/Versions/A/mpg123 dist/$zip_dir/kivy/.dylibs/;
-      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/kivy/.dylibs @rpath/SDL2.framework/Versions/A/SDL2 @loader_path/SDL2>output.txt;
-      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/kivy/.dylibs @rpath/FLAC.framework/Versions/A/FLAC @loader_path/FLAC>output.txt;
-      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/kivy/.dylibs @rpath/modplug.framework/Versions/A/modplug @loader_path/modplug>output.txt;
-      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/kivy/.dylibs @rpath/mpg123.framework/Versions/A/mpg123 @loader_path/mpg123>output.txt;
-      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/kivy/.dylibs @rpath/FreeType.framework/Versions/A/FreeType @loader_path/FreeType;
-      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/kivy/.dylibs @rpath/webp.framework/Versions/A/webp @loader_path/webp>output.txt;
-      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/kivy/.dylibs @rpath/Vorbis.framework/Versions/A/Vorbis @loader_path/Vorbis>output.txt;
-      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/kivy/.dylibs @rpath/../../../../SDL2.framework/Versions/A/SDL2 @loader_path/SDL2>output.txt;
-      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/kivy/.dylibs @rpath/Ogg.framework/Versions/A/Ogg @loader_path/Ogg>output.txt;
+      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/FLAC.framework/Versions/A/FLAC dist/$zip_dir/mpfmc/.dylibs/;
+      cp /Library/Frameworks/SDL2_ttf.framework/Versions/A/Frameworks/FreeType.framework/Versions/A/FreeType dist/$zip_dir/mpfmc/.dylibs/;
+      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/Ogg.framework/Versions/A/Ogg dist/$zip_dir/mpfmc/.dylibs/;
+      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/Vorbis.framework/Versions/A/Vorbis dist/$zip_dir/mpfmc/.dylibs/;
+      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/modplug.framework/Versions/A/modplug dist/$zip_dir/mpfmc/.dylibs/;
+      cp /Library/Frameworks/SDL2_mixer.framework/Versions/A/Frameworks/mpg123.framework/Versions/A/mpg123 dist/$zip_dir/mpfmc/.dylibs/;
+      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/mpfmc/.dylibs @rpath/SDL2.framework/Versions/A/SDL2 @loader_path/SDL2>output.txt;
+      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/mpfmc/.dylibs @rpath/FLAC.framework/Versions/A/FLAC @loader_path/FLAC>output.txt;
+      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/mpfmc/.dylibs @rpath/modplug.framework/Versions/A/modplug @loader_path/modplug>output.txt;
+      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/mpfmc/.dylibs @rpath/mpg123.framework/Versions/A/mpg123 @loader_path/mpg123>output.txt;
+      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/mpfmc/.dylibs @rpath/FreeType.framework/Versions/A/FreeType @loader_path/FreeType;
+      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/mpfmc/.dylibs @rpath/webp.framework/Versions/A/webp @loader_path/webp>output.txt;
+      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/mpfmc/.dylibs @rpath/Vorbis.framework/Versions/A/Vorbis @loader_path/Vorbis>output.txt;
+      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/mpfmc/.dylibs @rpath/../../../../SDL2.framework/Versions/A/SDL2 @loader_path/SDL2>output.txt;
+      python$pyver_short -m osxrelocator.__init__ dist/$zip_dir/mpfmc/.dylibs @rpath/Ogg.framework/Versions/A/Ogg @loader_path/Ogg>output.txt;
       rm dist/$zip_dir.whl;
       pushd dist;
       python$pyver_short -c "from delocate import delocating; delocating.dir2zip('$zip_dir', '$zip_dir.whl')";
@@ -140,18 +140,3 @@ after_success:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
       coveralls;
     fi;
-
-# commented out because we're not currently building wheels for Mac, but maybe
-# that will change in the future? Reason is because there are no wheels for Kivy,
-# so users need Cython and command line dev tools to build it, so why not just
-# build MPF-MC too?
-
-#  - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
-#      python3 setup.py bdist_wheel;
-#      ls;
-#      cd dist;
-#      python3 ../build_scripts/rename_wheels.py;
-#      pip3 install twine;
-#      ls;
-#      python3 -m twine upload -u brianmadden -p $PYPI_PASS --skip-existing *;
-#    fi;
