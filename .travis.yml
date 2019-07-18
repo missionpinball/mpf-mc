@@ -127,7 +127,9 @@ script:
       rm -rf $zip_dir;
       popd;
       /Library/Frameworks/Python.framework/Versions/$pyver_short/bin/delocate-addplat --rm-orig -x 10_9 -x 10_10 dist/*.whl;
-      python$pyver_short ./build_scripts/rename_wheels.py;
+      cd dist;
+      python$pyver_short ../build_scripts/rename_wheels.py;
+      cd ..;
       cp dist/*.whl ../wheelhouse/;
     done;
 
