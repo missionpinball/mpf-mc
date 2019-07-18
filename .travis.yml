@@ -90,10 +90,10 @@ script:
       python$pyver_short -m pip install git+http://github.com/tito/osxrelocator --user;
 
       python$pyver_short -m pip install --upgrade --user pip setuptools wheel;
-      python$pyver_short -m pip install --upgrade --user cython pytest wheel pillow mock docutils twine;
+      python$pyver_short -m pip install --upgrade --user cython==0.29.10 pytest wheel pillow mock docutils twine;
       python$pyver_short -m pip install --upgrade delocate;
 
-      git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
+      # git clone --recursive --branch ${TRAVIS_BRANCH} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python3 get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf;
       python$pyver_short -m pip install -e _mpf/;
 
       USE_CYTHON=1 USE_SDL2=1 USE_GSTREAMER=1 python$pyver_short setup.py build_ext --inplace>output.txt;
