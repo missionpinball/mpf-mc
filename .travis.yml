@@ -4,6 +4,36 @@ sudo: required
 matrix:
   fast_finish: true
   include:
+   - os: linux
+     env: LINUX=ubuntu:14.04 USE_CYTHON=1
+     sudo: required
+     language: python
+     python: "3.4"
+   - os: linux
+     env: LINUX=ubuntu:16.04 USE_CYTHON=1
+     sudo: required
+     language: python
+     python: "3.5"
+   - os: linux
+     env: LINUX=ubuntu:18.04 USE_CYTHON=1
+     sudo: required
+     language: python
+     python: "3.6"
+   - os: linux  # oldstable
+     env: LINUX=debian:jessie USE_CYTHON=1
+     sudo: required
+     language: python
+     python: "3.4"
+   - os: linux  # stable
+     env: LINUX=debian:stretch USE_CYTHON=1
+     sudo: required
+     language: python
+     python: "3.5"
+   - os: linux  # testing
+     env: LINUX=debian:buster USE_CYTHON=1
+     sudo: required
+     language: python
+     python: "3.6"
    - os: osx
      env: PYVERS="3.5.4 3.6.8 3.7.4"
      language: generic
