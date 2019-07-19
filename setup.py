@@ -556,7 +556,7 @@ def get_extensions_from_sources(sources_to_search):
         module_name = get_modulename_from_file(pyx)
         flags_clean = {'depends': depends_sources}
         for item_key, item_value in flags.items():
-            if len(item_value):
+            if item_value:
                 flags_clean[item_key] = item_value
         ext_modules_found.append(CythonExtension(
             module_name, [pyx] + f_depends + c_depends, **flags_clean))
