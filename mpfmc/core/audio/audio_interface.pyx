@@ -418,7 +418,7 @@ cdef class AudioInterface:
 
     @property
     def enabled(self):
-        return SDL_GetAudioStatus() == SDL_AUDIO_PLAYING and Mix_GetMusicHookData() != NULL
+        return Mix_GetMusicHookData() != NULL
 
     def enable(self):
         """

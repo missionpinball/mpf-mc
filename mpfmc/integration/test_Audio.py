@@ -54,8 +54,113 @@ class TestAudio(MpfIntegrationTestCase):
         status = track_loops.get_status()
         self.assertEqual(status[0]['status'], "playing")
         self.assertEqual(status[0]['sound_id'], self.mc.sounds["kick"].id)
-        self.assertTrue(status[0]['looping'])
-        self.assertEqual(status[1]['status'], "idle")
+        self.assertEqual(status[0]['stop_loop_samples_remaining'], "DO NOT STOP LOOP")
+        self.assertEqual(len(status), 1)
 
         self.post_event('stop_current_loop')
         self.advance_time_and_run(3)
+
+    def test_sound_player_and_show(self):
+
+        if SoundSystem is None or self.mc.sound_system is None:
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        if interface is None:
+            self.skipTest("Sound system audio interface could not be loaded")
+
+        self.assertIsNotNone(interface)
+
+        # Make sure sound assets are present
+        self.assertTrue(hasattr(self.mc, 'sounds'))
+        self.assertIn('264828_text', self.mc.sounds)
+
+        self.mock_event("use_sound_setting")
+        self.mock_event("text_sound_played")
+        self.mock_event("text_sound_played_from_show")
+        self.mock_event("text_sound_played_from_sound_player")
+        self.mock_event("text_sound_stopped")
+        self.mock_event("text_sound_stopped_from_show")
+        self.mock_event("text_sound_stopped_from_sound_player")
+
+        # Play sound using sound player
+        self.post_event('play_sound_1')
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_played")
+        self.assertEventCalled("text_sound_played_from_sound_player")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_stopped")
+        self.assertEventCalled("text_sound_stopped_from_sound_player")
+        self.reset_mock_events()
+
+        self.post_event('play_sound_2')
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_played_from_sound_player")
+        self.assertEventCalled("text_sound_played")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventCalled("text_sound_stopped")
+        self.assertEventNotCalled("text_sound_stopped_from_sound_player")
+        self.reset_mock_events()
+
+        self.post_event('play_sound_3')
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_played_from_sound_player")
+        self.assertEventNotCalled("text_sound_played")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventCalled("text_sound_stopped")
+        self.assertEventNotCalled("text_sound_stopped_from_sound_player")
+        self.reset_mock_events()
+
+        # Play first show
+        self.post_event('play_sound_test_1_show')
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_played")
+        self.assertEventCalled("text_sound_played_from_show")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_stopped")
+        self.assertEventCalled("text_sound_stopped_from_show")
+        self.reset_mock_events()
+
+        # Play second show
+        self.post_event('play_sound_test_2_show')
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_played_from_show")
+        self.assertEventCalled("text_sound_played")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventCalled("text_sound_stopped")
+        self.assertEventNotCalled("text_sound_stopped_from_show")
+        self.reset_mock_events()
+
+        # Play third show
+        self.post_event('play_sound_test_3_show')
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventNotCalled("text_sound_played_from_show")
+        self.assertEventNotCalled("text_sound_played")
+
+        self.post_event("stop_sound")
+        self.advance_time_and_run(0.1)
+        self.assertEventNotCalled("use_sound_setting")
+        self.assertEventCalled("text_sound_stopped")
+        self.assertEventNotCalled("text_sound_stopped_from_show")

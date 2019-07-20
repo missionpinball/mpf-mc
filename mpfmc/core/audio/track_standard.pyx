@@ -2,7 +2,6 @@
 #cython: embedsignature=True, language_level=3
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
-cimport cpython.pycapsule as pycapsule
 import cython
 import logging
 import time
@@ -1418,8 +1417,9 @@ cdef class TrackStandard(Track):
                 # Note: the current sample position has already been incremented when the sample data was received so
                 # we need to look backwards from the current position to determine if marker falls in chunk window.
 
-                # About to finish marker
+                # About to finish marker processing
                 if player.current.about_to_finish_marker != no_marker:
+
                     if player.current.sample_pos - current_chunk_bytes <= player.current.about_to_finish_marker < player.current.sample_pos:
                         # Marker is in window, send notification
                         send_sound_about_to_finish_notification(player_num,

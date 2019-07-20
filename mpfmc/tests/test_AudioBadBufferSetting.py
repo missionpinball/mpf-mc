@@ -34,5 +34,5 @@ class TestAudioBadBufferSetting(MpfMcTestCase):
         settings = self.mc.sound_system.audio_interface.get_settings()
         self.assertIsNotNone(settings)
         self.assertIn(settings['buffer_samples'], [1024, 2048])
-        self.assertEqual(settings['audio_channels'], 1)
+        self.assertIn(settings['audio_channels'], [1, 2])
         self.assertEqual(settings['sample_rate'], 44100)
