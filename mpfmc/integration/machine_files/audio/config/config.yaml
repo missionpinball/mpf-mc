@@ -56,7 +56,8 @@ sound_player:
       events_when_stopped: use_sound_setting
 
   stop_sound:
-    264828_text: stop
+    264828_text:
+      action: stop
 
 shows:
   sound_test_1:
