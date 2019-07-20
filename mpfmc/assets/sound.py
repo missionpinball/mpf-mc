@@ -726,11 +726,11 @@ class SoundInstance:
         # be overridden
         self._simultaneous_limit = sound.simultaneous_limit
         self._stealing_method = sound.stealing_method
-
-        self._track = sound.track
-        self._key = sound.key
+        self._markers = self._sound.markers
+        self._exp_time = None
 
         # Assign default values from parent sound for parameters that can be overridden
+        self._track = sound.track
         self._loops = self._sound.loops
         self._volume = self._sound.volume
         self._priority = self._sound.priority
@@ -744,8 +744,7 @@ class SoundInstance:
         self._events_when_looping = self._sound.events_when_looping
         self._events_when_about_to_finish = self._sound.events_when_about_to_finish
         self._mode_end_action = self._sound.mode_end_action
-        self._markers = self._sound.markers
-        self._exp_time = None
+        self._key = sound.key
 
         if settings is None:
             settings = dict()
@@ -753,59 +752,56 @@ class SoundInstance:
         # TODO: Implement parameter validation for overridden parameters
 
         # Assign any overridden parameter values
-        if 'track' in settings and settings['track'] is not None:
+        if settings.get('track'):
             self._track = settings['track']
 
-        if 'loops' in settings and settings['loops'] is not None:
+        if settings.get('loops'):
             self._loops = settings['loops']
 
-        if 'volume' in settings and settings['volume'] is not None:
+        if settings.get('volume'):
             self._volume = settings['volume']
 
-        if 'pan' in settings and settings['pan'] is not None:
+        if settings.get('pan'):
             self._pan = settings['pan']
 
-        if 'priority' in settings and settings['priority'] is not None:
+        if settings.get('priority'):
             self._priority = settings['priority']
 
-        if 'start_at' in settings and settings['start_at'] is not None:
+        if settings.get('start_at'):
             self._start_at = settings['start_at']
 
-        if 'fade_in' in settings and settings['fade_in'] is not None:
+        if settings.get('fade_in'):
             self._fade_in = settings['fade_in']
 
-        if 'fade_out' in settings and settings['fade_out'] is not None:
+        if settings.get('fade_out'):
             self._fade_out = settings['fade_out']
 
-        if 'about_to_finish_time' in settings:
+        if settings.get('about_to_finish_time', -1) != -1:
             self._about_to_finish_time = settings['about_to_finish_time']
 
-        if 'max_queue_time' in settings:
+        if settings.get('max_queue_time', -1) != -1:
             self._max_queue_time = settings['max_queue_time']
 
-        if 'events_when_played' in settings:
+        if settings.get('events_when_played', ['use_sound_setting']) != ['use_sound_setting']:
             self._events_when_played = settings['events_when_played']
 
-        if 'events_when_stopped' in settings:
+        if settings.get('events_when_stopped', ['use_sound_setting']) != ['use_sound_setting']:
             self._events_when_stopped = settings['events_when_stopped']
 
-        if 'events_when_looping' in settings:
+        if settings.get('events_when_looping', ['use_sound_setting']) != ['use_sound_setting']:
             self._events_when_looping = settings['events_when_looping']
 
-        if 'events_when_about_to_finish' in settings:
+        if settings.get('events_when_about_to_finish', ['use_sound_setting']) != ['use_sound_setting']:
             self._events_when_about_to_finish = settings['events_when_about_to_finish']
 
-        if 'mode_end_action' in settings and settings['mode_end_action'] is not None:
+        if settings.get('mode_end_action', 'use_sound_setting') != 'use_sound_setting':
             action = str(settings['mode_end_action']).lower()
             if action == 'stop':
                 self._mode_end_action = ModeEndAction.stop
             elif action == 'stop_looping':
                 self._mode_end_action = ModeEndAction.stop_looping
 
-        if settings is not None and 'markers' in settings:
-            self._markers = SoundAsset.load_markers(settings['markers'], self.name)
-
-        if 'key' in settings:
+        if settings.get('key', 'use_sound_setting') != 'use_sound_setting':
             self._key = settings['key']
 
     def __repr__(self):
