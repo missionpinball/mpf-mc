@@ -133,10 +133,6 @@ Here are several various examples:
                 self.machine.log.error("SoundPlayer: The specified action "
                                        "is not valid ('{}').".format(action))
 
-    def get_express_config(self, value):
-        """ express config for sounds is simply a string (sound name)"""
-        return dict(sound=value)
-
     # pylint: disable=too-many-branches
     def validate_config(self, config):
         """Validates the sound_player: section of a config file (either a
