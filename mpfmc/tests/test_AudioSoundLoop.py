@@ -543,7 +543,7 @@ class TestAudioSoundLoop(MpfMcTestCase):
 
         # Now play second kick loop and recheck status (loops should perform a quick cross-fade and switch)
         track_loops.play_sound_loop_set(self.mc.sound_loop_sets['basic_beat2'], None, {'timing': 'now'})
-        self.advance_real_time(0.2)
+        self.advance_real_time(0.3)
 
         status = track_loops.get_status()
         self.assertEqual(1, len(status))
