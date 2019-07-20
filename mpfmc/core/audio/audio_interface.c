@@ -14003,7 +14003,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
  * 
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)             # <<<<<<<<<<<<<<
  * 
- * cdef inline void send_sound_about_to_finish_notification(int player, long sound_id, long sound_instance_id,
+ * cdef inline void send_sound_about_to_finish_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
  */
     __pyx_v_track->notification_messages = g_slist_prepend(__pyx_v_track->notification_messages, __pyx_v_notification_message);
 
@@ -14030,12 +14030,12 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
 /* "mpfmc/core/audio/notification_message.pxd":116
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_about_to_finish_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_about_to_finish_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                          TrackState *track) nogil:
  *     """
  */
 
-static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_about_to_finish_notification(int __pyx_v_player, long __pyx_v_sound_id, long __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
+static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_about_to_finish_notification(int __pyx_v_player, Uint64 __pyx_v_sound_id, Uint64 __pyx_v_sound_instance_id, __pyx_t_5mpfmc_4core_5audio_5track_TrackState *__pyx_v_track) {
   __pyx_t_5mpfmc_4core_5audio_20notification_message_NotificationMessageContainer *__pyx_v_notification_message;
   int __pyx_t_1;
 
@@ -14115,7 +14115,7 @@ static CYTHON_INLINE void __pyx_f_5mpfmc_4core_5audio_20notification_message_sen
   /* "mpfmc/core/audio/notification_message.pxd":116
  *         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
  * 
- * cdef inline void send_sound_about_to_finish_notification(int player, long sound_id, long sound_instance_id,             # <<<<<<<<<<<<<<
+ * cdef inline void send_sound_about_to_finish_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,             # <<<<<<<<<<<<<<
  *                                                          TrackState *track) nogil:
  *     """
  */

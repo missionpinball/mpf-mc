@@ -113,7 +113,7 @@ cdef inline void send_sound_looping_notification(int player, Uint64 sound_id, Ui
 
         track.notification_messages = g_slist_prepend(track.notification_messages, notification_message)
 
-cdef inline void send_sound_about_to_finish_notification(int player, long sound_id, long sound_instance_id,
+cdef inline void send_sound_about_to_finish_notification(int player, Uint64 sound_id, Uint64 sound_instance_id,
                                                          TrackState *track) nogil:
     """
     Sends a sound about to finish notification
