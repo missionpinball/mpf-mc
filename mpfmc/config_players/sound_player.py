@@ -133,6 +133,10 @@ Here are several various examples:
                 self.machine.log.error("SoundPlayer: The specified action "
                                        "is not valid ('{}').".format(action))
 
+    def get_express_config(self, value):
+        """ express config for sounds is simply a string (sound name)"""
+        return dict(sound=value)
+
     # pylint: disable=too-many-branches
     def validate_config(self, config):
         """Validates the sound_player: section of a config file (either a
@@ -182,6 +186,53 @@ Here are several various examples:
                         self._validate_config_item(sound, sound_settings))
 
         return validated_config
+
+    def _validate_config_item(self, device, device_settings):
+        """Validates the config when in a show or in a player"""
+
+        # device is sound name
+        # Validate the settings against the config spec
+        validated_dict = super()._validate_config_item(device, device_settings)
+
+        # Remove any items from the settings that were not explicitly provided in the
+        # sound_player config section (only want to override sound settings explicitly
+        # and not with any default values).  The default values for these items are not
+        # legal values and therefore we know the user did not provide them.
+        if validated_dict[device]['track'] == 'use_sound_setting':
+            del validated_dict[device]['track']
+        if validated_dict[device]['priority'] is None:
+            del validated_dict[device]['priority']
+        if validated_dict[device]['volume'] is None:
+            del validated_dict[device]['volume']
+        if validated_dict[device]['loops'] is None:
+            del validated_dict[device]['loops']
+        if validated_dict[device]['start_at'] is None:
+            del validated_dict[device]['start_at']
+        if validated_dict[device]['fade_in'] is None:
+            del validated_dict[device]['fade_in']
+        if validated_dict[device]['fade_out'] is None:
+            del validated_dict[device]['fade_out']
+        if validated_dict[device]['about_to_finish_time'] == -1:
+            del validated_dict[device]['about_to_finish_time']
+        if validated_dict[device]['max_queue_time'] == -1:
+            del validated_dict[device]['max_queue_time']
+        if len(validated_dict[device]['events_when_played']) == 1 and \
+                validated_dict[device]['events_when_played'][0] == 'use_sound_setting':
+            del validated_dict[device]['events_when_played']
+        if len(validated_dict[device]['events_when_about_to_finish']) == 1 and \
+                validated_dict[device]['events_when_about_to_finish'][0] == 'use_sound_setting':
+            del validated_dict[device]['events_when_about_to_finish']
+        if len(validated_dict[device]['events_when_stopped']) == 1 and \
+                validated_dict[device]['events_when_stopped'][0] == 'use_sound_setting':
+            del validated_dict[device]['events_when_stopped']
+        if len(validated_dict[device]['events_when_looping']) == 1 and \
+                validated_dict[device]['events_when_looping'][0] == 'use_sound_setting':
+            del validated_dict[device]['events_when_looping']
+        if validated_dict[device]['mode_end_action'] is None or \
+                validated_dict[device]['mode_end_action'] == 'use_sound_setting':
+            del validated_dict[device]['mode_end_action']
+
+        return validated_dict
 
     def clear_context(self, context):
         """Stop all sounds from this context."""
