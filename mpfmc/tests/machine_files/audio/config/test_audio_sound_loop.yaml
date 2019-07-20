@@ -42,10 +42,12 @@ assets:
 
 sounds:
   kick:
+    loops: -1
     markers:
       - time: 1.0s
         events: kick_marker_1
   hihat:
+    loops: -1
     markers:
       - time: 0.5s
         events: hihat_marker_1
@@ -53,7 +55,23 @@ sounds:
         events: hihat_marker_2
 
 sound_loop_sets:
+  hi_hat:
+    sound: hihat
+    volume: 0.7
+    tempo: 130
+    events_when_played: hi_hat_played
+    events_when_looping: hi_hat_looping
+    events_when_stopped: hi_hat_stopped
+
   basic_beat:
+    sound: kick
+    volume: 0.5
+    tempo: 130
+    events_when_played: basic_beat_played
+    events_when_looping: basic_beat_looping
+    events_when_stopped: basic_beat_stopped
+
+  basic_beat_layers:
     sound: kick
     volume: 0.5
     tempo: 130
@@ -67,10 +85,19 @@ sound_loop_sets:
       - sound: clap
         volume: 0.45
         initial_state: stop
-    events_when_played: basic_beat_played
-    events_when_looping: basic_beat_looping
-    events_when_stopped: basic_beat_stopped, sound_loop_set_stopped
+    events_when_played: basic_beat_layers_played
+    events_when_looping: basic_beat_layers_looping
+    events_when_stopped: basic_beat_layers_stopped, sound_loop_set_stopped
+
   basic_beat2:
+    sound: kick2
+    volume: 0.5
+    tempo: 130
+    events_when_played: basic_beat2_played
+    events_when_looping: basic_beat2_looping
+    events_when_stopped: basic_beat2_stopped
+
+  basic_beat_layers2:
     sound: kick2
     volume: 0.5
     tempo: 130
@@ -85,13 +112,23 @@ sound_loop_sets:
       - sound: bass_synth
         volume: 0.5
         initial_state: play
-    events_when_played: basic_beat2_played
+    events_when_played: basic_beat_layers2_played
 
 sound_loop_player:
+  play_hi_hat:
+    loops:
+      action: play
+      sound_loop_set: hi_hat
+
   play_basic_beat:
     loops:
       action: play
       sound_loop_set: basic_beat
+
+  play_basic_beat_layers:
+    loops:
+      action: play
+      sound_loop_set: basic_beat_layers
   add_hi_hats:
     loops:
       action: play_layer
@@ -114,6 +151,11 @@ sound_loop_player:
     loops:
       action: play
       sound_loop_set: basic_beat2
+
+  play_basic_beat_layers2:
+    loops:
+      action: play
+      sound_loop_set: basic_beat_layers2
       timing: next_beat_interval
       interval: 2
   add_bass_synth:
@@ -141,4 +183,4 @@ sound_loop_player:
 
 sound_player:
     play_sound_synthping: 210871_synthping
-    basic_beat2_played: 210871_synthping
+    basic_beat_layers2_played: 210871_synthping
