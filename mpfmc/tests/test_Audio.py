@@ -210,6 +210,8 @@ class TestAudio(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=0, name='moron_marker')
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=1, name='moron_next_marker')
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=1, name='last_marker')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=2,
+                                                   name='moron_about_to_finish_marker')
 
     def test_sound_instance_parameters(self):
         """Test the creation of sound instances and their parameters"""
