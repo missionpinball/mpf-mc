@@ -87,9 +87,9 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
             return
 
         # test volume
-        self.assertEqual(0.8, self.machine.get_machine_var("master_volume"))
+        self.assertEqual(0.8, self.machine.variables.get_machine_var("master_volume"))
 
         self.hit_and_release_switch("s_service_up")
         self.advance_time_and_run()
-        self.assertEqual(0.84, self.machine.get_machine_var("master_volume"))
+        self.assertEqual(0.84, self.machine.variables.get_machine_var("master_volume"))
 

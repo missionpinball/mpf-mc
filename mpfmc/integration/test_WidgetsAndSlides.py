@@ -68,7 +68,7 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.post_event("start_mode4")
         self.advance_time_and_run(.1)
         self.post_event("show_variable_slide")
-        self.machine.set_machine_var("test1", "asd")
+        self.machine.variables.set_machine_var("test1", "asd")
         self.advance_time_and_run(.1)
         self.assertSlideOnTop("variable_slide")
         self.assertTextInSlide('MAIN TEXT 1:Test 2:7 3:1.75 4:asd', "variable_slide")
@@ -76,7 +76,7 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.machine.game.player["test_float"] = 42.23
         self.machine.game.player["test_str"] = "1337"
         self.machine.game.player["score"] = 1337
-        self.machine.set_machine_var("test1", "l33t")
+        self.machine.variables.set_machine_var("test1", "l33t")
         self.advance_time_and_run(.1)
         self.assertTextInSlide('MAIN TEXT 1:1337 2:42 3:42.23 4:l33t', "variable_slide")
         self.drain_all_balls()
