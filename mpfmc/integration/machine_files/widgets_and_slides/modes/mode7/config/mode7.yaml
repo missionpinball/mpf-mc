@@ -1,0 +1,21 @@
+#config_version=5
+
+mode:
+  start_events: start_mode7
+  stop_events: stop_mode7
+
+slide_player:
+  test_conditional.1{var==1}: test_condition1
+  test_conditional.2{var==2}: test_condition2
+  remove_conditional:
+    test_condition1:
+      action: remove
+
+
+slides:
+  test_condition1:
+  - type: text
+    text: Condition 1
+  test_condition2:
+  - type: text
+    text: Condition 2

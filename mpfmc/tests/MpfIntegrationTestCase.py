@@ -168,8 +168,51 @@ class MpfIntegrationTestCase(MpfTestCase):
     def get_enable_plugins(self):
         return True
 
+    def mock_mc_event(self, event_name):
+        """Configure an event to be mocked.
+
+        Same as mock_event but for mc in integration test.
+        """
+        self._mc_events[event_name] = 0
+        self.mc.events.remove_handler_by_event(event=event_name, handler=self._mock_mc_event_handler)
+        self.mc.events.add_handler(event=event_name,
+                                   handler=self._mock_mc_event_handler,
+                                   event_name=event_name)
+
+    def _mock_mc_event_handler(self, event_name, **kwargs):
+        self._last_mc_event_kwargs[event_name] = kwargs
+        self._mc_events[event_name] += 1
+
+    def assertMcEventNotCalled(self, event_name):
+        """Assert that event was not called.
+
+        Same as mock_event but for mc in integration test.
+        """
+        if event_name not in self._mc_events:
+            raise AssertionError("Event {} not mocked.".format(event_name))
+
+        if self._mc_events[event_name] != 0:
+            raise AssertionError("Event {} was called {} times.".format(event_name, self._mc_events[event_name]))
+
+    def assertMcEventCalled(self, event_name, times=None):
+        """Assert that event was called.
+
+        Same as mock_event but for mc in integration test.
+        """
+        if event_name not in self._mc_events:
+            raise AssertionError("Event {} not mocked.".format(event_name))
+
+        if self._mc_events[event_name] == 0 and times != 0:
+            raise AssertionError("Event {} was not called.".format(event_name))
+
+        if times is not None and self._mc_events[event_name] != times:
+            raise AssertionError("Event {} was called {} instead of {}.".format(
+                event_name, self._mc_events[event_name], times))
+
     def __init__(self, methodName):
         super().__init__(methodName)
+        self._mc_events = {}
+        self._last_mc_event_kwargs = {}
         try:
             del self.machine_config_patches['mpf']['plugins']
         except KeyError:
