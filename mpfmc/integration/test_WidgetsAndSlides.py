@@ -58,6 +58,19 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.assertModeRunning("mode6")
         self.assertTextOnTopSlide('Slide Mode 6')
 
+    def test_condition_slide_player(self):
+        self.start_game()
+        self.mc.post_mc_native_event("start_mode7")
+        self.advance_time_and_run()
+        self.assertModeRunning("mode7")
+        self.post_event_with_params("test_conditional", var=1)
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide('Condition 1')
+        self.post_event("remove_conditional")
+        self.post_event_with_params("test_conditional", var=2)
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide('Condition 2')
+
     def test_placeholders(self):
         self.post_event("play_slide_last_game_score")
         self.advance_time_and_run(.1)
