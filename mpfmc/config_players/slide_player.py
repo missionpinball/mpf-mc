@@ -108,9 +108,10 @@ class McSlidePlayer(McConfigPlayer):
         settings = settings['slides'] if 'slides' in settings else settings
 
         for slide, s in settings.items():
-            if slide.condition and not slide.condition.evaluate(kwargs):
-                continue
-            slide = slide.name
+            if not isinstance(slide, str):
+                if slide.condition and not slide.condition.evaluate(kwargs):
+                    continue
+                slide = slide.name
 
             s.update(kwargs)
 
