@@ -17,6 +17,8 @@ class TestBasicGame(MpfIntegrationTestCase):
     def test_basic_game(self):
         self.hit_switch_and_run('drain', 1)
         self.hit_and_release_switch('start')
+        self.mock_event("player_added")
+        self.mock_mc_event("player_added")
         self.advance_time_and_run(1)
 
         # make sure the MPF side has everything
@@ -31,3 +33,6 @@ class TestBasicGame(MpfIntegrationTestCase):
         self.assertTrue(self.mc.player)
         self.assertEqual(self.mc.player.ball, 1)
         self.assertEqual('FREE PLAY', self.mc.machine_vars['credits_string'])
+
+        self.assertEventCalled("player_added", 1)
+        self.assertMcEventCalled("player_added", 1)
