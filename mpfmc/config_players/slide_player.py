@@ -101,7 +101,6 @@ class McSlidePlayer(McConfigPlayer):
         """Process a slide_player event."""
         instance_dict = self._get_instance_dict(context)
         full_context = self._get_full_context(context)
-        settings = deepcopy(settings)
 
         self.machine.log.info("SlidePlayer: Play called with settings=%s", settings)
 
@@ -113,6 +112,7 @@ class McSlidePlayer(McConfigPlayer):
                     continue
                 slide = slide.name
 
+            s = deepcopy(s)
             s.update(kwargs)
 
             if s.get("slide"):
