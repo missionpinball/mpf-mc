@@ -14,6 +14,12 @@ slides:
   slide_with_var:
     - type: text
       text: SLIDE WITH VAR (test)
+  slide_condition_foo:
+    - type: text
+      text: Conditional Slide (FOO)
+  slide_condition_bar:
+    - type: text
+      text: Conditional Slide (BAR)
   machine_slide_1:
     - type: text
       text: TEST SLIDE PLAYER - SLIDE 1
@@ -247,3 +253,8 @@ slide_player:
     slide_with_var:
       tokens:
         test: asd
+  show_conditional_slide:
+    slide_condition_foo{var=="foo"}:
+      action: play
+    slide_condition_bar{var=="bar"}:
+      action: play
