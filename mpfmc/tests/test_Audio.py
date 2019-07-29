@@ -5,10 +5,12 @@ from unittest.mock import MagicMock, call, ANY
 
 try:
     from mpfmc.core.audio import SoundSystem
-    from mpfmc.assets.sound import SoundStealingMethod, SoundPool
+    from mpfmc.assets.sound import SoundInstance, SoundStealingMethod, SoundPool, ModeEndAction
 except ImportError:
     SoundSystem = None
+    SoundInstance = None
     SoundStealingMethod = None
+    ModeEndAction = None
     SoundPool = None
     logging.warning("mpfmc.core.audio library could not be loaded. Audio "
                     "features will not be available")
@@ -208,6 +210,75 @@ class TestAudio(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=0, name='moron_marker')
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=1, name='moron_next_marker')
         self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=1, name='last_marker')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, marker_id=2,
+                                                   name='moron_about_to_finish_marker')
+
+    def test_sound_instance_parameters(self):
+        """Test the creation of sound instances and their parameters"""
+
+        if SoundSystem is None or self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        if interface is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system audio interface could not be loaded - skipping audio tests")
+            self.skipTest("Sound system audio interface could not be loaded")
+
+        self.assertIsNotNone(interface)
+
+        # Ensure sound we are interested in exists
+        self.assertIn('210871_synthping', self.mc.sounds)
+        self.assertEqual(self.mc.sounds['210871_synthping'].priority, 1)
+        self.assertEqual(self.mc.sounds['210871_synthping'].simultaneous_limit, 3)
+        self.assertEqual(self.mc.sounds['210871_synthping'].stealing_method, SoundStealingMethod.oldest)
+        self.assertEqual(self.mc.sounds['210871_synthping'].events_when_played, ['synthping_played'])
+        self.assertIsNone(self.mc.sounds['210871_synthping'].events_when_stopped)
+        self.assertEqual(self.mc.sounds['210871_synthping'].max_queue_time, 2.0)
+        self.assertEqual(self.mc.sounds['210871_synthping'].mode_end_action, ModeEndAction.stop_looping)
+
+        # Create sound instance with no overridden parameters (all values come from sound)
+        instance1 = SoundInstance(self.mc.sounds['210871_synthping'])
+        self.assertEqual(instance1.priority, 1)
+        self.assertEqual(instance1.simultaneous_limit, 3)
+        self.assertEqual(instance1.stealing_method, SoundStealingMethod.oldest)
+        self.assertEqual(instance1.events_when_played, ['synthping_played'])
+        self.assertIsNone(instance1.events_when_stopped)
+        self.assertEqual(instance1.max_queue_time, 2.0)
+        self.assertEqual(instance1.mode_end_action, ModeEndAction.stop_looping)
+
+        # Create sound instance with several overridden parameters
+        instance2 = SoundInstance(self.mc.sounds['210871_synthping'], None,
+                                  {'priority': 5,
+                                   'simultaneous_limit': 7,
+                                   'stealing_method': 'skip',
+                                   'events_when_played': ['use_sound_setting'],
+                                   'events_when_stopped': ['synthping_stopped'],
+                                   'max_queue_time': None,
+                                   'mode_end_action': 'stop'})
+        self.assertEqual(instance2.priority, 5)
+        self.assertEqual(instance2.events_when_played, ['synthping_played'])
+        self.assertEqual(instance2.events_when_stopped, ['synthping_stopped'])
+        self.assertIsNone(instance2.max_queue_time)
+        self.assertEqual(instance2.mode_end_action, ModeEndAction.stop)
+
+        # These parameters may not be overridden (supplied values are ignored)
+        self.assertEqual(instance2.simultaneous_limit, 3)
+        self.assertEqual(instance2.stealing_method, SoundStealingMethod.oldest)
+
+        # Create sound instance with several overridden parameters
+        instance3 = SoundInstance(self.mc.sounds['210871_synthping'], None,
+                                  {'priority': None,
+                                   'events_when_played': None,
+                                   'events_when_stopped': ['use_sound_setting'],
+                                   'max_queue_time': 0.0})
+        self.assertEqual(instance3.priority, 1)
+        self.assertIsNone(instance3.events_when_played)
+        self.assertIsNone(instance3.events_when_stopped)
+        self.assertEqual(instance3.max_queue_time, 0.0)
 
     def test_mode_sounds(self):
         """ Test the sound system using sounds specified in a mode """

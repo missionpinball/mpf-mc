@@ -2,7 +2,6 @@
 #cython: embedsignature=True, language_level=3
 
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
-cimport cpython.pycapsule as pycapsule
 import cython
 import logging
 import time

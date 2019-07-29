@@ -73,10 +73,15 @@ sounds:
             - time: 3.5sec
               name: verse_1
               events: moron_next_marker, last_marker
+            - time: 5.39sec
+              name: about_to_finish
+              events: moron_about_to_finish_marker
     210871_synthping:
+        priority: 1
         simultaneous_limit: 3
         stealing_method: oldest
         events_when_played: synthping_played
+        max_queue_time: 2s
     198361_sfx-028:
         simultaneous_limit: 3
         stealing_method: newest

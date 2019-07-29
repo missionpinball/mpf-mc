@@ -149,7 +149,7 @@ class Widget(KivyWidget):
                 self.mc.post_mc_native_event(event)
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<{} Widget id={}>'.format(self.widget_type_name, self.id)
+        return '<{} Widget id={}>'.format(self.widget_type_name, id(self))
 
     @staticmethod
     def get_display():
@@ -391,8 +391,8 @@ class Widget(KivyWidget):
                 # TOOD: After sufficient time post-0.51, remove this breaking-change-related message
                 if " ".join(self.config['style']) in self.mc.machine_config['widget_styles']:
                     raise ValueError("{} has an invalid style name: {}. ".format(self, e) +
-                        "Please note that as of MPF 0.51, spaces are no longer valid " +
-                        "in widget style names (see '{}')".format(" ".join(self.config['style'])))
+                                     "Please note that as of MPF 0.51, spaces are no longer valid " +
+                                     "in widget style names (see '{}')".format(" ".join(self.config['style'])))
                 raise ValueError("{} has an invalid style name: {}".format(
                     self, e))
 
@@ -967,7 +967,7 @@ class WidgetContainer(RelativeLayout):
         self._widget = widget
 
     def __repr__(self) -> str:  # pragma: no cover
-        return '<WidgetContainer id={} z={} key={}>'.format(self.id, self.z, self.key)
+        return '<WidgetContainer z={} key={}>'.format(self.z, self.key)
 
     def __lt__(self, other: "KivyWidget") -> bool:
         """Less than comparison operator (based on z-order value).

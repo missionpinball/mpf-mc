@@ -585,7 +585,7 @@ class MpfMc(App):
                 custom_code_obj = Util.string_to_class(
                     self.machine_config['mpf-mc']['paths']['scriptlets'] +
                     "." + custom_code)(mc=self,
-                                     name=custom_code.split('.')[1])
+                                       name=custom_code.split('.')[1])
 
                 self.custom_code.append(custom_code_obj)
 

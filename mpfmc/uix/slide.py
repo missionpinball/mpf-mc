@@ -130,10 +130,10 @@ class Slide(Screen, StencilView):
             raise ValueError("Widget {} not found".format(name))
 
         widgets_added = create_widget_objects_from_config(config=self.mc.widgets[name],
-                                            mc=self.mc,
-                                            key=key,
-                                            widget_settings=widget_settings,
-                                            play_kwargs=play_kwargs)
+                                                          mc=self.mc,
+                                                          key=key,
+                                                          widget_settings=widget_settings,
+                                                          play_kwargs=play_kwargs)
         for widget in widgets_added:
             self.add_widget(widget)
 

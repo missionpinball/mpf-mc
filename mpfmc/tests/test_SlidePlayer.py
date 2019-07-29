@@ -19,6 +19,11 @@ class TestSlidePlayer(MpfMcTestCase):
     def get_config_file(self):
         return 'test_slide_player.yaml'
 
+    def test_slide_with_vars(self):
+        self.mc.events.post('show_slide_with_var')
+        self.advance_time()
+        self.assertEqual("SLIDE WITH VAR asd", self.mc.targets["default"].current_slide.children[0].children[0].text)
+
     def test_slide_on_default_display(self):
         self.mc.events.post('show_slide_1')
         self.advance_time()
@@ -171,24 +176,6 @@ class TestSlidePlayer(MpfMcTestCase):
                          'mode1_slide_2')
         self.assertEqual(self.mc.targets['display1'].current_slide.priority,
                          150)
-
-    def test_from_show_via_bcp(self):
-        from mpf.core.bcp.bcp_socket_client import encode_command_string
-
-        show_slide_section = dict()
-        show_slide_section['widgets'] = list()
-
-        show_slide_section['widgets'].append(dict(
-            type='text', text='TEST FROM SHOW'))
-
-        player = McSlidePlayer(self.mc)
-        show_slide_section = player._validate_config_item('slide1', show_slide_section)
-
-        bcp_string = encode_command_string('trigger', name='slides_play', context='test_context', priority=1,
-                                           settings=show_slide_section, calling_context='event2')
-
-        self.mc.bcp_processor.receive_bcp_message(bcp_string)
-        self.advance_time()
 
     def test_slides_created_in_slide_player(self):
         # Anon slides are where the widgets are listed in the slide_player

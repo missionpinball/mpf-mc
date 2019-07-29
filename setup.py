@@ -16,6 +16,7 @@ from distutils.sysconfig import get_python_inc
 from collections import OrderedDict
 from time import sleep
 
+from sysconfig import get_paths
 from setuptools import setup, Extension
 print('Using setuptools')
 
@@ -30,11 +31,18 @@ LooseVersion.__eq__ = ver_equal
 
 MIN_CYTHON_STRING = '0.24'
 MIN_CYTHON_VERSION = LooseVersion(MIN_CYTHON_STRING)
-MAX_CYTHON_STRING = '0.29.6'
+MAX_CYTHON_STRING = '0.29.10'
 MAX_CYTHON_VERSION = LooseVersion(MAX_CYTHON_STRING)
 CYTHON_UNSUPPORTED = (
     # ref https://github.com/cython/cython/issues/1968
     '0.27', '0.27.2'
+)
+CYTHON_REQUIRES_STRING = (
+    'cython>={min_version},<={max_version},{exclusion}'.format(
+        min_version=MIN_CYTHON_STRING,
+        max_version=MAX_CYTHON_STRING,
+        exclusion=','.join('!=%s' % excl for excl in CYTHON_UNSUPPORTED),
+    )
 )
 
 PACKAGE_FILES_ALLOWED_EXT = ('py', 'yaml', 'png', 'md', 'zip', 'gif', 'jpg',
@@ -231,12 +239,17 @@ class CustomBuildExt(build_ext):
 
 
 def _check_and_fix_sdl2_mixer(f_path_to_check):
+    # Between SDL_mixer 2.0.1 and 2.0.4, the included frameworks changed
+    # smpeg2 have been replaced with mpg123, but there is no need to fix.
+    smpeg2_path = ("{}/Versions/A/Frameworks/smpeg2.framework"
+                   "/Versions/A/smpeg2").format(f_path_to_check)
+    if not exists(smpeg2_path):
+        return
+
     print("Check if SDL2_mixer smpeg2 have an @executable_path")
     rpath_from = ("@executable_path/../Frameworks/SDL2.framework"
                   "/Versions/A/SDL2")
     rpath_to = "@rpath/../../../../SDL2.framework/Versions/A/SDL2"
-    smpeg2_path = ("{}/Versions/A/Frameworks/smpeg2.framework"
-                   "/Versions/A/smpeg2").format(f_path_to_check)
     output = getoutput(("otool -L '{}'").format(smpeg2_path)).decode('utf-8')
     if "@executable_path" not in output:
         return
@@ -293,6 +306,17 @@ if c_options['use_gstreamer'] in (None, True):
                     '-Xlinker', '190',
                     '-framework', 'GStreamer'],
                 'include_dirs': [join(f_path, 'Headers')]}
+    elif platform == 'win32':
+        gst_flags = pkgconfig('gstreamer-1.0')
+        if 'libraries' in gst_flags:
+            print('GStreamer found via pkg-config')
+            gstreamer_valid = True
+            c_options['use_gstreamer'] = True
+        elif exists(join(get_paths()['include'], 'gst', 'gst.h')):
+            print('GStreamer found via gst.h')
+            gstreamer_valid = True
+            c_options['use_gstreamer'] = True
+            gst_flags = {'libraries': ['gstreamer-1.0', 'glib-2.0', 'gobject-2.0']}
 
     if not gstreamer_valid:
         # use pkg-config approach instead
@@ -300,7 +324,6 @@ if c_options['use_gstreamer'] in (None, True):
         if 'libraries' in gst_flags:
             print('GStreamer found via pkg-config')
             c_options['use_gstreamer'] = True
-
 
 # detect SDL2
 # works if we forced the options or in autodetection
@@ -373,7 +396,9 @@ class CythonExtension(Extension):
         self.cython_directives = {
             'c_string_encoding': 'utf-8',
             'profile': 'USE_PROFILE' in environ,
-            'embedsignature': 'USE_EMBEDSIGNATURE' in environ}
+            'embedsignature': environ.get('USE_EMBEDSIGNATURE', '0') == 1,
+            'language_level': 3,
+            'unraisable_tracebacks': True}
         # XXX with pip, setuptools is imported before distutils, and change
         # our pyx to c, then, cythonize doesn't happen. So force again our
         # sources
@@ -442,7 +467,7 @@ def determine_sdl2():
 
     # no pkgconfig info, or we want to use a specific sdl2 path, so perform
     # manual configuration
-    flags['libraries'] = ['SDL2', 'SDL2_ttf', 'SDL2_image', 'SDL2_mixer']
+    flags['libraries'] = ['SDL2', 'SDL2_image', 'SDL2_mixer']
     split_chr = ';' if platform == 'win32' else ':'
     sdl2_paths = sdl2_path.split(split_chr) if sdl2_path else []
 
@@ -463,7 +488,7 @@ def determine_sdl2():
         flags = merge(flags, sdl2_flags)
 
     # ensure headers for all the SDL2 and sub libraries are available
-    libs_to_check = ['SDL', 'SDL_mixer', 'SDL_ttf', 'SDL_image']
+    libs_to_check = ['SDL', 'SDL_mixer', 'SDL_image']
     can_compile = True
     for lib in libs_to_check:
         found = False
@@ -522,14 +547,14 @@ def get_extensions_from_sources(sources_to_search):
     ext_modules_found = []
     for pyx, flags in sources_to_search.items():
         pyx = expand(src_path, pyx)
-        depends_souces = [expand(src_path, x) for x in flags.pop('depends', [])]
+        depends_sources = [expand(src_path, x) for x in flags.pop('depends', [])]
         c_depends = [expand(src_path, x) for x in flags.pop('c_depends', [])]
         if not have_cython:
             pyx = '%s.c' % pyx[:-4]
-        f_depends = [x for x in depends_souces if x.rsplit('.', 1)[-1] in (
+        f_depends = [x for x in depends_sources if x.rsplit('.', 1)[-1] in (
             'c', 'cpp', 'm')]
         module_name = get_modulename_from_file(pyx)
-        flags_clean = {'depends': depends_souces}
+        flags_clean = {'depends': depends_sources}
         for item_key, item_value in flags.items():
             if item_value:
                 flags_clean[item_key] = item_value
@@ -576,12 +601,12 @@ install_requires = ['ruamel.yaml==0.15.37',  # better YAML library
                     'kivy>=1.10.1',
                     'psutil',
                     'pygments',  # YAML syntax formatting for the iMC
-                    'pypiwin32>=223;platform_system=="Windows" and python_version>"3.4"',
-                    'pypiwin32<=219;platform_system=="Windows" and python_version=="3.4"',
-                    'kivy.deps.sdl2==0.1.17;platform_system=="Windows"',
-                    'kivy.deps.sdl2_dev==0.1.17;platform_system=="Windows"',
-                    'kivy.deps.glew==0.1.9;platform_system=="Windows"',
-                    'kivy.deps.gstreamer==0.1.12;platform_system=="Windows"',
+                    'pypiwin32>=223;platform_system=="Windows"',
+                    'kivy-deps.sdl2;platform_system=="Windows"',
+                    'kivy-deps.sdl2-dev;platform_system=="Windows"',
+                    'kivy-deps.glew;platform_system=="Windows"',
+                    'kivy-deps.gstreamer;platform_system=="Windows"',
+                    'kivy-deps.gstreamer-dev;platform_system=="Windows"',
                     ]
 
 # If we're running on Read The Docs, then we just need to copy the files
@@ -644,7 +669,6 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -671,4 +695,4 @@ setup(
     mc=mpfmc.commands.mc:get_command
     imc=mpfmc.commands.imc:get_command
     ''',
-    setup_requires=['cython>=' + MIN_CYTHON_STRING] if not skip_cython else [])
+    setup_requires=[CYTHON_REQUIRES_STRING] if not skip_cython else [])

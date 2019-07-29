@@ -9,12 +9,6 @@ environment:
   USE_CYTHON: 1
 
   matrix:
-  - PYVER: 34
-    BITNESS: 86
-    COMPILER: mingw
-  - PYVER: 34
-    BITNESS: 64
-    COMPILER: mingw
   - PYVER: 35
     BITNESS: 86
     COMPILER: msvc
@@ -156,9 +150,13 @@ build_script:
 
     echo "Installing prequisite Python packages..."
 
-    pip install kivy.deps.gstreamer --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\gstreamer
-
-    pip install mock cython pygments docutils kivy.deps.gstreamer_dev kivy.deps.glew kivy.deps.glew_dev kivy.deps.sdl2 kivy.deps.sdl2_dev --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
+    if ($env:BITNESS -eq "64") {
+      pip install kivy.deps.gstreamer==0.1.13 --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\gstreamer
+      pip install mock cython pygments docutils kivy.deps.gstreamer_dev==0.1.13 kivy.deps.glew kivy.deps.glew_dev kivy.deps.sdl2 kivy.deps.sdl2_dev --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
+    } else {
+      pip install kivy.deps.gstreamer==0.1.13 --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\gstreamer
+      pip install mock cython pygments docutils kivy.deps.gstreamer_dev==0.1.13 kivy.deps.glew kivy.deps.glew_dev kivy.deps.sdl2 kivy.deps.sdl2_dev --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
+    }
 
     Check-Error
 

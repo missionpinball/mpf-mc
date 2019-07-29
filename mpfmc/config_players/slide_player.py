@@ -108,11 +108,10 @@ class McSlidePlayer(McConfigPlayer):
         settings = settings['slides'] if 'slides' in settings else settings
 
         for slide, s in settings.items():
-            slide_dict = self.machine.placeholder_manager.parse_conditional_template(slide)
-
-            if slide_dict["condition"] and not slide_dict["condition"].evaluate(kwargs):
-                continue
-            slide = slide_dict["name"]
+            if not isinstance(slide, str):
+                if slide.condition and not slide.condition.evaluate(kwargs):
+                    continue
+                slide = slide.name
 
             s.update(kwargs)
 
@@ -157,9 +156,9 @@ class McSlidePlayer(McConfigPlayer):
                                        s)
                 if 'widgets' in s:
                     target.add_and_show_slide(key=full_context,
-                                              slide_name=slide, **s)
+                                              slide_name=slide, play_kwargs=s['tokens'], **s)
                 else:
-                    target.show_slide(slide_name=slide, key=full_context, **s)
+                    target.show_slide(slide_name=slide, key=full_context, play_kwargs=s['tokens'], **s)
 
                 target.get_screen(slide).on_slide_play()
 
@@ -169,6 +168,13 @@ class McSlidePlayer(McConfigPlayer):
                 del instance_dict[target_name][slide]
                 target.remove_slide(slide=slide,
                                     transition_config=s['transition'] if 'transition' in s else [])
+
+    def _expand_device(self, device):
+        # parse conditionals
+        devices = super()._expand_device(device)
+        for index, device_entry in enumerate(devices):
+            devices[index] = self.machine.placeholder_manager.parse_conditional_template(device_entry)
+        return devices
 
     def get_express_config(self, value):
         # express config for slides can either be a string (slide name) or a

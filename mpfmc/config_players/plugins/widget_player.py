@@ -16,4 +16,5 @@ def register_with_mpf(machine):
     """Register widget player in MPF module."""
     return 'widget', MpfWidgetPlayer(machine)
 
+
 player_cls = MpfWidgetPlayer

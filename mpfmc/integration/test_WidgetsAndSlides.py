@@ -11,6 +11,11 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
     def getMachinePath(self):
         return 'integration/machine_files/widgets_and_slides/'
 
+    def test_slide_with_vars(self):
+        self.post_event("play_show_with_var")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("SLIDE WITH VAR Test123")
+
     def test_anonymous_slides(self):
         self.post_event("start_mode1")
         self.advance_time_and_run(.1)
@@ -53,6 +58,19 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.assertModeRunning("mode6")
         self.assertTextOnTopSlide('Slide Mode 6')
 
+    def test_condition_slide_player(self):
+        self.start_game()
+        self.mc.post_mc_native_event("start_mode7")
+        self.advance_time_and_run()
+        self.assertModeRunning("mode7")
+        self.post_event_with_params("test_conditional", var=1)
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide('Condition 1')
+        self.post_event("remove_conditional")
+        self.post_event_with_params("test_conditional", var=2)
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide('Condition 2')
+
     def test_placeholders(self):
         self.post_event("play_slide_last_game_score")
         self.advance_time_and_run(.1)
@@ -63,7 +81,7 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.post_event("start_mode4")
         self.advance_time_and_run(.1)
         self.post_event("show_variable_slide")
-        self.machine.set_machine_var("test1", "asd")
+        self.machine.variables.set_machine_var("test1", "asd")
         self.advance_time_and_run(.1)
         self.assertSlideOnTop("variable_slide")
         self.assertTextInSlide('MAIN TEXT 1:Test 2:7 3:1.75 4:asd', "variable_slide")
@@ -71,7 +89,7 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
         self.machine.game.player["test_float"] = 42.23
         self.machine.game.player["test_str"] = "1337"
         self.machine.game.player["score"] = 1337
-        self.machine.set_machine_var("test1", "l33t")
+        self.machine.variables.set_machine_var("test1", "l33t")
         self.advance_time_and_run(.1)
         self.assertTextInSlide('MAIN TEXT 1:1337 2:42 3:42.23 4:l33t', "variable_slide")
         self.drain_all_balls()

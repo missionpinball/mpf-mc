@@ -59,9 +59,9 @@ class ColorDmdEffect(EffectsChain):
 
     blur = NumericProperty(0.1)
     '''
-    Sets the size of the blur around each pixel where it's blended with 
-    the background. The value is relative to the pixel. (e.g. a value of 
-    0.1 will add a 10% blur around the edge of each pixel.) 
+    Sets the size of the blur around each pixel where it's blended with
+    the background. The value is relative to the pixel. (e.g. a value of
+    0.1 will add a 10% blur around the edge of each pixel.)
 
     blur is a :class:`~kivy.properties.NumericProperty` and
     defaults to 0.1.
@@ -69,7 +69,7 @@ class ColorDmdEffect(EffectsChain):
 
     dot_size = NumericProperty(0.5)
     '''
-    Sets the size of the circle for the dot/pixel relative to the size of the 
+    Sets the size of the circle for the dot/pixel relative to the size of the
     square bounding box of the dot. A size of 1.0 means that the diameter
     of the dot will be the same as its bounding box, in other words a
     size of 1.0 means that the dot will touch each other.
@@ -81,7 +81,7 @@ class ColorDmdEffect(EffectsChain):
     background_color = ListProperty([0.1, 0.1, 0.1, 1.0])
     '''
     A four-item tuple or list that represents the color of the space between the
-    dots, in RGBA format with individual values as floats between 0.0 - 1.0. If 
+    dots, in RGBA format with individual values as floats between 0.0 - 1.0. If
     you want the background to be transparent, set it to (0.0, 0.0, 0.0, 0.0).
 
     background_color is a :class:`~kivy.properties.ListProperty` and

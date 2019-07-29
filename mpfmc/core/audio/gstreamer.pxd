@@ -19,12 +19,10 @@ cdef extern from 'gst/gst.h':
     ctypedef void *GObject
     ctypedef void (*appcallback_t)(void *, int, int, char *, int)
     ctypedef void (*buscallback_t)(void *, GstMessage *)
-    ctypedef int gint
     ctypedef unsigned int guint
     ctypedef unsigned long gulong
     ctypedef unsigned char guint8
     ctypedef unsigned int guint32
-    ctypedef unsigned long gulong
     ctypedef unsigned int gsize
     ctypedef void *gpointer
     ctypedef const void *gconstpointer
@@ -166,6 +164,7 @@ cdef extern from 'glib.h':
         GSList *next
     GSList* g_slist_append(GSList *list, gpointer data) nogil
     GSList* g_slist_prepend(GSList *list, gpointer data) nogil
+    GSList* g_slist_remove(GSList *list, gconstpointer data) nogil
     void g_slist_free (GSList *list) nogil
     guint g_slist_length (GSList *list) nogil
     GSList *g_slist_reverse(GSList *list) nogil

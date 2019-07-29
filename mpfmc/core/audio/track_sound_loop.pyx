@@ -3,10 +3,9 @@
 
 from libc.stdio cimport FILE, fopen, fprintf, sprintf, fflush, fclose
 from cpython.mem cimport PyMem_Malloc, PyMem_Realloc, PyMem_Free
-cimport cpython.pycapsule as pycapsule
 import cython
 import logging
-from math import ceil, floor
+from math import ceil
 
 from mpfmc.core.audio.sdl2 cimport *
 from mpfmc.core.audio.gstreamer cimport *
@@ -14,7 +13,6 @@ from mpfmc.core.audio.track cimport *
 from mpfmc.core.audio.inline cimport in_out_quad
 from mpfmc.core.audio.notification_message cimport *
 from mpfmc.core.audio.track_sound_loop cimport *
-from mpfmc.core.audio.audio_exception import AudioException
 
 
 # ---------------------------------------------------------------------------
@@ -55,10 +53,8 @@ cdef class TrackSoundLoop(Track):
         self.state.type_state = <void*>self.type_state
 
         # Initialize track specific state structures
-        self._initialize_player(&self.type_state.player_1)
-        self._initialize_player(&self.type_state.player_2)
-        self.type_state.current = cython.address(self.type_state.player_1)
-        self.type_state.next = cython.address(self.type_state.player_2)
+        self.type_state.players = NULL
+        self.type_state.current = NULL
 
         self._sound_loop_set_counter = 0
         self._active_sound_loop_sets = dict()
@@ -75,11 +71,15 @@ cdef class TrackSoundLoop(Track):
         # Free the specific track type state and other allocated memory
         if self.type_state != NULL:
 
-            if self.type_state.player_1.layers != NULL:
-                self._reset_player_layers(cython.address(self.type_state.player_1))
+            if self.type_state.players != NULL:
+                iterator = self.type_state.players
+                while iterator != NULL:
+                    self._delete_player_layers(<SoundLoopSetPlayer*>iterator.data)
+                    g_slice_free1(sizeof(SoundLoopSetPlayer), iterator.data)
+                    iterator = iterator.next
 
-            if self.type_state.player_2.layers != NULL:
-                self._reset_player_layers(cython.address(self.type_state.player_2))
+                g_slist_free(self.type_state.players)
+                self.type_state.players = NULL
 
             PyMem_Free(self.type_state)
             self.type_state = NULL
@@ -105,20 +105,21 @@ cdef class TrackSoundLoop(Track):
         """Return whether or not track accepts streaming sounds"""
         return False
 
-    cdef _initialize_player(self, SoundLoopSetPlayer *player):
-        """Initializes a SoundLoopSetPlayer struct."""
-        if player != NULL:
-            player.layers = NULL
-            player.master_sound_layer.markers = NULL
-            self._reset_player(player)
-
     def stop_all_sounds(self, float fade_out_seconds = 0.0):
         """
         Stops all playing sounds immediately on the track.
         Args:
             fade_out_seconds: The number of seconds to fade out the sounds before stopping
         """
-        pass
+        cdef GSList *iterator
+        cdef SoundLoopSetPlayer *player
+
+        iterator = self.type_state.players
+        while iterator != NULL:
+            player = <SoundLoopSetPlayer*>iterator.data
+            # TODO: Stop player (calculate fade out if necessary)
+
+            iterator = iterator.next
 
     def stop_sound(self, sound not None, fade_out=None):
         """
@@ -244,6 +245,12 @@ cdef class TrackSoundLoop(Track):
                 self.log.debug("Removing sound_loop_set settings %d from active list", notification_message.data.sound_loop_set.id)
                 del self._active_sound_loop_sets[notification_message.data.sound_loop_set.id]
 
+                # Remove and delete sound loop set player used to play this set
+                player = <SoundLoopSetPlayer*>notification_message.data.sound_loop_set.player
+                if player != NULL:
+                    self._delete_player(player)
+                    self.type_state.players = g_slist_remove(self.type_state.players, player)
+
             elif notification_message.message == notification_sound_loop_set_looping:
                 if sound_loop_set_settings['events_when_looping'] is not None:
                     for event in sound_loop_set_settings['events_when_looping']:
@@ -283,6 +290,7 @@ cdef class TrackSoundLoop(Track):
             player_settings: Settings to use for playback
         """
         cdef SoundLoopSetPlayer *player
+        cdef SoundLoopSetPlayer *existing_player
         cdef SoundLoopLayerSettings *layer
         cdef int bytes_per_sample_frame
         cdef bint player_already_playing = False
@@ -321,144 +329,13 @@ cdef class TrackSoundLoop(Track):
 
         SDL_LockAudio()
 
-        # Determine current track player status so we can determine what action(s) should be
-        # taken to play the requested loop set.  There should never be a situation where the
-        # current player is idle while the next one is playing.
-        if self.type_state.current.status == player_idle:
+        # Create new player
+        player = <SoundLoopSetPlayer*>g_slice_alloc0(sizeof(SoundLoopSetPlayer))
+        self._initialize_player(player)
 
-            # The current player is idle.  This is the simplest case as the queue and
-            # synchronize settings can be ignored as we simply start playing the requested
-            # loop set immediately on the current player.
-            player = self.type_state.current
-            self._reset_player(player)
-            player_already_playing = False
-
-        elif self.type_state.next.status in (player_idle, player_pending):
-
-            # The current player is busy playing a loop set.  In this case the queue and
-            # synchronize settings are important and dictate how the requested loop set
-            # will be played.
-            player = self.type_state.next
-            player_already_playing = True
-
-            # Remove the previously pending sound_loop_set from the active sound loop set dict (if exists)
-            if player.status == player_pending and player.master_sound_layer.sound_loop_set_id in self._active_sound_loop_sets:
-                del self._active_sound_loop_sets[player.master_sound_layer.sound_loop_set_id]
-
-            self._reset_player(player)
-
-        else:
-            # TODO: Handle case when both players are busy (i.e. during a cross-fade)
-            self.log.info("Unable to play sound - both sound loop players are currently busy.")
-            # print("Unable to play sound - both sound loop players are currently busy.")
-            SDL_UnlockAudio()
-            return
-
-        # print("play_sound_loop_set - player_already_playing:", player_already_playing)
-
-        # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
-        player.master_sound_layer.fade_in_steps = player_settings['fade_in'] * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
-        player.master_sound_layer.fade_out_steps = player_settings['fade_out'] * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
-        player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
-        
-        if player_already_playing:
-
-            # Determine if playing immediately or queuing until next loop
-            if player_settings['timing'] == 'loop_end':
-                # Queue until the end of the current loop
-                player.status = player_pending
-                player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
-                player.stop_loop_at_pos = do_not_stop_loop
-
-                # Ensure sample position starts on a sample frame boundary (audio distortion may occur if starting
-                # in the middle of a sample frame)
-                bytes_per_sample_frame = self.state.callback_data.bytes_per_sample * self.state.callback_data.channels
-                player.sample_pos = bytes_per_sample_frame * ceil(player.sample_pos / bytes_per_sample_frame)
-
-                self.type_state.current.stop_loop_at_pos = self.type_state.current.length
-
-            elif player_settings['timing'] == 'next_time_interval':
-                # Set currently playing sample to end at the next specified time interval multiple
-                player.status = player_pending
-                player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
-                player.stop_loop_at_pos = do_not_stop_loop
-
-                self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(
-                    self.type_state.current.sample_pos,
-                    <Uint32>(self.state.callback_data.seconds_to_bytes_factor * player_settings['interval']),
-                    self.state.callback_data.bytes_per_sample * self.state.callback_data.channels)
-
-                # Adjust currently playing sample end position to ensure it is within the sample
-                while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:
-                    self.type_state.current.stop_loop_at_pos -= self.type_state.current.length
-
-                # If stop position is at beginning of loop (first 10ms), set it to be the end so it won't start
-                # another iteration of the loop (probably a rounding error anyway)
-                if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):
-                    self.type_state.current.stop_loop_at_pos = self.type_state.current.length
-
-                # print("play_sound_loop_set - next_time_interval - sample_pos, stop_loop_at_pos, length:", self.type_state.current.sample_pos, self.type_state.current.stop_loop_at_pos, self.type_state.current.length)
-
-            elif player_settings['timing'] == 'next_beat_interval':
-                # Set currently playing sample to end at the next specified beat interval multiple
-                player.status = player_pending
-                player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
-                player.stop_loop_at_pos = do_not_stop_loop
-
-                self.type_state.current.stop_loop_at_pos = self._round_sample_pos_up_to_interval(
-                    self.type_state.current.sample_pos,
-                    <Uint32> (self.state.callback_data.seconds_to_bytes_factor * (
-                            player_settings['interval'] * 60.0 / self.type_state.current.tempo)),
-                    self.state.callback_data.bytes_per_sample * self.state.callback_data.channels)
-
-                # Adjust currently playing sample end position to ensure it is within the sample
-                while self.type_state.current.stop_loop_at_pos > self.type_state.current.length:
-                    self.type_state.current.stop_loop_at_pos -= self.type_state.current.length
-
-                # If stop position is at beginning of loop (first 10ms), set it to be the end so it won't start
-                # another iteration of the loop (probably a rounding error anyway)
-                if self.type_state.current.stop_loop_at_pos < <Uint32>(0.01 * self.state.callback_data.seconds_to_bytes_factor):
-                    self.type_state.current.stop_loop_at_pos = self.type_state.current.length
-
-            else:
-                # Play now
-
-                # Synchronize the loop set to the current player (if flag is set)
-                if player_settings['synchronize']:
-                    player.sample_pos = self.type_state.current.sample_pos
-
-                else:
-                    player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
-                    player.stop_loop_at_pos = do_not_stop_loop
-
-                # If no fade is set, use a quick cross-fade when synchronizing
-                # (avoids pops & clicks)
-                if player.master_sound_layer.fade_steps_remaining == 0:
-                    player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
-                    player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
-
-                if player.master_sound_layer.fade_steps_remaining > 0:
-                    player.status = player_fading_in
-                    self.type_state.current.status = player_fading_out
-                    self.type_state.current.master_sound_layer.fade_out_steps = player.master_sound_layer.fade_in_steps
-                    self.type_state.current.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_steps_remaining
-
-                else:
-                    player.status = player_playing
-
-        else:
-            player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
-            player.stop_loop_at_pos = do_not_stop_loop
-
-            if player.master_sound_layer.fade_steps_remaining > 0:
-                player.status = player_fading_in
-            else:
-                player.status = player_playing
-
-        # Save current sound loop set so it can be referred to again while it is active (event notifications)
         self._sound_loop_set_counter += 1
-        self._active_sound_loop_sets[self._sound_loop_set_counter] = player_settings
 
+        # Assign sound loop settings
         master_layer_settings = {
             "sound_loop_set_id": self._sound_loop_set_counter,
             "sound": sound_loop_set['sound'],
@@ -472,14 +349,13 @@ cdef class TrackSoundLoop(Track):
         if player.master_sound_layer.sound != NULL:
             player.length = <Uint32>player.master_sound_layer.sound.data.memory.size
             player.tempo = player_settings['tempo']
-
-            # Adjust sample position to ensure it is within the sample
-            while player.sample_pos >= player.length:
-                player.sample_pos -= player.length
         else:
             player.length = 0
             player.sample_pos = 0
             player.status = player_idle
+            g_slice_free1(sizeof(SoundLoopSetPlayer), player)
+            SDL_UnlockAudio()
+            return
 
         # Setup sound loop set layers
         for layer_settings in sound_loop_set['layers']:
@@ -494,12 +370,117 @@ cdef class TrackSoundLoop(Track):
             # Append layer
             player.layers = g_slist_append(player.layers, layer)
 
+        # Calculate fading (done at control rate; need to calculate the number of steps over which to fade in/out)
+        player.master_sound_layer.fade_in_steps = player_settings['fade_in'] * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
+        player.master_sound_layer.fade_out_steps = player_settings['fade_out'] * self.state.callback_data.seconds_to_bytes_factor // self.state.callback_data.bytes_per_control_point
+        player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
+
+        # Determine if there are any other active players
+        if self.type_state.players != NULL:
+            iterator = self.type_state.players
+            while iterator != NULL:
+                existing_player = <SoundLoopSetPlayer*>iterator.data
+                if existing_player != NULL and existing_player.status != player_idle:
+                    player_already_playing = True
+                    break
+                iterator = iterator.next
+
+        if player_already_playing and self.type_state.current != NULL:
+
+            # Determine if playing immediately or queuing until next loop
+            if player_settings['timing'] == 'loop_end':
+                # Queue until the end of the current loop
+                player.status = player_delayed
+
+                # Ensure sample position starts on a sample frame boundary (audio distortion may occur if starting
+                # in the middle of a sample frame)
+                bytes_per_sample_frame = self.state.callback_data.bytes_per_sample * self.state.callback_data.channels
+                player.sample_pos = bytes_per_sample_frame * ceil(player.sample_pos / bytes_per_sample_frame)
+
+                self.type_state.current.stop_loop_samples_remaining = self.type_state.current.length - self.type_state.current.sample_pos
+                player.start_delay_samples_remaining = self.type_state.current.stop_loop_samples_remaining
+
+            elif player_settings['timing'] == 'next_time_interval':
+                # Set currently playing sample to end at the next specified time interval multiple
+                player.status = player_delayed
+
+                self.type_state.current.stop_loop_samples_remaining = self._round_sample_pos_up_to_interval(
+                    self.type_state.current.sample_pos,
+                    <Uint32> (self.state.callback_data.seconds_to_bytes_factor * player_settings['interval']),
+                    self.state.callback_data.bytes_per_sample * self.state.callback_data.channels) - self.type_state.current.sample_pos
+
+                player.start_delay_samples_remaining = self.type_state.current.stop_loop_samples_remaining
+
+            elif player_settings['timing'] == 'next_beat_interval':
+                # Set currently playing sample to end at the next specified beat interval multiple
+                player.status = player_delayed
+
+                self.type_state.current.stop_loop_samples_remaining = self._round_sample_pos_up_to_interval(
+                    self.type_state.current.sample_pos,
+                    <Uint32> (self.state.callback_data.seconds_to_bytes_factor * (
+                            player_settings['interval'] * 60.0 / self.type_state.current.tempo)),
+                    self.state.callback_data.bytes_per_sample * self.state.callback_data.channels) - self.type_state.current.sample_pos
+
+                player.start_delay_samples_remaining = self.type_state.current.stop_loop_samples_remaining
+
+            else:
+                # 'timing' == 'now'
+                player.status = player_playing
+
+                # If no fade is set, use a quick fade-in
+                # (avoids pops & clicks)
+                if player.master_sound_layer.fade_steps_remaining == 0:
+                    player.master_sound_layer.fade_in_steps = self.state.callback_data.quick_fade_steps
+                    player.master_sound_layer.fade_steps_remaining = player.master_sound_layer.fade_in_steps
+
+                if player.master_sound_layer.fade_steps_remaining > 0:
+                    player.status = player_fading_in
+                    self._fade_out_all_players(player.master_sound_layer.fade_in_steps)
+                    # TODO: Should layers fade out as well? (Probably)
+
+            # Cancel and remove all existing delayed players
+            self._cancel_all_delayed_players()
+
+            if player_settings['synchronize']:
+                player.sample_pos = self.type_state.current.sample_pos + self.type_state.current.stop_loop_samples_remaining
+
+                # Adjust sample position to within sample boundaries of synchronized loop
+                while player.sample_pos > self.type_state.current.length:
+                    player.sample_pos -= self.type_state.current.length
+            else:
+                player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
+
+        else:
+            # 'timing' value is ignored when there are no other sound loops playing (playback
+            # begins right away)
+            player.master_sound_layer.fade_steps_remaining = 0
+            player.sample_pos = player_settings['start_at'] * self.state.callback_data.seconds_to_bytes_factor
+            player.status = player_playing
+
+        # Ensure sample position starts on a sample frame boundary (audio distortion may occur if starting
+        # in the middle of a sample frame)
+        bytes_per_sample_frame = self.state.callback_data.bytes_per_sample * self.state.callback_data.channels
+        player.sample_pos = bytes_per_sample_frame * ceil(player.sample_pos / bytes_per_sample_frame)
+
+        # Adjust new player playing position to ensure it is within the sample
+        while player.sample_pos >= player.length:
+            player.sample_pos -= player.length
+
+        # Save current sound loop set so it can be referred to again while it is active (event notifications)
+        self._active_sound_loop_sets[self._sound_loop_set_counter] = player_settings
+
+        # Add new player to the player list
+        self.type_state.players = g_slist_prepend(self.type_state.players, player)
+
         # Send sound_loop_set started notification (if not pending/queued)
-        if player.status not in (player_idle, player_pending):
+        if player.status not in (player_idle, player_delayed):
+            self.type_state.current = player
             send_sound_loop_set_started_notification(player.master_sound_layer.sound_loop_set_id,
                                                      player.master_sound_layer.sound_id,
+                                                     player,
                                                      self.state)
-            # send_sound_started_notification(0, player.master_sound_layer.sound_id, 0, self.state)
+
+        # print("play_sound_loop_set - status: ", self.get_status())
 
         SDL_UnlockAudio()
 
@@ -557,7 +538,7 @@ cdef class TrackSoundLoop(Track):
 
         self.log.debug("Stopping current sound loop set")
 
-        if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
+        if self.type_state.current == NULL or self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
             self.log.info("Unable to stop sound loop set - no sound loop set is currently playing.")
             SDL_UnlockAudio()
             return
@@ -574,15 +555,10 @@ cdef class TrackSoundLoop(Track):
         self.type_state.current.status = player_fading_out
 
         # Need to check if the next sound player has a loop set queued for playback and if so, cancel it
-        if self.type_state.next.status == player_pending:
-            self.type_state.next.status = player_idle
-            self.type_state.next.master_sound_layer.sound_loop_set_id = 0
-            self.type_state.next.master_sound_layer.sound_id = 0
+        self._cancel_all_delayed_players()
 
-        elif self.type_state.next.status == player_fading_out:
-            # Do we need to shorted the current fade-out?
-            if self.type_state.next.master_sound_layer.fade_steps_remaining > self.type_state.current.master_sound_layer.fade_steps_remaining:
-                self.type_state.next.master_sound_layer.fade_steps_remaining = self.type_state.current.master_sound_layer.fade_steps_remaining
+        # Do we need to shorted the current fade-out?
+        self._fade_out_all_players(self.type_state.current.master_sound_layer.fade_steps_remaining)
 
         SDL_UnlockAudio()
 
@@ -593,7 +569,7 @@ cdef class TrackSoundLoop(Track):
 
         self.log.debug("Jumping to %f seconds playback position in current sound loop set", time)
 
-        if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
+        if self.type_state.current == NULL or self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
             self.log.info("Unable to jump to specified playback position - "
                           "no sound loop set is currently playing.")
             SDL_UnlockAudio()
@@ -615,13 +591,12 @@ cdef class TrackSoundLoop(Track):
 
         self.log.debug("Stopping looping current sound loop set")
 
-        if self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
+        if self.type_state.current == NULL or self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
             self.log.info("Unable to stop looping sound loop set - no sound loop set is currently playing.")
             SDL_UnlockAudio()
             return
 
-        self.type_state.current.master_sound_layer.looping = False
-        self.type_state.current.stop_loop_at_pos = self.type_state.current.length
+        self.type_state.current.stop_loop_samples_remaining = self.type_state.current.length - self.type_state.current.sample_pos
 
         SDL_UnlockAudio()
 
@@ -646,6 +621,11 @@ cdef class TrackSoundLoop(Track):
 
         self.log.debug("play_layer - Play layer %d of the currently playing sound_loop_set (fade-in = %f sec).",
                        layer, fade_in)
+
+        if self.type_state.current == NULL or self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
+            self.log.info("Unable to play layer - no sound loop set is currently playing.")
+            SDL_UnlockAudio()
+            return
 
         # Retrieve the layer
         if self.type_state.current.layers == NULL:
@@ -708,6 +688,11 @@ cdef class TrackSoundLoop(Track):
 
         self.log.debug("stop_layer - Stop layer %d of the currently playing sound_loop_set (fade-out = %f sec).",
                        layer, fade_out)
+
+        if self.type_state.current == NULL or self.type_state.current.status not in (player_playing, player_fading_in, player_fading_out):
+            self.log.info("Unable to stop layer - no sound loop set is currently playing.")
+            SDL_UnlockAudio()
+            return
 
         # Retrieve the layer
         if self.type_state.current.layers == NULL:
@@ -779,10 +764,11 @@ cdef class TrackSoundLoop(Track):
 
         SDL_UnlockAudio()
 
-    cdef _reset_player(self, SoundLoopSetPlayer *player):
-        """Reset player back to defaults (frees any allocated layer memory)."""
+    cdef _initialize_player(self, SoundLoopSetPlayer *player):
+        """Initializes a SoundLoopSetPlayer struct."""
         if player != NULL:
-            self._reset_player_layers(player)
+            player.layers = NULL
+            player.master_sound_layer.markers = NULL
             player.status = player_idle
             player.length = 0
             player.master_sound_layer.status = layer_playing
@@ -796,30 +782,83 @@ cdef class TrackSoundLoop(Track):
             player.master_sound_layer.looping = True
             player.master_sound_layer.marker_count = 0
             player.sample_pos = 0
-            player.stop_loop_at_pos = do_not_stop_loop
+            player.start_delay_samples_remaining = 0
+            player.stop_loop_samples_remaining = do_not_stop_loop
 
-    cdef _reset_layer(self, SoundLoopLayerSettings *layer):
-        """Reset (free memory) for a single sound loop set layer."""
-        if layer != NULL:
-            if layer.markers != NULL:
-                g_array_free(layer.markers, True)
-                layer.markers = NULL
-
-    cdef _reset_player_layers(self, SoundLoopSetPlayer *player):
-        """Reset (free memory) for sound loop set player layers."""
+    cdef _delete_player(self, SoundLoopSetPlayer *player):
+        """Delete player (frees any allocated memory, including in layers)"""
         if player != NULL:
-            self._reset_layer(&player.master_sound_layer)
+            self._delete_player_layers(player)
+            g_slice_free1(sizeof(SoundLoopSetPlayer), player)
+
+    cdef _delete_player_layers(self, SoundLoopSetPlayer *player):
+        """Delete (free memory) for sound loop set player layers."""
+        if player != NULL:
+            if player.master_sound_layer.markers != NULL:
+                g_array_free(player.master_sound_layer.markers, True)
 
             if player.layers != NULL:
                 iterator = player.layers
                 while iterator != NULL:
                     layer = <SoundLoopLayerSettings*>iterator.data
-                    self._reset_layer(layer)
+                    if layer.markers != NULL:
+                        g_array_free(layer.markers, True)
                     g_slice_free1(sizeof(SoundLoopLayerSettings), layer)
                     iterator = iterator.next
 
                 g_slist_free(player.layers)
-                player.layers = NULL
+
+    cdef _cancel_all_delayed_players(self):
+        """Cancels and removes all delayed (pending) players."""
+        cdef SoundLoopSetPlayer *player
+        cdef GSList *iterator = self.type_state.players
+
+        # Loop over players
+        while iterator != NULL:
+            player = <SoundLoopSetPlayer*>iterator.data
+            iterator = iterator.next
+
+            # Remove player if it currently has a delayed status
+            if player != NULL and player.status == player_delayed:
+                self.type_state.players = g_slist_remove(self.type_state.players, player)
+
+                # Remove sound loop set from list of active sound loop sets
+                if player.master_sound_layer.sound_id in self._active_sound_loop_sets.keys():
+                    del self._active_sound_loop_sets[player.master_sound_layer.sound_id]
+
+                # Clean up allocated player memory
+                self._delete_player_layers(player)
+                g_slice_free1(sizeof(SoundLoopSetPlayer), player)
+
+    cdef _fade_out_all_players(self, Uint32 fade_steps):
+        """Fades out all currently playing players."""
+        cdef SoundLoopSetPlayer *player
+        cdef GSList *iterator = self.type_state.players
+
+        # Loop over players
+        while iterator != NULL:
+            player = <SoundLoopSetPlayer*>iterator.data
+            iterator = iterator.next
+
+            if player == NULL:
+                continue
+
+            elif player.status == player_playing:
+                player.status = player_fading_out
+                player.master_sound_layer.fade_out_steps = fade_steps
+                player.master_sound_layer.fade_steps_remaining = fade_steps
+
+            elif player.status == player_fading_out:
+                # The existing fade will only be adjusted if it has more steps remaining than specified here
+                if player.master_sound_layer.fade_steps_remaining > fade_steps:
+                    player.master_sound_layer.fade_out_steps = <Uint32>round(fade_steps * player.master_sound_layer.fade_out_steps / player.master_sound_layer.fade_steps_remaining)
+                    player.master_sound_layer.fade_steps_remaining = fade_steps
+
+            elif player.status == player_fading_in:
+                # Keep the same volume level to start as the current fade in
+                player.master_sound_layer.fade_out_steps = <Uint32>round(fade_steps / (1.0 - (player.master_sound_layer.fade_steps_remaining / player.master_sound_layer.fade_in_steps)))
+                player.master_sound_layer.fade_steps_remaining = fade_steps
+                player.status = player_fading_out
 
     def get_status(self):
         """
@@ -832,15 +871,14 @@ cdef class TrackSoundLoop(Track):
         cdef SoundLoopSetPlayer *player
         cdef SoundLoopLayerSettings *layer
         cdef int index = 0
+        cdef GSList *iterator
 
         SDL_LockAudio()
         status = []
-        for player_num in range(2):
-            if player_num == 0:
-                player = self.type_state.current
-            else:
-                player = self.type_state.next
 
+        iterator = self.type_state.players
+        while iterator != NULL:
+            player = <SoundLoopSetPlayer*>iterator.data
             if player == NULL:
                 status.append({
                     "status": TrackSoundLoop.player_status_to_text(player_idle),
@@ -869,14 +907,17 @@ cdef class TrackSoundLoop(Track):
                     "length": player.length,
                     "sound_id": player.master_sound_layer.sound_id,
                     "volume": player.master_sound_layer.volume,
+                    "tempo": player.tempo,
                     "layers": layers,
                     "sample_pos": player.sample_pos,
-                    "stop_loop_at_pos": player.stop_loop_at_pos,
+                    "stop_loop_samples_remaining": "DO NOT STOP LOOP" if player.stop_loop_samples_remaining == do_not_stop_loop else player.stop_loop_samples_remaining,
+                    "start_delay_samples_remaining": player.start_delay_samples_remaining,
                     "fade_in_steps": player.master_sound_layer.fade_in_steps,
                     "fade_out_steps": player.master_sound_layer.fade_out_steps,
                     "fade_steps_remaining": player.master_sound_layer.fade_steps_remaining,
-                    "looping": player.master_sound_layer.looping,
                 })
+
+            iterator = iterator.next
 
         SDL_UnlockAudio()
 
@@ -895,7 +936,7 @@ cdef class TrackSoundLoop(Track):
         """
         status_values = {
             player_idle: "idle",
-            player_pending: "pending",
+            player_delayed: "delayed",
             player_playing: "playing",
             player_fading_in: "fading in",
             player_fading_out: "fading out",
@@ -975,8 +1016,7 @@ cdef class TrackSoundLoop(Track):
         cdef TrackState *target_track
         cdef TrackSoundLoopState *sound_loop_track
         cdef bint first_layer = True
-        cdef bint switch_players = False
-        cdef bint reset_track_buffer_pos = True
+        cdef GSList *iterator
         cdef SoundLoopSetPlayer *player
 
         if track == NULL or track.type_state == NULL:
@@ -987,89 +1027,76 @@ cdef class TrackSoundLoop(Track):
         # Setup local variables
         cdef Uint32 track_buffer_pos
 
-        # If the current player is idle, the track is not active so there is nothing to do
-        if sound_loop_track.current == NULL or sound_loop_track.current.status == player_idle:
-            return
+        # Loop over the current sound loop players
+        iterator = sound_loop_track.players
+        while iterator != NULL:
+            player = <SoundLoopSetPlayer*>iterator.data
+            iterator = iterator.next
 
-        # Set flag indicating there is at least some activity on the track (it is active)
-        track.active = True
+            # If the current player is idle, the track is not active so there is nothing to do for this player
+            if player == NULL or player.status == player_idle:
+                continue
 
-        # Process the current loop player (fill the track buffer with samples)
-        track_buffer_pos = 0
-        while track_buffer_pos < buffer_length and sound_loop_track.current.status \
-                in (player_playing, player_fading_in, player_fading_out):
-
-            track_buffer_pos = get_player_sound_samples(track, sound_loop_track.current,
-                                                        buffer_length, track_buffer_pos,
-                                                        callback_data)
-
-            # Determine if we have reached the stop position for the loop (might not be at the end) or the
-            # loop has finished fading out and is now idle.
-            if sound_loop_track.current.sample_pos == sound_loop_track.current.stop_loop_at_pos or \
-                    sound_loop_track.current.status == player_idle:
-
-                sound_loop_track.current.status = player_idle
-
-                # Send stopped notification
-                send_sound_loop_set_stopped_notification(sound_loop_track.current.master_sound_layer.sound_loop_set_id,
-                                                         sound_loop_track.current.master_sound_layer.sound_id,
-                                                         track)
-
-                # This player has finished, switch the other player to current at the end of this method 
-                switch_players = True
-                
-                # If the other player has a sound loop pending, set the variables to start it playing
-                if sound_loop_track.next.status == player_pending:
-                    reset_track_buffer_pos = False
-                    sound_loop_track.next.status = player_playing
-                    send_sound_loop_set_started_notification(sound_loop_track.next.master_sound_layer.sound_loop_set_id,
-                                                             sound_loop_track.next.master_sound_layer.sound_id,
-                                                             track)
-
-            # Determine if sound should continue to loop
-            elif sound_loop_track.current.sample_pos >= sound_loop_track.current.length:
-
-                    # Send looping notification
-                    send_sound_loop_set_looping_notification(sound_loop_track.current.master_sound_layer.sound_loop_set_id,
-                                                             sound_loop_track.current.master_sound_layer.sound_id,
-                                                             track)
-                    sound_loop_track.current.sample_pos = 0
-
-        if reset_track_buffer_pos:
+            # Process the current loop player (fill the track buffer with samples)
             track_buffer_pos = 0
 
-        # Now process the next player
-        while track_buffer_pos < buffer_length and sound_loop_track.next.status \
-                in (player_playing, player_fading_in, player_fading_out):
+            # Handle any player delay
+            if player.status == player_delayed:
 
-            track_buffer_pos = get_player_sound_samples(track, sound_loop_track.next,
-                                                        buffer_length, track_buffer_pos,
-                                                        callback_data)
+                # Determine if player should start (delay elapses during this buffer)
+                if player.start_delay_samples_remaining < buffer_length:
 
-            # NOTE: It is not possible for the next loop player to have a stop position set (only
-            #       the current loop player can have stop_loop_at_pos set) so we don't need to
-            #       check it.
+                    # Start player playing
+                    track_buffer_pos = player.start_delay_samples_remaining
+                    player.start_delay_samples_remaining = 0
+                    player.status = player_playing
 
-            # Check if we have reached the end of the sound loop.
-            if sound_loop_track.next.sample_pos >= sound_loop_track.next.length:
-                # End of sound loop reached, the next player will always loop
-                send_sound_loop_set_looping_notification(sound_loop_track.next.master_sound_layer.sound_loop_set_id,
-                                                         sound_loop_track.next.master_sound_layer.sound_id,
-                                                         track)
-                sound_loop_track.next.sample_pos = 0
+                    # This player now becomes the current player
+                    sound_loop_track.current = player
 
-            # Check if sound loop has finished playing/fading out
-            if sound_loop_track.next.status == player_idle:
-                # Sound stopped, send notification
-                send_sound_loop_set_stopped_notification(sound_loop_track.next.master_sound_layer.sound_loop_set_id,
-                                                         sound_loop_track.next.master_sound_layer.sound_id,
-                                                         track)
+                    # Send started notification
+                    send_sound_loop_set_started_notification(player.master_sound_layer.sound_loop_set_id,
+                                                             player.master_sound_layer.sound_id,
+                                                             player,
+                                                             track)
 
-        # Switch current and next players (if necessary)
-        if switch_players:
-            player = sound_loop_track.current
-            sound_loop_track.current = sound_loop_track.next
-            sound_loop_track.next = player
+                else:
+                    # Continue to delay until a future buffer
+                    player.start_delay_samples_remaining -= buffer_length
+                    track_buffer_pos = buffer_length
+
+            # Loop over track buffer, filling samples for player (if applicable)
+            while track_buffer_pos < buffer_length and player.status \
+                    in (player_playing, player_fading_in, player_fading_out):
+
+                # Set flag indicating there is at least some activity on the track (it is active)
+                track.active = True
+
+                track_buffer_pos = get_player_sound_samples(track, player, buffer_length,
+                                                            track_buffer_pos, callback_data)
+
+                # Determine if the player has finished
+                if player.status == player_idle:
+
+                    # Player has stopped and is now idle, if it is set as the current one, set current to NULL
+                    if sound_loop_track.current == player:
+                        sound_loop_track.current = NULL
+
+                    # Send stopped notification
+                    send_sound_loop_set_stopped_notification(player.master_sound_layer.sound_loop_set_id,
+                                                             player.master_sound_layer.sound_id,
+                                                             player,
+                                                             track)
+
+                # Determine if sound is looping
+                elif player.sample_pos >= player.length:
+
+                    # Send looping notification
+                    send_sound_loop_set_looping_notification(player.master_sound_layer.sound_loop_set_id,
+                                                             player.master_sound_layer.sound_id,
+                                                             player,
+                                                             track)
+                    player.sample_pos = 0
 
 cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *player,
                                      Uint32 buffer_length, Uint32 track_buffer_pos,
@@ -1131,10 +1158,9 @@ cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *play
             player_volume = SDL_MIX_MAXVOLUME
 
         # Adjust chunk size if the loop is set to stop early (if not the chunk size will remain unchanged)
-        if player.sample_pos < player.stop_loop_at_pos:
-            current_chunk_bytes = min(current_chunk_bytes, player.stop_loop_at_pos - player.sample_pos)
+        current_chunk_bytes = min(current_chunk_bytes, player.stop_loop_samples_remaining)
 
-        if player.status == player_idle:
+        if player.status == player_idle or current_chunk_bytes == 0:
             return buffer_length
 
         # Get master layer samples
@@ -1224,11 +1250,16 @@ cdef Uint32 get_player_sound_samples(TrackState *track, SoundLoopSetPlayer *play
         track_buffer_pos += current_chunk_bytes
         buffer_bytes_remaining -= current_chunk_bytes
 
+        # If player is counting down to stop, decrement remaining samples and see if player is done
+        if player.stop_loop_samples_remaining != do_not_stop_loop:
+            player.stop_loop_samples_remaining -= current_chunk_bytes
+
+            if player.stop_loop_samples_remaining == 0:
+                player.status = player_idle
+
         # Stop looping and generating samples if we have reached the end of the sound or
         # the player is now idle (due to reaching end of a fade out)
-        if player.status == player_idle or \
-                player.sample_pos >= player.length or \
-                player.sample_pos == player.stop_loop_at_pos:
+        if player.status == player_idle or player.sample_pos >= player.length:
             break
 
     return track_buffer_pos
