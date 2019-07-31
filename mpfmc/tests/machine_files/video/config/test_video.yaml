@@ -96,6 +96,17 @@ slides:
   video_test9:
     - type: text
       text: Machine slide, no video
+  video_test10:
+    - type: video
+      video: fanta_1_animate
+    - type: text
+      text: Video with Alpha Channel
+      animations:
+        show_slide:
+          - property: rotation
+            value: 360
+            duration: 3s
+            repeat: -1
 
 slide_player:
   show_slide1: video_test
@@ -107,8 +118,11 @@ slide_player:
   show_slide7: video_test7
   show_slide8: video_test8
   show_slide9: video_test9
+  show_slide10: video_test10
 
 videos:
   mpf_video_small_test:
     width: 100
     height: 70
+  fanta_1_animate:
+    alpha_channel: true

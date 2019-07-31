@@ -18,8 +18,8 @@ class TestVideo(MpfMcTestCase):
         self.mc.events.post('show_slide1')
         self.advance_time()
 
-        video_widget = self.mc.targets['default'].current_slide.widgets[0]
-        text = self.mc.targets['default'].current_slide.widgets[2]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
+        text = self.mc.targets['default'].current_slide.widgets[2].widget
 
         self.assertEqual(video_widget.state, 'play')
         self.assertTrue(video_widget.video.loaded)
@@ -32,10 +32,10 @@ class TestVideo(MpfMcTestCase):
         self.assertEqual(video_widget.video.volume, 1.0)
 
         text.text = 'PLAY'
-        self.advance_time(1)
+        self.advance_real_time(1)
 
         # now that 1 sec has passed, make sure the video is advancing
-        self.assertGreater(video_widget.position, 0)
+        self.assertNotEqual(video_widget.position, 0)
 
         # also check the size. The size isn't set until the video actually
         # starts playing, which is why we don't check it until now.
@@ -55,10 +55,10 @@ class TestVideo(MpfMcTestCase):
         # now start it again
         video_widget.play()
         text.text = 'PLAY'
-        self.advance_time(1)
+        self.advance_real_time(1)
 
         self.assertEqual('playing', video_widget.video.state)
-        self.assertGreater(video_widget.video.position, pos)
+        self.assertNotEqual(video_widget.video.position, pos)
 
         # stop it, should go back to the beginning
         video_widget.stop()
@@ -68,14 +68,15 @@ class TestVideo(MpfMcTestCase):
 
         video_widget.play()
         text.text = 'PLAY FROM BEGINNING'
-        self.advance_time(1)
+        self.advance_real_time(1)
         self.assertAlmostEqual(video_widget.video.position, 1.0, delta=.5)
 
         # jump to the 50% point
-        video_widget.seek(.5)
-        text.text = 'SEEK TO 50%'
-        self.advance_time(.1)
-        self.assertAlmostEqual(video_widget.video.position, 4.0, delta=.5)
+        video_widget.pause()
+        video_widget.seek(.75)
+        text.text = 'SEEK TO 75%'
+        self.advance_time(1)
+        self.assertAlmostEqual(video_widget.video.position, video_widget.video.duration * 0.75, delta=1.0)
 
         # test the volume
         video_widget.set_volume(.5)
@@ -86,10 +87,12 @@ class TestVideo(MpfMcTestCase):
         text.text = 'VOLUME 100% (though this vid has no audible sound)'
         self.assertEqual(1.0, video_widget.video.volume)
 
-        video_widget.set_position(.5)
+        video_widget.set_playback_position(.5)
         text.text = 'SET POSITION TO 0.5s'
-        self.advance_time(.1)
-        self.assertAlmostEqual(video_widget.video.position, 0.6, delta=.5)
+        self.advance_real_time(.1)
+        print("Seek to:", 0.5 / video_widget.video.duration)
+        print("Position:", video_widget.video.position)
+        self.assertAlmostEqual(video_widget.video.position, 0.5, delta=1.0)
 
         # jump to the 90% point
         video_widget.seek(.9)
@@ -174,13 +177,13 @@ class TestVideo(MpfMcTestCase):
     def test_video_settings(self):
         self.mc.events.post('show_slide7')
         self.advance_time(1)
-        video_widget = self.mc.targets['default'].current_slide.widgets[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
 
         # make sure it's playing
         self.assertEqual('playing', video_widget.video.state)
         self.assertEqual(0.2, video_widget.video.volume)
         last_pos = video_widget.video.position
-        self.advance_time(1)
+        self.advance_real_time(1)
 
         # make sure the current position is about 1 sec later than last
         self.assertAlmostEqual(1, video_widget.video.position - last_pos, delta=.2)
@@ -188,12 +191,12 @@ class TestVideo(MpfMcTestCase):
         # jump to 90%
         self.mc.events.post('seek1')
         self.advance_time()
-        self.assertGreater(video_widget.video.position, 7)
+        self.assertGreater(video_widget.video.position, 6)
 
         # wait for the video to end and make sure it loops
         self.advance_time(2)
         last_pos = video_widget.video.position
-        self.advance_time(1)
+        self.advance_real_time(1)
 
         # should still be playing, make sure the current position is about 1
         # sec later than last
@@ -206,7 +209,7 @@ class TestVideo(MpfMcTestCase):
 
         self.mc.events.post('show_slide8')
         self.advance_time(1)
-        video_widget = self.mc.targets['default'].current_slide.widgets[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
 
         self.assertEqual('', video_widget.video.state)
         # stopped state is empty string
@@ -256,7 +259,7 @@ class TestVideo(MpfMcTestCase):
         self.advance_time(2)
         self.assertEqual(self.mc.targets['default'].current_slide.name, 'mode1_slide1')
 
-        video_widget = self.mc.targets['default'].current_slide.widgets[0]
+        video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
         self.assertTrue(isinstance(video_widget, VideoWidget))
         self.assertEqual(video_widget.state, 'play')
 
@@ -266,3 +269,18 @@ class TestVideo(MpfMcTestCase):
         self.assertEqual(self.mc.targets['default'].current_slide.name, 'video_test9')
 
         self.assertEqual(video_widget.state, 'stop')
+
+    def test_alpha_channel_video(self):
+        self.assertIn('fanta_1_animate', self.mc.videos)
+
+        self.mc.events.post('show_slide10')
+        self.advance_time()
+
+        video_widget = self.mc.targets['default'].current_slide.widgets[0].widget
+        text = self.mc.targets['default'].current_slide.widgets[1].widget
+
+        self.assertEqual(video_widget.state, 'play')
+        self.assertTrue(video_widget.video.loaded)
+
+        self.advance_real_time(4)
+
