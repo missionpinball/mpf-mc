@@ -1,9 +1,10 @@
-from kivy.core.video import Video
-from kivy.core.video.video_null import VideoNull
 from kivy.properties import AliasProperty
 
 from mpf.core.assets import AssetPool
 from mpfmc.assets.mc_asset import McAsset
+from mpfmc.core.video import Video
+from urllib.request import pathname2url
+from os.path import realpath
 
 
 class VideoPool(AssetPool):
@@ -16,30 +17,7 @@ class VideoPool(AssetPool):
         return self.asset
 
 
-class VideoWrapper(Video):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.register_event_type('on_play')
-        self.register_event_type('on_stop')
-
-    def on_play(self):
-        pass
-
-    def on_stop(self):
-        pass
-
-    def stop(self):
-        super().stop()
-        self.dispatch('on_stop')
-
-    def play(self):
-        super().play()
-        self.dispatch('on_play')
-
-
 class VideoAsset(McAsset):
-
     attribute = 'videos'
     path_string = 'videos'
     config_section = 'videos'
@@ -52,6 +30,12 @@ class VideoAsset(McAsset):
         self._video = None
         super().__init__(mc, name, file, config)
 
+        # Custom video player alpha channel support is controlled by config setting
+        if 'alpha_channel' in config:
+            self._alpha_channel = config['alpha_channel']
+        else:
+            self._alpha_channel = False
+
         # Setup events to post when video state changes
         self._events_when_played = list()
         self._events_when_stopped = list()
@@ -63,13 +47,25 @@ class VideoAsset(McAsset):
             self._events_when_stopped = self.config['events_when_stopped']
 
     @property
-    def video(self):
-        return self._video
+    def alpha_channel(self):
+        return self._alpha_channel
 
     def do_load(self):
         # For videos, we need them to load in the main thread, so we do not
         # load them here and load them via is_loaded() below.
         pass
+
+    def is_loaded(self):
+        """Handle that asset has been loaded."""
+        self._video = Video(filename=self.file, alpha_channel=self.alpha_channel)
+        self._video.load()
+        self._video.bind(on_play=self.on_play, on_stop=self.on_stop)
+
+        self.loading = False
+        self.loaded = True
+        self.unloading = False
+
+        self._call_callbacks()
 
     def _do_unload(self):
         if self._video:
@@ -78,22 +74,9 @@ class VideoAsset(McAsset):
             self._video = None
 
     def set_end_behavior(self, eos='stop'):
-        assert eos in ('loop', 'pause', 'stop')
-        self._video.eos = eos
-
-    def is_loaded(self):
-        self.loading = False
-        self.loaded = True
-        self.unloading = False
-        self._video = VideoWrapper(filename=self.file)
-        self._video.bind(on_load=self._check_duration,
-                         on_play=self.on_play,
-                         on_stop=self.on_stop)
-
-        if isinstance(self._video, VideoNull):
-            raise AssertionError("Kivy cannot load video {} because there is no provider.".format(self.file))
-
-        self._call_callbacks()
+        if self._video:
+            assert eos in ('loop', 'pause', 'stop')
+            self._video.eos = eos
 
     def _check_duration(self, instance):
         del instance
@@ -121,65 +104,54 @@ class VideoAsset(McAsset):
     # Properties
     #
 
-    def _get_position(self):
+    @property
+    def video(self):
+        return self._video
+
+    @property
+    def texture(self):
+        return self._video.texture
+
+    @property
+    def position(self):
         try:
             return self._video.position
         except AttributeError:
             return 0
 
-    def _set_position(self, pos):
+    @position.setter
+    def position(self, pos):
         # position in secs
         try:
             self._video.position = pos  # noqa
         except AttributeError:
             pass
 
-    position = AliasProperty(_get_position, _set_position)
-    '''Position of the video between 0 and :attr:`duration`. The position
-    defaults to -1 and is set to a real position when the video is loaded.
-
-    :attr:`position` is a :class:`~kivy.properties.NumericProperty` and
-    defaults to -1.
-    '''
-
-    def _get_duration(self):
+    @property
+    def duration(self):
         try:
             return self._video.duration
         except AttributeError:
             return 0
 
-    duration = AliasProperty(_get_duration, None)
-    '''Duration of the video. The duration defaults to -1, and is set to a real
-    duration when the video is loaded.
-
-    :attr:`duration` is a :class:`~kivy.properties.NumericProperty` and
-    defaults to -1.
-    '''
-
-    def _get_volume(self):
+    @property
+    def volume(self):
         try:
             return self._video.volume
         except AttributeError:
             return 0
 
-    def _set_volume(self, volume):
+    @volume.setter
+    def volume(self, volume):
         # float 0.0 - 1.0
         try:
-            self._video.volume = volume     # noqa
+            self._video.volume = volume  # noqa
         except AttributeError:
             pass
 
-    volume = AliasProperty(_get_volume, _set_volume)
-    '''Volume of the video, in the range 0-1. 1 means full volume, 0
-    means mute.
-
-    :attr:`volume` is a :class:`~kivy.properties.NumericProperty` and defaults
-    to 1.
-    '''
-
-    def _get_state(self):
-        return self._video.state
-
-    state = AliasProperty(_get_state, None)
-    '''String, indicates whether to play, pause, or stop the video::
-    '''
+    @property
+    def state(self):
+        if self._video:
+            return self._video.state
+        else:
+            return ''

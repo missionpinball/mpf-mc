@@ -526,6 +526,7 @@ sources = {
     'core/audio/audio_interface.pyx': {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/playlist_controller.pyx': {},
+    'core/video/gst_video.pyx': {'depends': ['core/video/gst_video.h']},
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
 }
 
