@@ -1,7 +1,8 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*.so
+*.o
+*.def
 
 # Distribution / packaging
 .Python
@@ -22,6 +23,12 @@ venv/
 *.egg-info/
 .installed.cfg
 *.egg
+*.so
+*.pyd
+*.pyc
+*.pyo
+*.py#
+*~
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
