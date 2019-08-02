@@ -580,6 +580,16 @@ class TestSlidePlayer(MpfMcTestCase):
             # build weak ref to curent slide
             slide = weakref.ref(self.mc.targets['display1'].current_slide)
 
+    def test_conditional_slide(self):
+        self.mc.events.post('show_conditional_slide', var='foo')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'slide_condition_foo')
+        self.mc.events.post('show_conditional_slide', var='bar')
+        self.advance_time()
+        self.assertEqual(self.mc.targets['display1'].current_slide_name,
+                         'slide_condition_bar')
+
 
 class TestMpfSlidePlayer(MpfTestCase):
 
