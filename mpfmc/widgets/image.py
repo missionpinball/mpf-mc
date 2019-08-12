@@ -119,7 +119,11 @@ class ImageWidget(Widget):
         """Prepare the widget to be removed."""
         super().prepare_for_removal()
         # stop any animations
-        self._image.image.anim_reset(False)
+        try:
+            self._image.image.anim_reset(False)
+        # If the image was already unloaded from memory
+        except AttributeError:
+            pass
 
     def _draw_widget(self, *args):
         """Draws the image (draws a rectangle using the image texture)"""
