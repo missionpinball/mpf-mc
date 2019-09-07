@@ -8,7 +8,7 @@ import psutil
 from kivy.clock import Clock
 
 import mpf.core.bcp.bcp_socket_client as bcp
-from mpfmc._version import __bcp_version__
+from mpfmc._version import __bcp_version__, version as mc_version, extended_version as mc_extended_version
 from mpfmc.core.bcp_server import BCPServer
 
 
@@ -57,6 +57,8 @@ class BcpProcessor:
 
     def _client_connected(self, **kwargs):
         del kwargs
+        self.send(bcp_command="set_machine_var", name="mc_version", value=mc_version)
+        self.send(bcp_command="set_machine_var", name="mc_extended_version", value=mc_extended_version)
         self.send(bcp_command="monitor_start", category="machine_vars")
         self.send(bcp_command="monitor_start", category="player_vars")
         self.send(bcp_command="monitor_start", category="modes")

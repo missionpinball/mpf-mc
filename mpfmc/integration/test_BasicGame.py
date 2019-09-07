@@ -1,4 +1,5 @@
 from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
+from mpfmc._version import version, extended_version
 
 
 class TestBasicGame(MpfIntegrationTestCase):
@@ -36,3 +37,6 @@ class TestBasicGame(MpfIntegrationTestCase):
 
         self.assertEventCalled("player_added", 1)
         self.assertMcEventCalled("player_added", 1)
+
+        self.assertMachineVarEqual(version, "mc_version")
+        self.assertMachineVarEqual(extended_version, "mc_extended_version")
