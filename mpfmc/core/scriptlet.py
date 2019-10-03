@@ -21,4 +21,3 @@ class Scriptlet:
         """Automatically called when this Scriptlet loads. It's the intention
         that the Scriptlet writer will overwrite this method in the Scriptlet.
         """
-        pass

@@ -91,7 +91,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
 
         # detach the widget from the parent
         parent = source.parent
-        if parent:
+        if parent and hasattr(parent, "remove_display_source"):
             parent.remove_display_source(source)
 
         effect_widget.add_widget(source.container)
@@ -107,7 +107,7 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         effect_widget.remove_widget(source.container)
 
         # reattach to the parent
-        if parent:
+        if parent and hasattr(parent, "add_display_source"):
             parent.add_display_source(source)
 
         if not first:
