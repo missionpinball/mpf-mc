@@ -601,7 +601,7 @@ class TestMpfSlidePlayer(MpfTestCase):
         # remove config patch which disables bcp
         del self.machine_config_patches['bcp']
 
-    def getAbsoluteMachinePath(self):
+    def get_absolute_machine_path(self):
         # override the base to we set the patch based on the mpfmc location
         return os.path.abspath(os.path.join(
             mpfmc.core.__path__[0], os.pardir, self.get_machine_path()))
