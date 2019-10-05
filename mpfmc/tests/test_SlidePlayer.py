@@ -609,7 +609,7 @@ class TestMpfSlidePlayer(MpfTestCase):
     def get_enable_plugins(self):
         return True
 
-    def getConfigFile(self):
+    def get_config_file(self):
         return 'test_slide_player.yaml'
 
     def getMachinePath(self):

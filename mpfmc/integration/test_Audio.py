@@ -11,7 +11,7 @@ class TestAudio(MpfIntegrationTestCase):
     def getMachinePath(self):
         return 'integration/machine_files/audio'
 
-    def getConfigFile(self):
+    def get_config_file(self):
         return 'config.yaml'
 
     def test_sound_loop_player(self):

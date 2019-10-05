@@ -9,7 +9,7 @@ class TestBasicGame(MpfIntegrationTestCase):
 
     """
 
-    def getConfigFile(self):
+    def get_config_file(self):
         return 'basic_game.yaml'
 
     def getMachinePath(self):

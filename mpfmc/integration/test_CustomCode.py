@@ -4,7 +4,7 @@ from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 
 class TestCustomCode(MpfIntegrationTestCase):
 
-    def getConfigFile(self):
+    def get_config_file(self):
         return 'config.yaml'
 
     def getMachinePath(self):
