@@ -51,7 +51,7 @@ class MpfMcTestCase(unittest.TestCase):
                     no_sound=False,
                     bcp=False)
 
-    def getAbsoluteMachinePath(self):
+    def get_absolute_machine_path(self):
         return os.path.abspath(os.path.join(
             mpfmc.__path__[0], os.pardir, 'mpfmc', self.get_machine_path()))
 
@@ -139,7 +139,7 @@ class MpfMcTestCase(unittest.TestCase):
         from mpf.core.player import Player
         Player.monitor_enabled = False
 
-        machine_path = self.getAbsoluteMachinePath()
+        machine_path = self.get_absolute_machine_path()
 
         try:
             self.mc = MpfMc(options=self.get_options(),

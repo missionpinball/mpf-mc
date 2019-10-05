@@ -6,10 +6,10 @@ from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 
 class TestDMDs(MpfIntegrationTestCase, MpfSlideTestCase):
 
-    def getConfigFile(self):
+    def get_config_file(self):
         return 'config.yaml'
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'integration/machine_files/dmd/'
 
     def test_empty_name(self):

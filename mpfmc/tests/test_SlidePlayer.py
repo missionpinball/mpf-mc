@@ -601,18 +601,18 @@ class TestMpfSlidePlayer(MpfTestCase):
         # remove config patch which disables bcp
         del self.machine_config_patches['bcp']
 
-    def getAbsoluteMachinePath(self):
+    def get_absolute_machine_path(self):
         # override the base to we set the patch based on the mpfmc location
         return os.path.abspath(os.path.join(
-            mpfmc.core.__path__[0], os.pardir, self.getMachinePath()))
+            mpfmc.core.__path__[0], os.pardir, self.get_machine_path()))
 
     def get_enable_plugins(self):
         return True
 
-    def getConfigFile(self):
+    def get_config_file(self):
         return 'test_slide_player.yaml'
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'tests/machine_files/slide_player/'
 
     # todo add tests

@@ -40,12 +40,12 @@ class TestBcpClient(MockBcpClient):
         self.mc.bcp_client_connected = True
         self.mc.events.post("client_connected")
 
-    def getAbsoluteMachinePath(self):
+    def get_absolute_machine_path(self):
         # creates an absolute path based on machine_path
         return self.machine.machine_path
 
     def get_options(self):
-        return dict(machine_path=self.getAbsoluteMachinePath(),
+        return dict(machine_path=self.get_absolute_machine_path(),
                     mcconfigfile='mcconfig.yaml',
                     production=False,
                     configfile=self.machine.options['configfile'],
@@ -120,7 +120,7 @@ class TestBcpClient(MockBcpClient):
         # prevent sleep in clock
         Clock._max_fps = 0
 
-        machine_path = self.getAbsoluteMachinePath()
+        machine_path = self.get_absolute_machine_path()
 
         self.mc = MpfMc(options=self.get_options(),
                         machine_path=machine_path)
@@ -160,10 +160,10 @@ class MpfIntegrationTestCase(MpfTestCase):
     def get_use_bcp(self):
         return True
 
-    def getAbsoluteMachinePath(self):
+    def get_absolute_machine_path(self):
         # creates an absolute path based on machine_path
         return os.path.abspath(os.path.join(
-            mpfmc.core.__path__[0], os.pardir, self.getMachinePath()))
+            mpfmc.core.__path__[0], os.pardir, self.get_machine_path()))
 
     def get_enable_plugins(self):
         return True

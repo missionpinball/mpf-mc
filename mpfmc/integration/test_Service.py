@@ -4,10 +4,10 @@ from mpfmc.tests.MpfSlideTestCase import MpfSlideTestCase
 
 class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
 
-    def getConfigFile(self):
+    def get_config_file(self):
         return 'config.yaml'
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'integration/machine_files/service_mode/'
 
     def test_service_slides(self):

@@ -3,10 +3,10 @@ from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 
 class TestVideo(MpfIntegrationTestCase):
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'integration/machine_files/video'
 
-    def getConfigFile(self):
+    def get_config_file(self):
         return 'config.yaml'
 
     def test_video_stops_on_slide_removal(self):
