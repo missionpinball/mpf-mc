@@ -604,7 +604,7 @@ class TestMpfSlidePlayer(MpfTestCase):
     def getAbsoluteMachinePath(self):
         # override the base to we set the patch based on the mpfmc location
         return os.path.abspath(os.path.join(
-            mpfmc.core.__path__[0], os.pardir, self.getMachinePath()))
+            mpfmc.core.__path__[0], os.pardir, self.get_machine_path()))
 
     def get_enable_plugins(self):
         return True
@@ -612,7 +612,7 @@ class TestMpfSlidePlayer(MpfTestCase):
     def get_config_file(self):
         return 'test_slide_player.yaml'
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'tests/machine_files/slide_player/'
 
     # todo add tests

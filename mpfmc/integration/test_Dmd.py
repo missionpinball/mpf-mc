@@ -9,7 +9,7 @@ class TestDMDs(MpfIntegrationTestCase, MpfSlideTestCase):
     def get_config_file(self):
         return 'config.yaml'
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'integration/machine_files/dmd/'
 
     def test_empty_name(self):

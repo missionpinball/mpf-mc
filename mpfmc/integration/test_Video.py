@@ -3,7 +3,7 @@ from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 
 class TestVideo(MpfIntegrationTestCase):
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'integration/machine_files/video'
 
     def get_config_file(self):

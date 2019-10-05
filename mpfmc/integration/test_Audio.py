@@ -8,7 +8,7 @@ except ImportError:
 
 class TestAudio(MpfIntegrationTestCase):
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'integration/machine_files/audio'
 
     def get_config_file(self):

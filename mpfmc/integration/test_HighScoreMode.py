@@ -14,7 +14,7 @@ class TestHighScoreMode(MpfIntegrationTestCase, MpfSlideTestCase, MpfFakeGameTes
     def get_config_file(self):
         return 'high_score.yaml'
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'integration/machine_files/high_score/'
 
     def test_empty_name(self):

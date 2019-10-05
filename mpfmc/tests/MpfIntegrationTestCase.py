@@ -163,7 +163,7 @@ class MpfIntegrationTestCase(MpfTestCase):
     def getAbsoluteMachinePath(self):
         # creates an absolute path based on machine_path
         return os.path.abspath(os.path.join(
-            mpfmc.core.__path__[0], os.pardir, self.getMachinePath()))
+            mpfmc.core.__path__[0], os.pardir, self.get_machine_path()))
 
     def get_enable_plugins(self):
         return True

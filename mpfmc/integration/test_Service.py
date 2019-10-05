@@ -7,7 +7,7 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
     def get_config_file(self):
         return 'config.yaml'
 
-    def getMachinePath(self):
+    def get_machine_path(self):
         return 'integration/machine_files/service_mode/'
 
     def test_service_slides(self):
