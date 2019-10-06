@@ -340,12 +340,12 @@ class TestText(MpfMcTestCase):
         self.get_widget().update_text('2000000')
         self.assertEqual(self.get_widget().text, '2,000,000')
         self.advance_time()
-        
+
     def test_text_casing(self):
         self.mc.events.post('text_nocase')
         self.advance_time()
         self.assertEqual(self.get_widget().text, 'sAmPlE tExT caSiNg')
-        
+
         self.mc.events.post('text_lower')
         self.advance_time()
         self.assertEqual(self.get_widget().text, 'sample text casing')
@@ -353,11 +353,11 @@ class TestText(MpfMcTestCase):
         self.mc.events.post('text_upper')
         self.advance_time()
         self.assertEqual(self.get_widget().text, 'SAMPLE TEXT CASING')
-        
+
         self.mc.events.post('text_title')
         self.advance_time()
         self.assertEqual(self.get_widget().text, 'Sample Text Casing')
-        
+
         self.mc.events.post('text_capitalize')
         self.advance_time()
         self.assertEqual(self.get_widget().text, 'Sample text casing')

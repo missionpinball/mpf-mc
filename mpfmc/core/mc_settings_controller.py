@@ -11,7 +11,6 @@ class McSettingsController(SettingsController):
 
     def _add_entries_from_config(self):
         """Do not load entries from config."""
-        pass
 
     def add_setting(self, setting):
         """Add a setting."""

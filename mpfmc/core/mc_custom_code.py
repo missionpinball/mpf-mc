@@ -34,11 +34,9 @@ class McCustomCode(LogMixin):
 
     def on_connect(self, **kwargs):
         """Called once MC is connected to MPF."""
-        pass
 
     def on_load(self):  # pragma: no cover
         """Automatically called when this custom code class loads.
 
         It's the intention that the custom code writer will overwrite this method.
         """
-        pass
