@@ -202,7 +202,7 @@ class TestText(MpfMcTestCase):
 
         bounding_box = self.get_widget().canvas.children[-1]
         self.assertEqual(self.get_widget().text, 'its even')
-        self.assertEqual(bounding_box.size, (343, 118))
+        self.assertEqual(bounding_box.size, (346, 118))
         self.assertEqual(bounding_box.pos, (200, 150))
 
         # update var, should update widget with an odd pixel width and offset DOWN
@@ -211,7 +211,7 @@ class TestText(MpfMcTestCase):
 
         bounding_box = self.get_widget().canvas.children[-1]
         self.assertEqual(self.get_widget().text, 'odd')
-        self.assertEqual(bounding_box.size, (169, 118))
+        self.assertEqual(bounding_box.size, (171, 118))
         self.assertEqual(bounding_box.pos, (199.5, 150))
 
         # update var, should update widget with an odd pixel width and offset UP
@@ -221,8 +221,8 @@ class TestText(MpfMcTestCase):
 
         bounding_box = self.get_widget().canvas.children[-1]
         self.assertEqual(self.get_widget().text, 'also odd')
-        self.assertEqual(bounding_box.size, (381, 118))
-        self.assertEqual(bounding_box.pos, (200.5, 150))
+        self.assertEqual(bounding_box.size, (384, 118))
+        self.assertEqual(bounding_box.pos, (200.0, 150))
 
         # update var, should update widget with an even pixel width and not offset
         self.mc.player.test_var = 'no round'
@@ -230,7 +230,7 @@ class TestText(MpfMcTestCase):
 
         bounding_box = self.get_widget().canvas.children[-1]
         self.assertEqual(self.get_widget().text, 'no round')
-        self.assertEqual(bounding_box.size, (394, 118))
+        self.assertEqual(bounding_box.size, (396, 118))
         self.assertEqual(bounding_box.pos, (200, 150))
 
     def test_current_player(self):
