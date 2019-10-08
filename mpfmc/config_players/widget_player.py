@@ -40,8 +40,8 @@ class McWidgetPlayer(McConfigPlayer):
                         "Widget Player Error: Slide name '{}' is not valid "
                         "slide. Widget config that caused this: "
                         "{}".format(slide_name, s))
-                else:
-                    raise SlideNotActiveError(slide_name=slide_name)
+
+                raise SlideNotActiveError(slide_name=slide_name)
 
         return slide
 

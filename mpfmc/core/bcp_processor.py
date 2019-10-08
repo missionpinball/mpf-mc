@@ -181,8 +181,6 @@ class BcpProcessor:
         #     self.socket_thread.sending_thread.stop()
         #     sys.exit()
 
-        pass  # todo
-
     def _bcp_mode_start(self, name=None, priority=0, **kwargs):
         """Processes an incoming BCP 'mode_start' command."""
         del kwargs
