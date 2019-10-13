@@ -1,4 +1,11 @@
-from kivy.core.image import Image
+import zipfile
+from io import BytesIO
+
+from kivy import Logger
+
+from kivy.cache import Cache
+
+from kivy.core.image import Image, ImageLoaderBase, ImageLoader, Texture
 from mpf.core.assets import AssetPool
 
 from mpfmc.assets.mc_asset import McAsset
@@ -19,6 +26,153 @@ class ImagePool(AssetPool):
     @property
     def image(self):
         return self.asset
+
+
+class LazyZipImageLoaderTexture:
+
+    """Lazy textures for images inside a zip."""
+
+    def __init__(self, zip_file, filename, mipmap, keep_data, no_cache):
+        self._zip_file = zip_file
+        self._mipmap = mipmap
+        self._keep_data = keep_data
+        self._no_cache = no_cache
+        self._filename = filename
+        znamelist = self._zip_file.namelist()
+        znamelist.sort()
+        self._index_list = []
+        self.width = None
+        self.height = None
+
+        for zfilename in znamelist:
+            self._index_list.append(zfilename)
+
+        self._loaded_textures = [None] * len(self._index_list)
+
+    def __len__(self):
+        return len(self._index_list)
+
+    def __getitem__(self, item):
+        if not self._loaded_textures[item]:
+            # first, check if a texture with the same name already exist in the
+            # cache
+            chr = type(self._filename)
+            uid = chr(u'%s|%d|%d') % (self._filename, self._mipmap, item)
+            texture = Cache.get('kv.texture', uid)
+
+            # if not create it and append to the cache
+            if texture is None:
+                zfilename = self._index_list[item]
+                # read file and store it in mem with fileIO struct around it
+                tmpfile = BytesIO(self._zip_file.read(zfilename))
+                ext = zfilename.split('.')[-1].lower()
+                image = None
+                for loader in ImageLoader.loaders:
+                    if (ext not in loader.extensions() or
+                            not loader.can_load_memory()):
+                        continue
+                    Logger.debug('Image%s: Load <%s> from <%s>' %
+                                 (loader.__name__[11:], zfilename,
+                                  self._filename))
+                    try:
+                        image = loader(zfilename, ext=ext, rawdata=tmpfile,
+                                       inline=True)
+                    except:
+                        # Loader failed, continue trying.
+                        continue
+                    break
+                if image is None:
+                    raise AssertionError("Could not load image {} (index {}) "
+                                         "from zip {}".format(zfilename, item,
+                                                              self._filename))
+
+                self.width = image.width
+                self.height = image.height
+
+                imagedata = image._data[0]
+
+                source = '{}{}|'.format(
+                    'zip|' if self._filename.endswith('.zip') else '',
+                    self._no_cache)
+                imagedata.source = chr(source) + uid
+                texture = Texture.create_from_data(
+                    imagedata, mipmap=self._mipmap)
+                if not self._no_cache:
+                    Cache.append('kv.texture', uid, texture)
+                if imagedata.flip_vertical:
+                    texture.flip_vertical()
+
+            self._loaded_textures[item] = texture
+
+        return self._loaded_textures[item]
+
+
+class LazyZipImageLoader(ImageLoaderBase):
+
+    """Lazy image loader for image inside a zip."""
+
+    @staticmethod
+    def save(*largs, **kwargs):
+        raise AssertionError("Not supported")
+
+    def __init__(self, filename, zipfile, **kwargs):
+        super().__init__(filename, **kwargs)
+        self._zipfile = zipfile
+        self._data = dict()     # to prevent breakage in loader::_load_urllib
+
+    def load(self, filename):
+        """Return the zip object."""
+        return filename
+
+    def populate(self):
+        """Polulate textures with lazy loader."""
+        self._textures = LazyZipImageLoaderTexture(self._zipfile,
+                                                   self.filename,
+                                                   self._mipmap,
+                                                   self.keep_data,
+                                                   self._nocache)
+
+    @property
+    def width(self):
+        '''Image width
+        '''
+        if not self._textures:
+            self.populate()
+        return self._textures.width
+
+    @property
+    def height(self):
+        '''Image height
+        '''
+        if not self._textures:
+            self.populate()
+        return self._textures.height
+
+    @property
+    def size(self):
+        '''Image size (width, height)
+        '''
+        return (self.width, self.height)
+
+
+class KivyImageLoaderPatch:
+
+    """Patch Kivy zip loader."""
+
+    @staticmethod
+    def lazy_zip_loader(filename):
+        '''Read images from an zip file lazily.
+
+        .. versionadded:: 1.12.0
+
+        Returns an LazyZipImageLoader which loads images from a zip on demand.
+        '''
+        # read zip in memory for faster access
+        _file = BytesIO(open(filename, 'rb').read())
+        # read all images inside the zip
+        zip_file = zipfile.ZipFile(_file)
+
+        return LazyZipImageLoader(filename, zipfile=zip_file, inline=True)
 
 
 class ImageAsset(McAsset):
@@ -48,6 +202,7 @@ class ImageAsset(McAsset):
         return self._image
 
     def do_load(self):
+        """Load the image."""
         # This is the method that's actually called to load the asset from
         # disk. It's called by the loader thread so it's ok to block. However
         # since it's a separate thread, don't update any other attributes.
@@ -56,6 +211,11 @@ class ImageAsset(McAsset):
         # the various load status attributes will be updated automatically,
         # and anything that was waiting for it to load will be called. So
         # all you have to do here is load and return.
+
+        if self.machine.machine_config['mpf-mc']['zip_lazy_loading']:
+            # lazy loading for zip file image sequences
+            ImageLoader.zip_loader = KivyImageLoaderPatch.lazy_zip_loader
+
         self._image = Image(self.config['file'],
                             keep_data=False,
                             scale=1.0,
