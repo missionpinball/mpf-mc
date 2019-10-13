@@ -32,6 +32,7 @@ class LazyZipImageLoaderTexture:
 
     """Lazy textures for images inside a zip."""
 
+    # pylint: disable-msg=too-many-arguments
     def __init__(self, zip_file, filename, mipmap, keep_data, no_cache):
         self._zip_file = zip_file
         self._mipmap = mipmap
@@ -56,6 +57,7 @@ class LazyZipImageLoaderTexture:
         if not self._loaded_textures[item]:
             # first, check if a texture with the same name already exist in the
             # cache
+            # pylint: disable-msg=redefined-builtin
             chr = type(self._filename)
             uid = chr(u'%s|%d|%d') % (self._filename, self._mipmap, item)
             texture = Cache.get('kv.texture', uid)
@@ -71,13 +73,13 @@ class LazyZipImageLoaderTexture:
                     if (ext not in loader.extensions() or
                             not loader.can_load_memory()):
                         continue
-                    Logger.debug('Image%s: Load <%s> from <%s>' %
-                                 (loader.__name__[11:], zfilename,
-                                  self._filename))
+                    Logger.debug('Image%s: Load <%s> from <%s>',
+                                 loader.__name__[11:], zfilename,
+                                 self._filename)
                     try:
                         image = loader(zfilename, ext=ext, rawdata=tmpfile,
                                        inline=True)
-                    except:
+                    except:     # pylint: disable-msg=bare-except   # noqa
                         # Loader failed, continue trying.
                         continue
                     break
@@ -89,7 +91,7 @@ class LazyZipImageLoaderTexture:
                 self.width = image.width
                 self.height = image.height
 
-                imagedata = image._data[0]
+                imagedata = image._data[0]  # pylint: disable-msg=protected-access
 
                 source = '{}{}|'.format(
                     'zip|' if self._filename.endswith('.zip') else '',
@@ -115,10 +117,11 @@ class LazyZipImageLoader(ImageLoaderBase):
     def save(*largs, **kwargs):
         raise AssertionError("Not supported")
 
-    def __init__(self, filename, zipfile, **kwargs):
+    def __init__(self, filename, zip_file, **kwargs):
         super().__init__(filename, **kwargs)
-        self._zipfile = zipfile
+        self._zipfile = zip_file
         self._data = dict()     # to prevent breakage in loader::_load_urllib
+        self._textures = None
 
     def load(self, filename):
         """Return the zip object."""
@@ -173,7 +176,7 @@ class KivyImageLoaderPatch:
         # read all images inside the zip
         zip_file = zipfile.ZipFile(_file)
 
-        return LazyZipImageLoader(filename, zipfile=zip_file, inline=True)
+        return LazyZipImageLoader(filename, zip_file=zip_file, inline=True)
 
 
 class ImageAsset(McAsset):
