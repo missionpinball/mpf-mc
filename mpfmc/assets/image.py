@@ -168,7 +168,8 @@ class KivyImageLoaderPatch:
         Returns an LazyZipImageLoader which loads images from a zip on demand.
         '''
         # read zip in memory for faster access
-        _file = BytesIO(open(filename, 'rb').read())
+        with open(filename, 'rb') as handle:
+            _file = BytesIO(handle.read())
         # read all images inside the zip
         zip_file = zipfile.ZipFile(_file)
 
