@@ -66,6 +66,8 @@ mpf-mc:
     allow_invalid_config_sections: true
     fps: 30
 
+    zip_lazy_loading: True
+
 
 
 logging:
