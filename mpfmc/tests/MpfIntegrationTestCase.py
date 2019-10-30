@@ -1,14 +1,20 @@
 import os
+import sys
 
+os.environ['KIVY_NO_FILELOG'] = '1'
+os.environ['KIVY_NO_CONSOLELOG'] = '1'
 os.environ["KIVY_NO_ARGS"] = "1"
 
 from queue import Queue
 
 import time
-from kivy import Config, Logger
+from kivy.config import Config
+from kivy.logger import Logger
 from kivy.base import runTouchApp, EventLoop
 from kivy.clock import Clock
 from kivy.uix.widget import Widget as KivyWidget
+
+sys.stderr = sys.__stderr__
 
 import mpfmc
 import mpfmc.core
