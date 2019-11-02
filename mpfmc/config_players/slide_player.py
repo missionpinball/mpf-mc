@@ -267,6 +267,8 @@ class McSlidePlayer(McConfigPlayer):
         validated_dict = super()._validate_config_item(device, device_settings)
 
         # device is slide name
+        if device not in self.machine.slides:
+            self.raise_config_error('Could not find slide "{}" referenced in slide_player.'.format(device), 1)
 
         for v in validated_dict.values():
             if 'widgets' in v:
