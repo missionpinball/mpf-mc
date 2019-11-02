@@ -149,17 +149,17 @@ kivy_config:
 widget_styles:
   text_default:
     font_size: 20
-  dmd_big:
+  big:
       font_name: Quadrit
       font_size: 10
       adjust_bottom: 5
       adjust_top: 2
-  dmd_med:
+  medium:
       font_name: pixelmix
       font_size: 8
       adjust_bottom: 1
       adjust_top: 1
-  dmd_small:
+  small:
       font_name: smallest_pixel-7
       font_size: 9
       adjust_bottom: 3

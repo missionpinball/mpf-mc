@@ -17,9 +17,9 @@ class TestFonts(MpfMcTestCase):
         self.advance_time(1)
 
         # Make sure the dmd_big style hasn't changed
-        self.assertEqual(self.mc.machine_config['widget_styles']['dmd_big']['adjust_bottom'], 5)
-        self.assertEqual(self.mc.machine_config['widget_styles']['dmd_big']['adjust_top'], 2)
-        self.assertEqual(self.mc.machine_config['widget_styles']['dmd_big']['font_size'], 10)
+        self.assertEqual(self.mc.machine_config['widget_styles']['big']['adjust_bottom'], 5)
+        self.assertEqual(self.mc.machine_config['widget_styles']['big']['adjust_top'], 2)
+        self.assertEqual(self.mc.machine_config['widget_styles']['big']['font_size'], 10)
 
         # make sure the adjustments are correct
         top_widget = self.mc.displays['dmd'].current_slide.widgets[0].widget
@@ -27,20 +27,20 @@ class TestFonts(MpfMcTestCase):
 
         self.assertEqual(bottom_widget.anchor_y, 'bottom')
         self.assertEqual(
-            self.mc.machine_config['widget_styles']['dmd_big']['adjust_bottom'],
+            self.mc.machine_config['widget_styles']['big']['adjust_bottom'],
             -bottom_widget.anchor_offset_pos[1])
 
         self.assertEqual(top_widget.anchor_y, 'top')
         self.assertEqual(top_widget.anchor_offset_pos[1], -top_widget.height +
-                         self.mc.machine_config['widget_styles']['dmd_big']['adjust_top'])
+                         self.mc.machine_config['widget_styles']['big']['adjust_top'])
 
         self.mc.events.post('dmd_med')
         self.advance_time(1)
 
         # Make sure the dmd_med style hasn't changed
-        self.assertEqual(self.mc.machine_config['widget_styles']['dmd_med']['adjust_bottom'], 1)
-        self.assertEqual(self.mc.machine_config['widget_styles']['dmd_med']['adjust_top'], 1)
-        self.assertEqual(self.mc.machine_config['widget_styles']['dmd_med']['font_size'], 8)
+        self.assertEqual(self.mc.machine_config['widget_styles']['medium']['adjust_bottom'], 1)
+        self.assertEqual(self.mc.machine_config['widget_styles']['medium']['adjust_top'], 1)
+        self.assertEqual(self.mc.machine_config['widget_styles']['medium']['font_size'], 8)
 
         # make sure the adjustments are correct
         top_widget = self.mc.displays['dmd'].current_slide.widgets[0].widget
@@ -48,20 +48,20 @@ class TestFonts(MpfMcTestCase):
 
         self.assertEqual(bottom_widget.anchor_y, 'bottom')
         self.assertEqual(
-            self.mc.machine_config['widget_styles']['dmd_med']['adjust_bottom'],
+            self.mc.machine_config['widget_styles']['medium']['adjust_bottom'],
             -bottom_widget.anchor_offset_pos[1])
 
         self.assertEqual(top_widget.anchor_y, 'top')
         self.assertEqual(top_widget.anchor_offset_pos[1], -top_widget.height +
-                         self.mc.machine_config['widget_styles']['dmd_med']['adjust_top'])
+                         self.mc.machine_config['widget_styles']['medium']['adjust_top'])
 
         self.mc.events.post('dmd_small')
         self.advance_time(1)
 
         # Make sure the dmd_small style hasn't changed
-        self.assertEqual(self.mc.machine_config['widget_styles']['dmd_small']['adjust_bottom'], 3)
-        self.assertEqual(self.mc.machine_config['widget_styles']['dmd_small']['adjust_top'], 2)
-        self.assertEqual(self.mc.machine_config['widget_styles']['dmd_small']['font_size'], 9)
+        self.assertEqual(self.mc.machine_config['widget_styles']['small']['adjust_bottom'], 3)
+        self.assertEqual(self.mc.machine_config['widget_styles']['small']['adjust_top'], 2)
+        self.assertEqual(self.mc.machine_config['widget_styles']['small']['font_size'], 9)
 
         # make sure the adjustments are correct
         top_widget = self.mc.displays['dmd'].current_slide.widgets[0].widget
@@ -69,9 +69,9 @@ class TestFonts(MpfMcTestCase):
 
         self.assertEqual(bottom_widget.anchor_y, 'bottom')
         self.assertEqual(
-            self.mc.machine_config['widget_styles']['dmd_small']['adjust_bottom'],
+            self.mc.machine_config['widget_styles']['small']['adjust_bottom'],
             -bottom_widget.anchor_offset_pos[1])
 
         self.assertEqual(top_widget.anchor_y, 'top')
         self.assertEqual(top_widget.anchor_offset_pos[1], -top_widget.height +
-                         self.mc.machine_config['widget_styles']['dmd_small']['adjust_top'])
+                         self.mc.machine_config['widget_styles']['small']['adjust_top'])
