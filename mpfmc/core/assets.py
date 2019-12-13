@@ -2,11 +2,59 @@
 import logging
 import threading
 import traceback
+from concurrent.futures import ThreadPoolExecutor
 from queue import PriorityQueue, Queue, Empty
 
 import sys
 
 from mpf.core.assets import BaseAssetManager
+
+
+class ThreadedAssetManagerWithWorkers(BaseAssetManager):
+
+    """AssetManager which uses multiple threads to load assets."""
+
+    __slots__ = ["executor"]
+
+    def __init__(self, machine):
+        """Initialise threads."""
+        super().__init__(machine)
+        self.executor = ThreadPoolExecutor(max_workers=10)
+        self.machine.events.add_handler("shutdown", self.stop)
+
+    def stop(self, **kwargs):
+        """Shutdown threads."""
+        del kwargs
+        self.executor.shutdown()
+
+    @staticmethod
+    def _load_sync(asset):
+        if not asset.loaded:
+            asset.do_load()
+            return True
+
+        return False
+
+    def wait_for_asset_load(self, asset):
+        """Wait for an asset to load."""
+        return asset, self._load_sync(asset)
+
+    def load_asset(self, asset):
+        """Load an asset."""
+        self.num_assets_to_load += 1
+        task = self.executor.submit(self.wait_for_asset_load, asset)
+        task.add_done_callback(self._done)
+
+    def _done(self, future):
+        """Evaluate result of task.
+
+        Will raise exceptions from within task.
+        """
+        asset, result = future.result()
+        if result:
+            asset.is_loaded()
+        self.num_assets_loaded += 1
+        self._post_loading_event()
 
 
 class ThreadedAssetManager(BaseAssetManager):
