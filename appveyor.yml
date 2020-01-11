@@ -75,7 +75,7 @@ build_script:
 
     echo "Cloning MPF..."
 
-    git clone -q --branch=dev --recursive https://github.com/missionpinball/mpf.git C:\projects\mpf
+    git clone -q --branch=0.53.x --recursive https://github.com/missionpinball/mpf.git C:\projects\mpf
 
     Check-Error
 
