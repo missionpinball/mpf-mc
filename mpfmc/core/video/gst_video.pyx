@@ -35,6 +35,7 @@ cdef extern from 'gst/gst.h':
     ctypedef unsigned long gulong
     ctypedef void *gpointer
     ctypedef char const_gchar 'const gchar'
+    ctypedef int gint
     ctypedef long int gint64
     ctypedef unsigned long long GstClockTime
     ctypedef int gboolean
@@ -70,6 +71,7 @@ cdef extern from 'gst/gst.h':
         GstMessageType type
 
     int GST_SECOND
+    int GST_MSECOND
     bool gst_init_check(int *argc, char ***argv, GError **error)
     bool gst_is_initialized()
     void gst_deinit()
@@ -116,6 +118,7 @@ cdef extern from 'gst_video.h':
     void g_object_set_double(GstElement *element, char *name, double value) nogil
     void g_object_set_caps(GstElement *element, char *value)
     void g_object_set_int(GstElement *element, char *name, int value)
+    gint g_object_get_int(GstElement *element, char *name)
     gulong c_appsink_set_sample_callback(GstElement *appsink,
             appcallback_t callback, void *userdata, int alpha_channel)
     void c_appsink_pull_preroll(GstElement *appsink,
@@ -124,6 +127,11 @@ cdef extern from 'gst_video.h':
             buscallback_t callback, void *userdata)
     void c_signal_disconnect(GstElement *appsink, gulong handler_id)
     void c_glib_iteration(int count)
+
+    ctypedef enum GstPlayFlags:
+        GST_PLAY_FLAG_VIDEO
+        GST_PLAY_FLAG_AUDIO
+        GST_PLAY_FLAG_TEXT
 
 
 # ---------------------------------------------------------------------------
@@ -158,12 +166,20 @@ class GstVideoException(Exception):
 #    Global GStreamer helper functions
 # ---------------------------------------------------------------------------
 
-cdef void _on_appsink_sample(void *c_video, int width, int height, char *data, int datasize) with gil:
+cdef void _on_appsink_video_sample(void *c_video, int width, int height, char *data, int datasize) with gil:
     """GStreamer appsink sample callback function (called when a video frame arrives)"""
     cdef GstVideo video = <GstVideo>c_video
     cdef bytes buffer = data[:datasize]
     if video.frame_callback:
         video.frame_callback(width, height, buffer)
+
+
+cdef void _on_appsink_audio_sample(void *c_video, char *data, int datasize) with gil:
+    """GStreamer appsink sample callback function (called when an audio buffer arrives)"""
+    cdef GstVideo video = <GstVideo>c_video
+    cdef bytes buffer = data[:datasize]
+    if video.audio_callback:
+        video.audio_callback(buffer)
 
 
 cdef void _on_gst_video_message(void *c_video, GstMessage *message) with gil:
@@ -189,6 +205,7 @@ cdef void _on_gst_video_message(void *c_video, GstMessage *message) with gil:
         g_error_free(err)
     else:
         pass
+
 
 def _gst_init():
     """Initializes the GStreamer library"""
@@ -221,31 +238,57 @@ cdef class GstVideo:
     cdef GstElement *playbin
     cdef GstElement *videoconvert
     cdef GstElement *alphabin
-    cdef GstElement *appsink
+    cdef GstElement *appsink_video
+    cdef GstElement *appsink_audio
     cdef GstElement *fakesink
     cdef GstBus *bus
-    cdef object uri, _frame_cb, _eos_cb, _message_cb
-    cdef gulong hid_sample, hid_message
+    cdef object uri, _frame_cb, _eos_cb, _message_cb, _audio_cb
+    cdef gulong hid_video_sample, hid_audio_sample, hid_message
     cdef object __weakref__
     cdef bint _alpha_channel
+    cdef dict _audio_caps
+    cdef int _av_offset
 
     def __cinit__(self, *args, **kwargs):
-        self.pipeline = self.playbin = self.videoconvert = self.alphabin = self.appsink = self.fakesink = NULL
+        self.pipeline = NULL
+        self.playbin = NULL
+        self.videoconvert = NULL
+        self.alphabin = NULL
+        self.appsink_video = NULL
+        self.appsink_audio = NULL
+        self.fakesink = NULL
         self.bus = NULL
-        self.hid_sample = self.hid_message = 0
-        self._alpha_channel = False
+        self.hid_video_sample = 0
+        self.hid_audio_sample = 0
+        self.hid_message = 0
 
-    def __init__(self, uri, frame_cb=None, eos_cb=None, message_cb=None, alpha_channel=False):
+    def __init__(self, uri,
+                 frame_cb=None, eos_cb=None, message_cb=None, audio_cb=None,
+                 alpha_channel=False, av_offset=0, mute_audio=False, audio_caps=None):
         super(GstVideo, self).__init__()
         self.uri = uri
         self._frame_cb = frame_cb
         self._eos_cb = eos_cb
         self._message_cb = message_cb
+        self._audio_cb = audio_cb
         self._alpha_channel = alpha_channel
+        self._mute_audio = mute_audio
+        self._av_offset = av_offset
+        self._audio_caps = audio_caps
         _instances.append(ref(self, _on_gst_video_deleted))
 
         # Ensure GStreamer is initialized
         _gst_init()
+
+        # Validate audio caps (if supplied)
+        if self._audio_caps:
+            if 'sample_rate' not in self._audio_caps:
+                raise GstVideoException("Invalid audio_caps: missing 'sample_rate'")
+            if 'buffer_size' not in self._audio_caps:
+                raise GstVideoException("Invalid audio_caps: missing 'buffer_size'")
+            if 'channels' not in self._audio_caps:
+                raise GstVideoException("Invalid audio_caps: missing 'channels'")
+            self._audio_caps.setdefault('format', 'S16LE')
 
     def __dealloc__(self):
         self.unload()
@@ -261,6 +304,14 @@ cdef class GstVideo:
     @frame_callback.setter
     def frame_callback(self, value):
         self._frame_cb = value
+
+    @property
+    def audio_callback(self):
+        return self._audio_cb
+
+    @audio_callback.setter
+    def audio_callback(self, value):
+        self._audio_cb = value
 
     @property
     def eos_callback(self):
@@ -300,8 +351,8 @@ cdef class GstVideo:
         # Attach the callback
         # NOTE no need to create a weakref here, as we manage to grab/release
         # the reference of self in the set_sample_callback() method.
-        self.hid_sample = c_appsink_set_sample_callback(
-                self.appsink, _on_appsink_sample, <void *>self, self._alpha_channel)
+        self.hid_video_sample = c_appsink_set_sample_callback(
+                self.appsink_video, _on_appsink_video_sample, <void *>self, self._alpha_channel)
 
         # get ready!
         with nogil:
@@ -309,6 +360,8 @@ cdef class GstVideo:
 
     cdef _create_pipeline(self):
         """Create the pipeline for the basic player"""
+        cdef gint flags
+
         self.pipeline = gst_pipeline_new(NULL)
         if self.pipeline == NULL:
             raise GstVideoException('Unable to create a pipeline')
@@ -326,69 +379,57 @@ cdef class GstVideo:
         if self.playbin == NULL:
             raise GstVideoException('Unable to create a playbin')
 
+        # Set the playbin av-offset (controls the synchronisation offset between the audio and video
+        # streams. Positive values make the audio ahead of the video and negative values make the
+        # audio go behind the video.)
+        g_object_set_int(self.playbin, 'av-offset', self._av_offset * GST_MSECOND)
+
         gst_bin_add(<GstBin *>self.pipeline, self.playbin)
 
-        # Instanciate an appsink
-        self.appsink = gst_element_factory_make('appsink', NULL)
-        if self.appsink == NULL:
-            raise GstVideoException('Unable to create an appsink')
+        # Instanciate a video appsink
+        self.appsink_video = gst_element_factory_make('appsink', "appsink-video")
+        if self.appsink_video == NULL:
+            raise GstVideoException('Unable to create a video appsink')
 
         if self._alpha_channel:
-            g_object_set_caps(self.appsink, 'video/x-raw,format=RGBA')
+            g_object_set_caps(self.appsink_video, 'video/x-raw,format=RGBA')
         else:
-            g_object_set_caps(self.appsink, 'video/x-raw,format=RGB')
+            g_object_set_caps(self.appsink_video, 'video/x-raw,format=RGB')
 
-        g_object_set_int(self.appsink, 'max-buffers', 5)
-        g_object_set_int(self.appsink, 'drop', 1)
-        g_object_set_int(self.appsink, 'sync', 1)
-        g_object_set_int(self.appsink, 'qos', 1)
+        g_object_set_int(self.appsink_video, 'max-buffers', 5)
+        g_object_set_int(self.appsink_video, 'drop', 1)
+        g_object_set_int(self.appsink_video, 'sync', 1)
+        g_object_set_int(self.appsink_video, 'qos', 1)
 
-        g_object_set_void(self.playbin, 'video-sink', self.appsink)
+        g_object_set_void(self.playbin, 'video-sink', self.appsink_video)
 
-        # Configure playbin
-        g_object_set_int(self.pipeline, 'async-handling', 1)
-        py_uri = <bytes>self.uri.encode('utf-8')
-        g_object_set_void(self.playbin, 'uri', <char *>py_uri)
+        if self._mute_audio:
+            # Instruct the playbin to not process audio information in the video
+            # (ensure audio play flag is not set)
+            flags = g_object_get_int(self.playbin, 'flags')
+            flags &= ~GST_PLAY_FLAG_AUDIO
+            g_object_set_int(self.playbin, 'flags', flags)
 
-    def _create_pipeline_alpha_channel_bad(self):
-        """Creates the gstreamer pipeline to playback videos with an alpha channel."""
+        elif self._audio_caps:
+            # Instanciate an audio appsink (if managing audio, otherwise audio sink will automatically
+            # be created by the playbin and will not integrate with the mpf-mc sound system)
+            self.appsink_audio = gst_element_factory_make('appsink', "appsink-audio")
+            if self.appsink_audio == NULL:
+                raise GstVideoException('Unable to create an audio appsink')
 
-        cdef GstElement *alphabin = NULL
+            g_object_set_caps(self.appsink_audio, 'audio/x-raw,rate={},channels={},format={},layout=interleaved'.format(
+                self._audio_caps['sample_rate'],
+                self._audio_caps['format'],
+                self._audio_caps['channels']
+            ))
 
-        # Create the pipeline
-        self.pipeline = gst_pipeline_new(NULL)
-        if self.pipeline == NULL:
-            raise GstVideoException('Unable to create a pipeline')
+            g_object_set_int(self.appsink_audio, 'max-buffers', 5)
+            g_object_set_int(self.appsink_audio, 'drop', 1)
+            g_object_set_int(self.appsink_audio, 'sync', 1)
+            g_object_set_int(self.appsink_audio, 'blocksize', self._audio_caps['buffer_size'])
+            g_object_set_int(self.appsink_audio, 'qos', 1)
 
-        self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)
-        if self.bus == NULL:
-            raise GstVideoException('Unable to get the bus from the pipeline')
-
-        gst_bus_enable_sync_message_emission(self.bus)
-        self.hid_message = c_bus_connect_message(
-                self.bus, _on_gst_video_message, <void *>self)
-
-        # Instanciate the playbin
-        self.playbin = gst_element_factory_make('playbin', NULL)
-        if self.playbin == NULL:
-            raise GstVideoException('Unable to create a playbin')
-
-        gst_bin_add(<GstBin *>self.pipeline, self.playbin)
-
-        # Instanciate an appsink with videoconvert to support alpha channel (required ghost pads will
-        # automatically be created).
-        self.alphabin = gst_parse_bin_from_description('qtdemux ! pngdec ! appsink name="appsink" '
-                                                       'caps="video/x-raw,format=RGBA" '
-                                                       'max-buffers=5 drop=1 sync=1 qos=1',
-                                                       True, NULL)
-        if self.alphabin == NULL:
-            raise GstVideoException('Unable to create the alpha channel video bin')
-
-        self.appsink = gst_bin_get_by_name(<GstBin*>self.alphabin, 'appsink')
-        if self.appsink == NULL:
-            raise GstVideoException('Unable to create an appsink')
-
-        g_object_set_void(self.playbin, 'video-sink', self.alphabin)
+            g_object_set_void(self.playbin, 'audio-sink', self.appsink_audio)
 
         # Configure playbin
         g_object_set_int(self.pipeline, 'async-handling', 1)
@@ -424,9 +465,13 @@ cdef class GstVideo:
         """Unload the player and deallocate GStreamer objects"""
         cdef GstState current_state, pending_state
 
-        if self.appsink != NULL and self.hid_sample != 0:
-            c_signal_disconnect(self.appsink, self.hid_sample)
-            self.hid_sample = 0
+        if self.appsink_video != NULL and self.hid_video_sample != 0:
+            c_signal_disconnect(self.appsink_video, self.hid_video_sample)
+            self.hid_video_sample = 0
+
+        if self.appsink_audio != NULL and self.hid_audio_sample != 0:
+            c_signal_disconnect(self.appsink_audio, self.hid_audio_sample)
+            self.hid_audio_sample = 0
 
         if self.bus != NULL and self.hid_message != 0:
             c_signal_disconnect(<GstElement *>self.bus, self.hid_message)
@@ -444,7 +489,8 @@ cdef class GstVideo:
         if self.bus != NULL:
             gst_object_unref(self.bus)
 
-        self.appsink = NULL
+        self.appsink_video = NULL
+        self.appsink_audio = NULL
         self.bus = NULL
         self.pipeline = NULL
         self.playbin = NULL
@@ -546,8 +592,8 @@ cdef class GstVideo:
         if not ret:
             return
 
-        if self.appsink != NULL:
+        if self.appsink_video != NULL:
             gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)
             if current_state != GST_STATE_PLAYING:
                 c_appsink_pull_preroll(
-                    self.appsink, _on_appsink_sample, <void *>self, self._alpha_channel)
+                    self.appsink_video, _on_appsink_video_sample, <void *>self, self._alpha_channel)

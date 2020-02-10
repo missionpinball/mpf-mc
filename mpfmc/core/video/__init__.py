@@ -42,7 +42,7 @@ class Video(EventDispatcher):
             Keep the image data when the texture is created.
     """
 
-    def __init__(self, filename, alpha_channel=False, **kwargs):
+    def __init__(self, filename, alpha_channel=False, av_offset=0, mute_audio=False, **kwargs):
         self.log = logging.getLogger('Video')
         self.log.debug('Video: Using Gstreamer {}'.format('.'.join(map(str, get_gst_version()))))
 
@@ -69,6 +69,8 @@ class Video(EventDispatcher):
         self._buffer_lock = Lock()
         self._volume = 1.
         self._framerate = kwargs.get('framerate', 30.)
+        self._mute_audio = mute_audio
+        self._av_offset = av_offset
         self.eos = kwargs.get('eos', 'stop')
 
         if self._alpha_channel:
@@ -91,7 +93,9 @@ class Video(EventDispatcher):
                                    self._frame_callback,
                                    self._on_gst_eos_sync,
                                    _on_gst_video_message,
-                                   self._alpha_channel)
+                                   self._alpha_channel,
+                                   self._av_offset,
+                                   self._mute_audio)
         self._gst_video.load()
 
     def unload(self):

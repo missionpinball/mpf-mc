@@ -31,6 +31,20 @@ static void g_object_set_int(GstElement *element, char *name, int value)
 	g_object_set(G_OBJECT(element), name, value, NULL);
 }
 
+static gint g_object_get_int(GstElement *element, char *name)
+{
+    gint value;
+    g_object_get(G_OBJECT(element), name, &value, NULL);
+    return value;
+}
+
+/* playbin flags */
+typedef enum {
+  GST_PLAY_FLAG_VIDEO         = (1 << 0), /* We want video output */
+  GST_PLAY_FLAG_AUDIO         = (1 << 1), /* We want audio output */
+  GST_PLAY_FLAG_TEXT          = (1 << 2)  /* We want subtitle output */
+} GstPlayFlags;
+
 typedef void (*appcallback_t)(void *, int, int, char *, int);
 typedef void (*buscallback_t)(void *, GstMessage *);
 typedef struct {

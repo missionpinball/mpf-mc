@@ -2,6 +2,7 @@
 import logging
 
 from kivy.clock import Clock
+from mpf.core.config_validator import ConfigValidator
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
 from mpfmc.core.audio.audio_interface import AudioInterface
@@ -10,17 +11,6 @@ from mpfmc.core.audio.audio_exception import AudioException
 __all__ = ('SoundSystem',
            'AudioInterface',
            'AudioException')
-
-# ---------------------------------------------------------------------------
-#    Default sound system and track values
-# ---------------------------------------------------------------------------
-DEFAULT_AUDIO_ENABLED = True
-DEFAULT_AUDIO_BUFFER_SAMPLE_SIZE = 2048
-DEFAULT_SAMPLE_RATE = 44100
-DEFAULT_AUDIO_CHANNELS = 1
-DEFAULT_MASTER_VOLUME = 0.5
-DEFAULT_TRACK_MAX_SIMULTANEOUS_SOUNDS = 1
-DEFAULT_TRACK_VOLUME = 0.5
 
 
 # pylint: disable=too-many-instance-attributes
@@ -39,6 +29,8 @@ class SoundSystem:
         self.mc = mc
         self.log = logging.getLogger('SoundSystem')
         self._initialized = False
+        self._integrated_video_sound = False
+        self._av_offset = 0
         self.audio_interface = None
         self.config = dict()
         self.sound_events = dict()
@@ -47,18 +39,7 @@ class SoundSystem:
 
         self.log.debug("Loading the Sound System")
 
-        # Load configuration for sound system
-        if 'sound_system' not in self.mc.machine_config:
-            self.log.info("SoundSystem: Using default 'sound_system' settings")
-            self.config = dict()
-        else:
-            self.config = self.mc.machine_config['sound_system']
-
-        # TODO: Use config spec validator
-
-        # Validate configuration and provide default values where needed
-        if 'enabled' not in self.config:
-            self.config['enabled'] = DEFAULT_AUDIO_ENABLED
+        self.config = ConfigValidator.validate_config("sound_system", self.mc.machine_config['sound_system'])
 
         # If the sound system has been disabled, abort initialization
         if not self.config['enabled']:
@@ -67,21 +48,25 @@ class SoundSystem:
                            "features will be available.")
             return
 
-        if 'buffer' not in self.config or self.config['buffer'] == 'auto':
-            self.config['buffer'] = DEFAULT_AUDIO_BUFFER_SAMPLE_SIZE
-        elif not AudioInterface.power_of_two(self.config['buffer']):
+        # Ensure audio buffer size is a power of 2 (requirement of SDL2)
+        if not AudioInterface.power_of_two(self.config['buffer']):
+            self.config['buffer'] = 2048
             self.log.warning("SoundSystem: The buffer setting is not a power of "
-                             "two. Default buffer size will be used.")
-            self.config['buffer'] = DEFAULT_AUDIO_BUFFER_SAMPLE_SIZE
+                             "two. Default buffer size ({}) will be used.".format(self.config['buffer']))
 
-        if 'frequency' not in self.config or self.config['frequency'] == 'auto':
-            self.config['frequency'] = DEFAULT_SAMPLE_RATE
+        self._integrated_video_sound = self.config.get('integrate_video_sound', False)
+        if self._integrated_video_sound:
+            self.log.debug("integrate_video_sound: True (sound from videos will be integrated into the sound system)")
+        else:
+            self.log.debug("integrate_video_sound: False (sound from videos is managed by Gstreamer)")
 
-        if 'channels' not in self.config:
-            self.config['channels'] = DEFAULT_AUDIO_CHANNELS
-
-        if 'master_volume' not in self.config:
-            self.config['master_volume'] = DEFAULT_MASTER_VOLUME
+        self._av_offset = self.config.get('av_offset', 0)
+        if self._av_offset > 0:
+            self.log.debug("av_offset: {0} ms (video is delayed by {0} milliseconds to adjust "
+                           "synchronization with audio)".format(self._av_offset))
+        elif self._av_offset < 0:
+            self.log.debug("av_offset: {0} ms (audio is delayed by {1} milliseconds to adjust "
+                           "synchronization with video)".format(self._av_offset, abs(self._av_offset)))
 
         # Initialize audio interface library (get audio output)
         try:
@@ -98,11 +83,27 @@ class SoundSystem:
         # Setup tracks in audio system (including initial volume levels)
         if 'tracks' in self.config:
             for track_name, track_config in self.config['tracks'].items():
+                # Check for reserved 'video' track name
+                if track_name.lower() == "video":
+                    msg = "The track name 'video' is reserved and will automatically be created when " \
+                          "video sound is integrated in the sound system. Please remove the 'video' " \
+                          "track from your sound_system configuration."
+                    self.log.error(msg)
+                    raise AudioException(msg)
+
                 self._create_track(track_name, track_config)
         else:
             self._create_track('default')
             self.log.info("No audio tracks are specified in your machine config file. "
                           "a track named 'default' has been created.")
+
+        # Create special video track (if video sound is integrated into the sound system)
+        if self.integrated_video_sound:
+            video_track_config = {
+                'type': 'video',
+                'volume': self.config.get('video_track_volume', 0.5)
+            }
+            self._create_track('video', video_track_config)
 
         # Set initial master volume level
         self.master_volume = self.config['master_volume']
@@ -153,6 +154,11 @@ class SoundSystem:
         """Return default track."""
         return self.audio_interface.get_track(0)
 
+    @property
+    def integrated_video_sound(self):
+        """Indicates whether video sound is integrated into the sound system"""
+        return self._integrated_video_sound
+
     def master_volume_increase(self, delta: float = 0.05, **kwargs):
         """Increase master volume by delta.
 
@@ -200,7 +206,7 @@ class SoundSystem:
         if 'type' not in config:
             config['type'] = 'standard'
 
-        if config['type'] not in ['standard', 'playlist', 'sound_loop']:
+        if config['type'] not in ['standard', 'playlist', 'sound_loop', 'video']:
             raise AudioException("Could not create '{}' track - an illegal value for "
                                  "'type' was found".format(name))
 
@@ -231,6 +237,11 @@ class SoundSystem:
                                                                  name,
                                                                  config['max_layers'],
                                                                  config['volume'])
+
+        elif config['type'] == 'video':
+            track = self.audio_interface.create_video_track(self.mc,
+                                                            name,
+                                                            config['volume'])
 
         if track is None:
             raise AudioException("Could not create '{}' track due to an error".format(name))

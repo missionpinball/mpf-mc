@@ -822,7 +822,7 @@ static const char *__pyx_f[] = {
 /*--- Type declarations ---*/
 struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo;
 
-/* "mpfmc/core/video/gst_video.pyx":219
+/* "mpfmc/core/video/gst_video.pyx":236
  * #    GstVideo class
  * # ---------------------------------------------------------------------------
  * cdef class GstVideo:             # <<<<<<<<<<<<<<
@@ -836,17 +836,22 @@ struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo {
   GstElement *playbin;
   GstElement *videoconvert;
   GstElement *alphabin;
-  GstElement *appsink;
+  GstElement *appsink_video;
+  GstElement *appsink_audio;
   GstElement *fakesink;
   GstBus *bus;
   PyObject *uri;
   PyObject *_frame_cb;
   PyObject *_eos_cb;
   PyObject *_message_cb;
-  gulong hid_sample;
+  PyObject *_audio_cb;
+  gulong hid_video_sample;
+  gulong hid_audio_sample;
   gulong hid_message;
   PyObject *__weakref__;
   int _alpha_channel;
+  PyObject *_audio_caps;
+  int _av_offset;
 };
 
 
@@ -1050,6 +1055,9 @@ static void __Pyx_WriteUnraisable(const char *name, int clineno,
                                   int lineno, const char *filename,
                                   int full_traceback, int nogil);
 
+/* PyObjectCall2Args.proto */
+static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
+
 /* PyDictVersioning.proto */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 #define __PYX_DICT_VERSION_INIT  ((PY_UINT64_T) -1)
@@ -1097,9 +1105,6 @@ static PyObject *__Pyx__GetModuleGlobalName(PyObject *name, PY_UINT64_T *dict_ve
 static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name);
 #endif
 
-/* PyObjectCall2Args.proto */
-static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2);
-
 /* RaiseException.proto */
 static void __Pyx_Raise(PyObject *type, PyObject *value, PyObject *tb, PyObject *cause);
 
@@ -1118,6 +1123,15 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
 static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
     Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
 
+/* PyObjectSetAttrStr.proto */
+#if CYTHON_USE_TYPE_SLOTS
+#define __Pyx_PyObject_DelAttrStr(o,n) __Pyx_PyObject_SetAttrStr(o, n, NULL)
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value);
+#else
+#define __Pyx_PyObject_DelAttrStr(o,n)   PyObject_DelAttr(o,n)
+#define __Pyx_PyObject_SetAttrStr(o,n,v) PyObject_SetAttr(o,n,v)
+#endif
+
 /* ListAppend.proto */
 #if CYTHON_USE_PYLIST_INTERNALS && CYTHON_ASSUME_SAFE_MACROS
 static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
@@ -1133,6 +1147,34 @@ static CYTHON_INLINE int __Pyx_PyList_Append(PyObject* list, PyObject* x) {
 }
 #else
 #define __Pyx_PyList_Append(L,x) PyList_Append(L,x)
+#endif
+
+/* PyDictContains.proto */
+static CYTHON_INLINE int __Pyx_PyDict_ContainsTF(PyObject* item, PyObject* dict, int eq) {
+    int result = PyDict_Contains(dict, item);
+    return unlikely(result < 0) ? result : (result == (eq == Py_EQ));
+}
+
+/* dict_setdefault.proto */
+static CYTHON_INLINE PyObject *__Pyx_PyDict_SetDefault(PyObject *d, PyObject *key, PyObject *default_value, int is_safe_type);
+
+/* CallUnboundCMethod2.proto */
+static PyObject* __Pyx__CallUnboundCMethod2(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg1, PyObject* arg2);
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030600B1
+static CYTHON_INLINE PyObject *__Pyx_CallUnboundCMethod2(__Pyx_CachedCFunction *cfunc, PyObject *self, PyObject *arg1, PyObject *arg2);
+#else
+#define __Pyx_CallUnboundCMethod2(cfunc, self, arg1, arg2)  __Pyx__CallUnboundCMethod2(cfunc, self, arg1, arg2)
+#endif
+
+/* DictGetItem.proto */
+#if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
+static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key);
+#define __Pyx_PyObject_Dict_GetItem(obj, name)\
+    (likely(PyDict_CheckExact(obj)) ?\
+     __Pyx_PyDict_GetItem(obj, name) : PyObject_GetItem(obj, name))
+#else
+#define __Pyx_PyDict_GetItem(d, key) PyObject_GetItem(d, key)
+#define __Pyx_PyObject_Dict_GetItem(obj, name)  PyObject_GetItem(obj, name)
 #endif
 
 /* PyObject_GenericGetAttrNoDict.proto */
@@ -1241,7 +1283,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
 /* Module declarations from 'mpfmc.core.video.gst_video' */
 static PyTypeObject *__pyx_ptype_5mpfmc_4core_5video_9gst_video_GstVideo = 0;
 static PyObject *__pyx_v_5mpfmc_4core_5video_9gst_video__instances = 0;
-static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *, int, int, char *, int); /*proto*/
+static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_video_sample(void *, int, int, char *, int); /*proto*/
 static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *, GstMessage *); /*proto*/
 #define __Pyx_MODULE_NAME "mpfmc.core.video.gst_video"
 extern int __pyx_module_is_main_mpfmc__core__video__gst_video;
@@ -1264,6 +1306,7 @@ static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_name[] = "__name__";
 static const char __pyx_k_nano[] = "nano";
 static const char __pyx_k_test[] = "__test__";
+static const char __pyx_k_S16LE[] = "S16LE";
 static const char __pyx_k_error[] = "error";
 static const char __pyx_k_major[] = "major";
 static const char __pyx_k_micro[] = "micro";
@@ -1283,6 +1326,8 @@ static const char __pyx_k_prepare[] = "__prepare__";
 static const char __pyx_k_warning[] = "warning";
 static const char __pyx_k_weakref[] = "weakref";
 static const char __pyx_k_GstVideo[] = "GstVideo";
+static const char __pyx_k_audio_cb[] = "audio_cb";
+static const char __pyx_k_channels[] = "channels";
 static const char __pyx_k_frame_cb[] = "frame_cb";
 static const char __pyx_k_getstate[] = "__getstate__";
 static const char __pyx_k_gst_init[] = "_gst_init";
@@ -1290,13 +1335,21 @@ static const char __pyx_k_qualname[] = "__qualname__";
 static const char __pyx_k_register[] = "register";
 static const char __pyx_k_setstate[] = "__setstate__";
 static const char __pyx_k_TypeError[] = "TypeError";
+static const char __pyx_k_av_offset[] = "av_offset";
 static const char __pyx_k_gst_video[] = "gst_video";
 static const char __pyx_k_metaclass[] = "__metaclass__";
 static const char __pyx_k_reduce_ex[] = "__reduce_ex__";
+static const char __pyx_k_audio_caps[] = "audio_caps";
 static const char __pyx_k_message_cb[] = "message_cb";
+static const char __pyx_k_mute_audio[] = "mute_audio";
 static const char __pyx_k_pyx_vtable[] = "__pyx_vtable__";
+static const char __pyx_k_setdefault[] = "setdefault";
+static const char __pyx_k_buffer_size[] = "buffer_size";
+static const char __pyx_k_sample_rate[] = "sample_rate";
+static const char __pyx_k_mute_audio_2[] = "_mute_audio";
 static const char __pyx_k_alpha_channel[] = "alpha_channel";
 static const char __pyx_k_reduce_cython[] = "__reduce_cython__";
+static const char __pyx_k_audio_callback[] = "audio_callback";
 static const char __pyx_k_frame_callback[] = "frame_callback";
 static const char __pyx_k_glib_iteration[] = "glib_iteration";
 static const char __pyx_k_gst_exit_clean[] = "gst_exit_clean";
@@ -1309,26 +1362,41 @@ static const char __pyx_k_on_gst_video_deleted[] = "_on_gst_video_deleted";
 static const char __pyx_k_Unable_to_create_a_playbin[] = "Unable to create a playbin";
 static const char __pyx_k_mpfmc_core_video_gst_video[] = "mpfmc.core.video.gst_video";
 static const char __pyx_k_Unable_to_create_a_pipeline[] = "Unable to create a pipeline";
-static const char __pyx_k_Unable_to_create_an_appsink[] = "Unable to create an appsink";
 static const char __pyx_k_GStreamer_Video_GstVideo_Plays[] = "\nGStreamer Video (GstVideo) - Plays videos using the GStreamer libraries\n\nNotes:\n    This library is basically a wrapper around the C API for GStreamer.  It is used for video playback.\n    When a video is played (using GStreamer playbin element), a callback function is called everytime a\n    new video frame arrives.  It is important to take threading issues into consideration because\n    GStreamer runs in a C thread outside of the scope of the Python GIL, therefore no Python functions\n    may be called in the callback function. To get around this, every time the video frame C callback\n    function is called, it in turn sets a Python callback for the current Kivy clock cycle. This isolates\n    the Python code from the GStreamer C code and keeps the data and locks happy in the multi-threaded\n    environment. Other event notifications (such as EOS) are handled in a similar manner.\n";
 static const char __pyx_k_mpfmc_core_video_gst_video_pyx[] = "mpfmc\\core\\video\\gst_video.pyx";
-static const char __pyx_k_Unable_to_create_the_alpha_chann[] = "Unable to create the alpha channel video bin";
+static const char __pyx_k_Invalid_audio_caps_missing_buffe[] = "Invalid audio_caps: missing 'buffer_size'";
+static const char __pyx_k_Invalid_audio_caps_missing_chann[] = "Invalid audio_caps: missing 'channels'";
+static const char __pyx_k_Invalid_audio_caps_missing_sampl[] = "Invalid audio_caps: missing 'sample_rate'";
+static const char __pyx_k_Unable_to_create_a_video_appsink[] = "Unable to create a video appsink";
+static const char __pyx_k_Unable_to_create_an_audio_appsin[] = "Unable to create an audio appsink";
 static const char __pyx_k_Unable_to_get_the_bus_from_the_p[] = "Unable to get the bus from the pipeline";
 static const char __pyx_k_Unable_to_initialize_gstreamer_c[] = "Unable to initialize gstreamer: code={} message={}";
+static const char __pyx_k_audio_x_raw_rate_channels_format[] = "audio/x-raw,rate={},channels={},format={},layout=interleaved";
 static const char __pyx_k_no_default___reduce___due_to_non[] = "no default __reduce__ due to non-trivial __cinit__";
 static PyObject *__pyx_n_s_GstVideo;
 static PyObject *__pyx_n_s_GstVideoException;
+static PyObject *__pyx_kp_u_Invalid_audio_caps_missing_buffe;
+static PyObject *__pyx_kp_u_Invalid_audio_caps_missing_chann;
+static PyObject *__pyx_kp_u_Invalid_audio_caps_missing_sampl;
+static PyObject *__pyx_n_u_S16LE;
 static PyObject *__pyx_n_s_TypeError;
 static PyObject *__pyx_kp_u_Unable_to_create_a_pipeline;
 static PyObject *__pyx_kp_u_Unable_to_create_a_playbin;
-static PyObject *__pyx_kp_u_Unable_to_create_an_appsink;
-static PyObject *__pyx_kp_u_Unable_to_create_the_alpha_chann;
+static PyObject *__pyx_kp_u_Unable_to_create_a_video_appsink;
+static PyObject *__pyx_kp_u_Unable_to_create_an_audio_appsin;
 static PyObject *__pyx_kp_u_Unable_to_get_the_bus_from_the_p;
 static PyObject *__pyx_kp_u_Unable_to_initialize_gstreamer_c;
 static PyObject *__pyx_n_s_alpha_channel;
 static PyObject *__pyx_n_s_argc;
 static PyObject *__pyx_n_s_argv;
 static PyObject *__pyx_n_s_atexit;
+static PyObject *__pyx_n_s_audio_callback;
+static PyObject *__pyx_n_s_audio_caps;
+static PyObject *__pyx_n_s_audio_cb;
+static PyObject *__pyx_kp_u_audio_x_raw_rate_channels_format;
+static PyObject *__pyx_n_s_av_offset;
+static PyObject *__pyx_n_u_buffer_size;
+static PyObject *__pyx_n_u_channels;
 static PyObject *__pyx_n_s_cline_in_traceback;
 static PyObject *__pyx_n_s_doc;
 static PyObject *__pyx_n_s_encode;
@@ -1336,6 +1404,7 @@ static PyObject *__pyx_n_s_eos_cb;
 static PyObject *__pyx_n_s_error;
 static PyObject *__pyx_n_u_error;
 static PyObject *__pyx_n_s_format;
+static PyObject *__pyx_n_u_format;
 static PyObject *__pyx_n_s_frame_callback;
 static PyObject *__pyx_n_s_frame_cb;
 static PyObject *__pyx_n_s_get_gst_version;
@@ -1359,6 +1428,8 @@ static PyObject *__pyx_n_s_module;
 static PyObject *__pyx_n_s_mpfmc_core_video_gst_video;
 static PyObject *__pyx_kp_s_mpfmc_core_video_gst_video_pyx;
 static PyObject *__pyx_n_s_msg;
+static PyObject *__pyx_n_s_mute_audio;
+static PyObject *__pyx_n_s_mute_audio_2;
 static PyObject *__pyx_n_s_name;
 static PyObject *__pyx_n_s_nano;
 static PyObject *__pyx_kp_s_no_default___reduce___due_to_non;
@@ -1372,6 +1443,8 @@ static PyObject *__pyx_n_s_reduce_ex;
 static PyObject *__pyx_n_s_ref;
 static PyObject *__pyx_n_s_register;
 static PyObject *__pyx_n_s_remove;
+static PyObject *__pyx_n_u_sample_rate;
+static PyObject *__pyx_n_s_setdefault;
 static PyObject *__pyx_n_s_setstate;
 static PyObject *__pyx_n_s_setstate_cython;
 static PyObject *__pyx_n_s_super;
@@ -1388,10 +1461,12 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
 static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_6get_gst_version(CYTHON_UNUSED PyObject *__pyx_self); /* proto */
 static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8glib_iteration(CYTHON_UNUSED PyObject *__pyx_self, int __pyx_v_loop); /* proto */
 static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo___cinit__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v_args, CYTHON_UNUSED PyObject *__pyx_v_kwargs); /* proto */
-static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, PyObject *__pyx_v_uri, PyObject *__pyx_v_frame_cb, PyObject *__pyx_v_eos_cb, PyObject *__pyx_v_message_cb, PyObject *__pyx_v_alpha_channel); /* proto */
+static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, PyObject *__pyx_v_uri, PyObject *__pyx_v_frame_cb, PyObject *__pyx_v_eos_cb, PyObject *__pyx_v_message_cb, PyObject *__pyx_v_audio_cb, PyObject *__pyx_v_alpha_channel, PyObject *__pyx_v_av_offset, PyObject *__pyx_v_mute_audio, PyObject *__pyx_v_audio_caps); /* proto */
 static void __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_4__dealloc__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14frame_callback___get__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
 static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14frame_callback_2__set__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback___get__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
+static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback_2__set__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12eos_callback___get__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
 static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12eos_callback_2__set__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16message_callback___get__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
@@ -1399,20 +1474,21 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16message_callback_
 static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_13alpha_channel___get__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6loaded___get__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6load(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_8_create_pipeline_alpha_channel_bad(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, float __pyx_v_volume); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duration(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_position(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26seek(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, float __pyx_v_percent); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_28__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_30__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_8play(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10stop(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12pause(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14ready(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16unload(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18set_volume(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, float __pyx_v_volume); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20get_duration(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_position(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24seek(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, float __pyx_v_percent); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_28__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static PyObject *__pyx_tp_new_5mpfmc_4core_5video_9gst_video_GstVideo(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
+static __Pyx_CachedCFunction __pyx_umethod_PyDict_Type_setdefault = {0, &__pyx_n_s_setdefault, 0, 0, 0};
 static __Pyx_CachedCFunction __pyx_umethod_PyList_Type_remove = {0, &__pyx_n_s_remove, 0, 0, 0};
+static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_neg_1;
 static PyObject *__pyx_tuple_;
 static PyObject *__pyx_tuple__2;
@@ -1428,7 +1504,7 @@ static PyObject *__pyx_codeobj__10;
 static PyObject *__pyx_codeobj__12;
 /* Late includes */
 
-/* "mpfmc/core/video/gst_video.pyx":135
+/* "mpfmc/core/video/gst_video.pyx":143
  * cdef list _instances = []
  * 
  * def _on_gst_video_deleted(wk):             # <<<<<<<<<<<<<<
@@ -1459,29 +1535,29 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video__on_gst_video_deleted(C
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("_on_gst_video_deleted", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":136
+  /* "mpfmc/core/video/gst_video.pyx":144
  * 
  * def _on_gst_video_deleted(wk):
  *     if wk in _instances:             # <<<<<<<<<<<<<<
  *         _instances.remove(wk)
  * 
  */
-  __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_v_wk, __pyx_v_5mpfmc_4core_5video_9gst_video__instances, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 136, __pyx_L1_error)
+  __pyx_t_1 = (__Pyx_PySequence_ContainsTF(__pyx_v_wk, __pyx_v_5mpfmc_4core_5video_9gst_video__instances, Py_EQ)); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 144, __pyx_L1_error)
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "mpfmc/core/video/gst_video.pyx":137
+    /* "mpfmc/core/video/gst_video.pyx":145
  * def _on_gst_video_deleted(wk):
  *     if wk in _instances:
  *         _instances.remove(wk)             # <<<<<<<<<<<<<<
  * 
  * @atexit.register
  */
-    __pyx_t_3 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyList_Type_remove, __pyx_v_5mpfmc_4core_5video_9gst_video__instances, __pyx_v_wk); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_CallUnboundCMethod1(&__pyx_umethod_PyList_Type_remove, __pyx_v_5mpfmc_4core_5video_9gst_video__instances, __pyx_v_wk); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 145, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":136
+    /* "mpfmc/core/video/gst_video.pyx":144
  * 
  * def _on_gst_video_deleted(wk):
  *     if wk in _instances:             # <<<<<<<<<<<<<<
@@ -1490,7 +1566,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video__on_gst_video_deleted(C
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":135
+  /* "mpfmc/core/video/gst_video.pyx":143
  * cdef list _instances = []
  * 
  * def _on_gst_video_deleted(wk):             # <<<<<<<<<<<<<<
@@ -1511,7 +1587,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video__on_gst_video_deleted(C
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":140
+/* "mpfmc/core/video/gst_video.pyx":148
  * 
  * @atexit.register
  * def gst_exit_clean():             # <<<<<<<<<<<<<<
@@ -1547,7 +1623,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_2gst_exit_clean(CYTHON_
   int __pyx_t_6;
   __Pyx_RefNannySetupContext("gst_exit_clean", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":144
+  /* "mpfmc/core/video/gst_video.pyx":152
  *     # element without releasing the GIL. Otherwise, we might have a deadlock due
  *     # to GIL in appsink callback + GIL already locked here.
  *     for wk in _instances:             # <<<<<<<<<<<<<<
@@ -1556,21 +1632,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_2gst_exit_clean(CYTHON_
  */
   if (unlikely(__pyx_v_5mpfmc_4core_5video_9gst_video__instances == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
-    __PYX_ERR(0, 144, __pyx_L1_error)
+    __PYX_ERR(0, 152, __pyx_L1_error)
   }
   __pyx_t_1 = __pyx_v_5mpfmc_4core_5video_9gst_video__instances; __Pyx_INCREF(__pyx_t_1); __pyx_t_2 = 0;
   for (;;) {
     if (__pyx_t_2 >= PyList_GET_SIZE(__pyx_t_1)) break;
     #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_3 = PyList_GET_ITEM(__pyx_t_1, __pyx_t_2); __Pyx_INCREF(__pyx_t_3); __pyx_t_2++; if (unlikely(0 < 0)) __PYX_ERR(0, 152, __pyx_L1_error)
     #else
-    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_3 = PySequence_ITEM(__pyx_t_1, __pyx_t_2); __pyx_t_2++; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 152, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     #endif
     __Pyx_XDECREF_SET(__pyx_v_wk, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":145
+    /* "mpfmc/core/video/gst_video.pyx":153
  *     # to GIL in appsink callback + GIL already locked here.
  *     for wk in _instances:
  *         gst_video = wk()             # <<<<<<<<<<<<<<
@@ -1590,30 +1666,30 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_2gst_exit_clean(CYTHON_
     }
     __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
     __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 145, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_XDECREF_SET(__pyx_v_gst_video, __pyx_t_3);
     __pyx_t_3 = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":146
+    /* "mpfmc/core/video/gst_video.pyx":154
  *     for wk in _instances:
  *         gst_video = wk()
  *         if gst_video:             # <<<<<<<<<<<<<<
  *             gst_video.unload()
  * 
  */
-    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_gst_video); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_gst_video); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 154, __pyx_L1_error)
     if (__pyx_t_6) {
 
-      /* "mpfmc/core/video/gst_video.pyx":147
+      /* "mpfmc/core/video/gst_video.pyx":155
  *         gst_video = wk()
  *         if gst_video:
  *             gst_video.unload()             # <<<<<<<<<<<<<<
  * 
  * 
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_gst_video, __pyx_n_s_unload); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 147, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_gst_video, __pyx_n_s_unload); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 155, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_5 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -1627,12 +1703,12 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_2gst_exit_clean(CYTHON_
       }
       __pyx_t_3 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
       __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 147, __pyx_L1_error)
+      if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 155, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "mpfmc/core/video/gst_video.pyx":146
+      /* "mpfmc/core/video/gst_video.pyx":154
  *     for wk in _instances:
  *         gst_video = wk()
  *         if gst_video:             # <<<<<<<<<<<<<<
@@ -1641,7 +1717,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_2gst_exit_clean(CYTHON_
  */
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":144
+    /* "mpfmc/core/video/gst_video.pyx":152
  *     # element without releasing the GIL. Otherwise, we might have a deadlock due
  *     # to GIL in appsink callback + GIL already locked here.
  *     for wk in _instances:             # <<<<<<<<<<<<<<
@@ -1651,7 +1727,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_2gst_exit_clean(CYTHON_
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":140
+  /* "mpfmc/core/video/gst_video.pyx":148
  * 
  * @atexit.register
  * def gst_exit_clean():             # <<<<<<<<<<<<<<
@@ -1677,15 +1753,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_2gst_exit_clean(CYTHON_
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":161
+/* "mpfmc/core/video/gst_video.pyx":169
  * # ---------------------------------------------------------------------------
  * 
- * cdef void _on_appsink_sample(void *c_video, int width, int height, char *data, int datasize) with gil:             # <<<<<<<<<<<<<<
+ * cdef void _on_appsink_video_sample(void *c_video, int width, int height, char *data, int datasize) with gil:             # <<<<<<<<<<<<<<
  *     """GStreamer appsink sample callback function (called when a video frame arrives)"""
  *     cdef GstVideo video = <GstVideo>c_video
  */
 
-static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__pyx_v_c_video, int __pyx_v_width, int __pyx_v_height, char *__pyx_v_data, int __pyx_v_datasize) {
+static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_video_sample(void *__pyx_v_c_video, int __pyx_v_width, int __pyx_v_height, char *__pyx_v_data, int __pyx_v_datasize) {
   struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_video = 0;
   PyObject *__pyx_v_buffer = 0;
   __Pyx_RefNannyDeclarations
@@ -1700,10 +1776,10 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__py
   #ifdef WITH_THREAD
   PyGILState_STATE __pyx_gilstate_save = __Pyx_PyGILState_Ensure();
   #endif
-  __Pyx_RefNannySetupContext("_on_appsink_sample", 0);
+  __Pyx_RefNannySetupContext("_on_appsink_video_sample", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":163
- * cdef void _on_appsink_sample(void *c_video, int width, int height, char *data, int datasize) with gil:
+  /* "mpfmc/core/video/gst_video.pyx":171
+ * cdef void _on_appsink_video_sample(void *c_video, int width, int height, char *data, int datasize) with gil:
  *     """GStreamer appsink sample callback function (called when a video frame arrives)"""
  *     cdef GstVideo video = <GstVideo>c_video             # <<<<<<<<<<<<<<
  *     cdef bytes buffer = data[:datasize]
@@ -1714,43 +1790,43 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__py
   __pyx_v_video = ((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":164
+  /* "mpfmc/core/video/gst_video.pyx":172
  *     """GStreamer appsink sample callback function (called when a video frame arrives)"""
  *     cdef GstVideo video = <GstVideo>c_video
  *     cdef bytes buffer = data[:datasize]             # <<<<<<<<<<<<<<
  *     if video.frame_callback:
  *         video.frame_callback(width, height, buffer)
  */
-  __pyx_t_1 = __Pyx_PyBytes_FromStringAndSize(__pyx_v_data + 0, __pyx_v_datasize - 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBytes_FromStringAndSize(__pyx_v_data + 0, __pyx_v_datasize - 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 172, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_v_buffer = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":165
+  /* "mpfmc/core/video/gst_video.pyx":173
  *     cdef GstVideo video = <GstVideo>c_video
  *     cdef bytes buffer = data[:datasize]
  *     if video.frame_callback:             # <<<<<<<<<<<<<<
  *         video.frame_callback(width, height, buffer)
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_frame_callback); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_frame_callback); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 165, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 173, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "mpfmc/core/video/gst_video.pyx":166
+    /* "mpfmc/core/video/gst_video.pyx":174
  *     cdef bytes buffer = data[:datasize]
  *     if video.frame_callback:
  *         video.frame_callback(width, height, buffer)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_frame_callback); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_frame_callback); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_width); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_width); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_height); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 166, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_int(__pyx_v_height); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 174, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     __pyx_t_7 = 0;
@@ -1767,7 +1843,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__py
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_4, __pyx_t_5, __pyx_v_buffer};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -1777,7 +1853,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__py
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[4] = {__pyx_t_6, __pyx_t_4, __pyx_t_5, __pyx_v_buffer};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 3+__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -1785,7 +1861,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__py
     } else
     #endif
     {
-      __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 166, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(3+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       if (__pyx_t_6) {
         __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -1799,14 +1875,14 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__py
       PyTuple_SET_ITEM(__pyx_t_8, 2+__pyx_t_7, __pyx_v_buffer);
       __pyx_t_4 = 0;
       __pyx_t_5 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":165
+    /* "mpfmc/core/video/gst_video.pyx":173
  *     cdef GstVideo video = <GstVideo>c_video
  *     cdef bytes buffer = data[:datasize]
  *     if video.frame_callback:             # <<<<<<<<<<<<<<
@@ -1815,10 +1891,10 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__py
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":161
+  /* "mpfmc/core/video/gst_video.pyx":169
  * # ---------------------------------------------------------------------------
  * 
- * cdef void _on_appsink_sample(void *c_video, int width, int height, char *data, int datasize) with gil:             # <<<<<<<<<<<<<<
+ * cdef void _on_appsink_video_sample(void *c_video, int width, int height, char *data, int datasize) with gil:             # <<<<<<<<<<<<<<
  *     """GStreamer appsink sample callback function (called when a video frame arrives)"""
  *     cdef GstVideo video = <GstVideo>c_video
  */
@@ -1832,7 +1908,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__py
   __Pyx_XDECREF(__pyx_t_5);
   __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_8);
-  __Pyx_WriteUnraisable("mpfmc.core.video.gst_video._on_appsink_sample", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __Pyx_WriteUnraisable("mpfmc.core.video.gst_video._on_appsink_video_sample", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
   __pyx_L0:;
   __Pyx_XDECREF((PyObject *)__pyx_v_video);
   __Pyx_XDECREF(__pyx_v_buffer);
@@ -1842,7 +1918,124 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample(void *__py
   #endif
 }
 
-/* "mpfmc/core/video/gst_video.pyx":169
+/* "mpfmc/core/video/gst_video.pyx":177
+ * 
+ * 
+ * cdef void _on_appsink_audio_sample(void *c_video, char *data, int datasize) with gil:             # <<<<<<<<<<<<<<
+ *     """GStreamer appsink sample callback function (called when an audio buffer arrives)"""
+ *     cdef GstVideo video = <GstVideo>c_video
+ */
+
+static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_audio_sample(void *__pyx_v_c_video, char *__pyx_v_data, int __pyx_v_datasize) {
+  struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_video = 0;
+  PyObject *__pyx_v_buffer = 0;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  #ifdef WITH_THREAD
+  PyGILState_STATE __pyx_gilstate_save = __Pyx_PyGILState_Ensure();
+  #endif
+  __Pyx_RefNannySetupContext("_on_appsink_audio_sample", 0);
+
+  /* "mpfmc/core/video/gst_video.pyx":179
+ * cdef void _on_appsink_audio_sample(void *c_video, char *data, int datasize) with gil:
+ *     """GStreamer appsink sample callback function (called when an audio buffer arrives)"""
+ *     cdef GstVideo video = <GstVideo>c_video             # <<<<<<<<<<<<<<
+ *     cdef bytes buffer = data[:datasize]
+ *     if video.audio_callback:
+ */
+  __pyx_t_1 = ((PyObject *)__pyx_v_c_video);
+  __Pyx_INCREF(__pyx_t_1);
+  __pyx_v_video = ((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "mpfmc/core/video/gst_video.pyx":180
+ *     """GStreamer appsink sample callback function (called when an audio buffer arrives)"""
+ *     cdef GstVideo video = <GstVideo>c_video
+ *     cdef bytes buffer = data[:datasize]             # <<<<<<<<<<<<<<
+ *     if video.audio_callback:
+ *         video.audio_callback(buffer)
+ */
+  __pyx_t_1 = __Pyx_PyBytes_FromStringAndSize(__pyx_v_data + 0, __pyx_v_datasize - 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_v_buffer = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "mpfmc/core/video/gst_video.pyx":181
+ *     cdef GstVideo video = <GstVideo>c_video
+ *     cdef bytes buffer = data[:datasize]
+ *     if video.audio_callback:             # <<<<<<<<<<<<<<
+ *         video.audio_callback(buffer)
+ * 
+ */
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_audio_callback); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_1);
+  __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 181, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+  if (__pyx_t_2) {
+
+    /* "mpfmc/core/video/gst_video.pyx":182
+ *     cdef bytes buffer = data[:datasize]
+ *     if video.audio_callback:
+ *         video.audio_callback(buffer)             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_audio_callback); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 182, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = NULL;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_4)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_4);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+      }
+    }
+    __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_v_buffer) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_buffer);
+    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+    /* "mpfmc/core/video/gst_video.pyx":181
+ *     cdef GstVideo video = <GstVideo>c_video
+ *     cdef bytes buffer = data[:datasize]
+ *     if video.audio_callback:             # <<<<<<<<<<<<<<
+ *         video.audio_callback(buffer)
+ * 
+ */
+  }
+
+  /* "mpfmc/core/video/gst_video.pyx":177
+ * 
+ * 
+ * cdef void _on_appsink_audio_sample(void *c_video, char *data, int datasize) with gil:             # <<<<<<<<<<<<<<
+ *     """GStreamer appsink sample callback function (called when an audio buffer arrives)"""
+ *     cdef GstVideo video = <GstVideo>c_video
+ */
+
+  /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_WriteUnraisable("mpfmc.core.video.gst_video._on_appsink_audio_sample", __pyx_clineno, __pyx_lineno, __pyx_filename, 1, 0);
+  __pyx_L0:;
+  __Pyx_XDECREF((PyObject *)__pyx_v_video);
+  __Pyx_XDECREF(__pyx_v_buffer);
+  __Pyx_RefNannyFinishContext();
+  #ifdef WITH_THREAD
+  __Pyx_PyGILState_Release(__pyx_gilstate_save);
+  #endif
+}
+
+/* "mpfmc/core/video/gst_video.pyx":185
  * 
  * 
  * cdef void _on_gst_video_message(void *c_video, GstMessage *message) with gil:             # <<<<<<<<<<<<<<
@@ -1866,7 +2059,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
   #endif
   __Pyx_RefNannySetupContext("_on_gst_video_message", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":171
+  /* "mpfmc/core/video/gst_video.pyx":187
  * cdef void _on_gst_video_message(void *c_video, GstMessage *message) with gil:
  *     """GStreamer message callback function"""
  *     cdef GstVideo video = <GstVideo>c_video             # <<<<<<<<<<<<<<
@@ -1878,7 +2071,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
   __pyx_v_video = ((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":172
+  /* "mpfmc/core/video/gst_video.pyx":188
  *     """GStreamer message callback function"""
  *     cdef GstVideo video = <GstVideo>c_video
  *     cdef GError *err = NULL             # <<<<<<<<<<<<<<
@@ -1887,7 +2080,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
   __pyx_v_err = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":173
+  /* "mpfmc/core/video/gst_video.pyx":189
  *     cdef GstVideo video = <GstVideo>c_video
  *     cdef GError *err = NULL
  *     if message.type == GST_MESSAGE_EOS:             # <<<<<<<<<<<<<<
@@ -1897,7 +2090,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
   switch (__pyx_v_message->type) {
     case GST_MESSAGE_EOS:
 
-    /* "mpfmc/core/video/gst_video.pyx":174
+    /* "mpfmc/core/video/gst_video.pyx":190
  *     cdef GError *err = NULL
  *     if message.type == GST_MESSAGE_EOS:
  *         video.got_eos()             # <<<<<<<<<<<<<<
@@ -1906,7 +2099,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     ((struct __pyx_vtabstruct_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_video->__pyx_vtab)->got_eos(__pyx_v_video);
 
-    /* "mpfmc/core/video/gst_video.pyx":173
+    /* "mpfmc/core/video/gst_video.pyx":189
  *     cdef GstVideo video = <GstVideo>c_video
  *     cdef GError *err = NULL
  *     if message.type == GST_MESSAGE_EOS:             # <<<<<<<<<<<<<<
@@ -1916,7 +2109,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
     break;
     case GST_MESSAGE_ERROR:
 
-    /* "mpfmc/core/video/gst_video.pyx":176
+    /* "mpfmc/core/video/gst_video.pyx":192
  *         video.got_eos()
  *     elif message.type == GST_MESSAGE_ERROR:
  *         gst_message_parse_error(message, &err, NULL)             # <<<<<<<<<<<<<<
@@ -1925,29 +2118,29 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     gst_message_parse_error(__pyx_v_message, (&__pyx_v_err), NULL);
 
-    /* "mpfmc/core/video/gst_video.pyx":177
+    /* "mpfmc/core/video/gst_video.pyx":193
  *     elif message.type == GST_MESSAGE_ERROR:
  *         gst_message_parse_error(message, &err, NULL)
  *         if video.message_callback:             # <<<<<<<<<<<<<<
  *             video.message_callback('error', err.message)
  *         g_error_free(err)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 193, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 177, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 193, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_2) {
 
-      /* "mpfmc/core/video/gst_video.pyx":178
+      /* "mpfmc/core/video/gst_video.pyx":194
  *         gst_message_parse_error(message, &err, NULL)
  *         if video.message_callback:
  *             video.message_callback('error', err.message)             # <<<<<<<<<<<<<<
  *         g_error_free(err)
  *     elif message.type == GST_MESSAGE_WARNING:
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 178, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 194, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_4 = __Pyx_PyBytes_FromString(__pyx_v_err->message); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 178, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyBytes_FromString(__pyx_v_err->message); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 194, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_5 = NULL;
       __pyx_t_6 = 0;
@@ -1964,7 +2157,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_n_u_error, __pyx_t_4};
-        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -1973,14 +2166,14 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[3] = {__pyx_t_5, __pyx_n_u_error, __pyx_t_4};
-        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       } else
       #endif
       {
-        __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 178, __pyx_L1_error)
+        __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 194, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         if (__pyx_t_5) {
           __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
@@ -1991,14 +2184,14 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
         __Pyx_GIVEREF(__pyx_t_4);
         PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_4);
         __pyx_t_4 = 0;
-        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 178, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 194, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "mpfmc/core/video/gst_video.pyx":177
+      /* "mpfmc/core/video/gst_video.pyx":193
  *     elif message.type == GST_MESSAGE_ERROR:
  *         gst_message_parse_error(message, &err, NULL)
  *         if video.message_callback:             # <<<<<<<<<<<<<<
@@ -2007,7 +2200,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":179
+    /* "mpfmc/core/video/gst_video.pyx":195
  *         if video.message_callback:
  *             video.message_callback('error', err.message)
  *         g_error_free(err)             # <<<<<<<<<<<<<<
@@ -2016,7 +2209,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     g_error_free(__pyx_v_err);
 
-    /* "mpfmc/core/video/gst_video.pyx":175
+    /* "mpfmc/core/video/gst_video.pyx":191
  *     if message.type == GST_MESSAGE_EOS:
  *         video.got_eos()
  *     elif message.type == GST_MESSAGE_ERROR:             # <<<<<<<<<<<<<<
@@ -2026,7 +2219,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
     break;
     case GST_MESSAGE_WARNING:
 
-    /* "mpfmc/core/video/gst_video.pyx":181
+    /* "mpfmc/core/video/gst_video.pyx":197
  *         g_error_free(err)
  *     elif message.type == GST_MESSAGE_WARNING:
  *         gst_message_parse_warning(message, &err, NULL)             # <<<<<<<<<<<<<<
@@ -2035,29 +2228,29 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     gst_message_parse_warning(__pyx_v_message, (&__pyx_v_err), NULL);
 
-    /* "mpfmc/core/video/gst_video.pyx":182
+    /* "mpfmc/core/video/gst_video.pyx":198
  *     elif message.type == GST_MESSAGE_WARNING:
  *         gst_message_parse_warning(message, &err, NULL)
  *         if video.message_callback:             # <<<<<<<<<<<<<<
  *             video.message_callback('warning', err.message)
  *         g_error_free(err)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 182, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 182, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 198, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_2) {
 
-      /* "mpfmc/core/video/gst_video.pyx":183
+      /* "mpfmc/core/video/gst_video.pyx":199
  *         gst_message_parse_warning(message, &err, NULL)
  *         if video.message_callback:
  *             video.message_callback('warning', err.message)             # <<<<<<<<<<<<<<
  *         g_error_free(err)
  *     elif message.type == GST_MESSAGE_INFO:
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 183, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 199, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_7 = __Pyx_PyBytes_FromString(__pyx_v_err->message); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 183, __pyx_L1_error)
+      __pyx_t_7 = __Pyx_PyBytes_FromString(__pyx_v_err->message); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 199, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_7);
       __pyx_t_4 = NULL;
       __pyx_t_6 = 0;
@@ -2074,7 +2267,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_n_u_warning, __pyx_t_7};
-        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -2083,14 +2276,14 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[3] = {__pyx_t_4, __pyx_n_u_warning, __pyx_t_7};
-        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
       } else
       #endif
       {
-        __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 183, __pyx_L1_error)
+        __pyx_t_5 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 199, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         if (__pyx_t_4) {
           __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_4); __pyx_t_4 = NULL;
@@ -2101,14 +2294,14 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
         __Pyx_GIVEREF(__pyx_t_7);
         PyTuple_SET_ITEM(__pyx_t_5, 1+__pyx_t_6, __pyx_t_7);
         __pyx_t_7 = 0;
-        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_5, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 199, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "mpfmc/core/video/gst_video.pyx":182
+      /* "mpfmc/core/video/gst_video.pyx":198
  *     elif message.type == GST_MESSAGE_WARNING:
  *         gst_message_parse_warning(message, &err, NULL)
  *         if video.message_callback:             # <<<<<<<<<<<<<<
@@ -2117,7 +2310,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":184
+    /* "mpfmc/core/video/gst_video.pyx":200
  *         if video.message_callback:
  *             video.message_callback('warning', err.message)
  *         g_error_free(err)             # <<<<<<<<<<<<<<
@@ -2126,7 +2319,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     g_error_free(__pyx_v_err);
 
-    /* "mpfmc/core/video/gst_video.pyx":180
+    /* "mpfmc/core/video/gst_video.pyx":196
  *             video.message_callback('error', err.message)
  *         g_error_free(err)
  *     elif message.type == GST_MESSAGE_WARNING:             # <<<<<<<<<<<<<<
@@ -2136,7 +2329,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
     break;
     case GST_MESSAGE_INFO:
 
-    /* "mpfmc/core/video/gst_video.pyx":186
+    /* "mpfmc/core/video/gst_video.pyx":202
  *         g_error_free(err)
  *     elif message.type == GST_MESSAGE_INFO:
  *         gst_message_parse_info(message, &err, NULL)             # <<<<<<<<<<<<<<
@@ -2145,29 +2338,29 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     gst_message_parse_info(__pyx_v_message, (&__pyx_v_err), NULL);
 
-    /* "mpfmc/core/video/gst_video.pyx":187
+    /* "mpfmc/core/video/gst_video.pyx":203
  *     elif message.type == GST_MESSAGE_INFO:
  *         gst_message_parse_info(message, &err, NULL)
  *         if video.message_callback:             # <<<<<<<<<<<<<<
  *             video.message_callback('info', err.message)
  *         g_error_free(err)
  */
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 187, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 203, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 187, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_2 < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     if (__pyx_t_2) {
 
-      /* "mpfmc/core/video/gst_video.pyx":188
+      /* "mpfmc/core/video/gst_video.pyx":204
  *         gst_message_parse_info(message, &err, NULL)
  *         if video.message_callback:
  *             video.message_callback('info', err.message)             # <<<<<<<<<<<<<<
  *         g_error_free(err)
  *     else:
  */
-      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_video), __pyx_n_s_message_callback); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 204, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
-      __pyx_t_5 = __Pyx_PyBytes_FromString(__pyx_v_err->message); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 188, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyBytes_FromString(__pyx_v_err->message); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 204, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_t_7 = NULL;
       __pyx_t_6 = 0;
@@ -2184,7 +2377,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
       #if CYTHON_FAST_PYCALL
       if (PyFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_n_u_info, __pyx_t_5};
-        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -2193,14 +2386,14 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
       #if CYTHON_FAST_PYCCALL
       if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
         PyObject *__pyx_temp[3] = {__pyx_t_7, __pyx_n_u_info, __pyx_t_5};
-        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
       } else
       #endif
       {
-        __pyx_t_4 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 188, __pyx_L1_error)
+        __pyx_t_4 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 204, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         if (__pyx_t_7) {
           __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_7); __pyx_t_7 = NULL;
@@ -2211,14 +2404,14 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
         __Pyx_GIVEREF(__pyx_t_5);
         PyTuple_SET_ITEM(__pyx_t_4, 1+__pyx_t_6, __pyx_t_5);
         __pyx_t_5 = 0;
-        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 188, __pyx_L1_error)
+        __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_1);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
       }
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-      /* "mpfmc/core/video/gst_video.pyx":187
+      /* "mpfmc/core/video/gst_video.pyx":203
  *     elif message.type == GST_MESSAGE_INFO:
  *         gst_message_parse_info(message, &err, NULL)
  *         if video.message_callback:             # <<<<<<<<<<<<<<
@@ -2227,7 +2420,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":189
+    /* "mpfmc/core/video/gst_video.pyx":205
  *         if video.message_callback:
  *             video.message_callback('info', err.message)
  *         g_error_free(err)             # <<<<<<<<<<<<<<
@@ -2236,7 +2429,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
  */
     g_error_free(__pyx_v_err);
 
-    /* "mpfmc/core/video/gst_video.pyx":185
+    /* "mpfmc/core/video/gst_video.pyx":201
  *             video.message_callback('warning', err.message)
  *         g_error_free(err)
  *     elif message.type == GST_MESSAGE_INFO:             # <<<<<<<<<<<<<<
@@ -2248,7 +2441,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
     break;
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":169
+  /* "mpfmc/core/video/gst_video.pyx":185
  * 
  * 
  * cdef void _on_gst_video_message(void *c_video, GstMessage *message) with gil:             # <<<<<<<<<<<<<<
@@ -2273,8 +2466,8 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message(void *_
   #endif
 }
 
-/* "mpfmc/core/video/gst_video.pyx":193
- *         pass
+/* "mpfmc/core/video/gst_video.pyx":210
+ * 
  * 
  * def _gst_init():             # <<<<<<<<<<<<<<
  *     """Initializes the GStreamer library"""
@@ -2313,7 +2506,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
   PyObject *__pyx_t_8 = NULL;
   __Pyx_RefNannySetupContext("_gst_init", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":195
+  /* "mpfmc/core/video/gst_video.pyx":212
  * def _gst_init():
  *     """Initializes the GStreamer library"""
  *     if gst_is_initialized():             # <<<<<<<<<<<<<<
@@ -2323,7 +2516,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
   __pyx_t_1 = (gst_is_initialized() != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":196
+    /* "mpfmc/core/video/gst_video.pyx":213
  *     """Initializes the GStreamer library"""
  *     if gst_is_initialized():
  *         return True             # <<<<<<<<<<<<<<
@@ -2335,7 +2528,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
     __pyx_r = Py_True;
     goto __pyx_L0;
 
-    /* "mpfmc/core/video/gst_video.pyx":195
+    /* "mpfmc/core/video/gst_video.pyx":212
  * def _gst_init():
  *     """Initializes the GStreamer library"""
  *     if gst_is_initialized():             # <<<<<<<<<<<<<<
@@ -2344,7 +2537,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":197
+  /* "mpfmc/core/video/gst_video.pyx":214
  *     if gst_is_initialized():
  *         return True
  *     cdef int argc = 0             # <<<<<<<<<<<<<<
@@ -2353,7 +2546,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
  */
   __pyx_v_argc = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":198
+  /* "mpfmc/core/video/gst_video.pyx":215
  *         return True
  *     cdef int argc = 0
  *     cdef char **argv = NULL             # <<<<<<<<<<<<<<
@@ -2362,7 +2555,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
  */
   __pyx_v_argv = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":200
+  /* "mpfmc/core/video/gst_video.pyx":217
  *     cdef char **argv = NULL
  *     cdef GError *error
  *     if not gst_init_check(&argc, &argv, &error):             # <<<<<<<<<<<<<<
@@ -2372,26 +2565,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
   __pyx_t_1 = ((!(gst_init_check((&__pyx_v_argc), (&__pyx_v_argv), (&__pyx_v_error)) != 0)) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "mpfmc/core/video/gst_video.pyx":201
+    /* "mpfmc/core/video/gst_video.pyx":218
  *     cdef GError *error
  *     if not gst_init_check(&argc, &argv, &error):
  *         msg = 'Unable to initialize gstreamer: code={} message={}'.format(             # <<<<<<<<<<<<<<
  *                 error.code, <bytes>error.message)
  *         raise GstVideoException(msg)
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Unable_to_initialize_gstreamer_c, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 201, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_Unable_to_initialize_gstreamer_c, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
 
-    /* "mpfmc/core/video/gst_video.pyx":202
+    /* "mpfmc/core/video/gst_video.pyx":219
  *     if not gst_init_check(&argc, &argv, &error):
  *         msg = 'Unable to initialize gstreamer: code={} message={}'.format(
  *                 error.code, <bytes>error.message)             # <<<<<<<<<<<<<<
  *         raise GstVideoException(msg)
  * 
  */
-    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_error->code); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 202, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_From_int(__pyx_v_error->code); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_5 = __Pyx_PyBytes_FromString(__pyx_v_error->message); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 202, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyBytes_FromString(__pyx_v_error->message); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 219, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_t_6 = NULL;
     __pyx_t_7 = 0;
@@ -2408,7 +2601,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_4, __pyx_t_5};
-      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -2418,7 +2611,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[3] = {__pyx_t_6, __pyx_t_4, __pyx_t_5};
-      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_7, 2+__pyx_t_7); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -2426,7 +2619,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
     } else
     #endif
     {
-      __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 201, __pyx_L1_error)
+      __pyx_t_8 = PyTuple_New(2+__pyx_t_7); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 218, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
       if (__pyx_t_6) {
         __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_8, 0, __pyx_t_6); __pyx_t_6 = NULL;
@@ -2438,7 +2631,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
       PyTuple_SET_ITEM(__pyx_t_8, 1+__pyx_t_7, __pyx_t_5);
       __pyx_t_4 = 0;
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 201, __pyx_L1_error)
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
     }
@@ -2446,14 +2639,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
     __pyx_v_msg = __pyx_t_2;
     __pyx_t_2 = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":203
+    /* "mpfmc/core/video/gst_video.pyx":220
  *         msg = 'Unable to initialize gstreamer: code={} message={}'.format(
  *                 error.code, <bytes>error.message)
  *         raise GstVideoException(msg)             # <<<<<<<<<<<<<<
  * 
  * def get_gst_version():
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 203, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 220, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_8 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -2467,14 +2660,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
     }
     __pyx_t_2 = (__pyx_t_8) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_8, __pyx_v_msg) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_v_msg);
     __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 203, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 220, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 203, __pyx_L1_error)
+    __PYX_ERR(0, 220, __pyx_L1_error)
 
-    /* "mpfmc/core/video/gst_video.pyx":200
+    /* "mpfmc/core/video/gst_video.pyx":217
  *     cdef char **argv = NULL
  *     cdef GError *error
  *     if not gst_init_check(&argc, &argv, &error):             # <<<<<<<<<<<<<<
@@ -2483,8 +2676,8 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":193
- *         pass
+  /* "mpfmc/core/video/gst_video.pyx":210
+ * 
  * 
  * def _gst_init():             # <<<<<<<<<<<<<<
  *     """Initializes the GStreamer library"""
@@ -2510,7 +2703,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_4_gst_init(CYTHON_UNUSE
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":205
+/* "mpfmc/core/video/gst_video.pyx":222
  *         raise GstVideoException(msg)
  * 
  * def get_gst_version():             # <<<<<<<<<<<<<<
@@ -2547,7 +2740,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_6get_gst_version(CYTHON
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("get_gst_version", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":208
+  /* "mpfmc/core/video/gst_video.pyx":225
  *     """Returns the current version of GStreamer"""
  *     cdef unsigned int major, minor, micro, nano
  *     gst_version(&major, &minor, &micro, &nano)             # <<<<<<<<<<<<<<
@@ -2556,7 +2749,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_6get_gst_version(CYTHON
  */
   gst_version((&__pyx_v_major), (&__pyx_v_minor), (&__pyx_v_micro), (&__pyx_v_nano));
 
-  /* "mpfmc/core/video/gst_video.pyx":209
+  /* "mpfmc/core/video/gst_video.pyx":226
  *     cdef unsigned int major, minor, micro, nano
  *     gst_version(&major, &minor, &micro, &nano)
  *     return major, minor, micro, nano             # <<<<<<<<<<<<<<
@@ -2564,15 +2757,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_6get_gst_version(CYTHON
  * def glib_iteration(int loop):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyInt_From_unsigned_int(__pyx_v_major); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyInt_From_unsigned_int(__pyx_v_major); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __Pyx_PyInt_From_unsigned_int(__pyx_v_minor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyInt_From_unsigned_int(__pyx_v_minor); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyInt_From_unsigned_int(__pyx_v_micro); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_From_unsigned_int(__pyx_v_micro); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = __Pyx_PyInt_From_unsigned_int(__pyx_v_nano); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_PyInt_From_unsigned_int(__pyx_v_nano); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyTuple_New(4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 209, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(4); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 226, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -2590,7 +2783,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_6get_gst_version(CYTHON
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":205
+  /* "mpfmc/core/video/gst_video.pyx":222
  *         raise GstVideoException(msg)
  * 
  * def get_gst_version():             # <<<<<<<<<<<<<<
@@ -2613,7 +2806,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_6get_gst_version(CYTHON
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":211
+/* "mpfmc/core/video/gst_video.pyx":228
  *     return major, minor, micro, nano
  * 
  * def glib_iteration(int loop):             # <<<<<<<<<<<<<<
@@ -2631,7 +2824,7 @@ static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_9glib_iteration(PyObjec
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("glib_iteration (wrapper)", 0);
   assert(__pyx_arg_loop); {
-    __pyx_v_loop = __Pyx_PyInt_As_int(__pyx_arg_loop); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 211, __pyx_L3_error)
+    __pyx_v_loop = __Pyx_PyInt_As_int(__pyx_arg_loop); if (unlikely((__pyx_v_loop == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 228, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -2651,7 +2844,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8glib_iteration(CYTHON_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("glib_iteration", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":213
+  /* "mpfmc/core/video/gst_video.pyx":230
  * def glib_iteration(int loop):
  *     """Python function wrapper of C iteration function"""
  *     c_glib_iteration(loop)             # <<<<<<<<<<<<<<
@@ -2660,7 +2853,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8glib_iteration(CYTHON_
  */
   c_glib_iteration(__pyx_v_loop);
 
-  /* "mpfmc/core/video/gst_video.pyx":211
+  /* "mpfmc/core/video/gst_video.pyx":228
  *     return major, minor, micro, nano
  * 
  * def glib_iteration(int loop):             # <<<<<<<<<<<<<<
@@ -2675,12 +2868,12 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8glib_iteration(CYTHON_
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":232
- *     cdef bint _alpha_channel
+/* "mpfmc/core/video/gst_video.pyx":252
+ *     cdef int _av_offset
  * 
  *     def __cinit__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
- *         self.pipeline = self.playbin = self.videoconvert = self.alphabin = self.appsink = self.fakesink = NULL
- *         self.bus = NULL
+ *         self.pipeline = NULL
+ *         self.playbin = NULL
  */
 
 /* Python wrapper */
@@ -2708,54 +2901,111 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo___cinit__(struct __
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":233
+  /* "mpfmc/core/video/gst_video.pyx":253
  * 
  *     def __cinit__(self, *args, **kwargs):
- *         self.pipeline = self.playbin = self.videoconvert = self.alphabin = self.appsink = self.fakesink = NULL             # <<<<<<<<<<<<<<
- *         self.bus = NULL
- *         self.hid_sample = self.hid_message = 0
+ *         self.pipeline = NULL             # <<<<<<<<<<<<<<
+ *         self.playbin = NULL
+ *         self.videoconvert = NULL
  */
   __pyx_v_self->pipeline = NULL;
+
+  /* "mpfmc/core/video/gst_video.pyx":254
+ *     def __cinit__(self, *args, **kwargs):
+ *         self.pipeline = NULL
+ *         self.playbin = NULL             # <<<<<<<<<<<<<<
+ *         self.videoconvert = NULL
+ *         self.alphabin = NULL
+ */
   __pyx_v_self->playbin = NULL;
+
+  /* "mpfmc/core/video/gst_video.pyx":255
+ *         self.pipeline = NULL
+ *         self.playbin = NULL
+ *         self.videoconvert = NULL             # <<<<<<<<<<<<<<
+ *         self.alphabin = NULL
+ *         self.appsink_video = NULL
+ */
   __pyx_v_self->videoconvert = NULL;
+
+  /* "mpfmc/core/video/gst_video.pyx":256
+ *         self.playbin = NULL
+ *         self.videoconvert = NULL
+ *         self.alphabin = NULL             # <<<<<<<<<<<<<<
+ *         self.appsink_video = NULL
+ *         self.appsink_audio = NULL
+ */
   __pyx_v_self->alphabin = NULL;
-  __pyx_v_self->appsink = NULL;
+
+  /* "mpfmc/core/video/gst_video.pyx":257
+ *         self.videoconvert = NULL
+ *         self.alphabin = NULL
+ *         self.appsink_video = NULL             # <<<<<<<<<<<<<<
+ *         self.appsink_audio = NULL
+ *         self.fakesink = NULL
+ */
+  __pyx_v_self->appsink_video = NULL;
+
+  /* "mpfmc/core/video/gst_video.pyx":258
+ *         self.alphabin = NULL
+ *         self.appsink_video = NULL
+ *         self.appsink_audio = NULL             # <<<<<<<<<<<<<<
+ *         self.fakesink = NULL
+ *         self.bus = NULL
+ */
+  __pyx_v_self->appsink_audio = NULL;
+
+  /* "mpfmc/core/video/gst_video.pyx":259
+ *         self.appsink_video = NULL
+ *         self.appsink_audio = NULL
+ *         self.fakesink = NULL             # <<<<<<<<<<<<<<
+ *         self.bus = NULL
+ *         self.hid_video_sample = 0
+ */
   __pyx_v_self->fakesink = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":234
- *     def __cinit__(self, *args, **kwargs):
- *         self.pipeline = self.playbin = self.videoconvert = self.alphabin = self.appsink = self.fakesink = NULL
+  /* "mpfmc/core/video/gst_video.pyx":260
+ *         self.appsink_audio = NULL
+ *         self.fakesink = NULL
  *         self.bus = NULL             # <<<<<<<<<<<<<<
- *         self.hid_sample = self.hid_message = 0
- *         self._alpha_channel = False
+ *         self.hid_video_sample = 0
+ *         self.hid_audio_sample = 0
  */
   __pyx_v_self->bus = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":235
- *         self.pipeline = self.playbin = self.videoconvert = self.alphabin = self.appsink = self.fakesink = NULL
+  /* "mpfmc/core/video/gst_video.pyx":261
+ *         self.fakesink = NULL
  *         self.bus = NULL
- *         self.hid_sample = self.hid_message = 0             # <<<<<<<<<<<<<<
- *         self._alpha_channel = False
+ *         self.hid_video_sample = 0             # <<<<<<<<<<<<<<
+ *         self.hid_audio_sample = 0
+ *         self.hid_message = 0
+ */
+  __pyx_v_self->hid_video_sample = 0;
+
+  /* "mpfmc/core/video/gst_video.pyx":262
+ *         self.bus = NULL
+ *         self.hid_video_sample = 0
+ *         self.hid_audio_sample = 0             # <<<<<<<<<<<<<<
+ *         self.hid_message = 0
  * 
  */
-  __pyx_v_self->hid_sample = 0;
+  __pyx_v_self->hid_audio_sample = 0;
+
+  /* "mpfmc/core/video/gst_video.pyx":263
+ *         self.hid_video_sample = 0
+ *         self.hid_audio_sample = 0
+ *         self.hid_message = 0             # <<<<<<<<<<<<<<
+ * 
+ *     def __init__(self, uri,
+ */
   __pyx_v_self->hid_message = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":236
- *         self.bus = NULL
- *         self.hid_sample = self.hid_message = 0
- *         self._alpha_channel = False             # <<<<<<<<<<<<<<
- * 
- *     def __init__(self, uri, frame_cb=None, eos_cb=None, message_cb=None, alpha_channel=False):
- */
-  __pyx_v_self->_alpha_channel = 0;
-
-  /* "mpfmc/core/video/gst_video.pyx":232
- *     cdef bint _alpha_channel
+  /* "mpfmc/core/video/gst_video.pyx":252
+ *     cdef int _av_offset
  * 
  *     def __cinit__(self, *args, **kwargs):             # <<<<<<<<<<<<<<
- *         self.pipeline = self.playbin = self.videoconvert = self.alphabin = self.appsink = self.fakesink = NULL
- *         self.bus = NULL
+ *         self.pipeline = NULL
+ *         self.playbin = NULL
  */
 
   /* function exit code */
@@ -2764,12 +3014,12 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo___cinit__(struct __
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":238
- *         self._alpha_channel = False
+/* "mpfmc/core/video/gst_video.pyx":265
+ *         self.hid_message = 0
  * 
- *     def __init__(self, uri, frame_cb=None, eos_cb=None, message_cb=None, alpha_channel=False):             # <<<<<<<<<<<<<<
- *         super(GstVideo, self).__init__()
- *         self.uri = uri
+ *     def __init__(self, uri,             # <<<<<<<<<<<<<<
+ *                  frame_cb=None, eos_cb=None, message_cb=None, audio_cb=None,
+ *                  alpha_channel=False, av_offset=0, mute_audio=False, audio_caps=None):
  */
 
 /* Python wrapper */
@@ -2779,21 +3029,53 @@ static int __pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_3__init__(PyObject 
   PyObject *__pyx_v_frame_cb = 0;
   PyObject *__pyx_v_eos_cb = 0;
   PyObject *__pyx_v_message_cb = 0;
+  PyObject *__pyx_v_audio_cb = 0;
   PyObject *__pyx_v_alpha_channel = 0;
+  PyObject *__pyx_v_av_offset = 0;
+  PyObject *__pyx_v_mute_audio = 0;
+  PyObject *__pyx_v_audio_caps = 0;
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_uri,&__pyx_n_s_frame_cb,&__pyx_n_s_eos_cb,&__pyx_n_s_message_cb,&__pyx_n_s_alpha_channel,0};
-    PyObject* values[5] = {0,0,0,0,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_uri,&__pyx_n_s_frame_cb,&__pyx_n_s_eos_cb,&__pyx_n_s_message_cb,&__pyx_n_s_audio_cb,&__pyx_n_s_alpha_channel,&__pyx_n_s_av_offset,&__pyx_n_s_mute_audio,&__pyx_n_s_audio_caps,0};
+    PyObject* values[9] = {0,0,0,0,0,0,0,0,0};
+
+    /* "mpfmc/core/video/gst_video.pyx":266
+ * 
+ *     def __init__(self, uri,
+ *                  frame_cb=None, eos_cb=None, message_cb=None, audio_cb=None,             # <<<<<<<<<<<<<<
+ *                  alpha_channel=False, av_offset=0, mute_audio=False, audio_caps=None):
+ *         super(GstVideo, self).__init__()
+ */
     values[1] = ((PyObject *)Py_None);
     values[2] = ((PyObject *)Py_None);
     values[3] = ((PyObject *)Py_None);
-    values[4] = ((PyObject *)Py_False);
+    values[4] = ((PyObject *)Py_None);
+
+    /* "mpfmc/core/video/gst_video.pyx":267
+ *     def __init__(self, uri,
+ *                  frame_cb=None, eos_cb=None, message_cb=None, audio_cb=None,
+ *                  alpha_channel=False, av_offset=0, mute_audio=False, audio_caps=None):             # <<<<<<<<<<<<<<
+ *         super(GstVideo, self).__init__()
+ *         self.uri = uri
+ */
+    values[5] = ((PyObject *)Py_False);
+    values[6] = ((PyObject *)__pyx_int_0);
+    values[7] = ((PyObject *)Py_False);
+    values[8] = ((PyObject *)Py_None);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
       switch (pos_args) {
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -2833,15 +3115,47 @@ static int __pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_3__init__(PyObject 
         CYTHON_FALLTHROUGH;
         case  4:
         if (kw_args > 0) {
-          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alpha_channel);
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_audio_cb);
           if (value) { values[4] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  5:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_alpha_channel);
+          if (value) { values[5] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  6:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_av_offset);
+          if (value) { values[6] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  7:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_mute_audio);
+          if (value) { values[7] = value; kw_args--; }
+        }
+        CYTHON_FALLTHROUGH;
+        case  8:
+        if (kw_args > 0) {
+          PyObject* value = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_audio_caps);
+          if (value) { values[8] = value; kw_args--; }
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 238, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(0, 265, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
+        case  9: values[8] = PyTuple_GET_ITEM(__pyx_args, 8);
+        CYTHON_FALLTHROUGH;
+        case  8: values[7] = PyTuple_GET_ITEM(__pyx_args, 7);
+        CYTHON_FALLTHROUGH;
+        case  7: values[6] = PyTuple_GET_ITEM(__pyx_args, 6);
+        CYTHON_FALLTHROUGH;
+        case  6: values[5] = PyTuple_GET_ITEM(__pyx_args, 5);
+        CYTHON_FALLTHROUGH;
         case  5: values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
         CYTHON_FALLTHROUGH;
         case  4: values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
@@ -2859,44 +3173,57 @@ static int __pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_3__init__(PyObject 
     __pyx_v_frame_cb = values[1];
     __pyx_v_eos_cb = values[2];
     __pyx_v_message_cb = values[3];
-    __pyx_v_alpha_channel = values[4];
+    __pyx_v_audio_cb = values[4];
+    __pyx_v_alpha_channel = values[5];
+    __pyx_v_av_offset = values[6];
+    __pyx_v_mute_audio = values[7];
+    __pyx_v_audio_caps = values[8];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 238, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 0, 1, 9, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 265, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("mpfmc.core.video.gst_video.GstVideo.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self), __pyx_v_uri, __pyx_v_frame_cb, __pyx_v_eos_cb, __pyx_v_message_cb, __pyx_v_alpha_channel);
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self), __pyx_v_uri, __pyx_v_frame_cb, __pyx_v_eos_cb, __pyx_v_message_cb, __pyx_v_audio_cb, __pyx_v_alpha_channel, __pyx_v_av_offset, __pyx_v_mute_audio, __pyx_v_audio_caps);
+
+  /* "mpfmc/core/video/gst_video.pyx":265
+ *         self.hid_message = 0
+ * 
+ *     def __init__(self, uri,             # <<<<<<<<<<<<<<
+ *                  frame_cb=None, eos_cb=None, message_cb=None, audio_cb=None,
+ *                  alpha_channel=False, av_offset=0, mute_audio=False, audio_caps=None):
+ */
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, PyObject *__pyx_v_uri, PyObject *__pyx_v_frame_cb, PyObject *__pyx_v_eos_cb, PyObject *__pyx_v_message_cb, PyObject *__pyx_v_alpha_channel) {
+static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, PyObject *__pyx_v_uri, PyObject *__pyx_v_frame_cb, PyObject *__pyx_v_eos_cb, PyObject *__pyx_v_message_cb, PyObject *__pyx_v_audio_cb, PyObject *__pyx_v_alpha_channel, PyObject *__pyx_v_av_offset, PyObject *__pyx_v_mute_audio, PyObject *__pyx_v_audio_caps) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   int __pyx_t_4;
-  PyObject *__pyx_t_5 = NULL;
-  int __pyx_t_6;
+  int __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
   PyObject *__pyx_t_7 = NULL;
   int __pyx_t_8;
+  int __pyx_t_9;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":239
- * 
- *     def __init__(self, uri, frame_cb=None, eos_cb=None, message_cb=None, alpha_channel=False):
+  /* "mpfmc/core/video/gst_video.pyx":268
+ *                  frame_cb=None, eos_cb=None, message_cb=None, audio_cb=None,
+ *                  alpha_channel=False, av_offset=0, mute_audio=False, audio_caps=None):
  *         super(GstVideo, self).__init__()             # <<<<<<<<<<<<<<
  *         self.uri = uri
  *         self._frame_cb = frame_cb
  */
-  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_INCREF(((PyObject *)__pyx_ptype_5mpfmc_4core_5video_9gst_video_GstVideo));
   __Pyx_GIVEREF(((PyObject *)__pyx_ptype_5mpfmc_4core_5video_9gst_video_GstVideo));
@@ -2904,10 +3231,10 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __
   __Pyx_INCREF(((PyObject *)__pyx_v_self));
   __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
   PyTuple_SET_ITEM(__pyx_t_2, 1, ((PyObject *)__pyx_v_self));
-  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_super, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = NULL;
@@ -2922,13 +3249,13 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 239, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 268, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":240
- *     def __init__(self, uri, frame_cb=None, eos_cb=None, message_cb=None, alpha_channel=False):
+  /* "mpfmc/core/video/gst_video.pyx":269
+ *                  alpha_channel=False, av_offset=0, mute_audio=False, audio_caps=None):
  *         super(GstVideo, self).__init__()
  *         self.uri = uri             # <<<<<<<<<<<<<<
  *         self._frame_cb = frame_cb
@@ -2940,7 +3267,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __
   __Pyx_DECREF(__pyx_v_self->uri);
   __pyx_v_self->uri = __pyx_v_uri;
 
-  /* "mpfmc/core/video/gst_video.pyx":241
+  /* "mpfmc/core/video/gst_video.pyx":270
  *         super(GstVideo, self).__init__()
  *         self.uri = uri
  *         self._frame_cb = frame_cb             # <<<<<<<<<<<<<<
@@ -2953,12 +3280,12 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __
   __Pyx_DECREF(__pyx_v_self->_frame_cb);
   __pyx_v_self->_frame_cb = __pyx_v_frame_cb;
 
-  /* "mpfmc/core/video/gst_video.pyx":242
+  /* "mpfmc/core/video/gst_video.pyx":271
  *         self.uri = uri
  *         self._frame_cb = frame_cb
  *         self._eos_cb = eos_cb             # <<<<<<<<<<<<<<
  *         self._message_cb = message_cb
- *         self._alpha_channel = alpha_channel
+ *         self._audio_cb = audio_cb
  */
   __Pyx_INCREF(__pyx_v_eos_cb);
   __Pyx_GIVEREF(__pyx_v_eos_cb);
@@ -2966,12 +3293,12 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __
   __Pyx_DECREF(__pyx_v_self->_eos_cb);
   __pyx_v_self->_eos_cb = __pyx_v_eos_cb;
 
-  /* "mpfmc/core/video/gst_video.pyx":243
+  /* "mpfmc/core/video/gst_video.pyx":272
  *         self._frame_cb = frame_cb
  *         self._eos_cb = eos_cb
  *         self._message_cb = message_cb             # <<<<<<<<<<<<<<
+ *         self._audio_cb = audio_cb
  *         self._alpha_channel = alpha_channel
- *         _instances.append(ref(self, _on_gst_video_deleted))
  */
   __Pyx_INCREF(__pyx_v_message_cb);
   __Pyx_GIVEREF(__pyx_v_message_cb);
@@ -2979,89 +3306,137 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __
   __Pyx_DECREF(__pyx_v_self->_message_cb);
   __pyx_v_self->_message_cb = __pyx_v_message_cb;
 
-  /* "mpfmc/core/video/gst_video.pyx":244
+  /* "mpfmc/core/video/gst_video.pyx":273
  *         self._eos_cb = eos_cb
  *         self._message_cb = message_cb
+ *         self._audio_cb = audio_cb             # <<<<<<<<<<<<<<
+ *         self._alpha_channel = alpha_channel
+ *         self._mute_audio = mute_audio
+ */
+  __Pyx_INCREF(__pyx_v_audio_cb);
+  __Pyx_GIVEREF(__pyx_v_audio_cb);
+  __Pyx_GOTREF(__pyx_v_self->_audio_cb);
+  __Pyx_DECREF(__pyx_v_self->_audio_cb);
+  __pyx_v_self->_audio_cb = __pyx_v_audio_cb;
+
+  /* "mpfmc/core/video/gst_video.pyx":274
+ *         self._message_cb = message_cb
+ *         self._audio_cb = audio_cb
  *         self._alpha_channel = alpha_channel             # <<<<<<<<<<<<<<
+ *         self._mute_audio = mute_audio
+ *         self._av_offset = av_offset
+ */
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_alpha_channel); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 274, __pyx_L1_error)
+  __pyx_v_self->_alpha_channel = __pyx_t_4;
+
+  /* "mpfmc/core/video/gst_video.pyx":275
+ *         self._audio_cb = audio_cb
+ *         self._alpha_channel = alpha_channel
+ *         self._mute_audio = mute_audio             # <<<<<<<<<<<<<<
+ *         self._av_offset = av_offset
+ *         self._audio_caps = audio_caps
+ */
+  if (__Pyx_PyObject_SetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_mute_audio_2, __pyx_v_mute_audio) < 0) __PYX_ERR(0, 275, __pyx_L1_error)
+
+  /* "mpfmc/core/video/gst_video.pyx":276
+ *         self._alpha_channel = alpha_channel
+ *         self._mute_audio = mute_audio
+ *         self._av_offset = av_offset             # <<<<<<<<<<<<<<
+ *         self._audio_caps = audio_caps
+ *         _instances.append(ref(self, _on_gst_video_deleted))
+ */
+  __pyx_t_5 = __Pyx_PyInt_As_int(__pyx_v_av_offset); if (unlikely((__pyx_t_5 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 276, __pyx_L1_error)
+  __pyx_v_self->_av_offset = __pyx_t_5;
+
+  /* "mpfmc/core/video/gst_video.pyx":277
+ *         self._mute_audio = mute_audio
+ *         self._av_offset = av_offset
+ *         self._audio_caps = audio_caps             # <<<<<<<<<<<<<<
  *         _instances.append(ref(self, _on_gst_video_deleted))
  * 
  */
-  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_alpha_channel); if (unlikely((__pyx_t_4 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 244, __pyx_L1_error)
-  __pyx_v_self->_alpha_channel = __pyx_t_4;
+  if (!(likely(PyDict_CheckExact(__pyx_v_audio_caps))||((__pyx_v_audio_caps) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "dict", Py_TYPE(__pyx_v_audio_caps)->tp_name), 0))) __PYX_ERR(0, 277, __pyx_L1_error)
+  __pyx_t_1 = __pyx_v_audio_caps;
+  __Pyx_INCREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->_audio_caps);
+  __Pyx_DECREF(__pyx_v_self->_audio_caps);
+  __pyx_v_self->_audio_caps = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":245
- *         self._message_cb = message_cb
- *         self._alpha_channel = alpha_channel
+  /* "mpfmc/core/video/gst_video.pyx":278
+ *         self._av_offset = av_offset
+ *         self._audio_caps = audio_caps
  *         _instances.append(ref(self, _on_gst_video_deleted))             # <<<<<<<<<<<<<<
  * 
  *         # Ensure GStreamer is initialized
  */
   if (unlikely(__pyx_v_5mpfmc_4core_5video_9gst_video__instances == Py_None)) {
     PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "append");
-    __PYX_ERR(0, 245, __pyx_L1_error)
+    __PYX_ERR(0, 278, __pyx_L1_error)
   }
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_ref); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_ref); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_on_gst_video_deleted); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 245, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_on_gst_video_deleted); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_5 = NULL;
-  __pyx_t_6 = 0;
+  __pyx_t_6 = NULL;
+  __pyx_t_5 = 0;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
-    __pyx_t_5 = PyMethod_GET_SELF(__pyx_t_2);
-    if (likely(__pyx_t_5)) {
+    __pyx_t_6 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_6)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
-      __Pyx_INCREF(__pyx_t_5);
+      __Pyx_INCREF(__pyx_t_6);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_2, function);
-      __pyx_t_6 = 1;
+      __pyx_t_5 = 1;
     }
   }
   #if CYTHON_FAST_PYCALL
   if (PyFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_5, ((PyObject *)__pyx_v_self), __pyx_t_3};
-    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 245, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    PyObject *__pyx_temp[3] = {__pyx_t_6, ((PyObject *)__pyx_v_self), __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else
   #endif
   #if CYTHON_FAST_PYCCALL
   if (__Pyx_PyFastCFunction_Check(__pyx_t_2)) {
-    PyObject *__pyx_temp[3] = {__pyx_t_5, ((PyObject *)__pyx_v_self), __pyx_t_3};
-    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_6, 2+__pyx_t_6); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 245, __pyx_L1_error)
-    __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
+    PyObject *__pyx_temp[3] = {__pyx_t_6, ((PyObject *)__pyx_v_self), __pyx_t_3};
+    __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_2, __pyx_temp+1-__pyx_t_5, 2+__pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
+    __Pyx_XDECREF(__pyx_t_6); __pyx_t_6 = 0;
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   } else
   #endif
   {
-    __pyx_t_7 = PyTuple_New(2+__pyx_t_6); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 245, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2+__pyx_t_5); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    if (__pyx_t_5) {
-      __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_5); __pyx_t_5 = NULL;
+    if (__pyx_t_6) {
+      __Pyx_GIVEREF(__pyx_t_6); PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_6); __pyx_t_6 = NULL;
     }
     __Pyx_INCREF(((PyObject *)__pyx_v_self));
     __Pyx_GIVEREF(((PyObject *)__pyx_v_self));
-    PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_6, ((PyObject *)__pyx_v_self));
+    PyTuple_SET_ITEM(__pyx_t_7, 0+__pyx_t_5, ((PyObject *)__pyx_v_self));
     __Pyx_GIVEREF(__pyx_t_3);
-    PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_6, __pyx_t_3);
+    PyTuple_SET_ITEM(__pyx_t_7, 1+__pyx_t_5, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 245, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_7, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 278, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
   }
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_5mpfmc_4core_5video_9gst_video__instances, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 245, __pyx_L1_error)
+  __pyx_t_8 = __Pyx_PyList_Append(__pyx_v_5mpfmc_4core_5video_9gst_video__instances, __pyx_t_1); if (unlikely(__pyx_t_8 == ((int)-1))) __PYX_ERR(0, 278, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":248
+  /* "mpfmc/core/video/gst_video.pyx":281
  * 
  *         # Ensure GStreamer is initialized
  *         _gst_init()             # <<<<<<<<<<<<<<
  * 
- *     def __dealloc__(self):
+ *         # Validate audio caps (if supplied)
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gst_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 248, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_gst_init); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_7 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
@@ -3075,17 +3450,207 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __
   }
   __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_7) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 248, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 281, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":238
- *         self._alpha_channel = False
+  /* "mpfmc/core/video/gst_video.pyx":284
  * 
- *     def __init__(self, uri, frame_cb=None, eos_cb=None, message_cb=None, alpha_channel=False):             # <<<<<<<<<<<<<<
- *         super(GstVideo, self).__init__()
- *         self.uri = uri
+ *         # Validate audio caps (if supplied)
+ *         if self._audio_caps:             # <<<<<<<<<<<<<<
+ *             if 'sample_rate' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'sample_rate'")
+ */
+  __pyx_t_4 = __Pyx_PyObject_IsTrue(__pyx_v_self->_audio_caps); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 284, __pyx_L1_error)
+  if (__pyx_t_4) {
+
+    /* "mpfmc/core/video/gst_video.pyx":285
+ *         # Validate audio caps (if supplied)
+ *         if self._audio_caps:
+ *             if 'sample_rate' not in self._audio_caps:             # <<<<<<<<<<<<<<
+ *                 raise GstVideoException("Invalid audio_caps: missing 'sample_rate'")
+ *             if 'buffer_size' not in self._audio_caps:
+ */
+    if (unlikely(__pyx_v_self->_audio_caps == Py_None)) {
+      PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+      __PYX_ERR(0, 285, __pyx_L1_error)
+    }
+    __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_n_u_sample_rate, __pyx_v_self->_audio_caps, Py_NE)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 285, __pyx_L1_error)
+    __pyx_t_9 = (__pyx_t_4 != 0);
+    if (unlikely(__pyx_t_9)) {
+
+      /* "mpfmc/core/video/gst_video.pyx":286
+ *         if self._audio_caps:
+ *             if 'sample_rate' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'sample_rate'")             # <<<<<<<<<<<<<<
+ *             if 'buffer_size' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'buffer_size'")
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 286, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_7 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_2);
+        if (likely(__pyx_t_7)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+          __Pyx_INCREF(__pyx_t_7);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_2, function);
+        }
+      }
+      __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_7, __pyx_kp_u_Invalid_audio_caps_missing_sampl) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_Invalid_audio_caps_missing_sampl);
+      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 286, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __PYX_ERR(0, 286, __pyx_L1_error)
+
+      /* "mpfmc/core/video/gst_video.pyx":285
+ *         # Validate audio caps (if supplied)
+ *         if self._audio_caps:
+ *             if 'sample_rate' not in self._audio_caps:             # <<<<<<<<<<<<<<
+ *                 raise GstVideoException("Invalid audio_caps: missing 'sample_rate'")
+ *             if 'buffer_size' not in self._audio_caps:
+ */
+    }
+
+    /* "mpfmc/core/video/gst_video.pyx":287
+ *             if 'sample_rate' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'sample_rate'")
+ *             if 'buffer_size' not in self._audio_caps:             # <<<<<<<<<<<<<<
+ *                 raise GstVideoException("Invalid audio_caps: missing 'buffer_size'")
+ *             if 'channels' not in self._audio_caps:
+ */
+    if (unlikely(__pyx_v_self->_audio_caps == Py_None)) {
+      PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+      __PYX_ERR(0, 287, __pyx_L1_error)
+    }
+    __pyx_t_9 = (__Pyx_PyDict_ContainsTF(__pyx_n_u_buffer_size, __pyx_v_self->_audio_caps, Py_NE)); if (unlikely(__pyx_t_9 < 0)) __PYX_ERR(0, 287, __pyx_L1_error)
+    __pyx_t_4 = (__pyx_t_9 != 0);
+    if (unlikely(__pyx_t_4)) {
+
+      /* "mpfmc/core/video/gst_video.pyx":288
+ *                 raise GstVideoException("Invalid audio_caps: missing 'sample_rate'")
+ *             if 'buffer_size' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'buffer_size'")             # <<<<<<<<<<<<<<
+ *             if 'channels' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'channels'")
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 288, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_7 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_2);
+        if (likely(__pyx_t_7)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+          __Pyx_INCREF(__pyx_t_7);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_2, function);
+        }
+      }
+      __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_7, __pyx_kp_u_Invalid_audio_caps_missing_buffe) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_Invalid_audio_caps_missing_buffe);
+      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 288, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __PYX_ERR(0, 288, __pyx_L1_error)
+
+      /* "mpfmc/core/video/gst_video.pyx":287
+ *             if 'sample_rate' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'sample_rate'")
+ *             if 'buffer_size' not in self._audio_caps:             # <<<<<<<<<<<<<<
+ *                 raise GstVideoException("Invalid audio_caps: missing 'buffer_size'")
+ *             if 'channels' not in self._audio_caps:
+ */
+    }
+
+    /* "mpfmc/core/video/gst_video.pyx":289
+ *             if 'buffer_size' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'buffer_size'")
+ *             if 'channels' not in self._audio_caps:             # <<<<<<<<<<<<<<
+ *                 raise GstVideoException("Invalid audio_caps: missing 'channels'")
+ *             self._audio_caps.setdefault('format', 'S16LE')
+ */
+    if (unlikely(__pyx_v_self->_audio_caps == Py_None)) {
+      PyErr_SetString(PyExc_TypeError, "'NoneType' object is not iterable");
+      __PYX_ERR(0, 289, __pyx_L1_error)
+    }
+    __pyx_t_4 = (__Pyx_PyDict_ContainsTF(__pyx_n_u_channels, __pyx_v_self->_audio_caps, Py_NE)); if (unlikely(__pyx_t_4 < 0)) __PYX_ERR(0, 289, __pyx_L1_error)
+    __pyx_t_9 = (__pyx_t_4 != 0);
+    if (unlikely(__pyx_t_9)) {
+
+      /* "mpfmc/core/video/gst_video.pyx":290
+ *                 raise GstVideoException("Invalid audio_caps: missing 'buffer_size'")
+ *             if 'channels' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'channels'")             # <<<<<<<<<<<<<<
+ *             self._audio_caps.setdefault('format', 'S16LE')
+ * 
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 290, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __pyx_t_7 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_2))) {
+        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_2);
+        if (likely(__pyx_t_7)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+          __Pyx_INCREF(__pyx_t_7);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_2, function);
+        }
+      }
+      __pyx_t_1 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_7, __pyx_kp_u_Invalid_audio_caps_missing_chann) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_kp_u_Invalid_audio_caps_missing_chann);
+      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+      if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 290, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_1);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __Pyx_Raise(__pyx_t_1, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+      __PYX_ERR(0, 290, __pyx_L1_error)
+
+      /* "mpfmc/core/video/gst_video.pyx":289
+ *             if 'buffer_size' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'buffer_size'")
+ *             if 'channels' not in self._audio_caps:             # <<<<<<<<<<<<<<
+ *                 raise GstVideoException("Invalid audio_caps: missing 'channels'")
+ *             self._audio_caps.setdefault('format', 'S16LE')
+ */
+    }
+
+    /* "mpfmc/core/video/gst_video.pyx":291
+ *             if 'channels' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'channels'")
+ *             self._audio_caps.setdefault('format', 'S16LE')             # <<<<<<<<<<<<<<
+ * 
+ *     def __dealloc__(self):
+ */
+    if (unlikely(__pyx_v_self->_audio_caps == Py_None)) {
+      PyErr_Format(PyExc_AttributeError, "'NoneType' object has no attribute '%.30s'", "setdefault");
+      __PYX_ERR(0, 291, __pyx_L1_error)
+    }
+    __pyx_t_1 = __Pyx_PyDict_SetDefault(__pyx_v_self->_audio_caps, __pyx_n_u_format, __pyx_n_u_S16LE, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 291, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
+
+    /* "mpfmc/core/video/gst_video.pyx":284
+ * 
+ *         # Validate audio caps (if supplied)
+ *         if self._audio_caps:             # <<<<<<<<<<<<<<
+ *             if 'sample_rate' not in self._audio_caps:
+ *                 raise GstVideoException("Invalid audio_caps: missing 'sample_rate'")
+ */
+  }
+
+  /* "mpfmc/core/video/gst_video.pyx":265
+ *         self.hid_message = 0
+ * 
+ *     def __init__(self, uri,             # <<<<<<<<<<<<<<
+ *                  frame_cb=None, eos_cb=None, message_cb=None, audio_cb=None,
+ *                  alpha_channel=False, av_offset=0, mute_audio=False, audio_caps=None):
  */
 
   /* function exit code */
@@ -3095,7 +3660,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __
   __Pyx_XDECREF(__pyx_t_1);
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7);
   __Pyx_AddTraceback("mpfmc.core.video.gst_video.GstVideo.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
@@ -3104,8 +3669,8 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_2__init__(struct __
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":250
- *         _gst_init()
+/* "mpfmc/core/video/gst_video.pyx":293
+ *             self._audio_caps.setdefault('format', 'S16LE')
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         self.unload()
@@ -3130,14 +3695,14 @@ static void __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_4__dealloc__(struc
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":251
+  /* "mpfmc/core/video/gst_video.pyx":294
  * 
  *     def __dealloc__(self):
  *         self.unload()             # <<<<<<<<<<<<<<
  * 
  *     cdef void got_eos(self):
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unload); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 251, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unload); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 294, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -3151,13 +3716,13 @@ static void __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_4__dealloc__(struc
   }
   __pyx_t_1 = (__pyx_t_3) ? __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_3) : __Pyx_PyObject_CallNoArg(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 251, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 294, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":250
- *         _gst_init()
+  /* "mpfmc/core/video/gst_video.pyx":293
+ *             self._audio_caps.setdefault('format', 'S16LE')
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         self.unload()
@@ -3175,7 +3740,7 @@ static void __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_4__dealloc__(struc
   __Pyx_RefNannyFinishContext();
 }
 
-/* "mpfmc/core/video/gst_video.pyx":253
+/* "mpfmc/core/video/gst_video.pyx":296
  *         self.unload()
  * 
  *     cdef void got_eos(self):             # <<<<<<<<<<<<<<
@@ -3191,17 +3756,17 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo_got_eos(struct __py
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("got_eos", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":254
+  /* "mpfmc/core/video/gst_video.pyx":297
  * 
  *     cdef void got_eos(self):
  *         if self._eos_cb:             # <<<<<<<<<<<<<<
  *             self._eos_cb()
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_self->_eos_cb); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 254, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_self->_eos_cb); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 297, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":255
+    /* "mpfmc/core/video/gst_video.pyx":298
  *     cdef void got_eos(self):
  *         if self._eos_cb:
  *             self._eos_cb()             # <<<<<<<<<<<<<<
@@ -3221,12 +3786,12 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo_got_eos(struct __py
     }
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 255, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 298, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":254
+    /* "mpfmc/core/video/gst_video.pyx":297
  * 
  *     cdef void got_eos(self):
  *         if self._eos_cb:             # <<<<<<<<<<<<<<
@@ -3235,7 +3800,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo_got_eos(struct __py
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":253
+  /* "mpfmc/core/video/gst_video.pyx":296
  *         self.unload()
  * 
  *     cdef void got_eos(self):             # <<<<<<<<<<<<<<
@@ -3254,7 +3819,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo_got_eos(struct __py
   __Pyx_RefNannyFinishContext();
 }
 
-/* "mpfmc/core/video/gst_video.pyx":258
+/* "mpfmc/core/video/gst_video.pyx":301
  * 
  *     @property
  *     def frame_callback(self):             # <<<<<<<<<<<<<<
@@ -3280,7 +3845,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14frame_callb
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":259
+  /* "mpfmc/core/video/gst_video.pyx":302
  *     @property
  *     def frame_callback(self):
  *         return self._frame_cb             # <<<<<<<<<<<<<<
@@ -3292,7 +3857,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14frame_callb
   __pyx_r = __pyx_v_self->_frame_cb;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":258
+  /* "mpfmc/core/video/gst_video.pyx":301
  * 
  *     @property
  *     def frame_callback(self):             # <<<<<<<<<<<<<<
@@ -3307,7 +3872,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14frame_callb
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":262
+/* "mpfmc/core/video/gst_video.pyx":305
  * 
  *     @frame_callback.setter
  *     def frame_callback(self, value):             # <<<<<<<<<<<<<<
@@ -3333,7 +3898,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14frame_callback_2_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":263
+  /* "mpfmc/core/video/gst_video.pyx":306
  *     @frame_callback.setter
  *     def frame_callback(self, value):
  *         self._frame_cb = value             # <<<<<<<<<<<<<<
@@ -3346,7 +3911,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14frame_callback_2_
   __Pyx_DECREF(__pyx_v_self->_frame_cb);
   __pyx_v_self->_frame_cb = __pyx_v_value;
 
-  /* "mpfmc/core/video/gst_video.pyx":262
+  /* "mpfmc/core/video/gst_video.pyx":305
  * 
  *     @frame_callback.setter
  *     def frame_callback(self, value):             # <<<<<<<<<<<<<<
@@ -3360,7 +3925,113 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14frame_callback_2_
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":266
+/* "mpfmc/core/video/gst_video.pyx":309
+ * 
+ *     @property
+ *     def audio_callback(self):             # <<<<<<<<<<<<<<
+ *         return self._audio_cb
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback___get__(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback___get__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+
+  /* "mpfmc/core/video/gst_video.pyx":310
+ *     @property
+ *     def audio_callback(self):
+ *         return self._audio_cb             # <<<<<<<<<<<<<<
+ * 
+ *     @audio_callback.setter
+ */
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_self->_audio_cb);
+  __pyx_r = __pyx_v_self->_audio_cb;
+  goto __pyx_L0;
+
+  /* "mpfmc/core/video/gst_video.pyx":309
+ * 
+ *     @property
+ *     def audio_callback(self):             # <<<<<<<<<<<<<<
+ *         return self._audio_cb
+ * 
+ */
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/core/video/gst_video.pyx":313
+ * 
+ *     @audio_callback.setter
+ *     def audio_callback(self, value):             # <<<<<<<<<<<<<<
+ *         self._audio_cb = value
+ * 
+ */
+
+/* Python wrapper */
+static int __pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback_2__set__(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback_2__set__(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__", 0);
+
+  /* "mpfmc/core/video/gst_video.pyx":314
+ *     @audio_callback.setter
+ *     def audio_callback(self, value):
+ *         self._audio_cb = value             # <<<<<<<<<<<<<<
+ * 
+ *     @property
+ */
+  __Pyx_INCREF(__pyx_v_value);
+  __Pyx_GIVEREF(__pyx_v_value);
+  __Pyx_GOTREF(__pyx_v_self->_audio_cb);
+  __Pyx_DECREF(__pyx_v_self->_audio_cb);
+  __pyx_v_self->_audio_cb = __pyx_v_value;
+
+  /* "mpfmc/core/video/gst_video.pyx":313
+ * 
+ *     @audio_callback.setter
+ *     def audio_callback(self, value):             # <<<<<<<<<<<<<<
+ *         self._audio_cb = value
+ * 
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "mpfmc/core/video/gst_video.pyx":317
  * 
  *     @property
  *     def eos_callback(self):             # <<<<<<<<<<<<<<
@@ -3386,7 +4057,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12eos_callbac
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":267
+  /* "mpfmc/core/video/gst_video.pyx":318
  *     @property
  *     def eos_callback(self):
  *         return self._eos_cb             # <<<<<<<<<<<<<<
@@ -3398,7 +4069,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12eos_callbac
   __pyx_r = __pyx_v_self->_eos_cb;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":266
+  /* "mpfmc/core/video/gst_video.pyx":317
  * 
  *     @property
  *     def eos_callback(self):             # <<<<<<<<<<<<<<
@@ -3413,7 +4084,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12eos_callbac
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":270
+/* "mpfmc/core/video/gst_video.pyx":321
  * 
  *     @eos_callback.setter
  *     def eos_callback(self, value):             # <<<<<<<<<<<<<<
@@ -3439,7 +4110,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12eos_callback_2__s
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":271
+  /* "mpfmc/core/video/gst_video.pyx":322
  *     @eos_callback.setter
  *     def eos_callback(self, value):
  *         self._eos_cb = value             # <<<<<<<<<<<<<<
@@ -3452,7 +4123,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12eos_callback_2__s
   __Pyx_DECREF(__pyx_v_self->_eos_cb);
   __pyx_v_self->_eos_cb = __pyx_v_value;
 
-  /* "mpfmc/core/video/gst_video.pyx":270
+  /* "mpfmc/core/video/gst_video.pyx":321
  * 
  *     @eos_callback.setter
  *     def eos_callback(self, value):             # <<<<<<<<<<<<<<
@@ -3466,7 +4137,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12eos_callback_2__s
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":274
+/* "mpfmc/core/video/gst_video.pyx":325
  * 
  *     @property
  *     def message_callback(self):             # <<<<<<<<<<<<<<
@@ -3492,7 +4163,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16message_cal
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":275
+  /* "mpfmc/core/video/gst_video.pyx":326
  *     @property
  *     def message_callback(self):
  *         return self._message_cb             # <<<<<<<<<<<<<<
@@ -3504,7 +4175,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16message_cal
   __pyx_r = __pyx_v_self->_message_cb;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":274
+  /* "mpfmc/core/video/gst_video.pyx":325
  * 
  *     @property
  *     def message_callback(self):             # <<<<<<<<<<<<<<
@@ -3519,7 +4190,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16message_cal
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":278
+/* "mpfmc/core/video/gst_video.pyx":329
  * 
  *     @message_callback.setter
  *     def message_callback(self, value):             # <<<<<<<<<<<<<<
@@ -3545,7 +4216,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16message_callback_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__set__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":279
+  /* "mpfmc/core/video/gst_video.pyx":330
  *     @message_callback.setter
  *     def message_callback(self, value):
  *         self._message_cb = value             # <<<<<<<<<<<<<<
@@ -3558,7 +4229,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16message_callback_
   __Pyx_DECREF(__pyx_v_self->_message_cb);
   __pyx_v_self->_message_cb = __pyx_v_value;
 
-  /* "mpfmc/core/video/gst_video.pyx":278
+  /* "mpfmc/core/video/gst_video.pyx":329
  * 
  *     @message_callback.setter
  *     def message_callback(self, value):             # <<<<<<<<<<<<<<
@@ -3572,7 +4243,7 @@ static int __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16message_callback_
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":282
+/* "mpfmc/core/video/gst_video.pyx":333
  * 
  *     @property
  *     def alpha_channel(self):             # <<<<<<<<<<<<<<
@@ -3599,7 +4270,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_13alpha_chann
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":283
+  /* "mpfmc/core/video/gst_video.pyx":334
  *     @property
  *     def alpha_channel(self):
  *         return self._alpha_channel             # <<<<<<<<<<<<<<
@@ -3607,13 +4278,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_13alpha_chann
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->_alpha_channel); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 283, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong(__pyx_v_self->_alpha_channel); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 334, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":282
+  /* "mpfmc/core/video/gst_video.pyx":333
  * 
  *     @property
  *     def alpha_channel(self):             # <<<<<<<<<<<<<<
@@ -3632,7 +4303,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_13alpha_chann
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":286
+/* "mpfmc/core/video/gst_video.pyx":337
  * 
  *     @property
  *     def loaded(self):             # <<<<<<<<<<<<<<
@@ -3659,7 +4330,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6loaded___get
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":287
+  /* "mpfmc/core/video/gst_video.pyx":338
  *     @property
  *     def loaded(self):
  *         return self.pipeline != NULL             # <<<<<<<<<<<<<<
@@ -3667,13 +4338,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6loaded___get
  *     def load(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_PyBool_FromLong((__pyx_v_self->pipeline != NULL)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 287, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong((__pyx_v_self->pipeline != NULL)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 338, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":286
+  /* "mpfmc/core/video/gst_video.pyx":337
  * 
  *     @property
  *     def loaded(self):             # <<<<<<<<<<<<<<
@@ -3692,7 +4363,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6loaded___get
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":289
+/* "mpfmc/core/video/gst_video.pyx":340
  *         return self.pipeline != NULL
  * 
  *     def load(self):             # <<<<<<<<<<<<<<
@@ -3723,7 +4394,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6load(struct 
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("load", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":294
+  /* "mpfmc/core/video/gst_video.pyx":345
  * 
  *         # if already loaded before, clean everything.
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -3733,14 +4404,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6load(struct 
   __pyx_t_1 = ((__pyx_v_self->pipeline != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":295
+    /* "mpfmc/core/video/gst_video.pyx":346
  *         # if already loaded before, clean everything.
  *         if self.pipeline != NULL:
  *             self.unload()             # <<<<<<<<<<<<<<
  * 
  *         # Create the Gstreamer pipeline
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unload); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 295, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unload); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 346, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -3754,12 +4425,12 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6load(struct 
     }
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 295, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 346, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":294
+    /* "mpfmc/core/video/gst_video.pyx":345
  * 
  *         # if already loaded before, clean everything.
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -3768,27 +4439,27 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6load(struct 
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":298
+  /* "mpfmc/core/video/gst_video.pyx":349
  * 
  *         # Create the Gstreamer pipeline
  *         self._create_pipeline()             # <<<<<<<<<<<<<<
  * 
  *         # Attach the callback
  */
-  __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self->__pyx_vtab)->_create_pipeline(__pyx_v_self); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 298, __pyx_L1_error)
+  __pyx_t_2 = ((struct __pyx_vtabstruct_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self->__pyx_vtab)->_create_pipeline(__pyx_v_self); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 349, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":303
+  /* "mpfmc/core/video/gst_video.pyx":354
  *         # NOTE no need to create a weakref here, as we manage to grab/release
  *         # the reference of self in the set_sample_callback() method.
- *         self.hid_sample = c_appsink_set_sample_callback(             # <<<<<<<<<<<<<<
- *                 self.appsink, _on_appsink_sample, <void *>self, self._alpha_channel)
+ *         self.hid_video_sample = c_appsink_set_sample_callback(             # <<<<<<<<<<<<<<
+ *                 self.appsink_video, _on_appsink_video_sample, <void *>self, self._alpha_channel)
  * 
  */
-  __pyx_v_self->hid_sample = c_appsink_set_sample_callback(__pyx_v_self->appsink, __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample, ((void *)__pyx_v_self), __pyx_v_self->_alpha_channel);
+  __pyx_v_self->hid_video_sample = c_appsink_set_sample_callback(__pyx_v_self->appsink_video, __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_video_sample, ((void *)__pyx_v_self), __pyx_v_self->_alpha_channel);
 
-  /* "mpfmc/core/video/gst_video.pyx":307
+  /* "mpfmc/core/video/gst_video.pyx":358
  * 
  *         # get ready!
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -3803,7 +4474,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6load(struct 
       #endif
       /*try:*/ {
 
-        /* "mpfmc/core/video/gst_video.pyx":308
+        /* "mpfmc/core/video/gst_video.pyx":359
  *         # get ready!
  *         with nogil:
  *             gst_element_set_state(self.pipeline, GST_STATE_READY)             # <<<<<<<<<<<<<<
@@ -3813,7 +4484,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6load(struct 
         (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_READY));
       }
 
-      /* "mpfmc/core/video/gst_video.pyx":307
+      /* "mpfmc/core/video/gst_video.pyx":358
  * 
  *         # get ready!
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -3832,7 +4503,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6load(struct 
       }
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":289
+  /* "mpfmc/core/video/gst_video.pyx":340
  *         return self.pipeline != NULL
  * 
  *     def load(self):             # <<<<<<<<<<<<<<
@@ -3855,15 +4526,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_6load(struct 
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":310
+/* "mpfmc/core/video/gst_video.pyx":361
  *             gst_element_set_state(self.pipeline, GST_STATE_READY)
  * 
  *     cdef _create_pipeline(self):             # <<<<<<<<<<<<<<
  *         """Create the pipeline for the basic player"""
- *         self.pipeline = gst_pipeline_new(NULL)
+ *         cdef gint flags
  */
 
 static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeline(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+  gint __pyx_v_flags;
   PyObject *__pyx_v_py_uri = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -3871,20 +4543,25 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
   PyObject *__pyx_t_2 = NULL;
   PyObject *__pyx_t_3 = NULL;
   PyObject *__pyx_t_4 = NULL;
-  char *__pyx_t_5;
+  PyObject *__pyx_t_5 = NULL;
+  PyObject *__pyx_t_6 = NULL;
+  PyObject *__pyx_t_7 = NULL;
+  int __pyx_t_8;
+  PyObject *__pyx_t_9 = NULL;
+  char *__pyx_t_10;
   __Pyx_RefNannySetupContext("_create_pipeline", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":312
- *     cdef _create_pipeline(self):
- *         """Create the pipeline for the basic player"""
+  /* "mpfmc/core/video/gst_video.pyx":365
+ *         cdef gint flags
+ * 
  *         self.pipeline = gst_pipeline_new(NULL)             # <<<<<<<<<<<<<<
  *         if self.pipeline == NULL:
  *             raise GstVideoException('Unable to create a pipeline')
  */
   __pyx_v_self->pipeline = gst_pipeline_new(NULL);
 
-  /* "mpfmc/core/video/gst_video.pyx":313
- *         """Create the pipeline for the basic player"""
+  /* "mpfmc/core/video/gst_video.pyx":366
+ * 
  *         self.pipeline = gst_pipeline_new(NULL)
  *         if self.pipeline == NULL:             # <<<<<<<<<<<<<<
  *             raise GstVideoException('Unable to create a pipeline')
@@ -3893,14 +4570,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
   __pyx_t_1 = ((__pyx_v_self->pipeline == NULL) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "mpfmc/core/video/gst_video.pyx":314
+    /* "mpfmc/core/video/gst_video.pyx":367
  *         self.pipeline = gst_pipeline_new(NULL)
  *         if self.pipeline == NULL:
  *             raise GstVideoException('Unable to create a pipeline')             # <<<<<<<<<<<<<<
  * 
  *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 314, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -3914,15 +4591,15 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
     }
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_create_a_pipeline) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_create_a_pipeline);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 314, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 367, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 314, __pyx_L1_error)
+    __PYX_ERR(0, 367, __pyx_L1_error)
 
-    /* "mpfmc/core/video/gst_video.pyx":313
- *         """Create the pipeline for the basic player"""
+    /* "mpfmc/core/video/gst_video.pyx":366
+ * 
  *         self.pipeline = gst_pipeline_new(NULL)
  *         if self.pipeline == NULL:             # <<<<<<<<<<<<<<
  *             raise GstVideoException('Unable to create a pipeline')
@@ -3930,7 +4607,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":316
+  /* "mpfmc/core/video/gst_video.pyx":369
  *             raise GstVideoException('Unable to create a pipeline')
  * 
  *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)             # <<<<<<<<<<<<<<
@@ -3939,7 +4616,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
  */
   __pyx_v_self->bus = gst_pipeline_get_bus(((GstPipeline *)__pyx_v_self->pipeline));
 
-  /* "mpfmc/core/video/gst_video.pyx":317
+  /* "mpfmc/core/video/gst_video.pyx":370
  * 
  *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)
  *         if self.bus == NULL:             # <<<<<<<<<<<<<<
@@ -3949,14 +4626,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
   __pyx_t_1 = ((__pyx_v_self->bus == NULL) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "mpfmc/core/video/gst_video.pyx":318
+    /* "mpfmc/core/video/gst_video.pyx":371
  *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)
  *         if self.bus == NULL:
  *             raise GstVideoException('Unable to get the bus from the pipeline')             # <<<<<<<<<<<<<<
  * 
  *         gst_bus_enable_sync_message_emission(self.bus)
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 318, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 371, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -3970,14 +4647,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
     }
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_get_the_bus_from_the_p) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_get_the_bus_from_the_p);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 318, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 371, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 318, __pyx_L1_error)
+    __PYX_ERR(0, 371, __pyx_L1_error)
 
-    /* "mpfmc/core/video/gst_video.pyx":317
+    /* "mpfmc/core/video/gst_video.pyx":370
  * 
  *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)
  *         if self.bus == NULL:             # <<<<<<<<<<<<<<
@@ -3986,7 +4663,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":320
+  /* "mpfmc/core/video/gst_video.pyx":373
  *             raise GstVideoException('Unable to get the bus from the pipeline')
  * 
  *         gst_bus_enable_sync_message_emission(self.bus)             # <<<<<<<<<<<<<<
@@ -3995,7 +4672,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
  */
   gst_bus_enable_sync_message_emission(__pyx_v_self->bus);
 
-  /* "mpfmc/core/video/gst_video.pyx":321
+  /* "mpfmc/core/video/gst_video.pyx":374
  * 
  *         gst_bus_enable_sync_message_emission(self.bus)
  *         self.hid_message = c_bus_connect_message(             # <<<<<<<<<<<<<<
@@ -4004,7 +4681,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
  */
   __pyx_v_self->hid_message = c_bus_connect_message(__pyx_v_self->bus, __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message, ((void *)__pyx_v_self));
 
-  /* "mpfmc/core/video/gst_video.pyx":325
+  /* "mpfmc/core/video/gst_video.pyx":378
  * 
  *         # Instanciate the playbin
  *         self.playbin = gst_element_factory_make('playbin', NULL)             # <<<<<<<<<<<<<<
@@ -4013,7 +4690,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
  */
   __pyx_v_self->playbin = gst_element_factory_make(((const gchar *)"playbin"), NULL);
 
-  /* "mpfmc/core/video/gst_video.pyx":326
+  /* "mpfmc/core/video/gst_video.pyx":379
  *         # Instanciate the playbin
  *         self.playbin = gst_element_factory_make('playbin', NULL)
  *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
@@ -4023,14 +4700,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
   __pyx_t_1 = ((__pyx_v_self->playbin == NULL) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "mpfmc/core/video/gst_video.pyx":327
+    /* "mpfmc/core/video/gst_video.pyx":380
  *         self.playbin = gst_element_factory_make('playbin', NULL)
  *         if self.playbin == NULL:
  *             raise GstVideoException('Unable to create a playbin')             # <<<<<<<<<<<<<<
  * 
- *         gst_bin_add(<GstBin *>self.pipeline, self.playbin)
+ *         # Set the playbin av-offset (controls the synchronisation offset between the audio and video
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 327, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 380, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -4044,14 +4721,14 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
     }
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_create_a_playbin) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_create_a_playbin);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 327, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 380, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 327, __pyx_L1_error)
+    __PYX_ERR(0, 380, __pyx_L1_error)
 
-    /* "mpfmc/core/video/gst_video.pyx":326
+    /* "mpfmc/core/video/gst_video.pyx":379
  *         # Instanciate the playbin
  *         self.playbin = gst_element_factory_make('playbin', NULL)
  *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
@@ -4060,42 +4737,51 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":329
- *             raise GstVideoException('Unable to create a playbin')
+  /* "mpfmc/core/video/gst_video.pyx":385
+ *         # streams. Positive values make the audio ahead of the video and negative values make the
+ *         # audio go behind the video.)
+ *         g_object_set_int(self.playbin, 'av-offset', self._av_offset * GST_MSECOND)             # <<<<<<<<<<<<<<
+ * 
+ *         gst_bin_add(<GstBin *>self.pipeline, self.playbin)
+ */
+  g_object_set_int(__pyx_v_self->playbin, ((char *)"av-offset"), (__pyx_v_self->_av_offset * GST_MSECOND));
+
+  /* "mpfmc/core/video/gst_video.pyx":387
+ *         g_object_set_int(self.playbin, 'av-offset', self._av_offset * GST_MSECOND)
  * 
  *         gst_bin_add(<GstBin *>self.pipeline, self.playbin)             # <<<<<<<<<<<<<<
  * 
- *         # Instanciate an appsink
+ *         # Instanciate a video appsink
  */
   (void)(gst_bin_add(((GstBin *)__pyx_v_self->pipeline), __pyx_v_self->playbin));
 
-  /* "mpfmc/core/video/gst_video.pyx":332
+  /* "mpfmc/core/video/gst_video.pyx":390
  * 
- *         # Instanciate an appsink
- *         self.appsink = gst_element_factory_make('appsink', NULL)             # <<<<<<<<<<<<<<
- *         if self.appsink == NULL:
- *             raise GstVideoException('Unable to create an appsink')
+ *         # Instanciate a video appsink
+ *         self.appsink_video = gst_element_factory_make('appsink', "appsink-video")             # <<<<<<<<<<<<<<
+ *         if self.appsink_video == NULL:
+ *             raise GstVideoException('Unable to create a video appsink')
  */
-  __pyx_v_self->appsink = gst_element_factory_make(((const gchar *)"appsink"), NULL);
+  __pyx_v_self->appsink_video = gst_element_factory_make(((const gchar *)"appsink"), ((const gchar *)"appsink-video"));
 
-  /* "mpfmc/core/video/gst_video.pyx":333
- *         # Instanciate an appsink
- *         self.appsink = gst_element_factory_make('appsink', NULL)
- *         if self.appsink == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create an appsink')
+  /* "mpfmc/core/video/gst_video.pyx":391
+ *         # Instanciate a video appsink
+ *         self.appsink_video = gst_element_factory_make('appsink', "appsink-video")
+ *         if self.appsink_video == NULL:             # <<<<<<<<<<<<<<
+ *             raise GstVideoException('Unable to create a video appsink')
  * 
  */
-  __pyx_t_1 = ((__pyx_v_self->appsink == NULL) != 0);
+  __pyx_t_1 = ((__pyx_v_self->appsink_video == NULL) != 0);
   if (unlikely(__pyx_t_1)) {
 
-    /* "mpfmc/core/video/gst_video.pyx":334
- *         self.appsink = gst_element_factory_make('appsink', NULL)
- *         if self.appsink == NULL:
- *             raise GstVideoException('Unable to create an appsink')             # <<<<<<<<<<<<<<
+    /* "mpfmc/core/video/gst_video.pyx":392
+ *         self.appsink_video = gst_element_factory_make('appsink', "appsink-video")
+ *         if self.appsink_video == NULL:
+ *             raise GstVideoException('Unable to create a video appsink')             # <<<<<<<<<<<<<<
  * 
  *         if self._alpha_channel:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 334, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 392, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -4107,111 +4793,416 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
         __Pyx_DECREF_SET(__pyx_t_3, function);
       }
     }
-    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_create_an_appsink) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_create_an_appsink);
+    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_create_a_video_appsink) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_create_a_video_appsink);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 334, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 392, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 334, __pyx_L1_error)
+    __PYX_ERR(0, 392, __pyx_L1_error)
 
-    /* "mpfmc/core/video/gst_video.pyx":333
- *         # Instanciate an appsink
- *         self.appsink = gst_element_factory_make('appsink', NULL)
- *         if self.appsink == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create an appsink')
+    /* "mpfmc/core/video/gst_video.pyx":391
+ *         # Instanciate a video appsink
+ *         self.appsink_video = gst_element_factory_make('appsink', "appsink-video")
+ *         if self.appsink_video == NULL:             # <<<<<<<<<<<<<<
+ *             raise GstVideoException('Unable to create a video appsink')
  * 
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":336
- *             raise GstVideoException('Unable to create an appsink')
+  /* "mpfmc/core/video/gst_video.pyx":394
+ *             raise GstVideoException('Unable to create a video appsink')
  * 
  *         if self._alpha_channel:             # <<<<<<<<<<<<<<
- *             g_object_set_caps(self.appsink, 'video/x-raw,format=RGBA')
+ *             g_object_set_caps(self.appsink_video, 'video/x-raw,format=RGBA')
  *         else:
  */
   __pyx_t_1 = (__pyx_v_self->_alpha_channel != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":337
+    /* "mpfmc/core/video/gst_video.pyx":395
  * 
  *         if self._alpha_channel:
- *             g_object_set_caps(self.appsink, 'video/x-raw,format=RGBA')             # <<<<<<<<<<<<<<
+ *             g_object_set_caps(self.appsink_video, 'video/x-raw,format=RGBA')             # <<<<<<<<<<<<<<
  *         else:
- *             g_object_set_caps(self.appsink, 'video/x-raw,format=RGB')
+ *             g_object_set_caps(self.appsink_video, 'video/x-raw,format=RGB')
  */
-    g_object_set_caps(__pyx_v_self->appsink, ((char *)"video/x-raw,format=RGBA"));
+    g_object_set_caps(__pyx_v_self->appsink_video, ((char *)"video/x-raw,format=RGBA"));
 
-    /* "mpfmc/core/video/gst_video.pyx":336
- *             raise GstVideoException('Unable to create an appsink')
+    /* "mpfmc/core/video/gst_video.pyx":394
+ *             raise GstVideoException('Unable to create a video appsink')
  * 
  *         if self._alpha_channel:             # <<<<<<<<<<<<<<
- *             g_object_set_caps(self.appsink, 'video/x-raw,format=RGBA')
+ *             g_object_set_caps(self.appsink_video, 'video/x-raw,format=RGBA')
  *         else:
  */
     goto __pyx_L7;
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":339
- *             g_object_set_caps(self.appsink, 'video/x-raw,format=RGBA')
+  /* "mpfmc/core/video/gst_video.pyx":397
+ *             g_object_set_caps(self.appsink_video, 'video/x-raw,format=RGBA')
  *         else:
- *             g_object_set_caps(self.appsink, 'video/x-raw,format=RGB')             # <<<<<<<<<<<<<<
+ *             g_object_set_caps(self.appsink_video, 'video/x-raw,format=RGB')             # <<<<<<<<<<<<<<
  * 
- *         g_object_set_int(self.appsink, 'max-buffers', 5)
+ *         g_object_set_int(self.appsink_video, 'max-buffers', 5)
  */
   /*else*/ {
-    g_object_set_caps(__pyx_v_self->appsink, ((char *)"video/x-raw,format=RGB"));
+    g_object_set_caps(__pyx_v_self->appsink_video, ((char *)"video/x-raw,format=RGB"));
   }
   __pyx_L7:;
 
-  /* "mpfmc/core/video/gst_video.pyx":341
- *             g_object_set_caps(self.appsink, 'video/x-raw,format=RGB')
+  /* "mpfmc/core/video/gst_video.pyx":399
+ *             g_object_set_caps(self.appsink_video, 'video/x-raw,format=RGB')
  * 
- *         g_object_set_int(self.appsink, 'max-buffers', 5)             # <<<<<<<<<<<<<<
- *         g_object_set_int(self.appsink, 'drop', 1)
- *         g_object_set_int(self.appsink, 'sync', 1)
+ *         g_object_set_int(self.appsink_video, 'max-buffers', 5)             # <<<<<<<<<<<<<<
+ *         g_object_set_int(self.appsink_video, 'drop', 1)
+ *         g_object_set_int(self.appsink_video, 'sync', 1)
  */
-  g_object_set_int(__pyx_v_self->appsink, ((char *)"max-buffers"), 5);
+  g_object_set_int(__pyx_v_self->appsink_video, ((char *)"max-buffers"), 5);
 
-  /* "mpfmc/core/video/gst_video.pyx":342
+  /* "mpfmc/core/video/gst_video.pyx":400
  * 
- *         g_object_set_int(self.appsink, 'max-buffers', 5)
- *         g_object_set_int(self.appsink, 'drop', 1)             # <<<<<<<<<<<<<<
- *         g_object_set_int(self.appsink, 'sync', 1)
- *         g_object_set_int(self.appsink, 'qos', 1)
+ *         g_object_set_int(self.appsink_video, 'max-buffers', 5)
+ *         g_object_set_int(self.appsink_video, 'drop', 1)             # <<<<<<<<<<<<<<
+ *         g_object_set_int(self.appsink_video, 'sync', 1)
+ *         g_object_set_int(self.appsink_video, 'qos', 1)
  */
-  g_object_set_int(__pyx_v_self->appsink, ((char *)"drop"), 1);
+  g_object_set_int(__pyx_v_self->appsink_video, ((char *)"drop"), 1);
 
-  /* "mpfmc/core/video/gst_video.pyx":343
- *         g_object_set_int(self.appsink, 'max-buffers', 5)
- *         g_object_set_int(self.appsink, 'drop', 1)
- *         g_object_set_int(self.appsink, 'sync', 1)             # <<<<<<<<<<<<<<
- *         g_object_set_int(self.appsink, 'qos', 1)
+  /* "mpfmc/core/video/gst_video.pyx":401
+ *         g_object_set_int(self.appsink_video, 'max-buffers', 5)
+ *         g_object_set_int(self.appsink_video, 'drop', 1)
+ *         g_object_set_int(self.appsink_video, 'sync', 1)             # <<<<<<<<<<<<<<
+ *         g_object_set_int(self.appsink_video, 'qos', 1)
  * 
  */
-  g_object_set_int(__pyx_v_self->appsink, ((char *)"sync"), 1);
+  g_object_set_int(__pyx_v_self->appsink_video, ((char *)"sync"), 1);
 
-  /* "mpfmc/core/video/gst_video.pyx":344
- *         g_object_set_int(self.appsink, 'drop', 1)
- *         g_object_set_int(self.appsink, 'sync', 1)
- *         g_object_set_int(self.appsink, 'qos', 1)             # <<<<<<<<<<<<<<
+  /* "mpfmc/core/video/gst_video.pyx":402
+ *         g_object_set_int(self.appsink_video, 'drop', 1)
+ *         g_object_set_int(self.appsink_video, 'sync', 1)
+ *         g_object_set_int(self.appsink_video, 'qos', 1)             # <<<<<<<<<<<<<<
  * 
- *         g_object_set_void(self.playbin, 'video-sink', self.appsink)
+ *         g_object_set_void(self.playbin, 'video-sink', self.appsink_video)
  */
-  g_object_set_int(__pyx_v_self->appsink, ((char *)"qos"), 1);
+  g_object_set_int(__pyx_v_self->appsink_video, ((char *)"qos"), 1);
 
-  /* "mpfmc/core/video/gst_video.pyx":346
- *         g_object_set_int(self.appsink, 'qos', 1)
+  /* "mpfmc/core/video/gst_video.pyx":404
+ *         g_object_set_int(self.appsink_video, 'qos', 1)
  * 
- *         g_object_set_void(self.playbin, 'video-sink', self.appsink)             # <<<<<<<<<<<<<<
+ *         g_object_set_void(self.playbin, 'video-sink', self.appsink_video)             # <<<<<<<<<<<<<<
+ * 
+ *         if self._mute_audio:
+ */
+  g_object_set_void(__pyx_v_self->playbin, ((char *)"video-sink"), __pyx_v_self->appsink_video);
+
+  /* "mpfmc/core/video/gst_video.pyx":406
+ *         g_object_set_void(self.playbin, 'video-sink', self.appsink_video)
+ * 
+ *         if self._mute_audio:             # <<<<<<<<<<<<<<
+ *             # Instruct the playbin to not process audio information in the video
+ *             # (ensure audio play flag is not set)
+ */
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_mute_audio_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 406, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_t_2); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 406, __pyx_L1_error)
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/video/gst_video.pyx":409
+ *             # Instruct the playbin to not process audio information in the video
+ *             # (ensure audio play flag is not set)
+ *             flags = g_object_get_int(self.playbin, 'flags')             # <<<<<<<<<<<<<<
+ *             flags &= ~GST_PLAY_FLAG_AUDIO
+ *             g_object_set_int(self.playbin, 'flags', flags)
+ */
+    __pyx_v_flags = g_object_get_int(__pyx_v_self->playbin, ((char *)"flags"));
+
+    /* "mpfmc/core/video/gst_video.pyx":410
+ *             # (ensure audio play flag is not set)
+ *             flags = g_object_get_int(self.playbin, 'flags')
+ *             flags &= ~GST_PLAY_FLAG_AUDIO             # <<<<<<<<<<<<<<
+ *             g_object_set_int(self.playbin, 'flags', flags)
+ * 
+ */
+    __pyx_v_flags = (__pyx_v_flags & (~GST_PLAY_FLAG_AUDIO));
+
+    /* "mpfmc/core/video/gst_video.pyx":411
+ *             flags = g_object_get_int(self.playbin, 'flags')
+ *             flags &= ~GST_PLAY_FLAG_AUDIO
+ *             g_object_set_int(self.playbin, 'flags', flags)             # <<<<<<<<<<<<<<
+ * 
+ *         elif self._audio_caps:
+ */
+    g_object_set_int(__pyx_v_self->playbin, ((char *)"flags"), __pyx_v_flags);
+
+    /* "mpfmc/core/video/gst_video.pyx":406
+ *         g_object_set_void(self.playbin, 'video-sink', self.appsink_video)
+ * 
+ *         if self._mute_audio:             # <<<<<<<<<<<<<<
+ *             # Instruct the playbin to not process audio information in the video
+ *             # (ensure audio play flag is not set)
+ */
+    goto __pyx_L8;
+  }
+
+  /* "mpfmc/core/video/gst_video.pyx":413
+ *             g_object_set_int(self.playbin, 'flags', flags)
+ * 
+ *         elif self._audio_caps:             # <<<<<<<<<<<<<<
+ *             # Instanciate an audio appsink (if managing audio, otherwise audio sink will automatically
+ *             # be created by the playbin and will not integrate with the mpf-mc sound system)
+ */
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_self->_audio_caps); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 413, __pyx_L1_error)
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/video/gst_video.pyx":416
+ *             # Instanciate an audio appsink (if managing audio, otherwise audio sink will automatically
+ *             # be created by the playbin and will not integrate with the mpf-mc sound system)
+ *             self.appsink_audio = gst_element_factory_make('appsink', "appsink-audio")             # <<<<<<<<<<<<<<
+ *             if self.appsink_audio == NULL:
+ *                 raise GstVideoException('Unable to create an audio appsink')
+ */
+    __pyx_v_self->appsink_audio = gst_element_factory_make(((const gchar *)"appsink"), ((const gchar *)"appsink-audio"));
+
+    /* "mpfmc/core/video/gst_video.pyx":417
+ *             # be created by the playbin and will not integrate with the mpf-mc sound system)
+ *             self.appsink_audio = gst_element_factory_make('appsink', "appsink-audio")
+ *             if self.appsink_audio == NULL:             # <<<<<<<<<<<<<<
+ *                 raise GstVideoException('Unable to create an audio appsink')
+ * 
+ */
+    __pyx_t_1 = ((__pyx_v_self->appsink_audio == NULL) != 0);
+    if (unlikely(__pyx_t_1)) {
+
+      /* "mpfmc/core/video/gst_video.pyx":418
+ *             self.appsink_audio = gst_element_factory_make('appsink', "appsink-audio")
+ *             if self.appsink_audio == NULL:
+ *                 raise GstVideoException('Unable to create an audio appsink')             # <<<<<<<<<<<<<<
+ * 
+ *             g_object_set_caps(self.appsink_audio, 'audio/x-raw,rate={},channels={},format={},layout=interleaved'.format(
+ */
+      __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 418, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_3);
+      __pyx_t_4 = NULL;
+      if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
+        __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
+        if (likely(__pyx_t_4)) {
+          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+          __Pyx_INCREF(__pyx_t_4);
+          __Pyx_INCREF(function);
+          __Pyx_DECREF_SET(__pyx_t_3, function);
+        }
+      }
+      __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_create_an_audio_appsin) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_create_an_audio_appsin);
+      __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
+      if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 418, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+      __Pyx_Raise(__pyx_t_2, 0, 0, 0);
+      __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+      __PYX_ERR(0, 418, __pyx_L1_error)
+
+      /* "mpfmc/core/video/gst_video.pyx":417
+ *             # be created by the playbin and will not integrate with the mpf-mc sound system)
+ *             self.appsink_audio = gst_element_factory_make('appsink', "appsink-audio")
+ *             if self.appsink_audio == NULL:             # <<<<<<<<<<<<<<
+ *                 raise GstVideoException('Unable to create an audio appsink')
+ * 
+ */
+    }
+
+    /* "mpfmc/core/video/gst_video.pyx":420
+ *                 raise GstVideoException('Unable to create an audio appsink')
+ * 
+ *             g_object_set_caps(self.appsink_audio, 'audio/x-raw,rate={},channels={},format={},layout=interleaved'.format(             # <<<<<<<<<<<<<<
+ *                 self._audio_caps['sample_rate'],
+ *                 self._audio_caps['format'],
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_audio_x_raw_rate_channels_format, __pyx_n_s_format); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 420, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+
+    /* "mpfmc/core/video/gst_video.pyx":421
+ * 
+ *             g_object_set_caps(self.appsink_audio, 'audio/x-raw,rate={},channels={},format={},layout=interleaved'.format(
+ *                 self._audio_caps['sample_rate'],             # <<<<<<<<<<<<<<
+ *                 self._audio_caps['format'],
+ *                 self._audio_caps['channels']
+ */
+    if (unlikely(__pyx_v_self->_audio_caps == Py_None)) {
+      PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+      __PYX_ERR(0, 421, __pyx_L1_error)
+    }
+    __pyx_t_4 = __Pyx_PyDict_GetItem(__pyx_v_self->_audio_caps, __pyx_n_u_sample_rate); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 421, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+
+    /* "mpfmc/core/video/gst_video.pyx":422
+ *             g_object_set_caps(self.appsink_audio, 'audio/x-raw,rate={},channels={},format={},layout=interleaved'.format(
+ *                 self._audio_caps['sample_rate'],
+ *                 self._audio_caps['format'],             # <<<<<<<<<<<<<<
+ *                 self._audio_caps['channels']
+ *             ))
+ */
+    if (unlikely(__pyx_v_self->_audio_caps == Py_None)) {
+      PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+      __PYX_ERR(0, 422, __pyx_L1_error)
+    }
+    __pyx_t_5 = __Pyx_PyDict_GetItem(__pyx_v_self->_audio_caps, __pyx_n_u_format); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 422, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_5);
+
+    /* "mpfmc/core/video/gst_video.pyx":423
+ *                 self._audio_caps['sample_rate'],
+ *                 self._audio_caps['format'],
+ *                 self._audio_caps['channels']             # <<<<<<<<<<<<<<
+ *             ))
+ * 
+ */
+    if (unlikely(__pyx_v_self->_audio_caps == Py_None)) {
+      PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+      __PYX_ERR(0, 423, __pyx_L1_error)
+    }
+    __pyx_t_6 = __Pyx_PyDict_GetItem(__pyx_v_self->_audio_caps, __pyx_n_u_channels); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 423, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_6);
+    __pyx_t_7 = NULL;
+    __pyx_t_8 = 0;
+    if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
+      __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_3);
+      if (likely(__pyx_t_7)) {
+        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
+        __Pyx_INCREF(__pyx_t_7);
+        __Pyx_INCREF(function);
+        __Pyx_DECREF_SET(__pyx_t_3, function);
+        __pyx_t_8 = 1;
+      }
+    }
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(__pyx_t_3)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_7, __pyx_t_4, __pyx_t_5, __pyx_t_6};
+      __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 420, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    } else
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
+      PyObject *__pyx_temp[4] = {__pyx_t_7, __pyx_t_4, __pyx_t_5, __pyx_t_6};
+      __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_8, 3+__pyx_t_8); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 420, __pyx_L1_error)
+      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+      __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+    } else
+    #endif
+    {
+      __pyx_t_9 = PyTuple_New(3+__pyx_t_8); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 420, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_9);
+      if (__pyx_t_7) {
+        __Pyx_GIVEREF(__pyx_t_7); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_7); __pyx_t_7 = NULL;
+      }
+      __Pyx_GIVEREF(__pyx_t_4);
+      PyTuple_SET_ITEM(__pyx_t_9, 0+__pyx_t_8, __pyx_t_4);
+      __Pyx_GIVEREF(__pyx_t_5);
+      PyTuple_SET_ITEM(__pyx_t_9, 1+__pyx_t_8, __pyx_t_5);
+      __Pyx_GIVEREF(__pyx_t_6);
+      PyTuple_SET_ITEM(__pyx_t_9, 2+__pyx_t_8, __pyx_t_6);
+      __pyx_t_4 = 0;
+      __pyx_t_5 = 0;
+      __pyx_t_6 = 0;
+      __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_9, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 420, __pyx_L1_error)
+      __Pyx_GOTREF(__pyx_t_2);
+      __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
+    }
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+
+    /* "mpfmc/core/video/gst_video.pyx":420
+ *                 raise GstVideoException('Unable to create an audio appsink')
+ * 
+ *             g_object_set_caps(self.appsink_audio, 'audio/x-raw,rate={},channels={},format={},layout=interleaved'.format(             # <<<<<<<<<<<<<<
+ *                 self._audio_caps['sample_rate'],
+ *                 self._audio_caps['format'],
+ */
+    __pyx_t_10 = __Pyx_PyObject_AsWritableString(__pyx_t_2); if (unlikely((!__pyx_t_10) && PyErr_Occurred())) __PYX_ERR(0, 420, __pyx_L1_error)
+    g_object_set_caps(__pyx_v_self->appsink_audio, __pyx_t_10);
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+
+    /* "mpfmc/core/video/gst_video.pyx":426
+ *             ))
+ * 
+ *             g_object_set_int(self.appsink_audio, 'max-buffers', 5)             # <<<<<<<<<<<<<<
+ *             g_object_set_int(self.appsink_audio, 'drop', 1)
+ *             g_object_set_int(self.appsink_audio, 'sync', 1)
+ */
+    g_object_set_int(__pyx_v_self->appsink_audio, ((char *)"max-buffers"), 5);
+
+    /* "mpfmc/core/video/gst_video.pyx":427
+ * 
+ *             g_object_set_int(self.appsink_audio, 'max-buffers', 5)
+ *             g_object_set_int(self.appsink_audio, 'drop', 1)             # <<<<<<<<<<<<<<
+ *             g_object_set_int(self.appsink_audio, 'sync', 1)
+ *             g_object_set_int(self.appsink_audio, 'blocksize', self._audio_caps['buffer_size'])
+ */
+    g_object_set_int(__pyx_v_self->appsink_audio, ((char *)"drop"), 1);
+
+    /* "mpfmc/core/video/gst_video.pyx":428
+ *             g_object_set_int(self.appsink_audio, 'max-buffers', 5)
+ *             g_object_set_int(self.appsink_audio, 'drop', 1)
+ *             g_object_set_int(self.appsink_audio, 'sync', 1)             # <<<<<<<<<<<<<<
+ *             g_object_set_int(self.appsink_audio, 'blocksize', self._audio_caps['buffer_size'])
+ *             g_object_set_int(self.appsink_audio, 'qos', 1)
+ */
+    g_object_set_int(__pyx_v_self->appsink_audio, ((char *)"sync"), 1);
+
+    /* "mpfmc/core/video/gst_video.pyx":429
+ *             g_object_set_int(self.appsink_audio, 'drop', 1)
+ *             g_object_set_int(self.appsink_audio, 'sync', 1)
+ *             g_object_set_int(self.appsink_audio, 'blocksize', self._audio_caps['buffer_size'])             # <<<<<<<<<<<<<<
+ *             g_object_set_int(self.appsink_audio, 'qos', 1)
+ * 
+ */
+    if (unlikely(__pyx_v_self->_audio_caps == Py_None)) {
+      PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
+      __PYX_ERR(0, 429, __pyx_L1_error)
+    }
+    __pyx_t_2 = __Pyx_PyDict_GetItem(__pyx_v_self->_audio_caps, __pyx_n_u_buffer_size); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_2);
+    __pyx_t_8 = __Pyx_PyInt_As_int(__pyx_t_2); if (unlikely((__pyx_t_8 == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 429, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+    g_object_set_int(__pyx_v_self->appsink_audio, ((char *)"blocksize"), __pyx_t_8);
+
+    /* "mpfmc/core/video/gst_video.pyx":430
+ *             g_object_set_int(self.appsink_audio, 'sync', 1)
+ *             g_object_set_int(self.appsink_audio, 'blocksize', self._audio_caps['buffer_size'])
+ *             g_object_set_int(self.appsink_audio, 'qos', 1)             # <<<<<<<<<<<<<<
+ * 
+ *             g_object_set_void(self.playbin, 'audio-sink', self.appsink_audio)
+ */
+    g_object_set_int(__pyx_v_self->appsink_audio, ((char *)"qos"), 1);
+
+    /* "mpfmc/core/video/gst_video.pyx":432
+ *             g_object_set_int(self.appsink_audio, 'qos', 1)
+ * 
+ *             g_object_set_void(self.playbin, 'audio-sink', self.appsink_audio)             # <<<<<<<<<<<<<<
  * 
  *         # Configure playbin
  */
-  g_object_set_void(__pyx_v_self->playbin, ((char *)"video-sink"), __pyx_v_self->appsink);
+    g_object_set_void(__pyx_v_self->playbin, ((char *)"audio-sink"), __pyx_v_self->appsink_audio);
 
-  /* "mpfmc/core/video/gst_video.pyx":349
+    /* "mpfmc/core/video/gst_video.pyx":413
+ *             g_object_set_int(self.playbin, 'flags', flags)
+ * 
+ *         elif self._audio_caps:             # <<<<<<<<<<<<<<
+ *             # Instanciate an audio appsink (if managing audio, otherwise audio sink will automatically
+ *             # be created by the playbin and will not integrate with the mpf-mc sound system)
+ */
+  }
+  __pyx_L8:;
+
+  /* "mpfmc/core/video/gst_video.pyx":435
  * 
  *         # Configure playbin
  *         g_object_set_int(self.pipeline, 'async-handling', 1)             # <<<<<<<<<<<<<<
@@ -4220,28 +5211,28 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
  */
   g_object_set_int(__pyx_v_self->pipeline, ((char *)"async-handling"), 1);
 
-  /* "mpfmc/core/video/gst_video.pyx":350
+  /* "mpfmc/core/video/gst_video.pyx":436
  *         # Configure playbin
  *         g_object_set_int(self.pipeline, 'async-handling', 1)
  *         py_uri = <bytes>self.uri.encode('utf-8')             # <<<<<<<<<<<<<<
  *         g_object_set_void(self.playbin, 'uri', <char *>py_uri)
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->uri, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->uri, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 436, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
+  __pyx_t_9 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_4)) {
+    __pyx_t_9 = PyMethod_GET_SELF(__pyx_t_3);
+    if (likely(__pyx_t_9)) {
       PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(__pyx_t_9);
       __Pyx_INCREF(function);
       __Pyx_DECREF_SET(__pyx_t_3, function);
     }
   }
-  __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_utf_8);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_2 = (__pyx_t_9) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_9, __pyx_kp_u_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_utf_8);
+  __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
+  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 436, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __pyx_t_3 = __pyx_t_2;
@@ -4250,26 +5241,26 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
   __pyx_v_py_uri = ((PyObject*)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":351
+  /* "mpfmc/core/video/gst_video.pyx":437
  *         g_object_set_int(self.pipeline, 'async-handling', 1)
  *         py_uri = <bytes>self.uri.encode('utf-8')
  *         g_object_set_void(self.playbin, 'uri', <char *>py_uri)             # <<<<<<<<<<<<<<
  * 
- *     def _create_pipeline_alpha_channel_bad(self):
+ *     def play(self):
  */
   if (unlikely(__pyx_v_py_uri == Py_None)) {
     PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-    __PYX_ERR(0, 351, __pyx_L1_error)
+    __PYX_ERR(0, 437, __pyx_L1_error)
   }
-  __pyx_t_5 = __Pyx_PyBytes_AsWritableString(__pyx_v_py_uri); if (unlikely((!__pyx_t_5) && PyErr_Occurred())) __PYX_ERR(0, 351, __pyx_L1_error)
-  g_object_set_void(__pyx_v_self->playbin, ((char *)"uri"), ((char *)__pyx_t_5));
+  __pyx_t_10 = __Pyx_PyBytes_AsWritableString(__pyx_v_py_uri); if (unlikely((!__pyx_t_10) && PyErr_Occurred())) __PYX_ERR(0, 437, __pyx_L1_error)
+  g_object_set_void(__pyx_v_self->playbin, ((char *)"uri"), ((char *)__pyx_t_10));
 
-  /* "mpfmc/core/video/gst_video.pyx":310
+  /* "mpfmc/core/video/gst_video.pyx":361
  *             gst_element_set_state(self.pipeline, GST_STATE_READY)
  * 
  *     cdef _create_pipeline(self):             # <<<<<<<<<<<<<<
  *         """Create the pipeline for the basic player"""
- *         self.pipeline = gst_pipeline_new(NULL)
+ *         cdef gint flags
  */
 
   /* function exit code */
@@ -4279,6 +5270,10 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
   __Pyx_XDECREF(__pyx_t_2);
   __Pyx_XDECREF(__pyx_t_3);
   __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_XDECREF(__pyx_t_5);
+  __Pyx_XDECREF(__pyx_t_6);
+  __Pyx_XDECREF(__pyx_t_7);
+  __Pyx_XDECREF(__pyx_t_9);
   __Pyx_AddTraceback("mpfmc.core.video.gst_video.GstVideo._create_pipeline", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = 0;
   __pyx_L0:;
@@ -4288,443 +5283,7 @@ static PyObject *__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__create_pipeli
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":353
- *         g_object_set_void(self.playbin, 'uri', <char *>py_uri)
- * 
- *     def _create_pipeline_alpha_channel_bad(self):             # <<<<<<<<<<<<<<
- *         """Creates the gstreamer pipeline to playback videos with an alpha channel."""
- * 
- */
-
-/* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_9_create_pipeline_alpha_channel_bad(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_8_create_pipeline_alpha_channel_bad[] = "GstVideo._create_pipeline_alpha_channel_bad(self)\nCreates the gstreamer pipeline to playback videos with an alpha channel.";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_9_create_pipeline_alpha_channel_bad(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
-  PyObject *__pyx_r = 0;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("_create_pipeline_alpha_channel_bad (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_8_create_pipeline_alpha_channel_bad(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
-
-  /* function exit code */
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_8_create_pipeline_alpha_channel_bad(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
-  CYTHON_UNUSED GstElement *__pyx_v_alphabin;
-  PyObject *__pyx_v_py_uri = NULL;
-  PyObject *__pyx_r = NULL;
-  __Pyx_RefNannyDeclarations
-  int __pyx_t_1;
-  PyObject *__pyx_t_2 = NULL;
-  PyObject *__pyx_t_3 = NULL;
-  PyObject *__pyx_t_4 = NULL;
-  char *__pyx_t_5;
-  __Pyx_RefNannySetupContext("_create_pipeline_alpha_channel_bad", 0);
-
-  /* "mpfmc/core/video/gst_video.pyx":356
- *         """Creates the gstreamer pipeline to playback videos with an alpha channel."""
- * 
- *         cdef GstElement *alphabin = NULL             # <<<<<<<<<<<<<<
- * 
- *         # Create the pipeline
- */
-  __pyx_v_alphabin = NULL;
-
-  /* "mpfmc/core/video/gst_video.pyx":359
- * 
- *         # Create the pipeline
- *         self.pipeline = gst_pipeline_new(NULL)             # <<<<<<<<<<<<<<
- *         if self.pipeline == NULL:
- *             raise GstVideoException('Unable to create a pipeline')
- */
-  __pyx_v_self->pipeline = gst_pipeline_new(NULL);
-
-  /* "mpfmc/core/video/gst_video.pyx":360
- *         # Create the pipeline
- *         self.pipeline = gst_pipeline_new(NULL)
- *         if self.pipeline == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create a pipeline')
- * 
- */
-  __pyx_t_1 = ((__pyx_v_self->pipeline == NULL) != 0);
-  if (unlikely(__pyx_t_1)) {
-
-    /* "mpfmc/core/video/gst_video.pyx":361
- *         self.pipeline = gst_pipeline_new(NULL)
- *         if self.pipeline == NULL:
- *             raise GstVideoException('Unable to create a pipeline')             # <<<<<<<<<<<<<<
- * 
- *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-      }
-    }
-    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_create_a_pipeline) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_create_a_pipeline);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 361, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 361, __pyx_L1_error)
-
-    /* "mpfmc/core/video/gst_video.pyx":360
- *         # Create the pipeline
- *         self.pipeline = gst_pipeline_new(NULL)
- *         if self.pipeline == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create a pipeline')
- * 
- */
-  }
-
-  /* "mpfmc/core/video/gst_video.pyx":363
- *             raise GstVideoException('Unable to create a pipeline')
- * 
- *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)             # <<<<<<<<<<<<<<
- *         if self.bus == NULL:
- *             raise GstVideoException('Unable to get the bus from the pipeline')
- */
-  __pyx_v_self->bus = gst_pipeline_get_bus(((GstPipeline *)__pyx_v_self->pipeline));
-
-  /* "mpfmc/core/video/gst_video.pyx":364
- * 
- *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)
- *         if self.bus == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to get the bus from the pipeline')
- * 
- */
-  __pyx_t_1 = ((__pyx_v_self->bus == NULL) != 0);
-  if (unlikely(__pyx_t_1)) {
-
-    /* "mpfmc/core/video/gst_video.pyx":365
- *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)
- *         if self.bus == NULL:
- *             raise GstVideoException('Unable to get the bus from the pipeline')             # <<<<<<<<<<<<<<
- * 
- *         gst_bus_enable_sync_message_emission(self.bus)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 365, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-      }
-    }
-    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_get_the_bus_from_the_p) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_get_the_bus_from_the_p);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 365, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 365, __pyx_L1_error)
-
-    /* "mpfmc/core/video/gst_video.pyx":364
- * 
- *         self.bus = gst_pipeline_get_bus(<GstPipeline *>self.pipeline)
- *         if self.bus == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to get the bus from the pipeline')
- * 
- */
-  }
-
-  /* "mpfmc/core/video/gst_video.pyx":367
- *             raise GstVideoException('Unable to get the bus from the pipeline')
- * 
- *         gst_bus_enable_sync_message_emission(self.bus)             # <<<<<<<<<<<<<<
- *         self.hid_message = c_bus_connect_message(
- *                 self.bus, _on_gst_video_message, <void *>self)
- */
-  gst_bus_enable_sync_message_emission(__pyx_v_self->bus);
-
-  /* "mpfmc/core/video/gst_video.pyx":368
- * 
- *         gst_bus_enable_sync_message_emission(self.bus)
- *         self.hid_message = c_bus_connect_message(             # <<<<<<<<<<<<<<
- *                 self.bus, _on_gst_video_message, <void *>self)
- * 
- */
-  __pyx_v_self->hid_message = c_bus_connect_message(__pyx_v_self->bus, __pyx_f_5mpfmc_4core_5video_9gst_video__on_gst_video_message, ((void *)__pyx_v_self));
-
-  /* "mpfmc/core/video/gst_video.pyx":372
- * 
- *         # Instanciate the playbin
- *         self.playbin = gst_element_factory_make('playbin', NULL)             # <<<<<<<<<<<<<<
- *         if self.playbin == NULL:
- *             raise GstVideoException('Unable to create a playbin')
- */
-  __pyx_v_self->playbin = gst_element_factory_make(((const gchar *)"playbin"), NULL);
-
-  /* "mpfmc/core/video/gst_video.pyx":373
- *         # Instanciate the playbin
- *         self.playbin = gst_element_factory_make('playbin', NULL)
- *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create a playbin')
- * 
- */
-  __pyx_t_1 = ((__pyx_v_self->playbin == NULL) != 0);
-  if (unlikely(__pyx_t_1)) {
-
-    /* "mpfmc/core/video/gst_video.pyx":374
- *         self.playbin = gst_element_factory_make('playbin', NULL)
- *         if self.playbin == NULL:
- *             raise GstVideoException('Unable to create a playbin')             # <<<<<<<<<<<<<<
- * 
- *         gst_bin_add(<GstBin *>self.pipeline, self.playbin)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 374, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-      }
-    }
-    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_create_a_playbin) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_create_a_playbin);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 374, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 374, __pyx_L1_error)
-
-    /* "mpfmc/core/video/gst_video.pyx":373
- *         # Instanciate the playbin
- *         self.playbin = gst_element_factory_make('playbin', NULL)
- *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create a playbin')
- * 
- */
-  }
-
-  /* "mpfmc/core/video/gst_video.pyx":376
- *             raise GstVideoException('Unable to create a playbin')
- * 
- *         gst_bin_add(<GstBin *>self.pipeline, self.playbin)             # <<<<<<<<<<<<<<
- * 
- *         # Instanciate an appsink with videoconvert to support alpha channel (required ghost pads will
- */
-  (void)(gst_bin_add(((GstBin *)__pyx_v_self->pipeline), __pyx_v_self->playbin));
-
-  /* "mpfmc/core/video/gst_video.pyx":380
- *         # Instanciate an appsink with videoconvert to support alpha channel (required ghost pads will
- *         # automatically be created).
- *         self.alphabin = gst_parse_bin_from_description('qtdemux ! pngdec ! appsink name="appsink" '             # <<<<<<<<<<<<<<
- *                                                        'caps="video/x-raw,format=RGBA" '
- *                                                        'max-buffers=5 drop=1 sync=1 qos=1',
- */
-  __pyx_v_self->alphabin = gst_parse_bin_from_description(((const gchar *)"qtdemux ! pngdec ! appsink name=\"appsink\" caps=\"video/x-raw,format=RGBA\" max-buffers=5 drop=1 sync=1 qos=1"), 1, NULL);
-
-  /* "mpfmc/core/video/gst_video.pyx":384
- *                                                        'max-buffers=5 drop=1 sync=1 qos=1',
- *                                                        True, NULL)
- *         if self.alphabin == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create the alpha channel video bin')
- * 
- */
-  __pyx_t_1 = ((__pyx_v_self->alphabin == NULL) != 0);
-  if (unlikely(__pyx_t_1)) {
-
-    /* "mpfmc/core/video/gst_video.pyx":385
- *                                                        True, NULL)
- *         if self.alphabin == NULL:
- *             raise GstVideoException('Unable to create the alpha channel video bin')             # <<<<<<<<<<<<<<
- * 
- *         self.appsink = gst_bin_get_by_name(<GstBin*>self.alphabin, 'appsink')
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 385, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-      }
-    }
-    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_create_the_alpha_chann) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_create_the_alpha_chann);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 385, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 385, __pyx_L1_error)
-
-    /* "mpfmc/core/video/gst_video.pyx":384
- *                                                        'max-buffers=5 drop=1 sync=1 qos=1',
- *                                                        True, NULL)
- *         if self.alphabin == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create the alpha channel video bin')
- * 
- */
-  }
-
-  /* "mpfmc/core/video/gst_video.pyx":387
- *             raise GstVideoException('Unable to create the alpha channel video bin')
- * 
- *         self.appsink = gst_bin_get_by_name(<GstBin*>self.alphabin, 'appsink')             # <<<<<<<<<<<<<<
- *         if self.appsink == NULL:
- *             raise GstVideoException('Unable to create an appsink')
- */
-  __pyx_v_self->appsink = gst_bin_get_by_name(((GstBin *)__pyx_v_self->alphabin), ((const gchar *)"appsink"));
-
-  /* "mpfmc/core/video/gst_video.pyx":388
- * 
- *         self.appsink = gst_bin_get_by_name(<GstBin*>self.alphabin, 'appsink')
- *         if self.appsink == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create an appsink')
- * 
- */
-  __pyx_t_1 = ((__pyx_v_self->appsink == NULL) != 0);
-  if (unlikely(__pyx_t_1)) {
-
-    /* "mpfmc/core/video/gst_video.pyx":389
- *         self.appsink = gst_bin_get_by_name(<GstBin*>self.alphabin, 'appsink')
- *         if self.appsink == NULL:
- *             raise GstVideoException('Unable to create an appsink')             # <<<<<<<<<<<<<<
- * 
- *         g_object_set_void(self.playbin, 'video-sink', self.alphabin)
- */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_GstVideoException); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 389, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = NULL;
-    if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
-      __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-      if (likely(__pyx_t_4)) {
-        PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-        __Pyx_INCREF(__pyx_t_4);
-        __Pyx_INCREF(function);
-        __Pyx_DECREF_SET(__pyx_t_3, function);
-      }
-    }
-    __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_Unable_to_create_an_appsink) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_Unable_to_create_an_appsink);
-    __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 389, __pyx_L1_error)
-    __Pyx_GOTREF(__pyx_t_2);
-    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_Raise(__pyx_t_2, 0, 0, 0);
-    __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __PYX_ERR(0, 389, __pyx_L1_error)
-
-    /* "mpfmc/core/video/gst_video.pyx":388
- * 
- *         self.appsink = gst_bin_get_by_name(<GstBin*>self.alphabin, 'appsink')
- *         if self.appsink == NULL:             # <<<<<<<<<<<<<<
- *             raise GstVideoException('Unable to create an appsink')
- * 
- */
-  }
-
-  /* "mpfmc/core/video/gst_video.pyx":391
- *             raise GstVideoException('Unable to create an appsink')
- * 
- *         g_object_set_void(self.playbin, 'video-sink', self.alphabin)             # <<<<<<<<<<<<<<
- * 
- *         # Configure playbin
- */
-  g_object_set_void(__pyx_v_self->playbin, ((char *)"video-sink"), __pyx_v_self->alphabin);
-
-  /* "mpfmc/core/video/gst_video.pyx":394
- * 
- *         # Configure playbin
- *         g_object_set_int(self.pipeline, 'async-handling', 1)             # <<<<<<<<<<<<<<
- *         py_uri = <bytes>self.uri.encode('utf-8')
- *         g_object_set_void(self.playbin, 'uri', <char *>py_uri)
- */
-  g_object_set_int(__pyx_v_self->pipeline, ((char *)"async-handling"), 1);
-
-  /* "mpfmc/core/video/gst_video.pyx":395
- *         # Configure playbin
- *         g_object_set_int(self.pipeline, 'async-handling', 1)
- *         py_uri = <bytes>self.uri.encode('utf-8')             # <<<<<<<<<<<<<<
- *         g_object_set_void(self.playbin, 'uri', <char *>py_uri)
- * 
- */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->uri, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 395, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_4 = NULL;
-  if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
-    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_3);
-    if (likely(__pyx_t_4)) {
-      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_3);
-      __Pyx_INCREF(__pyx_t_4);
-      __Pyx_INCREF(function);
-      __Pyx_DECREF_SET(__pyx_t_3, function);
-    }
-  }
-  __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_kp_u_utf_8) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_kp_u_utf_8);
-  __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-  if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 395, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_t_2);
-  __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_3 = __pyx_t_2;
-  __Pyx_INCREF(__pyx_t_3);
-  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_v_py_uri = ((PyObject*)__pyx_t_3);
-  __pyx_t_3 = 0;
-
-  /* "mpfmc/core/video/gst_video.pyx":396
- *         g_object_set_int(self.pipeline, 'async-handling', 1)
- *         py_uri = <bytes>self.uri.encode('utf-8')
- *         g_object_set_void(self.playbin, 'uri', <char *>py_uri)             # <<<<<<<<<<<<<<
- * 
- *     def play(self):
- */
-  if (unlikely(__pyx_v_py_uri == Py_None)) {
-    PyErr_SetString(PyExc_TypeError, "expected bytes, NoneType found");
-    __PYX_ERR(0, 396, __pyx_L1_error)
-  }
-  __pyx_t_5 = __Pyx_PyBytes_AsWritableString(__pyx_v_py_uri); if (unlikely((!__pyx_t_5) && PyErr_Occurred())) __PYX_ERR(0, 396, __pyx_L1_error)
-  g_object_set_void(__pyx_v_self->playbin, ((char *)"uri"), ((char *)__pyx_t_5));
-
-  /* "mpfmc/core/video/gst_video.pyx":353
- *         g_object_set_void(self.playbin, 'uri', <char *>py_uri)
- * 
- *     def _create_pipeline_alpha_channel_bad(self):             # <<<<<<<<<<<<<<
- *         """Creates the gstreamer pipeline to playback videos with an alpha channel."""
- * 
- */
-
-  /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
-  __pyx_L1_error:;
-  __Pyx_XDECREF(__pyx_t_2);
-  __Pyx_XDECREF(__pyx_t_3);
-  __Pyx_XDECREF(__pyx_t_4);
-  __Pyx_AddTraceback("mpfmc.core.video.gst_video.GstVideo._create_pipeline_alpha_channel_bad", __pyx_clineno, __pyx_lineno, __pyx_filename);
-  __pyx_r = NULL;
-  __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_py_uri);
-  __Pyx_XGIVEREF(__pyx_r);
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "mpfmc/core/video/gst_video.pyx":398
+/* "mpfmc/core/video/gst_video.pyx":439
  *         g_object_set_void(self.playbin, 'uri', <char *>py_uri)
  * 
  *     def play(self):             # <<<<<<<<<<<<<<
@@ -4733,26 +5292,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_8_create_pipe
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_11play(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_10play[] = "GstVideo.play(self)\nSet the video into play mode";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_11play(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_9play(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_8play[] = "GstVideo.play(self)\nSet the video into play mode";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_9play(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("play (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_8play(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_8play(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("play", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":400
+  /* "mpfmc/core/video/gst_video.pyx":441
  *     def play(self):
  *         """Set the video into play mode"""
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -4762,7 +5321,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(struct
   __pyx_t_1 = ((__pyx_v_self->pipeline != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":401
+    /* "mpfmc/core/video/gst_video.pyx":442
  *         """Set the video into play mode"""
  *         if self.pipeline != NULL:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -4777,7 +5336,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(struct
         #endif
         /*try:*/ {
 
-          /* "mpfmc/core/video/gst_video.pyx":402
+          /* "mpfmc/core/video/gst_video.pyx":443
  *         if self.pipeline != NULL:
  *             with nogil:
  *                 gst_element_set_state(self.pipeline, GST_STATE_PLAYING)             # <<<<<<<<<<<<<<
@@ -4787,7 +5346,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(struct
           (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_PLAYING));
         }
 
-        /* "mpfmc/core/video/gst_video.pyx":401
+        /* "mpfmc/core/video/gst_video.pyx":442
  *         """Set the video into play mode"""
  *         if self.pipeline != NULL:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -4806,7 +5365,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(struct
         }
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":400
+    /* "mpfmc/core/video/gst_video.pyx":441
  *     def play(self):
  *         """Set the video into play mode"""
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -4815,7 +5374,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(struct
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":398
+  /* "mpfmc/core/video/gst_video.pyx":439
  *         g_object_set_void(self.playbin, 'uri', <char *>py_uri)
  * 
  *     def play(self):             # <<<<<<<<<<<<<<
@@ -4830,7 +5389,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(struct
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":404
+/* "mpfmc/core/video/gst_video.pyx":445
  *                 gst_element_set_state(self.pipeline, GST_STATE_PLAYING)
  * 
  *     def stop(self):             # <<<<<<<<<<<<<<
@@ -4839,26 +5398,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10play(struct
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_13stop(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop[] = "GstVideo.stop(self)\nStop the video";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_13stop(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_11stop(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_10stop[] = "GstVideo.stop(self)\nStop the video";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_11stop(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("stop (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10stop(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_10stop(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("stop", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":406
+  /* "mpfmc/core/video/gst_video.pyx":447
  *     def stop(self):
  *         """Stop the video"""
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -4868,7 +5427,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct
   __pyx_t_1 = ((__pyx_v_self->pipeline != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":407
+    /* "mpfmc/core/video/gst_video.pyx":448
  *         """Stop the video"""
  *         if self.pipeline != NULL:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -4883,7 +5442,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct
         #endif
         /*try:*/ {
 
-          /* "mpfmc/core/video/gst_video.pyx":408
+          /* "mpfmc/core/video/gst_video.pyx":449
  *         if self.pipeline != NULL:
  *             with nogil:
  *                 gst_element_set_state(self.pipeline, GST_STATE_NULL)             # <<<<<<<<<<<<<<
@@ -4892,7 +5451,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct
  */
           (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_NULL));
 
-          /* "mpfmc/core/video/gst_video.pyx":409
+          /* "mpfmc/core/video/gst_video.pyx":450
  *             with nogil:
  *                 gst_element_set_state(self.pipeline, GST_STATE_NULL)
  *                 gst_element_set_state(self.pipeline, GST_STATE_READY)             # <<<<<<<<<<<<<<
@@ -4902,7 +5461,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct
           (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_READY));
         }
 
-        /* "mpfmc/core/video/gst_video.pyx":407
+        /* "mpfmc/core/video/gst_video.pyx":448
  *         """Stop the video"""
  *         if self.pipeline != NULL:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -4921,7 +5480,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct
         }
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":406
+    /* "mpfmc/core/video/gst_video.pyx":447
  *     def stop(self):
  *         """Stop the video"""
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -4930,7 +5489,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":404
+  /* "mpfmc/core/video/gst_video.pyx":445
  *                 gst_element_set_state(self.pipeline, GST_STATE_PLAYING)
  * 
  *     def stop(self):             # <<<<<<<<<<<<<<
@@ -4945,7 +5504,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":411
+/* "mpfmc/core/video/gst_video.pyx":452
  *                 gst_element_set_state(self.pipeline, GST_STATE_READY)
  * 
  *     def pause(self):             # <<<<<<<<<<<<<<
@@ -4954,26 +5513,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop(struct
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_15pause(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause[] = "GstVideo.pause(self)\nPause the video";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_15pause(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_13pause(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_12pause[] = "GstVideo.pause(self)\nPause the video";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_13pause(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("pause (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12pause(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_12pause(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("pause", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":413
+  /* "mpfmc/core/video/gst_video.pyx":454
  *     def pause(self):
  *         """Pause the video"""
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -4983,7 +5542,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(struc
   __pyx_t_1 = ((__pyx_v_self->pipeline != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":414
+    /* "mpfmc/core/video/gst_video.pyx":455
  *         """Pause the video"""
  *         if self.pipeline != NULL:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -4998,7 +5557,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(struc
         #endif
         /*try:*/ {
 
-          /* "mpfmc/core/video/gst_video.pyx":415
+          /* "mpfmc/core/video/gst_video.pyx":456
  *         if self.pipeline != NULL:
  *             with nogil:
  *                 gst_element_set_state(self.pipeline, GST_STATE_PAUSED)             # <<<<<<<<<<<<<<
@@ -5008,7 +5567,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(struc
           (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_PAUSED));
         }
 
-        /* "mpfmc/core/video/gst_video.pyx":414
+        /* "mpfmc/core/video/gst_video.pyx":455
  *         """Pause the video"""
  *         if self.pipeline != NULL:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -5027,7 +5586,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(struc
         }
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":413
+    /* "mpfmc/core/video/gst_video.pyx":454
  *     def pause(self):
  *         """Pause the video"""
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -5036,7 +5595,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(struc
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":411
+  /* "mpfmc/core/video/gst_video.pyx":452
  *                 gst_element_set_state(self.pipeline, GST_STATE_READY)
  * 
  *     def pause(self):             # <<<<<<<<<<<<<<
@@ -5051,7 +5610,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(struc
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":417
+/* "mpfmc/core/video/gst_video.pyx":458
  *                 gst_element_set_state(self.pipeline, GST_STATE_PAUSED)
  * 
  *     def ready(self):             # <<<<<<<<<<<<<<
@@ -5060,26 +5619,26 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause(struc
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_17ready(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready[] = "GstVideo.ready(self)\nEnsure the video is ready for playback";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_17ready(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_15ready(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_14ready[] = "GstVideo.ready(self)\nEnsure the video is ready for playback";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_15ready(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("ready (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14ready(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_14ready(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("ready", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":419
+  /* "mpfmc/core/video/gst_video.pyx":460
  *     def ready(self):
  *         """Ensure the video is ready for playback"""
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -5089,7 +5648,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(struc
   __pyx_t_1 = ((__pyx_v_self->pipeline != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":420
+    /* "mpfmc/core/video/gst_video.pyx":461
  *         """Ensure the video is ready for playback"""
  *         if self.pipeline != NULL:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -5104,7 +5663,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(struc
         #endif
         /*try:*/ {
 
-          /* "mpfmc/core/video/gst_video.pyx":421
+          /* "mpfmc/core/video/gst_video.pyx":462
  *         if self.pipeline != NULL:
  *             with nogil:
  *                 gst_element_set_state(self.pipeline, GST_STATE_READY)             # <<<<<<<<<<<<<<
@@ -5114,7 +5673,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(struc
           (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_READY));
         }
 
-        /* "mpfmc/core/video/gst_video.pyx":420
+        /* "mpfmc/core/video/gst_video.pyx":461
  *         """Ensure the video is ready for playback"""
  *         if self.pipeline != NULL:
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -5133,7 +5692,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(struc
         }
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":419
+    /* "mpfmc/core/video/gst_video.pyx":460
  *     def ready(self):
  *         """Ensure the video is ready for playback"""
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -5142,7 +5701,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(struc
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":417
+  /* "mpfmc/core/video/gst_video.pyx":458
  *                 gst_element_set_state(self.pipeline, GST_STATE_PAUSED)
  * 
  *     def ready(self):             # <<<<<<<<<<<<<<
@@ -5157,7 +5716,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(struc
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":423
+/* "mpfmc/core/video/gst_video.pyx":464
  *                 gst_element_set_state(self.pipeline, GST_STATE_READY)
  * 
  *     def unload(self):             # <<<<<<<<<<<<<<
@@ -5166,20 +5725,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready(struc
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_19unload(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload[] = "GstVideo.unload(self)\nUnload the player and deallocate GStreamer objects";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_19unload(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_17unload(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_16unload[] = "GstVideo.unload(self)\nUnload the player and deallocate GStreamer objects";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_17unload(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("unload (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16unload(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_16unload(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
   GstState __pyx_v_current_state;
   GstState __pyx_v_pending_state;
   PyObject *__pyx_r = NULL;
@@ -5188,53 +5747,98 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
   int __pyx_t_2;
   __Pyx_RefNannySetupContext("unload", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":427
+  /* "mpfmc/core/video/gst_video.pyx":468
  *         cdef GstState current_state, pending_state
  * 
- *         if self.appsink != NULL and self.hid_sample != 0:             # <<<<<<<<<<<<<<
- *             c_signal_disconnect(self.appsink, self.hid_sample)
- *             self.hid_sample = 0
+ *         if self.appsink_video != NULL and self.hid_video_sample != 0:             # <<<<<<<<<<<<<<
+ *             c_signal_disconnect(self.appsink_video, self.hid_video_sample)
+ *             self.hid_video_sample = 0
  */
-  __pyx_t_2 = ((__pyx_v_self->appsink != NULL) != 0);
+  __pyx_t_2 = ((__pyx_v_self->appsink_video != NULL) != 0);
   if (__pyx_t_2) {
   } else {
     __pyx_t_1 = __pyx_t_2;
     goto __pyx_L4_bool_binop_done;
   }
-  __pyx_t_2 = ((__pyx_v_self->hid_sample != 0) != 0);
+  __pyx_t_2 = ((__pyx_v_self->hid_video_sample != 0) != 0);
   __pyx_t_1 = __pyx_t_2;
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":428
+    /* "mpfmc/core/video/gst_video.pyx":469
  * 
- *         if self.appsink != NULL and self.hid_sample != 0:
- *             c_signal_disconnect(self.appsink, self.hid_sample)             # <<<<<<<<<<<<<<
- *             self.hid_sample = 0
+ *         if self.appsink_video != NULL and self.hid_video_sample != 0:
+ *             c_signal_disconnect(self.appsink_video, self.hid_video_sample)             # <<<<<<<<<<<<<<
+ *             self.hid_video_sample = 0
  * 
  */
-    c_signal_disconnect(__pyx_v_self->appsink, __pyx_v_self->hid_sample);
+    c_signal_disconnect(__pyx_v_self->appsink_video, __pyx_v_self->hid_video_sample);
 
-    /* "mpfmc/core/video/gst_video.pyx":429
- *         if self.appsink != NULL and self.hid_sample != 0:
- *             c_signal_disconnect(self.appsink, self.hid_sample)
- *             self.hid_sample = 0             # <<<<<<<<<<<<<<
+    /* "mpfmc/core/video/gst_video.pyx":470
+ *         if self.appsink_video != NULL and self.hid_video_sample != 0:
+ *             c_signal_disconnect(self.appsink_video, self.hid_video_sample)
+ *             self.hid_video_sample = 0             # <<<<<<<<<<<<<<
  * 
- *         if self.bus != NULL and self.hid_message != 0:
+ *         if self.appsink_audio != NULL and self.hid_audio_sample != 0:
  */
-    __pyx_v_self->hid_sample = 0;
+    __pyx_v_self->hid_video_sample = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":427
+    /* "mpfmc/core/video/gst_video.pyx":468
  *         cdef GstState current_state, pending_state
  * 
- *         if self.appsink != NULL and self.hid_sample != 0:             # <<<<<<<<<<<<<<
- *             c_signal_disconnect(self.appsink, self.hid_sample)
- *             self.hid_sample = 0
+ *         if self.appsink_video != NULL and self.hid_video_sample != 0:             # <<<<<<<<<<<<<<
+ *             c_signal_disconnect(self.appsink_video, self.hid_video_sample)
+ *             self.hid_video_sample = 0
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":431
- *             self.hid_sample = 0
+  /* "mpfmc/core/video/gst_video.pyx":472
+ *             self.hid_video_sample = 0
+ * 
+ *         if self.appsink_audio != NULL and self.hid_audio_sample != 0:             # <<<<<<<<<<<<<<
+ *             c_signal_disconnect(self.appsink_audio, self.hid_audio_sample)
+ *             self.hid_audio_sample = 0
+ */
+  __pyx_t_2 = ((__pyx_v_self->appsink_audio != NULL) != 0);
+  if (__pyx_t_2) {
+  } else {
+    __pyx_t_1 = __pyx_t_2;
+    goto __pyx_L7_bool_binop_done;
+  }
+  __pyx_t_2 = ((__pyx_v_self->hid_audio_sample != 0) != 0);
+  __pyx_t_1 = __pyx_t_2;
+  __pyx_L7_bool_binop_done:;
+  if (__pyx_t_1) {
+
+    /* "mpfmc/core/video/gst_video.pyx":473
+ * 
+ *         if self.appsink_audio != NULL and self.hid_audio_sample != 0:
+ *             c_signal_disconnect(self.appsink_audio, self.hid_audio_sample)             # <<<<<<<<<<<<<<
+ *             self.hid_audio_sample = 0
+ * 
+ */
+    c_signal_disconnect(__pyx_v_self->appsink_audio, __pyx_v_self->hid_audio_sample);
+
+    /* "mpfmc/core/video/gst_video.pyx":474
+ *         if self.appsink_audio != NULL and self.hid_audio_sample != 0:
+ *             c_signal_disconnect(self.appsink_audio, self.hid_audio_sample)
+ *             self.hid_audio_sample = 0             # <<<<<<<<<<<<<<
+ * 
+ *         if self.bus != NULL and self.hid_message != 0:
+ */
+    __pyx_v_self->hid_audio_sample = 0;
+
+    /* "mpfmc/core/video/gst_video.pyx":472
+ *             self.hid_video_sample = 0
+ * 
+ *         if self.appsink_audio != NULL and self.hid_audio_sample != 0:             # <<<<<<<<<<<<<<
+ *             c_signal_disconnect(self.appsink_audio, self.hid_audio_sample)
+ *             self.hid_audio_sample = 0
+ */
+  }
+
+  /* "mpfmc/core/video/gst_video.pyx":476
+ *             self.hid_audio_sample = 0
  * 
  *         if self.bus != NULL and self.hid_message != 0:             # <<<<<<<<<<<<<<
  *             c_signal_disconnect(<GstElement *>self.bus, self.hid_message)
@@ -5244,14 +5848,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
   if (__pyx_t_2) {
   } else {
     __pyx_t_1 = __pyx_t_2;
-    goto __pyx_L7_bool_binop_done;
+    goto __pyx_L10_bool_binop_done;
   }
   __pyx_t_2 = ((__pyx_v_self->hid_message != 0) != 0);
   __pyx_t_1 = __pyx_t_2;
-  __pyx_L7_bool_binop_done:;
+  __pyx_L10_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":432
+    /* "mpfmc/core/video/gst_video.pyx":477
  * 
  *         if self.bus != NULL and self.hid_message != 0:
  *             c_signal_disconnect(<GstElement *>self.bus, self.hid_message)             # <<<<<<<<<<<<<<
@@ -5260,7 +5864,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
     c_signal_disconnect(((GstElement *)__pyx_v_self->bus), __pyx_v_self->hid_message);
 
-    /* "mpfmc/core/video/gst_video.pyx":433
+    /* "mpfmc/core/video/gst_video.pyx":478
  *         if self.bus != NULL and self.hid_message != 0:
  *             c_signal_disconnect(<GstElement *>self.bus, self.hid_message)
  *             self.hid_message = 0             # <<<<<<<<<<<<<<
@@ -5269,8 +5873,8 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
     __pyx_v_self->hid_message = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":431
- *             self.hid_sample = 0
+    /* "mpfmc/core/video/gst_video.pyx":476
+ *             self.hid_audio_sample = 0
  * 
  *         if self.bus != NULL and self.hid_message != 0:             # <<<<<<<<<<<<<<
  *             c_signal_disconnect(<GstElement *>self.bus, self.hid_message)
@@ -5278,7 +5882,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":435
+  /* "mpfmc/core/video/gst_video.pyx":480
  *             self.hid_message = 0
  * 
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -5288,7 +5892,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
   __pyx_t_1 = ((__pyx_v_self->pipeline != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":439
+    /* "mpfmc/core/video/gst_video.pyx":484
  *             # need to query it. We also put a 5s timeout for safety, but normally, nobody should hit
  *             # it.
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -5303,7 +5907,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
         #endif
         /*try:*/ {
 
-          /* "mpfmc/core/video/gst_video.pyx":440
+          /* "mpfmc/core/video/gst_video.pyx":485
  *             # it.
  *             with nogil:
  *                 gst_element_set_state(self.pipeline, GST_STATE_NULL)             # <<<<<<<<<<<<<<
@@ -5312,7 +5916,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
           (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_NULL));
 
-          /* "mpfmc/core/video/gst_video.pyx":441
+          /* "mpfmc/core/video/gst_video.pyx":486
  *             with nogil:
  *                 gst_element_set_state(self.pipeline, GST_STATE_NULL)
  *                 gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>5e9)             # <<<<<<<<<<<<<<
@@ -5322,7 +5926,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
           (void)(gst_element_get_state(__pyx_v_self->pipeline, (&__pyx_v_current_state), (&__pyx_v_pending_state), ((GstClockTime)5e9)));
         }
 
-        /* "mpfmc/core/video/gst_video.pyx":439
+        /* "mpfmc/core/video/gst_video.pyx":484
  *             # need to query it. We also put a 5s timeout for safety, but normally, nobody should hit
  *             # it.
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -5335,13 +5939,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
             __Pyx_FastGIL_Forget();
             Py_BLOCK_THREADS
             #endif
-            goto __pyx_L12;
+            goto __pyx_L15;
           }
-          __pyx_L12:;
+          __pyx_L15:;
         }
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":442
+    /* "mpfmc/core/video/gst_video.pyx":487
  *                 gst_element_set_state(self.pipeline, GST_STATE_NULL)
  *                 gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>5e9)
  *             gst_object_unref(self.pipeline)             # <<<<<<<<<<<<<<
@@ -5350,7 +5954,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
     gst_object_unref(__pyx_v_self->pipeline);
 
-    /* "mpfmc/core/video/gst_video.pyx":435
+    /* "mpfmc/core/video/gst_video.pyx":480
  *             self.hid_message = 0
  * 
  *         if self.pipeline != NULL:             # <<<<<<<<<<<<<<
@@ -5359,7 +5963,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":444
+  /* "mpfmc/core/video/gst_video.pyx":489
  *             gst_object_unref(self.pipeline)
  * 
  *         if self.bus != NULL:             # <<<<<<<<<<<<<<
@@ -5369,16 +5973,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
   __pyx_t_1 = ((__pyx_v_self->bus != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":445
+    /* "mpfmc/core/video/gst_video.pyx":490
  * 
  *         if self.bus != NULL:
  *             gst_object_unref(self.bus)             # <<<<<<<<<<<<<<
  * 
- *         self.appsink = NULL
+ *         self.appsink_video = NULL
  */
     gst_object_unref(__pyx_v_self->bus);
 
-    /* "mpfmc/core/video/gst_video.pyx":444
+    /* "mpfmc/core/video/gst_video.pyx":489
  *             gst_object_unref(self.pipeline)
  * 
  *         if self.bus != NULL:             # <<<<<<<<<<<<<<
@@ -5387,26 +5991,35 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":447
+  /* "mpfmc/core/video/gst_video.pyx":492
  *             gst_object_unref(self.bus)
  * 
- *         self.appsink = NULL             # <<<<<<<<<<<<<<
+ *         self.appsink_video = NULL             # <<<<<<<<<<<<<<
+ *         self.appsink_audio = NULL
+ *         self.bus = NULL
+ */
+  __pyx_v_self->appsink_video = NULL;
+
+  /* "mpfmc/core/video/gst_video.pyx":493
+ * 
+ *         self.appsink_video = NULL
+ *         self.appsink_audio = NULL             # <<<<<<<<<<<<<<
  *         self.bus = NULL
  *         self.pipeline = NULL
  */
-  __pyx_v_self->appsink = NULL;
+  __pyx_v_self->appsink_audio = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":448
- * 
- *         self.appsink = NULL
+  /* "mpfmc/core/video/gst_video.pyx":494
+ *         self.appsink_video = NULL
+ *         self.appsink_audio = NULL
  *         self.bus = NULL             # <<<<<<<<<<<<<<
  *         self.pipeline = NULL
  *         self.playbin = NULL
  */
   __pyx_v_self->bus = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":449
- *         self.appsink = NULL
+  /* "mpfmc/core/video/gst_video.pyx":495
+ *         self.appsink_audio = NULL
  *         self.bus = NULL
  *         self.pipeline = NULL             # <<<<<<<<<<<<<<
  *         self.playbin = NULL
@@ -5414,7 +6027,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
   __pyx_v_self->pipeline = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":450
+  /* "mpfmc/core/video/gst_video.pyx":496
  *         self.bus = NULL
  *         self.pipeline = NULL
  *         self.playbin = NULL             # <<<<<<<<<<<<<<
@@ -5423,7 +6036,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
   __pyx_v_self->playbin = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":451
+  /* "mpfmc/core/video/gst_video.pyx":497
  *         self.pipeline = NULL
  *         self.playbin = NULL
  *         self.alphabin = NULL             # <<<<<<<<<<<<<<
@@ -5432,7 +6045,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
   __pyx_v_self->alphabin = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":452
+  /* "mpfmc/core/video/gst_video.pyx":498
  *         self.playbin = NULL
  *         self.alphabin = NULL
  *         self.fakesink = NULL             # <<<<<<<<<<<<<<
@@ -5441,7 +6054,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
   __pyx_v_self->fakesink = NULL;
 
-  /* "mpfmc/core/video/gst_video.pyx":423
+  /* "mpfmc/core/video/gst_video.pyx":464
  *                 gst_element_set_state(self.pipeline, GST_STATE_READY)
  * 
  *     def unload(self):             # <<<<<<<<<<<<<<
@@ -5456,7 +6069,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":454
+/* "mpfmc/core/video/gst_video.pyx":500
  *         self.fakesink = NULL
  * 
  *     def set_volume(self, float volume):             # <<<<<<<<<<<<<<
@@ -5465,15 +6078,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload(stru
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_21set_volume(PyObject *__pyx_v_self, PyObject *__pyx_arg_volume); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume[] = "GstVideo.set_volume(self, float volume)\nSet the player volume";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_21set_volume(PyObject *__pyx_v_self, PyObject *__pyx_arg_volume) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_19set_volume(PyObject *__pyx_v_self, PyObject *__pyx_arg_volume); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_18set_volume[] = "GstVideo.set_volume(self, float volume)\nSet the player volume";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_19set_volume(PyObject *__pyx_v_self, PyObject *__pyx_arg_volume) {
   float __pyx_v_volume;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("set_volume (wrapper)", 0);
   assert(__pyx_arg_volume); {
-    __pyx_v_volume = __pyx_PyFloat_AsFloat(__pyx_arg_volume); if (unlikely((__pyx_v_volume == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 454, __pyx_L3_error)
+    __pyx_v_volume = __pyx_PyFloat_AsFloat(__pyx_arg_volume); if (unlikely((__pyx_v_volume == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 500, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5481,20 +6094,20 @@ static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_21set_volume(
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self), ((float)__pyx_v_volume));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18set_volume(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self), ((float)__pyx_v_volume));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, float __pyx_v_volume) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_18set_volume(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, float __pyx_v_volume) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   int __pyx_t_1;
   __Pyx_RefNannySetupContext("set_volume", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":456
+  /* "mpfmc/core/video/gst_video.pyx":502
  *     def set_volume(self, float volume):
  *         """Set the player volume"""
  *         if self.playbin != NULL:             # <<<<<<<<<<<<<<
@@ -5504,7 +6117,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(
   __pyx_t_1 = ((__pyx_v_self->playbin != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":465
+    /* "mpfmc/core/video/gst_video.pyx":511
  *             # 2. the pulseaudio thread try to sent a message, and wait for the
  *             #    GIL
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -5519,7 +6132,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(
         #endif
         /*try:*/ {
 
-          /* "mpfmc/core/video/gst_video.pyx":466
+          /* "mpfmc/core/video/gst_video.pyx":512
  *             #    GIL
  *             with nogil:
  *                 g_object_set_double(self.playbin, 'volume', volume)             # <<<<<<<<<<<<<<
@@ -5529,7 +6142,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(
           g_object_set_double(__pyx_v_self->playbin, ((char *)"volume"), __pyx_v_volume);
         }
 
-        /* "mpfmc/core/video/gst_video.pyx":465
+        /* "mpfmc/core/video/gst_video.pyx":511
  *             # 2. the pulseaudio thread try to sent a message, and wait for the
  *             #    GIL
  *             with nogil:             # <<<<<<<<<<<<<<
@@ -5548,7 +6161,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(
         }
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":456
+    /* "mpfmc/core/video/gst_video.pyx":502
  *     def set_volume(self, float volume):
  *         """Set the player volume"""
  *         if self.playbin != NULL:             # <<<<<<<<<<<<<<
@@ -5557,7 +6170,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":454
+  /* "mpfmc/core/video/gst_video.pyx":500
  *         self.fakesink = NULL
  * 
  *     def set_volume(self, float volume):             # <<<<<<<<<<<<<<
@@ -5572,7 +6185,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":468
+/* "mpfmc/core/video/gst_video.pyx":514
  *                 g_object_set_double(self.playbin, 'volume', volume)
  * 
  *     def get_duration(self):             # <<<<<<<<<<<<<<
@@ -5581,20 +6194,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume(
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_23get_duration(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duration[] = "GstVideo.get_duration(self)\nGet the duration of the currently loaded video";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_23get_duration(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_21get_duration(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_20get_duration[] = "GstVideo.get_duration(self)\nGet the duration of the currently loaded video";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_21get_duration(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_duration (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duration(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20get_duration(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duration(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_20get_duration(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
   gint64 __pyx_v_duration;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -5602,7 +6215,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("get_duration", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":471
+  /* "mpfmc/core/video/gst_video.pyx":517
  *         """Get the duration of the currently loaded video"""
  *         cdef gint64 duration
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5617,7 +6230,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
       #endif
       /*try:*/ {
 
-        /* "mpfmc/core/video/gst_video.pyx":472
+        /* "mpfmc/core/video/gst_video.pyx":518
  *         cdef gint64 duration
  *         with nogil:
  *             duration = self._get_duration()             # <<<<<<<<<<<<<<
@@ -5627,7 +6240,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
         __pyx_v_duration = ((struct __pyx_vtabstruct_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self->__pyx_vtab)->_get_duration(__pyx_v_self);
       }
 
-      /* "mpfmc/core/video/gst_video.pyx":471
+      /* "mpfmc/core/video/gst_video.pyx":517
  *         """Get the duration of the currently loaded video"""
  *         cdef gint64 duration
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5646,7 +6259,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
       }
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":473
+  /* "mpfmc/core/video/gst_video.pyx":519
  *         with nogil:
  *             duration = self._get_duration()
  *         if duration == -1:             # <<<<<<<<<<<<<<
@@ -5656,7 +6269,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
   __pyx_t_1 = ((__pyx_v_duration == -1L) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":474
+    /* "mpfmc/core/video/gst_video.pyx":520
  *             duration = self._get_duration()
  *         if duration == -1:
  *             return -1             # <<<<<<<<<<<<<<
@@ -5668,7 +6281,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
     __pyx_r = __pyx_int_neg_1;
     goto __pyx_L0;
 
-    /* "mpfmc/core/video/gst_video.pyx":473
+    /* "mpfmc/core/video/gst_video.pyx":519
  *         with nogil:
  *             duration = self._get_duration()
  *         if duration == -1:             # <<<<<<<<<<<<<<
@@ -5677,7 +6290,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":475
+  /* "mpfmc/core/video/gst_video.pyx":521
  *         if duration == -1:
  *             return -1
  *         return duration / float(GST_SECOND)             # <<<<<<<<<<<<<<
@@ -5687,15 +6300,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(((double)GST_SECOND) == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 475, __pyx_L1_error)
+    __PYX_ERR(0, 521, __pyx_L1_error)
   }
-  __pyx_t_2 = PyFloat_FromDouble((((double)__pyx_v_duration) / ((double)GST_SECOND))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 475, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble((((double)__pyx_v_duration) / ((double)GST_SECOND))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 521, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":468
+  /* "mpfmc/core/video/gst_video.pyx":514
  *                 g_object_set_double(self.playbin, 'volume', volume)
  * 
  *     def get_duration(self):             # <<<<<<<<<<<<<<
@@ -5714,7 +6327,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":477
+/* "mpfmc/core/video/gst_video.pyx":523
  *         return duration / float(GST_SECOND)
  * 
  *     def get_position(self):             # <<<<<<<<<<<<<<
@@ -5723,20 +6336,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duratio
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_25get_position(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_position[] = "GstVideo.get_position(self)\nGet the playback position of the currently loaded video";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_25get_position(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_23get_position(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_position[] = "GstVideo.get_position(self)\nGet the playback position of the currently loaded video";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_23get_position(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_position (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_position(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_position(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_position(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_position(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
   gint64 __pyx_v_position;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -5744,7 +6357,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("get_position", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":480
+  /* "mpfmc/core/video/gst_video.pyx":526
  *         """Get the playback position of the currently loaded video"""
  *         cdef gint64 position
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5759,7 +6372,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
       #endif
       /*try:*/ {
 
-        /* "mpfmc/core/video/gst_video.pyx":481
+        /* "mpfmc/core/video/gst_video.pyx":527
  *         cdef gint64 position
  *         with nogil:
  *             position = self._get_position()             # <<<<<<<<<<<<<<
@@ -5769,7 +6382,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
         __pyx_v_position = ((struct __pyx_vtabstruct_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self->__pyx_vtab)->_get_position(__pyx_v_self);
       }
 
-      /* "mpfmc/core/video/gst_video.pyx":480
+      /* "mpfmc/core/video/gst_video.pyx":526
  *         """Get the playback position of the currently loaded video"""
  *         cdef gint64 position
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5788,7 +6401,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
       }
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":482
+  /* "mpfmc/core/video/gst_video.pyx":528
  *         with nogil:
  *             position = self._get_position()
  *         if position == -1:             # <<<<<<<<<<<<<<
@@ -5798,7 +6411,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
   __pyx_t_1 = ((__pyx_v_position == -1L) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":483
+    /* "mpfmc/core/video/gst_video.pyx":529
  *             position = self._get_position()
  *         if position == -1:
  *             return -1             # <<<<<<<<<<<<<<
@@ -5810,7 +6423,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
     __pyx_r = __pyx_int_neg_1;
     goto __pyx_L0;
 
-    /* "mpfmc/core/video/gst_video.pyx":482
+    /* "mpfmc/core/video/gst_video.pyx":528
  *         with nogil:
  *             position = self._get_position()
  *         if position == -1:             # <<<<<<<<<<<<<<
@@ -5819,7 +6432,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":484
+  /* "mpfmc/core/video/gst_video.pyx":530
  *         if position == -1:
  *             return -1
  *         return position / float(GST_SECOND)             # <<<<<<<<<<<<<<
@@ -5829,15 +6442,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
   __Pyx_XDECREF(__pyx_r);
   if (unlikely(((double)GST_SECOND) == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 484, __pyx_L1_error)
+    __PYX_ERR(0, 530, __pyx_L1_error)
   }
-  __pyx_t_2 = PyFloat_FromDouble((((double)__pyx_v_position) / ((double)GST_SECOND))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 484, __pyx_L1_error)
+  __pyx_t_2 = PyFloat_FromDouble((((double)__pyx_v_position) / ((double)GST_SECOND))); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 530, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":477
+  /* "mpfmc/core/video/gst_video.pyx":523
  *         return duration / float(GST_SECOND)
  * 
  *     def get_position(self):             # <<<<<<<<<<<<<<
@@ -5856,7 +6469,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":486
+/* "mpfmc/core/video/gst_video.pyx":532
  *         return position / float(GST_SECOND)
  * 
  *     def seek(self, float percent):             # <<<<<<<<<<<<<<
@@ -5865,15 +6478,15 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_positio
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_27seek(PyObject *__pyx_v_self, PyObject *__pyx_arg_percent); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_26seek[] = "GstVideo.seek(self, float percent)\nSet the playback position of the currently loaded video (based on duration percentage)";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_27seek(PyObject *__pyx_v_self, PyObject *__pyx_arg_percent) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_25seek(PyObject *__pyx_v_self, PyObject *__pyx_arg_percent); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_24seek[] = "GstVideo.seek(self, float percent)\nSet the playback position of the currently loaded video (based on duration percentage)";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_25seek(PyObject *__pyx_v_self, PyObject *__pyx_arg_percent) {
   float __pyx_v_percent;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("seek (wrapper)", 0);
   assert(__pyx_arg_percent); {
-    __pyx_v_percent = __pyx_PyFloat_AsFloat(__pyx_arg_percent); if (unlikely((__pyx_v_percent == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 486, __pyx_L3_error)
+    __pyx_v_percent = __pyx_PyFloat_AsFloat(__pyx_arg_percent); if (unlikely((__pyx_v_percent == (float)-1) && PyErr_Occurred())) __PYX_ERR(0, 532, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5881,19 +6494,19 @@ static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_27seek(PyObje
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26seek(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self), ((float)__pyx_v_percent));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24seek(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self), ((float)__pyx_v_percent));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26seek(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, float __pyx_v_percent) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_24seek(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, float __pyx_v_percent) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("seek", 0);
 
-  /* "mpfmc/core/video/gst_video.pyx":488
+  /* "mpfmc/core/video/gst_video.pyx":534
  *     def seek(self, float percent):
  *         """Set the playback position of the currently loaded video (based on duration percentage)"""
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5908,7 +6521,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26seek(struct
       #endif
       /*try:*/ {
 
-        /* "mpfmc/core/video/gst_video.pyx":489
+        /* "mpfmc/core/video/gst_video.pyx":535
  *         """Set the playback position of the currently loaded video (based on duration percentage)"""
  *         with nogil:
  *             self._seek(percent)             # <<<<<<<<<<<<<<
@@ -5918,7 +6531,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26seek(struct
         ((struct __pyx_vtabstruct_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self->__pyx_vtab)->_seek(__pyx_v_self, __pyx_v_percent);
       }
 
-      /* "mpfmc/core/video/gst_video.pyx":488
+      /* "mpfmc/core/video/gst_video.pyx":534
  *     def seek(self, float percent):
  *         """Set the playback position of the currently loaded video (based on duration percentage)"""
  *         with nogil:             # <<<<<<<<<<<<<<
@@ -5937,7 +6550,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26seek(struct
       }
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":486
+  /* "mpfmc/core/video/gst_video.pyx":532
  *         return position / float(GST_SECOND)
  * 
  *     def seek(self, float percent):             # <<<<<<<<<<<<<<
@@ -5952,7 +6565,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26seek(struct
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":495
+/* "mpfmc/core/video/gst_video.pyx":541
  *     #
  * 
  *     cdef gint64 _get_duration(self) nogil:             # <<<<<<<<<<<<<<
@@ -5966,7 +6579,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
   gint64 __pyx_r;
   int __pyx_t_1;
 
-  /* "mpfmc/core/video/gst_video.pyx":497
+  /* "mpfmc/core/video/gst_video.pyx":543
  *     cdef gint64 _get_duration(self) nogil:
  *         """Get the duration of the current video (no GIL)"""
  *         cdef gint64 duration = -1             # <<<<<<<<<<<<<<
@@ -5975,7 +6588,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
  */
   __pyx_v_duration = -1L;
 
-  /* "mpfmc/core/video/gst_video.pyx":499
+  /* "mpfmc/core/video/gst_video.pyx":545
  *         cdef gint64 duration = -1
  *         cdef GstState state
  *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
@@ -5985,7 +6598,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
   __pyx_t_1 = ((__pyx_v_self->playbin == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":500
+    /* "mpfmc/core/video/gst_video.pyx":546
  *         cdef GstState state
  *         if self.playbin == NULL:
  *             return -1             # <<<<<<<<<<<<<<
@@ -5995,7 +6608,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
     __pyx_r = -1L;
     goto __pyx_L0;
 
-    /* "mpfmc/core/video/gst_video.pyx":499
+    /* "mpfmc/core/video/gst_video.pyx":545
  *         cdef gint64 duration = -1
  *         cdef GstState state
  *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
@@ -6004,7 +6617,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":503
+  /* "mpfmc/core/video/gst_video.pyx":549
  * 
  *         # Check the state
  *         gst_element_get_state(self.pipeline, &state, NULL, <GstClockTime>GST_SECOND)             # <<<<<<<<<<<<<<
@@ -6013,7 +6626,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
  */
   (void)(gst_element_get_state(__pyx_v_self->pipeline, (&__pyx_v_state), NULL, ((GstClockTime)GST_SECOND)));
 
-  /* "mpfmc/core/video/gst_video.pyx":506
+  /* "mpfmc/core/video/gst_video.pyx":552
  * 
  *         # If we are already pre-rolled, we can read the duration
  *         if state == GST_STATE_PLAYING or state == GST_STATE_PAUSED:             # <<<<<<<<<<<<<<
@@ -6024,7 +6637,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
     case GST_STATE_PLAYING:
     case GST_STATE_PAUSED:
 
-    /* "mpfmc/core/video/gst_video.pyx":507
+    /* "mpfmc/core/video/gst_video.pyx":553
  *         # If we are already pre-rolled, we can read the duration
  *         if state == GST_STATE_PLAYING or state == GST_STATE_PAUSED:
  *             gst_element_query_duration(self.playbin, GST_FORMAT_TIME, &duration)             # <<<<<<<<<<<<<<
@@ -6033,7 +6646,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
  */
     (void)(gst_element_query_duration(__pyx_v_self->playbin, GST_FORMAT_TIME, (&__pyx_v_duration)));
 
-    /* "mpfmc/core/video/gst_video.pyx":508
+    /* "mpfmc/core/video/gst_video.pyx":554
  *         if state == GST_STATE_PLAYING or state == GST_STATE_PAUSED:
  *             gst_element_query_duration(self.playbin, GST_FORMAT_TIME, &duration)
  *             return duration             # <<<<<<<<<<<<<<
@@ -6043,7 +6656,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
     __pyx_r = __pyx_v_duration;
     goto __pyx_L0;
 
-    /* "mpfmc/core/video/gst_video.pyx":506
+    /* "mpfmc/core/video/gst_video.pyx":552
  * 
  *         # If we are already pre-rolled, we can read the duration
  *         if state == GST_STATE_PLAYING or state == GST_STATE_PAUSED:             # <<<<<<<<<<<<<<
@@ -6054,7 +6667,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
     default: break;
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":511
+  /* "mpfmc/core/video/gst_video.pyx":557
  * 
  *         # Pre-roll
  *         gst_element_set_state(self.pipeline, GST_STATE_PAUSED)             # <<<<<<<<<<<<<<
@@ -6063,7 +6676,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
  */
   (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_PAUSED));
 
-  /* "mpfmc/core/video/gst_video.pyx":512
+  /* "mpfmc/core/video/gst_video.pyx":558
  *         # Pre-roll
  *         gst_element_set_state(self.pipeline, GST_STATE_PAUSED)
  *         gst_element_get_state(self.pipeline, &state, NULL, <GstClockTime>GST_SECOND)             # <<<<<<<<<<<<<<
@@ -6072,7 +6685,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
  */
   (void)(gst_element_get_state(__pyx_v_self->pipeline, (&__pyx_v_state), NULL, ((GstClockTime)GST_SECOND)));
 
-  /* "mpfmc/core/video/gst_video.pyx":513
+  /* "mpfmc/core/video/gst_video.pyx":559
  *         gst_element_set_state(self.pipeline, GST_STATE_PAUSED)
  *         gst_element_get_state(self.pipeline, &state, NULL, <GstClockTime>GST_SECOND)
  *         gst_element_query_duration(self.playbin, GST_FORMAT_TIME, &duration)             # <<<<<<<<<<<<<<
@@ -6081,7 +6694,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
  */
   (void)(gst_element_query_duration(__pyx_v_self->playbin, GST_FORMAT_TIME, (&__pyx_v_duration)));
 
-  /* "mpfmc/core/video/gst_video.pyx":514
+  /* "mpfmc/core/video/gst_video.pyx":560
  *         gst_element_get_state(self.pipeline, &state, NULL, <GstClockTime>GST_SECOND)
  *         gst_element_query_duration(self.playbin, GST_FORMAT_TIME, &duration)
  *         gst_element_set_state(self.pipeline, GST_STATE_READY)             # <<<<<<<<<<<<<<
@@ -6090,7 +6703,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
  */
   (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_READY));
 
-  /* "mpfmc/core/video/gst_video.pyx":515
+  /* "mpfmc/core/video/gst_video.pyx":561
  *         gst_element_query_duration(self.playbin, GST_FORMAT_TIME, &duration)
  *         gst_element_set_state(self.pipeline, GST_STATE_READY)
  *         return duration             # <<<<<<<<<<<<<<
@@ -6100,7 +6713,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
   __pyx_r = __pyx_v_duration;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":495
+  /* "mpfmc/core/video/gst_video.pyx":541
  *     #
  * 
  *     cdef gint64 _get_duration(self) nogil:             # <<<<<<<<<<<<<<
@@ -6113,7 +6726,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration(str
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":517
+/* "mpfmc/core/video/gst_video.pyx":563
  *         return duration
  * 
  *     cdef gint64 _get_position(self) nogil:             # <<<<<<<<<<<<<<
@@ -6126,7 +6739,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
   gint64 __pyx_r;
   int __pyx_t_1;
 
-  /* "mpfmc/core/video/gst_video.pyx":519
+  /* "mpfmc/core/video/gst_video.pyx":565
  *     cdef gint64 _get_position(self) nogil:
  *         """Get the playback position of the current video (no GIL)"""
  *         cdef gint64 position = 0             # <<<<<<<<<<<<<<
@@ -6135,7 +6748,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
  */
   __pyx_v_position = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":520
+  /* "mpfmc/core/video/gst_video.pyx":566
  *         """Get the playback position of the current video (no GIL)"""
  *         cdef gint64 position = 0
  *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
@@ -6145,7 +6758,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
   __pyx_t_1 = ((__pyx_v_self->playbin == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":521
+    /* "mpfmc/core/video/gst_video.pyx":567
  *         cdef gint64 position = 0
  *         if self.playbin == NULL:
  *             return 0             # <<<<<<<<<<<<<<
@@ -6155,7 +6768,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "mpfmc/core/video/gst_video.pyx":520
+    /* "mpfmc/core/video/gst_video.pyx":566
  *         """Get the playback position of the current video (no GIL)"""
  *         cdef gint64 position = 0
  *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
@@ -6164,7 +6777,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":522
+  /* "mpfmc/core/video/gst_video.pyx":568
  *         if self.playbin == NULL:
  *             return 0
  *         if not gst_element_query_position(self.playbin, GST_FORMAT_TIME, &position):             # <<<<<<<<<<<<<<
@@ -6174,7 +6787,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
   __pyx_t_1 = ((!(gst_element_query_position(__pyx_v_self->playbin, GST_FORMAT_TIME, (&__pyx_v_position)) != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":523
+    /* "mpfmc/core/video/gst_video.pyx":569
  *             return 0
  *         if not gst_element_query_position(self.playbin, GST_FORMAT_TIME, &position):
  *             return 0             # <<<<<<<<<<<<<<
@@ -6184,7 +6797,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "mpfmc/core/video/gst_video.pyx":522
+    /* "mpfmc/core/video/gst_video.pyx":568
  *         if self.playbin == NULL:
  *             return 0
  *         if not gst_element_query_position(self.playbin, GST_FORMAT_TIME, &position):             # <<<<<<<<<<<<<<
@@ -6193,7 +6806,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":524
+  /* "mpfmc/core/video/gst_video.pyx":570
  *         if not gst_element_query_position(self.playbin, GST_FORMAT_TIME, &position):
  *             return 0
  *         return position             # <<<<<<<<<<<<<<
@@ -6203,7 +6816,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
   __pyx_r = __pyx_v_position;
   goto __pyx_L0;
 
-  /* "mpfmc/core/video/gst_video.pyx":517
+  /* "mpfmc/core/video/gst_video.pyx":563
  *         return duration
  * 
  *     cdef gint64 _get_position(self) nogil:             # <<<<<<<<<<<<<<
@@ -6216,7 +6829,7 @@ static gint64 __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position(str
   return __pyx_r;
 }
 
-/* "mpfmc/core/video/gst_video.pyx":526
+/* "mpfmc/core/video/gst_video.pyx":572
  *         return position
  * 
  *     cdef void _seek(self, float percent) nogil:             # <<<<<<<<<<<<<<
@@ -6233,7 +6846,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
   int __pyx_v_seek_flags;
   int __pyx_t_1;
 
-  /* "mpfmc/core/video/gst_video.pyx":532
+  /* "mpfmc/core/video/gst_video.pyx":578
  *         cdef gboolean ret
  *         cdef gint64 seek_t, duration
  *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
@@ -6243,7 +6856,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
   __pyx_t_1 = ((__pyx_v_self->playbin == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":533
+    /* "mpfmc/core/video/gst_video.pyx":579
  *         cdef gint64 seek_t, duration
  *         if self.playbin == NULL:
  *             return             # <<<<<<<<<<<<<<
@@ -6252,7 +6865,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
     goto __pyx_L0;
 
-    /* "mpfmc/core/video/gst_video.pyx":532
+    /* "mpfmc/core/video/gst_video.pyx":578
  *         cdef gboolean ret
  *         cdef gint64 seek_t, duration
  *         if self.playbin == NULL:             # <<<<<<<<<<<<<<
@@ -6261,7 +6874,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":535
+  /* "mpfmc/core/video/gst_video.pyx":581
  *             return
  * 
  *         duration = self._get_duration()             # <<<<<<<<<<<<<<
@@ -6270,7 +6883,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
   __pyx_v_duration = ((struct __pyx_vtabstruct_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self->__pyx_vtab)->_get_duration(__pyx_v_self);
 
-  /* "mpfmc/core/video/gst_video.pyx":536
+  /* "mpfmc/core/video/gst_video.pyx":582
  * 
  *         duration = self._get_duration()
  *         if duration <= 0:             # <<<<<<<<<<<<<<
@@ -6280,7 +6893,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
   __pyx_t_1 = ((__pyx_v_duration <= 0) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":537
+    /* "mpfmc/core/video/gst_video.pyx":583
  *         duration = self._get_duration()
  *         if duration <= 0:
  *             seek_t = 0             # <<<<<<<<<<<<<<
@@ -6289,7 +6902,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
     __pyx_v_seek_t = 0;
 
-    /* "mpfmc/core/video/gst_video.pyx":536
+    /* "mpfmc/core/video/gst_video.pyx":582
  * 
  *         duration = self._get_duration()
  *         if duration <= 0:             # <<<<<<<<<<<<<<
@@ -6299,7 +6912,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
     goto __pyx_L4;
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":539
+  /* "mpfmc/core/video/gst_video.pyx":585
  *             seek_t = 0
  *         else:
  *             seek_t = <gint64>(percent * duration)             # <<<<<<<<<<<<<<
@@ -6311,7 +6924,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
   }
   __pyx_L4:;
 
-  /* "mpfmc/core/video/gst_video.pyx":540
+  /* "mpfmc/core/video/gst_video.pyx":586
  *         else:
  *             seek_t = <gint64>(percent * duration)
  *         seek_flags = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT             # <<<<<<<<<<<<<<
@@ -6320,7 +6933,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
   __pyx_v_seek_flags = (GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT);
 
-  /* "mpfmc/core/video/gst_video.pyx":541
+  /* "mpfmc/core/video/gst_video.pyx":587
  *             seek_t = <gint64>(percent * duration)
  *         seek_flags = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT
  *         gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)             # <<<<<<<<<<<<<<
@@ -6329,7 +6942,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
   (void)(gst_element_get_state(__pyx_v_self->pipeline, (&__pyx_v_current_state), (&__pyx_v_pending_state), ((GstClockTime)GST_SECOND)));
 
-  /* "mpfmc/core/video/gst_video.pyx":542
+  /* "mpfmc/core/video/gst_video.pyx":588
  *         seek_flags = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT
  *         gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)
  *         if current_state == GST_STATE_READY:             # <<<<<<<<<<<<<<
@@ -6339,7 +6952,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
   __pyx_t_1 = ((__pyx_v_current_state == GST_STATE_READY) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":543
+    /* "mpfmc/core/video/gst_video.pyx":589
  *         gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)
  *         if current_state == GST_STATE_READY:
  *             gst_element_set_state(self.pipeline, GST_STATE_PAUSED)             # <<<<<<<<<<<<<<
@@ -6348,7 +6961,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
     (void)(gst_element_set_state(__pyx_v_self->pipeline, GST_STATE_PAUSED));
 
-    /* "mpfmc/core/video/gst_video.pyx":542
+    /* "mpfmc/core/video/gst_video.pyx":588
  *         seek_flags = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT
  *         gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)
  *         if current_state == GST_STATE_READY:             # <<<<<<<<<<<<<<
@@ -6357,7 +6970,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":544
+  /* "mpfmc/core/video/gst_video.pyx":590
  *         if current_state == GST_STATE_READY:
  *             gst_element_set_state(self.pipeline, GST_STATE_PAUSED)
  *         ret = gst_element_seek_simple(self.playbin, GST_FORMAT_TIME, <GstSeekFlags>seek_flags, seek_t)             # <<<<<<<<<<<<<<
@@ -6366,7 +6979,7 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
   __pyx_v_ret = gst_element_seek_simple(__pyx_v_self->playbin, GST_FORMAT_TIME, ((GstSeekFlags)__pyx_v_seek_flags), __pyx_v_seek_t);
 
-  /* "mpfmc/core/video/gst_video.pyx":546
+  /* "mpfmc/core/video/gst_video.pyx":592
  *         ret = gst_element_seek_simple(self.playbin, GST_FORMAT_TIME, <GstSeekFlags>seek_flags, seek_t)
  * 
  *         if not ret:             # <<<<<<<<<<<<<<
@@ -6376,16 +6989,16 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
   __pyx_t_1 = ((!(__pyx_v_ret != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":547
+    /* "mpfmc/core/video/gst_video.pyx":593
  * 
  *         if not ret:
  *             return             # <<<<<<<<<<<<<<
  * 
- *         if self.appsink != NULL:
+ *         if self.appsink_video != NULL:
  */
     goto __pyx_L0;
 
-    /* "mpfmc/core/video/gst_video.pyx":546
+    /* "mpfmc/core/video/gst_video.pyx":592
  *         ret = gst_element_seek_simple(self.playbin, GST_FORMAT_TIME, <GstSeekFlags>seek_flags, seek_t)
  * 
  *         if not ret:             # <<<<<<<<<<<<<<
@@ -6394,62 +7007,62 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":549
+  /* "mpfmc/core/video/gst_video.pyx":595
  *             return
  * 
- *         if self.appsink != NULL:             # <<<<<<<<<<<<<<
+ *         if self.appsink_video != NULL:             # <<<<<<<<<<<<<<
  *             gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)
  *             if current_state != GST_STATE_PLAYING:
  */
-  __pyx_t_1 = ((__pyx_v_self->appsink != NULL) != 0);
+  __pyx_t_1 = ((__pyx_v_self->appsink_video != NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/video/gst_video.pyx":550
+    /* "mpfmc/core/video/gst_video.pyx":596
  * 
- *         if self.appsink != NULL:
+ *         if self.appsink_video != NULL:
  *             gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)             # <<<<<<<<<<<<<<
  *             if current_state != GST_STATE_PLAYING:
  *                 c_appsink_pull_preroll(
  */
     (void)(gst_element_get_state(__pyx_v_self->pipeline, (&__pyx_v_current_state), (&__pyx_v_pending_state), ((GstClockTime)GST_SECOND)));
 
-    /* "mpfmc/core/video/gst_video.pyx":551
- *         if self.appsink != NULL:
+    /* "mpfmc/core/video/gst_video.pyx":597
+ *         if self.appsink_video != NULL:
  *             gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)
  *             if current_state != GST_STATE_PLAYING:             # <<<<<<<<<<<<<<
  *                 c_appsink_pull_preroll(
- *                     self.appsink, _on_appsink_sample, <void *>self, self._alpha_channel)
+ *                     self.appsink_video, _on_appsink_video_sample, <void *>self, self._alpha_channel)
  */
     __pyx_t_1 = ((__pyx_v_current_state != GST_STATE_PLAYING) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/video/gst_video.pyx":552
+      /* "mpfmc/core/video/gst_video.pyx":598
  *             gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)
  *             if current_state != GST_STATE_PLAYING:
  *                 c_appsink_pull_preroll(             # <<<<<<<<<<<<<<
- *                     self.appsink, _on_appsink_sample, <void *>self, self._alpha_channel)
+ *                     self.appsink_video, _on_appsink_video_sample, <void *>self, self._alpha_channel)
  */
-      c_appsink_pull_preroll(__pyx_v_self->appsink, __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_sample, ((void *)__pyx_v_self), __pyx_v_self->_alpha_channel);
+      c_appsink_pull_preroll(__pyx_v_self->appsink_video, __pyx_f_5mpfmc_4core_5video_9gst_video__on_appsink_video_sample, ((void *)__pyx_v_self), __pyx_v_self->_alpha_channel);
 
-      /* "mpfmc/core/video/gst_video.pyx":551
- *         if self.appsink != NULL:
+      /* "mpfmc/core/video/gst_video.pyx":597
+ *         if self.appsink_video != NULL:
  *             gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)
  *             if current_state != GST_STATE_PLAYING:             # <<<<<<<<<<<<<<
  *                 c_appsink_pull_preroll(
- *                     self.appsink, _on_appsink_sample, <void *>self, self._alpha_channel)
+ *                     self.appsink_video, _on_appsink_video_sample, <void *>self, self._alpha_channel)
  */
     }
 
-    /* "mpfmc/core/video/gst_video.pyx":549
+    /* "mpfmc/core/video/gst_video.pyx":595
  *             return
  * 
- *         if self.appsink != NULL:             # <<<<<<<<<<<<<<
+ *         if self.appsink_video != NULL:             # <<<<<<<<<<<<<<
  *             gst_element_get_state(self.pipeline, &current_state, &pending_state, <GstClockTime>GST_SECOND)
  *             if current_state != GST_STATE_PLAYING:
  */
   }
 
-  /* "mpfmc/core/video/gst_video.pyx":526
+  /* "mpfmc/core/video/gst_video.pyx":572
  *         return position
  * 
  *     cdef void _seek(self, float percent) nogil:             # <<<<<<<<<<<<<<
@@ -6468,20 +7081,20 @@ static void __pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek(struct __pyx_
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_29__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_28__reduce_cython__[] = "GstVideo.__reduce_cython__(self)";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_29__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_27__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_26__reduce_cython__[] = "GstVideo.__reduce_cython__(self)";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_27__reduce_cython__(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__reduce_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_28__reduce_cython__(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26__reduce_cython__(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_28__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_26__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -6523,20 +7136,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_28__reduce_cy
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_31__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
-static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_30__setstate_cython__[] = "GstVideo.__setstate_cython__(self, __pyx_state)";
-static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_31__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_29__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state); /*proto*/
+static char __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_28__setstate_cython__[] = "GstVideo.__setstate_cython__(self, __pyx_state)";
+static PyObject *__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_29__setstate_cython__(PyObject *__pyx_v_self, PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__setstate_cython__ (wrapper)", 0);
-  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_30__setstate_cython__(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
+  __pyx_r = __pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_28__setstate_cython__(((struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *)__pyx_v_self), ((PyObject *)__pyx_v___pyx_state));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_30__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
+static PyObject *__pyx_pf_5mpfmc_4core_5video_9gst_video_8GstVideo_28__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -6586,6 +7199,8 @@ static PyObject *__pyx_tp_new_5mpfmc_4core_5video_9gst_video_GstVideo(PyTypeObje
   p->_frame_cb = Py_None; Py_INCREF(Py_None);
   p->_eos_cb = Py_None; Py_INCREF(Py_None);
   p->_message_cb = Py_None; Py_INCREF(Py_None);
+  p->_audio_cb = Py_None; Py_INCREF(Py_None);
+  p->_audio_caps = ((PyObject*)Py_None); Py_INCREF(Py_None);
   if (unlikely(__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_1__cinit__(o, a, k) < 0)) goto bad;
   return o;
   bad:
@@ -6614,6 +7229,8 @@ static void __pyx_tp_dealloc_5mpfmc_4core_5video_9gst_video_GstVideo(PyObject *o
   Py_CLEAR(p->_frame_cb);
   Py_CLEAR(p->_eos_cb);
   Py_CLEAR(p->_message_cb);
+  Py_CLEAR(p->_audio_cb);
+  Py_CLEAR(p->_audio_caps);
   (*Py_TYPE(o)->tp_free)(o);
 }
 
@@ -6631,6 +7248,12 @@ static int __pyx_tp_traverse_5mpfmc_4core_5video_9gst_video_GstVideo(PyObject *o
   }
   if (p->_message_cb) {
     e = (*v)(p->_message_cb, a); if (e) return e;
+  }
+  if (p->_audio_cb) {
+    e = (*v)(p->_audio_cb, a); if (e) return e;
+  }
+  if (p->_audio_caps) {
+    e = (*v)(p->_audio_caps, a); if (e) return e;
   }
   return 0;
 }
@@ -6650,6 +7273,12 @@ static int __pyx_tp_clear_5mpfmc_4core_5video_9gst_video_GstVideo(PyObject *o) {
   tmp = ((PyObject*)p->_message_cb);
   p->_message_cb = Py_None; Py_INCREF(Py_None);
   Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->_audio_cb);
+  p->_audio_cb = Py_None; Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->_audio_caps);
+  p->_audio_caps = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
   return 0;
 }
 
@@ -6660,6 +7289,20 @@ static PyObject *__pyx_getprop_5mpfmc_4core_5video_9gst_video_8GstVideo_frame_ca
 static int __pyx_setprop_5mpfmc_4core_5video_9gst_video_8GstVideo_frame_callback(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
   if (v) {
     return __pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_14frame_callback_3__set__(o, v);
+  }
+  else {
+    PyErr_SetString(PyExc_NotImplementedError, "__del__");
+    return -1;
+  }
+}
+
+static PyObject *__pyx_getprop_5mpfmc_4core_5video_9gst_video_8GstVideo_audio_callback(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback_1__get__(o);
+}
+
+static int __pyx_setprop_5mpfmc_4core_5video_9gst_video_8GstVideo_audio_callback(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_14audio_callback_3__set__(o, v);
   }
   else {
     PyErr_SetString(PyExc_NotImplementedError, "__del__");
@@ -6705,23 +7348,23 @@ static PyObject *__pyx_getprop_5mpfmc_4core_5video_9gst_video_8GstVideo_loaded(P
 
 static PyMethodDef __pyx_methods_5mpfmc_4core_5video_9gst_video_GstVideo[] = {
   {"load", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_7load, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_6load},
-  {"_create_pipeline_alpha_channel_bad", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_9_create_pipeline_alpha_channel_bad, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_8_create_pipeline_alpha_channel_bad},
-  {"play", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_11play, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_10play},
-  {"stop", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_13stop, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_12stop},
-  {"pause", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_15pause, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_14pause},
-  {"ready", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_17ready, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_16ready},
-  {"unload", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_19unload, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_18unload},
-  {"set_volume", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_21set_volume, METH_O, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_20set_volume},
-  {"get_duration", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_23get_duration, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_duration},
-  {"get_position", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_25get_position, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_24get_position},
-  {"seek", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_27seek, METH_O, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_26seek},
-  {"__reduce_cython__", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_29__reduce_cython__, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_28__reduce_cython__},
-  {"__setstate_cython__", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_31__setstate_cython__, METH_O, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_30__setstate_cython__},
+  {"play", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_9play, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_8play},
+  {"stop", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_11stop, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_10stop},
+  {"pause", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_13pause, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_12pause},
+  {"ready", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_15ready, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_14ready},
+  {"unload", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_17unload, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_16unload},
+  {"set_volume", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_19set_volume, METH_O, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_18set_volume},
+  {"get_duration", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_21get_duration, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_20get_duration},
+  {"get_position", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_23get_position, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_22get_position},
+  {"seek", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_25seek, METH_O, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_24seek},
+  {"__reduce_cython__", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_27__reduce_cython__, METH_NOARGS, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_26__reduce_cython__},
+  {"__setstate_cython__", (PyCFunction)__pyx_pw_5mpfmc_4core_5video_9gst_video_8GstVideo_29__setstate_cython__, METH_O, __pyx_doc_5mpfmc_4core_5video_9gst_video_8GstVideo_28__setstate_cython__},
   {0, 0, 0, 0}
 };
 
 static struct PyGetSetDef __pyx_getsets_5mpfmc_4core_5video_9gst_video_GstVideo[] = {
   {(char *)"frame_callback", __pyx_getprop_5mpfmc_4core_5video_9gst_video_8GstVideo_frame_callback, __pyx_setprop_5mpfmc_4core_5video_9gst_video_8GstVideo_frame_callback, (char *)0, 0},
+  {(char *)"audio_callback", __pyx_getprop_5mpfmc_4core_5video_9gst_video_8GstVideo_audio_callback, __pyx_setprop_5mpfmc_4core_5video_9gst_video_8GstVideo_audio_callback, (char *)0, 0},
   {(char *)"eos_callback", __pyx_getprop_5mpfmc_4core_5video_9gst_video_8GstVideo_eos_callback, __pyx_setprop_5mpfmc_4core_5video_9gst_video_8GstVideo_eos_callback, (char *)0, 0},
   {(char *)"message_callback", __pyx_getprop_5mpfmc_4core_5video_9gst_video_8GstVideo_message_callback, __pyx_setprop_5mpfmc_4core_5video_9gst_video_8GstVideo_message_callback, (char *)0, 0},
   {(char *)"alpha_channel", __pyx_getprop_5mpfmc_4core_5video_9gst_video_8GstVideo_alpha_channel, 0, (char *)0, 0},
@@ -6755,7 +7398,7 @@ static PyTypeObject __pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo = {
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
   Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
-  "GstVideo(uri, frame_cb=None, eos_cb=None, message_cb=None, alpha_channel=False)", /*tp_doc*/
+  "GstVideo(uri, frame_cb=None, eos_cb=None, message_cb=None, audio_cb=None, alpha_channel=False, av_offset=0, mute_audio=False, audio_caps=None)", /*tp_doc*/
   __pyx_tp_traverse_5mpfmc_4core_5video_9gst_video_GstVideo, /*tp_traverse*/
   __pyx_tp_clear_5mpfmc_4core_5video_9gst_video_GstVideo, /*tp_clear*/
   0, /*tp_richcompare*/
@@ -6838,17 +7481,28 @@ static struct PyModuleDef __pyx_moduledef = {
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_GstVideo, __pyx_k_GstVideo, sizeof(__pyx_k_GstVideo), 0, 0, 1, 1},
   {&__pyx_n_s_GstVideoException, __pyx_k_GstVideoException, sizeof(__pyx_k_GstVideoException), 0, 0, 1, 1},
+  {&__pyx_kp_u_Invalid_audio_caps_missing_buffe, __pyx_k_Invalid_audio_caps_missing_buffe, sizeof(__pyx_k_Invalid_audio_caps_missing_buffe), 0, 1, 0, 0},
+  {&__pyx_kp_u_Invalid_audio_caps_missing_chann, __pyx_k_Invalid_audio_caps_missing_chann, sizeof(__pyx_k_Invalid_audio_caps_missing_chann), 0, 1, 0, 0},
+  {&__pyx_kp_u_Invalid_audio_caps_missing_sampl, __pyx_k_Invalid_audio_caps_missing_sampl, sizeof(__pyx_k_Invalid_audio_caps_missing_sampl), 0, 1, 0, 0},
+  {&__pyx_n_u_S16LE, __pyx_k_S16LE, sizeof(__pyx_k_S16LE), 0, 1, 0, 1},
   {&__pyx_n_s_TypeError, __pyx_k_TypeError, sizeof(__pyx_k_TypeError), 0, 0, 1, 1},
   {&__pyx_kp_u_Unable_to_create_a_pipeline, __pyx_k_Unable_to_create_a_pipeline, sizeof(__pyx_k_Unable_to_create_a_pipeline), 0, 1, 0, 0},
   {&__pyx_kp_u_Unable_to_create_a_playbin, __pyx_k_Unable_to_create_a_playbin, sizeof(__pyx_k_Unable_to_create_a_playbin), 0, 1, 0, 0},
-  {&__pyx_kp_u_Unable_to_create_an_appsink, __pyx_k_Unable_to_create_an_appsink, sizeof(__pyx_k_Unable_to_create_an_appsink), 0, 1, 0, 0},
-  {&__pyx_kp_u_Unable_to_create_the_alpha_chann, __pyx_k_Unable_to_create_the_alpha_chann, sizeof(__pyx_k_Unable_to_create_the_alpha_chann), 0, 1, 0, 0},
+  {&__pyx_kp_u_Unable_to_create_a_video_appsink, __pyx_k_Unable_to_create_a_video_appsink, sizeof(__pyx_k_Unable_to_create_a_video_appsink), 0, 1, 0, 0},
+  {&__pyx_kp_u_Unable_to_create_an_audio_appsin, __pyx_k_Unable_to_create_an_audio_appsin, sizeof(__pyx_k_Unable_to_create_an_audio_appsin), 0, 1, 0, 0},
   {&__pyx_kp_u_Unable_to_get_the_bus_from_the_p, __pyx_k_Unable_to_get_the_bus_from_the_p, sizeof(__pyx_k_Unable_to_get_the_bus_from_the_p), 0, 1, 0, 0},
   {&__pyx_kp_u_Unable_to_initialize_gstreamer_c, __pyx_k_Unable_to_initialize_gstreamer_c, sizeof(__pyx_k_Unable_to_initialize_gstreamer_c), 0, 1, 0, 0},
   {&__pyx_n_s_alpha_channel, __pyx_k_alpha_channel, sizeof(__pyx_k_alpha_channel), 0, 0, 1, 1},
   {&__pyx_n_s_argc, __pyx_k_argc, sizeof(__pyx_k_argc), 0, 0, 1, 1},
   {&__pyx_n_s_argv, __pyx_k_argv, sizeof(__pyx_k_argv), 0, 0, 1, 1},
   {&__pyx_n_s_atexit, __pyx_k_atexit, sizeof(__pyx_k_atexit), 0, 0, 1, 1},
+  {&__pyx_n_s_audio_callback, __pyx_k_audio_callback, sizeof(__pyx_k_audio_callback), 0, 0, 1, 1},
+  {&__pyx_n_s_audio_caps, __pyx_k_audio_caps, sizeof(__pyx_k_audio_caps), 0, 0, 1, 1},
+  {&__pyx_n_s_audio_cb, __pyx_k_audio_cb, sizeof(__pyx_k_audio_cb), 0, 0, 1, 1},
+  {&__pyx_kp_u_audio_x_raw_rate_channels_format, __pyx_k_audio_x_raw_rate_channels_format, sizeof(__pyx_k_audio_x_raw_rate_channels_format), 0, 1, 0, 0},
+  {&__pyx_n_s_av_offset, __pyx_k_av_offset, sizeof(__pyx_k_av_offset), 0, 0, 1, 1},
+  {&__pyx_n_u_buffer_size, __pyx_k_buffer_size, sizeof(__pyx_k_buffer_size), 0, 1, 0, 1},
+  {&__pyx_n_u_channels, __pyx_k_channels, sizeof(__pyx_k_channels), 0, 1, 0, 1},
   {&__pyx_n_s_cline_in_traceback, __pyx_k_cline_in_traceback, sizeof(__pyx_k_cline_in_traceback), 0, 0, 1, 1},
   {&__pyx_n_s_doc, __pyx_k_doc, sizeof(__pyx_k_doc), 0, 0, 1, 1},
   {&__pyx_n_s_encode, __pyx_k_encode, sizeof(__pyx_k_encode), 0, 0, 1, 1},
@@ -6856,6 +7510,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_error, __pyx_k_error, sizeof(__pyx_k_error), 0, 0, 1, 1},
   {&__pyx_n_u_error, __pyx_k_error, sizeof(__pyx_k_error), 0, 1, 0, 1},
   {&__pyx_n_s_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 0, 1, 1},
+  {&__pyx_n_u_format, __pyx_k_format, sizeof(__pyx_k_format), 0, 1, 0, 1},
   {&__pyx_n_s_frame_callback, __pyx_k_frame_callback, sizeof(__pyx_k_frame_callback), 0, 0, 1, 1},
   {&__pyx_n_s_frame_cb, __pyx_k_frame_cb, sizeof(__pyx_k_frame_cb), 0, 0, 1, 1},
   {&__pyx_n_s_get_gst_version, __pyx_k_get_gst_version, sizeof(__pyx_k_get_gst_version), 0, 0, 1, 1},
@@ -6879,6 +7534,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_mpfmc_core_video_gst_video, __pyx_k_mpfmc_core_video_gst_video, sizeof(__pyx_k_mpfmc_core_video_gst_video), 0, 0, 1, 1},
   {&__pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_k_mpfmc_core_video_gst_video_pyx, sizeof(__pyx_k_mpfmc_core_video_gst_video_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_msg, __pyx_k_msg, sizeof(__pyx_k_msg), 0, 0, 1, 1},
+  {&__pyx_n_s_mute_audio, __pyx_k_mute_audio, sizeof(__pyx_k_mute_audio), 0, 0, 1, 1},
+  {&__pyx_n_s_mute_audio_2, __pyx_k_mute_audio_2, sizeof(__pyx_k_mute_audio_2), 0, 0, 1, 1},
   {&__pyx_n_s_name, __pyx_k_name, sizeof(__pyx_k_name), 0, 0, 1, 1},
   {&__pyx_n_s_nano, __pyx_k_nano, sizeof(__pyx_k_nano), 0, 0, 1, 1},
   {&__pyx_kp_s_no_default___reduce___due_to_non, __pyx_k_no_default___reduce___due_to_non, sizeof(__pyx_k_no_default___reduce___due_to_non), 0, 0, 1, 0},
@@ -6892,6 +7549,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ref, __pyx_k_ref, sizeof(__pyx_k_ref), 0, 0, 1, 1},
   {&__pyx_n_s_register, __pyx_k_register, sizeof(__pyx_k_register), 0, 0, 1, 1},
   {&__pyx_n_s_remove, __pyx_k_remove, sizeof(__pyx_k_remove), 0, 0, 1, 1},
+  {&__pyx_n_u_sample_rate, __pyx_k_sample_rate, sizeof(__pyx_k_sample_rate), 0, 1, 0, 1},
+  {&__pyx_n_s_setdefault, __pyx_k_setdefault, sizeof(__pyx_k_setdefault), 0, 0, 1, 1},
   {&__pyx_n_s_setstate, __pyx_k_setstate, sizeof(__pyx_k_setstate), 0, 0, 1, 1},
   {&__pyx_n_s_setstate_cython, __pyx_k_setstate_cython, sizeof(__pyx_k_setstate_cython), 0, 0, 1, 1},
   {&__pyx_n_s_super, __pyx_k_super, sizeof(__pyx_k_super), 0, 0, 1, 1},
@@ -6905,7 +7564,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 239, __pyx_L1_error)
+  __pyx_builtin_super = __Pyx_GetBuiltinName(__pyx_n_s_super); if (!__pyx_builtin_super) __PYX_ERR(0, 268, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -6935,65 +7594,65 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "mpfmc/core/video/gst_video.pyx":135
+  /* "mpfmc/core/video/gst_video.pyx":143
  * cdef list _instances = []
  * 
  * def _on_gst_video_deleted(wk):             # <<<<<<<<<<<<<<
  *     if wk in _instances:
  *         _instances.remove(wk)
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_n_s_wk); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_n_s_wk); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
-  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_on_gst_video_deleted, 135, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_codeobj__4 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__3, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_on_gst_video_deleted, 143, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__4)) __PYX_ERR(0, 143, __pyx_L1_error)
 
-  /* "mpfmc/core/video/gst_video.pyx":140
+  /* "mpfmc/core/video/gst_video.pyx":148
  * 
  * @atexit.register
  * def gst_exit_clean():             # <<<<<<<<<<<<<<
  *     # XXX don't use a stop() method or anything that change the state of the
  *     # element without releasing the GIL. Otherwise, we might have a deadlock due
  */
-  __pyx_tuple__5 = PyTuple_Pack(2, __pyx_n_s_wk, __pyx_n_s_gst_video); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __pyx_tuple__5 = PyTuple_Pack(2, __pyx_n_s_wk, __pyx_n_s_gst_video); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
-  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_gst_exit_clean, 140, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(0, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_gst_exit_clean, 148, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 148, __pyx_L1_error)
 
-  /* "mpfmc/core/video/gst_video.pyx":193
- *         pass
+  /* "mpfmc/core/video/gst_video.pyx":210
+ * 
  * 
  * def _gst_init():             # <<<<<<<<<<<<<<
  *     """Initializes the GStreamer library"""
  *     if gst_is_initialized():
  */
-  __pyx_tuple__7 = PyTuple_Pack(4, __pyx_n_s_argc, __pyx_n_s_argv, __pyx_n_s_error, __pyx_n_s_msg); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_tuple__7 = PyTuple_Pack(4, __pyx_n_s_argc, __pyx_n_s_argv, __pyx_n_s_error, __pyx_n_s_msg); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__7);
   __Pyx_GIVEREF(__pyx_tuple__7);
-  __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_gst_init, 193, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_gst_init, 210, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 210, __pyx_L1_error)
 
-  /* "mpfmc/core/video/gst_video.pyx":205
+  /* "mpfmc/core/video/gst_video.pyx":222
  *         raise GstVideoException(msg)
  * 
  * def get_gst_version():             # <<<<<<<<<<<<<<
  *     """Returns the current version of GStreamer"""
  *     cdef unsigned int major, minor, micro, nano
  */
-  __pyx_tuple__9 = PyTuple_Pack(4, __pyx_n_s_major, __pyx_n_s_minor, __pyx_n_s_micro, __pyx_n_s_nano); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_tuple__9 = PyTuple_Pack(4, __pyx_n_s_major, __pyx_n_s_minor, __pyx_n_s_micro, __pyx_n_s_nano); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__9);
   __Pyx_GIVEREF(__pyx_tuple__9);
-  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_get_gst_version, 205, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(0, 0, 4, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_get_gst_version, 222, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 222, __pyx_L1_error)
 
-  /* "mpfmc/core/video/gst_video.pyx":211
+  /* "mpfmc/core/video/gst_video.pyx":228
  *     return major, minor, micro, nano
  * 
  * def glib_iteration(int loop):             # <<<<<<<<<<<<<<
  *     """Python function wrapper of C iteration function"""
  *     c_glib_iteration(loop)
  */
-  __pyx_tuple__11 = PyTuple_Pack(2, __pyx_n_s_loop, __pyx_n_s_loop); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 211, __pyx_L1_error)
+  __pyx_tuple__11 = PyTuple_Pack(2, __pyx_n_s_loop, __pyx_n_s_loop); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(0, 228, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__11);
   __Pyx_GIVEREF(__pyx_tuple__11);
-  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_glib_iteration, 211, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 211, __pyx_L1_error)
+  __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(1, 0, 2, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_video_gst_video_pyx, __pyx_n_s_glib_iteration, 228, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 228, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -7002,8 +7661,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 }
 
 static CYTHON_SMALL_CODE int __Pyx_InitGlobals(void) {
+  __pyx_umethod_PyDict_Type_setdefault.type = (PyObject*)&PyDict_Type;
   __pyx_umethod_PyList_Type_remove.type = (PyObject*)&PyList_Type;
   if (__Pyx_InitStrings(__pyx_string_tab) < 0) __PYX_ERR(0, 1, __pyx_L1_error);
+  __pyx_int_0 = PyInt_FromLong(0); if (unlikely(!__pyx_int_0)) __PYX_ERR(0, 1, __pyx_L1_error)
   __pyx_int_neg_1 = PyInt_FromLong(-1); if (unlikely(!__pyx_int_neg_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   return 0;
   __pyx_L1_error:;
@@ -7053,17 +7714,17 @@ static int __Pyx_modinit_type_init_code(void) {
   __pyx_vtable_5mpfmc_4core_5video_9gst_video_GstVideo._get_duration = (gint64 (*)(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *))__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_duration;
   __pyx_vtable_5mpfmc_4core_5video_9gst_video_GstVideo._get_position = (gint64 (*)(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *))__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__get_position;
   __pyx_vtable_5mpfmc_4core_5video_9gst_video_GstVideo._seek = (void (*)(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo *, float))__pyx_f_5mpfmc_4core_5video_9gst_video_8GstVideo__seek;
-  if (PyType_Ready(&__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo) < 0) __PYX_ERR(0, 236, __pyx_L1_error)
   #if PY_VERSION_HEX < 0x030800B1
   __pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo.tp_print = 0;
   #endif
   if ((CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP) && likely(!__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo.tp_dictoffset && __pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo.tp_getattro == PyObject_GenericGetAttr)) {
     __pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo.tp_getattro = __Pyx_PyObject_GenericGetAttr;
   }
-  if (__Pyx_SetVtable(__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo.tp_dict, __pyx_vtabptr_5mpfmc_4core_5video_9gst_video_GstVideo) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
-  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_GstVideo, (PyObject *)&__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo.tp_dict, __pyx_vtabptr_5mpfmc_4core_5video_9gst_video_GstVideo) < 0) __PYX_ERR(0, 236, __pyx_L1_error)
+  if (PyObject_SetAttr(__pyx_m, __pyx_n_s_GstVideo, (PyObject *)&__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo) < 0) __PYX_ERR(0, 236, __pyx_L1_error)
   if (__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo.tp_weaklistoffset == 0) __pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo.tp_weaklistoffset = offsetof(struct __pyx_obj_5mpfmc_4core_5video_9gst_video_GstVideo, __weakref__);
-  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo) < 0) __PYX_ERR(0, 219, __pyx_L1_error)
+  if (__Pyx_setup_reduce((PyObject*)&__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo) < 0) __PYX_ERR(0, 236, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5video_9gst_video_GstVideo = &__pyx_type_5mpfmc_4core_5video_9gst_video_GstVideo;
   __Pyx_RefNannyFinishContext();
   return 0;
@@ -7329,127 +7990,127 @@ if (!__Pyx_RefNanny) {
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_atexit, __pyx_t_2) < 0) __PYX_ERR(0, 19, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":133
+  /* "mpfmc/core/video/gst_video.pyx":141
  * # ---------------------------------------------------------------------------
  * 
  * cdef list _instances = []             # <<<<<<<<<<<<<<
  * 
  * def _on_gst_video_deleted(wk):
  */
-  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 133, __pyx_L1_error)
+  __pyx_t_2 = PyList_New(0); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_XGOTREF(__pyx_v_5mpfmc_4core_5video_9gst_video__instances);
   __Pyx_DECREF_SET(__pyx_v_5mpfmc_4core_5video_9gst_video__instances, ((PyObject*)__pyx_t_2));
   __Pyx_GIVEREF(__pyx_t_2);
   __pyx_t_2 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":135
+  /* "mpfmc/core/video/gst_video.pyx":143
  * cdef list _instances = []
  * 
  * def _on_gst_video_deleted(wk):             # <<<<<<<<<<<<<<
  *     if wk in _instances:
  *         _instances.remove(wk)
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_1_on_gst_video_deleted, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 135, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_1_on_gst_video_deleted, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_on_gst_video_deleted, __pyx_t_2) < 0) __PYX_ERR(0, 135, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_on_gst_video_deleted, __pyx_t_2) < 0) __PYX_ERR(0, 143, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":139
+  /* "mpfmc/core/video/gst_video.pyx":147
  *         _instances.remove(wk)
  * 
  * @atexit.register             # <<<<<<<<<<<<<<
  * def gst_exit_clean():
  *     # XXX don't use a stop() method or anything that change the state of the
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_atexit); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_atexit); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_register); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_register); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":140
+  /* "mpfmc/core/video/gst_video.pyx":148
  * 
  * @atexit.register
  * def gst_exit_clean():             # <<<<<<<<<<<<<<
  *     # XXX don't use a stop() method or anything that change the state of the
  *     # element without releasing the GIL. Otherwise, we might have a deadlock due
  */
-  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_3gst_exit_clean, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 140, __pyx_L1_error)
+  __pyx_t_2 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_3gst_exit_clean, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
 
-  /* "mpfmc/core/video/gst_video.pyx":139
+  /* "mpfmc/core/video/gst_video.pyx":147
  *         _instances.remove(wk)
  * 
  * @atexit.register             # <<<<<<<<<<<<<<
  * def gst_exit_clean():
  *     # XXX don't use a stop() method or anything that change the state of the
  */
-  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 139, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 147, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gst_exit_clean, __pyx_t_3) < 0) __PYX_ERR(0, 140, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gst_exit_clean, __pyx_t_3) < 0) __PYX_ERR(0, 148, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":153
+  /* "mpfmc/core/video/gst_video.pyx":161
  * #    GstVideoException class
  * # ---------------------------------------------------------------------------
  * class GstVideoException(Exception):             # <<<<<<<<<<<<<<
  *     pass
  * 
  */
-  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_3 = PyTuple_New(1); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_INCREF(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
   __Pyx_GIVEREF(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
   PyTuple_SET_ITEM(__pyx_t_3, 0, ((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
-  __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CalculateMetaclass(NULL, __pyx_t_3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_1 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_3, __pyx_n_s_GstVideoException, __pyx_n_s_GstVideoException, (PyObject *) NULL, __pyx_n_s_mpfmc_core_video_gst_video, (PyObject *) NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_Py3MetaclassPrepare(__pyx_t_2, __pyx_t_3, __pyx_n_s_GstVideoException, __pyx_n_s_GstVideoException, (PyObject *) NULL, __pyx_n_s_mpfmc_core_video_gst_video, (PyObject *) NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_GstVideoException, __pyx_t_3, __pyx_t_1, NULL, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
+  __pyx_t_4 = __Pyx_Py3ClassCreate(__pyx_t_2, __pyx_n_s_GstVideoException, __pyx_t_3, __pyx_t_1, NULL, 0, 0); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GstVideoException, __pyx_t_4) < 0) __PYX_ERR(0, 153, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_GstVideoException, __pyx_t_4) < 0) __PYX_ERR(0, 161, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":193
- *         pass
+  /* "mpfmc/core/video/gst_video.pyx":210
+ * 
  * 
  * def _gst_init():             # <<<<<<<<<<<<<<
  *     """Initializes the GStreamer library"""
  *     if gst_is_initialized():
  */
-  __pyx_t_3 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_5_gst_init, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 193, __pyx_L1_error)
+  __pyx_t_3 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_5_gst_init, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gst_init, __pyx_t_3) < 0) __PYX_ERR(0, 193, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gst_init, __pyx_t_3) < 0) __PYX_ERR(0, 210, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":205
+  /* "mpfmc/core/video/gst_video.pyx":222
  *         raise GstVideoException(msg)
  * 
  * def get_gst_version():             # <<<<<<<<<<<<<<
  *     """Returns the current version of GStreamer"""
  *     cdef unsigned int major, minor, micro, nano
  */
-  __pyx_t_3 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_7get_gst_version, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_3 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_7get_gst_version, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_gst_version, __pyx_t_3) < 0) __PYX_ERR(0, 205, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_get_gst_version, __pyx_t_3) < 0) __PYX_ERR(0, 222, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "mpfmc/core/video/gst_video.pyx":211
+  /* "mpfmc/core/video/gst_video.pyx":228
  *     return major, minor, micro, nano
  * 
  * def glib_iteration(int loop):             # <<<<<<<<<<<<<<
  *     """Python function wrapper of C iteration function"""
  *     c_glib_iteration(loop)
  */
-  __pyx_t_3 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_9glib_iteration, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 211, __pyx_L1_error)
+  __pyx_t_3 = PyCFunction_NewEx(&__pyx_mdef_5mpfmc_4core_5video_9gst_video_9glib_iteration, NULL, __pyx_n_s_mpfmc_core_video_gst_video); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 228, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glib_iteration, __pyx_t_3) < 0) __PYX_ERR(0, 211, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_glib_iteration, __pyx_t_3) < 0) __PYX_ERR(0, 228, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "mpfmc/core/video/gst_video.pyx":1
@@ -7917,6 +8578,35 @@ static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
 #endif
 }
 
+/* PyObjectCall2Args */
+static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2) {
+    PyObject *args, *result = NULL;
+    #if CYTHON_FAST_PYCALL
+    if (PyFunction_Check(function)) {
+        PyObject *args[2] = {arg1, arg2};
+        return __Pyx_PyFunction_FastCall(function, args, 2);
+    }
+    #endif
+    #if CYTHON_FAST_PYCCALL
+    if (__Pyx_PyFastCFunction_Check(function)) {
+        PyObject *args[2] = {arg1, arg2};
+        return __Pyx_PyCFunction_FastCall(function, args, 2);
+    }
+    #endif
+    args = PyTuple_New(2);
+    if (unlikely(!args)) goto done;
+    Py_INCREF(arg1);
+    PyTuple_SET_ITEM(args, 0, arg1);
+    Py_INCREF(arg2);
+    PyTuple_SET_ITEM(args, 1, arg2);
+    Py_INCREF(function);
+    result = __Pyx_PyObject_Call(function, args, NULL);
+    Py_DECREF(args);
+    Py_DECREF(function);
+done:
+    return result;
+}
+
 /* PyDictVersioning */
 #if CYTHON_USE_DICT_VERSIONS && CYTHON_USE_TYPE_SLOTS
 static CYTHON_INLINE PY_UINT64_T __Pyx_get_tp_dict_version(PyObject *obj) {
@@ -7976,35 +8666,6 @@ static CYTHON_INLINE PyObject *__Pyx__GetModuleGlobalName(PyObject *name)
     PyErr_Clear();
 #endif
     return __Pyx_GetBuiltinName(name);
-}
-
-/* PyObjectCall2Args */
-static CYTHON_UNUSED PyObject* __Pyx_PyObject_Call2Args(PyObject* function, PyObject* arg1, PyObject* arg2) {
-    PyObject *args, *result = NULL;
-    #if CYTHON_FAST_PYCALL
-    if (PyFunction_Check(function)) {
-        PyObject *args[2] = {arg1, arg2};
-        return __Pyx_PyFunction_FastCall(function, args, 2);
-    }
-    #endif
-    #if CYTHON_FAST_PYCCALL
-    if (__Pyx_PyFastCFunction_Check(function)) {
-        PyObject *args[2] = {arg1, arg2};
-        return __Pyx_PyCFunction_FastCall(function, args, 2);
-    }
-    #endif
-    args = PyTuple_New(2);
-    if (unlikely(!args)) goto done;
-    Py_INCREF(arg1);
-    PyTuple_SET_ITEM(args, 0, arg1);
-    Py_INCREF(arg2);
-    PyTuple_SET_ITEM(args, 1, arg2);
-    Py_INCREF(function);
-    result = __Pyx_PyObject_Call(function, args, NULL);
-    Py_DECREF(args);
-    Py_DECREF(function);
-done:
-    return result;
 }
 
 /* RaiseException */
@@ -8348,8 +9009,141 @@ static void __Pyx_RaiseArgtupleInvalid(
                  (num_expected == 1) ? "" : "s", num_found);
 }
 
+/* PyObjectSetAttrStr */
+#if CYTHON_USE_TYPE_SLOTS
+static CYTHON_INLINE int __Pyx_PyObject_SetAttrStr(PyObject* obj, PyObject* attr_name, PyObject* value) {
+    PyTypeObject* tp = Py_TYPE(obj);
+    if (likely(tp->tp_setattro))
+        return tp->tp_setattro(obj, attr_name, value);
+#if PY_MAJOR_VERSION < 3
+    if (likely(tp->tp_setattr))
+        return tp->tp_setattr(obj, PyString_AS_STRING(attr_name), value);
+#endif
+    return PyObject_SetAttr(obj, attr_name, value);
+}
+#endif
+
+/* CallUnboundCMethod2 */
+#if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x030600B1
+static CYTHON_INLINE PyObject *__Pyx_CallUnboundCMethod2(__Pyx_CachedCFunction *cfunc, PyObject *self, PyObject *arg1, PyObject *arg2) {
+    if (likely(cfunc->func)) {
+        PyObject *args[2] = {arg1, arg2};
+        if (cfunc->flag == METH_FASTCALL) {
+            #if PY_VERSION_HEX >= 0x030700A0
+            return (*(__Pyx_PyCFunctionFast)(void*)(PyCFunction)cfunc->func)(self, args, 2);
+            #else
+            return (*(__Pyx_PyCFunctionFastWithKeywords)(void*)(PyCFunction)cfunc->func)(self, args, 2, NULL);
+            #endif
+        }
+        #if PY_VERSION_HEX >= 0x030700A0
+        if (cfunc->flag == (METH_FASTCALL | METH_KEYWORDS))
+            return (*(__Pyx_PyCFunctionFastWithKeywords)(void*)(PyCFunction)cfunc->func)(self, args, 2, NULL);
+        #endif
+    }
+    return __Pyx__CallUnboundCMethod2(cfunc, self, arg1, arg2);
+}
+#endif
+static PyObject* __Pyx__CallUnboundCMethod2(__Pyx_CachedCFunction* cfunc, PyObject* self, PyObject* arg1, PyObject* arg2){
+    PyObject *args, *result = NULL;
+    if (unlikely(!cfunc->func && !cfunc->method) && unlikely(__Pyx_TryUnpackUnboundCMethod(cfunc) < 0)) return NULL;
+#if CYTHON_COMPILING_IN_CPYTHON
+    if (cfunc->func && (cfunc->flag & METH_VARARGS)) {
+        args = PyTuple_New(2);
+        if (unlikely(!args)) goto bad;
+        Py_INCREF(arg1);
+        PyTuple_SET_ITEM(args, 0, arg1);
+        Py_INCREF(arg2);
+        PyTuple_SET_ITEM(args, 1, arg2);
+        if (cfunc->flag & METH_KEYWORDS)
+            result = (*(PyCFunctionWithKeywords)(void*)(PyCFunction)cfunc->func)(self, args, NULL);
+        else
+            result = (*cfunc->func)(self, args);
+    } else {
+        args = PyTuple_New(3);
+        if (unlikely(!args)) goto bad;
+        Py_INCREF(self);
+        PyTuple_SET_ITEM(args, 0, self);
+        Py_INCREF(arg1);
+        PyTuple_SET_ITEM(args, 1, arg1);
+        Py_INCREF(arg2);
+        PyTuple_SET_ITEM(args, 2, arg2);
+        result = __Pyx_PyObject_Call(cfunc->method, args, NULL);
+    }
+#else
+    args = PyTuple_Pack(3, self, arg1, arg2);
+    if (unlikely(!args)) goto bad;
+    result = __Pyx_PyObject_Call(cfunc->method, args, NULL);
+#endif
+bad:
+    Py_XDECREF(args);
+    return result;
+}
+
+/* dict_setdefault */
+static CYTHON_INLINE PyObject *__Pyx_PyDict_SetDefault(PyObject *d, PyObject *key, PyObject *default_value,
+                                                       CYTHON_UNUSED int is_safe_type) {
+    PyObject* value;
+#if PY_VERSION_HEX >= 0x030400A0
+    if ((1)) {
+        value = PyDict_SetDefault(d, key, default_value);
+        if (unlikely(!value)) return NULL;
+        Py_INCREF(value);
+#else
+    if (is_safe_type == 1 || (is_safe_type == -1 &&
+#if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
+            (PyUnicode_CheckExact(key) || PyString_CheckExact(key) || PyLong_CheckExact(key)))) {
+        value = PyDict_GetItemWithError(d, key);
+        if (unlikely(!value)) {
+            if (unlikely(PyErr_Occurred()))
+                return NULL;
+            if (unlikely(PyDict_SetItem(d, key, default_value) == -1))
+                return NULL;
+            value = default_value;
+        }
+        Py_INCREF(value);
+#else
+            (PyString_CheckExact(key) || PyUnicode_CheckExact(key) || PyInt_CheckExact(key) || PyLong_CheckExact(key)))) {
+        value = PyDict_GetItem(d, key);
+        if (unlikely(!value)) {
+            if (unlikely(PyDict_SetItem(d, key, default_value) == -1))
+                return NULL;
+            value = default_value;
+        }
+        Py_INCREF(value);
+#endif
+#endif
+    } else {
+        value = __Pyx_CallUnboundCMethod2(&__pyx_umethod_PyDict_Type_setdefault, d, key, default_value);
+    }
+    return value;
+}
+
+/* DictGetItem */
+    #if PY_MAJOR_VERSION >= 3 && !CYTHON_COMPILING_IN_PYPY
+static PyObject *__Pyx_PyDict_GetItem(PyObject *d, PyObject* key) {
+    PyObject *value;
+    value = PyDict_GetItemWithError(d, key);
+    if (unlikely(!value)) {
+        if (!PyErr_Occurred()) {
+            if (unlikely(PyTuple_Check(key))) {
+                PyObject* args = PyTuple_Pack(1, key);
+                if (likely(args)) {
+                    PyErr_SetObject(PyExc_KeyError, args);
+                    Py_DECREF(args);
+                }
+            } else {
+                PyErr_SetObject(PyExc_KeyError, key);
+            }
+        }
+        return NULL;
+    }
+    Py_INCREF(value);
+    return value;
+}
+#endif
+
 /* PyObject_GenericGetAttrNoDict */
-#if CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP && PY_VERSION_HEX < 0x03070000
+    #if CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP && PY_VERSION_HEX < 0x03070000
 static PyObject *__Pyx_RaiseGenericGetAttributeError(PyTypeObject *tp, PyObject *attr_name) {
     PyErr_Format(PyExc_AttributeError,
 #if PY_MAJOR_VERSION >= 3
@@ -8389,7 +9183,7 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_GenericGetAttrNoDict(PyObject* obj
 #endif
 
 /* PyObject_GenericGetAttr */
-#if CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP && PY_VERSION_HEX < 0x03070000
+    #if CYTHON_USE_TYPE_SLOTS && CYTHON_USE_PYTYPE_LOOKUP && PY_VERSION_HEX < 0x03070000
 static PyObject* __Pyx_PyObject_GenericGetAttr(PyObject* obj, PyObject* attr_name) {
     if (unlikely(Py_TYPE(obj)->tp_dictoffset)) {
         return PyObject_GenericGetAttr(obj, attr_name);
@@ -8399,7 +9193,7 @@ static PyObject* __Pyx_PyObject_GenericGetAttr(PyObject* obj, PyObject* attr_nam
 #endif
 
 /* SetVTable */
-static int __Pyx_SetVtable(PyObject *dict, void *vtable) {
+    static int __Pyx_SetVtable(PyObject *dict, void *vtable) {
 #if PY_VERSION_HEX >= 0x02070000
     PyObject *ob = PyCapsule_New(vtable, 0, 0);
 #else
@@ -8417,7 +9211,7 @@ bad:
 }
 
 /* SetupReduce */
-static int __Pyx_setup_reduce_is_named(PyObject* meth, PyObject* name) {
+    static int __Pyx_setup_reduce_is_named(PyObject* meth, PyObject* name) {
   int ret;
   PyObject *name_attr;
   name_attr = __Pyx_PyObject_GetAttrStr(meth, __pyx_n_s_name);
@@ -8493,7 +9287,7 @@ GOOD:
 }
 
 /* Import */
-static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
+    static PyObject *__Pyx_Import(PyObject *name, PyObject *from_list, int level) {
     PyObject *empty_list = 0;
     PyObject *module = 0;
     PyObject *global_dict = 0;
@@ -8558,7 +9352,7 @@ bad:
 }
 
 /* ImportFrom */
-static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
+    static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
     PyObject* value = __Pyx_PyObject_GetAttrStr(module, name);
     if (unlikely(!value) && PyErr_ExceptionMatches(PyExc_AttributeError)) {
         PyErr_Format(PyExc_ImportError,
@@ -8572,7 +9366,7 @@ static PyObject* __Pyx_ImportFrom(PyObject* module, PyObject* name) {
 }
 
 /* CalculateMetaclass */
-static PyObject *__Pyx_CalculateMetaclass(PyTypeObject *metaclass, PyObject *bases) {
+    static PyObject *__Pyx_CalculateMetaclass(PyTypeObject *metaclass, PyObject *bases) {
     Py_ssize_t i, nbases = PyTuple_GET_SIZE(bases);
     for (i=0; i < nbases; i++) {
         PyTypeObject *tmptype;
@@ -8611,7 +9405,7 @@ static PyObject *__Pyx_CalculateMetaclass(PyTypeObject *metaclass, PyObject *bas
 }
 
 /* Py3ClassCreate */
-static PyObject *__Pyx_Py3MetaclassPrepare(PyObject *metaclass, PyObject *bases, PyObject *name,
+    static PyObject *__Pyx_Py3MetaclassPrepare(PyObject *metaclass, PyObject *bases, PyObject *name,
                                            PyObject *qualname, PyObject *mkw, PyObject *modname, PyObject *doc) {
     PyObject *ns;
     if (metaclass) {
@@ -8678,7 +9472,7 @@ static PyObject *__Pyx_Py3ClassCreate(PyObject *metaclass, PyObject *name, PyObj
 }
 
 /* CLineInTraceback */
-#ifndef CYTHON_CLINE_IN_TRACEBACK
+    #ifndef CYTHON_CLINE_IN_TRACEBACK
 static int __Pyx_CLineForTraceback(PyThreadState *tstate, int c_line) {
     PyObject *use_cline;
     PyObject *ptype, *pvalue, *ptraceback;
@@ -8720,7 +9514,7 @@ static int __Pyx_CLineForTraceback(PyThreadState *tstate, int c_line) {
 #endif
 
 /* CodeObjectCache */
-static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
+    static int __pyx_bisect_code_objects(__Pyx_CodeObjectCacheEntry* entries, int count, int code_line) {
     int start = 0, mid = 0, end = count - 1;
     if (end >= 0 && code_line > entries[end].code_line) {
         return count;
@@ -8800,7 +9594,7 @@ static void __pyx_insert_code_object(int code_line, PyCodeObject* code_object) {
 }
 
 /* AddTraceback */
-#include "compile.h"
+    #include "compile.h"
 #include "frameobject.h"
 #include "traceback.h"
 static PyCodeObject* __Pyx_CreateCodeObjectForTraceback(
@@ -8885,7 +9679,7 @@ bad:
 }
 
 /* CIntFromPyVerify */
-#define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
+    #define __PYX_VERIFY_RETURN_INT(target_type, func_type, func_value)\
     __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 0)
 #define __PYX_VERIFY_RETURN_INT_EXC(target_type, func_type, func_value)\
     __PYX__VERIFY_RETURN_INT(target_type, func_type, func_value, 1)
@@ -8907,7 +9701,7 @@ bad:
     }
 
 /* CIntToPy */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
+    static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
     const int neg_one = (int) ((int) 0 - (int) 1), const_zero = (int) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -8938,7 +9732,7 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
 }
 
 /* CIntToPy */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_int(unsigned int value) {
+    static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_int(unsigned int value) {
     const unsigned int neg_one = (unsigned int) ((unsigned int) 0 - (unsigned int) 1), const_zero = (unsigned int) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -8969,7 +9763,7 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_From_unsigned_int(unsigned int value)
 }
 
 /* CIntFromPy */
-static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
+    static CYTHON_INLINE int __Pyx_PyInt_As_int(PyObject *x) {
     const int neg_one = (int) ((int) 0 - (int) 1), const_zero = (int) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -9158,7 +9952,7 @@ raise_neg_overflow:
 }
 
 /* CIntToPy */
-static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
+    static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
     const long neg_one = (long) ((long) 0 - (long) 1), const_zero = (long) 0;
     const int is_unsigned = neg_one > const_zero;
     if (is_unsigned) {
@@ -9189,7 +9983,7 @@ static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
 }
 
 /* CIntFromPy */
-static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *x) {
+    static CYTHON_INLINE long __Pyx_PyInt_As_long(PyObject *x) {
     const long neg_one = (long) ((long) 0 - (long) 1), const_zero = (long) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
@@ -9378,7 +10172,7 @@ raise_neg_overflow:
 }
 
 /* FastTypeChecks */
-#if CYTHON_COMPILING_IN_CPYTHON
+    #if CYTHON_COMPILING_IN_CPYTHON
 static int __Pyx_InBases(PyTypeObject *a, PyTypeObject *b) {
     while (a) {
         a = a->tp_base;
@@ -9478,7 +10272,7 @@ static CYTHON_INLINE int __Pyx_PyErr_GivenExceptionMatches2(PyObject *err, PyObj
 #endif
 
 /* CheckBinaryVersion */
-static int __Pyx_check_binary_version(void) {
+    static int __Pyx_check_binary_version(void) {
     char ctversion[4], rtversion[4];
     PyOS_snprintf(ctversion, 4, "%d.%d", PY_MAJOR_VERSION, PY_MINOR_VERSION);
     PyOS_snprintf(rtversion, 4, "%s", Py_GetVersion());
@@ -9494,7 +10288,7 @@ static int __Pyx_check_binary_version(void) {
 }
 
 /* InitStrings */
-static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
+    static int __Pyx_InitStrings(__Pyx_StringTabEntry *t) {
     while (t->p) {
         #if PY_MAJOR_VERSION < 3
         if (t->is_unicode) {

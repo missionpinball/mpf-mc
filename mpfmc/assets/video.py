@@ -1,10 +1,14 @@
 from kivy.properties import AliasProperty
 
 from mpf.core.assets import AssetPool
+from mpf.core.config_validator import ConfigValidator
 from mpfmc.assets.mc_asset import McAsset
 from mpfmc.core.video import Video
+from mpfmc.assets.sound import DuckingSettings
 from urllib.request import pathname2url
 from os.path import realpath
+import sys
+import logging
 
 
 class VideoPool(AssetPool):
@@ -27,7 +31,9 @@ class VideoAsset(McAsset):
     asset_group_class = VideoPool
 
     def __init__(self, mc, name, file, config):
+        self.log = logging.getLogger('VideoAsset')
         self._video = None
+        self._ducking = None
         super().__init__(mc, name, file, config)
 
         # Custom video player alpha channel support is controlled by config setting
@@ -35,6 +41,11 @@ class VideoAsset(McAsset):
             self._alpha_channel = config['alpha_channel']
         else:
             self._alpha_channel = False
+
+        if self._alpha_channel:
+            self.log.debug("The '{}' video has been configured with alpha channel support. "
+                           "Please ensure the video was encoded using a codec that supports "
+                           "an alpha channel.".format(name))
 
         # Setup events to post when video state changes
         self._events_when_played = list()
@@ -45,6 +56,29 @@ class VideoAsset(McAsset):
 
         if self.config['events_when_stopped']:
             self._events_when_stopped = self.config['events_when_stopped']
+
+        self._mute_audio = self.config.get('mute_audio', False)
+        if self._mute_audio:
+            self.log.debug("NOTICE: The '{}' video has been configured to mute audio "
+                           "(video will play with no sound)".format(name))
+
+        # Ducking only applies when the sound system is enabled and video sound
+        # is integrated with the audio system
+        if self.machine.sound_system and self.machine.sound_system.enabled and \
+                self.machine.sound_system.integrated_video_sound and \
+                'ducking' in self.config:
+            try:
+                ducking_config = ConfigValidator.validate_config("sounds:ducking", self.config['ducking'])
+                self._ducking = DuckingSettings(self.machine, ducking_config)
+            except Exception:
+                raise Exception("Error in ducking settings: {}, Could not create video '{}' asset"
+                                .format(sys.exc_info()[1], self.name))
+
+        # An attenuation value of exactly 1.0 does absolutely nothing so
+        # there is no point in keeping the ducking settings for this
+        # sound when attenuation is 1.0.
+        if self._ducking and self._ducking.attenuation == 1.0:
+            self._ducking = None
 
     @property
     def alpha_channel(self):
@@ -57,9 +91,20 @@ class VideoAsset(McAsset):
 
     def is_loaded(self):
         """Handle that asset has been loaded."""
-        self._video = Video(filename=self.file, alpha_channel=self.alpha_channel)
+        self._video = Video(filename=self.file,
+                            alpha_channel=self.alpha_channel,
+                            av_offset=self.machine.sound_system.av_offset,
+                            mute_audio=self._mute_audio)
         self._video.load()
-        self._video.bind(on_play=self.on_play, on_stop=self.on_stop)
+        self._check_duration(None)
+        self._video.bind(on_play=self.on_play,
+                         on_stop=self.on_stop)
+
+        # Connect video to audio track (if sound system is managing video audio)
+        if self.machine.sound_system.integrated_video_sound:
+            video_audio_track = self.machine.sound_system.audio_interface.get_track_by_name("video")
+            if video_audio_track:
+                video_audio_track.connect_video(self.name, self._video.video)
 
         self.loading = False
         self.loaded = True
@@ -70,6 +115,13 @@ class VideoAsset(McAsset):
     def _do_unload(self):
         if self._video:
             self._video.stop()
+
+            # Disconnect video from audio track (if sound system is managing video audio)
+            if self.machine.sound_system.integrated_video_sound:
+                video_audio_track = self.machine.sound_system.audio_interface.get_track_by_name("video")
+                if video_audio_track:
+                    video_audio_track.disconnect_video(self.name)
+
             self._video.unload()
             self._video = None
 

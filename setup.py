@@ -515,6 +515,7 @@ base_flags = determine_base_flags()
 # -----------------------------------------------------------------------------
 # sources to compile
 sources = {
+    'core/video/gst_video.pyx': {'depends': ['core/video/gst_video.h']},
     'core/audio/sound_file.pyx': {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/track.pyx': {
@@ -523,10 +524,11 @@ sources = {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/track_sound_loop.pyx': {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
+    'core/audio/track_video.pyx': {
+        'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/audio_interface.pyx': {
         'depends': ['core/audio/sdl2_helper.h', 'core/audio/gstreamer_helper.h']},
     'core/audio/playlist_controller.pyx': {},
-    'core/video/gst_video.pyx': {'depends': ['core/video/gst_video.h']},
     'uix/bitmap_font/bitmap_font.pyx': {'depends': ['core/audio/sdl2.pxi', ]}
 }
 

@@ -83,6 +83,7 @@ cdef extern from 'gst/gst.h':
         GstMessageType type
 
     int GST_SECOND
+    int GST_MSECOND
     bool gst_init_check(int *argc, char ***argv, GError **error)
     bool gst_is_initialized()
     void gst_deinit()
