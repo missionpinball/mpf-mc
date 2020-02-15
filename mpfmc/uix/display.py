@@ -342,8 +342,12 @@ class Display(ScreenManager):
         if self.has_screen(slide_name):
             slide = self.get_screen(slide_name)
         else:
+            try:
+                slide_config = self.mc.slides[slide_name]
+            except KeyError:
+                raise AssertionError("Slide {} not found".format(slide_name))
             slide = self.add_slide(name=slide_name,
-                                   config=self.mc.slides[slide_name],
+                                   config=slide_config,
                                    priority=priority,
                                    key=key,
                                    play_kwargs=play_kwargs)
