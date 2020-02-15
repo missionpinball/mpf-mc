@@ -49,7 +49,7 @@ class WidgetCollection(ConfigCollection):
     def validate_config(self, config):
         """Check that this widget is valid."""
         for widget_config in config:
-            if widget_config.get("widget") and widget_config['widget'] not in self.mc.widgets:
+            if isinstance(widget_config.get("widget"), str) and widget_config['widget'] not in self.mc.widgets:
                 raise ValueError('"{}" is not a valid widget name.'.format(widget_config['widget']))
 
     def process_widget(self, config: dict) -> dict:
