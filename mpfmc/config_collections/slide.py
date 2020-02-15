@@ -37,5 +37,9 @@ class SlideCollection(ConfigCollection):
 
         return config
 
+    def validate_config(self, config):
+        # since dict is mutable it updates in place
+        self.mc.widgets.validate_config(config['widgets'])
+
 
 collection_cls = SlideCollection

@@ -1,5 +1,4 @@
 from importlib import import_module
-import logging
 
 from mpf.core.device_manager import DeviceCollection
 
@@ -20,6 +19,9 @@ class ConfigCollection(DeviceCollection):
         super().__init__(machine, collection, config_section)
         self.machine.events.add_handler('init_phase_1',
                                         self.create_entries_from_root_config)
+
+        self.machine.events.add_handler('init_phase_2',
+                                        self.validate_entries_from_root_config)
 
         self.machine.mode_controller.register_load_method(
             self.create_entries, self.config_section)
@@ -49,8 +51,21 @@ class ConfigCollection(DeviceCollection):
 
             self[name] = self.process_config(settings)
 
+    def validate_entries_from_root_config(self, **kwargs):
+        del kwargs
+        if self.config_section in self.machine.machine_config:
+            self.validate_entries(self.machine.machine_config[self.config_section])
+
+    def validate_entries(self, config, **kwargs):
+        del kwargs
+        for name in config.keys():
+            self.validate_config(self[name])
+
     def process_config(self, config):
         raise NotImplementedError
+
+    def validate_config(self, config):
+        pass
 
 
 def create_config_collections(mc, collections):
