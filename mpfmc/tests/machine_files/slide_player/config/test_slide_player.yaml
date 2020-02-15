@@ -137,9 +137,6 @@ slide_player:
   show_slide_1_force:
     machine_slide_1:
       force: true
-  add_slide_5_dont_show:
-    slide1:
-      show: false
   anon_slide_dict:
     slide_6:
       type: text
