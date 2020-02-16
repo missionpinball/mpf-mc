@@ -35,7 +35,6 @@ class SoundLoopSetCollection(ConfigCollection):
 
     def validate_entries_from_root_config(self, **kwargs):
         """Do nothing here."""
-        pass
 
     def process_config(self, config: dict) -> dict:
         # processes the 'sound_loop_sets' section of a config file to populate the
