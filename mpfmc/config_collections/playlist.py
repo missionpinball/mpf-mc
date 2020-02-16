@@ -40,6 +40,10 @@ class PlaylistCollection(ConfigCollection):
         # config is localized to 'playlists' section
         return self.process_playlist(config)
 
+    def validate_config(self, config):
+        """Do nothing here."""
+        pass
+
     def process_playlist(self, config: dict) -> dict:
         # config is localized to a single playlist settings within a list
 
