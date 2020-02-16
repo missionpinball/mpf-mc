@@ -106,6 +106,16 @@ class McWidgetPlayer(McConfigPlayer):
         if not s['key'] in instance_dict:
             instance_dict[s['key']] = True
 
+    def _validate_config_item(self, device, device_settings):
+        validated_dict = super()._validate_config_item(device, device_settings)
+        for widget, widget_settings in validated_dict.items():
+            if widget not in self.machine.widgets:
+                raise AssertionError("Unknown widget {}".format(widget))
+            if widget_settings["target"] and widget_settings["target"] not in self.machine.targets:
+                raise AssertionError("Unknown target {}".format(widget_settings["target"]))
+
+        return validated_dict
+
     def _action_remove(self, s, instance_dict, widget, context):
         if s['key']:
             key = s['key']
