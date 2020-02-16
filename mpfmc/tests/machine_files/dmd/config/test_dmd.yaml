@@ -139,6 +139,7 @@ slide_player:
   dmd_slide:
     dmd_slide:
       target: dmd
+  show_gamma_test: dmd_gamma_test
 
 widget_player:
   position_widget_right:
