@@ -170,7 +170,7 @@ slides:
     widgets:
       - type: text
         text: DMD GAMMA TEST
-        style: dmd_small
+        style: small
         y: 4
         anchor_x: left
         x: 2
