@@ -14,7 +14,7 @@ slides:
         - property: x  # x, y, height, width, opacity, rotation?
           value: 101
           duration: 1s
-          repeat: -1
+          repeat: False
         - property: x  # x, y, height, width, opacity, rotation?
           value: 100
           duration: 1s

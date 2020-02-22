@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 
@@ -13,6 +14,9 @@ from kivy.logger import Logger
 from kivy.base import runTouchApp, EventLoop
 from kivy.clock import Clock
 from kivy.uix.widget import Widget as KivyWidget
+
+for handler in Logger.handlers:
+    Logger.removeHandler(handler)
 
 sys.stderr = sys.__stderr__
 
@@ -219,6 +223,7 @@ class MpfIntegrationTestCase(MpfTestCase):
         super().__init__(methodName)
         self._mc_events = {}
         self._last_mc_event_kwargs = {}
+        self.console_logger = None
         try:
             del self.machine_config_patches['mpf']['plugins']
         except KeyError:
@@ -229,6 +234,18 @@ class MpfIntegrationTestCase(MpfTestCase):
         self.expected_duration = 60
 
     def setUp(self):
+        if self.unittest_verbosity() > 1:
+            self.console_logger = logging.StreamHandler()
+            self.console_logger.setLevel(logging.DEBUG)
+
+            # set a format which is simpler for console use
+            formatter = logging.Formatter('%(name)s: %(message)s')
+
+            # tell the handler to use this format
+            self.console_logger.setFormatter(formatter)
+
+            # add the handler to the root logger
+            logging.getLogger('').addHandler(self.console_logger)
         super().setUp()
 
         client = self.machine.bcp.transport.get_named_client("local_display")
@@ -239,3 +256,6 @@ class MpfIntegrationTestCase(MpfTestCase):
         super().tearDown()
         EventLoop.close()
 
+        if self.console_logger:
+            logging.getLogger('').removeFilter(self.console_logger)
+            self.console_logger = None

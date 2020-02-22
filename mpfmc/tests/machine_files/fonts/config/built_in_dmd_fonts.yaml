@@ -26,34 +26,34 @@ slides:
       color: gray
   dmd_small:
     - type: text
-      style: dmd_small
+      style: small
       text: DMD_SMALL
       anchor_y: top
       y: top
     - type: text
-      style: dmd_small
+      style: small
       text: DMD_SMALL
       anchor_y: bottom
       y: bottom
   dmd_med:
     - type: text
-      style: dmd_med
+      style: medium
       text: DMD_MED
       anchor_y: top
       y: top
     - type: text
-      style: dmd_med
+      style: medium
       text: DMD_MED
       anchor_y: bottom
       y: bottom
   dmd_big:
     - type: text
-      style: dmd_big
+      style: big
       text: DMD_BIG
       anchor_y: top
       y: top
     - type: text
-      style: dmd_big
+      style: big
       text: DMD_BIG
       anchor_y: bottom
       y: bottom

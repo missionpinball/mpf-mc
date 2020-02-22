@@ -125,3 +125,4 @@ class AssetLoader(threading.Thread):
                                                exc_traceback)
             msg = ''.join(line for line in lines)
             self.exception_queue.put(msg)
+            raise

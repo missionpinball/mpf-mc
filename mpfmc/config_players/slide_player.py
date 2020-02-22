@@ -173,7 +173,8 @@ class McSlidePlayer(McConfigPlayer):
         # parse conditionals
         devices = super()._expand_device(device)
         for index, device_entry in enumerate(devices):
-            devices[index] = self.machine.placeholder_manager.parse_conditional_template(device_entry)
+            if isinstance(device_entry, str):
+                devices[index] = self.machine.placeholder_manager.parse_conditional_template(device_entry)
         return devices
 
     def get_express_config(self, value):
@@ -265,15 +266,25 @@ class McSlidePlayer(McConfigPlayer):
 
     def _validate_config_item(self, device, device_settings):
         validated_dict = super()._validate_config_item(device, device_settings)
-
         # device is slide name
+        for config in validated_dict.values():
+            if config['target'] and config['target'] not in self.machine.targets:
+                raise AssertionError("Target {} does not exist.".format(config['target']))
+            if 'widgets' in config:
+                # verify widgets
+                config['widgets'] = self.machine.widgets.process_config(
+                    config['widgets'])
+            else:
+                # verify that slide exists
+                if config['slide']:
+                    slide = config['slide']
+                else:
+                    slide = self.machine.placeholder_manager.parse_conditional_template(device).name
 
-        for v in validated_dict.values():
-            if 'widgets' in v:
-                v['widgets'] = self.machine.widgets.process_config(
-                    v['widgets'])
+                if config['action'] == "play" and slide not in self.machine.slides:
+                    raise AssertionError("Slide {} not found".format(slide))
 
-            self.machine.transition_manager.validate_transitions(v)
+            self.machine.transition_manager.validate_transitions(config)
 
         return validated_dict
 

@@ -1,7 +1,9 @@
+from mpfmc.tests.MpfSlideTestCase import MpfSlideTestCase
+
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 
-class TestDmd(MpfMcTestCase):
+class TestDmd(MpfMcTestCase, MpfSlideTestCase):
     def get_machine_path(self):
         return 'tests/machine_files/dmd'
 
@@ -50,3 +52,8 @@ class TestDmd(MpfMcTestCase):
         self.advance_time(.1)
         self.assertEqual(left.text, 'Left Widget')
         self.assertEqual(4, len(self.mc.displays['dmd'].current_slide.widgets))
+
+    def test_gamma_test_slide(self):
+        self.mc.events.post('show_gamma_test')
+        self.advance_time(.1)
+        self.assertSlideOnTop("dmd_gamma_test")

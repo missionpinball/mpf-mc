@@ -33,6 +33,9 @@ class SoundLoopSetCollection(ConfigCollection):
         # assets have been loaded (can use the init_done event for that)
         self._validate_handler = self.mc.events.add_handler("init_done", self._validate_sound_assets)
 
+    def validate_entries_from_root_config(self, **kwargs):
+        """Do nothing here."""
+
     def process_config(self, config: dict) -> dict:
         # processes the 'sound_loop_sets' section of a config file to populate the
         # mc.sound_loop_sets dict.
