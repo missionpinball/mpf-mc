@@ -13577,12 +13577,12 @@ static void __pyx_f_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_audio
     }
   }
 
-  /* "mpfmc/core/audio/audio_interface.pyx":821
+  /* "mpfmc/core/audio/audio_interface.pyx":820
+ * 
  *         # Apply master volume to output buffer
- *         # Track.apply_volume(output_buffer, output_buffer, buffer_length, callback_data.master_volume)
- *         SDL_MixAudioFormat(output_buffer, output_buffer, callback_data.format, buffer_length, callback_data.master_volume)             # <<<<<<<<<<<<<<
+ *         Track.apply_volume(output_buffer, output_buffer, buffer_length, callback_data.master_volume)             # <<<<<<<<<<<<<<
  */
-  SDL_MixAudioFormat(__pyx_v_output_buffer, __pyx_v_output_buffer, __pyx_v_callback_data->format, __pyx_v_buffer_length, __pyx_v_callback_data->master_volume);
+  __pyx_vtabptr_5mpfmc_4core_5audio_5track_Track->apply_volume(__pyx_v_output_buffer, __pyx_v_output_buffer, __pyx_v_buffer_length, __pyx_v_callback_data->master_volume);
 
   /* "mpfmc/core/audio/audio_interface.pyx":756
  * 
