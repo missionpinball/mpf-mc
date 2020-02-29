@@ -109,7 +109,7 @@ class McWidgetPlayer(McConfigPlayer):
     def _validate_config_item(self, device, device_settings):
         validated_dict = super()._validate_config_item(device, device_settings)
         for widget, widget_settings in validated_dict.items():
-            if widget not in self.machine.widgets:
+            if widget_settings['action'] == "add" and widget not in self.machine.widgets:
                 raise AssertionError("Unknown widget {}".format(widget))
             if widget_settings["target"] and widget_settings["target"] not in self.machine.targets:
                 raise AssertionError("Unknown target {}".format(widget_settings["target"]))
