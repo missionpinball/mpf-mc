@@ -321,19 +321,19 @@ class SoundAsset(McAsset):
 
         if 'events_when_played' in self.config and isinstance(
                 self.config['events_when_played'], str):
-            self._events_when_played = Util.string_to_list(self.config['events_when_played'])
+            self._events_when_played = Util.string_to_event_list(self.config['events_when_played'])
 
         if 'events_when_stopped' in self.config and isinstance(
                 self.config['events_when_stopped'], str):
-            self._events_when_stopped = Util.string_to_list(self.config['events_when_stopped'])
+            self._events_when_stopped = Util.string_to_event_list(self.config['events_when_stopped'])
 
         if 'events_when_looping' in self.config and isinstance(
                 self.config['events_when_looping'], str):
-            self._events_when_looping = Util.string_to_list(self.config['events_when_looping'])
+            self._events_when_looping = Util.string_to_event_list(self.config['events_when_looping'])
 
         if 'events_when_about_to_finish' in self.config and isinstance(
                 self.config['events_when_about_to_finish'], str):
-            self._events_when_about_to_finish = Util.string_to_list(self.config['events_when_about_to_finish'])
+            self._events_when_about_to_finish = Util.string_to_event_list(self.config['events_when_about_to_finish'])
 
         if 'mode_end_action' in self.config and self.config['mode_end_action'] is not None:
             action = str(self.config['mode_end_action']).lower()
@@ -659,7 +659,7 @@ class SoundAsset(McAsset):
             last_marker_time = marker['time']
 
             if 'events' in settings and settings['events'] is not None:
-                marker['events'] = Util.string_to_list(settings['events'])
+                marker['events'] = Util.string_to_event_list(settings['events'])
             else:
                 raise AudioException("Sound markers for sound {} must specify at least one event".format(sound_name))
 
@@ -1244,7 +1244,7 @@ class DuckingSettings:
                                  "valid audio track name")
 
         # Target can contain a list of track names - convert string to list and validate
-        self._targets = Util.string_to_list(config['target'])
+        self._targets = Util.string_to_event_list(config['target'])
         if not self._targets:
             raise AudioException("'ducking.target' must contain at least one "
                                  "valid audio track name")
