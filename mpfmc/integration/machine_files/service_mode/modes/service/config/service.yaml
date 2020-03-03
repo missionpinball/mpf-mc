@@ -1,0 +1,5 @@
+#config_version=5
+
+mode_settings:
+  software_update: True
+  software_update_script: update.sh

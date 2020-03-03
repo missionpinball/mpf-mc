@@ -23,6 +23,16 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
         self.assertSlideOnTop("service_menu")
         self.assertTextOnTopSlide("Switch Test")
 
+        # check software update
+        self.hit_and_release_switch("s_service_down")
+        self.advance_time_and_run()
+        self.assertTextOnTopSlide("Software Update")
+
+        # Back to switch test
+        self.hit_and_release_switch("s_service_up")
+        self.advance_time_and_run()
+        self.assertTextOnTopSlide("Switch Test")
+
         # enter switch test
         self.hit_and_release_switch("s_service_enter")
         self.advance_time_and_run()
