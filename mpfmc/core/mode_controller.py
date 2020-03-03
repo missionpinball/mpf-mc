@@ -72,19 +72,24 @@ class ModeController:
         if self.debug:
             self.log.debug('Processing mode: %s', mode_string)
 
-        config = dict()
+        asset_paths = []
+        mode_path = None
+
+        if mode_string in self._mpf_mode_folders:
+            mode_path = os.path.join(
+                self.mc.mpf_path,
+                "modes",
+                self._mpf_mode_folders[mode_string])
+            asset_paths.append(mode_path)
 
         if mode_string in self._machine_mode_folders:
             mode_path = os.path.join(
                 self.mc.machine_path,
                 self.mc.machine_config['mpf-mc']['paths']['modes'],
                 self._machine_mode_folders[mode_string])
-        elif mode_string in self._mpf_mode_folders:
-            mode_path = os.path.join(
-                self.mc.mpf_path,
-                self.mc.machine_config['mpf-mc']['paths']['modes'],
-                self._mpf_mode_folders[mode_string])
-        else:
+            asset_paths.append(mode_path)
+
+        if not mode_path:
             raise ValueError("No folder found for mode '{}'. Is your mode "
                              "folder in your machine's 'modes' folder?"
                              .format(mode_string))
@@ -137,7 +142,7 @@ class ModeController:
 
         self.mc.config_validator.validate_config("mode", config['mode'])
 
-        return Mode(self.mc, config, mode_string, mode_path)
+        return Mode(self.mc, config, mode_string, mode_path, asset_paths)
 
     def _build_mode_folder_dicts(self):
         self._mpf_mode_folders = self._get_mode_folder(self.mc.mpf_path)

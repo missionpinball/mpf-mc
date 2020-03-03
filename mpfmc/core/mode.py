@@ -15,11 +15,15 @@ be called on mode_start or mode_stop.
 class Mode:
     """Parent class for in-game mode code."""
 
-    def __init__(self, mc, config, name, path):
+    __slots__ = ["mc", "config", "name", "path", "asset_paths", "log", "priority", "_active", "stop_methods",
+                 "start_callback", "stop_callback", "event_handlers", "target"]
+
+    def __init__(self, mc, config, name, path, asset_paths):
         self.mc = mc
         self.config = config
         self.name = name.lower()
         self.path = path
+        self.asset_paths = asset_paths
 
         self.log = logging.getLogger('Mode.' + name)
 
