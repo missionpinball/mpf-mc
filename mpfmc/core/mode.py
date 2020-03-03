@@ -18,6 +18,7 @@ class Mode:
     __slots__ = ["mc", "config", "name", "path", "asset_paths", "log", "priority", "_active", "stop_methods",
                  "start_callback", "stop_callback", "event_handlers", "target"]
 
+    # pylint: disable-msg=too-many-arguments
     def __init__(self, mc, config, name, path, asset_paths):
         self.mc = mc
         self.config = config
