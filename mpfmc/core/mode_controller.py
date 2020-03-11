@@ -59,10 +59,9 @@ class ModeController:
         mode_configs = [self._load_mode(mode) for mode in set(self.mc.machine_config['modes'])]
         # Instantiate Modes based on load_priority to ensure dependencies go first
         for mode_config in sorted(mode_configs, reverse = True, key = lambda x: x[0]):
-            config, mode_string, mode_path, asset_paths = *mode_config[1:]
+            config, mode_string, mode_path, asset_paths = mode_config[1:]
             self.mc.config_validator.validate_config("mode", config['mode'])
-            self.mc.modes[mode_string] =
-                Mode(self.mc, config, mode_string, mode_path, asset_paths)
+            self.mc.modes[mode_string] = Mode(self.mc, config, mode_string, mode_path, asset_paths)
 
 
 
@@ -150,7 +149,7 @@ class ModeController:
 
         load_priority = config['mode'].get('load_priority', 0)
         return [
-            load_priority
+            load_priority,
             config,
             mode_string,
             mode_path,
