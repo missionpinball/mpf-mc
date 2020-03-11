@@ -51,12 +51,20 @@ class ModeController:
     def _load_modes(self, **kwargs):
         del kwargs
         # Loads the modes from the modes: section of the machine configuration
-        # file.
+        # file. Order is influenced by load_priority in the mode config.
 
         self._build_mode_folder_dicts()
 
-        for mode in set(self.mc.machine_config['modes']):
-            self.mc.modes[mode] = self._load_mode(mode)
+        # First load all the configs for the modes so we can index objects
+        mode_configs = [self._load_mode(mode) for mode in set(self.mc.machine_config['modes'])]
+        # Instantiate Modes based on load_priority to ensure dependencies go first
+        for mode_config in sorted(mode_configs, reverse = True, key = lambda x: x[0]):
+            config, mode_string, mode_path, asset_paths = *mode_config[1:]
+            self.mc.config_validator.validate_config("mode", config['mode'])
+            self.mc.modes[mode_string] =
+                Mode(self.mc, config, mode_string, mode_path, asset_paths)
+
+
 
     def _load_mode(self, mode_string):
         """Loads a mode, reads in its config, and creates the Mode object.
@@ -140,9 +148,14 @@ class ModeController:
         if 'mode' not in config:
             config['mode'] = dict()
 
-        self.mc.config_validator.validate_config("mode", config['mode'])
-
-        return Mode(self.mc, config, mode_string, mode_path, asset_paths)
+        load_priority = config['mode'].get('load_priority', 0)
+        return [
+            load_priority
+            config,
+            mode_string,
+            mode_path,
+            asset_paths,
+        ]
 
     def _build_mode_folder_dicts(self):
         self._mpf_mode_folders = self._get_mode_folder(self.mc.mpf_path)
