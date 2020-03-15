@@ -148,7 +148,7 @@ class Command:
 
         args = parser.parse_args(args)
 
-        args.configfile = Util.string_to_list(args.configfile)
+        args.configfile = Util.string_to_event_list(args.configfile)
 
         # Configure logging. Creates a logfile and logs to the console.
         # Formatting options are documented here:

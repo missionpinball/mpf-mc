@@ -238,16 +238,16 @@ class SoundSystem:
         self.tracks[name] = track
 
         if 'events_when_stopped' in config and config['events_when_stopped'] is not None:
-            track.events_when_stopped = Util.string_to_list(config['events_when_stopped'])
+            track.events_when_stopped = Util.string_to_event_list(config['events_when_stopped'])
 
         if 'events_when_played' in config and config['events_when_played'] is not None:
-            track.events_when_played = Util.string_to_list(config['events_when_played'])
+            track.events_when_played = Util.string_to_event_list(config['events_when_played'])
 
         if 'events_when_paused' in config and config['events_when_paused'] is not None:
-            track.events_when_paused = Util.string_to_list(config['events_when_paused'])
+            track.events_when_paused = Util.string_to_event_list(config['events_when_paused'])
 
         if 'events_when_resumed' in config and config['events_when_resumed'] is not None:
-            track.events_when_resumed = Util.string_to_list(config['events_when_resumed'])
+            track.events_when_resumed = Util.string_to_event_list(config['events_when_resumed'])
 
     def tick(self, dt):
         """Clock callback function"""

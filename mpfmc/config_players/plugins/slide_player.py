@@ -117,7 +117,7 @@ class MpfSlidePlayer(PluginPlayer):
 
             # str means it's a list of named animations
             if isinstance(event_settings, str):
-                event_settings = Util.string_to_list(event_settings)
+                event_settings = Util.string_to_event_list(event_settings)
 
             # dict means it's a single set of settings for one animation step
             elif isinstance(event_settings, dict):

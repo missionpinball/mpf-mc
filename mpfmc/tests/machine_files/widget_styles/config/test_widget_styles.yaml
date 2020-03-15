@@ -43,7 +43,7 @@ slides:
   slide6:
     - type: text
       text: HELLO TOO
-      style: bigStyle stackedStyle
+      style: bigStyle, stackedStyle
   slide7:
     - type: text
       text: HELLO THREE
