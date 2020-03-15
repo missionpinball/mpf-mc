@@ -18,7 +18,7 @@ class ConfigProcessor(ConfigProcessorBase):
     config_spec = None
 
     def __init__(self, machine):
-        super().__init__(machine.config_validator)
+        super().__init__(False, False)
         self.mc = machine
         self.machine = machine
         self.system_config = self.mc.machine_config['mpf-mc']

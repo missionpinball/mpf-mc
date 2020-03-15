@@ -24,7 +24,7 @@ class ConfigCollection(DeviceCollection):
                                         self.validate_entries_from_root_config)
 
         self.machine.mode_controller.register_load_method(
-            self.create_entries, self.config_section)
+            self.create_entries, self.config_section, priority=100)
 
         self._initialize()
 

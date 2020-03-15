@@ -2,6 +2,8 @@ import os
 import sys
 import unittest
 
+from mpf.tests.MpfTestCase import UnitTestConfigLoader
+
 verbose = sys.argv and "-v" in sys.argv
 
 if not verbose:
@@ -141,9 +143,13 @@ class MpfMcTestCase(unittest.TestCase):
 
         machine_path = self.get_absolute_machine_path()
 
+        # load config
+        config_loader = UnitTestConfigLoader(machine_path, [self.get_config_file()], {}, {}, {})
+
+        config = config_loader.load_mc_config()
+
         try:
-            self.mc = MpfMc(options=self.get_options(),
-                            machine_path=machine_path)
+            self.mc = MpfMc(options=self.get_options(), config=config)
 
             self.patch_bcp()
 
@@ -153,7 +159,7 @@ class MpfMcTestCase(unittest.TestCase):
 
             self._start_app_as_slave()
         except Exception:
-            if self.mc:
+            if hasattr(self, "mc") and self.mc:
                 # prevent dead locks with two asset manager threads
                 self.mc.stop()
             raise

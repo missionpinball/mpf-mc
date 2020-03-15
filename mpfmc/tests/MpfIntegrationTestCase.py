@@ -2,6 +2,8 @@ import logging
 import os
 import sys
 
+import mpf.core
+
 os.environ['KIVY_NO_FILELOG'] = '1'
 os.environ['KIVY_NO_CONSOLELOG'] = '1'
 os.environ["KIVY_NO_ARGS"] = "1"
@@ -23,7 +25,7 @@ sys.stderr = sys.__stderr__
 import mpfmc
 import mpfmc.core
 from mpf.tests.MpfBcpTestCase import MockBcpClient
-from mpf.tests.MpfTestCase import MpfTestCase, patch
+from mpf.tests.MpfTestCase import MpfTestCase, patch, UnitTestConfigLoader
 
 
 class TestBcpClient(MockBcpClient):
@@ -132,8 +134,11 @@ class TestBcpClient(MockBcpClient):
 
         machine_path = self.get_absolute_machine_path()
 
-        self.mc = MpfMc(options=self.get_options(),
-                        machine_path=machine_path)
+        config_loader = UnitTestConfigLoader(machine_path, self.machine.options['configfile'], {}, {}, {})
+
+        config = config_loader.load_mc_config()
+
+        self.mc = MpfMc(config=config, options=self.get_options())
 
         from kivy.core.window import Window
         Window.create_window()
