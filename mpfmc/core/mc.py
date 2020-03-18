@@ -11,8 +11,6 @@ import logging
 import gc
 import weakref
 
-from pkg_resources import iter_entry_points
-
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.resources import resource_add_path
@@ -21,8 +19,8 @@ from kivy.logger import Logger
 from kivy.config import Config
 
 import mpf
-from mpf.core.config_processor import ConfigProcessor as MpfConfigProcessor
 from mpf._version import __version__ as __mpfversion__
+from mpf.core.config_loader import MpfMcConfig
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.config_validator import ConfigValidator
 from mpf.core.events import EventManager
@@ -66,8 +64,8 @@ class MpfMc(App):
     """Kivy app for the mpf media controller."""
 
     # pylint: disable-msg=too-many-statements
-    def __init__(self, options, machine_path,
-                 thread_stopper=None, **kwargs):
+    def __init__(self, options, config: MpfMcConfig,
+                 thread_stopper=None):
 
         self.log = logging.getLogger('mpfmc')
         self.log.info("Mission Pinball Framework Media Controller v%s", __version__)
@@ -84,17 +82,19 @@ class MpfMc(App):
                              "major.minor versions. You have MPF v{} and MPF-MC"
                              " v{}".format(__mpfversion__, __version__))
 
-        super().__init__(**kwargs)
+        super().__init__()
 
         self.options = options
-        self.log.info("Machine path: %s", machine_path)
-        self.machine_path = machine_path
+        self.machine_path = config.get_machine_path()
+        self.log.info("Machine path: %s", self.machine_path)
+
         # load machine into path to load modules
-        if machine_path not in sys.path:
-            sys.path.append(machine_path)
-        self.config_validator = ConfigValidator(self, not options["no_load_cache"], options["create_config_cache"])
-        self.mpf_config_processor = MpfConfigProcessor(self.config_validator)
-        self.machine_config = self._load_config()
+        if self.machine_path not in sys.path:
+            sys.path.append(self.machine_path)
+        self.mc_config = config
+        self.config_validator = ConfigValidator(self, config.get_config_spec())
+        self.machine_config = self.mc_config.get_machine_config()
+        self.config = self.machine_config
 
         self.clock = Clock
         # pylint: disable-msg=protected-access
@@ -142,6 +142,7 @@ class MpfMc(App):
         self.events = EventManager(self)
         self.mode_controller = ModeController(self)
         create_config_collections(self, self.machine_config['mpf-mc']['config_collections'])
+        self._preprocess_config(self.config)
 
         self.config_processor = ConfigProcessor(self)
         self.transition_manager = TransitionManager(self)

@@ -10,6 +10,8 @@ from datetime import datetime
 import time
 import errno
 import psutil
+from mpf.core.config_loader import YamlMultifileConfigLoader
+
 from mpf.commands.logging_formatters import JSONFormatter
 
 
@@ -207,9 +209,15 @@ class Command:
 
         thread_stopper = threading.Event()
 
+        # load config
+        config_loader = YamlMultifileConfigLoader(machine_path, args.configfile,
+                                                  not args.no_load_cache, args.create_config_cache)
+
+        config = config_loader.load_mc_config()
+
         try:
             MpfMc(options=vars(args),
-                  machine_path=machine_path,
+                  config=config,
                   thread_stopper=thread_stopper).run()
             logging.info("MC run loop ended.")
         except Exception as e:  # noqa
