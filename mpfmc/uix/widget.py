@@ -639,7 +639,7 @@ class Widget(KivyWidget):
             self.reset_animations()
 
         for k in self.config['animations'].keys():
-            event, placeholder = self.mc.events.get_event_and_condition_from_string(k)
+            event, placeholder, _ = self.mc.events.get_event_and_condition_from_string(k)
             if event == 'add_to_slide' and (not placeholder or placeholder.evaluate({})):
                 self.start_animation_from_event(k)
                 break
