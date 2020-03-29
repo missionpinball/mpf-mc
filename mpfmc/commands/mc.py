@@ -10,7 +10,7 @@ from datetime import datetime
 import time
 import errno
 import psutil
-from mpf.core.config_loader import YamlMultifileConfigLoader
+from mpf.core.config_loader import YamlMultifileConfigLoader, ProductionConfigLoader
 
 from mpf.commands.logging_formatters import JSONFormatter
 
@@ -24,7 +24,7 @@ class Command:
 
     # pylint: disable-msg=too-many-locals
     # pylint: disable-msg=too-many-statements
-    def __init__(self, mpf_path, machine_path, args):
+    def __init__(self, mpf_path, machine_path, args):   # noqa
         """Run MC."""
         p = psutil.Process(os.getpid())
         # increase priority slightly. this will keep MPF responsive when MC lags
@@ -210,8 +210,11 @@ class Command:
         thread_stopper = threading.Event()
 
         # load config
-        config_loader = YamlMultifileConfigLoader(machine_path, args.configfile,
-                                                  not args.no_load_cache, args.create_config_cache)
+        if not args.production:
+            config_loader = YamlMultifileConfigLoader(machine_path, args.configfile,
+                                                      not args.no_load_cache, args.create_config_cache)
+        else:
+            config_loader = ProductionConfigLoader(machine_path)
 
         config = config_loader.load_mc_config()
 
