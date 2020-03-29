@@ -29,11 +29,11 @@ matrix:
      sudo: required
      language: python
      python: "3.6"
-   - os: osx
-     env: PYVERS="3.6.8 3.7.7"
-     language: generic
-     osx_image: xcode10
-     name: "OSX - wheel generation"
+#   - os: osx
+#     env: PYVERS="3.6.8 3.7.7"
+#     language: generic
+#     osx_image: xcode10
+#     name: "OSX - wheel generation"
 
 services:
   - docker
