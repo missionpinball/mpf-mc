@@ -11,6 +11,7 @@ import traceback
 import select
 
 import mpf.core.bcp.bcp_socket_client as bcp
+from mpf.exceptions.runtime_error import MpfRuntimeError
 
 
 class BCPServer(threading.Thread):
@@ -58,9 +59,10 @@ class BCPServer(threading.Thread):
 
         try:
             self.socket.bind((interface, port))
-        except IOError:
-            self.log.critical('Socket bind IOError')
-            raise
+        except IOError as e:
+            raise MpfRuntimeError("Failed to bind BCP Socket to {} on port {}. "
+                                  "Is there another application running on that port?".format(interface, port), 1,
+                                  self.log.name) from e
 
         self.socket.listen(5)
         self.socket.settimeout(1)
