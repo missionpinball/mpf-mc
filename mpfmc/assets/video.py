@@ -49,7 +49,7 @@ class VideoAsset(McAsset):
     asset_group_class = VideoPool
 
     def __init__(self, mc, name, file, config):
-        self._video = None
+        self._video = None      # type: VideoWrapper
         super().__init__(mc, name, file, config)
 
         # Setup events to post when video state changes

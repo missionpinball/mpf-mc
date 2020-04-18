@@ -11,7 +11,7 @@ import logging
 import gc
 import weakref
 
-from mpf.core.rgb_color import RGBColor
+from typing import Dict
 
 from kivy.app import App
 from kivy.clock import Clock
@@ -29,6 +29,7 @@ from mpf.core.events import EventManager
 from mpf.core.player import Player
 from mpf.core.device_manager import DeviceCollection
 from mpf.core.utility_functions import Util
+from mpf.core.rgb_color import RGBColor
 
 import mpfmc
 from mpfmc._version import __version__
@@ -134,6 +135,10 @@ class MpfMc(App):
         self.ticks = 0
         self.start_time = 0
         self.debug_refs = []
+
+        MYPY = False    # NOQA
+        if MYPY:  # pragma: no cover
+            self.videos = None               # type: Dict[str, VideoAsset]
 
         if thread_stopper:
             self.thread_stopper = thread_stopper
