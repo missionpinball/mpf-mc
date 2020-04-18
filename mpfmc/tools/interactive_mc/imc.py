@@ -21,7 +21,6 @@ from mpf.core.events import EventManager
 from mpf.core.mode_controller import ModeController
 from mpf.core.config_validator import ConfigValidator
 from mpf.file_interfaces.yaml_interface import YamlInterface
-from mpf.core.config_processor import ConfigProcessor as MpfConfigProcessor
 
 import mpfmc
 from mpfmc.config_players.plugins.slide_player import MpfSlidePlayer
@@ -43,10 +42,12 @@ class InteractiveMc(App):
         del args
         super().__init__(**kwargs)
 
-        self.config_validator = ConfigValidator(self, True, False)
-        self.mpf_config_processor = MpfConfigProcessor(self.config_validator)
+        self.config_processor = ConfigProcessor(False, False)
+        config_spec = self.config_processor.load_config_spec()
+        self.config_validator = ConfigValidator(self, config_spec)
         files = [os.path.join(mpfmc.__path__[0], 'tools/interactive_mc/imcconfig.yaml')]
-        self.machine_config = self.mpf_config_processor.load_config_files_with_cache(files, "machine")
+        self.machine_config = self.config_processor.load_config_files_with_cache(files, "machine",
+                                                                                 config_spec=config_spec)
         self.machine_config['mpf'] = dict()
         self.machine_config['mpf']['allow_invalid_config_sections'] = True
         self.config = self.machine_config
@@ -57,7 +58,9 @@ class InteractiveMc(App):
         # needed for bcp
         self.settings = Settings()
         self.machine_vars = {}
-        self.modes = []
+        self.modes = {}
+
+        self.variables = Variables()
 
         self.events = EventManager(self)
         self.mode_controller = ModeController(self)
@@ -106,10 +109,21 @@ class InteractiveMc(App):
                                   pos=(0, 1),
                                   pos_hint={'top': 0.1, 'right': 0.95})
 
+        self.debug_button = Button(text='Debug Dump',
+                                  size=(150, 60),
+                                  size_hint=(None, None),
+                                  background_normal='',
+                                  background_color=(0, .6, 0, 1),
+                                  pos=(0, 1),
+                                  pos_hint={'top': 0.1, 'left': 0.95})
+
         self.send_button.bind(on_press=self.send_slide_to_mc)
 
         self.slide_screen.add_widget(self.slide_player_code)
         self.slide_screen.add_widget(self.send_button)
+
+        self.debug_button.bind(on_press=self.send_debug_dump_stats)
+        self.slide_screen.add_widget(self.debug_button)
 
         self.slide_player.register_player_events(dict())
 
@@ -149,6 +163,17 @@ class InteractiveMc(App):
             self._initialized = True
         self.slide_player.play(settings, 'imc', 100)
         self.clock.loop.run_until_complete(asyncio.sleep(.1, loop=self.clock.loop))
+
+    def send_debug_dump_stats(self, value):
+        del value
+        self.bcp.interface.bcp_trigger("debug_dump_stats")
+        self.clock.loop.run_until_complete(asyncio.sleep(.1, loop=self.clock.loop))
+
+
+class Variables:
+
+    def __init__(self):
+        self.machine_vars = {}
 
     def set_machine_var(self, name, value):
         pass
