@@ -411,8 +411,8 @@ class MpfMc(App):
     def _debug_dump_displays(self, **kwargs):
         del kwargs
         self.log.info("--- DEBUG DUMP DISPLAYS ---")
-        self.log.info("Active slides: %s (Count: %s). Displays: %s (Count: %s)", self.active_slides,
-                      len(self.active_slides), self.displays, len(self.displays))
+        self.log.info("Active slides: %s (Count: %s). Displays: %s (Count: %s). Available Slides: %s", self.active_slides,
+                      len(self.active_slides), self.displays, len(self.displays), len(self.slides))
         for display in self.displays:
             self.log.info("Listing children for display: %s", display)
             children = 0
