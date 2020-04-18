@@ -11,6 +11,8 @@ import logging
 import gc
 import weakref
 
+from mpf.core.rgb_color import RGBColor
+
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.resources import resource_add_path
@@ -179,6 +181,10 @@ class MpfMc(App):
         self.create_machine_var('mpfmc_ver', __version__)
         # force setting it here so we have it before MPF connects
         self.receive_machine_var_update('mpfmc_ver', __version__, 0, True)
+
+    def _load_named_colors(self):
+        for name, color in self.machine_config.get('named_colors', {}).items():
+            RGBColor.add_color(name, color)
 
     def track_leak_reference(self, element):
         """Track elements to find leaks."""
@@ -355,6 +361,7 @@ class MpfMc(App):
         # boot process until the window is setup, and we can't set the
         # window up until the displays are initialized.
 
+        self._load_named_colors()
         self._register_config_players()
         self.events.post("init_phase_1")
         # no events docstring as this event is also in mpf

@@ -1,0 +1,19 @@
+#config_version=5
+
+displays:
+  default:
+    width: 800
+    height: 600
+
+named_colors:
+   tt_yellow: [255,220, 0]
+
+widgets:
+   base_score_widget:
+      - type: text
+        text: HELLO
+        color: tt_yellow
+
+
+widget_player:
+  add_widget1_to_current: base_score_widget

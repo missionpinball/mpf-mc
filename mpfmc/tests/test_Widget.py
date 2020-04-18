@@ -16,6 +16,17 @@ from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from unittest.mock import MagicMock
 
 
+class TestWidgetWithNamedColor(MpfMcTestCase):
+    def get_machine_path(self):
+        return 'tests/machine_files/widgets'
+
+    def get_config_file(self):
+        return 'test_widgets_with_named_colors.yaml'
+
+    def test_named_colors(self):
+        self.mc.events.post("add_widget1_to_current")
+        self.advance_real_time()
+
 class TestWidget(MpfMcTestCase):
     def get_machine_path(self):
         return 'tests/machine_files/widgets'
