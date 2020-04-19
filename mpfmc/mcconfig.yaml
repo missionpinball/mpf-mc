@@ -41,6 +41,7 @@ mpf-mc:
         - flip_vertical
         - gain
         - gamma
+        - glow
         - monochrome
         - reduce
 
