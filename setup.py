@@ -603,13 +603,13 @@ install_requires = ['ruamel.yaml==0.15.100',  # better YAML library
                     'Pygments==2.3.1',  # YAML syntax formatting for the iMC
                     'pypiwin32==223;platform_system=="Windows"',
                     # also update those in appveyor.yaml if you change versions
-                    'kivy-deps.sdl2==0.1.22;platform_system=="Windows"',
-                    'kivy-deps.sdl2-dev==0.1.22;platform_system=="Windows"',
+                    'kivy-deps.sdl2==0.1.23;platform_system=="Windows"',
+                    'kivy-deps.sdl2-dev==0.1.23;platform_system=="Windows"',
                     'kivy-deps.glew==0.1.12;platform_system=="Windows"',
                     'kivy-deps.glew-dev==0.1.12;platform_system=="Windows"',
-                    'kivy-deps.gstreamer==0.1.17;platform_system=="Windows"',
-                    'kivy-deps.gstreamer-dev==0.1.17;platform_system=="Windows"',
-                    'ffpyplayer==4.2.0"'
+                    'kivy-deps.gstreamer==0.1.18;platform_system=="Windows"',
+                    'kivy-deps.gstreamer-dev==0.1.18;platform_system=="Windows"',
+                    'ffpyplayer==4.3.1'
                     ]
 
 # If we're running on Read The Docs, then we just need to copy the files
