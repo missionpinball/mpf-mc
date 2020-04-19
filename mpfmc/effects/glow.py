@@ -1,6 +1,7 @@
 from kivy.properties import NumericProperty
 from kivy.uix.effectwidget import EffectBase
 
+
 class GlowEffect(EffectBase):
 
     """GLSL effect to apply a glowing effect to a texture."""
@@ -31,6 +32,7 @@ class GlowEffect(EffectBase):
                                      float(self.intensity),
                                      float(self.glow_amplitude),
                                      float(self.glow_speed))
+
 
 glow_glsl = '''
 vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
