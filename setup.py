@@ -609,7 +609,7 @@ install_requires = ['ruamel.yaml==0.15.100',  # better YAML library
                     'kivy-deps.glew-dev==0.1.12;platform_system=="Windows"',
                     'kivy-deps.gstreamer==0.1.17;platform_system=="Windows"',
                     'kivy-deps.gstreamer-dev==0.1.17;platform_system=="Windows"',
-                    'ffpyplayer==4.2.0;platform_system!="Windows"'
+                    'ffpyplayer==4.2.0"'
                     ]
 
 # If we're running on Read The Docs, then we just need to copy the files
