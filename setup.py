@@ -599,9 +599,9 @@ else:
 install_requires = ['ruamel.yaml==0.15.100',  # better YAML library
                     'mpf>={}'.format(mpf_version),
                     'kivy==1.11.1',
-                    'psutil',
-                    'pygments',  # YAML syntax formatting for the iMC
-                    'pypiwin32>=223;platform_system=="Windows"',
+                    'psutil==5.7.0',
+                    'Pygments==2.3.1',  # YAML syntax formatting for the iMC
+                    'pypiwin32==223;platform_system=="Windows"',
                     # also update those in appveyor.yaml if you change versions
                     'kivy-deps.sdl2==0.1.22;platform_system=="Windows"',
                     'kivy-deps.sdl2-dev==0.1.22;platform_system=="Windows"',
