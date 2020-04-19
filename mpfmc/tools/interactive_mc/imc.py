@@ -2,7 +2,7 @@
 import asyncio
 import os
 
-from ruamel import yaml
+from pygments.lexers import YamlLexer
 
 from kivy.app import App
 from kivy.core.window import Window
@@ -11,8 +11,6 @@ from kivy.uix.codeinput import CodeInput
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import ScreenManager, Screen
-
-from pygments.lexers import YamlLexer
 
 from mpf.core.bcp.bcp import Bcp
 from mpf.core.clock import ClockBase
@@ -26,17 +24,13 @@ import mpfmc
 from mpfmc.config_players.plugins.slide_player import MpfSlidePlayer
 
 
-class Settings(object):
-
-    """Empty settings."""
-
-    def get_settings(self):
-        return {}
-
-
 class InteractiveMc(App):
 
+    """Interactive MC App."""
+
+    # pylint: disable-msg=too-many-instance-attributes
     def __init__(self, mpf_path, machine_path, args, **kwargs):
+        """Create IMC window."""
         del mpf_path
         del machine_path
         del args
@@ -110,12 +104,12 @@ class InteractiveMc(App):
                                   pos_hint={'top': 0.1, 'right': 0.95})
 
         self.debug_button = Button(text='Debug Dump',
-                                  size=(150, 60),
-                                  size_hint=(None, None),
-                                  background_normal='',
-                                  background_color=(0, .6, 0, 1),
-                                  pos=(0, 1),
-                                  pos_hint={'top': 0.1, 'left': 0.95})
+                                   size=(150, 60),
+                                   size_hint=(None, None),
+                                   background_normal='',
+                                   background_color=(0, .6, 0, 1),
+                                   pos=(0, 1),
+                                   pos_hint={'top': 0.1, 'left': 0.95})
 
         self.send_button.bind(on_press=self.send_slide_to_mc)
 
@@ -128,17 +122,20 @@ class InteractiveMc(App):
         self.slide_player.register_player_events(dict())
 
     def register_monitor(self, monitor_class, monitor):
+        """Ignore register call."""
         pass
 
     def build(self):
+        """Return screen manager."""
         return self.sm
 
     def send_slide_to_mc(self, value):
+        """Send this slide to MC via BCP."""
         del value
 
         try:
             settings = YamlInterface.process(self.slide_player_code.text)
-        except Exception as e:
+        except Exception as e:      # pylint: disable-msg=broad-except
             msg = str(e).replace('"', '\n')
             Popup(title='Error in your config',
                   content=Label(text=msg, size=(750, 350)),
@@ -149,7 +146,7 @@ class InteractiveMc(App):
         try:
             settings = (self.slide_player.validate_config_entry(settings,
                                                                 'slides'))
-        except Exception as e:
+        except Exception as e:      # pylint: disable-msg=broad-except
             msg = str(e).replace('"', '\n')
             Popup(title='Error in your config',
                   content=Label(text=msg, size=(750, 350)),
@@ -165,6 +162,7 @@ class InteractiveMc(App):
         self.clock.loop.run_until_complete(asyncio.sleep(.1, loop=self.clock.loop))
 
     def send_debug_dump_stats(self, value):
+        """Send event to MC via BCP."""
         del value
         self.bcp.interface.bcp_trigger("debug_dump_stats")
         self.clock.loop.run_until_complete(asyncio.sleep(.1, loop=self.clock.loop))
@@ -172,15 +170,32 @@ class InteractiveMc(App):
 
 class Variables:
 
+    """Variables of the iMC machine."""
+
     def __init__(self):
+        """Set empty variables."""
         self.machine_vars = {}
 
     def set_machine_var(self, name, value):
+        """Ignore changes."""
         pass
 
 
 class YamlCodeInput(CodeInput):
 
+    """Input Widget for YAML."""
+
     def insert_text(self, substring, from_undo=False):
+        """Add text."""
         s = substring.replace('\t', '    ')
         return super().insert_text(s, from_undo=from_undo)
+
+
+class Settings:
+
+    """Empty settings."""
+
+    @staticmethod
+    def get_settings():
+        """Return empty settings."""
+        return {}
