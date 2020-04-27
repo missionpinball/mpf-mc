@@ -268,6 +268,9 @@ class BcpProcessor:
         if int(state):
             self.mc.events.post('switch_' + name + '_active')
             '''event: switch_(name)_active
+            config_section: switches
+            class_label: switch
+
             desc: Posted on MPF-MC only (e.g. not in MPF) when the MC receives
             a BCP "switch" active command. Useful for video modes and graphical
             menu navigation. Note that this is not posted for every switch all
@@ -277,6 +280,9 @@ class BcpProcessor:
         else:
             self.mc.events.post('switch_' + name + '_inactive')
             '''event: switch_(name)_inactive
+            config_section: switches
+            class_label: switch
+
             desc: Posted on MPF-MC only (e.g. not in MPF) when the MC receives
             a BCP "switch" inactive command. Useful for video modes and graphical
             menu navigation. Note that this is not posted for every switch all

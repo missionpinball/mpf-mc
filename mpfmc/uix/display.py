@@ -163,6 +163,9 @@ class Display(ScreenManager):
         del args
         self.mc.post_mc_native_event('display_{}_initialized'.format(self.name))
         '''event: display_(name)_initialized
+        config_section: displays
+        class_label: display
+
         desc: The display called (name) has been initialized. This event is
         generated in the MC, so it won't be sent to MPF if the MC is started up
         and ready first.
@@ -227,6 +230,9 @@ class Display(ScreenManager):
 
         self.mc.post_mc_native_event('display_{}_ready'.format(self.name))
         '''event: display_(name)_ready
+        config_section: displays
+        class_label: display
+
         desc: The display target called (name) is now ready and available to
         show slides.
         This event is useful with display widgets where you want to add
@@ -595,6 +601,9 @@ class Display(ScreenManager):
 
         self.mc.post_mc_native_event('slide_{}_active'.format(self.current_slide_name))
         """event: slide_(name)_active
+        config_section: displays
+        class_label: display
+
         desc: A slide called (name) has just become active, meaning that
         it's now showing as the current slide.
         This is useful for things like the widget_player where you want to

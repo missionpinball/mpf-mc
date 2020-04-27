@@ -84,6 +84,8 @@ class Slide(Screen, StencilView):
             'slide_{}_created'.format(self.name))
 
         """event: slide_(name)_created
+        config_section: slides
+        class_label: slide
 
         desc: A slide called (name) has just been created.
 
@@ -234,6 +236,8 @@ class Slide(Screen, StencilView):
         self.mc.post_mc_native_event('slide_{}_removed'.format(self.name))
 
         """event: slide_(name)_removed
+        config_section: slides
+        class_label: slide
 
         desc: A slide called (name) has just been removed.
 
