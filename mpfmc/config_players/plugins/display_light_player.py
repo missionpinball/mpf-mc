@@ -25,12 +25,12 @@ class DisplayLightPlayer(BcpPluginPlayer):
         priority = context_dict[element][1]
 
         key = "display_light_player_{}".format(element)
+        fade_ms = int((current_frame - last_frame) * 1000)
         for light, color in values.items():
             if color == -1:
-                self.machine.lights[light].remove_from_stack_by_key(key=key)
+                self.machine.lights[light].remove_from_stack_by_key(key=key, fade_ms=fade_ms)
             else:
-                self.machine.lights[light].color(key=key, color=color, priority=priority,
-                                                 fade_ms=int((current_frame - last_frame) * 1000))
+                self.machine.lights[light].color(key=key, color=color, priority=priority, fade_ms=fade_ms)
 
     def _validate_config_item(self, device, device_settings):
         device_settings = super()._validate_config_item(device, device_settings)
@@ -61,7 +61,7 @@ class DisplayLightPlayer(BcpPluginPlayer):
     def _clear_key_from_lights(self, element):
         # remove color from leds
         key = "display_light_player_{}".format(element)
-        for light in self.machine.lights:
+        for light in self.machine.lights.values():
             light.remove_from_stack_by_key(key=key)
 
     def _build_light_map(self, tags):
@@ -81,6 +81,7 @@ class DisplayLightPlayer(BcpPluginPlayer):
         return light_map
 
     def clear_context(self, context):
+        """Clean up all active lights."""
         context_dics = self._get_instance_dict(context)
         for element in context_dics:
             self._clear_key_from_lights(element)
@@ -88,9 +89,6 @@ class DisplayLightPlayer(BcpPluginPlayer):
         self._reset_instance_dict(context)
 
         super().clear_context(context)
-
-    def get_express_config(self, value):
-        pass
 
 
 def register_with_mpf(machine):
