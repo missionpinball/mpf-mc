@@ -601,8 +601,8 @@ class Display(ScreenManager):
 
         self.mc.post_mc_native_event('slide_{}_active'.format(self.current_slide_name))
         """event: slide_(name)_active
-        config_section: displays
-        class_label: display
+        config_section: slides
+        class_label: slide
 
         desc: A slide called (name) has just become active, meaning that
         it's now showing as the current slide.
