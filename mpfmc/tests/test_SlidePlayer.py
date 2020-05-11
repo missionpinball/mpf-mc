@@ -3,7 +3,6 @@ import weakref
 import gc
 from kivy.uix.screenmanager import WipeTransition, FadeTransition
 
-from mpfmc.config_players.slide_player import McSlidePlayer
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 from mpfmc.transitions.move_in import MoveInTransition
 from mpf.tests.MpfTestCase import MpfTestCase
