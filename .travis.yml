@@ -62,20 +62,20 @@ install:
       hdiutil attach aria2-1.29.0-osx-darwin.dmg;
       sudo installer -package "/Volumes/aria2 1.29.0 Intel/aria2.pkg" -target /;
 
-      curl -O -L https://www.libsdl.org/release/SDL2-2.0.9.dmg;
-      curl -O -L https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.4.dmg;
+      curl -O -L https://www.libsdl.org/release/SDL2-2.0.10.dmg;
+      curl -O -L https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.5.dmg;
       curl -O -L https://www.libsdl.org/projects/SDL_mixer/release/SDL2_mixer-2.0.4.dmg;
-      /usr/local/aria2/bin/aria2c -x 10 https://gstreamer.freedesktop.org/data/pkg/osx/1.10.2/gstreamer-1.0-1.10.2-x86_64.pkg;
-      /usr/local/aria2/bin/aria2c -x 10 https://gstreamer.freedesktop.org/data/pkg/osx/1.10.2/gstreamer-1.0-devel-1.10.2-x86_64.pkg;
+      /usr/local/aria2/bin/aria2c -x 10 https://gstreamer.freedesktop.org/data/pkg/osx/1.10.2/gstreamer-1.0-1.12.4-x86_64.pkg;
+      /usr/local/aria2/bin/aria2c -x 10 https://gstreamer.freedesktop.org/data/pkg/osx/1.10.2/gstreamer-1.0-devel-1.12.4-x86_64.pkg;
 
-      hdiutil attach SDL2-2.0.9.dmg;
+      hdiutil attach SDL2-2.0.10.dmg;
       sudo cp -a /Volumes/SDL2/SDL2.framework /Library/Frameworks/;
-      hdiutil attach SDL2_image-2.0.4.dmg;
+      hdiutil attach SDL2_image-2.0.5.dmg;
       sudo cp -a /Volumes/SDL2_image/SDL2_image.framework /Library/Frameworks/;
       hdiutil attach SDL2_mixer-2.0.4.dmg;
       sudo cp -a /Volumes/SDL2_mixer/SDL2_mixer.framework /Library/Frameworks/;
-      sudo installer -package gstreamer-1.0-1.10.2-x86_64.pkg -target /;
-      sudo installer -package gstreamer-1.0-devel-1.10.2-x86_64.pkg -target /;
+      sudo installer -package gstreamer-1.0-1.2.4-x86_64.pkg -target /;
+      sudo installer -package gstreamer-1.0-devel-1.12.4-x86_64.pkg -target /;
     fi;
 
 before_script:
