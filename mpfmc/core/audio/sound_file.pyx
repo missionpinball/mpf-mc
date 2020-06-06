@@ -91,7 +91,8 @@ cdef class SoundMemoryFile(SoundFile):
         self.sample.data.memory.size = <gsize>chunk.alen
         self.sample.data.memory.data = <gpointer>chunk.abuf
 
-        # Set the sample duration (in seconds)
+        # Set the sample size (bytes) and  duration (seconds)
+        self.sample.size = self.sample.data.memory.size
         self.sample.duration = self.sample.data.memory.size / self.callback_data.seconds_to_bytes_factor
 
         # Free the chunk (sample memory will not be freed).  The chunk was allocated using SDL_malloc in the
@@ -196,7 +197,7 @@ cdef class SoundStreamingFile(SoundFile):
         """Creates the GStreamer pipeline used to stream the sound data"""
         cdef GError *error
         cdef GstSample *sample
-        cdef gint64 duration = 0
+        cdef gint64 size = 0
 
         # Pipeline structure: uridecodebin --> audioconvert --> audioresample --> appsink
 
@@ -243,12 +244,13 @@ cdef class SoundStreamingFile(SoundFile):
         if sample != NULL:
             gst_sample_unref(sample)
 
-        # Get duration of audio file (in nanoseconds)
-        if not gst_element_query_duration(self.sink, GST_FORMAT_TIME, &duration):
-            duration = 0
+        # Get size of audio file (in bytes)
+        if not gst_element_query_duration(self.sink, GST_FORMAT_BYTES , &size):
+            size = 0
 
-        # Store duration in seconds
-        self.sample.duration = duration / GST_SECOND
+        # Store length and duration (seconds)
+        self.sample.size = size
+        self.sample.duration = <double>size / self.callback_data.seconds_to_bytes_factor
 
         # The pipeline should now be ready to play.  Store the pointers to the pipeline
         # and appsink in the SampleStream struct for use in the application.

@@ -28,6 +28,7 @@ ctypedef struct SoundSample:
     SoundType type
     SoundSampleData data
     double duration
+    Uint32 size
 
 
 cdef class SoundFile:

@@ -95,6 +95,8 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].current.current_loop = 0
             self.type_state.sound_players[i].current.volume = 0
             self.type_state.sound_players[i].current.sample_pos = 0
+            self.type_state.sound_players[i].current.loop_start_pos = 0
+            self.type_state.sound_players[i].current.loop_end_pos = 0
             self.type_state.sound_players[i].current.sound_id = 0
             self.type_state.sound_players[i].current.sound_instance_id = 0
             self.type_state.sound_players[i].current.sound_priority = 0
@@ -110,6 +112,8 @@ cdef class TrackStandard(Track):
             self.type_state.sound_players[i].next.current_loop = 0
             self.type_state.sound_players[i].next.volume = 0
             self.type_state.sound_players[i].next.sample_pos = 0
+            self.type_state.sound_players[i].next.loop_start_pos = 0
+            self.type_state.sound_players[i].next.loop_end_pos = 0
             self.type_state.sound_players[i].next.sound_id = 0
             self.type_state.sound_players[i].next.sound_instance_id = 0
             self.type_state.sound_players[i].next.sound_priority = 0
@@ -754,8 +758,10 @@ cdef class TrackStandard(Track):
         for i in range(self.type_state.sound_player_count):
             if self.type_state.sound_players[i].status != player_idle and self.type_state.sound_players[
                 i].current.sound_instance_id == sound_instance.id:
-                # Set sound's loops_remaining variable to zero
+                # Set sound's loops_remaining variable to zero and loop end position to the end of the sound
                 self.type_state.sound_players[i].current.loops_remaining = 0
+                self.type_state.sound_players[i].current.loop_end_pos = self.type_state.sound_players[
+                    i].current.sample.data.memory.size
 
         # Remove any instances of the specified sound that are pending in the sound queue.
         if self.sound_instance_is_in_queue(sound_instance):
@@ -961,11 +967,24 @@ cdef class TrackStandard(Track):
 
         # Setup the player to start playing the sound
         sound_settings.sample_pos = <Uint32>(sound_instance.start_at * self.state.callback_data.seconds_to_bytes_factor)
-        if sound_settings.sample_pos > 0:
-            # Ensure sample position starts on a sample frame boundary (audio distortion may occur if starting
-            # in the middle of a sample frame)
-            bytes_per_sample_frame = self.state.callback_data.bytes_per_sample * self.state.callback_data.channels
-            sound_settings.sample_pos = bytes_per_sample_frame * ceil(sound_settings.sample_pos / bytes_per_sample_frame)
+        sound_settings.sample_pos = self._fix_sample_frame_pos(sound_settings.sample_pos, self.state.callback_data.bytes_per_sample, self.state.callback_data.channels)
+        if sound_settings.sample_pos > sound_container.sample.size:
+            sound_settings.sample_pos = 0
+
+        # Setup loop start position (defaults to 0)
+        sound_settings.loop_start_pos = <Uint32>(sound_instance.loop_start_at * self.state.callback_data.seconds_to_bytes_factor)
+        sound_settings.loop_start_pos = self._fix_sample_frame_pos(sound_settings.loop_start_pos, self.state.callback_data.bytes_per_sample, self.state.callback_data.channels)
+        if sound_settings.loop_start_pos > sound_container.sample.size:
+            sound_settings.loop_start_pos = 0
+
+        # Setup loop end position (if loop_end_at is None, set loop end to end of sound)
+        if sound_instance.loop_end_at is None:
+            sound_settings.loop_end_pos = sound_container.sample.size
+        else:
+            sound_settings.loop_end_pos = <Uint32>(sound_instance.loop_end_at * self.state.callback_data.seconds_to_bytes_factor)
+            sound_settings.loop_end_pos = self._fix_sample_frame_pos(sound_settings.loop_end_pos, self.state.callback_data.bytes_per_sample, self.state.callback_data.channels)
+            if sound_settings.loop_end_pos > sound_container.sample.size:
+                sound_settings.loop_end_pos = sound_container.sample.size
 
         sound_settings.current_loop = 0
         sound_settings.sound_id = sound_instance.sound_id
@@ -976,6 +995,10 @@ cdef class TrackStandard(Track):
         sound_settings.volume_right = sound_settings.volume
         sound_settings.loops_remaining = sound_instance.loops
         sound_settings.sound_priority = sound_instance.priority
+
+        # If the sound is not set to loop, adjust the loop end position to the end of the sound
+        if sound_settings.loops_remaining == 0:
+            sound_settings.loop_end_pos = sound_container.sample.size
 
         # Apply simple linear pan/balance setting
         if self.state.callback_data.channels == 2:
@@ -1110,6 +1133,22 @@ cdef class TrackStandard(Track):
         SDL_UnlockAudio()
         return -1
 
+    cdef Uint32 _fix_sample_frame_pos(self, Uint32 sample_pos, Uint8 bytes_per_sample, int channels):
+        """
+        Rounds up sample position to a sample frame boundary (audio distortion may occur if starting
+        in the middle of a sample frame).
+
+        Args:
+            sample_pos: The sample position
+            bytes_per_sample: The number of bytes per sample 
+            channels: The number of audio channels
+
+        Returns:
+            sample_pos rounded to the nearest sample frame boundary
+        """
+        cdef int bytes_per_sample_frame = bytes_per_sample * channels
+        return bytes_per_sample_frame * ceil(sample_pos / bytes_per_sample_frame)
+
     def get_playing_sound_instance_by_id(self, sound_instance_id):
         if sound_instance_id in self._playing_instances_by_id:
             return self._playing_instances_by_id[sound_instance_id]
@@ -1137,7 +1176,9 @@ cdef class TrackStandard(Track):
                 "priority": self.type_state.sound_players[player].current.sound_priority,
                 "loops": self.type_state.sound_players[player].current.loops_remaining,
                 "has_ducking": self.type_state.sound_players[player].current.sound_has_ducking,
-                "sample_pos": self.type_state.sound_players[player].current.sample_pos
+                "sample_pos": self.type_state.sound_players[player].current.sample_pos,
+                "loop_start_pos": self.type_state.sound_players[player].current.loop_start_pos,
+                "loop_end_pos": self.type_state.sound_players[player].current.loop_end_pos
             })
 
             self.log.debug("Status - Player %d: Status=%s, Sound=%d, SoundInstance=%d"
@@ -1545,8 +1586,9 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
 
     while samples_remaining_to_output > 0:
 
-        # Determine how many samples are remaining in the sound buffer before the end of the sound
-        samples_remaining_in_sound = sound.sample.data.memory.size - sound.sample_pos
+        # Determine how many samples are remaining in the sound buffer before the end of the sound (the
+        # current loop position)
+        samples_remaining_in_sound = sound.loop_end_pos - sound.sample_pos
 
         # Determine if we are consuming the entire remaining sound buffer, or just a portion of it
         if samples_remaining_to_output < samples_remaining_in_sound:
@@ -1585,21 +1627,25 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
             buffer_pos += samples_remaining_in_sound
 
         # Check if we are at the end of the source sample buffer (loop if applicable)
-        if sound.sample_pos >= sound.sample.data.memory.size:
+        if sound.sample_pos >= sound.loop_end_pos:
             if sound.loops_remaining > 0:
-                # At the end and still loops remaining, loop back to the beginning
+                # At the end and still loops remaining, loop back to the beginning of the loop
                 sound.loops_remaining -= 1
-                sound.sample_pos = 0
+                sound.sample_pos = sound.loop_start_pos
                 sound.current_loop += 1
                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
+
+                # If the sound is on its last loop, set the loop end position to be the end of the sound
+                if sound.loops_remaining == 0:
+                    sound.loop_end_pos = sound.sample.data.memory.size
 
             elif sound.loops_remaining == 0:
                 # At the end and not looping, the sample has finished playing (return True for end of sound)
                 return True
 
             else:
-                # Looping infinitely, loop back to the beginning
-                sound.sample_pos = 0
+                # Looping infinitely, loop back to the beginning of the loop
+                sound.sample_pos = sound.loop_start_pos
                 sound.current_loop += 1
                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
 

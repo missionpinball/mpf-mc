@@ -57,6 +57,8 @@ ctypedef struct SoundSettings:
     int loops_remaining
     int current_loop
     Uint32 sample_pos
+    Uint32 loop_start_pos
+    Uint32 loop_end_pos
     Uint64 sound_id
     Uint64 sound_instance_id
     int sound_priority
@@ -108,6 +110,7 @@ cdef class TrackStandard(Track):
     cdef _set_player_playing(self, SoundPlayer *player, object sound_instance)
     cdef _set_player_replacing(self, SoundPlayer *player, object sound_instance)
     cdef int _get_player_playing_sound_instance(self, sound_instance)
+    cdef Uint32 _fix_sample_frame_pos(self, Uint32 sample_pos, Uint8 bytes_per_sample, int channels)
 
     @staticmethod
     cdef void mix_playing_sounds(TrackState *track, Uint32 buffer_length, AudioCallbackData *callback_data) nogil
