@@ -1130,6 +1130,7 @@ struct __pyx_t_5mpfmc_4core_5audio_10sound_file_SoundSample {
   enum __pyx_t_5mpfmc_4core_5audio_10sound_file_SoundType type;
   __pyx_t_5mpfmc_4core_5audio_10sound_file_SoundSampleData data;
   double duration;
+  Uint32 size;
 };
 struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings;
 typedef struct __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings __pyx_t_5mpfmc_4core_5audio_16track_sound_loop_SoundLoopLayerSettings;
@@ -1252,7 +1253,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_5track_Track {
 };
 
 
-/* "mpfmc/core/audio/sound_file.pxd":33
+/* "mpfmc/core/audio/sound_file.pxd":34
  * 
  * 
  * cdef class SoundFile:             # <<<<<<<<<<<<<<
@@ -1268,7 +1269,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundFile {
 };
 
 
-/* "mpfmc/core/audio/sound_file.pxd":41
+/* "mpfmc/core/audio/sound_file.pxd":42
  * 
  * 
  * cdef class SoundMemoryFile(SoundFile):             # <<<<<<<<<<<<<<
@@ -1281,7 +1282,7 @@ struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundMemoryFile {
 };
 
 
-/* "mpfmc/core/audio/sound_file.pxd":47
+/* "mpfmc/core/audio/sound_file.pxd":48
  * 
  * 
  * cdef class SoundStreamingFile(SoundFile):             # <<<<<<<<<<<<<<
@@ -15965,14 +15966,14 @@ static int __Pyx_modinit_type_import_code(void) {
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__Pyx_modinit_type_import_code", 0);
   /*--- Type import code ---*/
-  __pyx_t_1 = PyImport_ImportModule("mpfmc.core.audio.sound_file"); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 33, __pyx_L1_error)
+  __pyx_t_1 = PyImport_ImportModule("mpfmc.core.audio.sound_file"); if (unlikely(!__pyx_t_1)) __PYX_ERR(2, 34, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundFile = __Pyx_ImportType(__pyx_t_1, "mpfmc.core.audio.sound_file", "SoundFile", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundFile), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundFile) __PYX_ERR(2, 33, __pyx_L1_error)
+   if (!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundFile) __PYX_ERR(2, 34, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundMemoryFile = __Pyx_ImportType(__pyx_t_1, "mpfmc.core.audio.sound_file", "SoundMemoryFile", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundMemoryFile), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundMemoryFile) __PYX_ERR(2, 41, __pyx_L1_error)
+   if (!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundMemoryFile) __PYX_ERR(2, 42, __pyx_L1_error)
   __pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile = __Pyx_ImportType(__pyx_t_1, "mpfmc.core.audio.sound_file", "SoundStreamingFile", sizeof(struct __pyx_obj_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile), __Pyx_ImportType_CheckSize_Warn);
-   if (!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile) __PYX_ERR(2, 47, __pyx_L1_error)
+   if (!__pyx_ptype_5mpfmc_4core_5audio_10sound_file_SoundStreamingFile) __PYX_ERR(2, 48, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __Pyx_RefNannyFinishContext();
   return 0;
