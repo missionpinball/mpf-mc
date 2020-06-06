@@ -21,12 +21,6 @@ environment:
   - PYVER: 37
     BITNESS: 64
     COMPILER: msvc
-  - PYVER: 38
-    BITNESS: 86
-    COMPILER: msvc
-  - PYVER: 38
-    BITNESS: 64
-    COMPILER: msvc
 
   pypi_user:
     secure: /UlFCFSXuqY1JAsOwKZdFg==
