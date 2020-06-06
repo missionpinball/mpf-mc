@@ -9,12 +9,6 @@ environment:
   USE_CYTHON: 1
 
   matrix:
-  - PYVER: 35
-    BITNESS: 86
-    COMPILER: msvc
-  - PYVER: 35
-    BITNESS: 64
-    COMPILER: msvc
   - PYVER: 36
     BITNESS: 86
     COMPILER: msvc
@@ -25,6 +19,12 @@ environment:
     BITNESS: 86
     COMPILER: msvc
   - PYVER: 37
+    BITNESS: 64
+    COMPILER: msvc
+  - PYVER: 38
+    BITNESS: 86
+    COMPILER: msvc
+  - PYVER: 38
     BITNESS: 64
     COMPILER: msvc
 
@@ -139,22 +139,13 @@ build_script:
 
     Check-Error
 
-    if ($env:COMPILER -ne "msvc") {
-      echo "Installing mingw compiler..."
-
-      python -c "with open(r'$PYTHON_ROOT\Lib\distutils\distutils.cfg', 'wb') as fh: fh.write(b'[build]\ncompiler = mingw32\n')"
-      Check-Error
-      pip install -i https://pypi.anaconda.org/carlkl/simple mingwpy --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\mingwpy
-      Check-Error
-    }
-
     echo "Installing prequisite Python packages..."
 
-    pip install kivy-deps.gstreamer==0.1.17 --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\gstreamer
+    pip install kivy_deps.gstreamer==0.2.0 --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\gstreamer
 
     Check-Error
 
-    pip install mock Cython==0.29.10 pygments docutils kivy-deps.gstreamer-dev==0.1.17 kivy-deps.glew==0.1.12 kivy-deps.glew-dev==0.1.12 kivy-deps.sdl2==0.1.22 kivy-deps.sdl2-dev==0.1.22 --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
+    pip install mock Cython==0.29.10 pygments docutils kivy_deps.gstreamer_dev==0.2.0 kivy_deps.glew==0.2.0 kivy_deps.glew_dev==0.2.0 kivy_deps.sdl2==0.2.0 kivy_deps.sdl2_dev==0.2.0 --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
 
     Check-Error
 
@@ -214,6 +205,5 @@ test_script:
     }
 
 cache:
-  - "C:\\tmp_%PYVER%_%BITNESS%\\mingwpy -> appveyor.yaml"
   - "C:\\tmp_%PYVER%_%BITNESS%\\deps -> appveyor.yaml"
   - "C:\\tmp_%PYVER%_%BITNESS%\\gstreamer -> appveyor.yaml"
