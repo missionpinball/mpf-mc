@@ -1175,6 +1175,7 @@ cdef class TrackStandard(Track):
                 "sound_instance_id": self.type_state.sound_players[player].current.sound_instance_id,
                 "priority": self.type_state.sound_players[player].current.sound_priority,
                 "loops": self.type_state.sound_players[player].current.loops_remaining,
+                "current_loop": self.type_state.sound_players[player].current.current_loop,
                 "has_ducking": self.type_state.sound_players[player].current.sound_has_ducking,
                 "sample_pos": self.type_state.sound_players[player].current.sample_pos,
                 "loop_start_pos": self.type_state.sound_players[player].current.loop_start_pos,
