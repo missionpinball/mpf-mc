@@ -225,6 +225,8 @@ class SoundAsset(McAsset):
         self.priority = DEFAULT_PRIORITY
         self._max_queue_time = DEFAULT_MAX_QUEUE_TIME
         self._loops = DEFAULT_LOOPS
+        self._loop_start_at = 0
+        self._loop_end_at = None
         self._start_at = 0
         self._fade_in = 0
         self._fade_out = 0
@@ -285,6 +287,15 @@ class SoundAsset(McAsset):
 
         self.config.setdefault('loops', 0)
         self._loops = int(self.config['loops'])
+
+        self.config.setdefault('loop_start_at', 0)
+        self._loop_start_at = AudioInterface.string_to_secs(self.config['loop_start_at'])
+
+        self.config.setdefault('loop_end_at', None)
+        if self.config['loop_end_at'] is None:
+            self._loop_end_at = None;
+        else:
+            self._loop_end_at = AudioInterface.string_to_secs(self.config['loop_end_at'])
 
         self.config.setdefault('simultaneous_limit', None)
         if self.config['simultaneous_limit'] is None:
@@ -424,6 +435,19 @@ class SoundAsset(McAsset):
     def start_at(self):
         """Return the start at time for the sound (in seconds)"""
         return self._start_at
+
+    @property
+    def loop_start_at(self):
+        """Return the loop start at time for the sound (in seconds)."""
+        return self._loop_start_at
+
+    @property
+    def loop_end_at(self):
+        """
+        Return the loop end at time for the sound (in seconds). If None, the loop end at point will be
+        at the end of the sound.
+        """
+        return self._loop_end_at
 
     @property
     def fade_in(self):
@@ -735,6 +759,8 @@ class SoundInstance:
         self._volume = self._sound.volume
         self._priority = self._sound.priority
         self._start_at = self._sound.start_at
+        self._loop_start_at = self._sound.loop_start_at
+        self._loop_end_at = self._sound.loop_end_at
         self._fade_in = self._sound.fade_in
         self._fade_out = self._sound.fade_out
         self._about_to_finish_time = self._sound.about_to_finish_time
@@ -769,6 +795,12 @@ class SoundInstance:
 
         if settings.get('start_at'):
             self._start_at = settings['start_at']
+
+        if settings.get('loop_start_at'):
+            self._loop_start_at = settings['loop_start_at']
+
+        if settings.get('loop_end_at'):
+            self._loop_end_at = settings['loop_end_at']
 
         if settings.get('fade_in'):
             self._fade_in = settings['fade_in']
@@ -914,6 +946,19 @@ class SoundInstance:
     def start_at(self):
         """Return the start at time for the sound (in seconds)"""
         return self._start_at
+
+    @property
+    def loop_start_at(self):
+        """Return the loop start at time for the sound (in seconds)."""
+        return self._loop_start_at
+
+    @property
+    def loop_end_at(self):
+        """
+        Return the loop end at time for the sound (in seconds). If None, the loop end at point will be
+        at the end of the sound.
+        """
+        return self._loop_end_at
 
     @property
     def fade_in(self):

@@ -401,7 +401,9 @@ cdef class AudioInterface:
             return {'sample_rate': self.audio_callback_data.sample_rate,
                     'audio_channels': self.audio_callback_data.channels,
                     'buffer_samples': self.audio_callback_data.buffer_samples,
-                    'buffer_size': self.audio_callback_data.buffer_size
+                    'buffer_size': self.audio_callback_data.buffer_size,
+                    'bytes_per_sample': self.audio_callback_data.bytes_per_sample,
+                    'seconds_to_bytes_factor': self.audio_callback_data.seconds_to_bytes_factor
                     }
         else:
             return None

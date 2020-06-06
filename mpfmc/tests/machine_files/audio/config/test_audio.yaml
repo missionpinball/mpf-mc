@@ -87,6 +87,14 @@ sounds:
         stealing_method: newest
     263774_music:
         streaming: False
+    looptest:
+        loop_start_at: 1.8461538s
+        loop_end_at: 3.6923077s
+        loops: 3
+        streaming: False
+        events_when_played: looptest_played
+        events_when_looping: looptest_looping
+        events_when_stopped: looptest_stopped
 
 sound_pools:
     drum_group:
