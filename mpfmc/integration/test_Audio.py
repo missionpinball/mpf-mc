@@ -14,6 +14,52 @@ class TestAudio(MpfIntegrationTestCase):
     def get_config_file(self):
         return 'config.yaml'
 
+    def test_sound_custom_code(self):
+
+        if SoundSystem is None or self.mc.sound_system is None:
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        if interface is None:
+            self.skipTest("Sound system audio interface could not be loaded")
+
+        self.assertIsNotNone(interface)
+
+        # Check sfx track
+        track_sfx = interface.get_track_by_name("sfx")
+        self.assertIsNotNone(track_sfx)
+        self.assertEqual(track_sfx.name, "sfx")
+        self.assertAlmostEqual(track_sfx.volume, 0.6, 1)
+
+        # /sounds/sfx
+        self.assertTrue(hasattr(self.mc, 'sounds'))
+        self.assertIn('264828_text', self.mc.sounds)
+
+        # Attempt to play sound by calling sound_player directly from custom code
+        settings = {
+            '264828_text': {
+                'action': 'play',
+                'loops': -1,
+                'key': 'music'
+            }
+        }
+        self.machine.sound_player.play(settings, 'asset_manager', None)
+        self.advance_time_and_run(0.2)
+
+        status = track_sfx.get_status()
+        self.assertEqual(status[0]['status'], "playing")
+        self.assertEqual(status[0]['sound_id'], self.mc.sounds["264828_text"].id)
+        self.assertEqual(len(status), 1)
+
+        settings = {
+            '264828_text': {
+                'action': 'stop'
+            }
+        }
+        self.machine.sound_player.play(settings, 'asset_manager', None)
+        self.advance_time_and_run(0.1)
+
     def test_sound_loop_player(self):
 
         if SoundSystem is None or self.mc.sound_system is None:
