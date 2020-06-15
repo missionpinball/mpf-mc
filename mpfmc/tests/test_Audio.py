@@ -810,76 +810,110 @@ class TestAudio(MpfMcTestCase):
         self.advance_real_time()
         self.assertFalse(sound_music.loaded)
 
-    def test_sound_looping(self):
-        """ Tests the sound looping features """
+        def test_sound_looping(self):
+            """ Tests the sound looping features """
 
-        if SoundSystem is None or self.mc.sound_system is None:
-            log = logging.getLogger('TestAudio')
-            log.warning("Sound system is not enabled - skipping audio tests")
-            self.skipTest("Sound system is not enabled")
+            if SoundSystem is None or self.mc.sound_system is None:
+                log = logging.getLogger('TestAudio')
+                log.warning("Sound system is not enabled - skipping audio tests")
+                self.skipTest("Sound system is not enabled")
 
-        self.assertIsNotNone(self.mc.sound_system)
-        interface = self.mc.sound_system.audio_interface
-        if interface is None:
-            log = logging.getLogger('TestAudio')
-            log.warning("Sound system audio interface could not be loaded - skipping audio tests")
-            self.skipTest("Sound system audio interface could not be loaded")
+            self.assertIsNotNone(self.mc.sound_system)
+            interface = self.mc.sound_system.audio_interface
+            if interface is None:
+                log = logging.getLogger('TestAudio')
+                log.warning("Sound system audio interface could not be loaded - skipping audio tests")
+                self.skipTest("Sound system audio interface could not be loaded")
 
-        self.assertIsNotNone(interface)
+            self.assertIsNotNone(interface)
 
-        # Mock BCP send method
-        self.mc.bcp_processor.send = MagicMock()
-        self.mc.bcp_processor.enabled = True
+            # Mock BCP send method
+            self.mc.bcp_processor.send = MagicMock()
+            self.mc.bcp_processor.enabled = True
 
-        track_music = interface.get_track_by_name("music")
-        self.assertIsNotNone(track_music)
-        self.assertEqual(track_music.name, "music")
-        self.assertEqual(track_music.max_simultaneous_sounds, 1)
+            track_music = interface.get_track_by_name("music")
+            self.assertIsNotNone(track_music)
+            self.assertEqual(track_music.name, "music")
+            self.assertEqual(track_music.max_simultaneous_sounds, 1)
 
-        # Because these tests can be run at different audio settings depending upon hardware,
-        # sample lengths and positions in bytes are not reliable to compare for testing. This
-        # test will convert sample lengths/positions back to time for comparisons based on the
-        # audio interface settings actually used in the test.
-        settings = self.mc.sound_system.audio_interface.get_settings()
-        self.assertIsNotNone(settings)
-        seconds_to_bytes_factor = settings['seconds_to_bytes_factor']
+            # Because these tests can be run at different audio settings depending upon hardware,
+            # sample lengths and positions in bytes are not reliable to compare for testing. This
+            # test will convert sample lengths/positions back to time for comparisons based on the
+            # audio interface settings actually used in the test.
+            settings = self.mc.sound_system.audio_interface.get_settings()
+            self.assertIsNotNone(settings)
+            seconds_to_bytes_factor = settings['seconds_to_bytes_factor']
 
-        self.advance_real_time(1)
+            self.advance_real_time(1)
 
-        self.assertIn('looptest', self.mc.sounds)  # .wav
-        sound_looptest = self.mc.sounds['looptest']
-        self.assertFalse(sound_looptest.loaded)
-        self.assertAlmostEqual(sound_looptest.loop_start_at, 1.8461538, 4)
-        self.assertAlmostEqual(sound_looptest.loop_end_at, 3.6923077, 4)
-        self.assertEqual(sound_looptest.loops, 3)
+            self.assertIn('looptest', self.mc.sounds)  # .wav
+            sound_looptest = self.mc.sounds['looptest']
+            self.assertFalse(sound_looptest.loaded)
+            self.assertAlmostEqual(sound_looptest.loop_start_at, 1.8461538, 4)
+            self.assertAlmostEqual(sound_looptest.loop_end_at, 3.6923077, 4)
+            self.assertEqual(sound_looptest.loops, 3)
 
-        instance1 = track_music.play_sound(sound_looptest, context=None, settings={'volume': 1.0})
-        self.advance_real_time()
+            instance1 = track_music.play_sound(sound_looptest, context=None, settings={'volume': 1.0})
+            self.advance_real_time()
 
-        status = track_music.get_status()
-        self.assertEqual(status[0]['sound_instance_id'], instance1.id)
-        self.assertEqual(status[0]['sound_id'], sound_looptest.id)
-        self.assertEqual(status[0]['status'], "playing")
-        self.assertEqual(status[0]['current_loop'], 0)
-        self.assertEqual(status[0]['loops'], 3)
-        self.assertAlmostEqual(status[0]['loop_start_pos'] / seconds_to_bytes_factor, 1.8461538, 4)
-        self.assertAlmostEqual(status[0]['loop_end_pos'] / seconds_to_bytes_factor, 3.6923077, 4)
-        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_played')
-        self.mc.bcp_processor.send.reset_mock()
+            status = track_music.get_status()
+            self.assertEqual(status[0]['sound_instance_id'], instance1.id)
+            self.assertEqual(status[0]['sound_id'], sound_looptest.id)
+            self.assertEqual(status[0]['status'], "playing")
+            self.assertEqual(status[0]['current_loop'], 0)
+            self.assertEqual(status[0]['loops'], 3)
+            self.assertAlmostEqual(status[0]['loop_start_pos'] / seconds_to_bytes_factor, 1.8461538, 4)
+            self.assertAlmostEqual(status[0]['loop_end_pos'] / seconds_to_bytes_factor, 3.6923077, 4)
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_played')
+            self.mc.bcp_processor.send.reset_mock()
 
-        self.advance_real_time(10)
-        instance1.stop()
-        self.advance_real_time()
+            self.advance_real_time(10)
+            instance1.stop()
+            self.advance_real_time()
 
-        status = track_music.get_status()
-        self.assertEqual(status[0]['sound_instance_id'], instance1.id)
-        self.assertEqual(status[0]['current_loop'], 3)
-        self.assertEqual(status[0]['loops'], 0)
-        self.assertAlmostEqual(status[0]['loop_start_pos'] / seconds_to_bytes_factor, 1.8461538, 4)
-        self.assertAlmostEqual(status[0]['loop_end_pos'] / seconds_to_bytes_factor, 5.8846259, 4)
+            status = track_music.get_status()
+            self.assertEqual(status[0]['sound_instance_id'], instance1.id)
+            self.assertEqual(status[0]['current_loop'], 3)
+            self.assertEqual(status[0]['loops'], 0)
+            self.assertAlmostEqual(status[0]['loop_start_pos'] / seconds_to_bytes_factor, 1.8461538, 4)
+            self.assertAlmostEqual(status[0]['loop_end_pos'] / seconds_to_bytes_factor, 5.8846259, 4)
 
-        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_looping')
-        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_stopped')
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_looping')
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_stopped')
+
+            # Now start playing the song after the end of the loop end (should loop back to the beginning of the loop)
+            instance1 = track_music.play_sound(sound_looptest, context=None,
+                                               settings={'volume': 1.0, 'start_at': 3.8, 'loops': 5})
+            self.advance_real_time()
+
+            status = track_music.get_status()
+            self.assertEqual(status[0]['sound_instance_id'], instance1.id)
+            self.assertEqual(status[0]['sound_id'], sound_looptest.id)
+            self.assertEqual(status[0]['status'], "playing")
+            self.assertEqual(status[0]['current_loop'], 0)
+            self.assertEqual(status[0]['loops'], 5)
+            self.assertGreater(status[0]['sample_pos'] / seconds_to_bytes_factor, 3.8)
+            self.assertAlmostEqual(status[0]['loop_start_pos'] / seconds_to_bytes_factor, 1.8461538, 4)
+            self.assertAlmostEqual(status[0]['loop_end_pos'] / seconds_to_bytes_factor, 3.6923077, 4)
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_played')
+            self.mc.bcp_processor.send.reset_mock()
+
+            self.advance_real_time(2.5)
+
+            status = track_music.get_status()
+            self.assertEqual(status[0]['sound_instance_id'], instance1.id)
+            self.assertEqual(status[0]['current_loop'], 1)
+            self.assertEqual(status[0]['loops'], 4)
+            self.assertGreater(status[0]['sample_pos'] / seconds_to_bytes_factor, 1.8461538)
+            self.assertLess(status[0]['sample_pos'] / seconds_to_bytes_factor, 5.8846259)
+            self.assertAlmostEqual(status[0]['loop_start_pos'] / seconds_to_bytes_factor, 1.8461538, 4)
+            self.assertAlmostEqual(status[0]['loop_end_pos'] / seconds_to_bytes_factor, 3.6923077, 4)
+
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_looping')
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_stopped')
+
+            instance1.stop()
+            self.advance_real_time()
 
         # TODO: Add integration test for sound_player
         # TODO: Add integration test for track_player

@@ -1580,16 +1580,25 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
 
     cdef Uint32 samples_remaining_to_output = length
     cdef Uint32 samples_remaining_in_sound
+    cdef Uint32 loop_end_pos = sound.loop_end_pos
     cdef Uint32 buffer_pos = 0
     cdef Uint8 *sound_buffer = <Uint8*>sound.sample.data.memory.data
     if sound_buffer == NULL:
         return True
 
+    # Make sure the sound sample position is not starting after the end of the loop position. If so, adjust the
+    # end of the loop position to be the end of the sound (keeps the sound player from running past the end of
+    # the sound buffer and into other parts of memory creating noise). This should only ever happen if the sound
+    # is started after the end of the loop position.
+    if sound.sample_pos >= loop_end_pos:
+        loop_end_pos = sound.sample.data.memory.size
+
+    # Loop while there are still samples remaining to be output
     while samples_remaining_to_output > 0:
 
         # Determine how many samples are remaining in the sound buffer before the end of the sound (the
         # current loop position)
-        samples_remaining_in_sound = sound.loop_end_pos - sound.sample_pos
+        samples_remaining_in_sound = loop_end_pos - sound.sample_pos
 
         # Determine if we are consuming the entire remaining sound buffer, or just a portion of it
         if samples_remaining_to_output < samples_remaining_in_sound:
@@ -1628,7 +1637,7 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
             buffer_pos += samples_remaining_in_sound
 
         # Check if we are at the end of the source sample buffer (loop if applicable)
-        if sound.sample_pos >= sound.loop_end_pos:
+        if sound.sample_pos >= loop_end_pos:
             if sound.loops_remaining > 0:
                 # At the end and still loops remaining, loop back to the beginning of the loop
                 sound.loops_remaining -= 1
@@ -1639,6 +1648,7 @@ cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *o
                 # If the sound is on its last loop, set the loop end position to be the end of the sound
                 if sound.loops_remaining == 0:
                     sound.loop_end_pos = sound.sample.data.memory.size
+                    loop_end_pos = sound.loop_end_pos
 
             elif sound.loops_remaining == 0:
                 # At the end and not looping, the sample has finished playing (return True for end of sound)
