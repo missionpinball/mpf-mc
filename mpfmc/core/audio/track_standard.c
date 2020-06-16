@@ -19453,7 +19453,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  *                         # Replacing the current sound with a new one: copy sound player settings from next sound to current
  *                         player.current.sample = player.next.sample             # <<<<<<<<<<<<<<
  *                         player.current.sample_pos = player.next.sample_pos
- *                         player.current.current_loop = player.next.current_loop
+ *                         player.current.loop_start_pos = player.next.loop_start_pos
  */
           __pyx_t_16 = __pyx_v_player->next.sample;
           __pyx_v_player->current.sample = __pyx_t_16;
@@ -19462,8 +19462,8 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  *                         # Replacing the current sound with a new one: copy sound player settings from next sound to current
  *                         player.current.sample = player.next.sample
  *                         player.current.sample_pos = player.next.sample_pos             # <<<<<<<<<<<<<<
- *                         player.current.current_loop = player.next.current_loop
- *                         player.current.sound_id = player.next.sound_id
+ *                         player.current.loop_start_pos = player.next.loop_start_pos
+ *                         player.current.loop_end_pos = player.next.loop_end_pos
  */
           __pyx_t_8 = __pyx_v_player->next.sample_pos;
           __pyx_v_player->current.sample_pos = __pyx_t_8;
@@ -19471,6 +19471,26 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           /* "mpfmc/core/audio/track_standard.pyx":1509
  *                         player.current.sample = player.next.sample
  *                         player.current.sample_pos = player.next.sample_pos
+ *                         player.current.loop_start_pos = player.next.loop_start_pos             # <<<<<<<<<<<<<<
+ *                         player.current.loop_end_pos = player.next.loop_end_pos
+ *                         player.current.current_loop = player.next.current_loop
+ */
+          __pyx_t_8 = __pyx_v_player->next.loop_start_pos;
+          __pyx_v_player->current.loop_start_pos = __pyx_t_8;
+
+          /* "mpfmc/core/audio/track_standard.pyx":1510
+ *                         player.current.sample_pos = player.next.sample_pos
+ *                         player.current.loop_start_pos = player.next.loop_start_pos
+ *                         player.current.loop_end_pos = player.next.loop_end_pos             # <<<<<<<<<<<<<<
+ *                         player.current.current_loop = player.next.current_loop
+ *                         player.current.sound_id = player.next.sound_id
+ */
+          __pyx_t_8 = __pyx_v_player->next.loop_end_pos;
+          __pyx_v_player->current.loop_end_pos = __pyx_t_8;
+
+          /* "mpfmc/core/audio/track_standard.pyx":1511
+ *                         player.current.loop_start_pos = player.next.loop_start_pos
+ *                         player.current.loop_end_pos = player.next.loop_end_pos
  *                         player.current.current_loop = player.next.current_loop             # <<<<<<<<<<<<<<
  *                         player.current.sound_id = player.next.sound_id
  *                         player.current.sound_instance_id = player.next.sound_instance_id
@@ -19478,8 +19498,8 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_11 = __pyx_v_player->next.current_loop;
           __pyx_v_player->current.current_loop = __pyx_t_11;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1510
- *                         player.current.sample_pos = player.next.sample_pos
+          /* "mpfmc/core/audio/track_standard.pyx":1512
+ *                         player.current.loop_end_pos = player.next.loop_end_pos
  *                         player.current.current_loop = player.next.current_loop
  *                         player.current.sound_id = player.next.sound_id             # <<<<<<<<<<<<<<
  *                         player.current.sound_instance_id = player.next.sound_instance_id
@@ -19488,7 +19508,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_17 = __pyx_v_player->next.sound_id;
           __pyx_v_player->current.sound_id = __pyx_t_17;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1511
+          /* "mpfmc/core/audio/track_standard.pyx":1513
  *                         player.current.current_loop = player.next.current_loop
  *                         player.current.sound_id = player.next.sound_id
  *                         player.current.sound_instance_id = player.next.sound_instance_id             # <<<<<<<<<<<<<<
@@ -19498,7 +19518,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_17 = __pyx_v_player->next.sound_instance_id;
           __pyx_v_player->current.sound_instance_id = __pyx_t_17;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1512
+          /* "mpfmc/core/audio/track_standard.pyx":1514
  *                         player.current.sound_id = player.next.sound_id
  *                         player.current.sound_instance_id = player.next.sound_instance_id
  *                         player.current.volume = player.next.volume             # <<<<<<<<<<<<<<
@@ -19508,7 +19528,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_9 = __pyx_v_player->next.volume;
           __pyx_v_player->current.volume = __pyx_t_9;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1513
+          /* "mpfmc/core/audio/track_standard.pyx":1515
  *                         player.current.sound_instance_id = player.next.sound_instance_id
  *                         player.current.volume = player.next.volume
  *                         player.current.loops_remaining = player.next.loops_remaining             # <<<<<<<<<<<<<<
@@ -19518,7 +19538,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_11 = __pyx_v_player->next.loops_remaining;
           __pyx_v_player->current.loops_remaining = __pyx_t_11;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1514
+          /* "mpfmc/core/audio/track_standard.pyx":1516
  *                         player.current.volume = player.next.volume
  *                         player.current.loops_remaining = player.next.loops_remaining
  *                         player.current.sound_priority = player.next.sound_priority             # <<<<<<<<<<<<<<
@@ -19528,7 +19548,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_11 = __pyx_v_player->next.sound_priority;
           __pyx_v_player->current.sound_priority = __pyx_t_11;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1515
+          /* "mpfmc/core/audio/track_standard.pyx":1517
  *                         player.current.loops_remaining = player.next.loops_remaining
  *                         player.current.sound_priority = player.next.sound_priority
  *                         player.current.fade_in_steps = player.next.fade_in_steps             # <<<<<<<<<<<<<<
@@ -19538,7 +19558,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_8 = __pyx_v_player->next.fade_in_steps;
           __pyx_v_player->current.fade_in_steps = __pyx_t_8;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1516
+          /* "mpfmc/core/audio/track_standard.pyx":1518
  *                         player.current.sound_priority = player.next.sound_priority
  *                         player.current.fade_in_steps = player.next.fade_in_steps
  *                         player.current.fade_out_steps = player.next.fade_out_steps             # <<<<<<<<<<<<<<
@@ -19548,7 +19568,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_8 = __pyx_v_player->next.fade_out_steps;
           __pyx_v_player->current.fade_out_steps = __pyx_t_8;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1517
+          /* "mpfmc/core/audio/track_standard.pyx":1519
  *                         player.current.fade_in_steps = player.next.fade_in_steps
  *                         player.current.fade_out_steps = player.next.fade_out_steps
  *                         player.current.fade_steps_remaining = player.next.fade_steps_remaining             # <<<<<<<<<<<<<<
@@ -19558,7 +19578,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_8 = __pyx_v_player->next.fade_steps_remaining;
           __pyx_v_player->current.fade_steps_remaining = __pyx_t_8;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1518
+          /* "mpfmc/core/audio/track_standard.pyx":1520
  *                         player.current.fade_out_steps = player.next.fade_out_steps
  *                         player.current.fade_steps_remaining = player.next.fade_steps_remaining
  *                         player.current.fading_status = player.next.fading_status             # <<<<<<<<<<<<<<
@@ -19568,7 +19588,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_18 = __pyx_v_player->next.fading_status;
           __pyx_v_player->current.fading_status = __pyx_t_18;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1519
+          /* "mpfmc/core/audio/track_standard.pyx":1521
  *                         player.current.fade_steps_remaining = player.next.fade_steps_remaining
  *                         player.current.fading_status = player.next.fading_status
  *                         player.current.about_to_finish_marker = player.next.about_to_finish_marker             # <<<<<<<<<<<<<<
@@ -19578,7 +19598,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_8 = __pyx_v_player->next.about_to_finish_marker;
           __pyx_v_player->current.about_to_finish_marker = __pyx_t_8;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1521
+          /* "mpfmc/core/audio/track_standard.pyx":1523
  *                         player.current.about_to_finish_marker = player.next.about_to_finish_marker
  * 
  *                         player.current.marker_count = player.next.marker_count             # <<<<<<<<<<<<<<
@@ -19588,7 +19608,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_9 = __pyx_v_player->next.marker_count;
           __pyx_v_player->current.marker_count = __pyx_t_9;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1522
+          /* "mpfmc/core/audio/track_standard.pyx":1524
  * 
  *                         player.current.marker_count = player.next.marker_count
  *                         g_array_set_size(player.current.markers, player.current.marker_count)             # <<<<<<<<<<<<<<
@@ -19597,7 +19617,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
           (void)(g_array_set_size(__pyx_v_player->current.markers, __pyx_v_player->current.marker_count));
 
-          /* "mpfmc/core/audio/track_standard.pyx":1523
+          /* "mpfmc/core/audio/track_standard.pyx":1525
  *                         player.current.marker_count = player.next.marker_count
  *                         g_array_set_size(player.current.markers, player.current.marker_count)
  *                         for marker_id in range(player.next.marker_count):             # <<<<<<<<<<<<<<
@@ -19609,7 +19629,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
             __pyx_v_marker_id = __pyx_t_11;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1524
+            /* "mpfmc/core/audio/track_standard.pyx":1526
  *                         g_array_set_size(player.current.markers, player.current.marker_count)
  *                         for marker_id in range(player.next.marker_count):
  *                             g_array_insert_val_uint(player.current.markers,             # <<<<<<<<<<<<<<
@@ -19619,7 +19639,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
             g_array_insert_val_uint(__pyx_v_player->current.markers, __pyx_v_marker_id, g_array_index_uint(__pyx_v_player->next.markers, __pyx_v_marker_id));
           }
 
-          /* "mpfmc/core/audio/track_standard.pyx":1528
+          /* "mpfmc/core/audio/track_standard.pyx":1530
  *                                                     g_array_index_uint(player.next.markers, marker_id))
  * 
  *                         if player.next.sound_has_ducking:             # <<<<<<<<<<<<<<
@@ -19629,7 +19649,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           __pyx_t_1 = (__pyx_v_player->next.sound_has_ducking != 0);
           if (__pyx_t_1) {
 
-            /* "mpfmc/core/audio/track_standard.pyx":1529
+            /* "mpfmc/core/audio/track_standard.pyx":1531
  * 
  *                         if player.next.sound_has_ducking:
  *                             player.current.sound_has_ducking = True             # <<<<<<<<<<<<<<
@@ -19638,7 +19658,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
             __pyx_v_player->current.sound_has_ducking = 1;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1530
+            /* "mpfmc/core/audio/track_standard.pyx":1532
  *                         if player.next.sound_has_ducking:
  *                             player.current.sound_has_ducking = True
  *                             player.current.ducking_stage = ducking_stage_delay             # <<<<<<<<<<<<<<
@@ -19647,7 +19667,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
             __pyx_v_player->current.ducking_stage = __pyx_e_5mpfmc_4core_5audio_14track_standard_ducking_stage_delay;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1531
+            /* "mpfmc/core/audio/track_standard.pyx":1533
  *                             player.current.sound_has_ducking = True
  *                             player.current.ducking_stage = ducking_stage_delay
  *                             player.current.ducking_settings.track_bit_mask = player.next.ducking_settings.track_bit_mask             # <<<<<<<<<<<<<<
@@ -19657,7 +19677,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
             __pyx_t_11 = __pyx_v_player->next.ducking_settings.track_bit_mask;
             __pyx_v_player->current.ducking_settings.track_bit_mask = __pyx_t_11;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1532
+            /* "mpfmc/core/audio/track_standard.pyx":1534
  *                             player.current.ducking_stage = ducking_stage_delay
  *                             player.current.ducking_settings.track_bit_mask = player.next.ducking_settings.track_bit_mask
  *                             player.current.ducking_settings.attack_start_pos = player.next.ducking_settings.attack_start_pos             # <<<<<<<<<<<<<<
@@ -19667,7 +19687,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
             __pyx_t_19 = __pyx_v_player->next.ducking_settings.attack_start_pos;
             __pyx_v_player->current.ducking_settings.attack_start_pos = __pyx_t_19;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1533
+            /* "mpfmc/core/audio/track_standard.pyx":1535
  *                             player.current.ducking_settings.track_bit_mask = player.next.ducking_settings.track_bit_mask
  *                             player.current.ducking_settings.attack_start_pos = player.next.ducking_settings.attack_start_pos
  *                             player.current.ducking_settings.attack_duration = player.next.ducking_settings.attack_duration             # <<<<<<<<<<<<<<
@@ -19677,7 +19697,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
             __pyx_t_19 = __pyx_v_player->next.ducking_settings.attack_duration;
             __pyx_v_player->current.ducking_settings.attack_duration = __pyx_t_19;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1534
+            /* "mpfmc/core/audio/track_standard.pyx":1536
  *                             player.current.ducking_settings.attack_start_pos = player.next.ducking_settings.attack_start_pos
  *                             player.current.ducking_settings.attack_duration = player.next.ducking_settings.attack_duration
  *                             player.current.ducking_settings.attenuation_volume = player.next.ducking_settings.attenuation_volume             # <<<<<<<<<<<<<<
@@ -19687,7 +19707,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
             __pyx_t_9 = __pyx_v_player->next.ducking_settings.attenuation_volume;
             __pyx_v_player->current.ducking_settings.attenuation_volume = __pyx_t_9;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1535
+            /* "mpfmc/core/audio/track_standard.pyx":1537
  *                             player.current.ducking_settings.attack_duration = player.next.ducking_settings.attack_duration
  *                             player.current.ducking_settings.attenuation_volume = player.next.ducking_settings.attenuation_volume
  *                             player.current.ducking_settings.release_start_pos = player.next.ducking_settings.release_start_pos             # <<<<<<<<<<<<<<
@@ -19697,7 +19717,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
             __pyx_t_19 = __pyx_v_player->next.ducking_settings.release_start_pos;
             __pyx_v_player->current.ducking_settings.release_start_pos = __pyx_t_19;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1536
+            /* "mpfmc/core/audio/track_standard.pyx":1538
  *                             player.current.ducking_settings.attenuation_volume = player.next.ducking_settings.attenuation_volume
  *                             player.current.ducking_settings.release_start_pos = player.next.ducking_settings.release_start_pos
  *                             player.current.ducking_settings.release_duration = player.next.ducking_settings.release_duration             # <<<<<<<<<<<<<<
@@ -19707,7 +19727,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
             __pyx_t_19 = __pyx_v_player->next.ducking_settings.release_duration;
             __pyx_v_player->current.ducking_settings.release_duration = __pyx_t_19;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1528
+            /* "mpfmc/core/audio/track_standard.pyx":1530
  *                                                     g_array_index_uint(player.next.markers, marker_id))
  * 
  *                         if player.next.sound_has_ducking:             # <<<<<<<<<<<<<<
@@ -19717,7 +19737,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
             goto __pyx_L40;
           }
 
-          /* "mpfmc/core/audio/track_standard.pyx":1538
+          /* "mpfmc/core/audio/track_standard.pyx":1540
  *                             player.current.ducking_settings.release_duration = player.next.ducking_settings.release_duration
  *                         else:
  *                             player.current.sound_has_ducking = False             # <<<<<<<<<<<<<<
@@ -19727,7 +19747,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           /*else*/ {
             __pyx_v_player->current.sound_has_ducking = 0;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1539
+            /* "mpfmc/core/audio/track_standard.pyx":1541
  *                         else:
  *                             player.current.sound_has_ducking = False
  *                             player.current.ducking_stage = ducking_stage_idle             # <<<<<<<<<<<<<<
@@ -19736,7 +19756,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
             __pyx_v_player->current.ducking_stage = __pyx_e_5mpfmc_4core_5audio_14track_standard_ducking_stage_idle;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1540
+            /* "mpfmc/core/audio/track_standard.pyx":1542
  *                             player.current.sound_has_ducking = False
  *                             player.current.ducking_stage = ducking_stage_idle
  *                             player.current.ducking_settings.track_bit_mask = 0             # <<<<<<<<<<<<<<
@@ -19745,7 +19765,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
             __pyx_v_player->current.ducking_settings.track_bit_mask = 0;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1541
+            /* "mpfmc/core/audio/track_standard.pyx":1543
  *                             player.current.ducking_stage = ducking_stage_idle
  *                             player.current.ducking_settings.track_bit_mask = 0
  *                             player.current.ducking_settings.attack_start_pos = 0             # <<<<<<<<<<<<<<
@@ -19754,7 +19774,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
             __pyx_v_player->current.ducking_settings.attack_start_pos = 0;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1542
+            /* "mpfmc/core/audio/track_standard.pyx":1544
  *                             player.current.ducking_settings.track_bit_mask = 0
  *                             player.current.ducking_settings.attack_start_pos = 0
  *                             player.current.ducking_settings.attack_duration = 0             # <<<<<<<<<<<<<<
@@ -19763,7 +19783,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
             __pyx_v_player->current.ducking_settings.attack_duration = 0;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1543
+            /* "mpfmc/core/audio/track_standard.pyx":1545
  *                             player.current.ducking_settings.attack_start_pos = 0
  *                             player.current.ducking_settings.attack_duration = 0
  *                             player.current.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME             # <<<<<<<<<<<<<<
@@ -19772,7 +19792,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
             __pyx_v_player->current.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1544
+            /* "mpfmc/core/audio/track_standard.pyx":1546
  *                             player.current.ducking_settings.attack_duration = 0
  *                             player.current.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME
  *                             player.current.ducking_settings.release_start_pos = 0             # <<<<<<<<<<<<<<
@@ -19781,7 +19801,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
             __pyx_v_player->current.ducking_settings.release_start_pos = 0;
 
-            /* "mpfmc/core/audio/track_standard.pyx":1545
+            /* "mpfmc/core/audio/track_standard.pyx":1547
  *                             player.current.ducking_settings.attenuation_volume = SDL_MIX_MAXVOLUME
  *                             player.current.ducking_settings.release_start_pos = 0
  *                             player.current.ducking_settings.release_duration = 0             # <<<<<<<<<<<<<<
@@ -19792,7 +19812,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           }
           __pyx_L40:;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1548
+          /* "mpfmc/core/audio/track_standard.pyx":1550
  * 
  *                         # Send sound started notification
  *                         send_sound_started_notification(player_num, player.current.sound_id, player.current.sound_instance_id, track)             # <<<<<<<<<<<<<<
@@ -19801,7 +19821,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
           __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_started_notification(__pyx_v_player_num, __pyx_v_player->current.sound_id, __pyx_v_player->current.sound_instance_id, __pyx_v_track);
 
-          /* "mpfmc/core/audio/track_standard.pyx":1549
+          /* "mpfmc/core/audio/track_standard.pyx":1551
  *                         # Send sound started notification
  *                         send_sound_started_notification(player_num, player.current.sound_id, player.current.sound_instance_id, track)
  *                         player.status = player_playing             # <<<<<<<<<<<<<<
@@ -19810,7 +19830,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
           __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_14track_standard_player_playing;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1550
+          /* "mpfmc/core/audio/track_standard.pyx":1552
  *                         send_sound_started_notification(player_num, player.current.sound_id, player.current.sound_instance_id, track)
  *                         player.status = player_playing
  *                         sound_finished = False             # <<<<<<<<<<<<<<
@@ -19829,7 +19849,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
           goto __pyx_L37;
         }
 
-        /* "mpfmc/core/audio/track_standard.pyx":1552
+        /* "mpfmc/core/audio/track_standard.pyx":1554
  *                         sound_finished = False
  *                     else:
  *                         player.status = player_idle             # <<<<<<<<<<<<<<
@@ -19839,7 +19859,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
         /*else*/ {
           __pyx_v_player->status = __pyx_e_5mpfmc_4core_5audio_14track_standard_player_idle;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1553
+          /* "mpfmc/core/audio/track_standard.pyx":1555
  *                     else:
  *                         player.status = player_idle
  *                         break             # <<<<<<<<<<<<<<
@@ -19859,7 +19879,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1556
+      /* "mpfmc/core/audio/track_standard.pyx":1558
  * 
  *                 # Move to next chunk
  *                 buffer_bytes_remaining -= current_chunk_bytes             # <<<<<<<<<<<<<<
@@ -19868,7 +19888,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
       __pyx_v_buffer_bytes_remaining = (__pyx_v_buffer_bytes_remaining - __pyx_v_current_chunk_bytes);
 
-      /* "mpfmc/core/audio/track_standard.pyx":1557
+      /* "mpfmc/core/audio/track_standard.pyx":1559
  *                 # Move to next chunk
  *                 buffer_bytes_remaining -= current_chunk_bytes
  *                 track_buffer_pos += current_chunk_bytes             # <<<<<<<<<<<<<<
@@ -19877,7 +19897,7 @@ static void __pyx_f_5mpfmc_4core_5audio_14track_standard_13TrackStandard_mix_pla
  */
       __pyx_v_track_buffer_pos = (__pyx_v_track_buffer_pos + __pyx_v_current_chunk_bytes);
 
-      /* "mpfmc/core/audio/track_standard.pyx":1558
+      /* "mpfmc/core/audio/track_standard.pyx":1560
  *                 buffer_bytes_remaining -= current_chunk_bytes
  *                 track_buffer_pos += current_chunk_bytes
  *                 control_point += 1             # <<<<<<<<<<<<<<
@@ -20014,7 +20034,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_14track_standard_13TrackStandard_6
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_standard.pyx":1560
+/* "mpfmc/core/audio/track_standard.pyx":1562
  *                 control_point += 1
  * 
  * cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,             # <<<<<<<<<<<<<<
@@ -20034,7 +20054,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
   Uint32 __pyx_t_3;
   gsize __pyx_t_4;
 
-  /* "mpfmc/core/audio/track_standard.pyx":1578
+  /* "mpfmc/core/audio/track_standard.pyx":1580
  *         True if sound is finished, False otherwise
  *     """
  *     if sound == NULL or output_buffer == NULL:             # <<<<<<<<<<<<<<
@@ -20052,7 +20072,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_standard.pyx":1579
+    /* "mpfmc/core/audio/track_standard.pyx":1581
  *     """
  *     if sound == NULL or output_buffer == NULL:
  *         return True             # <<<<<<<<<<<<<<
@@ -20062,7 +20082,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
     __pyx_r = 1;
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_standard.pyx":1578
+    /* "mpfmc/core/audio/track_standard.pyx":1580
  *         True if sound is finished, False otherwise
  *     """
  *     if sound == NULL or output_buffer == NULL:             # <<<<<<<<<<<<<<
@@ -20071,7 +20091,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
   }
 
-  /* "mpfmc/core/audio/track_standard.pyx":1581
+  /* "mpfmc/core/audio/track_standard.pyx":1583
  *         return True
  * 
  *     cdef Uint32 samples_remaining_to_output = length             # <<<<<<<<<<<<<<
@@ -20080,7 +20100,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
   __pyx_v_samples_remaining_to_output = __pyx_v_length;
 
-  /* "mpfmc/core/audio/track_standard.pyx":1583
+  /* "mpfmc/core/audio/track_standard.pyx":1585
  *     cdef Uint32 samples_remaining_to_output = length
  *     cdef Uint32 samples_remaining_in_sound
  *     cdef Uint32 loop_end_pos = sound.loop_end_pos             # <<<<<<<<<<<<<<
@@ -20090,7 +20110,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
   __pyx_t_3 = __pyx_v_sound->loop_end_pos;
   __pyx_v_loop_end_pos = __pyx_t_3;
 
-  /* "mpfmc/core/audio/track_standard.pyx":1584
+  /* "mpfmc/core/audio/track_standard.pyx":1586
  *     cdef Uint32 samples_remaining_in_sound
  *     cdef Uint32 loop_end_pos = sound.loop_end_pos
  *     cdef Uint32 buffer_pos = 0             # <<<<<<<<<<<<<<
@@ -20099,7 +20119,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
   __pyx_v_buffer_pos = 0;
 
-  /* "mpfmc/core/audio/track_standard.pyx":1585
+  /* "mpfmc/core/audio/track_standard.pyx":1587
  *     cdef Uint32 loop_end_pos = sound.loop_end_pos
  *     cdef Uint32 buffer_pos = 0
  *     cdef Uint8 *sound_buffer = <Uint8*>sound.sample.data.memory.data             # <<<<<<<<<<<<<<
@@ -20108,7 +20128,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
   __pyx_v_sound_buffer = ((Uint8 *)__pyx_v_sound->sample->data.memory->data);
 
-  /* "mpfmc/core/audio/track_standard.pyx":1586
+  /* "mpfmc/core/audio/track_standard.pyx":1588
  *     cdef Uint32 buffer_pos = 0
  *     cdef Uint8 *sound_buffer = <Uint8*>sound.sample.data.memory.data
  *     if sound_buffer == NULL:             # <<<<<<<<<<<<<<
@@ -20118,7 +20138,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
   __pyx_t_1 = ((__pyx_v_sound_buffer == NULL) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_standard.pyx":1587
+    /* "mpfmc/core/audio/track_standard.pyx":1589
  *     cdef Uint8 *sound_buffer = <Uint8*>sound.sample.data.memory.data
  *     if sound_buffer == NULL:
  *         return True             # <<<<<<<<<<<<<<
@@ -20128,7 +20148,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
     __pyx_r = 1;
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_standard.pyx":1586
+    /* "mpfmc/core/audio/track_standard.pyx":1588
  *     cdef Uint32 buffer_pos = 0
  *     cdef Uint8 *sound_buffer = <Uint8*>sound.sample.data.memory.data
  *     if sound_buffer == NULL:             # <<<<<<<<<<<<<<
@@ -20137,7 +20157,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
   }
 
-  /* "mpfmc/core/audio/track_standard.pyx":1593
+  /* "mpfmc/core/audio/track_standard.pyx":1595
  *     # the sound buffer and into other parts of memory creating noise). This should only ever happen if the sound
  *     # is started after the end of the loop position.
  *     if sound.sample_pos >= loop_end_pos:             # <<<<<<<<<<<<<<
@@ -20147,7 +20167,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
   __pyx_t_1 = ((__pyx_v_sound->sample_pos >= __pyx_v_loop_end_pos) != 0);
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_standard.pyx":1594
+    /* "mpfmc/core/audio/track_standard.pyx":1596
  *     # is started after the end of the loop position.
  *     if sound.sample_pos >= loop_end_pos:
  *         loop_end_pos = sound.sample.data.memory.size             # <<<<<<<<<<<<<<
@@ -20157,7 +20177,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
     __pyx_t_4 = __pyx_v_sound->sample->data.memory->size;
     __pyx_v_loop_end_pos = __pyx_t_4;
 
-    /* "mpfmc/core/audio/track_standard.pyx":1593
+    /* "mpfmc/core/audio/track_standard.pyx":1595
  *     # the sound buffer and into other parts of memory creating noise). This should only ever happen if the sound
  *     # is started after the end of the loop position.
  *     if sound.sample_pos >= loop_end_pos:             # <<<<<<<<<<<<<<
@@ -20166,7 +20186,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
   }
 
-  /* "mpfmc/core/audio/track_standard.pyx":1597
+  /* "mpfmc/core/audio/track_standard.pyx":1599
  * 
  *     # Loop while there are still samples remaining to be output
  *     while samples_remaining_to_output > 0:             # <<<<<<<<<<<<<<
@@ -20177,7 +20197,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
     __pyx_t_1 = ((__pyx_v_samples_remaining_to_output > 0) != 0);
     if (!__pyx_t_1) break;
 
-    /* "mpfmc/core/audio/track_standard.pyx":1601
+    /* "mpfmc/core/audio/track_standard.pyx":1603
  *         # Determine how many samples are remaining in the sound buffer before the end of the sound (the
  *         # current loop position)
  *         samples_remaining_in_sound = loop_end_pos - sound.sample_pos             # <<<<<<<<<<<<<<
@@ -20186,7 +20206,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
     __pyx_v_samples_remaining_in_sound = (__pyx_v_loop_end_pos - __pyx_v_sound->sample_pos);
 
-    /* "mpfmc/core/audio/track_standard.pyx":1604
+    /* "mpfmc/core/audio/track_standard.pyx":1606
  * 
  *         # Determine if we are consuming the entire remaining sound buffer, or just a portion of it
  *         if samples_remaining_to_output < samples_remaining_in_sound:             # <<<<<<<<<<<<<<
@@ -20196,7 +20216,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
     __pyx_t_1 = ((__pyx_v_samples_remaining_to_output < __pyx_v_samples_remaining_in_sound) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_standard.pyx":1607
+      /* "mpfmc/core/audio/track_standard.pyx":1609
  * 
  *             # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
  *             if channels == 2 and False:             # <<<<<<<<<<<<<<
@@ -20213,7 +20233,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
       __pyx_L12_bool_binop_done:;
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_standard.pyx":1609
+        /* "mpfmc/core/audio/track_standard.pyx":1611
  *             if channels == 2 and False:
  *                 # disabled for now
  *                 Track.mix_audio_stereo(output_buffer + buffer_pos,             # <<<<<<<<<<<<<<
@@ -20222,7 +20242,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
         __pyx_vtabptr_5mpfmc_4core_5audio_5track_Track->mix_audio_stereo((__pyx_v_output_buffer + __pyx_v_buffer_pos), (((Uint8 *)__pyx_v_sound->sample->data.memory->data) + __pyx_v_sound->sample_pos), __pyx_v_samples_remaining_to_output, __pyx_v_sound->volume_left, __pyx_v_sound->volume_right);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1607
+        /* "mpfmc/core/audio/track_standard.pyx":1609
  * 
  *             # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
  *             if channels == 2 and False:             # <<<<<<<<<<<<<<
@@ -20232,7 +20252,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
         goto __pyx_L11;
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1615
+      /* "mpfmc/core/audio/track_standard.pyx":1617
  *                                        sound.volume_right)
  *             else:
  *                 SDL_MixAudioFormat(output_buffer + buffer_pos, <Uint8*>sound.sample.data.memory.data + sound.sample_pos, track.callback_data.format, samples_remaining_to_output, volume)             # <<<<<<<<<<<<<<
@@ -20244,7 +20264,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
       }
       __pyx_L11:;
 
-      /* "mpfmc/core/audio/track_standard.pyx":1618
+      /* "mpfmc/core/audio/track_standard.pyx":1620
  * 
  *             # Update buffer position pointers
  *             sound.sample_pos += samples_remaining_to_output             # <<<<<<<<<<<<<<
@@ -20253,7 +20273,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
       __pyx_v_sound->sample_pos = (__pyx_v_sound->sample_pos + __pyx_v_samples_remaining_to_output);
 
-      /* "mpfmc/core/audio/track_standard.pyx":1621
+      /* "mpfmc/core/audio/track_standard.pyx":1623
  * 
  *             # Sound is not finished, but the output buffer has been filled
  *             return False             # <<<<<<<<<<<<<<
@@ -20263,7 +20283,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
       __pyx_r = 0;
       goto __pyx_L0;
 
-      /* "mpfmc/core/audio/track_standard.pyx":1604
+      /* "mpfmc/core/audio/track_standard.pyx":1606
  * 
  *         # Determine if we are consuming the entire remaining sound buffer, or just a portion of it
  *         if samples_remaining_to_output < samples_remaining_in_sound:             # <<<<<<<<<<<<<<
@@ -20272,7 +20292,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
     }
 
-    /* "mpfmc/core/audio/track_standard.pyx":1624
+    /* "mpfmc/core/audio/track_standard.pyx":1626
  *         else:
  *             # Entire sound buffer consumed. Mix in remaining samples
  *             if channels == 2 and False:             # <<<<<<<<<<<<<<
@@ -20290,7 +20310,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
       __pyx_L15_bool_binop_done:;
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_standard.pyx":1626
+        /* "mpfmc/core/audio/track_standard.pyx":1628
  *             if channels == 2 and False:
  *                 # disabled for now
  *                 Track.mix_audio_stereo(output_buffer + buffer_pos,             # <<<<<<<<<<<<<<
@@ -20299,7 +20319,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
         __pyx_vtabptr_5mpfmc_4core_5audio_5track_Track->mix_audio_stereo((__pyx_v_output_buffer + __pyx_v_buffer_pos), (((Uint8 *)__pyx_v_sound->sample->data.memory->data) + __pyx_v_sound->sample_pos), __pyx_v_samples_remaining_to_output, __pyx_v_sound->volume_left, __pyx_v_sound->volume_right);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1624
+        /* "mpfmc/core/audio/track_standard.pyx":1626
  *         else:
  *             # Entire sound buffer consumed. Mix in remaining samples
  *             if channels == 2 and False:             # <<<<<<<<<<<<<<
@@ -20309,7 +20329,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
         goto __pyx_L14;
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1632
+      /* "mpfmc/core/audio/track_standard.pyx":1634
  *                                        sound.volume_right)
  *             else:
  *                 SDL_MixAudioFormat(output_buffer + buffer_pos, <Uint8*>sound.sample.data.memory.data + sound.sample_pos, track.callback_data.format, samples_remaining_in_sound, volume)             # <<<<<<<<<<<<<<
@@ -20321,7 +20341,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
       }
       __pyx_L14:;
 
-      /* "mpfmc/core/audio/track_standard.pyx":1635
+      /* "mpfmc/core/audio/track_standard.pyx":1637
  * 
  *             # Update buffer position pointers/samples remaining to place in the output buffer
  *             samples_remaining_to_output -= samples_remaining_in_sound             # <<<<<<<<<<<<<<
@@ -20330,7 +20350,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
       __pyx_v_samples_remaining_to_output = (__pyx_v_samples_remaining_to_output - __pyx_v_samples_remaining_in_sound);
 
-      /* "mpfmc/core/audio/track_standard.pyx":1636
+      /* "mpfmc/core/audio/track_standard.pyx":1638
  *             # Update buffer position pointers/samples remaining to place in the output buffer
  *             samples_remaining_to_output -= samples_remaining_in_sound
  *             sound.sample_pos += samples_remaining_in_sound             # <<<<<<<<<<<<<<
@@ -20339,7 +20359,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
       __pyx_v_sound->sample_pos = (__pyx_v_sound->sample_pos + __pyx_v_samples_remaining_in_sound);
 
-      /* "mpfmc/core/audio/track_standard.pyx":1637
+      /* "mpfmc/core/audio/track_standard.pyx":1639
  *             samples_remaining_to_output -= samples_remaining_in_sound
  *             sound.sample_pos += samples_remaining_in_sound
  *             buffer_pos += samples_remaining_in_sound             # <<<<<<<<<<<<<<
@@ -20349,7 +20369,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
       __pyx_v_buffer_pos = (__pyx_v_buffer_pos + __pyx_v_samples_remaining_in_sound);
     }
 
-    /* "mpfmc/core/audio/track_standard.pyx":1640
+    /* "mpfmc/core/audio/track_standard.pyx":1642
  * 
  *         # Check if we are at the end of the source sample buffer (loop if applicable)
  *         if sound.sample_pos >= loop_end_pos:             # <<<<<<<<<<<<<<
@@ -20359,7 +20379,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
     __pyx_t_1 = ((__pyx_v_sound->sample_pos >= __pyx_v_loop_end_pos) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_standard.pyx":1641
+      /* "mpfmc/core/audio/track_standard.pyx":1643
  *         # Check if we are at the end of the source sample buffer (loop if applicable)
  *         if sound.sample_pos >= loop_end_pos:
  *             if sound.loops_remaining > 0:             # <<<<<<<<<<<<<<
@@ -20369,7 +20389,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
       __pyx_t_1 = ((__pyx_v_sound->loops_remaining > 0) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_standard.pyx":1643
+        /* "mpfmc/core/audio/track_standard.pyx":1645
  *             if sound.loops_remaining > 0:
  *                 # At the end and still loops remaining, loop back to the beginning of the loop
  *                 sound.loops_remaining -= 1             # <<<<<<<<<<<<<<
@@ -20378,7 +20398,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
         __pyx_v_sound->loops_remaining = (__pyx_v_sound->loops_remaining - 1);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1644
+        /* "mpfmc/core/audio/track_standard.pyx":1646
  *                 # At the end and still loops remaining, loop back to the beginning of the loop
  *                 sound.loops_remaining -= 1
  *                 sound.sample_pos = sound.loop_start_pos             # <<<<<<<<<<<<<<
@@ -20388,7 +20408,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
         __pyx_t_3 = __pyx_v_sound->loop_start_pos;
         __pyx_v_sound->sample_pos = __pyx_t_3;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1645
+        /* "mpfmc/core/audio/track_standard.pyx":1647
  *                 sound.loops_remaining -= 1
  *                 sound.sample_pos = sound.loop_start_pos
  *                 sound.current_loop += 1             # <<<<<<<<<<<<<<
@@ -20397,7 +20417,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
         __pyx_v_sound->current_loop = (__pyx_v_sound->current_loop + 1);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1646
+        /* "mpfmc/core/audio/track_standard.pyx":1648
  *                 sound.sample_pos = sound.loop_start_pos
  *                 sound.current_loop += 1
  *                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)             # <<<<<<<<<<<<<<
@@ -20406,7 +20426,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
         __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(__pyx_v_player_num, __pyx_v_sound->sound_id, __pyx_v_sound->sound_instance_id, __pyx_v_track);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1649
+        /* "mpfmc/core/audio/track_standard.pyx":1651
  * 
  *                 # If the sound is on its last loop, set the loop end position to be the end of the sound
  *                 if sound.loops_remaining == 0:             # <<<<<<<<<<<<<<
@@ -20416,7 +20436,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
         __pyx_t_1 = ((__pyx_v_sound->loops_remaining == 0) != 0);
         if (__pyx_t_1) {
 
-          /* "mpfmc/core/audio/track_standard.pyx":1650
+          /* "mpfmc/core/audio/track_standard.pyx":1652
  *                 # If the sound is on its last loop, set the loop end position to be the end of the sound
  *                 if sound.loops_remaining == 0:
  *                     sound.loop_end_pos = sound.sample.data.memory.size             # <<<<<<<<<<<<<<
@@ -20426,7 +20446,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
           __pyx_t_4 = __pyx_v_sound->sample->data.memory->size;
           __pyx_v_sound->loop_end_pos = __pyx_t_4;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1651
+          /* "mpfmc/core/audio/track_standard.pyx":1653
  *                 if sound.loops_remaining == 0:
  *                     sound.loop_end_pos = sound.sample.data.memory.size
  *                     loop_end_pos = sound.loop_end_pos             # <<<<<<<<<<<<<<
@@ -20436,7 +20456,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
           __pyx_t_3 = __pyx_v_sound->loop_end_pos;
           __pyx_v_loop_end_pos = __pyx_t_3;
 
-          /* "mpfmc/core/audio/track_standard.pyx":1649
+          /* "mpfmc/core/audio/track_standard.pyx":1651
  * 
  *                 # If the sound is on its last loop, set the loop end position to be the end of the sound
  *                 if sound.loops_remaining == 0:             # <<<<<<<<<<<<<<
@@ -20445,7 +20465,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
         }
 
-        /* "mpfmc/core/audio/track_standard.pyx":1641
+        /* "mpfmc/core/audio/track_standard.pyx":1643
  *         # Check if we are at the end of the source sample buffer (loop if applicable)
  *         if sound.sample_pos >= loop_end_pos:
  *             if sound.loops_remaining > 0:             # <<<<<<<<<<<<<<
@@ -20455,7 +20475,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
         goto __pyx_L18;
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1653
+      /* "mpfmc/core/audio/track_standard.pyx":1655
  *                     loop_end_pos = sound.loop_end_pos
  * 
  *             elif sound.loops_remaining == 0:             # <<<<<<<<<<<<<<
@@ -20465,7 +20485,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
       __pyx_t_1 = ((__pyx_v_sound->loops_remaining == 0) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_standard.pyx":1655
+        /* "mpfmc/core/audio/track_standard.pyx":1657
  *             elif sound.loops_remaining == 0:
  *                 # At the end and not looping, the sample has finished playing (return True for end of sound)
  *                 return True             # <<<<<<<<<<<<<<
@@ -20475,7 +20495,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
         __pyx_r = 1;
         goto __pyx_L0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1653
+        /* "mpfmc/core/audio/track_standard.pyx":1655
  *                     loop_end_pos = sound.loop_end_pos
  * 
  *             elif sound.loops_remaining == 0:             # <<<<<<<<<<<<<<
@@ -20484,7 +20504,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1659
+      /* "mpfmc/core/audio/track_standard.pyx":1661
  *             else:
  *                 # Looping infinitely, loop back to the beginning of the loop
  *                 sound.sample_pos = sound.loop_start_pos             # <<<<<<<<<<<<<<
@@ -20495,7 +20515,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
         __pyx_t_3 = __pyx_v_sound->loop_start_pos;
         __pyx_v_sound->sample_pos = __pyx_t_3;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1660
+        /* "mpfmc/core/audio/track_standard.pyx":1662
  *                 # Looping infinitely, loop back to the beginning of the loop
  *                 sound.sample_pos = sound.loop_start_pos
  *                 sound.current_loop += 1             # <<<<<<<<<<<<<<
@@ -20504,7 +20524,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
  */
         __pyx_v_sound->current_loop = (__pyx_v_sound->current_loop + 1);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1661
+        /* "mpfmc/core/audio/track_standard.pyx":1663
  *                 sound.sample_pos = sound.loop_start_pos
  *                 sound.current_loop += 1
  *                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)             # <<<<<<<<<<<<<<
@@ -20515,7 +20535,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
       }
       __pyx_L18:;
 
-      /* "mpfmc/core/audio/track_standard.pyx":1640
+      /* "mpfmc/core/audio/track_standard.pyx":1642
  * 
  *         # Check if we are at the end of the source sample buffer (loop if applicable)
  *         if sound.sample_pos >= loop_end_pos:             # <<<<<<<<<<<<<<
@@ -20525,7 +20545,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
     }
   }
 
-  /* "mpfmc/core/audio/track_standard.pyx":1663
+  /* "mpfmc/core/audio/track_standard.pyx":1665
  *                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
  * 
  *     return False             # <<<<<<<<<<<<<<
@@ -20535,7 +20555,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/track_standard.pyx":1560
+  /* "mpfmc/core/audio/track_standard.pyx":1562
  *                 control_point += 1
  * 
  * cdef bint get_memory_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,             # <<<<<<<<<<<<<<
@@ -20548,7 +20568,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_memory_sound_samples
   return __pyx_r;
 }
 
-/* "mpfmc/core/audio/track_standard.pyx":1665
+/* "mpfmc/core/audio/track_standard.pyx":1667
  *     return False
  * 
  * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,             # <<<<<<<<<<<<<<
@@ -20564,7 +20584,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
   int __pyx_t_1;
   int __pyx_t_2;
 
-  /* "mpfmc/core/audio/track_standard.pyx":1690
+  /* "mpfmc/core/audio/track_standard.pyx":1692
  *         end of stream (eos), or another buffer is pulled.
  *     """
  *     if sound == NULL or output_buffer == NULL or sound.sample.data.stream.pipeline == NULL:             # <<<<<<<<<<<<<<
@@ -20588,7 +20608,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
   __pyx_L4_bool_binop_done:;
   if (__pyx_t_1) {
 
-    /* "mpfmc/core/audio/track_standard.pyx":1691
+    /* "mpfmc/core/audio/track_standard.pyx":1693
  *     """
  *     if sound == NULL or output_buffer == NULL or sound.sample.data.stream.pipeline == NULL:
  *         return True             # <<<<<<<<<<<<<<
@@ -20598,7 +20618,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
     __pyx_r = 1;
     goto __pyx_L0;
 
-    /* "mpfmc/core/audio/track_standard.pyx":1690
+    /* "mpfmc/core/audio/track_standard.pyx":1692
  *         end of stream (eos), or another buffer is pulled.
  *     """
  *     if sound == NULL or output_buffer == NULL or sound.sample.data.stream.pipeline == NULL:             # <<<<<<<<<<<<<<
@@ -20607,7 +20627,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
   }
 
-  /* "mpfmc/core/audio/track_standard.pyx":1693
+  /* "mpfmc/core/audio/track_standard.pyx":1695
  *         return True
  * 
  *     cdef Uint32 samples_remaining_to_output = length             # <<<<<<<<<<<<<<
@@ -20616,7 +20636,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
   __pyx_v_samples_remaining_to_output = __pyx_v_length;
 
-  /* "mpfmc/core/audio/track_standard.pyx":1695
+  /* "mpfmc/core/audio/track_standard.pyx":1697
  *     cdef Uint32 samples_remaining_to_output = length
  *     cdef Uint32 samples_remaining_in_map
  *     cdef Uint32 buffer_pos = 0             # <<<<<<<<<<<<<<
@@ -20625,7 +20645,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
   __pyx_v_buffer_pos = 0;
 
-  /* "mpfmc/core/audio/track_standard.pyx":1697
+  /* "mpfmc/core/audio/track_standard.pyx":1699
  *     cdef Uint32 buffer_pos = 0
  * 
  *     while samples_remaining_to_output > 0:             # <<<<<<<<<<<<<<
@@ -20636,7 +20656,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
     __pyx_t_1 = ((__pyx_v_samples_remaining_to_output > 0) != 0);
     if (!__pyx_t_1) break;
 
-    /* "mpfmc/core/audio/track_standard.pyx":1700
+    /* "mpfmc/core/audio/track_standard.pyx":1702
  * 
  *         # Copy any samples remaining in the streaming buffer
  *         if sound.sample.data.stream.map_contains_valid_sample_data:             # <<<<<<<<<<<<<<
@@ -20646,7 +20666,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
     __pyx_t_1 = (__pyx_v_sound->sample->data.stream->map_contains_valid_sample_data != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_standard.pyx":1701
+      /* "mpfmc/core/audio/track_standard.pyx":1703
  *         # Copy any samples remaining in the streaming buffer
  *         if sound.sample.data.stream.map_contains_valid_sample_data:
  *             samples_remaining_in_map = sound.sample.data.stream.map_info.size - sound.sample.data.stream.map_buffer_pos             # <<<<<<<<<<<<<<
@@ -20655,7 +20675,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
       __pyx_v_samples_remaining_in_map = (__pyx_v_sound->sample->data.stream->map_info.size - __pyx_v_sound->sample->data.stream->map_buffer_pos);
 
-      /* "mpfmc/core/audio/track_standard.pyx":1704
+      /* "mpfmc/core/audio/track_standard.pyx":1706
  * 
  *             # Determine if we are consuming the entire buffer of streaming samples, or just a portion of it
  *             if samples_remaining_to_output < samples_remaining_in_map:             # <<<<<<<<<<<<<<
@@ -20665,7 +20685,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
       __pyx_t_1 = ((__pyx_v_samples_remaining_to_output < __pyx_v_samples_remaining_in_map) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_standard.pyx":1706
+        /* "mpfmc/core/audio/track_standard.pyx":1708
  *             if samples_remaining_to_output < samples_remaining_in_map:
  *                 # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
  *                 if channels == 2 and False:             # <<<<<<<<<<<<<<
@@ -20682,7 +20702,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         __pyx_L12_bool_binop_done:;
         if (__pyx_t_1) {
 
-          /* "mpfmc/core/audio/track_standard.pyx":1708
+          /* "mpfmc/core/audio/track_standard.pyx":1710
  *                 if channels == 2 and False:
  *                     # disabled for now
  *                     Track.mix_audio_stereo(output_buffer + buffer_pos,             # <<<<<<<<<<<<<<
@@ -20691,7 +20711,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
           __pyx_vtabptr_5mpfmc_4core_5audio_5track_Track->mix_audio_stereo((__pyx_v_output_buffer + __pyx_v_buffer_pos), (__pyx_v_sound->sample->data.stream->map_info.data + __pyx_v_sound->sample->data.stream->map_buffer_pos), __pyx_v_samples_remaining_to_output, __pyx_v_sound->volume_left, __pyx_v_sound->volume_right);
 
-          /* "mpfmc/core/audio/track_standard.pyx":1706
+          /* "mpfmc/core/audio/track_standard.pyx":1708
  *             if samples_remaining_to_output < samples_remaining_in_map:
  *                 # We are not consuming the entire streaming buffer.  There will still be buffer data remaining for the next call.
  *                 if channels == 2 and False:             # <<<<<<<<<<<<<<
@@ -20701,7 +20721,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
           goto __pyx_L11;
         }
 
-        /* "mpfmc/core/audio/track_standard.pyx":1714
+        /* "mpfmc/core/audio/track_standard.pyx":1716
  *                                            sound.volume_right)
  *                 else:
  *                     SDL_MixAudioFormat(output_buffer + buffer_pos,             # <<<<<<<<<<<<<<
@@ -20710,7 +20730,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         /*else*/ {
 
-          /* "mpfmc/core/audio/track_standard.pyx":1716
+          /* "mpfmc/core/audio/track_standard.pyx":1718
  *                     SDL_MixAudioFormat(output_buffer + buffer_pos,
  *                                        sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
  *                                        track.callback_data.format, samples_remaining_to_output, volume)             # <<<<<<<<<<<<<<
@@ -20721,7 +20741,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         }
         __pyx_L11:;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1719
+        /* "mpfmc/core/audio/track_standard.pyx":1721
  * 
  *                 # Update buffer position pointers
  *                 sound.sample.data.stream.map_buffer_pos += samples_remaining_to_output             # <<<<<<<<<<<<<<
@@ -20730,7 +20750,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample->data.stream->map_buffer_pos = (__pyx_v_sound->sample->data.stream->map_buffer_pos + __pyx_v_samples_remaining_to_output);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1720
+        /* "mpfmc/core/audio/track_standard.pyx":1722
  *                 # Update buffer position pointers
  *                 sound.sample.data.stream.map_buffer_pos += samples_remaining_to_output
  *                 sound.sample_pos += samples_remaining_to_output             # <<<<<<<<<<<<<<
@@ -20739,7 +20759,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample_pos = (__pyx_v_sound->sample_pos + __pyx_v_samples_remaining_to_output);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1723
+        /* "mpfmc/core/audio/track_standard.pyx":1725
  * 
  *                 # Sound is not finished, but the output buffer has been filled
  *                 return False             # <<<<<<<<<<<<<<
@@ -20749,7 +20769,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         __pyx_r = 0;
         goto __pyx_L0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1704
+        /* "mpfmc/core/audio/track_standard.pyx":1706
  * 
  *             # Determine if we are consuming the entire buffer of streaming samples, or just a portion of it
  *             if samples_remaining_to_output < samples_remaining_in_map:             # <<<<<<<<<<<<<<
@@ -20758,7 +20778,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1726
+      /* "mpfmc/core/audio/track_standard.pyx":1728
  *             else:
  *                 # Entire buffer of leftover samples consumed.  Free the buffer resources to prepare for next call
  *                 if channels == 2 and False:             # <<<<<<<<<<<<<<
@@ -20776,7 +20796,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         __pyx_L15_bool_binop_done:;
         if (__pyx_t_1) {
 
-          /* "mpfmc/core/audio/track_standard.pyx":1728
+          /* "mpfmc/core/audio/track_standard.pyx":1730
  *                 if channels == 2 and False:
  *                     # disabled for now
  *                     Track.mix_audio_stereo(output_buffer + buffer_pos,             # <<<<<<<<<<<<<<
@@ -20785,7 +20805,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
           __pyx_vtabptr_5mpfmc_4core_5audio_5track_Track->mix_audio_stereo((__pyx_v_output_buffer + __pyx_v_buffer_pos), (__pyx_v_sound->sample->data.stream->map_info.data + __pyx_v_sound->sample->data.stream->map_buffer_pos), __pyx_v_samples_remaining_to_output, __pyx_v_sound->volume_left, __pyx_v_sound->volume_right);
 
-          /* "mpfmc/core/audio/track_standard.pyx":1726
+          /* "mpfmc/core/audio/track_standard.pyx":1728
  *             else:
  *                 # Entire buffer of leftover samples consumed.  Free the buffer resources to prepare for next call
  *                 if channels == 2 and False:             # <<<<<<<<<<<<<<
@@ -20795,7 +20815,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
           goto __pyx_L14;
         }
 
-        /* "mpfmc/core/audio/track_standard.pyx":1734
+        /* "mpfmc/core/audio/track_standard.pyx":1736
  *                                            sound.volume_right)
  *                 else:
  *                     SDL_MixAudioFormat(output_buffer + buffer_pos,             # <<<<<<<<<<<<<<
@@ -20804,7 +20824,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         /*else*/ {
 
-          /* "mpfmc/core/audio/track_standard.pyx":1736
+          /* "mpfmc/core/audio/track_standard.pyx":1738
  *                     SDL_MixAudioFormat(output_buffer + buffer_pos,
  *                                        sound.sample.data.stream.map_info.data + sound.sample.data.stream.map_buffer_pos,
  *                                        track.callback_data.format, samples_remaining_in_map, volume)             # <<<<<<<<<<<<<<
@@ -20815,7 +20835,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         }
         __pyx_L14:;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1739
+        /* "mpfmc/core/audio/track_standard.pyx":1741
  * 
  *                 # Update buffer position pointers/samples remaining to place in the output buffer
  *                 samples_remaining_to_output -= samples_remaining_in_map             # <<<<<<<<<<<<<<
@@ -20824,7 +20844,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_samples_remaining_to_output = (__pyx_v_samples_remaining_to_output - __pyx_v_samples_remaining_in_map);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1740
+        /* "mpfmc/core/audio/track_standard.pyx":1742
  *                 # Update buffer position pointers/samples remaining to place in the output buffer
  *                 samples_remaining_to_output -= samples_remaining_in_map
  *                 sound.sample_pos += samples_remaining_in_map             # <<<<<<<<<<<<<<
@@ -20833,7 +20853,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample_pos = (__pyx_v_sound->sample_pos + __pyx_v_samples_remaining_in_map);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1741
+        /* "mpfmc/core/audio/track_standard.pyx":1743
  *                 samples_remaining_to_output -= samples_remaining_in_map
  *                 sound.sample_pos += samples_remaining_in_map
  *                 buffer_pos += samples_remaining_in_map             # <<<<<<<<<<<<<<
@@ -20842,7 +20862,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_buffer_pos = (__pyx_v_buffer_pos + __pyx_v_samples_remaining_in_map);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1744
+        /* "mpfmc/core/audio/track_standard.pyx":1746
  * 
  *                 # Done with the streaming buffer, release references to it
  *                 gst_buffer_unmap(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info)             # <<<<<<<<<<<<<<
@@ -20851,7 +20871,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         gst_buffer_unmap(__pyx_v_sound->sample->data.stream->buffer, (&__pyx_v_sound->sample->data.stream->map_info));
 
-        /* "mpfmc/core/audio/track_standard.pyx":1745
+        /* "mpfmc/core/audio/track_standard.pyx":1747
  *                 # Done with the streaming buffer, release references to it
  *                 gst_buffer_unmap(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info)
  *                 gst_sample_unref(sound.sample.data.stream.sample)             # <<<<<<<<<<<<<<
@@ -20860,7 +20880,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         gst_sample_unref(__pyx_v_sound->sample->data.stream->sample);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1747
+        /* "mpfmc/core/audio/track_standard.pyx":1749
  *                 gst_sample_unref(sound.sample.data.stream.sample)
  * 
  *                 sound.sample.data.stream.buffer = NULL             # <<<<<<<<<<<<<<
@@ -20869,7 +20889,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample->data.stream->buffer = NULL;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1748
+        /* "mpfmc/core/audio/track_standard.pyx":1750
  * 
  *                 sound.sample.data.stream.buffer = NULL
  *                 sound.sample.data.stream.sample = NULL             # <<<<<<<<<<<<<<
@@ -20878,7 +20898,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample->data.stream->sample = NULL;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1749
+        /* "mpfmc/core/audio/track_standard.pyx":1751
  *                 sound.sample.data.stream.buffer = NULL
  *                 sound.sample.data.stream.sample = NULL
  *                 sound.sample.data.stream.map_buffer_pos = 0             # <<<<<<<<<<<<<<
@@ -20887,7 +20907,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample->data.stream->map_buffer_pos = 0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1750
+        /* "mpfmc/core/audio/track_standard.pyx":1752
  *                 sound.sample.data.stream.sample = NULL
  *                 sound.sample.data.stream.map_buffer_pos = 0
  *                 sound.sample.data.stream.map_contains_valid_sample_data = 0             # <<<<<<<<<<<<<<
@@ -20897,7 +20917,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         __pyx_v_sound->sample->data.stream->map_contains_valid_sample_data = 0;
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1700
+      /* "mpfmc/core/audio/track_standard.pyx":1702
  * 
  *         # Copy any samples remaining in the streaming buffer
  *         if sound.sample.data.stream.map_contains_valid_sample_data:             # <<<<<<<<<<<<<<
@@ -20906,7 +20926,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
     }
 
-    /* "mpfmc/core/audio/track_standard.pyx":1753
+    /* "mpfmc/core/audio/track_standard.pyx":1755
  * 
  *         # Check for eos (end of stream)
  *         if g_object_get_bool(sound.sample.data.stream.sink, "eos"):             # <<<<<<<<<<<<<<
@@ -20916,7 +20936,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
     __pyx_t_1 = (g_object_get_bool(__pyx_v_sound->sample->data.stream->sink, ((char *)"eos")) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_standard.pyx":1756
+      /* "mpfmc/core/audio/track_standard.pyx":1758
  * 
  *             # At the end of the stream - check if sound should loop or end
  *             if sound.loops_remaining > 0:             # <<<<<<<<<<<<<<
@@ -20926,7 +20946,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
       __pyx_t_1 = ((__pyx_v_sound->loops_remaining > 0) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_standard.pyx":1758
+        /* "mpfmc/core/audio/track_standard.pyx":1760
  *             if sound.loops_remaining > 0:
  *                 # At the end and still loops remaining, loop back to the beginning
  *                 sound.loops_remaining -= 1             # <<<<<<<<<<<<<<
@@ -20935,7 +20955,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->loops_remaining = (__pyx_v_sound->loops_remaining - 1);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1759
+        /* "mpfmc/core/audio/track_standard.pyx":1761
  *                 # At the end and still loops remaining, loop back to the beginning
  *                 sound.loops_remaining -= 1
  *                 sound.sample_pos = 0             # <<<<<<<<<<<<<<
@@ -20944,7 +20964,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample_pos = 0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1760
+        /* "mpfmc/core/audio/track_standard.pyx":1762
  *                 sound.loops_remaining -= 1
  *                 sound.sample_pos = 0
  *                 sound.current_loop += 1             # <<<<<<<<<<<<<<
@@ -20953,7 +20973,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->current_loop = (__pyx_v_sound->current_loop + 1);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1761
+        /* "mpfmc/core/audio/track_standard.pyx":1763
  *                 sound.sample_pos = 0
  *                 sound.current_loop += 1
  *                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)             # <<<<<<<<<<<<<<
@@ -20962,7 +20982,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_f_5mpfmc_4core_5audio_20notification_message_send_sound_looping_notification(__pyx_v_player_num, __pyx_v_sound->sound_id, __pyx_v_sound->sound_instance_id, __pyx_v_track);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1756
+        /* "mpfmc/core/audio/track_standard.pyx":1758
  * 
  *             # At the end of the stream - check if sound should loop or end
  *             if sound.loops_remaining > 0:             # <<<<<<<<<<<<<<
@@ -20972,7 +20992,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         goto __pyx_L18;
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1763
+      /* "mpfmc/core/audio/track_standard.pyx":1765
  *                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
  * 
  *             elif sound.loops_remaining == 0:             # <<<<<<<<<<<<<<
@@ -20982,7 +21002,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
       __pyx_t_1 = ((__pyx_v_sound->loops_remaining == 0) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_standard.pyx":1765
+        /* "mpfmc/core/audio/track_standard.pyx":1767
  *             elif sound.loops_remaining == 0:
  *                 # At the end and not looping, the sample has finished playing (return True for end of sound)
  *                 return True             # <<<<<<<<<<<<<<
@@ -20992,7 +21012,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         __pyx_r = 1;
         goto __pyx_L0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1763
+        /* "mpfmc/core/audio/track_standard.pyx":1765
  *                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)
  * 
  *             elif sound.loops_remaining == 0:             # <<<<<<<<<<<<<<
@@ -21001,7 +21021,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1769
+      /* "mpfmc/core/audio/track_standard.pyx":1771
  *             else:
  *                 # Looping infinitely, loop back to the beginning
  *                 sound.sample_pos = 0             # <<<<<<<<<<<<<<
@@ -21011,7 +21031,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
       /*else*/ {
         __pyx_v_sound->sample_pos = 0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1770
+        /* "mpfmc/core/audio/track_standard.pyx":1772
  *                 # Looping infinitely, loop back to the beginning
  *                 sound.sample_pos = 0
  *                 sound.current_loop += 1             # <<<<<<<<<<<<<<
@@ -21020,7 +21040,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->current_loop = (__pyx_v_sound->current_loop + 1);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1771
+        /* "mpfmc/core/audio/track_standard.pyx":1773
  *                 sound.sample_pos = 0
  *                 sound.current_loop += 1
  *                 send_sound_looping_notification(player_num, sound.sound_id, sound.sound_instance_id, track)             # <<<<<<<<<<<<<<
@@ -21031,7 +21051,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
       }
       __pyx_L18:;
 
-      /* "mpfmc/core/audio/track_standard.pyx":1774
+      /* "mpfmc/core/audio/track_standard.pyx":1776
  * 
  *             # Seek back to the beginning of the sound's source file
  *             gst_element_seek_simple(sound.sample.data.stream.pipeline, GST_FORMAT_TIME, <GstSeekFlags>(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT), 0)             # <<<<<<<<<<<<<<
@@ -21040,7 +21060,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
       (void)(gst_element_seek_simple(__pyx_v_sound->sample->data.stream->pipeline, GST_FORMAT_TIME, ((GstSeekFlags)(GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_KEY_UNIT)), 0));
 
-      /* "mpfmc/core/audio/track_standard.pyx":1753
+      /* "mpfmc/core/audio/track_standard.pyx":1755
  * 
  *         # Check for eos (end of stream)
  *         if g_object_get_bool(sound.sample.data.stream.sink, "eos"):             # <<<<<<<<<<<<<<
@@ -21049,7 +21069,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
     }
 
-    /* "mpfmc/core/audio/track_standard.pyx":1777
+    /* "mpfmc/core/audio/track_standard.pyx":1779
  * 
  *         # Retrieve the next buffer from the streaming pipeline
  *         sound.sample.data.stream.sample = c_appsink_pull_sample(sound.sample.data.stream.sink)             # <<<<<<<<<<<<<<
@@ -21058,7 +21078,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
     __pyx_v_sound->sample->data.stream->sample = c_appsink_pull_sample(__pyx_v_sound->sample->data.stream->sink);
 
-    /* "mpfmc/core/audio/track_standard.pyx":1779
+    /* "mpfmc/core/audio/track_standard.pyx":1781
  *         sound.sample.data.stream.sample = c_appsink_pull_sample(sound.sample.data.stream.sink)
  * 
  *         if sound.sample.data.stream.sample == NULL:             # <<<<<<<<<<<<<<
@@ -21068,7 +21088,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
     __pyx_t_1 = ((__pyx_v_sound->sample->data.stream->sample == NULL) != 0);
     if (__pyx_t_1) {
 
-      /* "mpfmc/core/audio/track_standard.pyx":1780
+      /* "mpfmc/core/audio/track_standard.pyx":1782
  * 
  *         if sound.sample.data.stream.sample == NULL:
  *             sound.sample.data.stream.null_buffer_count += 1             # <<<<<<<<<<<<<<
@@ -21077,7 +21097,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
       __pyx_v_sound->sample->data.stream->null_buffer_count = (__pyx_v_sound->sample->data.stream->null_buffer_count + 1);
 
-      /* "mpfmc/core/audio/track_standard.pyx":1783
+      /* "mpfmc/core/audio/track_standard.pyx":1785
  * 
  *             # If we've received too many consecutive null buffers, end the sound
  *             if sound.sample.data.stream.null_buffer_count > CONSECUTIVE_NULL_STREAMING_BUFFER_LIMIT:             # <<<<<<<<<<<<<<
@@ -21087,7 +21107,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
       __pyx_t_1 = ((__pyx_v_sound->sample->data.stream->null_buffer_count > 2) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_standard.pyx":1784
+        /* "mpfmc/core/audio/track_standard.pyx":1786
  *             # If we've received too many consecutive null buffers, end the sound
  *             if sound.sample.data.stream.null_buffer_count > CONSECUTIVE_NULL_STREAMING_BUFFER_LIMIT:
  *                 return True             # <<<<<<<<<<<<<<
@@ -21097,7 +21117,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         __pyx_r = 1;
         goto __pyx_L0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1783
+        /* "mpfmc/core/audio/track_standard.pyx":1785
  * 
  *             # If we've received too many consecutive null buffers, end the sound
  *             if sound.sample.data.stream.null_buffer_count > CONSECUTIVE_NULL_STREAMING_BUFFER_LIMIT:             # <<<<<<<<<<<<<<
@@ -21106,7 +21126,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1779
+      /* "mpfmc/core/audio/track_standard.pyx":1781
  *         sound.sample.data.stream.sample = c_appsink_pull_sample(sound.sample.data.stream.sink)
  * 
  *         if sound.sample.data.stream.sample == NULL:             # <<<<<<<<<<<<<<
@@ -21116,7 +21136,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
       goto __pyx_L19;
     }
 
-    /* "mpfmc/core/audio/track_standard.pyx":1786
+    /* "mpfmc/core/audio/track_standard.pyx":1788
  *                 return True
  *         else:
  *             sound.sample.data.stream.null_buffer_count = 0             # <<<<<<<<<<<<<<
@@ -21126,7 +21146,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
     /*else*/ {
       __pyx_v_sound->sample->data.stream->null_buffer_count = 0;
 
-      /* "mpfmc/core/audio/track_standard.pyx":1787
+      /* "mpfmc/core/audio/track_standard.pyx":1789
  *         else:
  *             sound.sample.data.stream.null_buffer_count = 0
  *             sound.sample.data.stream.buffer = gst_sample_get_buffer(sound.sample.data.stream.sample)             # <<<<<<<<<<<<<<
@@ -21135,7 +21155,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
       __pyx_v_sound->sample->data.stream->buffer = gst_sample_get_buffer(__pyx_v_sound->sample->data.stream->sample);
 
-      /* "mpfmc/core/audio/track_standard.pyx":1789
+      /* "mpfmc/core/audio/track_standard.pyx":1791
  *             sound.sample.data.stream.buffer = gst_sample_get_buffer(sound.sample.data.stream.sample)
  * 
  *             if gst_buffer_map(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info, GST_MAP_READ):             # <<<<<<<<<<<<<<
@@ -21145,7 +21165,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
       __pyx_t_1 = (gst_buffer_map(__pyx_v_sound->sample->data.stream->buffer, (&__pyx_v_sound->sample->data.stream->map_info), GST_MAP_READ) != 0);
       if (__pyx_t_1) {
 
-        /* "mpfmc/core/audio/track_standard.pyx":1790
+        /* "mpfmc/core/audio/track_standard.pyx":1792
  * 
  *             if gst_buffer_map(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info, GST_MAP_READ):
  *                 sound.sample.data.stream.map_contains_valid_sample_data = 1             # <<<<<<<<<<<<<<
@@ -21154,7 +21174,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample->data.stream->map_contains_valid_sample_data = 1;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1791
+        /* "mpfmc/core/audio/track_standard.pyx":1793
  *             if gst_buffer_map(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info, GST_MAP_READ):
  *                 sound.sample.data.stream.map_contains_valid_sample_data = 1
  *                 sound.sample.data.stream.map_buffer_pos = 0             # <<<<<<<<<<<<<<
@@ -21163,7 +21183,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample->data.stream->map_buffer_pos = 0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1789
+        /* "mpfmc/core/audio/track_standard.pyx":1791
  *             sound.sample.data.stream.buffer = gst_sample_get_buffer(sound.sample.data.stream.sample)
  * 
  *             if gst_buffer_map(sound.sample.data.stream.buffer, &sound.sample.data.stream.map_info, GST_MAP_READ):             # <<<<<<<<<<<<<<
@@ -21173,7 +21193,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
         goto __pyx_L21;
       }
 
-      /* "mpfmc/core/audio/track_standard.pyx":1793
+      /* "mpfmc/core/audio/track_standard.pyx":1795
  *                 sound.sample.data.stream.map_buffer_pos = 0
  *             else:
  *                 sound.sample.data.stream.map_contains_valid_sample_data = 0             # <<<<<<<<<<<<<<
@@ -21183,7 +21203,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
       /*else*/ {
         __pyx_v_sound->sample->data.stream->map_contains_valid_sample_data = 0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1794
+        /* "mpfmc/core/audio/track_standard.pyx":1796
  *             else:
  *                 sound.sample.data.stream.map_contains_valid_sample_data = 0
  *                 sound.sample.data.stream.map_buffer_pos = 0             # <<<<<<<<<<<<<<
@@ -21192,7 +21212,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         __pyx_v_sound->sample->data.stream->map_buffer_pos = 0;
 
-        /* "mpfmc/core/audio/track_standard.pyx":1795
+        /* "mpfmc/core/audio/track_standard.pyx":1797
  *                 sound.sample.data.stream.map_contains_valid_sample_data = 0
  *                 sound.sample.data.stream.map_buffer_pos = 0
  *                 gst_sample_unref(sound.sample.data.stream.sample)             # <<<<<<<<<<<<<<
@@ -21201,7 +21221,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
  */
         gst_sample_unref(__pyx_v_sound->sample->data.stream->sample);
 
-        /* "mpfmc/core/audio/track_standard.pyx":1796
+        /* "mpfmc/core/audio/track_standard.pyx":1798
  *                 sound.sample.data.stream.map_buffer_pos = 0
  *                 gst_sample_unref(sound.sample.data.stream.sample)
  *                 sound.sample.data.stream.sample = NULL             # <<<<<<<<<<<<<<
@@ -21215,7 +21235,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
     __pyx_L19:;
   }
 
-  /* "mpfmc/core/audio/track_standard.pyx":1799
+  /* "mpfmc/core/audio/track_standard.pyx":1801
  * 
  *     # The sound has not finished playing, but the output buffer has been filled
  *     return False             # <<<<<<<<<<<<<<
@@ -21223,7 +21243,7 @@ static int __pyx_f_5mpfmc_4core_5audio_14track_standard_get_streaming_sound_samp
   __pyx_r = 0;
   goto __pyx_L0;
 
-  /* "mpfmc/core/audio/track_standard.pyx":1665
+  /* "mpfmc/core/audio/track_standard.pyx":1667
  *     return False
  * 
  * cdef bint get_streaming_sound_samples(SoundSettings *sound, Uint32 length, Uint8 *output_buffer, int channels,             # <<<<<<<<<<<<<<

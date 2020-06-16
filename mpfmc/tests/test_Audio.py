@@ -909,11 +909,57 @@ class TestAudio(MpfMcTestCase):
             self.assertAlmostEqual(status[0]['loop_start_pos'] / seconds_to_bytes_factor, 1.8461538, 4)
             self.assertAlmostEqual(status[0]['loop_end_pos'] / seconds_to_bytes_factor, 3.6923077, 4)
 
-            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_looping')
-            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_stopped')
-
             instance1.stop()
             self.advance_real_time()
+
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_looping')
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='looptest_stopped')
+            self.mc.bcp_processor.send.reset_mock()
+
+            # Now test a voice-stealing scenario to ensure sound settings are copied correctly
+            track_voice = interface.get_track_by_name("voice")
+            self.assertIsNotNone(track_voice)
+            self.assertEqual(track_voice.name, "voice")
+            self.assertEqual(track_voice.max_simultaneous_sounds, 1)
+
+            self.assertIn('104457_moron_test', self.mc.sounds)
+            sound_moron_test = self.mc.sounds['104457_moron_test']
+
+            instance2 = track_voice.play_sound(sound_moron_test, context=None,
+                                               settings={'volume': 1.0, 'loops': 0, 'priority': 900})
+            self.advance_real_time()
+
+            status = track_voice.get_status()
+            self.assertEqual(status[0]['sound_instance_id'], instance2.id)
+            self.assertEqual(status[0]['sound_id'], sound_moron_test.id)
+            self.assertEqual(status[0]['status'], "playing")
+            self.assertEqual(status[0]['current_loop'], 0)
+            self.assertEqual(status[0]['loops'], 0)
+            self.assertAlmostEqual(status[0]['loop_start_pos'] / seconds_to_bytes_factor, 0.0, 3)
+            self.assertAlmostEqual(status[0]['loop_end_pos'] / seconds_to_bytes_factor, 7.39048, 3)
+            self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='moron_test_played')
+            self.mc.bcp_processor.send.reset_mock()
+
+            self.advance_real_time(1.0)
+
+            self.assertIn('113690_test', self.mc.sounds)
+            sound_test = self.mc.sounds['113690_test']
+
+            # Play sound with higher priority than the one currently playing to make sure the sound replacing
+            # code copies all the sound settings to the new sound (this test specifically addresses a bug
+            # introduced after adding loop point settings).
+            instance3 = track_voice.play_sound(sound_test, context=None,
+                                               settings={'volume': 1.0, 'loops': 0, 'priority': 1000})
+            self.advance_real_time(0.2)
+
+            status = track_voice.get_status()
+            self.assertEqual(status[0]['sound_instance_id'], instance3.id)
+            self.assertEqual(status[0]['sound_id'], sound_test.id)
+            self.assertEqual(status[0]['status'], "playing")
+            self.assertEqual(status[0]['current_loop'], 0)
+            self.assertEqual(status[0]['loops'], 0)
+            self.assertAlmostEqual(status[0]['loop_start_pos'] / seconds_to_bytes_factor, 0.0, 3)
+            self.assertAlmostEqual(status[0]['loop_end_pos'] / seconds_to_bytes_factor, 6.95655, 3)
 
         # TODO: Add integration test for sound_player
         # TODO: Add integration test for track_player

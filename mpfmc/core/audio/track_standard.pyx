@@ -1506,6 +1506,8 @@ cdef class TrackStandard(Track):
                         # Replacing the current sound with a new one: copy sound player settings from next sound to current
                         player.current.sample = player.next.sample
                         player.current.sample_pos = player.next.sample_pos
+                        player.current.loop_start_pos = player.next.loop_start_pos
+                        player.current.loop_end_pos = player.next.loop_end_pos
                         player.current.current_loop = player.next.current_loop
                         player.current.sound_id = player.next.sound_id
                         player.current.sound_instance_id = player.next.sound_instance_id
