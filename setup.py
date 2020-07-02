@@ -79,8 +79,8 @@ def pkgconfig(*packages, **kw):
     cmd = 'pkg-config --libs --cflags {}'.format(' '.join(packages))
     results = getoutput(cmd, lenviron).split()
     for token in results:
-        ext = token[:2].decode('utf-8')
-        flag = flag_map.get(ext)
+        extension = token[:2].decode('utf-8')
+        flag = flag_map.get(extension)
         if not flag:
             continue
         kw.setdefault(flag, []).append(token[2:].decode('utf-8'))
@@ -96,9 +96,9 @@ def get_isolated_env_paths():
     except ImportError:
         return [], []
 
-    root = os.path.abspath(join(sdl2_dev.__path__[0], '../../../..'))
-    includes = [join(root, 'Include')] if isdir(join(root, 'Include')) else []
-    libs = [join(root, 'libs')] if isdir(join(root, 'libs')) else []
+    sdl_root = os.path.abspath(join(sdl2_dev.__path__[0], '../../../..'))
+    includes = [join(sdl_root, 'Include')] if isdir(join(sdl_root, 'Include')) else []
+    libs = [join(sdl_root, 'libs')] if isdir(join(sdl_root, 'libs')) else []
     return includes, libs
 
 
@@ -520,10 +520,10 @@ def determine_sdl2():
     for lib in libs_to_check:
         found = False
         for d in flags['include_dirs']:
-            fn = join(d, '{}.h'.format(lib))
-            if exists(fn):
+            inc_dir = join(d, '{}.h'.format(lib))
+            if exists(inc_dir):
                 found = True
-                print('SDL2: found {} header at {}'.format(lib, fn))
+                print('SDL2: found {} header at {}'.format(lib, inc_dir))
                 break
 
         if not found:
