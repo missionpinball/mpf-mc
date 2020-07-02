@@ -344,6 +344,7 @@ if c_options['use_gstreamer'] in (None, True):
         gst_flags = pkgconfig('gstreamer-1.0')
         if 'libraries' in gst_flags:
             print('GStreamer found via pkg-config')
+            gstreamer_valid = True
             c_options['use_gstreamer'] = True
 
     if not gstreamer_valid:
