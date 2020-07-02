@@ -79,12 +79,27 @@ def pkgconfig(*packages, **kw):
     cmd = 'pkg-config --libs --cflags {}'.format(' '.join(packages))
     results = getoutput(cmd, lenviron).split()
     for token in results:
-        extension = token[:2].decode('utf-8')
-        flag = flag_map.get(extension)
+        ext = token[:2].decode('utf-8')
+        flag = flag_map.get(ext)
         if not flag:
             continue
         kw.setdefault(flag, []).append(token[2:].decode('utf-8'))
     return kw
+
+
+def get_isolated_env_paths():
+    try:
+        # sdl2_dev is installed before setup.py is run, when installing from
+        # source due to pyproject.toml. However, it is installed to a
+        # pip isolated env, which we need to add to compiler
+        import kivy_deps.sdl2_dev as sdl2_dev
+    except ImportError:
+        return [], []
+
+    root = os.path.abspath(join(sdl2_dev.__path__[0], '../../../..'))
+    includes = [join(root, 'Include')] if isdir(join(root, 'Include')) else []
+    libs = [join(root, 'libs')] if isdir(join(root, 'libs')) else []
+    return includes, libs
 
 
 # -----------------------------------------------------------------------------
@@ -312,11 +327,17 @@ if c_options['use_gstreamer'] in (None, True):
             print('GStreamer found via pkg-config')
             gstreamer_valid = True
             c_options['use_gstreamer'] = True
-        elif exists(join(get_paths()['include'], 'gst', 'gst.h')):
-            print('GStreamer found via gst.h')
-            gstreamer_valid = True
-            c_options['use_gstreamer'] = True
-            gst_flags = {'libraries': ['gstreamer-1.0', 'glib-2.0', 'gobject-2.0']}
+        else:
+            _includes = get_isolated_env_paths()[0] + [get_paths()['include']]
+            for include_dir in _includes:
+                if exists(join(include_dir, 'gst', 'gst.h')):
+                    print('GStreamer found via gst.h')
+                    gstreamer_valid = True
+                    c_options['use_gstreamer'] = True
+                    gst_flags = {
+                        'libraries':
+                            ['gstreamer-1.0', 'glib-2.0', 'gobject-2.0']}
+                    break
 
     if not gstreamer_valid:
         # use pkg-config approach instead
@@ -324,6 +345,9 @@ if c_options['use_gstreamer'] in (None, True):
         if 'libraries' in gst_flags:
             print('GStreamer found via pkg-config')
             c_options['use_gstreamer'] = True
+
+    if not gstreamer_valid:
+        raise RuntimeError('GStreamer not found and is required to build MPF-MC')
 
 # detect SDL2
 # works if we forced the options or in autodetection
@@ -368,7 +392,6 @@ if c_options['use_sdl2'] in (None, True):
         if 'libraries' in sdl2_flags:
             print('SDL2 found via pkg-config')
             c_options['use_sdl2'] = True
-
 
 # -----------------------------------------------------------------------------
 # declare flags
@@ -465,6 +488,8 @@ def determine_sdl2():
     if sdl2_flags and not sdl2_path and platform == 'darwin':
         return sdl2_flags
 
+    includes, _ = get_isolated_env_paths()
+
     # no pkgconfig info, or we want to use a specific sdl2 path, so perform
     # manual configuration
     flags['libraries'] = ['SDL2', 'SDL2_image', 'SDL2_mixer']
@@ -472,9 +497,11 @@ def determine_sdl2():
     sdl2_paths = sdl2_path.split(split_chr) if sdl2_path else []
 
     if not sdl2_paths:
-        sdl_inc = join(sys.prefix, 'include', 'SDL2')
-        if isdir(sdl_inc):
-            sdl2_paths = [sdl_inc]
+        sdl2_paths = []
+        for include in includes + [join(sys.prefix, 'include')]:
+            sdl_inc = join(include, 'SDL2')
+            if isdir(sdl_inc):
+                sdl2_paths.append(sdl_inc)
         sdl2_paths.extend(['/usr/local/include/SDL2', '/usr/include/SDL2'])
 
     flags['include_dirs'] = sdl2_paths
@@ -493,10 +520,10 @@ def determine_sdl2():
     for lib in libs_to_check:
         found = False
         for d in flags['include_dirs']:
-            header_file = join(d, '{}.h'.format(lib))
-            if exists(header_file):
+            fn = join(d, '{}.h'.format(lib))
+            if exists(fn):
                 found = True
-                print('SDL2: found {} header at {}'.format(lib, header_file))
+                print('SDL2: found {} header at {}'.format(lib, fn))
                 break
 
         if not found:
@@ -599,17 +626,17 @@ else:
 install_requires = ['ruamel.yaml==0.15.100',  # better YAML library
                     'mpf>={}'.format(mpf_version),
                     'kivy==1.11.1',
-                    'psutil',
-                    'pygments',  # YAML syntax formatting for the iMC
-                    'pypiwin32>=223;platform_system=="Windows"',
+                    'psutil==5.7.0',
+                    'Pygments==2.3.1',  # YAML syntax formatting for the iMC
+                    'pypiwin32==223;platform_system=="Windows"',
                     # also update those in appveyor.yaml if you change versions
-                    'kivy-deps.sdl2==0.1.22;platform_system=="Windows"',
-                    'kivy-deps.sdl2-dev==0.1.22;platform_system=="Windows"',
-                    'kivy-deps.glew==0.1.12;platform_system=="Windows"',
-                    'kivy-deps.glew-dev==0.1.12;platform_system=="Windows"',
-                    'kivy-deps.gstreamer==0.1.17;platform_system=="Windows"',
-                    'kivy-deps.gstreamer-dev==0.1.17;platform_system=="Windows"',
-                    'ffpyplayer==4.2.0;platform_system!="Windows"'
+                    'kivy_deps.sdl2==0.1.23;platform_system=="Windows"',
+                    'kivy_deps.sdl2-dev==0.1.23;platform_system=="Windows"',
+                    'kivy_deps.glew==0.1.12;platform_system=="Windows"',
+                    'kivy_deps.glew-dev==0.1.12;platform_system=="Windows"',
+                    'kivy_deps.gstreamer==0.1.18;platform_system=="Windows"',
+                    'kivy_deps.gstreamer-dev==0.1.18;platform_system=="Windows"',
+                    'ffpyplayer==4.3.1'
                     ]
 
 # If we're running on Read The Docs, then we just need to copy the files
