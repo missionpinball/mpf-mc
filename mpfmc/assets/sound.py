@@ -293,7 +293,7 @@ class SoundAsset(McAsset):
 
         self.config.setdefault('loop_end_at', None)
         if self.config['loop_end_at'] is None:
-            self._loop_end_at = None;
+            self._loop_end_at = None
         else:
             self._loop_end_at = AudioInterface.string_to_secs(self.config['loop_end_at'])
 
