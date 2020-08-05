@@ -145,7 +145,7 @@ build_script:
 
     Check-Error
 
-    pip install mock Cython==0.29.10 pygments docutils kivy_deps.gstreamer_dev==0.1.18 kivy_deps.glew==0.1.12 kivy_deps.glew_dev==0.1.12 kivy_deps.sdl2==0.1.23 kivy_deps.sdl2_dev==0.1.23 --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
+    pip install mock Cython==0.29.21 pygments docutils kivy_deps.gstreamer_dev==0.1.18 kivy_deps.glew==0.1.12 kivy_deps.glew_dev==0.1.12 kivy_deps.sdl2==0.1.23 kivy_deps.sdl2_dev==0.1.23 --cache-dir C:\tmp_$env:PYVER_$env:BITNESS\deps
 
     Check-Error
 
