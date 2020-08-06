@@ -107,7 +107,7 @@ script:
         python$pyver_short -m pip install git+http://github.com/tito/osxrelocator --user;
 
         python$pyver_short -m pip install --upgrade --user pip setuptools wheel;
-        python$pyver_short -m pip install --upgrade --user cython==0.29.10 pytest wheel pillow mock docutils twine;
+        python$pyver_short -m pip install --upgrade --user cython==0.29.21 pytest wheel pillow mock docutils twine;
         python$pyver_short -m pip install --upgrade delocate;
 
         python$pyver_short -m pip install -e _mpf/;
