@@ -50,3 +50,15 @@ class TestAnimatedImages(MpfMcTestCase):
         # test starting
         stick_figures.play()
         self.advance_time()
+        self.assertTrue(self.mc.images["busy-stick-figures-animated"].image._anim_ev)
+        #self.assertEqual(1, self.mc.images["busy-stick-figures-animated"].references)
+
+        self.mc.events.post('slide2')
+        self.advance_time(.2)
+        self.assertTrue(self.mc.images["busy-stick-figures-animated"].image._anim_ev)
+        #self.assertEqual(2, self.mc.images["busy-stick-figures-animated"].references)
+
+        self.mc.events.post('slide1_remove')
+        self.advance_time(1)
+        self.assertTrue(self.mc.images["busy-stick-figures-animated"].image._anim_ev)
+        #self.assertEqual(1, self.mc.images["busy-stick-figures-animated"].references)

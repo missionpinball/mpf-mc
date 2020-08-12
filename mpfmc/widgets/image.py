@@ -49,6 +49,8 @@ class ImageWidget(Widget):
             raise ValueError("Cannot add Image widget. Image '{}' is not a "
                              "valid image name.".format(self.config['image']))
 
+        self._image.references += 1
+
         # Updates the config for this widget to pull in any defaults that were
         # in the asset config
         self.merge_asset_config(self._image)
@@ -119,11 +121,14 @@ class ImageWidget(Widget):
         """Prepare the widget to be removed."""
         super().prepare_for_removal()
         # stop any animations
-        try:
-            self._image.image.anim_reset(False)
-        # If the image was already unloaded from memory
-        except AttributeError:
-            pass
+        if self._image:
+            self._image.references -= 1
+            if self._image.references == 0:
+                try:
+                    self._image.image.anim_reset(False)
+                # If the image was already unloaded from memory
+                except AttributeError:
+                    pass
 
     def _draw_widget(self, *args):
         """Draws the image (draws a rectangle using the image texture)"""

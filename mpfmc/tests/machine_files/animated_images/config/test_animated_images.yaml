@@ -36,5 +36,15 @@ slides:
       x: 14
       y: 68
       anchor_x: left
+  slide2:
+    - image: busy-stick-figures-animated
+      type: image
+      y: 100
+      x: 250
 slide_player:
   slide1: slide1
+  slide1_remove:
+    slide1: remove
+  slide2:
+    slide2:
+      priority: 200
