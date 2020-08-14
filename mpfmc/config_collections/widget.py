@@ -28,6 +28,8 @@ class WidgetCollection(ConfigCollection):
 
     def process_config(self, config: Union[dict, list]) -> List["Widget"]:
         # config is localized to a specific widget section
+        if config is None:
+            config = []
         if isinstance(config, dict):
             config = [config]
 
