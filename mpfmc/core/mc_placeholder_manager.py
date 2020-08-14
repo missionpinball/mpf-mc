@@ -10,7 +10,7 @@ class McPlaceholderManager(BasePlaceholderManager):
         if name == "settings":
             return self.machine.settings
         elif name == "machine":
-            return MachinePlaceholder(self.machine)
+            return False
         elif self.machine.player:
             if name == "current_player":
                 return self.machine.player

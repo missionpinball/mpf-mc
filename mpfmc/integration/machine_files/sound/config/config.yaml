@@ -1,0 +1,41 @@
+#config_version=5
+sound_system:
+  buffer: 2048
+  frequency: 44100
+  channels: 2
+  master_volume: 0.9
+  tracks:
+    music:
+      volume: 0.5
+      simultaneous_sounds: 1
+    sfx:
+      volume: 0.4
+      simultaneous_sounds: 8
+      preload: yes
+    voice:
+      volume: 0.6
+      simultaneous_sounds: 1
+      preload: yes
+
+assets:
+    sounds:
+        default:
+            load: preload
+        voice:
+            load: preload
+            track: voice
+        sfx:
+            load: preload
+            track: sfx
+        music:
+            load: on_demand
+            track: music
+        loops:
+            load: preload
+            track: sfx
+        playlist:
+            load: on_demand
+            track: sfx
+
+sound_player:
+  machine_var_factory_reset_current_selection{machine.factory_reset_current_selection==2}: 210871_synthping
