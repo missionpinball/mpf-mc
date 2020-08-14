@@ -1,5 +1,7 @@
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.utility_functions import Util
+from mpfmc.config_collections.animation import AnimationCollection
+from mpfmc.uix.widget import magic_events
 
 
 class MpfSlidePlayer(PluginPlayer):
@@ -115,6 +117,13 @@ class MpfSlidePlayer(PluginPlayer):
 
         for event_name, event_settings in config.items():
 
+            # make sure the event_name is registered as a trigger event so MPF
+            # will send those events as triggers via BCP. But we don't want
+            # to register magic events since those aren't real MPF events.
+            if event_name not in magic_events:
+                client = self.machine.bcp.transport.get_named_client("local_display")
+                self.machine.bcp.interface.add_registered_trigger_event_for_client(client, event_name)
+
             # str means it's a list of named animations
             if isinstance(event_settings, str):
                 event_settings = Util.string_to_event_list(event_settings)
@@ -127,28 +136,9 @@ class MpfSlidePlayer(PluginPlayer):
             # as we iterate
             new_list = list()
             for settings in event_settings:
-                new_list.append(self.process_animation(settings))
+                new_list.append(AnimationCollection.process_animation(settings, self.machine.config_validator))
 
             config[event_name] = new_list
-
-        return config
-
-    def process_animation(self, config):
-        # config is localized to a single animation's settings within a list
-
-        # str means it's a named animation
-        if isinstance(config, str):
-            config = dict(named_animation=config)
-
-        # dict is settings for an animation
-        elif isinstance(config, dict):
-            self.machine.config_validator.validate_config('widgets:animations',
-                                                          config)
-
-            if len(config['property']) != len(config['value']):
-                raise ValueError('Animation "property" list ({}) is not the '
-                                 'same length as the "end" list ({}).'.
-                                 format(config['property'], config['end']))
 
         return config
 

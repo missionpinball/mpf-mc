@@ -1,0 +1,13 @@
+#show_version=5
+- duration: -1
+  slides:
+    slide_1:
+      widgets:
+        - type: text
+          text: Test Text
+          color: white
+          animations:
+            event_to_rotate_widget:
+              - property: rotation
+                value: 90
+                duration: .001s

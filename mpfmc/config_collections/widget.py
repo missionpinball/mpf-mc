@@ -5,6 +5,7 @@ from importlib import import_module
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
 from mpf.core.utility_functions import Util
 from mpf.core.placeholder_manager import TextTemplate
+from mpfmc.config_collections.animation import AnimationCollection
 from mpfmc.core.config_collection import ConfigCollection
 from mpfmc.uix.widget import magic_events
 
@@ -135,7 +136,7 @@ class WidgetCollection(ConfigCollection):
             # as we iterate
             new_list = list()
             for settings in event_settings:
-                new_list.append(self.mc.animations.process_animation(settings))
+                new_list.append(AnimationCollection.process_animation(settings, self.mc.config_validator))
 
             config[event_name] = new_list
 

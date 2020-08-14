@@ -2,6 +2,10 @@ from importlib import import_module
 
 from mpf.core.device_manager import DeviceCollection
 
+MYPY = False
+if MYPY:    # pragma: no cover
+    from mpfmc.core.mc import MpfMc     # pylint: disable-msg=cyclic-import,unused-import
+
 
 class ConfigCollection(DeviceCollection):
     """ A lightweight collection of validated configs from the machine or
@@ -29,7 +33,7 @@ class ConfigCollection(DeviceCollection):
         self._initialize()
 
     @property
-    def mc(self):
+    def mc(self) -> "MpfMc":
         return self.machine
 
     def _initialize(self):

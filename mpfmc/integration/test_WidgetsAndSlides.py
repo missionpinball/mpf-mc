@@ -11,6 +11,15 @@ class TestWidgetsAndSlides(MpfIntegrationTestCase, MpfFakeGameTestCase, MpfSlide
     def get_machine_path(self):
         return 'integration/machine_files/widgets_and_slides/'
 
+    def test_animation_events(self):
+        self.post_event("play_animation_show")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Test Text")
+        self.assertEqual(0.0, self.mc.targets["default"].current_slide.children[0].widget.rotate.angle)
+        self.post_event("event_to_rotate_widget")
+        self.advance_time_and_run(.1)
+        self.assertEqual(90.0, self.mc.targets["default"].current_slide.children[0].widget.rotate.angle)
+
     def test_slide_with_vars(self):
         self.post_event("play_show_with_var")
         self.advance_time_and_run(.1)

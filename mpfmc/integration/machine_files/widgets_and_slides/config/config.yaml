@@ -111,3 +111,4 @@ show_player:
     slide_show:
       show_tokens:
         my_show_var: Test123
+  play_animation_show: animation_show
