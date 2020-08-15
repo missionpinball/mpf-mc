@@ -16,21 +16,11 @@ from mpf.core.rgba_color import RGBAColor
 
 from mpfmc.uix.relative_animation import RelativeAnimation
 from mpfmc.core.utils import percent_to_float
+from mpfmc.uix.widget_magic_events import magic_events
 
 MYPY = False
 if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc
-
-magic_events = ('add_to_slide',
-                'remove_from_slide',
-                'pre_show_slide',
-                'show_slide',
-                'pre_slide_leave',
-                'slide_leave',
-                'slide_play')
-"""Magic Events are events that are used to trigger widget actions that
-are not real MPF events, rather, they're used to trigger animations from
-things the slide is doing."""
 
 
 # pylint: disable-msg=too-many-instance-attributes

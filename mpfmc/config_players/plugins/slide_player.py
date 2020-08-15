@@ -1,7 +1,7 @@
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.utility_functions import Util
 from mpfmc.config_collections.animation import AnimationCollection
-from mpfmc.uix.widget import magic_events
+from mpfmc.uix.widget_magic_events import magic_events
 
 
 class MpfSlidePlayer(PluginPlayer):
