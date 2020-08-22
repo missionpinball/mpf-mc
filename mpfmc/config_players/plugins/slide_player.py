@@ -1,3 +1,5 @@
+from functools import partial
+
 from mpf.config_players.plugin_player import PluginPlayer
 from mpf.core.utility_functions import Util
 from mpfmc.config_collections.animation import AnimationCollection
@@ -91,6 +93,15 @@ class MpfSlidePlayer(PluginPlayer):
 
         return widget_list
 
+    def _register_trigger(self, event, **kwargs):
+        """Register trigger via BCP for MC."""
+        del kwargs
+        client = self.machine.bcp.transport.get_named_client("local_display")
+        if client:
+            self.machine.bcp.interface.add_registered_trigger_event_for_client(client, event)
+        else:
+            self.machine.events.add_handler("bcp_clients_connected", partial(self._register_trigger, event))
+
     def process_widget(self, config):
         # config is localized widget settings
 
@@ -102,6 +113,16 @@ class MpfSlidePlayer(PluginPlayer):
         except KeyError:
             raise KeyError("Slide config validation error. Something is "
                            "wrong here: {}".format(config))
+
+        if 'control_events' in config:
+            for event_dict in config['control_events']:
+                if event_dict["event"] not in magic_events:
+                    self._register_trigger(event_dict["event"])
+
+        if 'reset_animations_events' in config:
+            for event_name in config['reset_animations_events']:
+                if event_name not in magic_events:
+                    self._register_trigger(event_name)
 
         if 'animations' in config:
             config['animations'] = self.process_animations(
@@ -121,8 +142,7 @@ class MpfSlidePlayer(PluginPlayer):
             # will send those events as triggers via BCP. But we don't want
             # to register magic events since those aren't real MPF events.
             if event_name not in magic_events:
-                client = self.machine.bcp.transport.get_named_client("local_display")
-                self.machine.bcp.interface.add_registered_trigger_event_for_client(client, event_name)
+                self._register_trigger(event_name)
 
             # str means it's a list of named animations
             if isinstance(event_settings, str):

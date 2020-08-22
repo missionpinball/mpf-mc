@@ -13,6 +13,9 @@ slide_player:
       widgets:
       - type: video
         video: mpf_video_small_test2
+        control_events:
+          - event: pause_event_from_mpf
+            action: pause
       - type: text
         text: Video from Mode
         y: bottom+20%

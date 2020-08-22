@@ -55,7 +55,7 @@ class WidgetCollection(ConfigCollection):
             if isinstance(widget_config.get("widget"), str) and widget_config['widget'] not in self.mc.widgets:
                 raise ValueError('"{}" is not a valid widget name.'.format(widget_config['widget']))
 
-    def process_widget(self, config: dict) -> dict:
+    def process_widget(self, config: dict) -> dict:     # noqa
         if config.get("widget"):
             return self._load_widget_by_name(config)
 
@@ -90,6 +90,12 @@ class WidgetCollection(ConfigCollection):
 
         else:
             config['animations'] = None
+
+        if 'control_events' in config:
+            for event_dict in config['control_events']:
+                if event_dict["event"] not in magic_events:
+                    self.mc.events.add_handler("client_connected", partial(self._register_trigger,
+                                                                           event_dict["event"]))
 
         if 'reset_animations_events' in config:
             for event_name in config['reset_animations_events']:

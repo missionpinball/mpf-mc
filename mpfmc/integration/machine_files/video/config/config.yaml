@@ -7,3 +7,6 @@ displays:
 
 modes:
   - mode1
+
+show_player:
+  play_show_with_video: show_with_video
