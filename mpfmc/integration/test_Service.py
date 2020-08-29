@@ -19,42 +19,54 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
 
         # enter
         self.hit_and_release_switch("s_service_enter")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
         self.assertSlideOnTop("service_menu")
-        self.assertTextOnTopSlide("Switch Test")
+        self.assertTextOnTopSlide("Diagnostics Menu")
 
-        # check software update
-        self.hit_and_release_switch("s_service_down")
-        self.advance_time_and_run()
-        self.assertTextOnTopSlide("Software Update")
+        # enter diagnostics menu
+        self.hit_and_release_switch("s_service_enter")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Switch Menu")
 
-        # Back to switch test
-        self.hit_and_release_switch("s_service_up")
-        self.advance_time_and_run()
-        self.assertTextOnTopSlide("Switch Test")
+        # enter switch menu
+        self.hit_and_release_switch("s_service_enter")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Switch Edge Test")
 
         # enter switch test
         self.hit_and_release_switch("s_service_enter")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
         self.assertSlideOnTop("service_switch_test")
 
         self.hit_and_release_switch("s_test")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
         self.assertTextOnTopSlide("s_test")
         self.assertTextOnTopSlide("The test switch label")
 
         # exit
         self.hit_and_release_switch("s_service_esc")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
         self.assertSlideOnTop("service_menu")
+        self.assertTextOnTopSlide("Switch Edge Test")
+
+        # exit
+        self.hit_and_release_switch("s_service_esc")
+        self.advance_time_and_run(.1)
+        self.assertSlideOnTop("service_menu")
+        self.assertTextOnTopSlide("Switch Menu")
 
         self.hit_and_release_switch("s_service_up")
-        self.advance_time_and_run()
-        self.assertTextOnTopSlide("Coil Test")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Coil Menu")
+
+        # enter coil menu
+        self.hit_and_release_switch("s_service_enter")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Single Coil Test")
 
         # enter coil test
         self.hit_and_release_switch("s_service_enter")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
         self.assertSlideOnTop("service_coil_test")
         self.assertTextOnTopSlide("c_test")
         self.assertTextOnTopSlide("First coil")
@@ -62,19 +74,71 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
 
         # exit
         self.hit_and_release_switch("s_service_esc")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
         self.assertSlideOnTop("service_menu")
+        self.assertTextOnTopSlide("Single Coil Test")
+
+        # exit
+        self.hit_and_release_switch("s_service_esc")
+        self.advance_time_and_run(.1)
+        self.assertSlideOnTop("service_menu")
+        self.assertTextOnTopSlide("Coil Menu")
 
         self.hit_and_release_switch("s_service_up")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Light Menu")
+
+        # enter light menu
+        self.hit_and_release_switch("s_service_enter")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Single Light Test")
 
         # enter light test
         self.hit_and_release_switch("s_service_enter")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
         self.assertSlideOnTop("service_light_test")
         self.assertTextOnTopSlide("l_light1")
         self.assertTextOnTopSlide("First light")
         self.assertTextOnTopSlide("1/white")
+
+        # exit
+        self.hit_and_release_switch("s_service_esc")
+        self.advance_time_and_run(.1)
+        self.assertSlideOnTop("service_menu")
+        self.assertTextOnTopSlide("Single Light Test")
+
+        # exit
+        self.hit_and_release_switch("s_service_esc")
+        self.advance_time_and_run(.1)
+        self.assertSlideOnTop("service_menu")
+        self.assertTextOnTopSlide("Light Menu")
+
+        # exit
+        self.hit_and_release_switch("s_service_esc")
+        self.advance_time_and_run(.1)
+        self.assertSlideOnTop("service_menu")
+        self.assertTextOnTopSlide("Diagnostics Menu")
+
+        self.hit_and_release_switch("s_service_up")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Audits Menu")
+
+        self.hit_and_release_switch("s_service_up")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Adjustments Menu")
+
+        self.hit_and_release_switch("s_service_up")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Utilities Menu")
+
+        # enter util menu
+        self.hit_and_release_switch("s_service_enter")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Reset Menu")
+
+        self.hit_and_release_switch("s_service_up")
+        self.advance_time_and_run(.1)
+        self.assertTextOnTopSlide("Software Update")
 
         # close door
         self.release_switch_and_run("s_door_open", 1)
@@ -82,16 +146,12 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
 
         # exit
         self.hit_and_release_switch("s_service_esc")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
         self.assertSlideOnTop("service_menu")
-
-        self.hit_and_release_switch("s_service_up")
-        self.advance_time_and_run()
-        self.assertTextOnTopSlide("Settings")
 
         # exit service menu
         self.hit_and_release_switch("s_service_esc")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
 
         if not self.mc.sound_system or not self.mc.sound_system.audio_interface:
             return
@@ -100,6 +160,5 @@ class TestService(MpfIntegrationTestCase, MpfSlideTestCase):
         self.assertEqual(0.8, self.machine.variables.get_machine_var("master_volume"))
 
         self.hit_and_release_switch("s_service_up")
-        self.advance_time_and_run()
+        self.advance_time_and_run(.1)
         self.assertEqual(0.84, self.machine.variables.get_machine_var("master_volume"))
-

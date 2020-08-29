@@ -83,6 +83,8 @@ displays:
     width: 128
     height: 32
     default: true
+    round_anchor_x: left
+    round_anchor_y: top
 
 slides:
   window_slide_1:
