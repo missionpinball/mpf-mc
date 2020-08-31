@@ -128,12 +128,13 @@ class LazyZipImageLoader(ImageLoaderBase):
         return filename
 
     def populate(self):
-        """Polulate textures with lazy loader."""
-        self._textures = LazyZipImageLoaderTexture(self._zipfile,
-                                                   self.filename,
-                                                   self._mipmap,
-                                                   self.keep_data,
-                                                   self._nocache)
+        """Populate textures with lazy loader."""
+        if not self._textures:
+            self._textures = LazyZipImageLoaderTexture(self._zipfile,
+                                                       self.filename,
+                                                       self._mipmap,
+                                                       self.keep_data,
+                                                       self._nocache)
 
     @property
     def width(self):
@@ -231,6 +232,9 @@ class ImageAsset(McAsset):
                             nocache=True)
 
         self._image.anim_reset(False)
+
+        # load first texture to speed up first display
+        self._callbacks.add(lambda x: self._image.texture)
 
     def _do_unload(self):
         # This is the method that's called to unload the asset. It's called by
