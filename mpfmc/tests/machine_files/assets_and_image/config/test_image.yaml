@@ -9,6 +9,10 @@ displays:
     height: 300
 
 slides:
+  random_image_test:
+    - type: image
+      image: random_image
+      x: 50
   image_test:
     - type: image
       image: image1
@@ -69,8 +73,31 @@ slides:
       image: image12
       x: 380
 
+image_pools:
+  random_image:
+      images:
+         - image1
+         - image2
+         - image3
+
+widgets:
+  random_image_widget:
+    - type: image
+      image: random_image
+      rotation: 25
+      x: 80
+
 slide_player:
   show_slide1: image_test
+  show_random_slide: random_image_test
+
+widget_player:
+  add_random_image:
+    random_image_widget:
+      slide: random_image_test
+  remove_random_image:
+    random_image_widget:
+      action: remove
 
 assets:
     images:

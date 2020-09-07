@@ -32,15 +32,15 @@ class ImageWidget(Widget):
         # display the image. Scaling and rotation is handled by the Scatter
         # widget.
         try:
-            self._image = self.mc.images[self.config['image']]
+            image = self.mc.images[self.config['image']]
         except KeyError:
 
             try:
-                self._image = self.mc.images[kwargs['play_kwargs']['image']]
+                image = self.mc.images[kwargs['play_kwargs']['image']]
             except KeyError:
                 pass
 
-        if not self._image:
+        if not image:
             if not self.mc.asset_manager.initial_assets_loaded:
                 raise ValueError("Tried to use an image '{}' when the initial asset loading run has not yet been "
                                  "completed. Try to use 'init_done' as event to show your slides if you want to "
@@ -49,11 +49,16 @@ class ImageWidget(Widget):
             raise ValueError("Cannot add Image widget. Image '{}' is not a "
                              "valid image name.".format(self.config['image']))
 
-        self._image.references += 1
-
         # Updates the config for this widget to pull in any defaults that were
         # in the asset config
-        self.merge_asset_config(self._image)
+        self.merge_asset_config(image)
+
+        if image.is_pool:
+            self._image = image.get_next()
+        else:
+            self._image = image
+
+        self._image.references += 1
 
         # If the associated image asset exists, that means it's loaded already.
         if self._image.image:

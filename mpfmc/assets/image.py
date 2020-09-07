@@ -16,8 +16,9 @@ from mpfmc.assets.mc_asset import McAsset
 
 class ImagePool(AssetPool):
 
-    # Be sure the pool group, if you use it, is first in the file ahead of the
-    # asset class.
+    """A pool of images."""
+
+    __slots__ = []
 
     def __repr__(self):
         # String that's returned if someone prints this object

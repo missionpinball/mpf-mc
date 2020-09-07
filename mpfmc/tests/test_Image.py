@@ -2,9 +2,10 @@
 
 
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
+from mpfmc.tests.MpfSlideTestCase import MpfSlideTestCase
 
 
-class TestImage(MpfMcTestCase):
+class TestImage(MpfMcTestCase, MpfSlideTestCase):
     def get_machine_path(self):
         return 'tests/machine_files/assets_and_image'
 
@@ -24,3 +25,12 @@ class TestImage(MpfMcTestCase):
 
         for x in range(12):
             self.assertIn('image{}'.format(x+1), active_widget_names)
+
+    def test_image_pools(self):
+        self.mc.events.post("show_random_slide")
+        self.advance_time(.1)
+        self.assertSlideOnTop("random_image_test")
+        self.mc.events.post("add_random_image")
+        self.advance_time(.1)
+        self.mc.events.post("remove_random_image")
+        self.advance_time(.1)
