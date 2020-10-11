@@ -25,6 +25,8 @@ slides:
         value: 0
         duration: .25s
         repeat: yes
+    block_events: test_block
+    release_events: test_release
   - type: text
     text: ""
     key: key1
