@@ -1,6 +1,7 @@
 from importlib import import_module
 
 from mpf.core.device_manager import DeviceCollection
+from mpf.exceptions.config_file_error import ConfigFileError
 
 MYPY = False
 if MYPY:    # pragma: no cover
@@ -52,8 +53,11 @@ class ConfigCollection(DeviceCollection):
             # if not settings:
             #     raise AssertionError("{} entry '{}' has an empty config."
             #                          .format(self.config_section, name))
-
-            self[name] = self.process_config(settings)
+            try:
+                self[name] = self.process_config(settings)
+            except ConfigFileError as e:
+                raise ConfigFileError("Error creating {} config entry for '{}' >> {}".format(
+                    self.config_section, name, e._message), e._error_no, e._logger_name) from e
 
     def validate_entries_from_root_config(self, **kwargs):
         del kwargs

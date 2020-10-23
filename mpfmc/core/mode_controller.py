@@ -6,6 +6,7 @@ from collections import namedtuple
 
 from mpf.core.config_processor import ConfigProcessor
 from mpf.core.utility_functions import Util
+from mpf.exceptions.config_file_error import ConfigFileError
 from mpfmc.core.mode import Mode
 
 
@@ -61,14 +62,17 @@ class ModeController:
         # initialise modes after loading all of them to prevent races
         for item in self.loader_methods:
             for mode in self.mc.modes.values():
-                if ((item.config_section in mode.config and
-                        mode.config[item.config_section]) or not
-                        item.config_section):
-                    item.method(config=mode.config.get(item.config_section),
-                                mode=mode,
-                                mode_path=mode.path,
-                                root_config_dict=mode.config,
-                                **item.kwargs)
+                try:
+                    if ((item.config_section in mode.config and
+                            mode.config[item.config_section]) or not
+                            item.config_section):
+                        item.method(config=mode.config.get(item.config_section),
+                                    mode=mode,
+                                    mode_path=mode.path,
+                                    root_config_dict=mode.config,
+                                    **item.kwargs)
+                except ConfigFileError as e:
+                    raise ConfigFileError("Error while loading mode '{}' >> {}".format(mode.name, e._message), e._error_no, e._logger_name) from e
 
     def _load_mode(self, mode_string):
         """Loads a mode, reads in its config, and creates the Mode object.
