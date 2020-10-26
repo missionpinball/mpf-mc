@@ -104,12 +104,12 @@ class MpfTextInput(Text):
             self.config['force_complete_event'] = (
                 'text_input_{}_force_complete'.format(self.key))
 
-        for event in self.config.get('block_events',[]):
+        for event in self.config.get('block_events', []):
             self.registered_event_handlers.add(self.mc.events.add_handler(
                 event, self.block_enable, priority=2  # Priority avoids conflicts with select/abort event handlers
             ))
             self.mc.bcp_processor.register_trigger(event)
-        for event in self.config.get('release_events',[]):
+        for event in self.config.get('release_events', []):
             self.registered_event_handlers.add(self.mc.events.add_handler(
                 event, self.block_disable, priority=2
             ))
