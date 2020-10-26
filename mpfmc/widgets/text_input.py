@@ -49,6 +49,7 @@ class MpfTextInput(Text):
         self.final_list = deque()
         self.final_list.append('back')
         self.final_list.append('end')
+        self._is_blocking = False
 
         Clock.schedule_once(self.find_linked_text_widget)
 
@@ -103,6 +104,17 @@ class MpfTextInput(Text):
             self.config['force_complete_event'] = (
                 'text_input_{}_force_complete'.format(self.key))
 
+        for event in self.config.get('block_events', []):
+            self.registered_event_handlers.add(self.mc.events.add_handler(
+                event, self.block_enable, priority=2  # Priority avoids conflicts with select/abort event handlers
+            ))
+            self.mc.bcp_processor.register_trigger(event)
+        for event in self.config.get('release_events', []):
+            self.registered_event_handlers.add(self.mc.events.add_handler(
+                event, self.block_disable, priority=2
+            ))
+            self.mc.bcp_processor.register_trigger(event)
+
         self.registered_event_handlers.add(self.mc.events.add_handler(
             self.config['shift_left_event'], self.shift, places=-1))
         self.mc.bcp_processor.register_trigger(self.config['shift_left_event'])
@@ -143,6 +155,8 @@ class MpfTextInput(Text):
 
     def shift(self, places: int = 1, force: bool = False, **kwargs) -> None:
         del kwargs
+        if self._is_blocking:
+            return
         if self.active or force:
             self.current_list.rotate(-places)
 
@@ -244,6 +258,14 @@ class MpfTextInput(Text):
     def prepare_for_removal(self) -> None:
         self.done()
         super().prepare_for_removal()
+
+    def block_enable(self, **kwargs) -> None:
+        del kwargs
+        self._is_blocking = True
+
+    def block_disable(self, **kwargs) -> None:
+        del kwargs
+        self._is_blocking = False
 
 
 widget_classes = [MpfTextInput]

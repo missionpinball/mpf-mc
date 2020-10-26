@@ -207,3 +207,40 @@ class TestText(MpfMcTestCase):
         self.mc.events.post('sw_start')
         self.advance_time()
         self.assertEqual(text_display_widget.text, 'MPF')
+
+    def test_text_input_blocking(self):
+        self.mc.events.post('slide1')
+        self.advance_time(1)
+
+        text_input_widget = (
+            self.mc.targets['default'].current_slide.widgets[1].widget)
+
+        text_display_widget = (
+            self.mc.targets['default'].current_slide.widgets[2].widget)
+
+        self.assertEqual(text_display_widget.text, '')
+        self.assertEqual(text_input_widget.text, 'C')
+        self.advance_time()
+
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'B')
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'C')
+        self.mc.events.post('test_block')
+        self.advance_time()
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'C')
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'C')
+        self.mc.events.post('test_release')
+        self.advance_time()
+        self.mc.events.post('sw_right_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'D')
+        self.mc.events.post('sw_left_flipper')
+        self.advance_time()
+        self.assertEqual(text_input_widget.text, 'C')
