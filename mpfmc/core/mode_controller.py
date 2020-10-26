@@ -72,7 +72,8 @@ class ModeController:
                                     root_config_dict=mode.config,
                                     **item.kwargs)
                 except ConfigFileError as e:
-                    raise ConfigFileError("Error while loading mode '{}' >> {}".format(mode.name, e._message), e._error_no, e._logger_name) from e
+                    e.extend("Error while loading mode '{}'".format(mode.name))
+                    raise e
 
     def _load_mode(self, mode_string):
         """Loads a mode, reads in its config, and creates the Mode object.

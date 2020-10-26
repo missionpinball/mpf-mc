@@ -56,8 +56,8 @@ class ConfigCollection(DeviceCollection):
             try:
                 self[name] = self.process_config(settings)
             except ConfigFileError as e:
-                raise ConfigFileError("Error creating {} config entry for '{}' >> {}".format(
-                    self.config_section, name, e._message), e._error_no, e._logger_name) from e
+                e.extend("Error creating {} config entry for '{}'".format(self.config_section, name))
+                raise e
 
     def validate_entries_from_root_config(self, **kwargs):
         del kwargs
