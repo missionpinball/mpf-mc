@@ -623,7 +623,8 @@ class SoundAsset(McAsset):
         except AudioException as exception:
             self.log.error("Load sound %s failed due to an exception - %s",
                            self.name, str(exception))
-            raise AudioException("Load sound {} failed due to an exception: {}".format(self.name, exception)) from exception
+            raise AudioException("Load sound {} failed due to an exception: {}".format(
+                self.name, exception)) from exception
 
         # Validate ducking now that the sound has been loaded
         # TODO: Implement me
