@@ -110,28 +110,37 @@ Here are several various examples:
                                        .format(s['track'], action, sound_name))
                 return
 
-            # Determine action to perform
+            delay = s['delay']
+            del s['delay']
+
+            # Determine action to perform and store it in a lambda to be executed immediately or after a delay
+            execute = None
             if action == 'play':
-                track.play_sound(sound, context, s)
+                execute = lambda dt: track.play_sound(sound, context, s)
 
             elif action == 'stop':
                 if 'fade_out' in s:
-                    track.stop_sound(sound, s['fade_out'])
+                    execute = lambda dt: track.stop_sound(sound, s['fade_out'])
                 else:
-                    track.stop_sound(sound)
+                    execute = lambda dt: track.stop_sound(sound)
 
             elif action == 'stop_looping':
-                track.stop_sound_looping(sound)
+                execute = lambda dt: track.stop_sound_looping(sound)
 
             elif action == 'load':
-                sound.load()
+                execute = lambda dt: sound.load()
 
             elif action == 'unload':
-                sound.unload()
+                execute = lambda dt: sound.unload()
 
             else:
                 self.machine.log.error("SoundPlayer: The specified action "
                                        "is not valid ('{}').".format(action))
+
+            if delay:
+                self.machine.clock.schedule_once(execute, delay)
+            else:
+                execute(None)
 
     def get_express_config(self, value):
         """ express config for sounds is simply a string (sound name)"""
