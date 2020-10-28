@@ -31,6 +31,7 @@ class ImageWidget(Widget):
         # draws a rectangle using the texture from the loaded image asset to
         # display the image. Scaling and rotation is handled by the Scatter
         # widget.
+        image = None
         try:
             image = self.mc.images[self.config['image']]
         except KeyError:
