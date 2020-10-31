@@ -19,6 +19,11 @@ matrix:
      sudo: required
      language: python
      python: "3.6"
+   - os: linux  # this is python 3.8
+     env: LINUX=ubuntu:20.04 USE_CYTHON=1 USE_PPA=1
+     sudo: required
+     language: python
+     python: "3.6"
    - os: linux  # stable
      env: LINUX=debian:stretch USE_CYTHON=1
      sudo: required
@@ -88,7 +93,7 @@ before_script:
 
 script:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-      docker run -v $PWD:$PWD -v /dev/snd:/dev/snd --privileged -w $PWD $LINUX /bin/sh -c "_mpf_installer/install-mpf-dependencies && _mpf_installer/install-mc-dependencies && pip3 install --upgrade coveralls && pip3 install prospector==1.1.7 && apt-get -y install xvfb && pip3 install -e _mpf/ && pip3 install -e . && export DISPLAY=:99.0 && /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX && export PYTHONPATH=$PYTHONPATH:$(pwd) && coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests && prospector && coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;";
+      docker run -v $PWD:$PWD -v /dev/snd:/dev/snd --privileged -w $PWD $LINUX /bin/sh -c "if [ \"${USE_PPA}\" == \"1\" ]; then add-apt-repository -y ppa:deadsnakes/ppa && apt update && apt install python3.7-venv python3.7 python3.7-dev && python3.7 -m venv ~/mpfenv && . ~/mpfenv/bin/activate; fi; _mpf_installer/install-mpf-dependencies && _mpf_installer/install-mc-dependencies && pip3 install --upgrade coveralls && pip3 install prospector==1.1.7 && apt-get -y install xvfb && pip3 install -e _mpf/ && pip3 install -e . && export DISPLAY=:99.0 && /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX && export PYTHONPATH=$PYTHONPATH:$(pwd) && coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests && prospector && coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;";
     fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then
