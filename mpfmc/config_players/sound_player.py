@@ -76,13 +76,14 @@ Here are several various examples:
             sound_player (they must be specified in the sounds section of a config file).
 
         """
-        del calling_context
         settings = deepcopy(settings)
 
         if 'sounds' in settings:
             settings = settings['sounds']
 
         for sound_name, s in settings.items():
+            if self.check_delayed_play(sound_name, s, context, calling_context, priority, **kwargs):
+                return
 
             try:
                 s['priority'] += priority
@@ -110,37 +111,28 @@ Here are several various examples:
                                        .format(s['track'], action, sound_name))
                 return
 
-            delay = s['delay']
-            del s['delay']
-
             # Determine action to perform and store it in a lambda to be executed immediately or after a delay
-            execute = None
             if action == 'play':
-                execute = lambda dt: track.play_sound(sound, context, s)
+                track.play_sound(sound, context, s)
 
             elif action == 'stop':
                 if 'fade_out' in s:
-                    execute = lambda dt: track.stop_sound(sound, s['fade_out'])
+                    track.stop_sound(sound, s['fade_out'])
                 else:
-                    execute = lambda dt: track.stop_sound(sound)
+                    track.stop_sound(sound)
 
             elif action == 'stop_looping':
-                execute = lambda dt: track.stop_sound_looping(sound)
+                track.stop_sound_looping(sound)
 
             elif action == 'load':
-                execute = lambda dt: sound.load()
+                sound.load()
 
             elif action == 'unload':
-                execute = lambda dt: sound.unload()
+                sound.unload()
 
             else:
                 self.machine.log.error("SoundPlayer: The specified action "
                                        "is not valid ('{}').".format(action))
-
-            if delay:
-                self.machine.clock.schedule_once(execute, delay)
-            else:
-                execute(None)
 
     def get_express_config(self, value):
         """ express config for sounds is simply a string (sound name)"""
