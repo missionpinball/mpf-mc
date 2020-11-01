@@ -111,7 +111,7 @@ Here are several various examples:
                                        .format(s['track'], action, sound_name))
                 return
 
-            # Determine action to perform and store it in a lambda to be executed immediately or after a delay
+            # Determine action to perform
             if action == 'play':
                 track.play_sound(sound, context, s)
 
