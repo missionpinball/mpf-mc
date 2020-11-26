@@ -46,7 +46,7 @@ class Display(ScreenManager):
     @staticmethod
     def create_default_display(mc: "MpfMc") -> None:
         """Create default display."""
-        Display(mc, 'default', width=800, height=600)
+        Display(mc, 'default', width=800, height=600, enabled=True)
 
     def __init__(self, mc: "MpfMc", name: str, **kwargs) -> None:
         """Initialise Display."""
