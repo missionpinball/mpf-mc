@@ -64,6 +64,7 @@ class Display(ScreenManager):
         self.native_size = (self.config['width'], self.config['height'])
         self.size_hint = (None, None)
         self.size = self.native_size
+        self.enabled = self.config['enabled']
 
         self.transition = NoTransition()
 

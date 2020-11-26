@@ -137,6 +137,10 @@ class McSlidePlayer(McConfigPlayer):
 
             target = self.machine.targets[target_name]
 
+            # Target has been disabled via config setting, ignore all slides for it
+            if not target.enabled:
+                return
+
             # remove target
             s.pop("target")
 
