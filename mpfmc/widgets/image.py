@@ -102,9 +102,12 @@ class ImageWidget(Widget):
         if self._image.image.anim_available:
             self.fps = self.config['fps']
             self.loops = self.config['loops']
-            if self.config['auto_play']:
-                self.play()
-            else:
+            self.start_frame = self.config['start_frame']
+
+            # Always play so we can get the starting frame rendered
+            self.play(start_frame=self.start_frame)
+            # If auto_play is not enabled, immediately stop
+            if not self.config['auto_play']:
                 self.stop()
 
     def _on_texture_change(self, *args) -> None:

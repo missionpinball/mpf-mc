@@ -76,13 +76,14 @@ Here are several various examples:
             sound_player (they must be specified in the sounds section of a config file).
 
         """
-        del calling_context
         settings = deepcopy(settings)
 
         if 'sounds' in settings:
             settings = settings['sounds']
 
         for sound_name, s in settings.items():
+            if self.check_delayed_play(sound_name, s, context, calling_context, priority, **kwargs):
+                return
 
             try:
                 s['priority'] += priority
