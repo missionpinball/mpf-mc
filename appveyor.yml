@@ -28,11 +28,9 @@ environment:
     BITNESS: 64
     COMPILER: msvc
 
-  pypi_user:
-    secure: /UlFCFSXuqY1JAsOwKZdFg==
-
   pypi_password:
-    secure: j1I2BPfJaYmFsQGsR8IWBQ==
+    secure: rCMmmOBIvdX3F9PXj/Vx8fz4nZnON6rZt0XZ7mw4OTOd4SB/od3U9pE6ogAsBkvOnhqqeM8XruxPh9+gZ5PDvb/KKB89FGVIAx6av7kFqMYwkAdhhR3SDsdjQDxfZAxc69cWzb2545LLsuGmLdEaqne5s41HT+8tFGVgyTKGdMQzAiUyOwhF+0Gdm5GTKvyd6lRC71SA6k04q5OWuEWf64BzVvSRchSGkQXzP7J8H0i3rYVOq8JNwdUqsL5nXLVTxkFXBulf81A6WqG6Rsqh3w==
+
 
 install:
 - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-desktop.ps1'))
@@ -175,7 +173,7 @@ build_script:
       python ../build_scripts/rename_wheels.py
 
       echo "Uploding wheels to pypi..."
-      $output = Invoke-Expression "python -m twine upload -u $env:pypi_user -p $env:pypi_password --skip-existing *" -ErrorVariable e
+      $output = Invoke-Expression "python -m twine upload -u __token__ -p $env:pypi_password --skip-existing *" -ErrorVariable e
       echo $output
       echo $e
     }
