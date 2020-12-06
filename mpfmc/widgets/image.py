@@ -141,8 +141,11 @@ class ImageWidget(Widget):
                 self.mc.log.info(" - anim_reset false is now complete, what's the anim index? {}".format(ci.anim_index))
                 return
 
-            elif self._image.frame_skips and self._image.frame_skips.get(ci.anim_index) is not None and self._end_index > self._image.frame_skips[ci.anim_index]:
-                self.mc.log.info(" - SKIPPING from frame {} to {}".format(ci.anim_index, self._image.frame_skips[ci.anim_index]))
+            # If the end_index is after the skip to, OR if the skip to is before the skip from (i.e. looping around) and the end_index is after the skip from
+            elif self._image.frame_skips and self._image.frame_skips.get(ci.anim_index) is not None and \
+                    (self._end_index > self._image.frame_skips[ci.anim_index] or self._end_index < ci.anim_index) and not \
+                    (self._end_index > ci.anim_index and self._image.frame_skips[ci.anim_index] < ci.anim_index):
+                self.mc.log.info(" - SKIPPING from frame {} to {} because end index is {}".format(ci.anim_index, self._image.frame_skips[ci.anim_index], self._end_index))
                 self.current_frame = self._image.frame_skips[ci.anim_index]
 
         # Handle animation looping (when applicable)

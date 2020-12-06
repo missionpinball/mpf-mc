@@ -7,6 +7,7 @@ from kivy.cache import Cache
 
 from kivy.core.image import Image, ImageLoaderBase, ImageLoader, Texture
 from mpf.core.assets import AssetPool
+from mpf.core.utility_functions import Util
 
 from mpfmc.assets.mc_asset import McAsset
 
@@ -221,6 +222,14 @@ class ImageAsset(McAsset):
         # the various load status attributes will be updated automatically,
         # and anything that was waiting for it to load will be called. So
         # all you have to do here is load and return.
+
+        if self.config.get('image_template'):
+            try:
+                template = self.machine.machine_config['image_templates'][self.config['image_template']]
+                self.config = Util.dict_merge(template, self.config)
+                self.machine.log.info(" - Merged configs with template! {}".format(self.config))
+            except KeyError:
+                raise KeyError("Image template '{}' was not found, referenced in image config {}".format(self.config['image_template'], self.config))
 
         if self.machine.machine_config['mpf-mc']['zip_lazy_loading']:
             # lazy loading for zip file image sequences
