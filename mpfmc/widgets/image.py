@@ -27,6 +27,7 @@ class ImageWidget(Widget):
         self._image = None  # type: ImageAsset
         self._current_loop = 0
         self._end_index = -1
+        self._frame_skips = None
 
         # Retrieve the specified image asset to display.  This widget simply
         # draws a rectangle using the texture from the loaded image asset to
@@ -72,6 +73,11 @@ class ImageWidget(Widget):
             self.size = (0, 0)
             self._image.load(callback=self._image_loaded)
 
+        if self.config.get('frame_skips'):
+            self._frame_skips = { s['start'] - 1: s['end'] -1 for s in self.config['frame_skips']}
+            self.mc.log.info("IMage frame skips are: {}".format(self._frame_skips))
+        else:
+            self.mc.log.info("no skips, maybe the image? {}".format(self._image))
         # Bind to all properties that when changed need to force
         # the widget to be redrawn
         self.bind(pos=self._draw_widget,
@@ -127,12 +133,17 @@ class ImageWidget(Widget):
         # Check if this is the end frame to stop the image. For some reason, after the image
         # stops the anim_index will increment one last time, so check for end_index - 1 to prevent
         # a full rollover on subsequent calls to the same end frame.
-        if self._end_index > -1 and ci.anim_index == self._end_index - 1:
-            self.mc.log.info("Image {} end index {} hit, stopping with anim index {}".format(self._image.image.filename, self._end_index, ci.anim_index))
-            self._end_index = -1
-            ci.anim_reset(False)
-            self.mc.log.info(" - anim_reset false is now complete, what's the anim index? {}".format(ci.anim_index))
-            return
+        if self._end_index > -1:
+            if ci.anim_index == self._end_index - 1:
+                self.mc.log.info("Image {} end index {} hit, stopping with anim index {}".format(self._image.image.filename, self._end_index, ci.anim_index))
+                self._end_index = -1
+                ci.anim_reset(False)
+                self.mc.log.info(" - anim_reset false is now complete, what's the anim index? {}".format(ci.anim_index))
+                return
+
+            elif self._image.frame_skips and self._image.frame_skips.get(ci.anim_index) is not None and self._end_index > self._image.frame_skips[ci.anim_index]:
+                self.mc.log.info(" - SKIPPING from frame {} to {}".format(ci.anim_index, self._image.frame_skips[ci.anim_index]))
+                self.current_frame = self._image.frame_skips[ci.anim_index]
 
         # Handle animation looping (when applicable)
         if ci.anim_available and self.loops > -1 and ci.anim_index == len(ci.image.textures) - 1:
