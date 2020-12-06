@@ -18,7 +18,7 @@ class ImageWidget(Widget):
 
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
-    animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'opacity')
+    animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'end_frame', 'opacity')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
@@ -26,6 +26,7 @@ class ImageWidget(Widget):
 
         self._image = None  # type: ImageAsset
         self._current_loop = 0
+        self._end_frame = -1
 
         # Retrieve the specified image asset to display.  This widget simply
         # draws a rectangle using the texture from the loaded image asset to
@@ -118,8 +119,13 @@ class ImageWidget(Widget):
         self.size = self.texture.size
         self._draw_widget()
 
-        # Handle animation looping (when applicable)
         ci = self._image.image
+        if self._end_frame > -1 and ci.anim_index == self._end_frame:
+            self._end_frame = -1
+            ci.anim_reset(False)
+            return
+
+        # Handle animation looping (when applicable)
         if ci.anim_available and self.loops > -1 and ci.anim_index == len(ci.image.textures) - 1:
             self._current_loop += 1
             if self._current_loop > self.loops:
@@ -223,6 +229,24 @@ class ImageWidget(Widget):
 
     current_frame = AliasProperty(_get_current_frame, _set_current_frame)
     '''The current frame of the animation.
+    '''
+
+    def _get_end_frame(self) -> int:
+        return self._end_frame
+
+    def _set_end_frame(self, value: int):
+        if not self._image.image.anim_available or not hasattr(self._image.image.image, 'textures'):
+            return
+        frame = (int(value) - 1) % len(self._image.image.image.textures)
+        self.mc.log.info("Setting end frame to {}, current frame is {}".format(frame, self._image.image.anim_index))
+        if frame == self._image.image.anim_index - 1:
+            return
+
+        self._end_frame = frame
+        self._image.image.anim_reset(True)
+
+    end_frame = AliasProperty(_get_end_frame, _set_end_frame)
+    '''The target frame at which the animation will stop.
     '''
 
     rotation = NumericProperty(0)

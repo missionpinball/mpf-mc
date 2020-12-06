@@ -237,6 +237,14 @@ class ImageAsset(McAsset):
         # load first texture to speed up first display
         self._callbacks.add(lambda x: self._image.texture)
 
+        self.machine.log.info("Loaded image {}, is anim? {}".format(self._image.filename, self._image.anim_available))
+        # self.machine.log.info(dir(self._image))
+        # if self._image.anim_available:
+        self._image.on_texture(self._on_texture)
+
+    def _on_texture(self, **kwargs):
+        self.machine.log.info("Image texture: {}".format(kwargs))
+
     def _do_unload(self):
         # This is the method that's called to unload the asset. It's called by
         # the main thread so you don't have to worry about thread
