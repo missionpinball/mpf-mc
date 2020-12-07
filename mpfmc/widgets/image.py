@@ -74,7 +74,7 @@ class ImageWidget(Widget):
             self._image.load(callback=self._image_loaded)
 
         if self.config.get('frame_skips'):
-            self._frame_skips = { s['start'] - 1: s['end'] -1 for s in self.config['frame_skips']}
+            self._frame_skips = {s['start'] - 1: s['end'] - 1 for s in self.config['frame_skips']}
 
         # Bind to all properties that when changed need to force
         # the widget to be redrawn
@@ -130,11 +130,12 @@ class ImageWidget(Widget):
                 ci.anim_reset(False)
                 return
 
-            # If the end_index is after the skip to, OR if the skip to is before the skip from (i.e. looping around) and the end_index is after the skip from
-            elif self._image.frame_skips and self._image.frame_skips.get(ci.anim_index) is not None and \
-                    (self._end_index > self._image.frame_skips[ci.anim_index] or self._end_index < ci.anim_index) and not \
-                    (self._end_index > ci.anim_index and self._image.frame_skips[ci.anim_index] < ci.anim_index):
-                self.current_frame = self._image.frame_skips[ci.anim_index]
+            skip_to = self._image.frame_skips and self._image.frame_skips.get(ci.anim_index)
+            # If the end_index is after the skip to or before the current position (i.e. we need to loop)
+            # But not if the skip will cause a loop around and bypass the end_index ahead
+            if skip_to is not None and (self._end_index > skip_to or self._end_index < ci.anim_index) and not \
+                    (self._end_index > ci.anim_index and skip_to < ci.anim_index):
+                self.current_frame = skip_to
 
         # Handle animation looping (when applicable)
         if ci.anim_available and self.loops > -1 and ci.anim_index == len(ci.image.textures) - 1:
@@ -234,7 +235,7 @@ class ImageWidget(Widget):
         if frame == self._image.image.anim_index:
             return
         else:
-            self._image.image._anim_index = frame # pylint: disable-msg=protected-access
+            self._image.image._anim_index = frame  # pylint: disable-msg=protected-access
             self._image.image.anim_reset(True)
 
     current_frame = AliasProperty(_get_current_frame, _set_current_frame)

@@ -228,7 +228,8 @@ class ImageAsset(McAsset):
                 template = self.machine.machine_config['image_templates'][self.config['image_template']]
                 self.config = Util.dict_merge(template, self.config)
             except KeyError:
-                raise KeyError("Image template '{}' was not found, referenced in image config {}".format(self.config['image_template'], self.config))
+                raise KeyError("Image template '{}' was not found, referenced in image config {}".format(
+                               self.config['image_template'], self.config))
 
         if self.machine.machine_config['mpf-mc']['zip_lazy_loading']:
             # lazy loading for zip file image sequences
@@ -245,8 +246,7 @@ class ImageAsset(McAsset):
 
         if self.config.get('frame_skips'):
             # Frames are provided in 1-index values, but the image animates in zero-index values
-            self.frame_skips = { s['from'] - 1: s['to'] -1 for s in self.config['frame_skips']}
-
+            self.frame_skips = {s['from'] - 1: s['to'] - 1 for s in self.config['frame_skips']}
 
         # load first texture to speed up first display
         self._callbacks.add(lambda x: self._image.texture)
