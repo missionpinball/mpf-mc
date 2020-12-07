@@ -250,7 +250,6 @@ class ImageAsset(McAsset):
 
         # load first texture to speed up first display
         self._callbacks.add(lambda x: self._image.texture)
-        self._image.on_texture(self._on_texture)
 
     def _do_unload(self):
         # This is the method that's called to unload the asset. It's called by
