@@ -75,9 +75,7 @@ class ImageWidget(Widget):
 
         if self.config.get('frame_skips'):
             self._frame_skips = { s['start'] - 1: s['end'] -1 for s in self.config['frame_skips']}
-            self.mc.log.info("IMage frame skips are: {}".format(self._frame_skips))
-        else:
-            self.mc.log.info("no skips, maybe the image? {}".format(self._image))
+
         # Bind to all properties that when changed need to force
         # the widget to be redrawn
         self.bind(pos=self._draw_widget,
@@ -111,14 +109,7 @@ class ImageWidget(Widget):
             self.loops = self.config['loops']
             self.start_frame = self.config['start_frame']
             self._end_index = self.start_frame - 1
-            # Always play so we can get the starting frame rendered
-            self.mc.log.info("Loaded calling play for image {} with start frame {}".format(self._image.image.filename, self.start_frame))
-            # If auto_play is not enabled, immediately stop
-            # if self.config['auto_play']:
             self.play(start_frame=self.start_frame, auto_play=self.config['auto_play'])
-            # if not self.config['auto_play']:
-                # self.stop()
-            self.mc.log.info(" - loaded play complete for image {}, anim index is now {} and current frame is {}".format(self._image.image.filename, self._image.image.anim_index, self.current_frame))
 
     def _on_texture_change(self, *args) -> None:
         """Update texture from image asset (callback when image texture changes)."""
@@ -135,17 +126,14 @@ class ImageWidget(Widget):
         # a full rollover on subsequent calls to the same end frame.
         if self._end_index > -1:
             if ci.anim_index == self._end_index - 1:
-                self.mc.log.info("Image {} end index {} hit, stopping with anim index {}".format(self._image.image.filename, self._end_index, ci.anim_index))
                 self._end_index = -1
                 ci.anim_reset(False)
-                self.mc.log.info(" - anim_reset false is now complete, what's the anim index? {}".format(ci.anim_index))
                 return
 
             # If the end_index is after the skip to, OR if the skip to is before the skip from (i.e. looping around) and the end_index is after the skip from
             elif self._image.frame_skips and self._image.frame_skips.get(ci.anim_index) is not None and \
                     (self._end_index > self._image.frame_skips[ci.anim_index] or self._end_index < ci.anim_index) and not \
                     (self._end_index > ci.anim_index and self._image.frame_skips[ci.anim_index] < ci.anim_index):
-                self.mc.log.info(" - SKIPPING from frame {} to {} because end index is {}".format(ci.anim_index, self._image.frame_skips[ci.anim_index], self._end_index))
                 self.current_frame = self._image.frame_skips[ci.anim_index]
 
         # Handle animation looping (when applicable)
@@ -163,7 +151,6 @@ class ImageWidget(Widget):
             self._image.references -= 1
             if self._image.references == 0:
                 try:
-                    self.mc.log.info("Preparing to REMOVE image {}".format(self._image.image.filename))
                     self._image.image.anim_reset(False)
                 # If the image was already unloaded from memory
                 except AttributeError:
@@ -184,13 +171,11 @@ class ImageWidget(Widget):
 
     def play(self, start_frame: Optional[int] = 0, auto_play: Optional[bool] = True):
         """Play the image animation (if images supports it)."""
-        self.mc.log.info("Playing image with start frame {}, current index returns {}".format(start_frame, self.current_frame))
         if start_frame:
             self.current_frame = start_frame
 
         # pylint: disable-msg=protected-access
         self._image.image._anim_index = start_frame - 1
-        self.mc.log.info(" - play is calling anim_reset, start frame {} current_frame {} anim_index {}".format(start_frame, self.current_frame, self._image.image.anim_index))
         self._image.image.anim_reset(auto_play)
 
     def stop(self) -> None:
@@ -245,14 +230,10 @@ class ImageWidget(Widget):
     def _set_current_frame(self, value: Union[int, float]):
         if not self._image.image.anim_available or not hasattr(self._image.image.image, 'textures'):
             return
-        self.mc.log.info("Setting current frame, value is {} and texture length is {}".format(value, len(self._image.image.image.textures)))
         frame = (int(value) - 1) % len(self._image.image.image.textures)
-        self.mc.log.info(" - resulting calculated frame index: {}".format(frame))
         if frame == self._image.image.anim_index:
-            self.mc.log.info(" - anim index is also {}, no action".format(frame))
             return
         else:
-            self.mc.log.info(" - anim index is {}, setting to {} and calling play".format(self._image.image.anim_index, frame))
             self._image.image._anim_index = frame # pylint: disable-msg=protected-access
             self._image.image.anim_reset(True)
 
@@ -267,9 +248,7 @@ class ImageWidget(Widget):
         if not self._image.image.anim_available or not hasattr(self._image.image.image, 'textures'):
             return
         frame = (int(value) - 1) % len(self._image.image.image.textures)
-        self.mc.log.info("Setting end index to {}, current index is {}".format(frame, self._image.image.anim_index))
         if frame == self._image.image.anim_index:
-            self.mc.log.info(" - end index matchen current index, not doing anything")
             return
 
         self._end_index = frame

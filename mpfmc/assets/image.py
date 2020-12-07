@@ -227,7 +227,6 @@ class ImageAsset(McAsset):
             try:
                 template = self.machine.machine_config['image_templates'][self.config['image_template']]
                 self.config = Util.dict_merge(template, self.config)
-                self.machine.log.info(" - Merged configs with template! {}".format(self.config))
             except KeyError:
                 raise KeyError("Image template '{}' was not found, referenced in image config {}".format(self.config['image_template'], self.config))
 
@@ -245,20 +244,13 @@ class ImageAsset(McAsset):
         self._image.anim_reset(False)
 
         if self.config.get('frame_skips'):
+            # Frames are provided in 1-index values, but the image animates in zero-index values
             self.frame_skips = { s['from'] - 1: s['to'] -1 for s in self.config['frame_skips']}
-            self.machine.log.info("IMage frame skips are: {}".format(self.frame_skips))
 
 
         # load first texture to speed up first display
         self._callbacks.add(lambda x: self._image.texture)
-
-        self.machine.log.info("Loaded image {}, is anim? {}".format(self._image.filename, self._image.anim_available))
-        # self.machine.log.info(dir(self._image))
-        # if self._image.anim_available:
         self._image.on_texture(self._on_texture)
-
-    def _on_texture(self, **kwargs):
-        self.machine.log.info("Image texture: {}".format(kwargs))
 
     def _do_unload(self):
         # This is the method that's called to unload the asset. It's called by
