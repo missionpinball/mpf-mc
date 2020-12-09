@@ -104,7 +104,7 @@ class McSlidePlayer(McConfigPlayer):
 
         self.machine.log.info("SlidePlayer: Play called with settings=%s", settings)
 
-        settings = settings['slides'] if 'slides' in settings else settings
+        settings = settings.get('slides', settings)
 
         for slide, s in settings.items():
             if not isinstance(slide, str):
@@ -126,17 +126,7 @@ class McSlidePlayer(McConfigPlayer):
             except (KeyError, TypeError):
                 s['priority'] = priority
 
-            if s['target']:
-                target_name = s['target']
-            else:
-                target_name = 'default'
-
-            if target_name not in self.machine.targets or not self.machine.targets[target_name].ready:
-                # Target does not exist yet or is not ready. Perform action when it is ready
-                raise AssertionError("Target {} not ready".format(target_name))
-
-            target = self.machine.targets[target_name]
-
+            target_name, target = self._get_target(s)
             # Target has been disabled via config setting, ignore all slides for it
             if not target.enabled:
                 return
@@ -180,6 +170,18 @@ class McSlidePlayer(McConfigPlayer):
             if isinstance(device_entry, str):
                 devices[index] = self.machine.placeholder_manager.parse_conditional_template(device_entry)
         return devices
+
+    def _get_target(self, settings):
+        if settings['target']:
+            target_name = settings['target']
+        else:
+            target_name = 'default'
+
+        if target_name not in self.machine.targets or not self.machine.targets[target_name].ready:
+            # Target does not exist yet or is not ready. Perform action when it is ready
+            raise AssertionError("Target {} not ready".format(target_name))
+
+        return target_name, self.machine.targets[target_name]
 
     def get_express_config(self, value):
         # express config for slides can either be a string (slide name) or a
