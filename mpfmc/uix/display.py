@@ -190,8 +190,7 @@ class Display(ScreenManager):
 
         # Determine the 'default' display
         if len(self.mc.displays) == 1:
-            self.mc.targets['default'] = \
-                [x for x in self.mc.displays.values()][0]
+            self.mc.targets['default'] = next(iter(self.mc.displays.values()))
 
         elif 'default' not in self.mc.targets:
             for target in ('window', 'dmd'):
@@ -552,7 +551,7 @@ class Display(ScreenManager):
         for s in self.slides:
             if s == slide:
                 continue
-            elif not new_slide:
+            if not new_slide:
                 new_slide = s
             elif s.priority > new_slide.priority:
                 new_slide = s

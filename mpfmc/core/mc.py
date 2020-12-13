@@ -322,6 +322,7 @@ class MpfMc(App):
     def displays_initialized(self, *args):
         del args
         self.validate_machine_config_section('window')
+        # pylint: disable-msg=import-outside-toplevel
         from mpfmc.uix.window import Window
         Window.initialize(self)
         self.events.post('displays_initialized')

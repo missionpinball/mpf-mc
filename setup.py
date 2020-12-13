@@ -53,6 +53,7 @@ on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 
 def getoutput(cmd, env=None):
+    # pylint: disable-msg=import-outside-toplevel
     import subprocess
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, env=env)
@@ -92,6 +93,7 @@ def get_isolated_env_paths():
         # sdl2_dev is installed before setup.py is run, when installing from
         # source due to pyproject.toml. However, it is installed to a
         # pip isolated env, which we need to add to compiler
+        # pylint: disable-msg=import-outside-toplevel
         import kivy_deps.sdl2_dev as sdl2_dev
     except ImportError:
         return [], []
@@ -236,6 +238,7 @@ src_path = build_path = dirname(__file__)
 class CustomBuildExt(build_ext):
 
     def finalize_options(self):
+        # pylint: disable-msg=assignment-from-no-return
         retval = build_ext.finalize_options(self)
         global build_path   # noqa
         if (self.build_lib is not None and exists(self.build_lib) and
@@ -458,6 +461,7 @@ def determine_base_flags():
         if v[2] >= '13.0.0':
             # use xcode-select to search on the right Xcode path
             # XXX use the best SDK available instead of a specific one
+            # pylint: disable-msg=import-outside-toplevel
             import platform as _platform
             xcode_dev = getoutput('xcode-select -p').splitlines()[0]
             sdk_mac_ver = '.'.join(_platform.mac_ver()[0].split('.')[:2])
@@ -649,7 +653,7 @@ if on_rtd:
 # -----------------------------------------------------------------------------
 # automatically detect package files
 package_files = dict(mpfmc=list())
-for root, subFolders, files in walk('mpfmc'):
+for root, _, files in walk('mpfmc'):
     for fn in files:
         ext = fn.split('.')[-1].lower()
         if ext not in PACKAGE_FILES_ALLOWED_EXT:
