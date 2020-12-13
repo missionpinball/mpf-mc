@@ -5,25 +5,20 @@ matrix:
   fast_finish: true
   include:
    - os: linux
-     env: LINUX=ubuntu:16.04 USE_CYTHON=1
+     env: LINUX=ubuntu:20.04 USE_CYTHON=1
      sudo: required
      language: python
-     python: "3.5"
+     python: "3.6"
    - os: linux
      env: LINUX=ubuntu:18.04 USE_CYTHON=1
      sudo: required
      language: python
      python: "3.6"
-   - os: linux  # this is python 3.7
-     env: LINUX=ubuntu:19.10 USE_CYTHON=1
+   - os: linux  # stable
+     env: LINUX=debian:bullseye USE_CYTHON=1
      sudo: required
      language: python
      python: "3.6"
-   - os: linux  # stable
-     env: LINUX=debian:stretch USE_CYTHON=1
-     sudo: required
-     language: python
-     python: "3.5"
    - os: linux  # testing; this is actually python 3.7
      env: LINUX=debian:buster USE_CYTHON=1
      sudo: required

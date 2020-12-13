@@ -9,12 +9,6 @@ environment:
   USE_CYTHON: 1
 
   matrix:
-  - PYVER: 35
-    BITNESS: 86
-    COMPILER: msvc
-  - PYVER: 35
-    BITNESS: 64
-    COMPILER: msvc
   - PYVER: 36
     BITNESS: 86
     COMPILER: msvc
@@ -25,6 +19,12 @@ environment:
     BITNESS: 86
     COMPILER: msvc
   - PYVER: 37
+    BITNESS: 64
+    COMPILER: msvc
+  - PYVER: 38
+    BITNESS: 86
+    COMPILER: msvc
+  - PYVER: 38
     BITNESS: 64
     COMPILER: msvc
 
