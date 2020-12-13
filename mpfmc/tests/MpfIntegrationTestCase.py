@@ -121,7 +121,7 @@ class TestBcpClient(MockBcpClient):
             return
 
         self.mc.dispatch('on_start')
-        runTouchApp(slave=True)  # change is here
+        runTouchApp(embedded=True)  # change is here
 
         while not self.mc.is_init_done.is_set():
             EventLoop.idle()
