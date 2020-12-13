@@ -195,7 +195,7 @@ class MpfMcTestCase(unittest.TestCase):
             return
 
         self.mc.dispatch('on_start')
-        runTouchApp(slave=True)  # change is here
+        runTouchApp(embedded=True)  # change is here
 
         # Perform init process
         tries = 0
