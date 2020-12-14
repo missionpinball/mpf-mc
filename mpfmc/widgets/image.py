@@ -27,7 +27,6 @@ class ImageWidget(Widget):
         self._image = None  # type: ImageAsset
         self._current_loop = 0
         self._end_index = -1
-        self._frame_skips = None
 
         # Retrieve the specified image asset to display.  This widget simply
         # draws a rectangle using the texture from the loaded image asset to
@@ -73,9 +72,6 @@ class ImageWidget(Widget):
             self.size = (0, 0)
             self._image.load(callback=self._image_loaded)
 
-        if self.config.get('frame_skips'):
-            self._frame_skips = {s['start'] - 1: s['end'] - 1 for s in self.config['frame_skips']}
-
         # Bind to all properties that when changed need to force
         # the widget to be redrawn
         self.bind(pos=self._draw_widget,
@@ -108,7 +104,10 @@ class ImageWidget(Widget):
             self.fps = self.config['fps']
             self.loops = self.config['loops']
             self.start_frame = self.config['start_frame']
-            self._end_index = self.start_frame - 1
+            # If not auto playing, set the end index to be the start frame
+            if not self.config['auto_play']:
+                # Frame numbers start at 1 and indexes at 0, so subtract 1
+                self._end_index = self.start_frame - 1
             self.play(start_frame=self.start_frame, auto_play=self.config['auto_play'])
 
     def _on_texture_change(self, *args) -> None:
@@ -123,7 +122,7 @@ class ImageWidget(Widget):
 
         # Check if this is the end frame to stop the image. For some reason, after the image
         # stops the anim_index will increment one last time, so check for end_index - 1 to prevent
-        # a full rollover on subsequent calls to the same end frame.
+        # a full animation loop on subsequent calls to the same end frame.
         if self._end_index > -1:
             if ci.anim_index == self._end_index - 1:
                 self._end_index = -1
@@ -131,8 +130,8 @@ class ImageWidget(Widget):
                 return
 
             skip_to = self._image.frame_skips and self._image.frame_skips.get(ci.anim_index)
-            # If the end_index is after the skip to or before the current position (i.e. we need to loop)
-            # But not if the skip will cause a loop around and bypass the end_index ahead
+            # Skip if the end_index is after the skip_to or before the current position (i.e. we need to loop),
+            # but not if the skip will cause a loop around and bypass the end_index ahead
             if skip_to is not None and (self._end_index > skip_to or self._end_index < ci.anim_index) and not \
                     (self._end_index > ci.anim_index and skip_to < ci.anim_index):
                 self.current_frame = skip_to
