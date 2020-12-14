@@ -3,7 +3,7 @@ from mpfmc.core.config_collection import ConfigCollection
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.uix.widget import Widget
+    from mpfmc.uix.widget import Widget   # pylint: disable-msg=cyclic-import,unused-import
 
 
 class AnimationCollection(ConfigCollection):

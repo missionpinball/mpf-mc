@@ -9,7 +9,7 @@ from mpfmc.effects.reduce import ReduceEffect
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from kivy.uix.effectwidget import EffectBase
+    from kivy.uix.effectwidget import EffectBase    # pylint: disable-msg=cyclic-import,unused-import
 
 
 class ColorDmdEffect(EffectsChain):
@@ -104,9 +104,6 @@ class ColorDmdEffect(EffectsChain):
     shades is a :class:`~kivy.properties.NumericProperty` and
     defaults to 16.
     '''
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
 
     def get_effects(self) -> List["EffectBase"]:
         effects = []

@@ -1,7 +1,6 @@
 """Contains the sound config player class"""
 
 from copy import deepcopy
-from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
 
 

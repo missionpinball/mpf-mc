@@ -24,8 +24,6 @@ pylint:
     - too-few-public-methods
     - unsubscriptable-object    # broken on python 3.9
 
-    - cyclic-import     # TODO: fix this
-    - unused-import     # TODO: fix this
     - invalid-name      # TODO: fix this
     - no-else-return    # TODO: fix this
 

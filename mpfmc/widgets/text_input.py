@@ -9,12 +9,11 @@ from collections import deque
 from typing import Optional
 from kivy.clock import Clock
 
-from mpfmc.uix.widget import WidgetContainer
 from mpfmc.widgets.text import Text
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
+    from mpfmc.core.mc import MpfMc     # pylint: disable-msg=cyclic-import,unused-import
 
 
 class MpfTextInput(Text):

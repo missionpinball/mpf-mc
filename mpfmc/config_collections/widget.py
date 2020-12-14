@@ -11,7 +11,7 @@ from mpfmc.uix.widget import magic_events
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.uix.widget import Widget
+    from mpfmc.uix.widget import Widget     # pylint: disable-msg=cyclic-import,unused-import
 
 
 class WidgetCollection(ConfigCollection):

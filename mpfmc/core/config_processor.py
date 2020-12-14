@@ -1,9 +1,5 @@
-"""Contains classes which are used to process config files for the media
-controller.
+"""Contains classes which are used to process config files for the media controller."""
 
-"""
-
-import logging
 from mpf.core.config_processor import ConfigProcessor as ConfigProcessorBase
 
 # from mpfmc.uix.display import Display is imported deeper in this file
