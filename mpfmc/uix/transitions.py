@@ -35,8 +35,8 @@ class TransitionManager:
     def _register_mpf_transitions(self):
         for t in self.mc.machine_config['mpf-mc']['mpf_transition_modules']:
             i = importlib.import_module('mpfmc.transitions.{}'.format(t))
-            self.register_transition(getattr(i, 'name'),
-                                     getattr(i, 'transition_cls'))
+            self.register_transition(getattr(i, 'NAME'),
+                                     getattr(i, 'TransitionCls'))
 
     def _register_kivy_transitions(self):
         self.register_transition('wipe', WipeTransition)

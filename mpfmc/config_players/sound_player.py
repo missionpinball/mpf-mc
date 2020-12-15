@@ -197,4 +197,4 @@ Here are several various examples:
                 track.clear_context(context)
 
 
-mc_player_cls = McSoundPlayer
+McPlayerCls = McSoundPlayer

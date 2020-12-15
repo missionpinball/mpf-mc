@@ -209,4 +209,4 @@ Here are several various examples:
                 playlist_controller.clear_context(context)
 
 
-mc_player_cls = McPlaylistPlayer
+McPlayerCls = McPlaylistPlayer

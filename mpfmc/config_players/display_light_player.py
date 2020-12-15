@@ -145,4 +145,4 @@ class McDisplayLightPlayer(BcpConfigPlayer):
         self._reset_instance_dict(context)
 
 
-mc_player_cls = McDisplayLightPlayer
+McPlayerCls = McDisplayLightPlayer

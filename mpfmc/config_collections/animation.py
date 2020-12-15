@@ -49,4 +49,4 @@ class AnimationCollection(ConfigCollection):
         return config
 
 
-collection_cls = AnimationCollection
+CollectionCls = AnimationCollection

@@ -317,7 +317,7 @@ class MpfMc(App):
                 'config_players'].items():
             imported_module = importlib.import_module(module)
             setattr(self, '{}_player'.format(name),
-                    imported_module.mc_player_cls(self))
+                    imported_module.McPlayerCls(self))
 
     def displays_initialized(self, *args):
         del args

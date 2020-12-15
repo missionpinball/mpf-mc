@@ -15,4 +15,4 @@ class WidgetStyleCollection(ConfigCollection):
         return config
 
 
-collection_cls = WidgetStyleCollection
+CollectionCls = WidgetStyleCollection

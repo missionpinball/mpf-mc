@@ -229,4 +229,4 @@ Here are several various examples:
             del instance_dict[sound_instance_id]
 
 
-mc_player_cls = McSoundLoopPlayer
+McPlayerCls = McSoundLoopPlayer

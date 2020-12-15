@@ -80,6 +80,6 @@ def create_config_collections(mc, collections):
 
     for module in collections.values():
         imported_module = import_module(module)
-        setattr(mc, imported_module.collection_cls.collection,
-                imported_module.collection_cls(mc, imported_module.collection_cls.collection,
-                                               imported_module.collection_cls.collection))
+        setattr(mc, imported_module.CollectionCls.collection,
+                imported_module.CollectionCls(mc, imported_module.CollectionCls.collection,
+                                              imported_module.CollectionCls.collection))

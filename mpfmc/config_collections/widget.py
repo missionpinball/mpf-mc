@@ -149,4 +149,4 @@ class WidgetCollection(ConfigCollection):
         return config
 
 
-collection_cls = WidgetCollection
+CollectionCls = WidgetCollection

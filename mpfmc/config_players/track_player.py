@@ -191,4 +191,4 @@ class McTrackPlayer(McConfigPlayer):
         del context
 
 
-mc_player_cls = McTrackPlayer
+McPlayerCls = McTrackPlayer
