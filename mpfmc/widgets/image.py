@@ -18,7 +18,7 @@ class ImageWidget(Widget):
 
     widget_type_name = 'Image'
     merge_settings = ('height', 'width')
-    animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'opacity')
+    animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'end_frame', 'opacity')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
@@ -26,6 +26,7 @@ class ImageWidget(Widget):
 
         self._image = None  # type: ImageAsset
         self._current_loop = 0
+        self._end_index = -1
 
         # Retrieve the specified image asset to display.  This widget simply
         # draws a rectangle using the texture from the loaded image asset to
@@ -103,12 +104,11 @@ class ImageWidget(Widget):
             self.fps = self.config['fps']
             self.loops = self.config['loops']
             self.start_frame = self.config['start_frame']
-
-            # Always play so we can get the starting frame rendered
-            self.play(start_frame=self.start_frame)
-            # If auto_play is not enabled, immediately stop
+            # If not auto playing, set the end index to be the start frame
             if not self.config['auto_play']:
-                self.stop()
+                # Frame numbers start at 1 and indexes at 0, so subtract 1
+                self._end_index = self.start_frame - 1
+            self.play(start_frame=self.start_frame, auto_play=self.config['auto_play'])
 
     def _on_texture_change(self, *args) -> None:
         """Update texture from image asset (callback when image texture changes)."""
@@ -118,8 +118,25 @@ class ImageWidget(Widget):
         self.size = self.texture.size
         self._draw_widget()
 
-        # Handle animation looping (when applicable)
         ci = self._image.image
+
+        # Check if this is the end frame to stop the image. For some reason, after the image
+        # stops the anim_index will increment one last time, so check for end_index - 1 to prevent
+        # a full animation loop on subsequent calls to the same end frame.
+        if self._end_index > -1:
+            if ci.anim_index == self._end_index - 1:
+                self._end_index = -1
+                ci.anim_reset(False)
+                return
+
+            skip_to = self._image.frame_skips and self._image.frame_skips.get(ci.anim_index)
+            # Skip if the end_index is after the skip_to or before the current position (i.e. we need to loop),
+            # but not if the skip will cause a loop around and bypass the end_index ahead
+            if skip_to is not None and (self._end_index > skip_to or self._end_index < ci.anim_index) and not \
+                    (self._end_index > ci.anim_index and skip_to < ci.anim_index):
+                self.current_frame = skip_to
+
+        # Handle animation looping (when applicable)
         if ci.anim_available and self.loops > -1 and ci.anim_index == len(ci.image.textures) - 1:
             self._current_loop += 1
             if self._current_loop > self.loops:
@@ -152,14 +169,14 @@ class ImageWidget(Widget):
             Scale(self.scale).origin = anchor
             Rectangle(pos=self.pos, size=self.size, texture=self.texture)
 
-    def play(self, start_frame: Optional[int] = 0):
+    def play(self, start_frame: Optional[int] = 0, auto_play: Optional[bool] = True):
         """Play the image animation (if images supports it)."""
         if start_frame:
             self.current_frame = start_frame
 
         # pylint: disable-msg=protected-access
-        self._image.image._anim_index = start_frame
-        self._image.image.anim_reset(True)
+        self._image.image._anim_index = start_frame - 1
+        self._image.image.anim_reset(auto_play)
 
     def stop(self) -> None:
         """Stop the image animation."""
@@ -213,16 +230,32 @@ class ImageWidget(Widget):
     def _set_current_frame(self, value: Union[int, float]):
         if not self._image.image.anim_available or not hasattr(self._image.image.image, 'textures'):
             return
-
         frame = (int(value) - 1) % len(self._image.image.image.textures)
         if frame == self._image.image.anim_index:
             return
         else:
-            self._image.image._anim_index = frame   # pylint: disable-msg=protected-access
+            self._image.image._anim_index = frame  # pylint: disable-msg=protected-access
             self._image.image.anim_reset(True)
 
     current_frame = AliasProperty(_get_current_frame, _set_current_frame)
     '''The current frame of the animation.
+    '''
+
+    def _get_end_frame(self) -> int:
+        return self._end_index + 1
+
+    def _set_end_frame(self, value: int):
+        if not self._image.image.anim_available or not hasattr(self._image.image.image, 'textures'):
+            return
+        frame = (int(value) - 1) % len(self._image.image.image.textures)
+        if frame == self._image.image.anim_index:
+            return
+
+        self._end_index = frame
+        self._image.image.anim_reset(True)
+
+    end_frame = AliasProperty(_get_end_frame, _set_end_frame)
+    '''The target frame at which the animation will stop.
     '''
 
     rotation = NumericProperty(0)

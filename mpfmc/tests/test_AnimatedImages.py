@@ -62,3 +62,31 @@ class TestAnimatedImages(MpfMcTestCase):
         self.advance_time(1)
         self.assertTrue(self.mc.images["busy-stick-figures-animated"].image._anim_ev)
         #self.assertEqual(1, self.mc.images["busy-stick-figures-animated"].references)
+
+    def test_start_frame_hold(self):
+        self.mc.events.post('slide3')
+        self.advance_time()
+        stick_figures = self.mc.targets['default'].current_slide.widgets[0].widget
+        for _ in range(4):
+            self.advance_time()
+            self.assertEqual(stick_figures.current_frame, 4)
+
+    def test_skip_frames(self):
+        self.mc.events.post('slide4')
+        self.advance_time()
+        stick_figures = self.mc.targets['default'].current_slide.widgets[0].widget
+        self.advance_time()
+        self.assertEqual(stick_figures.current_frame, 0)
+        self.mc.events.post('advance_frames')
+        self.advance_time()
+        self.assertEqual(stick_figures.current_frame, 1)
+        self.advance_time()
+        self.assertEqual(stick_figures.current_frame, 2)
+        self.advance_time()
+        self.assertEqual(stick_figures.current_frame, 3)
+        self.advance_time()
+        self.assertEqual(stick_figures.current_frame, 9)
+        self.advance_time()
+        self.assertEqual(stick_figures.current_frame, 10)
+        self.advance_time()
+        self.assertEqual(stick_figures.current_frame, 10)

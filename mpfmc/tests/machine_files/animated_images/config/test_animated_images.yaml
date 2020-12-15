@@ -5,6 +5,13 @@ displays:
     width: 400
     height: 300
 
+images:
+  stick-figures-skipframes:
+    file: reel.gif
+    frame_skips:
+      - from: 3
+        to: 8
+
 slides:
   slide1:
     - type: image
@@ -14,7 +21,6 @@ slides:
     - image: busy-stick-figures-animated
       type: image
       y: 100
-#      auto_play: no
       x: 250
     - type: text
       text: ZIP FILE OF PNGs
@@ -41,6 +47,20 @@ slides:
       type: image
       y: 100
       x: 250
+  slide3:
+    - image: busy-stick-figures-animated
+      type: image
+      auto_play: false
+      start_frame: 4
+  slide4:
+    - image: stick-figures-skipframes
+      type: image
+      auto_play: false
+      animations:
+          advance_frames:
+            - property: end_frame
+              value: 10
+              duration: 0
 slide_player:
   slide1: slide1
   slide1_remove:
@@ -48,3 +68,5 @@ slide_player:
   slide2:
     slide2:
       priority: 200
+  slide3: slide3
+  slide4: slide4

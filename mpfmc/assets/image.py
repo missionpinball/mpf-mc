@@ -8,6 +8,7 @@ from kivy.cache import Cache
 
 from kivy.core.image import Image, ImageLoaderBase, ImageLoader, Texture
 from mpf.core.assets import AssetPool
+from mpf.core.utility_functions import Util
 
 from mpfmc.assets.mc_asset import McAsset
 
@@ -195,7 +196,7 @@ class ImageAsset(McAsset):
     pool_config_section = 'image_pools'  # Will setup groups if present
     asset_group_class = ImagePool  # Class or None to not use pools
 
-    __slots__ = ["references", "_image"]
+    __slots__ = ["frame_skips", "references", "_image"]
 
     def __init__(self, mc, name, file, config):
         super().__init__(mc, name, file, config)  # be sure to call super
@@ -204,6 +205,7 @@ class ImageAsset(McAsset):
         # you don't need to do anything.
 
         self._image = None  # holds the actual image in memory
+        self.frame_skips = None
         self.references = 0
 
     @property
@@ -225,6 +227,14 @@ class ImageAsset(McAsset):
         # and anything that was waiting for it to load will be called. So
         # all you have to do here is load and return.
 
+        if self.config.get('image_template'):
+            try:
+                template = self.machine.machine_config['image_templates'][self.config['image_template']]
+                self.config = Util.dict_merge(template, self.config)
+            except KeyError:
+                raise KeyError("Image template '{}' was not found, referenced in image config {}".format(
+                               self.config['image_template'], self.config))
+
         if self.machine.machine_config['mpf-mc']['zip_lazy_loading']:
             # lazy loading for zip file image sequences
             ImageLoader.zip_loader = KivyImageLoaderPatch.lazy_zip_loader
@@ -237,6 +247,10 @@ class ImageAsset(McAsset):
                             nocache=True)
 
         self._image.anim_reset(False)
+
+        if self.config.get('frame_skips'):
+            # Frames are provided in 1-index values, but the image animates in zero-index values
+            self.frame_skips = {s['from'] - 1: s['to'] - 1 for s in self.config['frame_skips']}
 
         # load first texture to speed up first display
         self._callbacks.add(lambda x: self._image.texture)
