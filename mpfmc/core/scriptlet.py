@@ -1,9 +1,5 @@
 """Contains the parent class for Scriptlets used in MPF-MC."""
 
-MYPY = False
-if MYPY:    # pragma: no cover
-    from mpfmc.core.mc import MpfMc
-
 
 class Scriptlet:
 

@@ -239,4 +239,4 @@ class PlaylistInstance:
             return None
 
 
-collection_cls = PlaylistCollection
+CollectionCls = PlaylistCollection

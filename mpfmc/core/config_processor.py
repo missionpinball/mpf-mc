@@ -1,9 +1,5 @@
-"""Contains classes which are used to process config files for the media
-controller.
+"""Contains classes which are used to process config files for the media controller."""
 
-"""
-
-import logging
 from mpf.core.config_processor import ConfigProcessor as ConfigProcessorBase
 
 # from mpfmc.uix.display import Display is imported deeper in this file
@@ -40,6 +36,7 @@ class ConfigProcessor(ConfigProcessorBase):
             pass
 
         if not self.mc.displays:
+            # pylint: disable-msg=import-outside-toplevel
             from mpfmc.uix.display import Display
             Display.create_default_display(self.mc)
 
@@ -86,5 +83,6 @@ class ConfigProcessor(ConfigProcessorBase):
 
     def create_display(self, name, config):
         # config is localized display settings
+        # pylint: disable-msg=import-outside-toplevel
         from mpfmc.uix.display import Display
         return Display(self.mc, name, **self.machine.config_validator.validate_config('displays', config))

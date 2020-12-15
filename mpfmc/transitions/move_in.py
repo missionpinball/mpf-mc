@@ -31,5 +31,5 @@ class MoveInTransition(MpfTransition):
             s_in.y = 0 - height * (1 - progress)
 
 
-transition_cls = MoveInTransition
-name = 'move_in'
+TransitionCls = MoveInTransition
+NAME = 'move_in'

@@ -1,7 +1,6 @@
 """Contains the sound config player class"""
 
 from copy import deepcopy
-from mpf.core.config_validator import ConfigValidator
 from mpfmc.core.mc_config_player import McConfigPlayer
 
 
@@ -198,4 +197,4 @@ Here are several various examples:
                 track.clear_context(context)
 
 
-mc_player_cls = McSoundPlayer
+McPlayerCls = McSoundPlayer

@@ -11,7 +11,7 @@ from mpfmc.effects.gain import GainEffect
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from kivy.uix.effectwidget import EffectBase
+    from kivy.uix.effectwidget import EffectBase        # pylint: disable-msg=cyclic-import,unused-import
 
 
 class DmdEffect(ColorDmdEffect):

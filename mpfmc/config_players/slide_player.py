@@ -304,4 +304,4 @@ class McSlidePlayer(McConfigPlayer):
         self._reset_instance_dict(context)
 
 
-mc_player_cls = McSlidePlayer
+McPlayerCls = McSlidePlayer

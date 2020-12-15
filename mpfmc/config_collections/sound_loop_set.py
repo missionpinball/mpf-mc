@@ -100,4 +100,4 @@ class SoundLoopSetCollection(ConfigCollection):
                                          "supported in loop sets)".format(name, layer["sound"]))
 
 
-collection_cls = SoundLoopSetCollection
+CollectionCls = SoundLoopSetCollection

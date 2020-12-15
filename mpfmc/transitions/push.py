@@ -40,5 +40,5 @@ class PushTransition(MpfTransition):
             s_in.y = 0 - height * (1 - progress)
 
 
-transition_cls = PushTransition
-name = 'push'
+TransitionCls = PushTransition
+NAME = 'push'

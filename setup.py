@@ -53,6 +53,7 @@ on_rtd = os.environ.get('READTHEDOCS') == 'True'
 
 
 def getoutput(cmd, env=None):
+    # pylint: disable-msg=import-outside-toplevel
     import subprocess
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE, env=env)
@@ -92,6 +93,7 @@ def get_isolated_env_paths():
         # sdl2_dev is installed before setup.py is run, when installing from
         # source due to pyproject.toml. However, it is installed to a
         # pip isolated env, which we need to add to compiler
+        # pylint: disable-msg=import-outside-toplevel
         import kivy_deps.sdl2_dev as sdl2_dev
     except ImportError:
         return [], []
@@ -236,6 +238,7 @@ src_path = build_path = dirname(__file__)
 class CustomBuildExt(build_ext):
 
     def finalize_options(self):
+        # pylint: disable-msg=assignment-from-no-return
         retval = build_ext.finalize_options(self)
         global build_path   # noqa
         if (self.build_lib is not None and exists(self.build_lib) and
@@ -458,6 +461,7 @@ def determine_base_flags():
         if v[2] >= '13.0.0':
             # use xcode-select to search on the right Xcode path
             # XXX use the best SDK available instead of a specific one
+            # pylint: disable-msg=import-outside-toplevel
             import platform as _platform
             xcode_dev = getoutput('xcode-select -p').splitlines()[0]
             sdk_mac_ver = '.'.join(_platform.mac_ver()[0].split('.')[:2])
@@ -626,18 +630,17 @@ else:
 
 install_requires = ['ruamel.yaml==0.15.100',  # better YAML library
                     'mpf>={}'.format(mpf_version),
-                    'kivy==1.11.1',
-                    'psutil==5.7.0',
+                    'kivy==2.0.0',
+                    'psutil==5.7.3',
                     'Pygments==2.3.1',  # YAML syntax formatting for the iMC
-                    'pypiwin32==223;platform_system=="Windows"',
                     # also update those in appveyor.yaml if you change versions
-                    'kivy_deps.sdl2==0.1.23;platform_system=="Windows"',
-                    'kivy_deps.sdl2-dev==0.1.23;platform_system=="Windows"',
-                    'kivy_deps.glew==0.1.12;platform_system=="Windows"',
-                    'kivy_deps.glew-dev==0.1.12;platform_system=="Windows"',
-                    'kivy_deps.gstreamer==0.1.18;platform_system=="Windows"',
-                    'kivy_deps.gstreamer-dev==0.1.18;platform_system=="Windows"',
-                    'ffpyplayer==4.3.1'
+                    'kivy_deps.sdl2==0.3.1;platform_system=="Windows"',
+                    'kivy_deps.sdl2-dev==0.3.1;platform_system=="Windows"',
+                    'kivy_deps.glew==0.3.0;platform_system=="Windows"',
+                    'kivy_deps.glew-dev==0.3.0;platform_system=="Windows"',
+                    'kivy_deps.gstreamer==0.3.1;platform_system=="Windows"',
+                    'kivy_deps.gstreamer-dev==0.3.1;platform_system=="Windows"',
+                    'ffpyplayer==4.3.2'
                     ]
 
 # If we're running on Read The Docs, then we just need to copy the files
@@ -650,7 +653,7 @@ if on_rtd:
 # -----------------------------------------------------------------------------
 # automatically detect package files
 package_files = dict(mpfmc=list())
-for root, subFolders, files in walk('mpfmc'):
+for root, _, files in walk('mpfmc'):
     for fn in files:
         ext = fn.split('.')[-1].lower()
         if ext not in PACKAGE_FILES_ALLOWED_EXT:
@@ -700,9 +703,10 @@ setup(
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Natural Language :: English',
         'Operating System :: MacOS :: MacOS X',
         'Operating System :: Microsoft :: Windows',

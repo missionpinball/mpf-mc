@@ -317,11 +317,12 @@ class MpfMc(App):
                 'config_players'].items():
             imported_module = importlib.import_module(module)
             setattr(self, '{}_player'.format(name),
-                    imported_module.mc_player_cls(self))
+                    imported_module.McPlayerCls(self))
 
     def displays_initialized(self, *args):
         del args
         self.validate_machine_config_section('window')
+        # pylint: disable-msg=import-outside-toplevel
         from mpfmc.uix.window import Window
         Window.initialize(self)
         self.events.post('displays_initialized')

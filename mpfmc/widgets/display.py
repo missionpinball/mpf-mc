@@ -9,8 +9,8 @@ from mpfmc.uix.display import DisplayOutput
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
-    from mpfmc.uix.slide import Slide
+    from mpfmc.core.mc import MpfMc     # pylint: disable-msg=cyclic-import,unused-import
+    from mpfmc.uix.slide import Slide   # pylint: disable-msg=cyclic-import,unused-import
 
 
 class DisplayWidget(Widget, RelativeLayout):

@@ -1,4 +1,4 @@
-from mpf.core.placeholder_manager import MachinePlaceholder, BasePlaceholderManager
+from mpf.core.placeholder_manager import BasePlaceholderManager
 
 
 class McPlaceholderManager(BasePlaceholderManager):

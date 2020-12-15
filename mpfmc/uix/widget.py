@@ -20,7 +20,7 @@ from mpfmc.uix.widget_magic_events import magic_events
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
+    from mpfmc.core.mc import MpfMc     # pylint: disable-msg=cyclic-import,unused-import
 
 
 # pylint: disable-msg=too-many-instance-attributes

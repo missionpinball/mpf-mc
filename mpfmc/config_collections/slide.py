@@ -42,4 +42,4 @@ class SlideCollection(ConfigCollection):
         self.mc.widgets.validate_config(config['widgets'])
 
 
-collection_cls = SlideCollection
+CollectionCls = SlideCollection

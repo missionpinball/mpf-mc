@@ -10,19 +10,22 @@ from kivy.uix.screenmanager import (ScreenManager, NoTransition,
                                     FadeTransition, WipeTransition,
                                     FallOutTransition, RiseInTransition,
                                     ScreenManagerException)
-from kivy.uix.widget import Widget as KivyWidget, WidgetException as KivyWidgetException
+from kivy.uix.widget import WidgetException as KivyWidgetException
 from kivy.uix.scatter import Scatter
 from kivy.graphics import (
     Translate, Fbo, ClearColor, ClearBuffers, Scale)
 from kivy.properties import ObjectProperty
 
-from mpfmc.uix.widget import WidgetContainer, Widget
+from mpfmc.uix.widget import Widget
 from mpfmc.uix.slide import Slide
 
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
+    from mpfmc.core.mc import MpfMc                 # pylint: disable-msg=cyclic-import,unused-import
+    from kivy.uix.widget import \
+        Widget as KivyWidget                        # pylint: disable-msg=cyclic-import,unused-import,ungrouped-imports
+    from mpfmc.uix.widget import WidgetContainer    # pylint: disable-msg=cyclic-import,unused-import,ungrouped-imports
 
 
 transition_map = dict(none=NoTransition,
@@ -191,8 +194,7 @@ class Display(ScreenManager):
 
         # Determine the 'default' display
         if len(self.mc.displays) == 1:
-            self.mc.targets['default'] = \
-                [x for x in self.mc.displays.values()][0]
+            self.mc.targets['default'] = next(iter(self.mc.displays.values()))
 
         elif 'default' not in self.mc.targets:
             for target in ('window', 'dmd'):
@@ -553,7 +555,7 @@ class Display(ScreenManager):
         for s in self.slides:
             if s == slide:
                 continue
-            elif not new_slide:
+            if not new_slide:
                 new_slide = s
             elif s.priority > new_slide.priority:
                 new_slide = s

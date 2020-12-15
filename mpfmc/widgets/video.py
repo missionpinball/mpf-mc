@@ -10,8 +10,8 @@ from mpfmc.uix.widget import Widget, magic_events
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
-    from kivy.graphics.texture import Texture   # noqa
+    from mpfmc.core.mc import MpfMc             # pylint: disable-msg=cyclic-import,unused-import
+    from kivy.graphics.texture import Texture   # pylint: disable-msg=cyclic-import,unused-import,ungrouped-imports
 
 
 class VideoWidget(Widget, Video):

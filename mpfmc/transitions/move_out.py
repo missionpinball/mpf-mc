@@ -38,5 +38,5 @@ class MoveOutTransition(MpfTransition):
             s_out.y = height * progress
 
 
-transition_cls = MoveOutTransition
-name = 'move_out'
+TransitionCls = MoveOutTransition
+NAME = 'move_out'
