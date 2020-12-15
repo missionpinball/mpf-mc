@@ -193,4 +193,4 @@ class McWidgetPlayer(McConfigPlayer):
         self._reset_instance_dict(context)
 
 
-mc_player_cls = McWidgetPlayer
+McPlayerCls = McWidgetPlayer

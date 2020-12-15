@@ -5,13 +5,17 @@ from typing import List, Optional
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.uix.screenmanager import Screen
 from kivy.uix.stencilview import StencilView
-from kivy.uix.widget import Widget as KivyWidget
 from kivy.graphics import Color
 from kivy.properties import ListProperty, AliasProperty
 
-from mpfmc.uix.widget import (WidgetContainer, Widget,
-                              create_widget_objects_from_config)
-from mpfmc.core.mc import MpfMc
+from mpfmc.uix.widget import Widget, create_widget_objects_from_config
+
+MYPY = False
+if MYPY:   # pragma: no cover
+    from mpfmc.core.mc import MpfMc                 # pylint: disable-msg=cyclic-import,unused-import
+    from kivy.uix.widget import \
+        Widget as KivyWidget                        # pylint: disable-msg=cyclic-import,unused-import,ungrouped-imports
+    from mpfmc.uix.widget import WidgetContainer    # pylint: disable-msg=cyclic-import,unused-import,ungrouped-imports
 
 
 # pylint: disable-msg=too-many-instance-attributes

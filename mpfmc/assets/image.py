@@ -1,3 +1,4 @@
+import os
 import zipfile
 from io import BytesIO
 
@@ -48,6 +49,9 @@ class LazyZipImageLoaderTexture:
         self.height = None
 
         for zfilename in znamelist:
+            if zfilename.endswith(os.sep) or zfilename.startswith("."):
+                # skip directories and hidden files
+                continue
             self._index_list.append(zfilename)
 
         self._loaded_textures = [None] * len(self._index_list)

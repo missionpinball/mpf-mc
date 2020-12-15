@@ -3,7 +3,7 @@ import abc
 from typing import Optional, List, Union
 
 from kivy.event import EventDispatcher
-from kivy.uix.effectwidget import (MonochromeEffect, InvertEffect,
+from kivy.uix.effectwidget import (InvertEffect,
                                    ScanlinesEffect, ChannelMixEffect,
                                    PixelateEffect, HorizontalBlurEffect,
                                    VerticalBlurEffect, FXAAEffect,
@@ -11,7 +11,7 @@ from kivy.uix.effectwidget import (MonochromeEffect, InvertEffect,
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
+    from mpfmc.core.mc import MpfMc     # pylint: disable-msg=cyclic-import,unused-import
 
 
 class EffectsManager:

@@ -5,25 +5,20 @@ matrix:
   fast_finish: true
   include:
    - os: linux
-     env: LINUX=ubuntu:16.04 USE_CYTHON=1
+     env: LINUX=ubuntu:20.04 USE_CYTHON=1
      sudo: required
      language: python
-     python: "3.5"
+     python: "3.6"
    - os: linux
      env: LINUX=ubuntu:18.04 USE_CYTHON=1
      sudo: required
      language: python
      python: "3.6"
-   - os: linux  # this is python 3.7
-     env: LINUX=ubuntu:19.10 USE_CYTHON=1
+   - os: linux  # stable
+     env: LINUX=debian:bullseye USE_CYTHON=1
      sudo: required
      language: python
      python: "3.6"
-   - os: linux  # stable
-     env: LINUX=debian:stretch USE_CYTHON=1
-     sudo: required
-     language: python
-     python: "3.5"
    - os: linux  # testing; this is actually python 3.7
      env: LINUX=debian:buster USE_CYTHON=1
      sudo: required
@@ -88,7 +83,7 @@ before_script:
 
 script:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
-      docker run -v $PWD:$PWD -v /dev/snd:/dev/snd --privileged -w $PWD $LINUX /bin/sh -c "_mpf_installer/install-mpf-dependencies && _mpf_installer/install-mc-dependencies && pip3 install --upgrade coveralls && pip3 install prospector==1.1.7 && apt-get -y install xvfb && pip3 install -e _mpf/ && pip3 install -e . && export DISPLAY=:99.0 && /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX && export PYTHONPATH=$PYTHONPATH:$(pwd) && coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests && prospector && coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;";
+      docker run -v $PWD:$PWD -v /dev/snd:/dev/snd --privileged -w $PWD $LINUX /bin/sh -c "export DEBIAN_FRONTEND=noninteractive; _mpf_installer/install-mpf-dependencies && _mpf_installer/install-mc-dependencies && pip3 install --upgrade coveralls && pip3 install prospector==1.3.1 && apt-get -y install xvfb && pip3 install -e _mpf/ && pip3 install -e . && export DISPLAY=:99.0 && /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX && export PYTHONPATH=$PYTHONPATH:$(pwd) && coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests && prospector && coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;";
     fi;
 
   - if [ "${TRAVIS_OS_NAME}" == "osx" ]; then

@@ -35,6 +35,7 @@ class Command:
         # undo all of Kivy's built-in logging so we can do it our way
         os.environ['KIVY_NO_FILELOG'] = '1'
         os.environ['KIVY_NO_CONSOLELOG'] = '1'
+        # pylint: disable-msg=import-outside-toplevel
         from kivy.logger import Logger
 
         for handler in Logger.handlers:
@@ -43,6 +44,7 @@ class Command:
 
         # Need to have these in here because we don't want them to load when
         # the module is loaded as an mpf.command
+        # pylint: disable-msg=import-outside-toplevel
         from mpf.core.utility_functions import Util
 
         del mpf_path
@@ -203,6 +205,7 @@ class Command:
         # add the handler to the root logger
         logging.getLogger('').addHandler(console)
 
+        # pylint: disable-msg=import-outside-toplevel
         from mpfmc.core.mc import MpfMc
 
         logging.info("Loading MPF-MC controller")

@@ -8,8 +8,8 @@ from mpfmc.uix.widget import Widget
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
-    from mpfmc.assets.image import ImageAsset
+    from mpfmc.core.mc import MpfMc             # pylint: disable-msg=cyclic-import,unused-import
+    from mpfmc.assets.image import ImageAsset   # pylint: disable-msg=cyclic-import,unused-import
 
 
 class ImageWidget(Widget):

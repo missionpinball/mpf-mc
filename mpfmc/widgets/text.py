@@ -12,7 +12,7 @@ from mpfmc.uix.bitmap_font.label_bitmap_font import LabelBitmapFont
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
+    from mpfmc.core.mc import MpfMc     # pylint: disable-msg=cyclic-import,unused-import
 
 
 # pylint: disable-msg=too-many-instance-attributes
@@ -217,7 +217,7 @@ class Text(Widget):
                     text = text.replace('(' + var_string + ')',
                                         str(self.mc.player[var_string.split('|')[1]]))
                     continue
-                elif var_string.startswith('player') and '|' in var_string:
+                if var_string.startswith('player') and '|' in var_string:
                     player_num, var_name = var_string.lstrip('player').split('|')
                     try:
                         value = self.mc.player_list[int(player_num) - 1][
@@ -231,7 +231,7 @@ class Text(Widget):
                     except IndexError:
                         text = text.replace('(' + var_string + ')', '')
                     continue
-                elif self.mc.player.is_player_var(var_string):
+                if self.mc.player.is_player_var(var_string):
                     text = text.replace('(' + var_string + ')',
                                         str(self.mc.player[var_string]))
                     continue

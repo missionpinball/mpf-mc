@@ -8,6 +8,7 @@ def _start_mc(mpf_path, machine_path, args):
 
 
 def _start_imc(mpf_path, machine_path, args):
+    # pylint: disable-msg=import-outside-toplevel
     from mpfmc.tools.interactive_mc.imc import InteractiveMc
     InteractiveMc(mpf_path, machine_path, args).run()
 
