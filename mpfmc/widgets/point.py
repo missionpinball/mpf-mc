@@ -10,7 +10,7 @@ from mpfmc.core.utils import center_of_points_list
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
+    from mpfmc.core.mc import MpfMc     # pylint: disable-msg=cyclic-import,unused-import
 
 
 class Point(Widget):

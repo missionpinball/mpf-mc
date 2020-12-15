@@ -4,7 +4,7 @@ from mpfmc.uix.widget import WidgetContainer
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.uix.slide import Slide
+    from mpfmc.uix.slide import Slide       # pylint: disable-msg=cyclic-import,unused-import
 
 
 class MpfSlideTestCase(MpfTestCase):

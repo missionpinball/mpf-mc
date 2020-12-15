@@ -4,7 +4,7 @@ from mpf.core.logging import LogMixin
 
 MYPY = False
 if MYPY:    # pragma: no cover
-    from mpfmc.core.mc import MpfMc
+    from mpfmc.core.mc import MpfMc     # pylint: disable-msg=cyclic-import,unused-import
 
 
 class McCustomCode(LogMixin):

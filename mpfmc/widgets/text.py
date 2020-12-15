@@ -12,7 +12,7 @@ from mpfmc.uix.bitmap_font.label_bitmap_font import LabelBitmapFont
 
 MYPY = False
 if MYPY:   # pragma: no cover
-    from mpfmc.core.mc import MpfMc
+    from mpfmc.core.mc import MpfMc     # pylint: disable-msg=cyclic-import,unused-import
 
 
 # pylint: disable-msg=too-many-instance-attributes
