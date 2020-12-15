@@ -41,6 +41,11 @@ class TestSlidePlayer(MpfMcTestCase):
         self.assertEqual(self.mc.displays['display1'].current_slide_name,
                          'machine_slide_2')
 
+    def test_slide_on_disabled_display(self):
+        self.mc.events.post('show_slide_display3')
+        self.advance_time()
+        self.assertNotEqual(self.mc.displays['display3'].current_slide_name, 'machine_slide_1')
+
     def test_animation(self):
         self.mc.events.post("show_slide_with_animations")
         self.advance_time()

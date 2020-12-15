@@ -49,7 +49,7 @@ class Display(ScreenManager):
     @staticmethod
     def create_default_display(mc: "MpfMc") -> None:
         """Create default display."""
-        Display(mc, 'default', width=800, height=600)
+        Display(mc, 'default', width=800, height=600, enabled=True)
 
     def __init__(self, mc: "MpfMc", name: str, **kwargs) -> None:
         """Initialise Display."""
@@ -67,6 +67,7 @@ class Display(ScreenManager):
         self.native_size = (self.config['width'], self.config['height'])
         self.size_hint = (None, None)
         self.size = self.native_size
+        self.enabled = self.config['enabled']
 
         self.transition = NoTransition()
 

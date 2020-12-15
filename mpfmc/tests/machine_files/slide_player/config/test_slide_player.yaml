@@ -9,6 +9,10 @@ displays:
   display2:
     height: 400
     width: 300
+  display3:
+    height: 400
+    width: 300
+    enabled: false
 
 slides:
   slide_with_var:
@@ -137,6 +141,9 @@ slide_player:
   show_slide_1_force:
     machine_slide_1:
       force: true
+  show_slide_display3:
+    machine_slide_1:
+        target: display3
   anon_slide_dict:
     slide_6:
       type: text
