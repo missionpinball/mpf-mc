@@ -7,6 +7,7 @@ from queue import PriorityQueue, Queue, Empty
 import sys
 
 from mpf.core.assets import BaseAssetManager
+from mpf.exceptions.config_file_error import ConfigFileError
 
 
 class ThreadedAssetManager(BaseAssetManager):
@@ -111,7 +112,12 @@ class AssetLoader(threading.Thread):
                 if asset:
                     with asset.lock:
                         if not asset.loaded:
-                            asset.do_load()
+                            try:
+                                asset.do_load()
+                            except Exception as e:
+                                raise ConfigFileError(
+                                    "Error while loading {} asset file '{}'".format(asset.attribute, asset.file),
+                                    1, self.log.name, asset.name) from e
                             self.loaded_queue.put((asset, True))
                         else:
                             self.loaded_queue.put((asset, False))
