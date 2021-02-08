@@ -196,7 +196,7 @@ class ImageAsset(McAsset):
     pool_config_section = 'image_pools'  # Will setup groups if present
     asset_group_class = ImagePool  # Class or None to not use pools
 
-    __slots__ = ["frame_skips", "references", "_image"]
+    __slots__ = ["frame_persist", "frame_skips", "references", "_image"]
 
     def __init__(self, mc, name, file, config):
         super().__init__(mc, name, file, config)  # be sure to call super
@@ -205,6 +205,7 @@ class ImageAsset(McAsset):
         # you don't need to do anything.
 
         self._image = None  # holds the actual image in memory
+        self.frame_persist = None
         self.frame_skips = None
         self.references = 0
 
