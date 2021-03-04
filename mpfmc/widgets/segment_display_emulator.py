@@ -1,11 +1,10 @@
 """Widget emulating a segment display."""
-from typing import Optional, Union
+from typing import Optional
 import math
 
 from kivy.graphics.vertex_instructions import Mesh
-from kivy.properties import ObjectProperty, NumericProperty, AliasProperty, BooleanProperty, \
-    ListProperty, StringProperty
-from kivy.graphics import Rectangle, Color, Rotate, Scale
+from kivy.properties import NumericProperty, BooleanProperty, ListProperty, StringProperty
+from kivy.graphics import Color, Rotate, Scale
 
 from mpfmc.uix.widget import Widget
 from mpf.core.segment_mappings import FOURTEEN_SEGMENTS
@@ -36,7 +35,9 @@ class SegmentDisplayEmulator(Widget):
         self._segment_map = {k: self.get_character_encoding(v) for k, v in FOURTEEN_SEGMENTS.items()}
 
         # Override default character segment mappings with specific settings
-        # TODO: apply segment map overrides from config
+        if "character_map" in self.config and self.config["character_map"] is not None:
+            for k, v in self.config["character_map"].items():
+                self._segment_map[k] = v
 
         # Initialize the encoded display characters
         self._encoded_characters = [OFF] * self.character_count

@@ -9,11 +9,19 @@ widgets:
   segment_display_widget_top:
     type: segment_display_emulator
     character_count: 7
-    character_slant_angle: 0
+    character_slant_angle: 6
     character_spacing: 20
+    segment_width: 0.11
+    segment_interval: 0.04
     segment_off_color: 4b4c4a30
     segment_on_color: fe961bff
-    side_bevel_enabled: false
+    side_bevel_enabled: true
+    character_map:
+      16: 54
+      17: 8264
+      18: 456
+      19: 235
+      20: 1240
     text: "*HELLO*"
     width: 400
     height: 100
@@ -21,15 +29,23 @@ widgets:
 
   segment_display_widget_bottom:
     type: segment_display_emulator
-    character_count: 7
-    character_slant_angle: 0
-    character_spacing: 20
+    character_count: 16
+    character_slant_angle: 6
+    character_spacing: 5
+    segment_width: 0.11
+    segment_interval: 0.04
     segment_off_color: 4b4c4a30
     segment_on_color: fe961bff
-    side_bevel_enabled: false
+    side_bevel_enabled: true
+    character_map:
+      16: 54
+      17: 8264
+      18: 456
+      19: 235
+      20: 1240
     text: ">TESTS<"
     width: 400
-    height: 100
+    height: 70
     y: 100
 
 widget_player:
@@ -45,4 +61,79 @@ widget_player:
     segment_display_widget_bottom:
       action: update
       widget_settings:
-        text: "FOR NOW"
+        text: "FOR NOW "
+  update_display2:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "\x11       FOR NOW "
+  update_display3:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "\x12\x11      FOR NOW "
+  update_display4:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "\x13\x12\x11     FOR NOW "
+  update_display5:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "\x13\x13\x12\x11    FOR NOW "
+  update_display6:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "\x14\x13\x13\x12\x11   FOR NOW "
+  update_display7:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: " \x14\x13\x13\x12\x11  FOR NOW "
+  update_display8:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "  \x14\x13\x13\x12\x11 FOR NOW "
+  update_display9:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "   \x14\x13\x13\x12\x11FOR NOW "
+  update_display10:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "    \x14\x13\x13\x12\x11OR NOW "
+  update_display11:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "     \x14\x13\x13\x12\x11R NOW "
+  update_display12:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "      \x14\x13\x13\x12\x11 NOW "
+  update_display13:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "       \x14\x13\x13\x12\x11NOW "
+  update_display14:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "        \x14\x13\x13\x12\x11OW "
+  update_display15:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "         \x14\x13\x13\x12\x11W "
+  update_display16:
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "          \x14\x13\x13\x12\x11 "
