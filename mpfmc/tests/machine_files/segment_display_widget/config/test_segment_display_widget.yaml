@@ -1,0 +1,48 @@
+#config_version=5
+
+displays:
+  window:
+    width: 400
+    height: 300
+
+widgets:
+  segment_display_widget_top:
+    type: segment_display_emulator
+    character_count: 7
+    character_slant_angle: 0
+    character_spacing: 20
+    segment_off_color: 4b4c4a30
+    segment_on_color: fe961bff
+    side_bevel_enabled: false
+    text: "*HELLO*"
+    width: 400
+    height: 100
+    y: 200
+
+  segment_display_widget_bottom:
+    type: segment_display_emulator
+    character_count: 7
+    character_slant_angle: 0
+    character_spacing: 20
+    segment_off_color: 4b4c4a30
+    segment_on_color: fe961bff
+    side_bevel_enabled: false
+    text: ">TESTS<"
+    width: 400
+    height: 100
+    y: 100
+
+widget_player:
+  show_top_display: segment_display_widget_top
+
+  show_bottom_display: segment_display_widget_bottom
+
+  update_display:
+    segment_display_widget_top:
+      action: update
+      widget_settings:
+        text: "GOODBYE"
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: "FOR NOW"
