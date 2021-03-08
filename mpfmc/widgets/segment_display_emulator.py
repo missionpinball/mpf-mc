@@ -1,7 +1,8 @@
 """Widget emulating a segment display."""
-from typing import Optional
+from typing import Optional, List, Dict
 import math
 
+from kivy.clock import Clock
 from kivy.graphics.vertex_instructions import Mesh
 from kivy.properties import NumericProperty, BooleanProperty, ListProperty, AliasProperty, StringProperty
 from kivy.graphics import Color, Rotate, Scale
@@ -253,44 +254,15 @@ class SegmentDisplayEmulator(Widget):
                 self._segment_mesh_objects.append(mesh_objects)
                 x_offset += self.char_width + self.character_spacing
 
-    def update_segment_display(self, text, **kwargs):
+    def update_segment_display(self, text: str, transition: dict = None, **kwargs):
         """Method to update the segment display."""
-        self.text = text
+        if transition is None:
+            self.text = text
 
     def _update_text(self, *args):
         """Process the new text value to prepare it for display"""
-        text_position = 0
-        encoded_characters = []
-        while text_position < len(self.text):
-            char = self.text[text_position]
-            text_position += 1
-            encoded_char = self._segment_map.get(ord(char))
-            if self.dot_enabled or self.comma_enabled:
-                # embed dots is enabled and dot is inactive
-                try:
-                    next_char = self.text[text_position]
-                except IndexError:
-                    next_char = " "
-                if self.dot_enabled and next_char == ".":
-                    # next char is a dot -> turn dot on
-                    encoded_char |= DP
-                    text_position += 1
-                elif self.comma_enabled and next_char == ",":
-                    # next char is a dot -> turn dot on
-                    encoded_char |= COM
-                    text_position += 1
-
-            encoded_characters.append(encoded_char)
-
-        # remove leading segments if mapping is too long
-        if self.character_count < len(encoded_characters):
-            encoded_characters = encoded_characters[-self.character_count:]
-
-        while self.character_count > len(encoded_characters):
-            # prepend spaces to pad mapping
-            encoded_characters.insert(0, OFF)
-
-        self._encoded_characters = encoded_characters
+        self._encoded_characters = self.encode_characters(self.text, self.character_count, self._segment_map,
+                                                          self.dot_enabled, self.comma_enabled)
         self._draw_widget()
 
     def _create_segment_color(self, segment: int, char_code: int):
@@ -326,6 +298,217 @@ class SegmentDisplayEmulator(Widget):
         if self._update_event_handler_key:
             self.mc.events.remove_handler_by_key(self._update_event_handler_key)
         super().prepare_for_removal()
+
+    @staticmethod
+    def encode_characters(text: str, character_count: int, segment_map: Dict[int, int],
+                          dot_enabled: bool, comma_enabled: bool) -> List[int]:
+        text_position = 0
+        encoded_characters = []
+        while text_position < len(text):
+            char = text[text_position]
+            text_position += 1
+            encoded_char = segment_map.get(ord(char))
+            if dot_enabled or comma_enabled:
+                # embed dots is enabled and dot is inactive
+                try:
+                    next_char = text[text_position]
+                except IndexError:
+                    next_char = " "
+                if dot_enabled and next_char == ".":
+                    # next char is a dot -> turn dot on
+                    encoded_char |= DP
+                    text_position += 1
+                elif comma_enabled and next_char == ",":
+                    # next char is a dot -> turn dot on
+                    encoded_char |= COM
+                    text_position += 1
+
+            encoded_characters.append(encoded_char)
+
+        # remove leading segments if mapping is too long
+        if character_count < len(encoded_characters):
+            encoded_characters = encoded_characters[-character_count:]
+
+        while character_count > len(encoded_characters):
+            # prepend spaces to pad mapping
+            encoded_characters.insert(0, OFF)
+
+        return encoded_characters
+
+    def _start_transition(self):
+        # encode the new characters
+        # calculate the number of steps (based on display size, transition type, and step size)
+        # generate list of strings (all transition steps)
+        # set clock callbacks
+        pass
+
+    def _update_transition(self):
+        # update the display with the next transition string in the list
+        pass
+
+    def _cancel_transition(self):
+        # cancel and remove clock callback
+        # set final text value
+        pass
+
+    def _stop_transition(self):
+        # remove clock callback
+        # set updated text value
+        pass
+
+    @staticmethod
+    def generate_push_transition(current_encoded_characters: List[int], new_encoded_characters: List[int],
+                                 direction_right: bool) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+
+        # create a big list of a concatenation of new and current encoded characters
+        if direction_right:
+            encoded_characters = new_encoded_characters
+            encoded_characters.extend(current_encoded_characters)
+
+            transition_steps = []
+
+            for index in range(1, display_length + 1):
+                transition_steps.append(encoded_characters[display_length - index:2 * display_length - index])
+        else:
+            encoded_characters = current_encoded_characters
+            encoded_characters.extend(new_encoded_characters)
+
+            transition_steps = []
+
+            for index in range(1, display_length + 1):
+                transition_steps.append(encoded_characters[index:index + display_length])
+
+        return transition_steps
+
+    @staticmethod
+    def generate_cover_transition(current_encoded_characters: List[int], new_encoded_characters: List[int],
+                                  direction_right: bool) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        if direction_right:
+            for index in range(display_length):
+                encoded_characters = new_encoded_characters[-(index + 1):]
+                encoded_characters.extend(current_encoded_characters[index + 1:])
+                transition_steps.append(encoded_characters)
+        else:
+            for index in range(1, display_length + 1):
+                encoded_characters = current_encoded_characters[:display_length - index]
+                encoded_characters.extend(new_encoded_characters[:index])
+                transition_steps.append(encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_uncover_transition(current_encoded_characters: List[int], new_encoded_characters: List[int],
+                                    direction_right: bool) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        if direction_right:
+            for index in range(1, display_length + 1):
+                encoded_characters = new_encoded_characters[:index]
+                encoded_characters.extend(current_encoded_characters[:display_length - index])
+                transition_steps.append(encoded_characters)
+        else:
+            for index in range(1, display_length + 1):
+                encoded_characters = current_encoded_characters[index:]
+                encoded_characters.extend(new_encoded_characters[-index:])
+                transition_steps.append(encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_wipe_transition(current_encoded_characters: List[int], new_encoded_characters: List[int],
+                                 direction_right: bool) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        if direction_right:
+            for index in range(1, display_length + 1):
+                encoded_characters = new_encoded_characters[:index]
+                encoded_characters.extend(current_encoded_characters[index:])
+                transition_steps.append(encoded_characters)
+        else:
+            for index in range(1, display_length + 1):
+                encoded_characters = current_encoded_characters[:display_length - index]
+                encoded_characters.extend(new_encoded_characters[-index:])
+                transition_steps.append(encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_wipe_split_transition(current_encoded_characters: List[int],
+                                       new_encoded_characters: List[int]) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        characters = int(display_length / 2)
+        if characters * 2 == display_length:
+            characters -= 1
+
+        while characters > 0:
+            encoded_characters = current_encoded_characters[:characters]
+            encoded_characters.extend(new_encoded_characters[characters:characters + (display_length - 2 * characters)])
+            encoded_characters.extend(current_encoded_characters[-characters:])
+            transition_steps.append(encoded_characters)
+            characters -= 1
+
+        transition_steps.append(new_encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_push_split_open_transition(current_encoded_characters: List[int],
+                                            new_encoded_characters: List[int]) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        characters = int(display_length / 2)
+        split_point = characters
+        if characters * 2 == display_length:
+            characters -= 1
+        else:
+            split_point += 1
+
+        while characters > 0:
+            encoded_characters = current_encoded_characters[split_point - characters:split_point]
+            encoded_characters.extend(new_encoded_characters[characters:characters + (display_length - 2 * characters)])
+            encoded_characters.extend(current_encoded_characters[split_point:split_point + characters])
+            transition_steps.append(encoded_characters)
+            characters -= 1
+
+        transition_steps.append(new_encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_push_split_close_transition(current_encoded_characters: List[int],
+                                             new_encoded_characters: List[int]) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        split_point = int(display_length / 2)
+        characters = 1
+        if split_point * 2 < display_length:
+            split_point += 1
+
+        while characters <= split_point:
+            encoded_characters = new_encoded_characters[split_point - characters:split_point]
+            encoded_characters.extend(current_encoded_characters[characters:characters + (display_length - 2 * characters)])
+            encoded_characters.extend(new_encoded_characters[split_point:split_point + characters])
+            transition_steps.append(encoded_characters)
+            characters += 1
+
+        return transition_steps
 
     #
     # Properties
