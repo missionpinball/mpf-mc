@@ -56,9 +56,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
     def test_transition_steps(self):
 
         # push right
-        transition_steps = SegmentDisplayEmulator.generate_push_transition([1, 2, 3, 4, 5],
-                                                                           [101, 102, 103, 104, 105],
-                                                                           True)
+        transition_steps = SegmentDisplayEmulator.generate_push_right_transition([1, 2, 3, 4, 5],
+                                                                                 [101, 102, 103, 104, 105])
         self.assertEqual(5, len(transition_steps))
         self.assertEqual([105, 1, 2, 3, 4], transition_steps[0])
         self.assertEqual([104, 105, 1, 2, 3], transition_steps[1])
@@ -67,9 +66,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.assertEqual([101, 102, 103, 104, 105], transition_steps[4])
 
         # push left
-        transition_steps = SegmentDisplayEmulator.generate_push_transition([1, 2, 3, 4, 5],
-                                                                           [101, 102, 103, 104, 105],
-                                                                           False)
+        transition_steps = SegmentDisplayEmulator.generate_push_left_transition([1, 2, 3, 4, 5],
+                                                                                [101, 102, 103, 104, 105])
         self.assertEqual(5, len(transition_steps))
         self.assertEqual([2, 3, 4, 5, 101], transition_steps[0])
         self.assertEqual([3, 4, 5, 101, 102], transition_steps[1])
@@ -78,9 +76,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.assertEqual([101, 102, 103, 104, 105], transition_steps[4])
 
         # cover right
-        transition_steps = SegmentDisplayEmulator.generate_cover_transition([1, 2, 3, 4, 5],
-                                                                            [101, 102, 103, 104, 105],
-                                                                            True)
+        transition_steps = SegmentDisplayEmulator.generate_cover_right_transition([1, 2, 3, 4, 5],
+                                                                                  [101, 102, 103, 104, 105])
         self.assertEqual(5, len(transition_steps))
         self.assertEqual([105, 2, 3, 4, 5], transition_steps[0])
         self.assertEqual([104, 105, 3, 4, 5], transition_steps[1])
@@ -89,9 +86,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.assertEqual([101, 102, 103, 104, 105], transition_steps[4])
 
         # cover left
-        transition_steps = SegmentDisplayEmulator.generate_cover_transition([1, 2, 3, 4, 5],
-                                                                            [101, 102, 103, 104, 105],
-                                                                            False)
+        transition_steps = SegmentDisplayEmulator.generate_cover_left_transition([1, 2, 3, 4, 5],
+                                                                                 [101, 102, 103, 104, 105])
         self.assertEqual(5, len(transition_steps))
         self.assertEqual([1, 2, 3, 4, 101], transition_steps[0])
         self.assertEqual([1, 2, 3, 101, 102], transition_steps[1])
@@ -100,9 +96,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.assertEqual([101, 102, 103, 104, 105], transition_steps[4])
 
         # uncover right
-        transition_steps = SegmentDisplayEmulator.generate_uncover_transition([1, 2, 3, 4, 5],
-                                                                              [101, 102, 103, 104, 105],
-                                                                              True)
+        transition_steps = SegmentDisplayEmulator.generate_uncover_right_transition([1, 2, 3, 4, 5],
+                                                                                    [101, 102, 103, 104, 105])
         self.assertEqual(5, len(transition_steps))
         self.assertEqual([101, 1, 2, 3, 4], transition_steps[0])
         self.assertEqual([101, 102, 1, 2, 3], transition_steps[1])
@@ -111,9 +106,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.assertEqual([101, 102, 103, 104, 105], transition_steps[4])
 
         # uncover left
-        transition_steps = SegmentDisplayEmulator.generate_uncover_transition([1, 2, 3, 4, 5],
-                                                                              [101, 102, 103, 104, 105],
-                                                                              False)
+        transition_steps = SegmentDisplayEmulator.generate_uncover_left_transition([1, 2, 3, 4, 5],
+                                                                                   [101, 102, 103, 104, 105])
         self.assertEqual(5, len(transition_steps))
         self.assertEqual([2, 3, 4, 5, 105], transition_steps[0])
         self.assertEqual([3, 4, 5, 104, 105], transition_steps[1])
@@ -122,9 +116,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.assertEqual([101, 102, 103, 104, 105], transition_steps[4])
 
         # wipe right
-        transition_steps = SegmentDisplayEmulator.generate_wipe_transition([1, 2, 3, 4, 5],
-                                                                           [101, 102, 103, 104, 105],
-                                                                           True)
+        transition_steps = SegmentDisplayEmulator.generate_wipe_right_transition([1, 2, 3, 4, 5],
+                                                                                 [101, 102, 103, 104, 105])
         self.assertEqual(5, len(transition_steps))
         self.assertEqual([101, 2, 3, 4, 5], transition_steps[0])
         self.assertEqual([101, 102, 3, 4, 5], transition_steps[1])
@@ -133,9 +126,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.assertEqual([101, 102, 103, 104, 105], transition_steps[4])
 
         # wipe left
-        transition_steps = SegmentDisplayEmulator.generate_wipe_transition([1, 2, 3, 4, 5],
-                                                                           [101, 102, 103, 104, 105],
-                                                                           False)
+        transition_steps = SegmentDisplayEmulator.generate_wipe_left_transition([1, 2, 3, 4, 5],
+                                                                                [101, 102, 103, 104, 105])
         self.assertEqual(5, len(transition_steps))
         self.assertEqual([1, 2, 3, 4, 105], transition_steps[0])
         self.assertEqual([1, 2, 3, 104, 105], transition_steps[1])
@@ -144,16 +136,16 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.assertEqual([101, 102, 103, 104, 105], transition_steps[4])
 
         # split wipe (odd display length)
-        transition_steps = SegmentDisplayEmulator.generate_wipe_split_transition([1, 2, 3, 4, 5],
-                                                                                 [101, 102, 103, 104, 105])
+        transition_steps = SegmentDisplayEmulator.generate_wipe_split_open_transition([1, 2, 3, 4, 5],
+                                                                                      [101, 102, 103, 104, 105])
         self.assertEqual(3, len(transition_steps))
         self.assertEqual([1, 2, 103, 4, 5], transition_steps[0])
         self.assertEqual([1, 102, 103, 104, 5], transition_steps[1])
         self.assertEqual([101, 102, 103, 104, 105], transition_steps[2])
 
         # wipe split open (even display length)
-        transition_steps = SegmentDisplayEmulator.generate_wipe_split_transition([1, 2, 3, 4, 5, 6],
-                                                                                 [101, 102, 103, 104, 105, 106])
+        transition_steps = SegmentDisplayEmulator.generate_wipe_split_open_transition([1, 2, 3, 4, 5, 6],
+                                                                                      [101, 102, 103, 104, 105, 106])
         self.assertEqual(3, len(transition_steps))
         self.assertEqual([1, 2, 103, 104, 5, 6], transition_steps[0])
         self.assertEqual([1, 102, 103, 104, 105, 6], transition_steps[1])

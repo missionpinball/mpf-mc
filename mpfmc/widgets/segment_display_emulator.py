@@ -366,6 +366,7 @@ class SegmentDisplayEmulator(Widget):
 
     def _start_transition(self):
         # encode the new characters
+
         # calculate the number of steps (based on display size, transition type, and step size)
         # generate list of strings (all transition steps)
         # set clock callbacks
@@ -386,94 +387,125 @@ class SegmentDisplayEmulator(Widget):
         pass
 
     @staticmethod
-    def generate_push_transition(current_encoded_characters: List[int], new_encoded_characters: List[int],
-                                 direction_right: bool) -> List[List[int]]:
+    def generate_push_right_transition(current_encoded_characters: List[int],
+                                       new_encoded_characters: List[int]) -> List[List[int]]:
 
         display_length = len(current_encoded_characters)
+        transition_steps = []
 
         # create a big list of a concatenation of new and current encoded characters
-        if direction_right:
-            encoded_characters = new_encoded_characters
-            encoded_characters.extend(current_encoded_characters)
+        encoded_characters = new_encoded_characters
+        encoded_characters.extend(current_encoded_characters)
 
-            transition_steps = []
-
-            for index in range(1, display_length + 1):
-                transition_steps.append(encoded_characters[display_length - index:2 * display_length - index])
-        else:
-            encoded_characters = current_encoded_characters
-            encoded_characters.extend(new_encoded_characters)
-
-            transition_steps = []
-
-            for index in range(1, display_length + 1):
-                transition_steps.append(encoded_characters[index:index + display_length])
+        for index in range(1, display_length + 1):
+            transition_steps.append(encoded_characters[display_length - index:2 * display_length - index])
 
         return transition_steps
 
     @staticmethod
-    def generate_cover_transition(current_encoded_characters: List[int], new_encoded_characters: List[int],
-                                  direction_right: bool) -> List[List[int]]:
+    def generate_push_left_transition(current_encoded_characters: List[int],
+                                      new_encoded_characters: List[int]) -> List[List[int]]:
 
         display_length = len(current_encoded_characters)
         transition_steps = []
 
-        if direction_right:
-            for index in range(display_length):
-                encoded_characters = new_encoded_characters[-(index + 1):]
-                encoded_characters.extend(current_encoded_characters[index + 1:])
-                transition_steps.append(encoded_characters)
-        else:
-            for index in range(1, display_length + 1):
-                encoded_characters = current_encoded_characters[:display_length - index]
-                encoded_characters.extend(new_encoded_characters[:index])
-                transition_steps.append(encoded_characters)
+        # create a big list of a concatenation of new and current encoded characters
+        encoded_characters = current_encoded_characters
+        encoded_characters.extend(new_encoded_characters)
+
+        for index in range(1, display_length + 1):
+            transition_steps.append(encoded_characters[index:index + display_length])
 
         return transition_steps
 
     @staticmethod
-    def generate_uncover_transition(current_encoded_characters: List[int], new_encoded_characters: List[int],
-                                    direction_right: bool) -> List[List[int]]:
+    def generate_cover_right_transition(current_encoded_characters: List[int],
+                                        new_encoded_characters: List[int]) -> List[List[int]]:
 
         display_length = len(current_encoded_characters)
         transition_steps = []
 
-        if direction_right:
-            for index in range(1, display_length + 1):
-                encoded_characters = new_encoded_characters[:index]
-                encoded_characters.extend(current_encoded_characters[:display_length - index])
-                transition_steps.append(encoded_characters)
-        else:
-            for index in range(1, display_length + 1):
-                encoded_characters = current_encoded_characters[index:]
-                encoded_characters.extend(new_encoded_characters[-index:])
-                transition_steps.append(encoded_characters)
+        for index in range(display_length):
+            encoded_characters = new_encoded_characters[-(index + 1):]
+            encoded_characters.extend(current_encoded_characters[index + 1:])
+            transition_steps.append(encoded_characters)
 
         return transition_steps
 
     @staticmethod
-    def generate_wipe_transition(current_encoded_characters: List[int], new_encoded_characters: List[int],
-                                 direction_right: bool) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        if direction_right:
-            for index in range(1, display_length + 1):
-                encoded_characters = new_encoded_characters[:index]
-                encoded_characters.extend(current_encoded_characters[index:])
-                transition_steps.append(encoded_characters)
-        else:
-            for index in range(1, display_length + 1):
-                encoded_characters = current_encoded_characters[:display_length - index]
-                encoded_characters.extend(new_encoded_characters[-index:])
-                transition_steps.append(encoded_characters)
-
-        return transition_steps
-
-    @staticmethod
-    def generate_wipe_split_transition(current_encoded_characters: List[int],
+    def generate_cover_left_transition(current_encoded_characters: List[int],
                                        new_encoded_characters: List[int]) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        for index in range(1, display_length + 1):
+            encoded_characters = current_encoded_characters[:display_length - index]
+            encoded_characters.extend(new_encoded_characters[:index])
+            transition_steps.append(encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_uncover_right_transition(current_encoded_characters: List[int],
+                                          new_encoded_characters: List[int]) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        for index in range(1, display_length + 1):
+            encoded_characters = new_encoded_characters[:index]
+            encoded_characters.extend(current_encoded_characters[:display_length - index])
+            transition_steps.append(encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_uncover_left_transition(current_encoded_characters: List[int],
+                                         new_encoded_characters: List[int]) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        for index in range(1, display_length + 1):
+            encoded_characters = current_encoded_characters[index:]
+            encoded_characters.extend(new_encoded_characters[-index:])
+            transition_steps.append(encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_wipe_right_transition(current_encoded_characters: List[int],
+
+                                 new_encoded_characters: List[int]) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        for index in range(1, display_length + 1):
+            encoded_characters = new_encoded_characters[:index]
+            encoded_characters.extend(current_encoded_characters[index:])
+            transition_steps.append(encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_wipe_left_transition(current_encoded_characters: List[int],
+                                      new_encoded_characters: List[int]) -> List[List[int]]:
+
+        display_length = len(current_encoded_characters)
+        transition_steps = []
+
+        for index in range(1, display_length + 1):
+            encoded_characters = current_encoded_characters[:display_length - index]
+            encoded_characters.extend(new_encoded_characters[-index:])
+            transition_steps.append(encoded_characters)
+
+        return transition_steps
+
+    @staticmethod
+    def generate_wipe_split_open_transition(current_encoded_characters: List[int],
+                                            new_encoded_characters: List[int]) -> List[List[int]]:
 
         display_length = len(current_encoded_characters)
         transition_steps = []
