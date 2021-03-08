@@ -3,7 +3,7 @@ from typing import Optional
 import math
 
 from kivy.graphics.vertex_instructions import Mesh
-from kivy.properties import NumericProperty, BooleanProperty, ListProperty, StringProperty
+from kivy.properties import NumericProperty, BooleanProperty, ListProperty, AliasProperty, StringProperty
 from kivy.graphics import Color, Rotate, Scale
 
 from mpfmc.uix.widget import Widget
@@ -44,6 +44,7 @@ class SegmentDisplayEmulator(Widget):
 
         self._segment_colors = None
         self._segment_mesh_objects = None
+        self._update_event_handler_key = None
 
         # Bind to all properties that when changed need to force
         # the widget to be redrawn
@@ -53,6 +54,12 @@ class SegmentDisplayEmulator(Widget):
                   color=self._draw_widget,
                   segment_off_color=self._draw_widget,
                   segment_on_color=self._draw_widget)
+
+        # Bind an event handler to a custom trigger event to update this
+        if self.config['number']:
+            self._update_event_handler_key = self.mc.events.add_handler(
+                "update_segment_display_{}".format(self.config['number']),
+                self.update_segment_display)
 
         self._calculate_segment_points()
         self._update_text()
@@ -246,7 +253,11 @@ class SegmentDisplayEmulator(Widget):
                 self._segment_mesh_objects.append(mesh_objects)
                 x_offset += self.char_width + self.character_spacing
 
-    def _update_text(self):
+    def update_segment_display(self, text, **kwargs):
+        """Method to update the segment display."""
+        self.text = text
+
+    def _update_text(self, *args):
         """Process the new text value to prepare it for display"""
         text_position = 0
         encoded_characters = []
@@ -310,6 +321,11 @@ class SegmentDisplayEmulator(Widget):
                     self._segment_colors[char_index][segment].rgba = self.segment_on_color
                 else:
                     self._segment_colors[char_index][segment].rgba = self.segment_off_color
+
+    def prepare_for_removal(self) -> None:
+        if self._update_event_handler_key:
+            self.mc.events.remove_handler_by_key(self._update_event_handler_key)
+        super().prepare_for_removal()
 
     #
     # Properties
@@ -403,7 +419,7 @@ class SegmentDisplayEmulator(Widget):
     :attr:`comma_enabled` is an :class:`kivy.properties.BooleanProperty` and defaults to False.
     '''
 
-    text = StringProperty()
+    text = StringProperty("")
     '''Contains the text string to display
 
     :attr:`text` is an :class:`kivy.properties.StringProperty` and defaults to "".

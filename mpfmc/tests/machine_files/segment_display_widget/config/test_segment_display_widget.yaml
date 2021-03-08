@@ -8,6 +8,7 @@ displays:
 widgets:
   segment_display_widget_top:
     type: segment_display_emulator
+    number: 1
     character_count: 7
     character_slant_angle: 6
     character_spacing: 20
@@ -29,6 +30,7 @@ widgets:
 
   segment_display_widget_bottom:
     type: segment_display_emulator
+    number: 2
     character_count: 16
     character_slant_angle: 6
     character_spacing: 5
@@ -61,79 +63,4 @@ widget_player:
     segment_display_widget_bottom:
       action: update
       widget_settings:
-        text: "FOR NOW "
-  update_display2:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "\x11       FOR NOW "
-  update_display3:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "\x12\x11      FOR NOW "
-  update_display4:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "\x13\x12\x11     FOR NOW "
-  update_display5:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "\x13\x13\x12\x11    FOR NOW "
-  update_display6:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "\x14\x13\x13\x12\x11   FOR NOW "
-  update_display7:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: " \x14\x13\x13\x12\x11  FOR NOW "
-  update_display8:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "  \x14\x13\x13\x12\x11 FOR NOW "
-  update_display9:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "   \x14\x13\x13\x12\x11FOR NOW "
-  update_display10:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "    \x14\x13\x13\x12\x11OR NOW "
-  update_display11:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "     \x14\x13\x13\x12\x11R NOW "
-  update_display12:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "      \x14\x13\x13\x12\x11 NOW "
-  update_display13:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "       \x14\x13\x13\x12\x11NOW "
-  update_display14:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "        \x14\x13\x13\x12\x11OW "
-  update_display15:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "         \x14\x13\x13\x12\x11W "
-  update_display16:
-    segment_display_widget_bottom:
-      action: update
-      widget_settings:
-        text: "          \x14\x13\x13\x12\x11 "
+        text: ""
