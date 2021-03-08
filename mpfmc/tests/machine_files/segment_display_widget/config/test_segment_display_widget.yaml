@@ -17,6 +17,8 @@ widgets:
     segment_off_color: 4b4c4a30
     segment_on_color: fe961bff
     side_bevel_enabled: true
+    dot_enabled: true
+    comma_enabled: true
     character_map:
       16: 54
       17: 8264
@@ -39,6 +41,7 @@ widgets:
     segment_off_color: 4b4c4a30
     segment_on_color: fe961bff
     side_bevel_enabled: true
+    dot_enabled: true
     comma_enabled: true
     character_map:
       16: 54

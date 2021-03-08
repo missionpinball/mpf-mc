@@ -3,7 +3,7 @@ from typing import Optional, List, Dict
 import math
 
 from kivy.clock import Clock
-from kivy.graphics.vertex_instructions import Mesh
+from kivy.graphics.vertex_instructions import Mesh, Ellipse
 from kivy.properties import NumericProperty, BooleanProperty, ListProperty, AliasProperty, StringProperty
 from kivy.graphics import Color, Rotate, Scale
 
@@ -208,19 +208,27 @@ class SegmentDisplayEmulator(Widget):
         # Sort the segment dictionary by segment name (key)
         segment_points = {key: value for key, value in sorted(segment_points.items(), key=lambda item: item[0])}
 
+        if self.dot_enabled:
+            # Store center point of dot/period circle (diameter will be segment_width) (x, y, radius)
+            self._dot_points = [self.char_width + segment_width / 2, 0, segment_width]
+
+        if self.comma_enabled:
+            #  (comma should fit in padding on right side of character/element)
+            self._comma_points = [self.char_width + 0.5 * segment_width, -0.5 * segment_interval,
+                                  self.char_width + 0.75 * segment_width, -1.5 * segment_interval,
+                                  self.char_width + segment_width, -2.5 * segment_interval,
+                                  self.char_width + 1.25 * segment_width, -1.5 * segment_interval,
+                                  self.char_width + 1.5 * segment_width, -0.5 * segment_interval,
+                                  self.char_width + 1.4 * segment_width, -0.75 * segment_width,
+                                  self.char_width + 0.5 * segment_width, -2 * segment_width,
+                                  self.char_width + 0.8 * segment_width, -0.5 * segment_width]
+
         # Determine if characters are slanted (if so, apply slant translation)
         if self.character_slant_angle > 0.0:
             segment_points.update(
                 {k: self._apply_character_slant_to_points(v, slant_slope) for k, v in segment_points.items()})
-
-        if self.dot_enabled:
-            # Store center point of dot/period circle (diameter will be segment_width)
-            segment_points["dp"] = [self.char_width + segment_width, segment_width / 2]
-
-        if self.comma_enabled:
-            #  (comma should fit in padding on right side of character/element)
-            # TODO: calculate comma points
-            pass
+            if self.comma_enabled:
+                self._comma_points = self._apply_character_slant_to_points(self._comma_points, slant_slope)
 
         self._segment_points = list(segment_points.values())
 
@@ -244,7 +252,7 @@ class SegmentDisplayEmulator(Widget):
             y_offset = self.y + self.padding
 
             for encoded_char in self._encoded_characters:
-                colors = [None] * 14
+                colors = [None] * 16
                 mesh_objects = [None] * 14
                 for segment in range(14):
                     colors[segment] = self._create_segment_color(segment, encoded_char)
@@ -252,6 +260,24 @@ class SegmentDisplayEmulator(Widget):
 
                 self._segment_colors.append(colors)
                 self._segment_mesh_objects.append(mesh_objects)
+                if self.dot_enabled:
+                    colors[14] = self._create_segment_color(14, encoded_char)
+                    Ellipse(pos=(self._dot_points[0] + x_offset, self._dot_points[1] + y_offset),
+                            size=(self._dot_points[2], self._dot_points[2]))
+
+                if self.dot_enabled:
+                    colors[15] = self._create_segment_color(15, encoded_char)
+                    Mesh(vertices=[self._comma_points[0] + x_offset, self._comma_points[1] + y_offset, 0, 0,
+                                   self._comma_points[2] + x_offset, self._comma_points[3] + y_offset, 0, 0,
+                                   self._comma_points[4] + x_offset, self._comma_points[5] + y_offset, 0, 0,
+                                   self._comma_points[6] + x_offset, self._comma_points[7] + y_offset, 0, 0,
+                                   self._comma_points[8] + x_offset, self._comma_points[9] + y_offset, 0, 0,
+                                   self._comma_points[10] + x_offset, self._comma_points[11] + y_offset, 0, 0,
+                                   self._comma_points[12] + x_offset, self._comma_points[13] + y_offset, 0, 0,
+                                   self._comma_points[14] + x_offset, self._comma_points[15] + y_offset, 0, 0],
+                         indices=[0, 1, 2, 3, 4, 5, 6, 7],
+                         mode="triangle_fan")
+
                 x_offset += self.char_width + self.character_spacing
 
     def update_segment_display(self, text: str, transition: dict = None, **kwargs):
@@ -284,6 +310,9 @@ class SegmentDisplayEmulator(Widget):
             indices.append(int(index / 2))
 
         return Mesh(vertices=vertices, indices=indices, mode="triangle_fan")
+
+    def _create_segment_dot_object(self, x_offset, y_offset):
+        pass
 
     def _update_segment_colors(self):
         for char_index in range(self.character_count):
