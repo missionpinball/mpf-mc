@@ -4,20 +4,17 @@ import math
 
 from kivy.clock import Clock
 from kivy.graphics.vertex_instructions import Mesh, Ellipse
-from kivy.properties import NumericProperty, BooleanProperty, ListProperty, AliasProperty, StringProperty
+from kivy.properties import NumericProperty, BooleanProperty, ListProperty, StringProperty, OptionProperty
 from kivy.graphics import Color, Rotate, Scale
 
 from mpfmc.uix.widget import Widget
-from mpf.core.segment_mappings import FOURTEEN_SEGMENTS
+from mpf.core.segment_mappings import FOURTEEN_SEGMENTS, SEVEN_SEGMENTS
 
 MYPY = False
 if MYPY:   # pragma: no cover
     from mpfmc.core.mc import MpfMc             # pylint: disable-msg=cyclic-import,unused-import
-    from mpfmc.assets.image import ImageAsset   # pylint: disable-msg=cyclic-import,unused-import
 
 # Constants for punctuation segments (dot/period and comma)
-DP = 1 << 14
-COM = 1 << 15
 OFF = 0
 
 
@@ -33,7 +30,17 @@ class SegmentDisplayEmulator(Widget):
         super().__init__(mc=mc, config=config, key=key)
 
         # Initialize the character segment map with the default 14-segment mappings from MPF
-        self._segment_map = {k: self.get_character_encoding(v) for k, v in FOURTEEN_SEGMENTS.items()}
+        if self.display_type == "7seg":
+            self._segment_map = {k: self.get_seven_segment_character_encoding(v) for k, v in SEVEN_SEGMENTS.items()}
+            self._segment_count = 7
+            self._dot_segment_index = 0
+            self._comma_segment_index = 7
+        elif self.display_type == "14seg":
+            self._segment_map = {k: self.get_fourteen_segment_character_encoding(v) for k, v in
+                                 FOURTEEN_SEGMENTS.items()}
+            self._segment_count = 14
+            self._dot_segment_index = 14
+            self._comma_segment_index = 15
 
         # Override default character segment mappings with specific settings
         if "character_map" in self.config and self.config["character_map"] is not None:
@@ -66,7 +73,15 @@ class SegmentDisplayEmulator(Widget):
         self._update_text()
 
     @staticmethod
-    def get_character_encoding(segments: FOURTEEN_SEGMENTS) -> int:
+    def get_seven_segment_character_encoding(segments: SEVEN_SEGMENTS) -> int:
+        """Returns segment value in order used in the segment display widget."""
+        # Note: the l and n segments appear to be swapped in the encodings in the FOURTEEN_SEGMENTS dict
+        return int(
+            (segments.g << 6) | (segments.f << 5) | (segments.e << 4) |
+            (segments.d << 3) | (segments.c << 2) | (segments.b << 1) | segments.a)
+
+    @staticmethod
+    def get_fourteen_segment_character_encoding(segments: FOURTEEN_SEGMENTS) -> int:
         """Returns segment value in order used in the segment display widget."""
         # Note: the l and n segments appear to be swapped in the encodings in the FOURTEEN_SEGMENTS dict
         return int(
@@ -141,69 +156,26 @@ class SegmentDisplayEmulator(Widget):
         segment_width = self.segment_width * self.char_width
         segment_interval = self.segment_interval * self.char_width
         bevel_width = self.bevel_width * self.char_width
-        side_bevel_multiplier = 1 if self.side_bevel_enabled else 0
-
-        segment_factor = segment_width * 0.8
-        diagonal_slope = self.char_height / self.char_width
-        sqrt2 = math.sqrt(2)
-        sqrt3 = math.sqrt(3)
 
         # Base positions of points without bevel and interval
-        x0 = self.char_width / 2 - segment_width / 2
-        x1 = self.char_width / 2
-        x2 = self.char_width / 2 + segment_width / 2
-        x3 = self.char_width - segment_width
-        x4 = self.char_width - segment_width / 2
-        x5 = self.char_width
+        x = [self.char_width / 2 - segment_width / 2,
+             self.char_width / 2,
+             self.char_width / 2 + segment_width / 2,
+             self.char_width - segment_width,
+             self.char_width - segment_width / 2,
+             self.char_width]
 
-        y0 = 0
-        y1 = segment_width / 2
-        y2 = segment_width
-        y3 = self.char_height / 2 - segment_width / 2
-        y4 = self.char_height / 2
-        y5 = self.char_height / 2 + segment_width / 2
+        y = [0,
+             segment_width / 2,
+             segment_width,
+             self.char_height / 2 - segment_width / 2,
+             self.char_height / 2,
+             self.char_height / 2 + segment_width / 2]
 
-        # Create dictionary of segment points keyed by segment name/letter
-        segment_points = {"d": [bevel_width * 2 + segment_interval / sqrt2, y0,
-                                x5 - (bevel_width * 2 + segment_interval / sqrt2), y0,
-                                x5 - (bevel_width + segment_interval / sqrt2), y1,
-                                x5 - (bevel_width * 2 + segment_interval / sqrt2), y2,
-                                bevel_width * 2 + segment_interval / sqrt2, y2,
-                                bevel_width + segment_interval / sqrt2, y1],
-                          "g2": [x1 + segment_interval / 2, y3,
-                                 x3 - segment_interval / 2 * sqrt3, y3,
-                                 x4 - segment_interval / 2 * sqrt3, y4,
-                                 x3 - segment_interval / 2 * sqrt3, y5,
-                                 x1 + segment_interval / 2, y5],
-                          "c": [x5, y0 + bevel_width * 2 + segment_interval / sqrt2,
-                                x5, y4 - segment_interval / 2 - segment_width / 2 * side_bevel_multiplier,
-                                x4, y4 - segment_interval / 2,
-                                x3, y3 - segment_interval / 2,
-                                x3, y2 + segment_interval / sqrt2,
-                                x5 - bevel_width, y0 + bevel_width + segment_interval / sqrt2],
-                          "m": [x2, y2 + segment_interval,
-                                x2, y3 - segment_interval,
-                                x0, y3 - segment_interval,
-                                x0, y2 + segment_interval],
-                          "l": [(segment_width + segment_factor) / diagonal_slope + segment_interval,
-                                y2 + segment_interval,
-                                x0 - segment_interval, x0 * diagonal_slope - segment_factor - segment_interval,
-                                x0 - segment_interval, y3 - segment_interval,
-                                (y3 - segment_interval) / diagonal_slope - segment_interval, y3 - segment_interval,
-                                segment_width + segment_interval,
-                                y2 * diagonal_slope + segment_factor + segment_interval,
-                                segment_width + segment_interval, y2 + segment_interval]}
-
-        # Create the rest of the segments by flipping/mirroring existing points (either horizontally or vertically)
-        segment_points["a"] = self._flip_vertical(segment_points["d"], self.char_height)
-        segment_points["b"] = self._flip_vertical(segment_points["c"], self.char_height)
-        segment_points["e"] = self._flip_horizontal(segment_points["c"], self.char_width)
-        segment_points["f"] = self._flip_horizontal(segment_points["b"], self.char_width)
-        segment_points["g1"] = self._flip_horizontal(segment_points["g2"], self.char_width)
-        segment_points["h"] = self._flip_vertical(segment_points["l"], self.char_height)
-        segment_points["j"] = self._flip_vertical(segment_points["m"], self.char_height)
-        segment_points["k"] = self._flip_horizontal(segment_points["h"], self.char_width)
-        segment_points["n"] = self._flip_horizontal(segment_points["l"], self.char_width)
+        if self.display_type == "14seg":
+            segment_points = self._calculate_fourteen_segment_points(x, y, segment_width, segment_interval, bevel_width)
+        elif self.display_type == "7seg":
+            segment_points = self._calculate_seven_segment_points(x, y, segment_width, segment_interval, bevel_width)
 
         # Sort the segment dictionary by segment name (key)
         segment_points = {key: value for key, value in sorted(segment_points.items(), key=lambda item: item[0])}
@@ -232,6 +204,100 @@ class SegmentDisplayEmulator(Widget):
 
         self._segment_points = list(segment_points.values())
 
+    def _calculate_seven_segment_points(self, x: List[float], y: List[float],
+                                        segment_width: float, segment_interval: float,
+                                        bevel_width: float) -> Dict[str, float]:
+
+        side_bevel_multiplier = 1 if self.side_bevel_enabled else 0
+
+        segment_factor = segment_width * 0.8
+        diagonal_slope = self.char_height / self.char_width
+        sqrt2 = math.sqrt(2)
+        sqrt3 = math.sqrt(3)
+
+        # Create dictionary of segment points keyed by segment name/letter
+        segment_points = {"d": [bevel_width * 2 + segment_interval / sqrt2, y[0],
+                                x[5] - (bevel_width * 2 + segment_interval / sqrt2), y[0],
+                                x[5] - (bevel_width + segment_interval / sqrt2), y[1],
+                                x[5] - (bevel_width * 2 + segment_interval / sqrt2), y[2],
+                                bevel_width * 2 + segment_interval / sqrt2, y[2],
+                                bevel_width + segment_interval / sqrt2, y[1]],
+                          "g": [segment_width + segment_interval / 2 * sqrt3, y[3],
+                                x[3] - segment_interval / 2 * sqrt3, y[3],
+                                x[4] - segment_interval / 2 * sqrt3, y[4],
+                                x[3] - segment_interval / 2 * sqrt3, y[5],
+                                segment_width / 2 + segment_interval / 2 * sqrt3, y[5],
+                                segment_width + segment_interval / 2 * sqrt3, y[4]],
+                          "c": [x[5], y[0] + bevel_width * 2 + segment_interval / sqrt2,
+                                x[5], y[4] - segment_interval / 2 - segment_width / 2 * side_bevel_multiplier,
+                                x[4], y[4] - segment_interval / 2,
+                                x[3], y[3] - segment_interval / 2,
+                                x[3], y[2] + segment_interval / sqrt2,
+                                x[5] - bevel_width, y[0] + bevel_width + segment_interval / sqrt2]}
+
+        # Create the rest of the segments by flipping/mirroring existing points (either horizontally or vertically)
+        segment_points["a"] = self._flip_vertical(segment_points["d"], self.char_height)
+        segment_points["b"] = self._flip_vertical(segment_points["c"], self.char_height)
+        segment_points["e"] = self._flip_horizontal(segment_points["c"], self.char_width)
+        segment_points["f"] = self._flip_horizontal(segment_points["b"], self.char_width)
+
+        return segment_points
+
+    def _calculate_fourteen_segment_points(self, x: List[float], y: List[float],
+                                           segment_width: float, segment_interval: float,
+                                           bevel_width: float) -> Dict[str, float]:
+
+        side_bevel_multiplier = 1 if self.side_bevel_enabled else 0
+
+        segment_factor = segment_width * 0.8
+        diagonal_slope = self.char_height / self.char_width
+        sqrt2 = math.sqrt(2)
+        sqrt3 = math.sqrt(3)
+
+        # Create dictionary of segment points keyed by segment name/letter
+        segment_points = {"d": [bevel_width * 2 + segment_interval / sqrt2, y[0],
+                                x[5] - (bevel_width * 2 + segment_interval / sqrt2), y[0],
+                                x[5] - (bevel_width + segment_interval / sqrt2), y[1],
+                                x[5] - (bevel_width * 2 + segment_interval / sqrt2), y[2],
+                                bevel_width * 2 + segment_interval / sqrt2, y[2],
+                                bevel_width + segment_interval / sqrt2, y[1]],
+                          "g2": [x[1] + segment_interval / 2, y[3],
+                                 x[3] - segment_interval / 2 * sqrt3, y[3],
+                                 x[4] - segment_interval / 2 * sqrt3, y[4],
+                                 x[3] - segment_interval / 2 * sqrt3, y[5],
+                                 x[1] + segment_interval / 2, y[5]],
+                          "c": [x[5], y[0] + bevel_width * 2 + segment_interval / sqrt2,
+                                x[5], y[4] - segment_interval / 2 - segment_width / 2 * side_bevel_multiplier,
+                                x[4], y[4] - segment_interval / 2,
+                                x[3], y[3] - segment_interval / 2,
+                                x[3], y[2] + segment_interval / sqrt2,
+                                x[5] - bevel_width, y[0] + bevel_width + segment_interval / sqrt2],
+                          "m": [x[2], y[2] + segment_interval,
+                                x[2], y[3] - segment_interval,
+                                x[0], y[3] - segment_interval,
+                                x[0], y[2] + segment_interval],
+                          "l": [(segment_width + segment_factor) / diagonal_slope + segment_interval,
+                                y[2] + segment_interval,
+                                x[0] - segment_interval, x[0] * diagonal_slope - segment_factor - segment_interval,
+                                x[0] - segment_interval, y[3] - segment_interval,
+                                (y[3] - segment_interval) / diagonal_slope - segment_interval, y[3] - segment_interval,
+                                segment_width + segment_interval,
+                                y[2] * diagonal_slope + segment_factor + segment_interval,
+                                segment_width + segment_interval, y[2] + segment_interval]}
+
+        # Create the rest of the segments by flipping/mirroring existing points (either horizontally or vertically)
+        segment_points["a"] = self._flip_vertical(segment_points["d"], self.char_height)
+        segment_points["b"] = self._flip_vertical(segment_points["c"], self.char_height)
+        segment_points["e"] = self._flip_horizontal(segment_points["c"], self.char_width)
+        segment_points["f"] = self._flip_horizontal(segment_points["b"], self.char_width)
+        segment_points["g1"] = self._flip_horizontal(segment_points["g2"], self.char_width)
+        segment_points["h"] = self._flip_vertical(segment_points["l"], self.char_height)
+        segment_points["j"] = self._flip_vertical(segment_points["m"], self.char_height)
+        segment_points["k"] = self._flip_horizontal(segment_points["h"], self.char_width)
+        segment_points["n"] = self._flip_horizontal(segment_points["l"], self.char_width)
+
+        return segment_points
+
     def _draw_widget(self, *args) -> None:
         """Establish the drawing instructions for the widget."""
         del args
@@ -252,21 +318,21 @@ class SegmentDisplayEmulator(Widget):
             y_offset = self.y + self.padding
 
             for encoded_char in self._encoded_characters:
-                colors = [None] * 16
-                mesh_objects = [None] * 14
-                for segment in range(14):
+                colors = [None] * (self._segment_count + 2)
+                mesh_objects = [None] * self._segment_count
+                for segment in range(self._segment_count):
                     colors[segment] = self._create_segment_color(segment, encoded_char)
                     mesh_objects[segment] = self._create_segment_mesh_object(segment, x_offset, y_offset)
 
                 self._segment_colors.append(colors)
                 self._segment_mesh_objects.append(mesh_objects)
                 if self.dot_enabled:
-                    colors[14] = self._create_segment_color(14, encoded_char)
+                    colors[self._dot_segment_index] = self._create_segment_color(self._dot_segment_index, encoded_char)
                     Ellipse(pos=(self._dot_points[0] + x_offset, self._dot_points[1] + y_offset),
                             size=(self._dot_points[2], self._dot_points[2]))
 
-                if self.dot_enabled:
-                    colors[15] = self._create_segment_color(15, encoded_char)
+                if self.comma_enabled:
+                    colors[self._comma_segment_index] = self._create_segment_color(self._comma_segment_index, encoded_char)
                     Mesh(vertices=[self._comma_points[0] + x_offset, self._comma_points[1] + y_offset, 0, 0,
                                    self._comma_points[2] + x_offset, self._comma_points[3] + y_offset, 0, 0,
                                    self._comma_points[4] + x_offset, self._comma_points[5] + y_offset, 0, 0,
@@ -280,15 +346,15 @@ class SegmentDisplayEmulator(Widget):
 
                 x_offset += self.char_width + self.character_spacing
 
-    def update_segment_display(self, text: str, transition: dict = None, **kwargs):
+    def update_segment_display(self, text: str, **kwargs):
         """Method to update the segment display."""
-        if transition is None:
-            self.text = text
+        self.text = text
 
     def _update_text(self, *args):
         """Process the new text value to prepare it for display"""
         self._encoded_characters = self.encode_characters(self.text, self.character_count, self._segment_map,
-                                                          self.dot_enabled, self.comma_enabled)
+                                                          self.dot_enabled, 1 << self._dot_segment_index,
+                                                          self.comma_enabled, 1 << self._comma_segment_index)
         self._draw_widget()
 
     def _create_segment_color(self, segment: int, char_code: int):
@@ -330,7 +396,8 @@ class SegmentDisplayEmulator(Widget):
 
     @staticmethod
     def encode_characters(text: str, character_count: int, segment_map: Dict[int, int],
-                          dot_enabled: bool, comma_enabled: bool) -> List[int]:
+                          dot_enabled: bool, dot_segment_mask: int,
+                          comma_enabled: bool, comma_segment_mask: int) -> List[int]:
         text_position = 0
         encoded_characters = []
         while text_position < len(text):
@@ -345,11 +412,11 @@ class SegmentDisplayEmulator(Widget):
                     next_char = " "
                 if dot_enabled and next_char == ".":
                     # next char is a dot -> turn dot on
-                    encoded_char |= DP
+                    encoded_char |= dot_segment_mask
                     text_position += 1
                 elif comma_enabled and next_char == ",":
                     # next char is a dot -> turn dot on
-                    encoded_char |= COM
+                    encoded_char |= comma_segment_mask
                     text_position += 1
 
             encoded_characters.append(encoded_char)
@@ -363,213 +430,6 @@ class SegmentDisplayEmulator(Widget):
             encoded_characters.insert(0, OFF)
 
         return encoded_characters
-
-    def _start_transition(self):
-        # encode the new characters
-
-        # calculate the number of steps (based on display size, transition type, and step size)
-        # generate list of strings (all transition steps)
-        # set clock callbacks
-        pass
-
-    def _update_transition(self):
-        # update the display with the next transition string in the list
-        pass
-
-    def _cancel_transition(self):
-        # cancel and remove clock callback
-        # set final text value
-        pass
-
-    def _stop_transition(self):
-        # remove clock callback
-        # set updated text value
-        pass
-
-    @staticmethod
-    def generate_push_right_transition(current_encoded_characters: List[int],
-                                       new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        # create a big list of a concatenation of new and current encoded characters
-        encoded_characters = new_encoded_characters
-        encoded_characters.extend(current_encoded_characters)
-
-        for index in range(1, display_length + 1):
-            transition_steps.append(encoded_characters[display_length - index:2 * display_length - index])
-
-        return transition_steps
-
-    @staticmethod
-    def generate_push_left_transition(current_encoded_characters: List[int],
-                                      new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        # create a big list of a concatenation of new and current encoded characters
-        encoded_characters = current_encoded_characters
-        encoded_characters.extend(new_encoded_characters)
-
-        for index in range(1, display_length + 1):
-            transition_steps.append(encoded_characters[index:index + display_length])
-
-        return transition_steps
-
-    @staticmethod
-    def generate_cover_right_transition(current_encoded_characters: List[int],
-                                        new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        for index in range(display_length):
-            encoded_characters = new_encoded_characters[-(index + 1):]
-            encoded_characters.extend(current_encoded_characters[index + 1:])
-            transition_steps.append(encoded_characters)
-
-        return transition_steps
-
-    @staticmethod
-    def generate_cover_left_transition(current_encoded_characters: List[int],
-                                       new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        for index in range(1, display_length + 1):
-            encoded_characters = current_encoded_characters[:display_length - index]
-            encoded_characters.extend(new_encoded_characters[:index])
-            transition_steps.append(encoded_characters)
-
-        return transition_steps
-
-    @staticmethod
-    def generate_uncover_right_transition(current_encoded_characters: List[int],
-                                          new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        for index in range(1, display_length + 1):
-            encoded_characters = new_encoded_characters[:index]
-            encoded_characters.extend(current_encoded_characters[:display_length - index])
-            transition_steps.append(encoded_characters)
-
-        return transition_steps
-
-    @staticmethod
-    def generate_uncover_left_transition(current_encoded_characters: List[int],
-                                         new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        for index in range(1, display_length + 1):
-            encoded_characters = current_encoded_characters[index:]
-            encoded_characters.extend(new_encoded_characters[-index:])
-            transition_steps.append(encoded_characters)
-
-        return transition_steps
-
-    @staticmethod
-    def generate_wipe_right_transition(current_encoded_characters: List[int],
-
-                                 new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        for index in range(1, display_length + 1):
-            encoded_characters = new_encoded_characters[:index]
-            encoded_characters.extend(current_encoded_characters[index:])
-            transition_steps.append(encoded_characters)
-
-        return transition_steps
-
-    @staticmethod
-    def generate_wipe_left_transition(current_encoded_characters: List[int],
-                                      new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        for index in range(1, display_length + 1):
-            encoded_characters = current_encoded_characters[:display_length - index]
-            encoded_characters.extend(new_encoded_characters[-index:])
-            transition_steps.append(encoded_characters)
-
-        return transition_steps
-
-    @staticmethod
-    def generate_wipe_split_open_transition(current_encoded_characters: List[int],
-                                            new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        characters = int(display_length / 2)
-        if characters * 2 == display_length:
-            characters -= 1
-
-        while characters > 0:
-            encoded_characters = current_encoded_characters[:characters]
-            encoded_characters.extend(new_encoded_characters[characters:characters + (display_length - 2 * characters)])
-            encoded_characters.extend(current_encoded_characters[-characters:])
-            transition_steps.append(encoded_characters)
-            characters -= 1
-
-        transition_steps.append(new_encoded_characters)
-
-        return transition_steps
-
-    @staticmethod
-    def generate_push_split_open_transition(current_encoded_characters: List[int],
-                                            new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        characters = int(display_length / 2)
-        split_point = characters
-        if characters * 2 == display_length:
-            characters -= 1
-        else:
-            split_point += 1
-
-        while characters > 0:
-            encoded_characters = current_encoded_characters[split_point - characters:split_point]
-            encoded_characters.extend(new_encoded_characters[characters:characters + (display_length - 2 * characters)])
-            encoded_characters.extend(current_encoded_characters[split_point:split_point + characters])
-            transition_steps.append(encoded_characters)
-            characters -= 1
-
-        transition_steps.append(new_encoded_characters)
-
-        return transition_steps
-
-    @staticmethod
-    def generate_push_split_close_transition(current_encoded_characters: List[int],
-                                             new_encoded_characters: List[int]) -> List[List[int]]:
-
-        display_length = len(current_encoded_characters)
-        transition_steps = []
-
-        split_point = int(display_length / 2)
-        characters = 1
-        if split_point * 2 < display_length:
-            split_point += 1
-
-        while characters <= split_point:
-            encoded_characters = new_encoded_characters[split_point - characters:split_point]
-            encoded_characters.extend(current_encoded_characters[characters:characters + (display_length - 2 * characters)])
-            encoded_characters.extend(new_encoded_characters[split_point:split_point + characters])
-            transition_steps.append(encoded_characters)
-            characters += 1
-
-        return transition_steps
 
     #
     # Properties
@@ -593,6 +453,12 @@ class SegmentDisplayEmulator(Widget):
     '''The number of display characters in the segment display.
 
     :attr:`character_count` is an :class:`~kivy.properties.NumericProperty` and defaults to 1.
+    '''
+
+    display_type = OptionProperty("14seg", options=["7seg", "14seg"])
+    '''The type of display (7 segment, 14 segment).
+
+    :attr:`display_type` is an :class:`~kivy.properties.OptionProperty` and defaults to `14SEG`.
     '''
 
     character_slant_angle = NumericProperty(16)

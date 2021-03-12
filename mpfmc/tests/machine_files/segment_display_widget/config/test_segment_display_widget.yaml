@@ -28,7 +28,26 @@ widgets:
     text: "*HELLO*"
     width: 400
     height: 100
-    y: 200
+    y: 250
+
+  segment_display_widget_middle:
+    type: segment_display_emulator
+    number: 3
+    display_type: 7seg
+    character_count: 8
+    character_slant_angle: 6
+    character_spacing: 5
+    segment_width: 0.11
+    segment_interval: 0.04
+    segment_off_color: 4b4c4a30
+    segment_on_color: f01020ff
+    side_bevel_enabled: true
+    dot_enabled: false
+    comma_enabled: true
+    text: "BALL 2"
+    width: 200
+    height: 70
+    y: 150
 
   segment_display_widget_bottom:
     type: segment_display_emulator
@@ -56,7 +75,7 @@ widgets:
 
 widget_player:
   show_top_display: segment_display_widget_top
-
+  show_middle_display: segment_display_widget_middle
   show_bottom_display: segment_display_widget_bottom
 
   update_display:
