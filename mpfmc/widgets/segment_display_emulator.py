@@ -3,7 +3,7 @@ from typing import Optional, List, Dict
 import math
 
 from kivy.clock import Clock
-from kivy.graphics.vertex_instructions import Mesh, Ellipse
+from kivy.graphics.vertex_instructions import Mesh, Ellipse, Rectangle
 from kivy.properties import NumericProperty, BooleanProperty, ListProperty, StringProperty, OptionProperty
 from kivy.graphics import Color, Rotate, Scale
 
@@ -310,9 +310,12 @@ class SegmentDisplayEmulator(Widget):
         self._segment_mesh_objects = []
 
         with self.canvas:
-            Color(*self.color)
+            Color(*self.background_color)
             Scale(self.scale, origin=self.center)
             Rotate(angle=self.rotation, origin=self.center)
+
+            # Fill background
+            Rectangle(pos=self.pos, size=self.size)
 
             x_offset = self.x + self.padding
             y_offset = self.y + self.padding
@@ -403,7 +406,7 @@ class SegmentDisplayEmulator(Widget):
         while text_position < len(text):
             char = text[text_position]
             text_position += 1
-            encoded_char = segment_map.get(ord(char))
+            encoded_char = segment_map.get(ord(char), 0x00)
             if dot_enabled or comma_enabled:
                 # embed dots is enabled and dot is inactive
                 try:
@@ -515,6 +518,13 @@ class SegmentDisplayEmulator(Widget):
 
     :attr:`segment_on_color` is a :class:`~kivy.properties.ListProperty` and
     defaults to [0.867, 0.510, 0.090, 1.0].
+    '''
+
+    background_color = ListProperty([0, 0, 0, 1.0])
+    '''The background color of the display widget, in the (r, g, b, a) format.
+
+    :attr:`background_color` is a :class:`~kivy.properties.ListProperty` and
+    defaults to [0, 0, 0, 1.0].
     '''
 
     dot_enabled = BooleanProperty(False)
