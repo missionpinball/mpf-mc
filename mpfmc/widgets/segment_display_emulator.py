@@ -50,6 +50,9 @@ class SegmentDisplayEmulator(Widget):
         # Initialize the encoded display characters
         self._encoded_characters = [OFF] * self.character_count
 
+        self._flash_clock_event = None
+        self._apply_flash_mask = False
+        self._flash_character_mask = [0xFF] * self.character_count
         self._segment_colors = None
         self._segment_mesh_objects = None
         self._update_event_handler_key = None
@@ -57,9 +60,10 @@ class SegmentDisplayEmulator(Widget):
         # Bind to all properties that when changed need to force
         # the widget to be redrawn
         self.bind(text=self._update_text,
+                  flash_mode=self._set_flash_mode,
                   pos=self._draw_widget,
                   size=self._draw_widget,
-                  color=self._draw_widget,
+                  background_color=self._draw_widget,
                   segment_off_color=self._draw_widget,
                   segment_on_color=self._draw_widget)
 
@@ -71,6 +75,7 @@ class SegmentDisplayEmulator(Widget):
 
         self._calculate_segment_points()
         self._update_text()
+        self._set_flash_mode()
 
     @staticmethod
     def get_seven_segment_character_encoding(segments: SEVEN_SEGMENTS) -> int:
@@ -308,6 +313,9 @@ class SegmentDisplayEmulator(Widget):
         self.canvas.clear()
         self._segment_colors = []
         self._segment_mesh_objects = []
+        encoded_characters = [
+            self._encoded_characters[index] & self._flash_character_mask[index] if self._apply_flash_mask else
+            self._encoded_characters[index] for index in range(len(self._encoded_characters))]
 
         with self.canvas:
             Color(*self.background_color)
@@ -320,7 +328,8 @@ class SegmentDisplayEmulator(Widget):
             x_offset = self.x + self.padding
             y_offset = self.y + self.padding
 
-            for encoded_char in self._encoded_characters:
+            for encoded_char in encoded_characters:
+
                 colors = [None] * (self._segment_count + 2)
                 mesh_objects = [None] * self._segment_count
                 for segment in range(self._segment_count):
@@ -434,6 +443,46 @@ class SegmentDisplayEmulator(Widget):
 
         return encoded_characters
 
+    def _set_flash_mode(self):
+        if self.flash_mode == "off":
+            self._flash_character_mask = [0xFF] * self.character_count
+            self._stop_flash_timer()
+        elif self.flash_mode == "all":
+            self._flash_character_mask = [0x00] * self.character_count
+            self._start_flash_timer()
+        elif self.flash_mode == "match":
+            self._flash_character_mask = [0xFF] * (self.character_count - 2)
+            self._flash_character_mask.extend([0x00] * 2)
+            self._start_flash_timer()
+        elif self.flash_mode == "mask":
+            mask = self.flash_mask.rjust(self.character_count, ' ')
+            mask = mask[-self.character_count:]
+            self._flash_character_mask = [0x00 if c == "F" else 0xFF for c in mask]
+            for index in range(len(mask)):
+                if mask[index] == "F":
+                    self._flash_character_mask[index] = 0x00
+            self._start_flash_timer()
+
+    def _start_flash_timer(self):
+        self._apply_flash_mask = True
+        if self._flash_clock_event:
+            self._flash_clock_event.cancel()
+        self._flash_clock_event = Clock.schedule_interval(self._flash_clock_callback, 1 / (self.flash_frequency * 2))
+        self._draw_widget()
+
+    def _stop_flash_timer(self):
+        self._apply_flash_mask = False
+        if self._flash_clock_event:
+            self._flash_clock_event.cancel()
+            self._flash_clock_event = None
+        self._draw_widget()
+
+    def _flash_clock_callback(self, dt, *args):
+        del dt
+        del args
+        self._apply_flash_mask = not self._apply_flash_mask
+        self._draw_widget()
+
     #
     # Properties
     #
@@ -545,5 +594,24 @@ class SegmentDisplayEmulator(Widget):
     :attr:`text` is an :class:`kivy.properties.StringProperty` and defaults to "".
     '''
 
+    flash_mode = OptionProperty("off", options=["off", "all", "match", "mask"])
+    '''The current disiplay flash mode. Defaults to "off".
+
+    :attr:`flash_mode` is an :class:`~kivy.properties.OptionProperty` and defaults to `off`.
+    '''
+
+    flash_frequency = NumericProperty(1)
+    '''The number of times per second the display should flash.
+
+    :attr:`flash_frequency` is an :class:`~kivy.properties.NumericProperty` and defaults to 1.
+    '''
+
+    flash_mask = StringProperty(None)
+    '''Contains the flash mask string to use when flashing in mask mode. Each character of the flash
+    mask string represents a character in the display. Character positions with an `F` character 
+    will be flashed while any other character will not flash. 
+
+    :attr:`flash_mask` is an :class:`kivy.properties.StringProperty` and defaults to None.
+    '''
 
 widget_classes = [SegmentDisplayEmulator]

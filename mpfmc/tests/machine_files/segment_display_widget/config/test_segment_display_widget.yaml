@@ -42,6 +42,9 @@ widgets:
     segment_off_color: 4b4c4a30
     segment_on_color: f01020ff
     side_bevel_enabled: true
+    flash_mode: "mask"
+    flash_mask: "_______F"
+    flash_frequency: 4
     dot_enabled: false
     comma_enabled: true
     text: "BALL 2"
