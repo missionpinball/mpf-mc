@@ -1,9 +1,13 @@
 #config_version=5
 
-displays:
-  window:
-    width: 400
-    height: 300
+window:
+  width: 1200
+  height: 900
+  effects:
+    - type: glow
+      glow_speed: 0
+      intensity: 0.5
+      blur_size: 4.0
 
 widgets:
   segment_display_widget_top:
