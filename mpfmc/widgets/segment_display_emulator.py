@@ -1,11 +1,12 @@
 """Widget emulating a segment display."""
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 import math
 
 from kivy.clock import Clock
 from kivy.graphics.vertex_instructions import Mesh, Ellipse, Rectangle
 from kivy.properties import NumericProperty, BooleanProperty, ListProperty, StringProperty, OptionProperty
 from kivy.graphics import Color, Rotate, Scale
+from kivy.utils import get_color_from_hex
 
 from mpfmc.uix.widget import Widget
 from mpf.core.segment_mappings import FOURTEEN_SEGMENTS, SEVEN_SEGMENTS
@@ -25,6 +26,8 @@ class SegmentDisplayEmulator(Widget):
     widget_type_name = 'SegmentDisplayEmulator'
     merge_settings = ('height', 'width')
     animation_properties = ('x', 'y', 'scale', 'width', 'height', 'opacity', 'segment_on_color')
+
+    display_instances = []
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
         super().__init__(mc=mc, config=config, key=key)
@@ -67,15 +70,22 @@ class SegmentDisplayEmulator(Widget):
                   segment_off_color=self._draw_widget,
                   segment_on_color=self._draw_widget)
 
-        # Bind an event handler to a custom trigger event to update this
-        if self.config['number']:
-            self._update_event_handler_key = self.mc.events.add_handler(
-                "update_segment_display_{}".format(self.config['number']),
-                self.update_segment_display)
-
         self._calculate_segment_points()
         self._update_text()
         self._set_flash_mode()
+
+        self._update_event_handler_key = self.mc.events.add_handler(
+            "update_segment_display",
+            self.on_update_segment_display)
+
+    def prepare_for_removal(self) -> None:
+        """Prepare the widget to be removed."""
+        if self._update_event_handler_key:
+            self.mc.events.remove_handler_by_key(self._update_event_handler_key)
+            self._update_event_handler_key = None
+
+        # important to call base class to ensure the widget gets removed
+        super().prepare_for_removal()
 
     @staticmethod
     def get_seven_segment_character_encoding(segments: SEVEN_SEGMENTS) -> int:
@@ -131,7 +141,7 @@ class SegmentDisplayEmulator(Widget):
     def _calculate_segment_points(self):
         """Calculate the points of all the display segments to be drawn."""
 
-        # The code in this module is based on an open source sixteen segment display project:
+        # The coordinate calculations in this module are based on an open source sixteen segment display project:
         # https://github.com/Enderer/sixteensegment
 
         # Calculate the size dimensions of a single character/element in the display
@@ -212,6 +222,7 @@ class SegmentDisplayEmulator(Widget):
     def _calculate_seven_segment_points(self, x: List[float], y: List[float],
                                         segment_width: float, segment_interval: float,
                                         bevel_width: float) -> Dict[str, float]:
+        """Calculate the vertices for all segments in a seven-segment display."""
 
         side_bevel_multiplier = 1 if self.side_bevel_enabled else 0
 
@@ -251,6 +262,7 @@ class SegmentDisplayEmulator(Widget):
     def _calculate_fourteen_segment_points(self, x: List[float], y: List[float],
                                            segment_width: float, segment_interval: float,
                                            bevel_width: float) -> Dict[str, float]:
+        """Calculate the vertices for all segments in a fourteen-segment display."""
 
         side_bevel_multiplier = 1 if self.side_bevel_enabled else 0
 
@@ -313,6 +325,8 @@ class SegmentDisplayEmulator(Widget):
         self.canvas.clear()
         self._segment_colors = []
         self._segment_mesh_objects = []
+
+        # Get the list of encoded characters (apply flash mask if applicable)
         encoded_characters = [
             self._encoded_characters[index] & self._flash_character_mask[index] if self._apply_flash_mask else
             self._encoded_characters[index] for index in range(len(self._encoded_characters))]
@@ -358,9 +372,15 @@ class SegmentDisplayEmulator(Widget):
 
                 x_offset += self.char_width + self.character_spacing
 
-    def update_segment_display(self, text: str, **kwargs):
-        """Method to update the segment display."""
-        self.text = text
+    def on_update_segment_display(self, number: Any, **kwargs):
+        """Event handler method to update the segment display."""
+        if number == self.config['number']:
+            if 'text' in kwargs:
+                self.text = kwargs['text']
+            if 'color' in kwargs:
+                self.segment_on_color = get_color_from_hex(kwargs['color'].pop())
+                pass
+            # todo: update flash
 
     def _update_text(self, *args):
         """Process the new text value to prepare it for display"""
@@ -393,6 +413,7 @@ class SegmentDisplayEmulator(Widget):
         pass
 
     def _update_segment_colors(self):
+        """Update the colors for every segment (on or off based on actual characters)."""
         for char_index in range(self.character_count):
             char_code = self._encoded_characters[char_index]
             for segment in range(16):
@@ -401,15 +422,11 @@ class SegmentDisplayEmulator(Widget):
                 else:
                     self._segment_colors[char_index][segment].rgba = self.segment_off_color
 
-    def prepare_for_removal(self) -> None:
-        if self._update_event_handler_key:
-            self.mc.events.remove_handler_by_key(self._update_event_handler_key)
-        super().prepare_for_removal()
-
     @staticmethod
     def encode_characters(text: str, character_count: int, segment_map: Dict[int, int],
                           dot_enabled: bool, dot_segment_mask: int,
                           comma_enabled: bool, comma_segment_mask: int) -> List[int]:
+        """Encode the text characters to prepare for display."""
         text_position = 0
         encoded_characters = []
         while text_position < len(text):
@@ -444,6 +461,7 @@ class SegmentDisplayEmulator(Widget):
         return encoded_characters
 
     def _set_flash_mode(self):
+        """Set the current flash mode."""
         if self.flash_mode == "off":
             self._flash_character_mask = [0xFF] * self.character_count
             self._stop_flash_timer()
@@ -464,6 +482,7 @@ class SegmentDisplayEmulator(Widget):
             self._start_flash_timer()
 
     def _start_flash_timer(self):
+        """Start the timer to control flashing."""
         self._apply_flash_mask = True
         if self._flash_clock_event:
             self._flash_clock_event.cancel()
@@ -471,6 +490,7 @@ class SegmentDisplayEmulator(Widget):
         self._draw_widget()
 
     def _stop_flash_timer(self):
+        """Stop the timer that controls flashing."""
         self._apply_flash_mask = False
         if self._flash_clock_event:
             self._flash_clock_event.cancel()
@@ -478,6 +498,7 @@ class SegmentDisplayEmulator(Widget):
         self._draw_widget()
 
     def _flash_clock_callback(self, dt, *args):
+        """Callback method for the clock."""
         del dt
         del args
         self._apply_flash_mask = not self._apply_flash_mask
@@ -595,8 +616,7 @@ class SegmentDisplayEmulator(Widget):
 
     @staticmethod
     def generate_wipe_right_transition(current_encoded_characters: List[int],
-
-                                 new_encoded_characters: List[int]) -> List[List[int]]:
+                                       new_encoded_characters: List[int]) -> List[List[int]]:
 
         display_length = len(current_encoded_characters)
         transition_steps = []
@@ -693,7 +713,6 @@ class SegmentDisplayEmulator(Widget):
     #
     # Properties
     #
-
     rotation = NumericProperty(0)
     '''Rotation angle value of the widget.
 
@@ -820,5 +839,6 @@ class SegmentDisplayEmulator(Widget):
 
     :attr:`flash_mask` is an :class:`kivy.properties.StringProperty` and defaults to None.
     '''
+
 
 widget_classes = [SegmentDisplayEmulator]

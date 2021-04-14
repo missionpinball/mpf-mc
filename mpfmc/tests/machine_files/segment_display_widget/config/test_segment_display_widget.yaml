@@ -1,8 +1,8 @@
 #config_version=5
 
 window:
-  width: 1200
-  height: 900
+  width: 800
+  height: 600
   effects:
     - type: glow
       glow_speed: 0
@@ -30,9 +30,9 @@ widgets:
       19: 235
       20: 1240
     text: "*HELLO*"
-    width: 400
-    height: 100
-    y: 250
+    width: 600
+    height: 150
+    y: 450
 
   segment_display_widget_middle:
     type: segment_display_emulator
@@ -52,9 +52,9 @@ widgets:
     dot_enabled: false
     comma_enabled: true
     text: "BALL 2"
-    width: 200
-    height: 70
-    y: 160
+    width: 500
+    height: 120
+    y: 260
 
   segment_display_widget_bottom:
     type: segment_display_emulator
@@ -76,8 +76,8 @@ widgets:
       19: 235
       20: 1240
     text: ">TESTS<"
-    width: 400
-    height: 70
+    width: 700
+    height: 100
     y: 100
 
 widget_player:
