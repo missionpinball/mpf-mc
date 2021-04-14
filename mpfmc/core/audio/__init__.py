@@ -191,7 +191,7 @@ class SoundSystem:
             raise AudioException("Could not create '{}' track - a track with that name "
                                  "already exists".format(name))
 
-        if config is None:
+        if not config:
             config = {}
 
         if 'volume' not in config:

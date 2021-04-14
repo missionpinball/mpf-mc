@@ -135,6 +135,10 @@ class Keyboard(KivyWidget):
         del text
         key = keycode[1]
 
+        # only consider numlock modifier for keys on the numlock field
+        if "numlock" in modifiers and not key.startswith("num"):
+            modifiers.remove("numlock")
+
         if self.debug:
             if modifiers:
                 print("KEYS: {}+{}".format('+'.join(modifiers), key))

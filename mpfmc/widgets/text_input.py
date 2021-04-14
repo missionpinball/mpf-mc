@@ -159,6 +159,9 @@ class MpfTextInput(Text):
         if self.active or force:
             self.current_list.rotate(-places)
 
+            self.mc.post_mc_native_event('text_input_{}_active_character'.format(self.key),
+                                         text=self.current_list[0])
+
             if self.current_list[0] == 'end':
                 self.font_size = self.config['font_size'] / 2
                 self.update_text('END')
@@ -205,6 +208,9 @@ class MpfTextInput(Text):
             if len(self.linked_text_widget.text) > self.config['max_chars']:
                 # we are done
                 self.complete()
+
+        self.mc.post_mc_native_event('text_input_{}_select'.format(self.key),
+                                     text=self.linked_text_widget.text, length=len(self.linked_text_widget.text))
 
     def set_relative_position(self, *args) -> None:
         del args
