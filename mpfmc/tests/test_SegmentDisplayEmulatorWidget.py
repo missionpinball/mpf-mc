@@ -14,12 +14,14 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
     def test_character_encoding(self):
         self.assertEqual(2304,
                          SegmentDisplayEmulator.get_fourteen_segment_character_encoding(FOURTEEN_SEGMENTS[ord(')')]))
+        self.assertEqual(11,
+                         SegmentDisplayEmulator.get_seven_segment_character_encoding(SEVEN_SEGMENTS[ord(')')]))
 
     def test_segment_display(self):
         self.mc.events.post('show_top_display')
         self.mc.events.post('show_middle_display')
         self.mc.events.post('show_bottom_display')
-        self.advance_real_time(3)
+        self.advance_real_time(1)
         self.mc.events.post('update_segment_display', number='1', text='GOODBYE')
         self.mc.events.post('update_segment_display', number='2', text='FOR NOW ')
         self.advance_real_time(0.033)
@@ -54,7 +56,7 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.mc.events.post('update_segment_display', number='2', text='  FOR NOW \x14\x13\x13\x12\x11 ')
         self.advance_real_time(0.033)
         self.mc.events.post('update_segment_display', number='2', text='   FOR NOW \x14\x13\x13\x12\x11')
-        self.advance_real_time(4)
+        self.advance_real_time(1)
 
     def test_push_right_transition_steps(self):
         # push right
