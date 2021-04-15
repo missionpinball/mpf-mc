@@ -25,6 +25,10 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.mc.events.post('update_segment_display', number='1', text='GOODBYE')
         self.mc.events.post('update_segment_display', number='2', text='FOR NOW ')
         self.advance_real_time(0.033)
+        self.assertIn('GOODBYE', [x.widget.text for x in self.mc.targets[
+            'default'].current_slide.widgets])
+        self.assertIn('FOR NOW ', [x.widget.text for x in self.mc.targets[
+            'default'].current_slide.widgets])
         self.mc.events.post('update_segment_display', number='2', text='\x11               ')
         self.advance_real_time(0.033)
         self.mc.events.post('update_segment_display', number='2', text='\x12\x11              ')
@@ -37,6 +41,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.advance_real_time(0.033)
         self.mc.events.post('update_segment_display', number='2', text=' \x14\x13\x13\x12\x11          ')
         self.advance_real_time(0.033)
+        self.assertIn(' \x14\x13\x13\x12\x11          ', [x.widget.text for x in self.mc.targets[
+            'default'].current_slide.widgets])
         self.mc.events.post('update_segment_display', number='2', text='W  \x14\x13\x13\x12\x11         ')
         self.advance_real_time(0.033)
         self.mc.events.post('update_segment_display', number='2', text='OW \x14\x13\x13\x12\x11        ')
@@ -47,6 +53,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.advance_real_time(0.033)
         self.mc.events.post('update_segment_display', number='2', text='R NOW \x14\x13\x13\x12\x11     ')
         self.advance_real_time(0.033)
+        self.assertIn('R NOW \x14\x13\x13\x12\x11     ', [x.widget.text for x in self.mc.targets[
+            'default'].current_slide.widgets])
         self.mc.events.post('update_segment_display', number='2', text='OR NOW \x14\x13\x13\x12\x11    ')
         self.advance_real_time(0.033)
         self.mc.events.post('update_segment_display', number='2', text='FOR NOW \x14\x13\x13\x12\x11   ')
@@ -57,6 +65,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.advance_real_time(0.033)
         self.mc.events.post('update_segment_display', number='2', text='   FOR NOW \x14\x13\x13\x12\x11')
         self.advance_real_time(1)
+        self.assertIn('   FOR NOW \x14\x13\x13\x12\x11', [x.widget.text for x in self.mc.targets[
+            'default'].current_slide.widgets])
 
     def test_push_right_transition_steps(self):
         # push right
