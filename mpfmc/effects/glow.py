@@ -39,27 +39,25 @@ vec4 effect(vec4 color, sampler2D texture, vec2 tex_coords, vec2 coords)
 {{
     float blurSize = {0}/resolution.x;
     vec4 sum = vec4(0.0);
-    sum += texture2D(texture, vec2(tex_coords.x - 4.0 * blurSize, tex_coords.y)) * .05;
-    sum += texture2D(texture, vec2(tex_coords.x - 3.0*blurSize, tex_coords.y)) * 0.09;
-    sum += texture2D(texture, vec2(tex_coords.x - 2.0*blurSize, tex_coords.y)) * 0.12;
-    sum += texture2D(texture, vec2(tex_coords.x - blurSize, tex_coords.y)) * 0.15;
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y)) * 0.16;
-    sum += texture2D(texture, vec2(tex_coords.x + blurSize, tex_coords.y)) * 0.15;
-    sum += texture2D(texture, vec2(tex_coords.x + 2.0*blurSize, tex_coords.y)) * 0.12;
-    sum += texture2D(texture, vec2(tex_coords.x + 3.0*blurSize, tex_coords.y)) * 0.09;
-    sum += texture2D(texture, vec2(tex_coords.x + 4.0*blurSize, tex_coords.y)) * 0.05;
-
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y - 4.0*blurSize)) * 0.05;
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y - 3.0*blurSize)) * 0.09;
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y - 2.0*blurSize)) * 0.12;
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y - blurSize)) * 0.15;
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y)) * 0.16;
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y + blurSize)) * 0.15;
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y + 2.0*blurSize)) * 0.12;
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y + 3.0*blurSize)) * 0.09;
-    sum += texture2D(texture, vec2(tex_coords.x, tex_coords.y + 4.0*blurSize)) * 0.05;
-
-    vec4 result = texture2D(texture, tex_coords);
+    sum += texture(texture, vec2(tex_coords.x - 4.0 * blurSize, tex_coords.y)) * .05;
+    sum += texture(texture, vec2(tex_coords.x - 3.0*blurSize, tex_coords.y)) * 0.09;
+    sum += texture(texture, vec2(tex_coords.x - 2.0*blurSize, tex_coords.y)) * 0.12;
+    sum += texture(texture, vec2(tex_coords.x - blurSize, tex_coords.y)) * 0.15;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y)) * 0.16;
+    sum += texture(texture, vec2(tex_coords.x + blurSize, tex_coords.y)) * 0.15;
+    sum += texture(texture, vec2(tex_coords.x + 2.0*blurSize, tex_coords.y)) * 0.12;
+    sum += texture(texture, vec2(tex_coords.x + 3.0*blurSize, tex_coords.y)) * 0.09;
+    sum += texture(texture, vec2(tex_coords.x + 4.0*blurSize, tex_coords.y)) * 0.05;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y - 4.0*blurSize)) * 0.05;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y - 3.0*blurSize)) * 0.09;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y - 2.0*blurSize)) * 0.12;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y - blurSize)) * 0.15;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y)) * 0.16;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y + blurSize)) * 0.15;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y + 2.0*blurSize)) * 0.12;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y + 3.0*blurSize)) * 0.09;
+    sum += texture(texture, vec2(tex_coords.x, tex_coords.y + 4.0*blurSize)) * 0.05;
+    vec4 result = texture(texture, tex_coords);
     result = sum * ({2}*sin(2*3.14*{3}*time) + {1})  + result;
     return result;
 }}
