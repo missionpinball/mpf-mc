@@ -25,7 +25,7 @@ class SegmentDisplayEmulator(Widget):
 
     widget_type_name = 'SegmentDisplayEmulator'
     merge_settings = ('height', 'width')
-    animation_properties = ('x', 'y', 'scale', 'width', 'height', 'opacity', 'segment_on_color')
+    animation_properties = ('x', 'y', 'scale', 'width', 'height', 'opacity', 'rotation', 'segment_on_color')
 
     display_instances = []
 
@@ -739,16 +739,16 @@ class SegmentDisplayEmulator(Widget):
     :attr:`display_type` is an :class:`~kivy.properties.OptionProperty` and defaults to `14SEG`.
     '''
 
-    character_slant_angle = NumericProperty(16)
+    character_slant_angle = NumericProperty(0)
     '''The angle at which the characters are slanted (degrees from vertical)
 
-    :attr:`character_slant_angle` is an :class:`~kivy.properties.NumericProperty` and defaults to 16.
+    :attr:`character_slant_angle` is an :class:`~kivy.properties.NumericProperty` and defaults to 0.
     '''
 
-    character_spacing = NumericProperty(5)
+    character_spacing = NumericProperty(10)
     '''The space between each character/element.
 
-    :attr:`character_spacing` is an :class:`~kivy.properties.NumericProperty` and defaults to 5.
+    :attr:`character_spacing` is an :class:`~kivy.properties.NumericProperty` and defaults to 10.
     '''
 
     padding = NumericProperty(10)
