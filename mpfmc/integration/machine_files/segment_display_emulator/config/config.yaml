@@ -3,12 +3,11 @@
 segment_displays:
   display1:
     number: 1
-    platform_settings:
-      post_update_events: true
   display2:
     number: 2
-    platform_settings:
-      post_update_events: true
+
+virtual_segment_display_connector:
+  segment_displays: display1, display2
 
 window:
   width: 600
