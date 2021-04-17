@@ -372,9 +372,9 @@ class SegmentDisplayEmulator(Widget):
 
                 x_offset += self.char_width + self.character_spacing
 
-    def on_update_segment_display(self, number: Any, **kwargs):
+    def on_update_segment_display(self, segment_display_name: Any, **kwargs):
         """Event handler method to update the segment display."""
-        if number == self.config['number']:
+        if segment_display_name == self.config['name']:
             if 'text' in kwargs:
                 self.text = kwargs['text']
             if 'color' in kwargs:

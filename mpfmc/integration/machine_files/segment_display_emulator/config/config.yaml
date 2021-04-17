@@ -27,7 +27,7 @@ displays:
 slides:
   segment_display_slide:
   - type: segment_display_emulator
-    number: 1
+    name: display1
     character_count: 7
     character_slant_angle: 0
     character_spacing: 20
