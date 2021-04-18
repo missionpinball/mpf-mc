@@ -67,11 +67,16 @@ class BcpProcessor:
         self.register_trigger("master_volume_increase")
         self.register_trigger("master_volume_decrease")
         self.register_trigger("debug_dump_stats")
+        self.register_trigger("update_segment_display")
         self.connected = True
 
     def register_trigger(self, event):
         """Register a trigger for events from MPF."""
         self.send("register_trigger", event=event)
+
+    def remove_trigger(self, event):
+        """Remove/unregister a trigger for events from MPF."""
+        self.send("remove_trigger", event=event)
 
     def _start_socket_thread(self, **kwargs):
         del kwargs

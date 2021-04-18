@@ -1,0 +1,65 @@
+#config_version=5
+
+segment_displays:
+  display1:
+    number: 1
+  display2:
+    number: 2
+
+virtual_segment_display_connector:
+  segment_displays: display1, display2
+
+window:
+  width: 600
+  height: 200
+  title: Segment Display Emulator Test
+  resizable: true
+  fullscreen: false
+  borderless: false
+  exit_on_escape: true
+  source_display: window
+
+displays:
+  window:
+    width: 600
+    height: 200
+
+slides:
+  segment_display_slide:
+  - type: segment_display_emulator
+    name: display1
+    character_count: 7
+    character_slant_angle: 0
+    character_spacing: 20
+    segment_width: 0.11
+    segment_interval: 0.04
+    segment_off_color: 4b4c4a30
+    segment_on_color: fe961bff
+    side_bevel_enabled: true
+    dot_enabled: true
+    comma_enabled: true
+    text: ""
+    width: 600
+    height: 150
+    y: 100
+
+slide_player:
+  mc_ready:
+    segment_display_slide:
+      target: window
+
+segment_display_player:
+  update_segment_display_1:
+    display1:
+      text: "HELLO"
+  update_segment_display_2:
+    display2:
+      text: "IGNORE"
+  update_segment_display_3:
+    display1:
+      text: "* BYE *"
+      color: "FF0000"
+  update_segment_display_4:
+    display1:
+      action: set_color
+      color: "FF0000"

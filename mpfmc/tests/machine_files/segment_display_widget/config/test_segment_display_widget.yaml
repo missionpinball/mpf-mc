@@ -1,0 +1,91 @@
+#config_version=5
+
+window:
+  width: 800
+  height: 600
+
+widgets:
+  segment_display_widget_top:
+    type: segment_display_emulator
+    number: 1
+    character_count: 7
+    character_slant_angle: 6
+    character_spacing: 20
+    segment_width: 0.11
+    segment_interval: 0.04
+    segment_off_color: 4b4c4a30
+    segment_on_color: fe961bff
+    side_bevel_enabled: true
+    dot_enabled: true
+    comma_enabled: true
+    character_map:
+      16: 54
+      17: 8264
+      18: 456
+      19: 235
+      20: 1240
+    text: "*HELLO*"
+    width: 600
+    height: 150
+    y: 450
+
+  segment_display_widget_middle:
+    type: segment_display_emulator
+    number: 3
+    display_type: 7seg
+    character_count: 8
+    character_slant_angle: 6
+    character_spacing: 5
+    segment_width: 0.11
+    segment_interval: 0.04
+    segment_off_color: 4b4c4a30
+    segment_on_color: f01020ff
+    side_bevel_enabled: true
+    flash_mode: "mask"
+    flash_mask: "_______F"
+    flash_frequency: 4
+    dot_enabled: false
+    comma_enabled: true
+    text: "BALL 2"
+    width: 500
+    height: 120
+    y: 260
+
+  segment_display_widget_bottom:
+    type: segment_display_emulator
+    number: 2
+    character_count: 16
+    character_slant_angle: 6
+    character_spacing: 5
+    segment_width: 0.11
+    segment_interval: 0.04
+    segment_off_color: 4b4c4a30
+    segment_on_color: fe961bff
+    side_bevel_enabled: true
+    dot_enabled: true
+    comma_enabled: true
+    character_map:
+      16: 54
+      17: 8264
+      18: 456
+      19: 235
+      20: 1240
+    text: ">TESTS<"
+    width: 700
+    height: 100
+    y: 100
+
+widget_player:
+  show_top_display: segment_display_widget_top
+  show_middle_display: segment_display_widget_middle
+  show_bottom_display: segment_display_widget_bottom
+
+  update_display:
+    segment_display_widget_top:
+      action: update
+      widget_settings:
+        text: "GOODBYE"
+    segment_display_widget_bottom:
+      action: update
+      widget_settings:
+        text: ""
