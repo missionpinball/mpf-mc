@@ -7,7 +7,7 @@ window:
 widgets:
   segment_display_widget_top:
     type: segment_display_emulator
-    number: 1
+    name: display1
     character_count: 7
     character_slant_angle: 6
     character_spacing: 20
@@ -31,7 +31,7 @@ widgets:
 
   segment_display_widget_middle:
     type: segment_display_emulator
-    number: 3
+    name: display3
     display_type: 7seg
     character_count: 8
     character_slant_angle: 6
@@ -53,7 +53,7 @@ widgets:
 
   segment_display_widget_bottom:
     type: segment_display_emulator
-    number: 2
+    name: display2
     character_count: 16
     character_slant_angle: 6
     character_spacing: 5
