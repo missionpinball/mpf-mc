@@ -8,8 +8,8 @@ from kivy.properties import NumericProperty, BooleanProperty, ListProperty, Stri
 from kivy.graphics import Color, Rotate, Scale
 from kivy.utils import get_color_from_hex
 
-from mpfmc.uix.widget import Widget
 from mpf.core.segment_mappings import FOURTEEN_SEGMENTS, SEVEN_SEGMENTS
+from mpfmc.uix.widget import Widget
 
 MYPY = False
 if MYPY:   # pragma: no cover
@@ -19,6 +19,7 @@ if MYPY:   # pragma: no cover
 OFF = 0
 
 
+# pylint: disable-msg=too-many-instance-attributes
 class SegmentDisplayEmulator(Widget):
 
     """Widget emulating a segment display."""
@@ -166,7 +167,7 @@ class SegmentDisplayEmulator(Widget):
 
         # Calculate the width of each character (from corner to corner, not including spacing and padding)
         self.char_width = (self.width - self.character_spacing * (self.character_count - 1) - (
-                self.padding * 2)) / self.character_count
+            self.padding * 2)) / self.character_count
 
         segment_width = self.segment_width * self.char_width
         segment_interval = self.segment_interval * self.char_width
@@ -219,6 +220,7 @@ class SegmentDisplayEmulator(Widget):
 
         self._segment_points = list(segment_points.values())
 
+    # pylint: disable-msg=too-many-arguments
     def _calculate_seven_segment_points(self, x: List[float], y: List[float],
                                         segment_width: float, segment_interval: float,
                                         bevel_width: float) -> Dict[str, float]:
@@ -226,8 +228,6 @@ class SegmentDisplayEmulator(Widget):
 
         side_bevel_multiplier = 1 if self.side_bevel_enabled else 0
 
-        segment_factor = segment_width * 0.8
-        diagonal_slope = self.char_height / self.char_width
         sqrt2 = math.sqrt(2)
         sqrt3 = math.sqrt(3)
 
@@ -259,6 +259,7 @@ class SegmentDisplayEmulator(Widget):
 
         return segment_points
 
+    # pylint: disable-msg=too-many-arguments
     def _calculate_fourteen_segment_points(self, x: List[float], y: List[float],
                                            segment_width: float, segment_interval: float,
                                            bevel_width: float) -> Dict[str, float]:
@@ -358,7 +359,8 @@ class SegmentDisplayEmulator(Widget):
                             size=(self._dot_points[2], self._dot_points[2]))
 
                 if self.comma_enabled:
-                    colors[self._comma_segment_index] = self._create_segment_color(self._comma_segment_index, encoded_char)
+                    colors[self._comma_segment_index] = self._create_segment_color(self._comma_segment_index,
+                                                                                   encoded_char)
                     Mesh(vertices=[self._comma_points[0] + x_offset, self._comma_points[1] + y_offset, 0, 0,
                                    self._comma_points[2] + x_offset, self._comma_points[3] + y_offset, 0, 0,
                                    self._comma_points[4] + x_offset, self._comma_points[5] + y_offset, 0, 0,
@@ -379,11 +381,11 @@ class SegmentDisplayEmulator(Widget):
                 self.text = kwargs['text']
             if 'color' in kwargs:
                 self.segment_on_color = get_color_from_hex(kwargs['color'].pop())
-                pass
             # todo: update flash
 
     def _update_text(self, *args):
         """Process the new text value to prepare it for display"""
+        del args
         self._encoded_characters = self.encode_characters(self.text, self.character_count, self._segment_map,
                                                           self.dot_enabled, 1 << self._dot_segment_index,
                                                           self.comma_enabled, 1 << self._comma_segment_index)
@@ -394,9 +396,8 @@ class SegmentDisplayEmulator(Widget):
         if (1 << segment) & char_code:
             return Color(self.segment_on_color[0], self.segment_on_color[1], self.segment_on_color[2],
                          self.segment_on_color[3])
-        else:
-            return Color(self.segment_off_color[0], self.segment_off_color[1], self.segment_off_color[2],
-                         self.segment_off_color[3])
+        return Color(self.segment_off_color[0], self.segment_off_color[1], self.segment_off_color[2],
+                     self.segment_off_color[3])
 
     def _create_segment_mesh_object(self, segment, x_offset, y_offset):
         """Creates a Mesh vertex instruction for the specified segment number"""
@@ -422,6 +423,7 @@ class SegmentDisplayEmulator(Widget):
                 else:
                     self._segment_colors[char_index][segment].rgba = self.segment_off_color
 
+    # pylint: disable-msg=too-many-arguments
     @staticmethod
     def encode_characters(text: str, character_count: int, segment_map: Dict[int, int],
                           dot_enabled: bool, dot_segment_mask: int,
@@ -476,8 +478,8 @@ class SegmentDisplayEmulator(Widget):
             mask = self.flash_mask.rjust(self.character_count, ' ')
             mask = mask[-self.character_count:]
             self._flash_character_mask = [0x00 if c == "F" else 0xFF for c in mask]
-            for index in range(len(mask)):
-                if mask[index] == "F":
+            for index, char in enumerate(mask):
+                if char == "F":
                     self._flash_character_mask[index] = 0x00
             self._start_flash_timer()
 
@@ -571,7 +573,7 @@ class SegmentDisplayEmulator(Widget):
 
     side_bevel_enabled = BooleanProperty(True)
     '''Determines if the sides should be beveled
-    
+
     :attr:`side_bevel_enabled` is an :class:`kivy.properties.BooleanProperty` and defaults to True.
     '''
 
@@ -628,8 +630,8 @@ class SegmentDisplayEmulator(Widget):
 
     flash_mask = StringProperty(None)
     '''Contains the flash mask string to use when flashing in mask mode. Each character of the flash
-    mask string represents a character in the display. Character positions with an `F` character 
-    will be flashed while any other character will not flash. 
+    mask string represents a character in the display. Character positions with an `F` character
+    will be flashed while any other character will not flash.
 
     :attr:`flash_mask` is an :class:`kivy.properties.StringProperty` and defaults to None.
     '''
