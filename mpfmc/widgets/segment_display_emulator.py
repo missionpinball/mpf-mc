@@ -67,10 +67,16 @@ class SegmentDisplayEmulator(Widget):
         self.bind(text=self._update_text,
                   flash_mode=self._set_flash_mode,
                   pos=self._draw_widget,
-                  size=self._draw_widget,
+                  size=self._recalculate,
                   background_color=self._draw_widget,
                   segment_off_color=self._draw_widget,
-                  segment_on_color=self._draw_widget)
+                  segment_on_color=self._draw_widget,
+                  segment_width=self._recalculate,
+                  segment_interval=self._recalculate,
+                  bevel_width=self._recalculate,
+                  side_bevel_enabled=self._recalculate,
+                  character_slant_angle=self._recalculate,
+                  character_spacing=self._recalculate)
 
         self._calculate_segment_points()
         self._update_text()
@@ -139,6 +145,11 @@ class SegmentDisplayEmulator(Widget):
             modified_points.append(points[index + 1])
 
         return modified_points
+
+    def _recalculate(self):
+        """Recalculate the segments and redraw the display widget."""
+        self._calculate_segment_points()
+        self._draw_widget()
 
     def _calculate_segment_points(self):
         """Calculate the points of all the display segments to be drawn."""
@@ -381,8 +392,19 @@ class SegmentDisplayEmulator(Widget):
             if 'text' in kwargs:
                 self.text = kwargs['text']
             if 'color' in kwargs:
-                self.segment_on_color = get_color_from_hex(kwargs['color'].pop())
-            # todo: update flash
+                self.segment_on_color = get_color_from_hex(kwargs['color'])
+            if 'flashing' in kwargs:
+                if kwargs['flashing'] == "False":
+                    self.flash_mode = "off"
+                elif kwargs['flashing'] == "True":
+                    self.flash_mode = "all"
+                elif kwargs['flashing'] == "match":
+                    self.flash_mode = "match"
+                elif kwargs['flashing'] == "mask":
+                    self.flash_mask = kwargs.get('flash_mask', "")
+                    self.flash_mode = "mask"
+                else:
+                    self.flash_mode = "off"
 
     def _update_text(self, *args):
         """Process the new text value to prepare it for display"""
