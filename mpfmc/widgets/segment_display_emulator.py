@@ -146,8 +146,9 @@ class SegmentDisplayEmulator(Widget):
 
         return modified_points
 
-    def _recalculate(self):
+    def _recalculate(self, *args):
         """Recalculate the segments and redraw the display widget."""
+        del args
         self._calculate_segment_points()
         self._draw_widget()
 
@@ -392,7 +393,7 @@ class SegmentDisplayEmulator(Widget):
             if 'text' in kwargs:
                 self.text = kwargs['text']
             if 'color' in kwargs:
-                self.segment_on_color = get_color_from_hex(kwargs['color'])
+                self.segment_on_color = get_color_from_hex(kwargs['color'].pop(0))
             if 'flashing' in kwargs:
                 if kwargs['flashing'] == "False":
                     self.flash_mode = "off"
