@@ -486,8 +486,9 @@ class SegmentDisplayEmulator(Widget):
 
         return encoded_characters
 
-    def _set_flash_mode(self):
+    def _set_flash_mode(self, *args):
         """Set the current flash mode."""
+        del args
         if self.flash_mode == "off":
             self._flash_character_mask = [0xFF] * self.character_count
             self._stop_flash_timer()
@@ -501,10 +502,7 @@ class SegmentDisplayEmulator(Widget):
         elif self.flash_mode == "mask":
             mask = self.flash_mask.rjust(self.character_count, ' ')
             mask = mask[-self.character_count:]
-            self._flash_character_mask = [0x00 if c == "F" else 0xFF for c in mask]
-            for index, char in enumerate(mask):
-                if char == "F":
-                    self._flash_character_mask[index] = 0x00
+            self._flash_character_mask = [0x00 if char == "F" else 0xFF for char in mask]
             self._start_flash_timer()
 
     def _start_flash_timer(self):
