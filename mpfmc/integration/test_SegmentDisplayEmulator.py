@@ -13,6 +13,7 @@ class TestSegmentDisplayEmulator(MpfIntegrationTestCase, MpfFakeGameTestCase, Mp
 
     def test_segment_display_widget(self):
         """Integration test to test segment_display_player in MPF updating segment display widget in MC"""
+        self.advance_time_and_run(1000)
         self.assertTextOnTopSlide("")
 
         self.post_event("update_segment_display_1")
@@ -23,6 +24,10 @@ class TestSegmentDisplayEmulator(MpfIntegrationTestCase, MpfFakeGameTestCase, Mp
         self.post_event("update_segment_display_2")
         self.advance_time_and_run()
         self.assertTextOnTopSlide("HELLO")
+
+        self.post_event("update_segment_display_5")
+        self.advance_time_and_run()
+        self.assertTextOnTopSlide("SCROLL")
 
         self.post_event("update_segment_display_3")
         self.advance_time_and_run()

@@ -63,3 +63,9 @@ segment_display_player:
     display1:
       action: set_color
       color: "FF0000"
+  update_segment_display_5:
+    display1:
+      text: "SCROLL"
+      transition:
+        type: push
+        direction: right
