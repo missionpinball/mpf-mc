@@ -52,6 +52,7 @@ segment_display_player:
   update_segment_display_1:
     display1:
       text: "HELLO"
+      color: FF0000,00FF00,0000FF,FFFF00,00FFFF,FF00FF,FFFFFF
   update_segment_display_2:
     display2:
       text: "IGNORE"

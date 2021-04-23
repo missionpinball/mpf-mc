@@ -39,7 +39,7 @@ widgets:
     segment_width: 0.11
     segment_interval: 0.04
     segment_off_color: 4b4c4a30
-    segment_on_color: f01020ff
+    segment_on_color: f01020ff,f01020ff,f01020ff,f01020ff,f01020ff,f01020ff,f01020ff,008000ff
     side_bevel_enabled: true
     flash_mode: "mask"
     flash_mask: "_______F"
