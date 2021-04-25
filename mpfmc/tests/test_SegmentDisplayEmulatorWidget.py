@@ -33,7 +33,8 @@ class TestSegmentDisplayEmulatorWidget(MpfMcTestCase):
         self.advance_real_time(0.033)
         self.mc.events.post('update_segment_display', segment_display_name='display2', text='\x12\x11              ')
         self.advance_real_time(0.033)
-        self.mc.events.post('update_segment_display', segment_display_name='display2', text='\x13\x12\x11             ')
+        self.mc.events.post('update_segment_display', segment_display_name='display2',
+                            text='\x13\x12\x11             ')
         self.advance_real_time(0.033)
         self.mc.events.post('update_segment_display', segment_display_name='display2',
                             text='\x13\x13\x12\x11            ')

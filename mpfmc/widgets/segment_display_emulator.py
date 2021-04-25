@@ -10,6 +10,8 @@ from kivy.graphics import Color, Rotate, Scale
 from kivy.utils import get_color_from_hex
 
 from mpf.core.segment_mappings import FOURTEEN_SEGMENTS, SEVEN_SEGMENTS
+from mpf.core.utility_functions import Util
+
 from mpfmc.uix.widget import Widget
 
 MYPY = False
@@ -52,6 +54,10 @@ class SegmentDisplayEmulator(Widget):
             for k, v in self.config["character_map"].items():
                 self._segment_map[k] = v
 
+        # The initial value for segment_on_color is typically set using the config file which creates
+        # a list of lists. A flat one-dimensional list is required so flatten the initial list.
+        self.segment_on_color = list(Util.flatten_list(self.segment_on_color))
+
         # Initialize the encoded display characters
         self._encoded_characters = [OFF] * self.character_count
 
@@ -67,12 +73,19 @@ class SegmentDisplayEmulator(Widget):
         self.bind(text=self._update_text,
                   flash_mode=self._set_flash_mode,
                   pos=self._draw_widget,
-                  size=self._draw_widget,
+                  size=self._recalculate,
                   background_color=self._draw_widget,
                   segment_off_color=self._draw_widget,
-                  segment_on_color=self._draw_widget)
+                  segment_on_color=self._set_character_colors,
+                  segment_width=self._recalculate,
+                  segment_interval=self._recalculate,
+                  bevel_width=self._recalculate,
+                  side_bevel_enabled=self._recalculate,
+                  character_slant_angle=self._recalculate,
+                  character_spacing=self._recalculate)
 
         self._calculate_segment_points()
+        self._set_character_colors()
         self._update_text()
         self._set_flash_mode()
 
@@ -139,6 +152,12 @@ class SegmentDisplayEmulator(Widget):
             modified_points.append(points[index + 1])
 
         return modified_points
+
+    def _recalculate(self, *args):
+        """Recalculate the segments and redraw the display widget."""
+        del args
+        self._calculate_segment_points()
+        self._draw_widget()
 
     def _calculate_segment_points(self):
         """Calculate the points of all the display segments to be drawn."""
@@ -344,23 +363,24 @@ class SegmentDisplayEmulator(Widget):
             x_offset = self.x + self.padding
             y_offset = self.y + self.padding
 
-            for encoded_char in encoded_characters:
+            for index, encoded_char in enumerate(encoded_characters):
 
                 colors = [None] * (self._segment_count + 2)
                 mesh_objects = [None] * self._segment_count
                 for segment in range(self._segment_count):
-                    colors[segment] = self._create_segment_color(segment, encoded_char)
+                    colors[segment] = self._create_segment_color(index, segment, encoded_char)
                     mesh_objects[segment] = self._create_segment_mesh_object(segment, x_offset, y_offset)
 
                 self._segment_colors.append(colors)
                 self._segment_mesh_objects.append(mesh_objects)
                 if self.dot_enabled:
-                    colors[self._dot_segment_index] = self._create_segment_color(self._dot_segment_index, encoded_char)
+                    colors[self._dot_segment_index] = self._create_segment_color(index, self._dot_segment_index,
+                                                                                 encoded_char)
                     Ellipse(pos=(self._dot_points[0] + x_offset, self._dot_points[1] + y_offset),
                             size=(self._dot_points[2], self._dot_points[2]))
 
                 if self.comma_enabled:
-                    colors[self._comma_segment_index] = self._create_segment_color(self._comma_segment_index,
+                    colors[self._comma_segment_index] = self._create_segment_color(index, self._comma_segment_index,
                                                                                    encoded_char)
                     Mesh(vertices=[self._comma_points[0] + x_offset, self._comma_points[1] + y_offset, 0, 0,
                                    self._comma_points[2] + x_offset, self._comma_points[3] + y_offset, 0, 0,
@@ -380,9 +400,23 @@ class SegmentDisplayEmulator(Widget):
         if segment_display_name == self.config['name']:
             if 'text' in kwargs:
                 self.text = kwargs['text']
-            if 'color' in kwargs:
-                self.segment_on_color = get_color_from_hex(kwargs['color'].pop())
-            # todo: update flash
+            if 'colors' in kwargs and kwargs['colors']:
+                colors = []
+                for color in kwargs['colors']:
+                    colors.extend(get_color_from_hex(color))
+                self.segment_on_color = colors
+            if 'flashing' in kwargs:
+                if kwargs['flashing'] == "False":
+                    self.flash_mode = "off"
+                elif kwargs['flashing'] == "True":
+                    self.flash_mode = "all"
+                elif kwargs['flashing'] == "match":
+                    self.flash_mode = "match"
+                elif kwargs['flashing'] == "mask":
+                    self.flash_mask = kwargs.get('flash_mask', "")
+                    self.flash_mode = "mask"
+                else:
+                    self.flash_mode = "off"
 
     def _update_text(self, *args):
         """Process the new text value to prepare it for display"""
@@ -392,11 +426,11 @@ class SegmentDisplayEmulator(Widget):
                                                           self.comma_enabled, 1 << self._comma_segment_index)
         self._draw_widget()
 
-    def _create_segment_color(self, segment: int, char_code: int):
+    def _create_segment_color(self, index: int, segment: int, char_code: int):
         """Creates a Color vertex instruction for the specified segment number"""
         if (1 << segment) & char_code:
-            return Color(self.segment_on_color[0], self.segment_on_color[1], self.segment_on_color[2],
-                         self.segment_on_color[3])
+            return Color(self.segment_on_color[index * 4], self.segment_on_color[index * 4 + 1],
+                         self.segment_on_color[index * 4 + 2], self.segment_on_color[index * 4 + 3])
         return Color(self.segment_off_color[0], self.segment_off_color[1], self.segment_off_color[2],
                      self.segment_off_color[3])
 
@@ -418,9 +452,10 @@ class SegmentDisplayEmulator(Widget):
         """Update the colors for every segment (on or off based on actual characters)."""
         for char_index in range(self.character_count):
             char_code = self._encoded_characters[char_index]
+            on_color = self._character_colors[char_index * 4:char_index * 4 + 4]
             for segment in range(16):
                 if (1 << segment) & char_code:
-                    self._segment_colors[char_index][segment].rgba = self.segment_on_color
+                    self._segment_colors[char_index][segment].rgba = on_color
                 else:
                     self._segment_colors[char_index][segment].rgba = self.segment_off_color
 
@@ -463,8 +498,22 @@ class SegmentDisplayEmulator(Widget):
 
         return encoded_characters
 
-    def _set_flash_mode(self):
+    def _set_character_colors(self, *args):
+        """Set the segment on/active colors for each character in the display."""
+        del args
+        self._character_colors = self.segment_on_color
+        color_count = int(len(self._character_colors) / 4)
+
+        # fill the rest of the character colors with the last color
+        if color_count < self.character_count:
+            last_color = self._character_colors[-4:]
+            self._character_colors.extend(last_color * (self.character_count - color_count))
+
+        self._draw_widget()
+
+    def _set_flash_mode(self, *args):
         """Set the current flash mode."""
+        del args
         if self.flash_mode == "off":
             self._flash_character_mask = [0xFF] * self.character_count
             self._stop_flash_timer()
@@ -478,10 +527,7 @@ class SegmentDisplayEmulator(Widget):
         elif self.flash_mode == "mask":
             mask = self.flash_mask.rjust(self.character_count, ' ')
             mask = mask[-self.character_count:]
-            self._flash_character_mask = [0x00 if c == "F" else 0xFF for c in mask]
-            for index, char in enumerate(mask):
-                if char == "F":
-                    self._flash_character_mask[index] = 0x00
+            self._flash_character_mask = [0x00 if char == "F" else 0xFF for char in mask]
             self._start_flash_timer()
 
     def _start_flash_timer(self):
@@ -586,7 +632,10 @@ class SegmentDisplayEmulator(Widget):
     '''
 
     segment_on_color = ListProperty([0.867, 0.510, 0.090, 1.0])
-    '''The color of a segment that is on, in the (r, g, b, a) format.
+    '''The color of a segment that is on, in the (r, g, b, a) format. When there is only one color in
+    the list, all characters will use that color. The list can be extended to set a color for each
+    character in the display. If there are fewer colors than characters, the last color in the list
+    will be extended to the remaining characters.
 
     :attr:`segment_on_color` is a :class:`~kivy.properties.ListProperty` and
     defaults to [0.867, 0.510, 0.090, 1.0].
