@@ -1,7 +1,7 @@
 #config_version=5
 
 mode:
-  priority: 500
+  priority: 1000
 
 sounds:
     boing_mode2:
@@ -15,4 +15,5 @@ sound_player:
             volume: 0.8
             mode_end_action: stop
             fade_out: 1s
-
+    play_slingshot_sound: boing_mode2
+    play_slingshot_sound_with_block: boing_mode2|block
