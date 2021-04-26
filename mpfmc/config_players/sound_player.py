@@ -61,8 +61,7 @@ Here are several various examples:
         self.blocks = {}    # type: Dict[str, List[SoundBlock]]
 
     # pylint: disable=invalid-name,too-many-branches
-    # noqa: MC0001
-    def play(self, settings, context, calling_context, priority=0, **kwargs):
+    def play(self, settings, context, calling_context, priority=0, **kwargs):  # noqa: MC0001
         """Plays a validated sounds: section from a sound_player: section of a
         config file or the sounds: section of a show.
 
