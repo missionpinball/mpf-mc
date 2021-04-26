@@ -319,9 +319,9 @@ class TestAudio(MpfMcTestCase):
         self.advance_real_time(2)
 
         # Start mode
-        self.send(bcp_command='mode_start', name='mode2', priority=500)
+        self.send(bcp_command='mode_start', name='mode2', priority=1000)
         self.assertTrue(self.mc.modes['mode2'].active)
-        self.assertEqual(self.mc.modes['mode2'].priority, 500)
+        self.assertEqual(self.mc.modes['mode2'].priority, 1000)
         self.assertIn('boing_mode2', self.mc.sounds)  # .wav
         boing_sound = self.mc.sounds['boing_mode2']
         self.advance_real_time()
@@ -986,3 +986,76 @@ class TestAudio(MpfMcTestCase):
         # trigger events, etc.)
         #
         """
+
+    def test_sound_player_blocking(self):
+        """ Tests blocking in the sound_player."""
+
+        if SoundSystem is None or self.mc.sound_system is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system is not enabled - skipping audio tests")
+            self.skipTest("Sound system is not enabled")
+
+        self.assertIsNotNone(self.mc.sound_system)
+        interface = self.mc.sound_system.audio_interface
+        if interface is None:
+            log = logging.getLogger('TestAudio')
+            log.warning("Sound system audio interface could not be loaded - skipping audio tests")
+            self.skipTest("Sound system audio interface could not be loaded")
+
+        self.assertIsNotNone(interface)
+
+        # Mock BCP send method
+        self.mc.bcp_processor.send = MagicMock()
+        self.mc.bcp_processor.enabled = True
+
+        # Get tracks
+        track_sfx = interface.get_track_by_name("sfx")
+        self.assertIsNotNone(track_sfx)
+        self.assertEqual(track_sfx.name, "sfx")
+
+        # Start mode 1 (lower priority mode)
+        self.send(bcp_command='mode_start', name='mode1', priority=500)
+        self.assertTrue(self.mc.modes['mode1'].active)
+        self.assertEqual(self.mc.modes['mode1'].priority, 500)
+        self.assertIn('210871_synthping', self.mc.sounds)
+        self.advance_real_time()
+
+        # Play a sound with an event
+        self.mc.events.post('play_slingshot_sound')
+        self.advance_real_time()
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='synthping_played')
+        self.mc.bcp_processor.send.reset_mock()
+
+        # Start mode 2 (higher priority mode)
+        self.send(bcp_command='mode_start', name='mode2', priority=1000)
+        self.assertTrue(self.mc.modes['mode2'].active)
+        self.assertEqual(self.mc.modes['mode2'].priority, 1000)
+        self.assertIn('boing_mode2', self.mc.sounds)
+        self.advance_real_time()
+
+        # Play a sound with an event (both modes should play a sound)
+        self.mc.events.post('play_slingshot_sound')
+        self.advance_real_time()
+        self.assertEqual(2, self.mc.bcp_processor.send.call_count)
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='boing_sound_played')
+        self.mc.bcp_processor.send.assert_any_call('trigger', sound_instance=ANY, name='synthping_played')
+        self.mc.bcp_processor.send.reset_mock()
+
+        # Play the same sounds using an event that uses blocking (only the highest priority mode should play a sound)
+        self.mc.events.post('play_slingshot_sound_with_block')
+        self.advance_real_time()
+        self.assertEqual(1, self.mc.bcp_processor.send.call_count)
+        self.mc.bcp_processor.send.assert_called_once_with('trigger', sound_instance=ANY, name='boing_sound_played')
+        self.mc.bcp_processor.send.reset_mock()
+
+        # Play the same sounds using an event that uses blocking (only the highest priority mode should play a sound)
+        self.mc.events.post('play_slingshot_sound_with_express_config_block')
+        self.advance_real_time()
+        self.assertEqual(1, self.mc.bcp_processor.send.call_count)
+        self.mc.bcp_processor.send.assert_called_once_with('trigger', sound_instance=ANY, name='boing_sound_played')
+        self.mc.bcp_processor.send.reset_mock()
+
+        # End mode 1
+        self.send(bcp_command='mode_stop', name='mode1')
+        self.assertFalse(self.mc.modes['mode1'].active)
+        self.advance_real_time()
