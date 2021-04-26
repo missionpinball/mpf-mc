@@ -1048,6 +1048,13 @@ class TestAudio(MpfMcTestCase):
         self.mc.bcp_processor.send.assert_called_once_with('trigger', sound_instance=ANY, name='boing_sound_played')
         self.mc.bcp_processor.send.reset_mock()
 
+        # Play the same sounds using an event that uses blocking (only the highest priority mode should play a sound)
+        self.mc.events.post('play_slingshot_sound_with_express_config_block')
+        self.advance_real_time()
+        self.assertEqual(1, self.mc.bcp_processor.send.call_count)
+        self.mc.bcp_processor.send.assert_called_once_with('trigger', sound_instance=ANY, name='boing_sound_played')
+        self.mc.bcp_processor.send.reset_mock()
+
         # End mode 1
         self.send(bcp_command='mode_stop', name='mode1')
         self.assertFalse(self.mc.modes['mode1'].active)

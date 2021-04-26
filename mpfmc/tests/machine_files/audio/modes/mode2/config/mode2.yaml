@@ -16,4 +16,7 @@ sound_player:
             mode_end_action: stop
             fade_out: 1s
     play_slingshot_sound: boing_mode2
-    play_slingshot_sound_with_block: boing_mode2|block
+    play_slingshot_sound_with_express_config_block: boing_mode2|block
+    play_slingshot_sound_with_block:
+        boing_mode2:
+            block: true

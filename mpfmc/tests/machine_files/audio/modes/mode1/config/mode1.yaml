@@ -7,4 +7,7 @@ sound_player:
     play_sound_synthping_in_mode: 210871_synthping
     play_sound_drum_group_in_mode: drum_group
     play_slingshot_sound: 210871_synthping
-    play_slingshot_sound_with_block: 210871_synthping
+    play_slingshot_sound_with_express_config_block: 210871_synthping
+    play_slingshot_sound_with_block:
+        210871_synthping:
+            block: true
