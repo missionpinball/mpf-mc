@@ -61,6 +61,7 @@ Here are several various examples:
         self.blocks = {}    # type: Dict[str, List[SoundBlock]]
 
     # pylint: disable=invalid-name,too-many-branches
+    # noqa: MC0001
     def play(self, settings, context, calling_context, priority=0, **kwargs):
         """Plays a validated sounds: section from a sound_player: section of a
         config file or the sounds: section of a show.
@@ -93,6 +94,7 @@ Here are several various examples:
             if self.check_delayed_play(sound_name, s, context, calling_context, priority, **kwargs):
                 return
 
+            # adjust priority
             try:
                 s['priority'] += priority
             except (KeyError, TypeError):
@@ -111,6 +113,7 @@ Here are several various examples:
             action = s['action'].lower()
             del s['action']
 
+            # assign output track
             track = self.machine.sound_system.audio_interface.get_track_by_name(s.get('track') or sound.track)
             if track is None:
                 self.machine.log.error("SoundPlayer: The specified track ('{}') "
@@ -154,8 +157,8 @@ Here are several various examples:
                 self.machine.log.error("SoundPlayer: The specified action "
                                        "is not valid ('{}').".format(action))
 
-    def _is_blocked(self, block_item: str, context: str,
-                    priority: int) -> bool:
+    def _is_blocked(self, block_item: str, context: str, priority: int) -> bool:
+        """Determine if event should be blocked."""
         if block_item not in self.blocks or not self.blocks[block_item]:
             return False
         priority_sorted = sorted(self.blocks[block_item], reverse=True)
