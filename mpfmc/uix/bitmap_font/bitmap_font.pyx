@@ -965,10 +965,15 @@ cdef class _SurfaceContainer:
 
         # Copy each character in the text string from the bitmap font atlas to
         # the output texture/surface
+        first_char = True
         for text_char in text:
             current_char = ord(text_char)
             if current_char in characters:
                 char_info = characters[current_char]
+
+                # need to ensure the first character is drawn at position 0 (adjust for initial xoffset value)
+                if first_char:
+                    cursor_rect.x -= char_info.xoffset
 
                 if use_kerning and previous_char in kernings and current_char in kernings[previous_char]:
                     cursor_rect.x += kernings[previous_char][current_char]
@@ -978,6 +983,7 @@ cdef class _SurfaceContainer:
                 dest_rect.y = cursor_rect.y + char_info.yoffset
                 SDL_BlitSurface(source_image, &source_rect, self.surface, &dest_rect)
                 cursor_rect.x += char_info.xadvance
+                first_char = False
 
             previous_char = current_char
 
