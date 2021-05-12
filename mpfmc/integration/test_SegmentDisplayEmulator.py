@@ -18,16 +18,16 @@ class TestSegmentDisplayEmulator(MpfIntegrationTestCase, MpfFakeGameTestCase, Mp
 
         self.post_event("update_segment_display_1")
         self.advance_time_and_run()
-        self.assertTextOnTopSlide("HELLO")
+        self.assertTextOnTopSlide("  HELLO")
 
         # this event updates a different segment display (not on top slide) -- text should not change
         self.post_event("update_segment_display_2")
         self.advance_time_and_run()
-        self.assertTextOnTopSlide("HELLO")
+        self.assertTextOnTopSlide("  HELLO")
 
         self.post_event("update_segment_display_5")
         self.advance_time_and_run()
-        self.assertTextOnTopSlide("SCROLL")
+        self.assertTextOnTopSlide(" SCROLL")
 
         self.post_event("update_segment_display_3")
         self.advance_time_and_run()
