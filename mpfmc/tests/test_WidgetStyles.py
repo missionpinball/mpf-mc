@@ -61,22 +61,47 @@ class TestWidgetStyles(MpfMcTestCase):
         self.assertEqual(self.get_widget().font_size, 21)
         self.assertEqual(self.get_widget().color, [0.0, 0.0, 1.0, 1]);
 
-    # todo some future release
+    def test_mode_style(self):
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+    
+        self.mc.events.post('slide2')
+        self.advance_time()
+    
+        # widget with no style, should pickup default out of the mode
+        # text_strings, rather than the machine wide one
+        self.assertEqual(self.get_widget().font_size, 50)
+    
+        # mode widget with style from machine wide config
+        self.assertEqual(self.get_widget(1).font_size, 100)
+    
+        # mode widget with style from mode config
+        self.assertEqual(self.get_widget(2).font_size, 25)
 
-    # def test_mode_style(self):
-    #     self.mc.modes['mode1'].start()
-    #     self.advance_time()
-    #
-    #     self.mc.events.post('slide2')
-    #     self.advance_time()
-    #
-    #     # widget with no style, should pickup default out of the mode
-    #     # text_strings, rather than the machine wide one
-    #     self.assertEqual(self.get_widget().font_size, 50)
-    #
-    #     # mode widget with style from machine wide config
-    #     self.assertEqual(self.get_widget(1).font_size, 100)
-    #
-    #     # mode widget with style name that's not valid, so it should
-    #     # pickup the default
-    #     self.assertEqual(self.get_widget(2).font_size, 50)
+    def test_mode_style_priority_12(self):
+        # modes started in priority order
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+    
+        self.mc.modes['mode2'].start()
+        self.advance_time()
+
+        self.mc.events.post('slide2')
+        self.advance_time()
+
+        # should use style from mode 2
+        self.assertEqual(self.get_widget(2).font_size, 20)
+
+    def test_mode_style_priority_21(self):
+        # modes started in reverse priority order
+        self.mc.modes['mode2'].start()
+        self.advance_time()
+    
+        self.mc.modes['mode1'].start()
+        self.advance_time()
+
+        self.mc.events.post('slide2')
+        self.advance_time()
+
+        # should use style from mode 2
+        self.assertEqual(self.get_widget(2).font_size, 20)

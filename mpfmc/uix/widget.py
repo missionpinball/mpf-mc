@@ -1,6 +1,6 @@
 # pylint: disable-msg=too-many-lines
 """A widget on a slide."""
-from typing import Union, Optional, List, Tuple
+from typing import Union, Optional, List, Tuple, Dict, Any
 from copy import deepcopy
 from functools import reduce
 import math
@@ -360,12 +360,21 @@ class Widget(KivyWidget):
         """
         return cls._calculate_x_position(parent_w, x, round_x), cls._calculate_y_position(parent_h, y, round_y)
 
+    def _lookup_style(self, name: str) -> Dict[str, Any]:
+        """Lookup style first by mode, then in machine config"""
+        for mode in self.mc.mode_controller.active_modes:
+            if 'widget_styles' in mode.config:
+                if name in mode.config['widget_styles']:
+                    return mode.config['widget_styles'][name]
+        return self.mc.machine_config['widget_styles'][name]
+
     def _set_default_style(self) -> None:
         """Sets the default widget style name."""
-        if ('{}_default'.format(self.widget_type_name.lower()) in
-                self.mc.machine_config['widget_styles']):
-            self._default_style = self.mc.machine_config['widget_styles'][
-                '{}_default'.format(self.widget_type_name.lower())]
+        name = '{}_default'.format(self.widget_type_name.lower())
+        try:
+            self._default_style = self._lookup_style(name) 
+        except KeyError:
+            pass
 
     def _apply_style(self, force_default: bool = False) -> None:
         """Apply any style to the widget that is specified in the config."""
@@ -376,9 +385,9 @@ class Widget(KivyWidget):
                 return
         else:
             try:
-                styles = [self.mc.machine_config['widget_styles'][s] for s in self.config['style']]
+                styles = [self._lookup_style(s) for s in self.config['style']]
             except KeyError as e:
-                # TOOD: After sufficient time post-0.51, remove this breaking-change-related message
+                # TODO: After sufficient time post-0.51, remove this breaking-change-related message
                 if " ".join(self.config['style']) in self.mc.machine_config['widget_styles']:
                     raise ValueError("{} has an invalid style name: {}. ".format(self, e) +
                                      "Please note that as of MPF 0.51, spaces are no longer valid " +

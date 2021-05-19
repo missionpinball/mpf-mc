@@ -6,6 +6,8 @@ mode:
 widget_styles:
   text_default:
     font_size: 50
+  smallStyle:
+    font_size: 25
 
 slides:
   slide2:
@@ -13,9 +15,12 @@ slides:
       text: MODE1 DEFAULT STYLE
       y: 75
     - type: text
-      style: big
+      style: bigStyle
       text: BIG FROM BASE
       y: 225
+    - type: text
+      style: smallStyle
+      text: SMALL FROM MODE
 
 slide_player:
   slide2: slide2

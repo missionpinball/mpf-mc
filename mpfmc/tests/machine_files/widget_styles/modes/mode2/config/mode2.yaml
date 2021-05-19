@@ -1,0 +1,8 @@
+#config_version=5
+
+mode:
+  priority: 200
+
+widget_styles:
+  smallStyle:
+    font_size: 20
