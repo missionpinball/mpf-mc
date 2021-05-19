@@ -372,7 +372,7 @@ class Widget(KivyWidget):
         """Sets the default widget style name."""
         name = '{}_default'.format(self.widget_type_name.lower())
         try:
-            self._default_style = self._lookup_style(name) 
+            self._default_style = self._lookup_style(name)
         except KeyError:
             pass
 
