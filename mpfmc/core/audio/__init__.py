@@ -62,9 +62,9 @@ class SoundSystem:
 
         # If the sound system has been disabled, abort initialization
         if not self.config['enabled']:
-            self.log.debug("SoundSystem: The sound system has been disabled in "
-                           "the configuration file (enabled: False). No audio "
-                           "features will be available.")
+            self.log.info("SoundSystem: The sound system has been disabled in "
+                          "the configuration file (enabled: False). No audio "
+                          "features will be available.")
             return
 
         if 'buffer' not in self.config or self.config['buffer'] == 'auto':
