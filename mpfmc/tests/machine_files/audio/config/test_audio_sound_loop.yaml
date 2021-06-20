@@ -179,6 +179,10 @@ sound_loop_player:
     loops:
       action: jump_to
       time: 0s
+  jump_to_middle_of_loop:
+    loops:
+      action: jump_to
+      time: 0.923s
 
 sound_player:
     play_sound_synthping: 210871_synthping

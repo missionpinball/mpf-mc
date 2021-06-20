@@ -164,6 +164,7 @@ cdef class AudioInterface:
         self.audio_callback_data.track_count = 0
         self.audio_callback_data.tracks = <void**>PyMem_Malloc(MAX_TRACKS * sizeof(TrackState*))
         self.audio_callback_data.c_log_file = NULL
+        # self.audio_callback_data.c_log_file = fopen("/tmp/MPFMC_AudioLibrary.log", "wb")
         # self.audio_callback_data.c_log_file = fopen("D:\\Temp\\Dev\\MPFMC_AudioLibrary.log", "wb")
         # fprintf(self.audio_callback_data.c_log_file, "---------------------------------------------------------------------------\r\n")
         # fflush(self.audio_callback_data.c_log_file)
