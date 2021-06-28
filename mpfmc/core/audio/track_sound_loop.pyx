@@ -969,7 +969,7 @@ cdef class TrackSoundLoop(Track):
         except KeyError:
             return "unknown"
 
-    cdef Uint32 _fix_sample_frame_pos(self, Uint32 sample_pos, Uint8 bytes_per_sample, int channels):
+    cdef inline Uint32 _fix_sample_frame_pos(self, Uint32 sample_pos, Uint8 bytes_per_sample, int channels):
         """
         Rounds up sample position to a sample frame boundary (audio distortion may occur if starting
         in the middle of a sample frame).
@@ -982,8 +982,7 @@ cdef class TrackSoundLoop(Track):
         Returns:
             sample_pos rounded to the nearest sample frame boundary
         """
-        cdef int bytes_per_sample_frame = bytes_per_sample * channels
-        return bytes_per_sample_frame * ceil(sample_pos / bytes_per_sample_frame)
+        return bytes_per_sample * channels * ceil(sample_pos / (bytes_per_sample * channels))
 
     cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval, int bytes_per_sample_frame):
         """
