@@ -80,7 +80,7 @@ before_script:
       export FFLAGS=-ff2c;
       export KIVY_GL_BACKEND=mock;
     fi;
-  - if [ "${TRAVIS_OS_NAME}" == "linux" ] && [ ! -z "${DOCKER_PASSWORD}" ]; then; then
+  - if [ "${TRAVIS_OS_NAME}" == "linux" ] && [ ! -z "${DOCKER_PASSWORD}" ]; then
       echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin;
     fi;
 
