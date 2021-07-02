@@ -117,7 +117,13 @@ class SoundSystem:
         self.mc.events.add_handler("master_volume_increase", self.master_volume_increase)
         self.mc.events.add_handler("master_volume_decrease", self.master_volume_decrease)
         self.mc.events.add_handler("shutdown", self.shutdown)
-        self.mc.events.add_handler("client_connected", self._send_volume, -1)
+        self.mc.events.add_handler("machine_var_master_volume", self._get_initial_volume)
+
+    def _get_initial_volume(self, **kwargs):
+        self.master_volume = kwargs['value']
+        # Subsequent volume changes will be pushed to MPF and bounced back,
+        # but there's no reason to keep listening
+        self.mc.events.remove_handler(self._get_initial_volume)
 
     def _send_volume(self, **kwargs):
         del kwargs
