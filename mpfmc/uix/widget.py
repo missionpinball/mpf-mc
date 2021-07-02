@@ -459,9 +459,9 @@ class Widget(KivyWidget):
             val = percent_to_float(val, self._percent_prop_dicts[prop])
         except KeyError:
             # because widget properties can include a % sign, they are
-            # all strings, so even ones that aren't on the list to look
+            # often strings, so even ones that aren't on the list to look
             # for percent signs have to be converted to numbers.
-            if '.' in val:
+            if '.' in str(val):
                 val = float(val)
             else:
                 val = int(val)
