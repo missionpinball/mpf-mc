@@ -632,7 +632,7 @@ install_requires = ['ruamel.yaml==0.15.100',  # better YAML library
                     'mpf>={}'.format(mpf_version),
                     'kivy==2.0.0',
                     'psutil==5.7.3',
-                    'Pygments==2.3.1',  # YAML syntax formatting for the iMC
+                    'Pygments==2.6.1',  # YAML syntax formatting for the iMC
                     # also update those in appveyor.yaml if you change versions
                     'kivy_deps.sdl2==0.3.1;platform_system=="Windows"',
                     'kivy_deps.sdl2-dev==0.3.1;platform_system=="Windows"',

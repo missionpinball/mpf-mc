@@ -3821,8 +3821,8 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
  *         self._initialize_gstreamer()
  * 
  *         self.log.info("Initialized")             # <<<<<<<<<<<<<<
- *         self.log.debug("Loaded %s", AudioInterface.get_sdl_version())
- *         self.log.debug("Loaded %s", AudioInterface.get_sdl_mixer_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_sdl_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_sdl_mixer_version())
  */
   __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 128, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -3846,11 +3846,11 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
   /* "mpfmc/core/audio/audio_interface.pyx":129
  * 
  *         self.log.info("Initialized")
- *         self.log.debug("Loaded %s", AudioInterface.get_sdl_version())             # <<<<<<<<<<<<<<
- *         self.log.debug("Loaded %s", AudioInterface.get_sdl_mixer_version())
- *         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_sdl_version())             # <<<<<<<<<<<<<<
+ *         self.log.info("Loaded %s", AudioInterface.get_sdl_mixer_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_gstreamer_version())
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 129, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_AudioInterface), __pyx_n_s_get_sdl_version); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 129, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
@@ -3920,12 +3920,12 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
 
   /* "mpfmc/core/audio/audio_interface.pyx":130
  *         self.log.info("Initialized")
- *         self.log.debug("Loaded %s", AudioInterface.get_sdl_version())
- *         self.log.debug("Loaded %s", AudioInterface.get_sdl_mixer_version())             # <<<<<<<<<<<<<<
- *         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
- *         self.log.debug("Loaded %s", AudioInterface.get_glib_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_sdl_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_sdl_mixer_version())             # <<<<<<<<<<<<<<
+ *         self.log.info("Loaded %s", AudioInterface.get_gstreamer_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_glib_version())
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_AudioInterface), __pyx_n_s_get_sdl_mixer_version); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 130, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -3994,13 +3994,13 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/audio_interface.pyx":131
- *         self.log.debug("Loaded %s", AudioInterface.get_sdl_version())
- *         self.log.debug("Loaded %s", AudioInterface.get_sdl_mixer_version())
- *         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())             # <<<<<<<<<<<<<<
- *         self.log.debug("Loaded %s", AudioInterface.get_glib_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_sdl_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_sdl_mixer_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_gstreamer_version())             # <<<<<<<<<<<<<<
+ *         self.log.info("Loaded %s", AudioInterface.get_glib_version())
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 131, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_10 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_AudioInterface), __pyx_n_s_get_gstreamer_version); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 131, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_10);
@@ -4069,13 +4069,13 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/audio_interface.pyx":132
- *         self.log.debug("Loaded %s", AudioInterface.get_sdl_mixer_version())
- *         self.log.debug("Loaded %s", AudioInterface.get_gstreamer_version())
- *         self.log.debug("Loaded %s", AudioInterface.get_glib_version())             # <<<<<<<<<<<<<<
+ *         self.log.info("Loaded %s", AudioInterface.get_sdl_mixer_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_gstreamer_version())
+ *         self.log.info("Loaded %s", AudioInterface.get_glib_version())             # <<<<<<<<<<<<<<
  * 
  *         # Lock SDL from calling the audio callback functions while we set things up
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __pyx_t_6 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_ptype_5mpfmc_4core_5audio_15audio_interface_AudioInterface), __pyx_n_s_get_glib_version); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
@@ -4366,18 +4366,18 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
   /* "mpfmc/core/audio/audio_interface.pyx":171
  *         # fflush(self.audio_callback_data.c_log_file)
  * 
- *         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',             # <<<<<<<<<<<<<<
+ *         self.log.info('Settings requested - rate: %d, channels: %d, buffer: %d samples',             # <<<<<<<<<<<<<<
  *                        rate, channels, buffer_samples)
- *         self.log.debug('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',
+ *         self.log.info('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 171, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
 
   /* "mpfmc/core/audio/audio_interface.pyx":172
  * 
- *         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
+ *         self.log.info('Settings requested - rate: %d, channels: %d, buffer: %d samples',
  *                        rate, channels, buffer_samples)             # <<<<<<<<<<<<<<
- *         self.log.debug('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',
+ *         self.log.info('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',
  *                        self.audio_callback_data.sample_rate, self.audio_callback_data.channels,
  */
   __pyx_t_10 = NULL;
@@ -4434,18 +4434,18 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/audio_interface.pyx":173
- *         self.log.debug('Settings requested - rate: %d, channels: %d, buffer: %d samples',
+ *         self.log.info('Settings requested - rate: %d, channels: %d, buffer: %d samples',
  *                        rate, channels, buffer_samples)
- *         self.log.debug('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',             # <<<<<<<<<<<<<<
+ *         self.log.info('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',             # <<<<<<<<<<<<<<
  *                        self.audio_callback_data.sample_rate, self.audio_callback_data.channels,
  *                        self.audio_callback_data.buffer_samples, self.audio_callback_data.buffer_size,
  */
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_info); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
 
   /* "mpfmc/core/audio/audio_interface.pyx":174
  *                        rate, channels, buffer_samples)
- *         self.log.debug('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',
+ *         self.log.info('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',
  *                        self.audio_callback_data.sample_rate, self.audio_callback_data.channels,             # <<<<<<<<<<<<<<
  *                        self.audio_callback_data.buffer_samples, self.audio_callback_data.buffer_size,
  *                        self.audio_callback_data.bytes_per_sample)
@@ -4456,7 +4456,7 @@ static int __pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface_2__in
   __Pyx_GOTREF(__pyx_t_10);
 
   /* "mpfmc/core/audio/audio_interface.pyx":175
- *         self.log.debug('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',
+ *         self.log.info('Settings in use - rate: %d, channels: %d, buffer: %d samples (%d bytes @ %d bytes per sample)',
  *                        self.audio_callback_data.sample_rate, self.audio_callback_data.channels,
  *                        self.audio_callback_data.buffer_samples, self.audio_callback_data.buffer_size,             # <<<<<<<<<<<<<<
  *                        self.audio_callback_data.bytes_per_sample)
@@ -8901,11 +8901,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface
   /* "mpfmc/core/audio/audio_interface.pyx":429
  *         Enables audio playback (begins audio processing)
  *         """
- *         self.log.debug("Enabling audio playback")             # <<<<<<<<<<<<<<
+ *         self.log.info("Enabling audio playback")             # <<<<<<<<<<<<<<
  *         Mix_HookMusic(self.audio_callback, &self.audio_callback_data)
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 429, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -8926,7 +8926,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface
 
   /* "mpfmc/core/audio/audio_interface.pyx":430
  *         """
- *         self.log.debug("Enabling audio playback")
+ *         self.log.info("Enabling audio playback")
  *         Mix_HookMusic(self.audio_callback, &self.audio_callback_data)             # <<<<<<<<<<<<<<
  * 
  *     def disable(self):
@@ -8992,11 +8992,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface
   /* "mpfmc/core/audio/audio_interface.pyx":436
  *         Disables audio playback (stops audio processing)
  *         """
- *         self.log.debug("Disabling audio playback")             # <<<<<<<<<<<<<<
+ *         self.log.info("Disabling audio playback")             # <<<<<<<<<<<<<<
  *         self.stop_all_sounds()
  *         Mix_HookMusic(NULL, NULL)
  */
-  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_debug); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 436, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->log, __pyx_n_s_info); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 436, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_3 = NULL;
   if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_2))) {
@@ -9017,7 +9017,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface
 
   /* "mpfmc/core/audio/audio_interface.pyx":437
  *         """
- *         self.log.debug("Disabling audio playback")
+ *         self.log.info("Disabling audio playback")
  *         self.stop_all_sounds()             # <<<<<<<<<<<<<<
  *         Mix_HookMusic(NULL, NULL)
  * 
@@ -9042,7 +9042,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_15audio_interface_14AudioInterface
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/audio_interface.pyx":438
- *         self.log.debug("Disabling audio playback")
+ *         self.log.info("Disabling audio playback")
  *         self.stop_all_sounds()
  *         Mix_HookMusic(NULL, NULL)             # <<<<<<<<<<<<<<
  * 

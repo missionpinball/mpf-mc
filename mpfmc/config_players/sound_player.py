@@ -1,7 +1,10 @@
 """Contains the sound config player class"""
-
+from collections import namedtuple
 from copy import deepcopy
+from typing import Dict, List
 from mpfmc.core.mc_config_player import McConfigPlayer
+
+SoundBlock = namedtuple("SoundBlock", ["priority", "context"])
 
 
 class McSoundPlayer(McConfigPlayer):
@@ -52,8 +55,13 @@ Here are several various examples:
     show_section = 'sounds'
     machine_collection_name = 'sounds'
 
-    # pylint: disable=invalid-name
-    def play(self, settings, context, calling_context, priority=0, **kwargs):
+    def __init__(self, machine) -> None:
+        """Initialise variable player."""
+        super().__init__(machine)
+        self.blocks = {}    # type: Dict[str, List[SoundBlock]]
+
+    # pylint: disable=invalid-name,too-many-branches
+    def play(self, settings, context, calling_context, priority=0, **kwargs):  # noqa: MC0001
         """Plays a validated sounds: section from a sound_player: section of a
         config file or the sounds: section of a show.
 
@@ -69,6 +77,7 @@ Here are several various examples:
         volume:
         loops:
         max_queue_time:
+        block:
 
         Notes:
             Ducking settings and markers cannot currently be specified/overridden in the
@@ -84,6 +93,7 @@ Here are several various examples:
             if self.check_delayed_play(sound_name, s, context, calling_context, priority, **kwargs):
                 return
 
+            # adjust priority
             try:
                 s['priority'] += priority
             except (KeyError, TypeError):
@@ -102,6 +112,7 @@ Here are several various examples:
             action = s['action'].lower()
             del s['action']
 
+            # assign output track
             track = self.machine.sound_system.audio_interface.get_track_by_name(s.get('track') or sound.track)
             if track is None:
                 self.machine.log.error("SoundPlayer: The specified track ('{}') "
@@ -109,6 +120,18 @@ Here are several various examples:
                                        "on sound '{}'."
                                        .format(s['track'], action, sound_name))
                 return
+
+            # a block will block any other lower priority sound from being triggered by the same event
+            # the calling_context contains the name of the triggering event
+            block_item = str(calling_context)
+
+            if self._is_blocked(block_item, context, priority):
+                continue
+            if s['block']:
+                if block_item not in self.blocks:
+                    self.blocks[block_item] = []
+                if SoundBlock(priority, context) not in self.blocks[block_item]:
+                    self.blocks[block_item].append(SoundBlock(priority, context))
 
             # Determine action to perform
             if action == 'play':
@@ -133,9 +156,29 @@ Here are several various examples:
                 self.machine.log.error("SoundPlayer: The specified action "
                                        "is not valid ('{}').".format(action))
 
+    def _is_blocked(self, block_item: str, context: str, priority: int) -> bool:
+        """Determine if event should be blocked."""
+        if block_item not in self.blocks or not self.blocks[block_item]:
+            return False
+        priority_sorted = sorted(self.blocks[block_item], reverse=True)
+        first_element = priority_sorted[0]
+        return first_element.priority > priority and first_element.context != context
+
     def get_express_config(self, value):
-        """ express config for sounds is simply a string (sound name)"""
-        return dict(sound=value)
+        """Express config for sounds is simply a string (sound name) with an optional block."""
+        if not isinstance(value, str):
+            block = False
+        else:
+            try:
+                value, block_str = value.split('|')
+            except ValueError:
+                block = False
+            else:
+                if block_str != "block":
+                    raise ValueError("Invalid action in sound_player entry: {}".format(value), 6)
+                block = True
+
+        return {value: {"block": block}}
 
     # pylint: disable=too-many-branches
     def validate_config(self, config):
@@ -162,6 +205,9 @@ Here are several various examples:
         for event, settings in config.items():
             validated_config[event] = dict()
             validated_config[event]['sounds'] = dict()
+
+            if isinstance(settings, str):
+                settings = self.get_express_config(settings)
 
             if not isinstance(settings, dict):
                 settings = {settings: dict()}
@@ -195,6 +241,12 @@ Here are several various examples:
             track = self.machine.sound_system.audio_interface.get_track(index)
             if track.type == "standard":
                 track.clear_context(context)
+
+        # clear blocks
+        for item in self.blocks:
+            for entry, s in enumerate(self.blocks[item]):
+                if s.context == context:
+                    del self.blocks[item][entry]
 
 
 McPlayerCls = McSoundPlayer

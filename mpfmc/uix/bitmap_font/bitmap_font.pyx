@@ -891,23 +891,38 @@ cdef class BitmapFont:
         return self.base
 
     def get_extents(self, str text, font_kerning=True):
-        cdef int width = 0
+        """Calculate the actual size of the specified text when rendered."""
+        cdef int left_x = 0
+        cdef int right_x = 0
+        cdef int cursor_x = 0
         cdef int previous_char = -1
         cdef int current_char
         cdef bint use_kerning = font_kerning
+        cdef BitmapFontCharacter char_info
 
-        for text_char in text:
+        # loop over characters getting character information
+        for index, text_char in enumerate(text):
             current_char = ord(text_char)
             if current_char in self.characters:
                 char_info = self.characters[current_char]
-                width += char_info.xadvance
 
+                # capture the left coordinate of the first character
+                if index == 0:
+                    left_x = char_info.xoffset
+
+                # apply kerning (if applicable)
                 if use_kerning and previous_char in self.kernings and current_char in self.kernings[previous_char]:
-                    width += self.kernings[previous_char][current_char]
+                    cursor_x += self.kernings[previous_char][current_char]
+
+                # determine right coordinate of current character
+                right_x = cursor_x + char_info.xoffset + char_info.rect.w
+
+                # advance the cursor to measure the next character
+                cursor_x += char_info.xadvance
 
             previous_char = current_char
 
-        return width, self.line_height
+        return right_x - left_x, self.line_height
 
 
 cdef class _SurfaceContainer:
@@ -920,11 +935,8 @@ cdef class _SurfaceContainer:
         self.h = h
 
     def __init__(self, w, h):
-        # XXX check on OSX to see if little endian/big endian make a difference
-        # here.
-        self.surface = SDL_CreateRGBSurface(0,
-            w, h, 32,
-            0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
+        # XXX check on OSX to see if little endian/big endian make a difference here.
+        self.surface = SDL_CreateRGBSurface(0, w, h, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000)
         memset(self.surface.pixels, 0, w * h * 4)
 
     def __dealloc__(self):
@@ -956,6 +968,27 @@ cdef class _SurfaceContainer:
         if source_image == NULL:
             return
 
+        """
+        How to interpret the values in the font descriptor file:
+        line_height is how far the cursor should be moved vertically when moving to the next line. The base value is 
+        how far from the top of the cell height the base of the characters in the font should be placed. Characters can 
+        extend above or below this base line, which is entirely up to the font design.
+        
+        The current cursor position determines the starting point for drawing the next character. To get to the next
+        cursor position (for the next character) the cursor is moved horizontally in the amount determined by the 
+        xadvance value. If kerning pairs are used the cursor should also be moved accordingly. 
+        
+        The yoffset gives the distance from the top of the cell height to the top of the character. A negative value 
+        here would mean that the character extends above the cell height. The xoffset gives the horizontal offset that 
+        should be added to the cursor position to find the left position where the character should be drawn. A 
+        negative value here would mean that the character slightly overlaps the previous character. Observe that these 
+        values shouldn't be used to move the cursor position, only to determine where to actually draw the current
+        character.
+        
+        The x, y, width, and height attributes indicate the precise location and size in the font atlas to copy to the
+        current font position.
+        """
+
         cursor_rect.x = x
         cursor_rect.y = y
 
@@ -963,20 +996,27 @@ cdef class _SurfaceContainer:
         kernings = font.get_kernings()
         use_kerning = container.options['font_kerning']
 
-        # Copy each character in the text string from the bitmap font atlas to
-        # the output texture/surface
-        for text_char in text:
+        # Copy each character in the text string from the bitmap font atlas to the output texture/surface
+        for index, text_char in enumerate(text):
             current_char = ord(text_char)
             if current_char in characters:
                 char_info = characters[current_char]
 
+                # need to ensure the first character is drawn at position 0 (adjust for initial xoffset value)
+                if index == 0:
+                    cursor_rect.x -= char_info.xoffset
+
+                # apply kerning (if applicable)
                 if use_kerning and previous_char in kernings and current_char in kernings[previous_char]:
                     cursor_rect.x += kernings[previous_char][current_char]
 
+                # set rectangles for character image copy and perform image copy operation
                 source_rect = char_info.rect
                 dest_rect.x = cursor_rect.x + char_info.xoffset
                 dest_rect.y = cursor_rect.y + char_info.yoffset
                 SDL_BlitSurface(source_image, &source_rect, self.surface, &dest_rect)
+
+                # advance the cursor in preparation for drawing the next character
                 cursor_rect.x += char_info.xadvance
 
             previous_char = current_char
