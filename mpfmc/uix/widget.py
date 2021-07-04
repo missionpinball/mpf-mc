@@ -450,10 +450,13 @@ class Widget(KivyWidget):
             Numeric value (float or int).
         """
         if val.startswith("(") and val.endswith(")"):
-            try:
-                val = event_args[val[1:-1]]
-            except KeyError:
-                raise AssertionError("Excepted an event parameter {}".format(val[1:-1]))
+            if val[1:-1].startswith("machine|"):
+                val = self.mc.machine_vars.get(val[9:-1], 0)
+            else:
+                try:
+                    val = event_args[val[1:-1]]
+                except KeyError:
+                    raise AssertionError("Excepted an event parameter {}".format(val[1:-1]))
 
         try:
             val = percent_to_float(val, self._percent_prop_dicts[prop])
