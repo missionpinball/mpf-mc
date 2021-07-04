@@ -41,7 +41,8 @@ class TestAudio(MpfIntegrationTestCase):
             '264828_text': {
                 'action': 'play',
                 'loops': -1,
-                'key': 'music'
+                'key': 'music',
+                'block': False,
             }
         }
         self.machine.sound_player.play(settings, 'asset_manager', None)
@@ -54,7 +55,8 @@ class TestAudio(MpfIntegrationTestCase):
 
         settings = {
             '264828_text': {
-                'action': 'stop'
+                'action': 'stop',
+                'block': False,
             }
         }
         self.machine.sound_player.play(settings, 'asset_manager', None)

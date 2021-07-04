@@ -13,6 +13,10 @@ coils:
         number: 2
         label: Second coil
 
+machine_vars:
+  master_volume:
+    initial_value: 0.8
+
 switches:
     s_door_open:
         number:
@@ -58,7 +62,6 @@ sound_system:
   buffer: 2048  # previous value was 512
   frequency: 44100
   channels: 1
-  master_volume: 0.8
   enabled: true
 
 dmds:
