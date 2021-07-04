@@ -64,8 +64,6 @@ class BcpProcessor:
         self.send(bcp_command="monitor_start", category="modes")
         self.send(bcp_command="monitor_start", category="core_events")
         self.send(bcp_command="monitor_start", category="status_request")
-        self.register_trigger("master_volume_increase")
-        self.register_trigger("master_volume_decrease")
         self.register_trigger("debug_dump_stats")
         self.register_trigger("update_segment_display")
         self.connected = True

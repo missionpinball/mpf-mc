@@ -104,8 +104,10 @@ class SoundSystem:
             self.log.info("No audio tracks are specified in your machine config file. "
                           "a track named 'default' has been created.")
 
-        # Set initial master volume level
-        self.master_volume = self.config['master_volume']
+        # Set initial master volume level to off
+        self.master_volume = 0.0
+        if "master_volume" in self.config:
+            self.log.warning("master_volume in sound_system is deprecated and will be removed in the future.")
 
         # Establish machine tick function callback (will process internal audio events)
         self.clock_event = Clock.schedule_interval(self.tick, 0)
@@ -114,20 +116,11 @@ class SoundSystem:
         self.audio_interface.enable()
         self._initialized = True
 
-        self.mc.events.add_handler("master_volume_increase", self.master_volume_increase)
-        self.mc.events.add_handler("master_volume_decrease", self.master_volume_decrease)
         self.mc.events.add_handler("shutdown", self.shutdown)
-        self.mc.events.add_handler("machine_var_master_volume", self._get_initial_volume)
+        self.mc.events.add_handler("machine_var_master_volume", self._set_volume)
 
-    def _get_initial_volume(self, **kwargs):
+    def _set_volume(self, **kwargs):
         self.master_volume = kwargs['value']
-        # Subsequent volume changes will be pushed to MPF and bounced back,
-        # but there's no reason to keep listening
-        self.mc.events.remove_handler(self._get_initial_volume)
-
-    def _send_volume(self, **kwargs):
-        del kwargs
-        self.mc.set_machine_var("master_volume", self.audio_interface.get_master_volume())
 
     def shutdown(self, **kwargs):
         """Shuts down the audio interface"""
@@ -152,32 +145,12 @@ class SoundSystem:
         # Constrain volume to the range 0.0 to 1.0
         value = min(max(value, 0.0), 1.0)
         self.audio_interface.set_master_volume(value)
-        self._send_volume()
+        self.log.info("Setting master volume to %s", value)
 
     @property
     def default_track(self):
         """Return default track."""
         return self.audio_interface.get_track(0)
-
-    def master_volume_increase(self, delta: float = 0.05, **kwargs):
-        """Increase master volume by delta.
-
-        Args:
-            delta: How much to increase volume?
-        """
-        del kwargs
-        self.master_volume += delta
-        self.log.info("Increased master volume by %s to %s.", delta, self.master_volume)
-
-    def master_volume_decrease(self, delta: float = 0.05, **kwargs):
-        """Decrease master volume by delta.
-
-        Args:
-            delta: How much to decrease volume?
-        """
-        del kwargs
-        self.master_volume -= delta
-        self.log.info("Decreased master volume by %s to %s.", delta, self.master_volume)
 
     def _create_track(self, name, config=None):     # noqa
         """Create a track in the audio system with the specified name and configuration.
