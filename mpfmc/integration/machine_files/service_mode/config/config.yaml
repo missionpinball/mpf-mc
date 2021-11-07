@@ -4,6 +4,7 @@ modes:
     - attract
     - game
     - service
+    - service_dmd
 
 coils:
     c_test:
