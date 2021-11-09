@@ -26,7 +26,7 @@ class TestBasicGame(MpfIntegrationTestCase):
         self.assertModeRunning('game')
         self.assertTrue(self.machine.game.player)
         self.assertEqual(self.machine.game.player.ball, 1)
-        self.assertEqual({'value': 'FREE PLAY', 'persist': False, 'expire_secs': None},
+        self.assertEqual({'value': 'FREE PLAY', 'persist': False, 'timeout': None, 'expire_secs': None},
                          self.machine.variables.machine_vars['credits_string'])
 
         # make sure the MC side has everything
