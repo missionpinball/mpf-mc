@@ -817,7 +817,7 @@ static const char *__pyx_filename;
 
 static const char *__pyx_f[] = {
   "stringsource",
-  "mpfmc\\uix\\bitmap_font\\bitmap_font.pyx",
+  "mpfmc/uix/bitmap_font/bitmap_font.pyx",
 };
 
 /*--- Type declarations ---*/

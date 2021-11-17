@@ -820,7 +820,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "mpfmc\\core\\audio\\track.pyx",
+  "mpfmc/core/audio/track.pyx",
   "stringsource",
 };
 /* ForceInitThreads.proto */

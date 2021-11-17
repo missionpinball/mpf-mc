@@ -820,7 +820,7 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "mpfmc\\core\\audio\\sound_file.pyx",
+  "mpfmc/core/audio/sound_file.pyx",
   "stringsource",
 };
 /* NoFastGil.proto */
