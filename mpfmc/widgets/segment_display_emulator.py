@@ -9,7 +9,7 @@ from kivy.properties import NumericProperty, BooleanProperty, ListProperty, Stri
 from kivy.graphics import Color, Rotate, Scale
 from kivy.utils import get_color_from_hex
 
-from mpf.core.segment_mappings import FOURTEEN_SEGMENTS, SEVEN_SEGMENTS
+from mpf.core.segment_mappings import FOURTEEN_SEGMENTS, SEVEN_SEGMENTS, EIGHT_SEGMENTS
 from mpf.core.utility_functions import Util
 
 from mpfmc.uix.widget import Widget
@@ -42,6 +42,11 @@ class SegmentDisplayEmulator(Widget):
             self._segment_count = 7
             self._dot_segment_index = 0
             self._comma_segment_index = 7
+        elif self.display_type == "8seg":
+            self._segment_map = {k: self.get_eight_segment_character_encoding(v) for k, v in EIGHT_SEGMENTS.items()}
+            self._segment_count = 8
+            self._dot_segment_index = 8
+            self._comma_segment_index = 9
         elif self.display_type == "14seg":
             self._segment_map = {k: self.get_fourteen_segment_character_encoding(v) for k, v in
                                  FOURTEEN_SEGMENTS.items()}
@@ -108,6 +113,14 @@ class SegmentDisplayEmulator(Widget):
         # Note: the l and n segments appear to be swapped in the encodings in the FOURTEEN_SEGMENTS dict
         return int(
             (segments.g << 6) | (segments.f << 5) | (segments.e << 4) |
+            (segments.d << 3) | (segments.c << 2) | (segments.b << 1) | segments.a)
+
+    @staticmethod
+    def get_eight_segment_character_encoding(segments: EIGHT_SEGMENTS) -> int:
+        """Returns segment value in order used in the segment display widget."""
+        # Note: the l and n segments appear to be swapped in the encodings in the FOURTEEN_SEGMENTS dict
+        return int(
+            (segments.h << 7) | (segments.g << 6) | (segments.f << 5) | (segments.e << 4) |
             (segments.d << 3) | (segments.c << 2) | (segments.b << 1) | segments.a)
 
     @staticmethod
@@ -212,6 +225,8 @@ class SegmentDisplayEmulator(Widget):
             segment_points = self._calculate_fourteen_segment_points(x, y, segment_width, segment_interval, bevel_width)
         elif self.display_type == "7seg":
             segment_points = self._calculate_seven_segment_points(x, y, segment_width, segment_interval, bevel_width)
+        elif self.display_type == "8seg":
+            segment_points = self._calculate_eight_segment_points(x, y, segment_width, segment_interval, bevel_width)
 
         # Sort the segment dictionary by segment name (key)
         segment_points = OrderedDict(sorted(segment_points.items()))
@@ -270,6 +285,49 @@ class SegmentDisplayEmulator(Widget):
                                 x[3], y[3] - segment_interval / 2,
                                 x[3], y[2] + segment_interval / sqrt2,
                                 x[5] - bevel_width, y[0] + bevel_width + segment_interval / sqrt2]}
+
+        # Create the rest of the segments by flipping/mirroring existing points (either horizontally or vertically)
+        segment_points["a"] = self._flip_vertical(segment_points["d"], self.char_height)
+        segment_points["b"] = self._flip_vertical(segment_points["c"], self.char_height)
+        segment_points["e"] = self._flip_horizontal(segment_points["c"], self.char_width)
+        segment_points["f"] = self._flip_horizontal(segment_points["b"], self.char_width)
+
+        return segment_points
+
+    # pylint: disable-msg=too-many-arguments
+    def _calculate_eight_segment_points(self, x: List[float], y: List[float],
+                                        segment_width: float, segment_interval: float,
+                                        bevel_width: float) -> Dict[str, float]:
+        """Calculate the vertices for all segments in a fourteen-segment display."""
+
+        side_bevel_multiplier = 1 if self.side_bevel_enabled else 0
+
+        sqrt2 = math.sqrt(2)
+        sqrt3 = math.sqrt(3)
+
+        # Create dictionary of segment points keyed by segment name/letter
+        segment_points = {"d": [bevel_width * 2 + segment_interval / sqrt2, y[0],
+                                x[5] - (bevel_width * 2 + segment_interval / sqrt2), y[0],
+                                x[5] - (bevel_width + segment_interval / sqrt2), y[1],
+                                x[5] - (bevel_width * 2 + segment_interval / sqrt2), y[2],
+                                bevel_width * 2 + segment_interval / sqrt2, y[2],
+                                bevel_width + segment_interval / sqrt2, y[1]],
+                          "g": [x[3] - segment_interval / 2 * sqrt3, y[3],
+                                x[4] - segment_interval / 2 * sqrt3, y[4],
+                                x[3] - segment_interval / 2 * sqrt3, y[5],
+                                bevel_width * 2 + segment_interval / sqrt2, y[5],
+                                bevel_width + segment_interval / sqrt2, y[4],
+                                bevel_width * 2 + segment_interval / sqrt2, y[3]],
+                          "c": [x[5], y[0] + bevel_width * 2 + segment_interval / sqrt2,
+                                x[5], y[4] - segment_interval / 2 - segment_width / 2 * side_bevel_multiplier,
+                                x[4], y[4] - segment_interval / 2,
+                                x[3], y[3] - segment_interval / 2,
+                                x[3], y[2] + segment_interval / sqrt2,
+                                x[5] - bevel_width, y[0] + bevel_width + segment_interval / sqrt2],
+                          "h": [x[0], y[2] + segment_interval,
+                                x[2], y[2] + segment_interval,
+                                x[2], self.char_height - y[2] - segment_interval,
+                                x[0], self.char_height - y[2] - segment_interval]}
 
         # Create the rest of the segments by flipping/mirroring existing points (either horizontally or vertically)
         segment_points["a"] = self._flip_vertical(segment_points["d"], self.char_height)
@@ -576,8 +634,8 @@ class SegmentDisplayEmulator(Widget):
     :attr:`character_count` is an :class:`~kivy.properties.NumericProperty` and defaults to 1.
     '''
 
-    display_type = OptionProperty("14seg", options=["7seg", "14seg"])
-    '''The type of display (7 segment, 14 segment).
+    display_type = OptionProperty("14seg", options=["7seg", "8seg", "14seg"])
+    '''The type of display (7 segment, 8 segment, 14 segment).
 
     :attr:`display_type` is an :class:`~kivy.properties.OptionProperty` and defaults to `14SEG`.
     '''
