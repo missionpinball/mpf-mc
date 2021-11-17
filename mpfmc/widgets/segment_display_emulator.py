@@ -296,14 +296,12 @@ class SegmentDisplayEmulator(Widget):
 
     # pylint: disable-msg=too-many-arguments
     def _calculate_eight_segment_points(self, x: List[float], y: List[float],
-                                           segment_width: float, segment_interval: float,
-                                           bevel_width: float) -> Dict[str, float]:
+                                        segment_width: float, segment_interval: float,
+                                        bevel_width: float) -> Dict[str, float]:
         """Calculate the vertices for all segments in a fourteen-segment display."""
 
         side_bevel_multiplier = 1 if self.side_bevel_enabled else 0
 
-        segment_factor = segment_width * 0.8
-        diagonal_slope = self.char_height / self.char_width
         sqrt2 = math.sqrt(2)
         sqrt3 = math.sqrt(3)
 
@@ -314,36 +312,29 @@ class SegmentDisplayEmulator(Widget):
                                 x[5] - (bevel_width * 2 + segment_interval / sqrt2), y[2],
                                 bevel_width * 2 + segment_interval / sqrt2, y[2],
                                 bevel_width + segment_interval / sqrt2, y[1]],
-
-                          "g": [ x[3] - segment_interval / 2 * sqrt3, y[3],             #right end
-                                 x[4] - segment_interval / 2 * sqrt3, y[4],
-                                 x[3] - segment_interval / 2 * sqrt3, y[5],
-                                 
-                                 bevel_width * 2 + segment_interval / sqrt2, y[5],          #left end
-                                 bevel_width + segment_interval / sqrt2, y[4],
-                                 bevel_width * 2 + segment_interval / sqrt2, y[3]],
-
-
+                          "g": [x[3] - segment_interval / 2 * sqrt3, y[3],
+                                x[4] - segment_interval / 2 * sqrt3, y[4],
+                                x[3] - segment_interval / 2 * sqrt3, y[5],
+                                bevel_width * 2 + segment_interval / sqrt2, y[5],
+                                bevel_width + segment_interval / sqrt2, y[4],
+                                bevel_width * 2 + segment_interval / sqrt2, y[3]],
                           "c": [x[5], y[0] + bevel_width * 2 + segment_interval / sqrt2,
                                 x[5], y[4] - segment_interval / 2 - segment_width / 2 * side_bevel_multiplier,
                                 x[4], y[4] - segment_interval / 2,
                                 x[3], y[3] - segment_interval / 2,
                                 x[3], y[2] + segment_interval / sqrt2,
                                 x[5] - bevel_width, y[0] + bevel_width + segment_interval / sqrt2],
-
-                          "h": [x[0], y[2] + segment_interval,          #bottom end
+                          "h": [x[0], y[2] + segment_interval,
                                 x[2], y[2] + segment_interval,
-                                                               
-                                x[2], self.char_height - y[2] - segment_interval,  #top end
+                                x[2], self.char_height - y[2] - segment_interval,
                                 x[0], self.char_height - y[2] - segment_interval]}
-                         
 
         # Create the rest of the segments by flipping/mirroring existing points (either horizontally or vertically)
         segment_points["a"] = self._flip_vertical(segment_points["d"], self.char_height)
         segment_points["b"] = self._flip_vertical(segment_points["c"], self.char_height)
         segment_points["e"] = self._flip_horizontal(segment_points["c"], self.char_width)
         segment_points["f"] = self._flip_horizontal(segment_points["b"], self.char_width)
-     
+
         return segment_points
 
     # pylint: disable-msg=too-many-arguments
