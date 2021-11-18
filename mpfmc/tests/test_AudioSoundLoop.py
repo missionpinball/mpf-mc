@@ -374,8 +374,18 @@ class TestAudioSoundLoop(MpfMcTestCase):
         self.advance_real_time(0.1)
         self.mc.events.post('reset_current_loop')
         self.advance_real_time(0.2)
+
         self.mc.events.post('reset_current_loop')
+        self.advance_time()
+        status = track_loops.get_status()
+        self.assertEqual(status[0]["sample_pos"], 0)
         self.advance_real_time(0.1)
+
+        self.mc.events.post('jump_to_middle_of_loop')
+        self.advance_time()
+        status = track_loops.get_status()
+        self.assertAlmostEqual(status[0]['sample_pos'], status[0]["length"]//2, delta=16)
+        self.advance_real_time(2)
 
         self.mc.events.post('play_basic_beat_layers')
         self.mc.events.post('stop_current_loop')

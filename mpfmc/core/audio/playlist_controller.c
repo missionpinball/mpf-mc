@@ -820,8 +820,8 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "mpfmc\\core\\audio\\playlist_controller.pyx",
-  "mpfmc\\core\\audio\\track.pxd",
+  "mpfmc/core/audio/playlist_controller.pyx",
+  "mpfmc/core/audio/track.pxd",
 };
 
 /*--- Type declarations ---*/
@@ -1597,7 +1597,7 @@ static const char __pyx_k_set_repeat_Setting_repeat_for_cu[] = "set_repeat - Set
 static const char __pyx_k_stop_No_playlist_is_currently_pl[] = "stop - No playlist is currently playing. Could not stop current playlist.";
 static const char __pyx_k_stop_Stopping_the_current_playli[] = "stop - Stopping the current playlist ('%s').";
 static const char __pyx_k_PlaylistController__on_sound_ins_2[] = "PlaylistController._on_sound_instance_about_to_finish";
-static const char __pyx_k_mpfmc_core_audio_playlist_contro_2[] = "mpfmc\\core\\audio\\playlist_controller.pyx";
+static const char __pyx_k_mpfmc_core_audio_playlist_contro_2[] = "mpfmc/core/audio/playlist_controller.pyx";
 static PyObject *__pyx_kp_u_Clearing_context_s;
 static PyObject *__pyx_kp_u_Created_PlaylistController_s;
 static PyObject *__pyx_n_s_PlaylistController;

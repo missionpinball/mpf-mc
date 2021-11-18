@@ -76,6 +76,7 @@ cdef class TrackSoundLoop(Track):
     cdef _delete_player_layers(self, SoundLoopSetPlayer *player)
     cdef _cancel_all_delayed_players(self)
     cdef _fade_out_all_players(self, Uint32 fade_steps)
+    cdef inline Uint32 _fix_sample_frame_pos(self, Uint32 sample_pos, Uint8 bytes_per_sample, int channels)
     cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval, int bytes_per_sample_frame)
 
     @staticmethod

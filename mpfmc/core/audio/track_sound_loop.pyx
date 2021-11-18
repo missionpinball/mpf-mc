@@ -394,8 +394,7 @@ cdef class TrackSoundLoop(Track):
 
                 # Ensure sample position starts on a sample frame boundary (audio distortion may occur if starting
                 # in the middle of a sample frame)
-                bytes_per_sample_frame = self.state.callback_data.bytes_per_sample * self.state.callback_data.channels
-                player.sample_pos = bytes_per_sample_frame * ceil(player.sample_pos / bytes_per_sample_frame)
+                player.sample_pos = self._fix_sample_frame_pos(player.sample_pos, self.state.callback_data.bytes_per_sample, self.state.callback_data.channels)
 
                 self.type_state.current.stop_loop_samples_remaining = self.type_state.current.length - self.type_state.current.sample_pos
                 player.start_delay_samples_remaining = self.type_state.current.stop_loop_samples_remaining
@@ -459,8 +458,7 @@ cdef class TrackSoundLoop(Track):
 
         # Ensure sample position starts on a sample frame boundary (audio distortion may occur if starting
         # in the middle of a sample frame)
-        bytes_per_sample_frame = self.state.callback_data.bytes_per_sample * self.state.callback_data.channels
-        player.sample_pos = bytes_per_sample_frame * ceil(player.sample_pos / bytes_per_sample_frame)
+        player.sample_pos = self._fix_sample_frame_pos(player.sample_pos, self.state.callback_data.bytes_per_sample, self.state.callback_data.channels)
 
         # Adjust new player playing position to ensure it is within the sample
         while player.sample_pos >= player.length:
@@ -576,7 +574,7 @@ cdef class TrackSoundLoop(Track):
             return
 
         # Set new playback position (make sure it is within the current sample length)
-        self.type_state.current.sample_pos = time * self.state.callback_data.seconds_to_bytes_factor
+        self.type_state.current.sample_pos = self._fix_sample_frame_pos(time * self.state.callback_data.seconds_to_bytes_factor, self.state.callback_data.bytes_per_sample, self.state.callback_data.channels)
         while self.type_state.current.sample_pos >= self.type_state.current.length:
             self.type_state.current.sample_pos -= self.type_state.current.length
 
@@ -970,6 +968,21 @@ cdef class TrackSoundLoop(Track):
             return status_values.get(status)
         except KeyError:
             return "unknown"
+
+    cdef inline Uint32 _fix_sample_frame_pos(self, Uint32 sample_pos, Uint8 bytes_per_sample, int channels):
+        """
+        Rounds up sample position to a sample frame boundary (audio distortion may occur if starting
+        in the middle of a sample frame).
+
+        Args:
+            sample_pos: The sample position
+            bytes_per_sample: The number of bytes per sample
+            channels: The number of audio channels
+
+        Returns:
+            sample_pos rounded to the nearest sample frame boundary
+        """
+        return bytes_per_sample * channels * ceil(sample_pos / (bytes_per_sample * channels))
 
     cdef inline Uint32 _round_sample_pos_up_to_interval(self, Uint32 sample_pos, Uint32 interval, int bytes_per_sample_frame):
         """

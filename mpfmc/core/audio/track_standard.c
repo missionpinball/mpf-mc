@@ -820,9 +820,9 @@ static const char *__pyx_filename;
 
 
 static const char *__pyx_f[] = {
-  "mpfmc\\core\\audio\\track_standard.pyx",
+  "mpfmc/core/audio/track_standard.pyx",
   "stringsource",
-  "mpfmc\\core\\audio\\sound_file.pxd",
+  "mpfmc/core/audio/sound_file.pxd",
 };
 /* NoFastGil.proto */
 #define __Pyx_PyGILState_Ensure PyGILState_Ensure
@@ -2245,7 +2245,7 @@ static const char __pyx_k_Sound_s_has_reached_the_maximum[] = "Sound %s has reac
 static const char __pyx_k_Track_play_sound_encountered_an[] = "Track {} play_sound encountered an unexpected exception while attempting to play the {} sound.";
 static const char __pyx_k_get_newest_playing_sound_instan[] = "_get_newest_playing_sound_instance";
 static const char __pyx_k_get_oldest_playing_sound_instan[] = "_get_oldest_playing_sound_instance";
-static const char __pyx_k_mpfmc_core_audio_track_standard[] = "mpfmc\\core\\audio\\track_standard.pyx";
+static const char __pyx_k_mpfmc_core_audio_track_standard[] = "mpfmc/core/audio/track_standard.pyx";
 static const char __pyx_k_play_sound_No_idle_sound_player[] = "play_sound - No idle sound player is available.";
 static const char __pyx_k_play_sound_on_sound_player_s_tr[] = "_play_sound_on_sound_player - %s track is not currently playing and therefore the request to play sound %s will be canceled";
 static const char __pyx_k_remove_sound_instance_from_queu[] = "_remove_sound_instance_from_queue";
