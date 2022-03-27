@@ -67,80 +67,87 @@ class BCPServer(threading.Thread):
         self.socket.listen(5)
         self.socket.settimeout(1)
 
+    def _connect(self):
+        self.log.info("Waiting for a connection...")
+        # Since posting an event from a thread is not safe, we just
+        # drop the event we want into the receive queue and let the
+        # main loop pick it up
+        self.receive_queue.put(('trigger',
+                                {'name': 'client_disconnected',
+                                 'host': self.socket.getsockname()[0],
+                                 'port': self.socket.getsockname()[1]}))
+        '''event: client_disconnected
+        desc: Posted on the MPF-MC only (e.g. not in MPF) when the BCP
+        client disconnects. This event is also posted when the MPF-MC
+        starts before a client is connected.
+
+        This is useful for triggering a slide notifying of the
+        disconnect.
+
+        args:
+        host: The hostname or IP address that the socket is listening
+        on.
+        port: The port that the socket is listening on.
+
+        '''
+        self.mc.bcp_client_connected = False
+
+        start_time = time.time()
+        while (not self.connection and
+               not self.mc.thread_stopper.is_set()):
+            try:
+                self.connection, client_address = self.socket.accept()
+            except (socket.timeout, OSError):
+                if self.mc.options['production'] and start_time + 30 < time.time():
+                    self.log.warning("Timeout while waiting for connection. Stopping!")
+                    self.mc.stop()
+                    return False
+                if self.mc.thread_stopper.is_set():
+                    self.log.info("Stopping BCP listener thread")
+                    return False
+
+        self.log.info("Received connection from: %s:%s",
+                      client_address[0], client_address[1])
+
+        # Since posting an event from a thread is not safe, we just
+        # drop the event we want into the receive queue and let the
+        # main loop pick it up
+        self.receive_queue.put(('trigger',
+                                {'name': 'client_connected',
+                                 'host': client_address[0],
+                                 'port': client_address[1]}))
+
+        '''event: client_connected
+        desc: Posted on the MPF-MC only when a BCP client has
+        connected.
+
+        args:
+        address: The IP address of the client that connected.
+        port: The port the client connected on.
+        '''
+        self.mc.bcp_client_connected = True
+
+        return True
+
     def run(self):
         """The socket thread's run loop."""
         try:
             while not self.mc.thread_stopper.is_set():
-                self.log.info("Waiting for a connection...")
-                # Since posting an event from a thread is not safe, we just
-                # drop the event we want into the receive queue and let the
-                # main loop pick it up
-                self.receive_queue.put(('trigger',
-                                        {'name': 'client_disconnected',
-                                         'host': self.socket.getsockname()[0],
-                                         'port': self.socket.getsockname()[1]}))
-                '''event: client_disconnected
-                desc: Posted on the MPF-MC only (e.g. not in MPF) when the BCP
-                client disconnects. This event is also posted when the MPF-MC
-                starts before a client is connected.
+                if not self._connect():
+                    return
 
-                This is useful for triggering a slide notifying of the
-                disconnect.
-
-                args:
-                host: The hostname or IP address that the socket is listening
-                on.
-                port: The port that the socket is listening on.
-
-                '''
-                self.mc.bcp_client_connected = False
-
-                start_time = time.time()
-                while (not self.connection and
-                        not self.mc.thread_stopper.is_set()):
-                    try:
-                        self.connection, client_address = self.socket.accept()
-                    except (socket.timeout, OSError):
-                        if self.mc.options['production'] and start_time + 30 < time.time():
-                            self.log.warning("Timeout while waiting for connection. Stopping!")
-                            self.mc.stop()
-                            return
-                        if self.mc.thread_stopper.is_set():
-                            self.log.info("Stopping BCP listener thread")
-                            return
-
-                self.log.info("Received connection from: %s:%s",
-                              client_address[0], client_address[1])
-
-                # Since posting an event from a thread is not safe, we just
-                # drop the event we want into the receive queue and let the
-                # main loop pick it up
-                self.receive_queue.put(('trigger',
-                                        {'name': 'client_connected',
-                                         'host': client_address[0],
-                                         'port': client_address[1]}))
-
-                '''event: client_connected
-                desc: Posted on the MPF-MC only when a BCP client has
-                connected.
-
-                args:
-                address: The IP address of the client that connected.
-                port: The port the client connected on.
-                '''
-
-                self.mc.bcp_client_connected = True
                 socket_chars = b''
+
+                if sys.platform in ("linux", "darwin"):
+                    poller = select.poll()
+                    poller.register(self.connection, select.POLLIN)
 
                 # Receive the data in small chunks and retransmit it
                 while not self.mc.thread_stopper.is_set():
-                    # todo Better large message handling
-                    # if a json message comes in that's larger than 8192, it
-                    # won't be processed properly. So if we end up sticking
-                    # with BCP, we should probably change this to be smarter
-                    # and to check for complete messages before processing them
-
-                    ready = select.select([self.connection], [], [], 1)
+                    if sys.platform in ("linux", "darwin"):
+                        ready = poller.poll(None)
+                    else:
+                        ready = select.select([self.connection], [], [], 1)
                     if ready[0]:
                         try:
                             data_read = self.connection.recv(8192)
