@@ -27,6 +27,9 @@ environment:
   - PYVER: 38
     BITNESS: 64
     COMPILER: msvc
+  - PYVER: 39
+    BITNESS: 64
+    COMPILER: msvc
 
   pypi_password:
     secure: rCMmmOBIvdX3F9PXj/Vx8fz4nZnON6rZt0XZ7mw4OTOd4SB/od3U9pE6ogAsBkvOnhqqeM8XruxPh9+gZ5PDvb/KKB89FGVIAx6av7kFqMYwkAdhhR3SDsdjQDxfZAxc69cWzb2545LLsuGmLdEaqne5s41HT+8tFGVgyTKGdMQzAiUyOwhF+0Gdm5GTKvyd6lRC71SA6k04q5OWuEWf64BzVvSRchSGkQXzP7J8H0i3rYVOq8JNwdUqsL5nXLVTxkFXBulf81A6WqG6Rsqh3w==
