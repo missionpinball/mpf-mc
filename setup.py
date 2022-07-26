@@ -46,8 +46,7 @@ def members_appended(*ds):
 audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
 
 ext_modules = [
-    Extension('mpfmc.core.audio.sound_file', ['mpfmc/core/audio/sound_file.pyx'], 
-              **audio_kws ,),
+    Extension('mpfmc.core.audio.sound_file', [*sound_file_source], **audio_kws ,),
     Extension('mpfmc.core.audio.track', [*track_source], **audio_kws),
     Extension('mpfmc.core.audio.track_standard', [*track_standard_source], **audio_kws),
     Extension('mpfmc.core.audio.track_sound_loop', [*track_sound_loop_source], **audio_kws),
