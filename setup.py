@@ -35,8 +35,6 @@ for lib in ext_libs:
     if not pc.exists(lib):
         raise Exception(f"Missing {lib}")
 
-
-
 def members_appended(*ds):
         result = defaultdict(list)
         for d in ds:
@@ -45,17 +43,17 @@ def members_appended(*ds):
                 result[k].extend(v)
         return result
 
-sound_file_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
+audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
 
 ext_modules = [
     Extension('mpfmc.core.audio.sound_file', ['mpfmc/core/audio/sound_file.pyx'], 
-              **sound_file_kws ,),
-    # Extension('mpfmc.core.audio.track', [track_source],),
-    # Extension('mpfmc.core.audio.track_standard', [track_standard_source],),
-    # Extension('mpfmc.core.audio.track_sound_loop', [track_sound_loop_source],),
-    # Extension('mpfmc.core.audio.audio_interface', [audio_interface_source],),
-    # Extension('mpfmc.core.audio.playlist_controller', [playlist_controller_source],),
-    # Extension('mpfmc.uix.bitmap_font.bitmap_font', [bitmap_font_source],),
+              **audio_kws ,),
+    Extension('mpfmc.core.audio.track', [*track_source], **audio_kws),
+    Extension('mpfmc.core.audio.track_standard', [*track_standard_source], **audio_kws),
+    Extension('mpfmc.core.audio.track_sound_loop', [*track_sound_loop_source], **audio_kws),
+    Extension('mpfmc.core.audio.audio_interface', [*audio_interface_source], **audio_kws),
+    Extension('mpfmc.core.audio.playlist_controller', [*playlist_controller_source], **audio_kws),
+    Extension('mpfmc.uix.bitmap_font.bitmap_font', [*bitmap_font_source], **pc.parse('SDL2_mixer'),)
 ]
 
 setup(
