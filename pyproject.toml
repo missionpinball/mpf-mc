@@ -30,7 +30,7 @@ classifiers=['Development Status :: 4 - Beta',
 dependencies = [
     "ruamel.yaml == 0.15.100",
     "mpf >= 0.56.0dev1", # {attr = 'mpfmc._version.__mpf_version_required__'},
-    "kivy ==2.0.0",
+    "kivy >=2.0.0",
     "psutil ==5.7.3",
     "Pygments ==2.6.1",
     "kivy_deps.sdl2 == 0.3.1; platform_system=='Windows'",
@@ -39,7 +39,7 @@ dependencies = [
     "kivy_deps.glew-dev == 0.3.0; platform_system=='Windows'",
     "kivy_deps.gstreamer == 0.3.1; platform_system=='Windows'",
     "kivy_deps.gstreamer-dev == 0.3.1; platform_system=='Windows'",
-    "ffpyplayer == 4.3.2"
+    "ffpyplayer >= 4.3.2"
     ]
 dynamic = ["version"]
 
