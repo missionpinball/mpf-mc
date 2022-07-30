@@ -7,7 +7,6 @@ jobs:
     name: Build wheel for ${{ matrix.python }}-${{ matrix.platform }}-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
       matrix:
         include:
         # - os: windows-2019
@@ -44,7 +43,7 @@ jobs:
       - name: Setup python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: ${{ matrix.python }}
 
       - name: Install dependencies
         run: |
