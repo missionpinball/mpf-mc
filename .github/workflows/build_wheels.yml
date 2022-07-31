@@ -60,7 +60,9 @@ jobs:
         uses: pypa/cibuildwheel@v2.8.1
         env:
           CIBW_BUILD: ${{ matrix.python-spec }}-${{ matrix.platform }}
-          CIBW_ARCHS: all
+          CIBW_ARCHS_MACOS: universal2
+          CIBW_ARCHS_LINUX: x86_64
+          CIBW_ARCHS_WINDOWS: AMD64
           CIBW_BUILD_VERBOSITY: 3
 
       - uses: actions/upload-artifact@v3
