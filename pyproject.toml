@@ -62,16 +62,10 @@ mc = "mpfmc.commands.mc:get_command"
 imc = "mpfmc.commands.imc:get_command"
 
 [tool.setuptools]
-packages = ["mpfmc"]
-# package-dir = {"" = "mpfmc"}
 include-package-data = true
 
 [tool.setuptools.dynamic]
 version = {attr = "mpfmc._version.__version__"}
 
-[tool.setuptools.package-data]
-mpfmc = [
-    '*.py', '*.yaml', '*.png', '*.md', '*.zip', '*.gif', '*.jpg',
-    '*.mp4', '*.m4v', '*.so', '*.pyd', '*.dylib', '*.wav', '*.ogg',
-    '*.pxd', '*.pyx', '*.c', '*.h', '*.ttf', '*.fnt', '*.txt'
-]
+[tool.setuptools.packages.find]
+include = ["mpfmc*"]
