@@ -28,14 +28,14 @@ jobs:
         - os: macos-latest
           python-version: 3.9
           cibw-build: cp39-macosx_universal2
-        # - os: macos-latest
-        #   python-spec: cp38
-        #   python-version: 3.8
-        #   cibw-build: cp38-macosx_x86_64
-        # - os: macos-latest
-        #   python-spec: cp39
-        #   python-version: 3.9
-        #   cibw-build: cp39-macosx_x86_64
+        - os: macos-latest
+          python-spec: cp38
+          python-version: 3.8
+          cibw-build: cp38-macosx_x86_64
+        - os: macos-latest
+          python-spec: cp39
+          python-version: 3.9
+          cibw-build: cp39-macosx_x86_64
         # - os: macos-latest
         #   python-spec: cp38
         #   python-version: 3.8
@@ -56,8 +56,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -U pip setuptools wheel
           brew install SDL2 SDL2_mixer SDL2_ttf SDL2_image gstreamer pkg-config
+          pip install -U pip setuptools wheel
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
