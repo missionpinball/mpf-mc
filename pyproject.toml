@@ -1,7 +1,7 @@
 [build-system]
 requires = ["setuptools >= 63",
     "setuptools_scm[toml] >= 6.2",
-    "cython >= 0.29",
+    "cython >= 0.29, <3.0",
     "pkgconfig",
     ]
 build-backend = "setuptools.build_meta"
