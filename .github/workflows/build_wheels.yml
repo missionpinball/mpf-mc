@@ -4,9 +4,10 @@ on: [push, pull_request]
 
 jobs:
   build_wheels:
-    name: Build wheel for ${{ matrix.os }} cp${{ matrix.python-version }}
+    name: Build wheel for ${{ matrix.cibw-build }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         include:
         # - os: windows-2019
@@ -16,31 +17,33 @@ jobs:
         #   python: cp39
         #   platform: win_amd64
         - os: ubuntu-latest
-          python-spec: cp38
           python-version: 3.8
-          platform: manylinux_x86_64
-          manylinux_image: manylinux2014
+          cibw-build: cp38-manylinux_x86_64
         - os: ubuntu-latest
-          python-spec: cp39
           python-version: 3.9
-          platform: manylinux_x86_64
-          manylinux_image: manylinux2014
+          cibw-build: cp39-manylinux_x86_64
         - os: macos-latest
-          python-spec: cp38
           python-version: 3.8
-          platform: macosx_x86_64
+          cibw-build: cp38-macosx_universal2
         - os: macos-latest
-          python-spec: cp39
           python-version: 3.9
-          platform: macosx_x86_64
-        - os: macos-latest
-          python-spec: cp38
-          python-version: 3.8
-          platform: macosx_arm64
-        - os: macos-latest
-          python-spec: cp39
-          python-version: 3.9
-          platform: macosx_arm64
+          cibw-build: cp39-macosx_universal2
+        # - os: macos-latest
+        #   python-spec: cp38
+        #   python-version: 3.8
+        #   cibw-build: cp38-macosx_x86_64
+        # - os: macos-latest
+        #   python-spec: cp39
+        #   python-version: 3.9
+        #   cibw-build: cp39-macosx_x86_64
+        # - os: macos-latest
+        #   python-spec: cp38
+        #   python-version: 3.8
+        #   cibw-build: cp38-macosx_arm64
+        # - os: macos-latest
+        #   python-spec: cp39
+        #   python-version: 3.9
+        #   cibw-build: cp39-macosx_arm64
 
     steps:
       - name: Checkout MPF-MC
@@ -59,10 +62,7 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
         env:
-          CIBW_BUILD: ${{ matrix.python-spec }}-${{ matrix.platform }}
-          CIBW_ARCHS_MACOS: universal2
-          CIBW_ARCHS_LINUX: x86_64
-          CIBW_ARCHS_WINDOWS: AMD64
+          CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
 
       - uses: actions/upload-artifact@v3
