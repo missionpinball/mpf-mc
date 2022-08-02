@@ -28,11 +28,11 @@ jobs:
         - os: macos-latest
           python-version: 3.9
           cibw-build: cp39-macosx_arm64
-        - os: macos-latest
+        - os: self-hosted
           python-spec: cp38
           python-version: 3.8
           cibw-build: cp38-macosx_x86_64
-        - os: macos-latest
+        - os: self-hosted
           python-spec: cp39
           python-version: 3.9
           cibw-build: cp39-macosx_x86_64
