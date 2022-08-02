@@ -22,17 +22,17 @@ jobs:
         - os: ubuntu-latest
           python-version: 3.9
           cibw-build: cp39-manylinux_x86_64
-        - os: macos-latest
+        - os: self-hosted
           python-version: 3.8
           cibw-build: cp38-macosx_arm64
-        - os: macos-latest
+        - os: self-hosted
           python-version: 3.9
           cibw-build: cp39-macosx_arm64
-        - os: self-hosted
+        - os: macos-latest
           python-spec: cp38
           python-version: 3.8
           cibw-build: cp38-macosx_x86_64
-        - os: self-hosted
+        - os: macos-latest
           python-spec: cp39
           python-version: 3.9
           cibw-build: cp39-macosx_x86_64
