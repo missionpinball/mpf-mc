@@ -32,7 +32,9 @@ cython_sources = [
 ext_libs = ['sdl2', 'SDL2_image', 'SDL2_mixer', 'SDL2_ttf', 'gstreamer-1.0']
 
 for lib in ext_libs:
-    if not pc.exists(lib):
+    if sys.platform == 'win32':
+        lib += '.dll'
+    elif not pc.exists(lib):
         raise Exception(f"Missing {lib}")
 
 def members_appended(*ds):
@@ -43,7 +45,18 @@ def members_appended(*ds):
                 result[k].extend(v)
         return result
 
-audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
+if sys.platform == 'win32':
+    audio_kws = {'define_macros': [('_THREAD_SAFE', None)],
+                 'include_dirs': ['C:/Users/Brian Madden/AppData/Local/Programs/Python/Python39/include/SDL2'],
+                 'libraries': ['SDL2_mixer', 'SDL2', 'gstreamer-1.0', 'glib-2.0', 'gobject-2.0']}
+    
+    bitmap_font_kws = {'define_macros': [('_THREAD_SAFE', None)],
+                 'include_dirs': ['C:/Users/Brian Madden/AppData/Local/Programs/Python/Python39/include/SDL2'],
+                 'libraries': ['SDL2', 'SDL2_image']}
+    
+else:
+    audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
+    bitmap_font_kws = members_appended(pc.parse('SDL2'), pc.parse('SDL2_image'))
 
 ext_modules = [
     Extension('mpfmc.core.audio.sound_file', [*sound_file_source], **audio_kws ,),
@@ -52,7 +65,7 @@ ext_modules = [
     Extension('mpfmc.core.audio.track_sound_loop', [*track_sound_loop_source], **audio_kws),
     Extension('mpfmc.core.audio.audio_interface', [*audio_interface_source], **audio_kws),
     Extension('mpfmc.core.audio.playlist_controller', [*playlist_controller_source], **audio_kws),
-    Extension('mpfmc.uix.bitmap_font.bitmap_font', [*bitmap_font_source], **pc.parse('SDL2_mixer'),)
+    Extension('mpfmc.uix.bitmap_font.bitmap_font', [*bitmap_font_source], **bitmap_font_kws,)
 ]
 
 setup(
