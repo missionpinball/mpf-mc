@@ -16,28 +16,33 @@ jobs:
         - os: windows-latest
           python-version: 3.9
           cibw-build: cp39-win_amd64
-        - os: ubuntu-latest
-          python-version: 3.8
-          cibw-build: cp38-manylinux_x86_64
-        - os: ubuntu-latest
-          python-version: 3.9
-          cibw-build: cp39-manylinux_x86_64
+        # - os: ubuntu-latest
+        #   python-version: 3.8
+        #   cibw-build: cp38-manylinux_x86_64
+        # - os: ubuntu-latest
+        #   python-version: 3.9
+        #   cibw-build: cp39-manylinux_x86_64
         # - os: macos-latest
         #   python-version: 3.8
         #   cibw-build: cp38-macosx_arm64
         # - os: macos-latest
         #   python-version: 3.9
         #   cibw-build: cp39-macosx_arm64
-        - os: macos-latest
-          python-version: 3.8
-          cibw-build: cp38-macosx_x86_64
-        - os: macos-latest
-          python-version: 3.9
-          cibw-build: cp39-macosx_x86_64
+        # - os: macos-latest
+        #   python-version: 3.8
+        #   cibw-build: cp38-macosx_x86_64
+        # - os: macos-latest
+        #   python-version: 3.9
+        #   cibw-build: cp39-macosx_x86_64
 
     steps:
       - name: Checkout MPF-MC
         uses: actions/checkout@v3
+      
+      # - uses: ilammy/msvc-dev-cmd@v1
+      #   if: runner.os == 'Windows'
+      #   with:
+      #     arch: amd_64
 
       - name: Setup python
         uses: actions/setup-python@v4
