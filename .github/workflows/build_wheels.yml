@@ -12,10 +12,10 @@ jobs:
         include:
         - os: windows-2019
           python: cp38
-          platform: win_amd64
+          cibw-build: cp38-win_amd64
         - os: windows-latest
           python: cp39
-          platform: win_amd64
+          cibw-build: cp39-win_amd64
         - os: ubuntu-latest
           python-version: 3.8
           cibw-build: cp38-manylinux_x86_64
