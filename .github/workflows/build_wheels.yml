@@ -46,17 +46,18 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
+      - name: Install dependencies via apt-get
+        if: runner.os == 'Linux'
         run: |
-          
-          if [ "$RUNNER_OS" == "Linux" ]; then
               sudo apt-get update
               sudo apt-get install -y build-essential git python3-dev libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly libgstreamer1.0-dev libxine2-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff5-dev libx11-dev libmtdev-dev libgl1-mesa-dev libgles2-mesa-dev xvfb pulseaudio
-          else
-              brew install SDL2 SDL2_mixer SDL2_ttf SDL2_image gstreamer pkg-config
-          fi
-          
-          pip install -U pip setuptools wheel
+        
+      - name: Install dependencies via brew
+        if: runner.os == 'macOS'  
+        run: brew install SDL2 SDL2_mixer SDL2_ttf SDL2_image gstreamer pkg-config
+      
+      - name: Install setup dependencies via pip
+        run: pip install -U pip setuptools wheel build
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
