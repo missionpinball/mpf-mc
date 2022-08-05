@@ -52,11 +52,11 @@ if sys.platform == 'win32':
     posix_prefix = pathlib.PureWindowsPath(repr(sys.prefix)).as_posix()
     
     audio_kws = {'define_macros': [('_THREAD_SAFE', None)],
-                 'include_dirs': [f'{posix_prefix}/include/SDL2'],
+                 'include_dirs': [f'{posix_prefix}include/SDL2'],
                  'libraries': ['SDL2_mixer', 'SDL2', 'gstreamer-1.0', 'glib-2.0', 'gobject-2.0']}
     
     bitmap_font_kws = {'define_macros': [('_THREAD_SAFE', None)],
-                 'include_dirs': [f'{posix_prefix}/include/SDL2'],
+                 'include_dirs': [f'{posix_prefix}include/SDL2'],
                  'libraries': ['SDL2', 'SDL2_image']}
     
 else:
