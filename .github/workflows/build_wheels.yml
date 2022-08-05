@@ -41,8 +41,6 @@ jobs:
       
       - uses: ilammy/msvc-dev-cmd@v1
         if: runner.os == 'Windows'
-        with:
-          arch: amd_64
 
       - name: Setup python
         uses: actions/setup-python@v4
