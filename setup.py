@@ -47,7 +47,7 @@ def members_appended(*ds):
 
 if sys.platform == 'win32':
     
-    import pathlib
+    import os, pathlib
     
     posix_prefix = pathlib.PureWindowsPath(repr(sys.prefix)).as_posix()
     
@@ -58,6 +58,13 @@ if sys.platform == 'win32':
     bitmap_font_kws = {'define_macros': [('_THREAD_SAFE', None)],
                  'include_dirs': [f'{posix_prefix}include/SDL2'],
                  'libraries': ['SDL2', 'SDL2_image']}
+    
+    print('*************')
+    print(f'{posix_prefix}include/SDL2')
+    print(os.listdir(f'{posix_prefix}include/SDL2'))
+    print('*************')
+    print(f'{posix_prefix}include')
+    print(os.listdir(f'{posix_prefix}include'))
     
 else:
     audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
