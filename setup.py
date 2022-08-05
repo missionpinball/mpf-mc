@@ -7,7 +7,9 @@ Notes:
 import os
 import sys
 
-import pkgconfig as pc
+if sys.platform != 'win32':
+    import pkgconfig as pc
+
 from collections import defaultdict
 from setuptools import Extension, setup
 
@@ -31,11 +33,10 @@ cython_sources = [
 
 ext_libs = ['sdl2', 'SDL2_image', 'SDL2_mixer', 'SDL2_ttf', 'gstreamer-1.0']
 
-for lib in ext_libs:
-    if sys.platform == 'win32':
-        lib += '.dll'
-    elif not pc.exists(lib):
-        raise Exception(f"Missing {lib}")
+if sys.platform != 'win32':
+    for lib in ext_libs:
+        if not pc.exists(lib):
+            raise Exception(f"Missing {lib}")
 
 def members_appended(*ds):
         result = defaultdict(list)
@@ -47,11 +48,11 @@ def members_appended(*ds):
 
 if sys.platform == 'win32':
     audio_kws = {'define_macros': [('_THREAD_SAFE', None)],
-                 'include_dirs': ['C:/Users/Brian Madden/AppData/Local/Programs/Python/Python39/include/SDL2'],
+                 'include_dirs': [f'{sys.prefix}/include/SDL2'],
                  'libraries': ['SDL2_mixer', 'SDL2', 'gstreamer-1.0', 'glib-2.0', 'gobject-2.0']}
     
     bitmap_font_kws = {'define_macros': [('_THREAD_SAFE', None)],
-                 'include_dirs': ['C:/Users/Brian Madden/AppData/Local/Programs/Python/Python39/include/SDL2'],
+                 'include_dirs': [f'{sys.prefix}/include/SDL2'],
                  'libraries': ['SDL2', 'SDL2_image']}
     
 else:
