@@ -49,22 +49,22 @@ if sys.platform == 'win32':
     
     import os, pathlib
     
-    posix_prefix = pathlib.PureWindowsPath(repr(sys.prefix)).as_posix()
+    posix_prefix = pathlib.PureWindowsPath(repr(sys.prefix)).as_posix()[1:-1]
     
     audio_kws = {'define_macros': [('_THREAD_SAFE', None)],
-                 'include_dirs': ['{posix_prefix}/include/SDL2'],
+                 'include_dirs': [f'{posix_prefix}/include/SDL2'],
                  'libraries': ['SDL2_mixer', 'SDL2', 'gstreamer-1.0', 'glib-2.0', 'gobject-2.0']}
     
     bitmap_font_kws = {'define_macros': [('_THREAD_SAFE', None)],
-                 'include_dirs': ['{posix_prefix}/include/SDL2'],
+                 'include_dirs': [f'{posix_prefix}/include/SDL2'],
                  'libraries': ['SDL2', 'SDL2_image']}
     
     print('*************')
-    print('{posix_prefix}/include/SDL2')
-    print(os.listdir('{posix_prefix}/include/SDL2'))
+    print(f'{posix_prefix}/include/SDL2')
+    print(os.listdir(f'{posix_prefix}/include/SDL2'))
     print('*************')
-    print('{posix_prefix}/include')
-    print(os.listdir('{posix_prefix}/include'))
+    print(f'{posix_prefix}/include')
+    print(os.listdir(f'{posix_prefix}/include'))
     
 else:
     audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
