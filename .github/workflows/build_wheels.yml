@@ -39,8 +39,8 @@ jobs:
       - name: Checkout MPF-MC
         uses: actions/checkout@v3
       
-      - uses: ilammy/msvc-dev-cmd@v1
-        if: runner.os == 'Windows'
+      # - uses: ilammy/msvc-dev-cmd@v1
+      #   if: runner.os == 'Windows'
 
       - name: Setup python
         uses: actions/setup-python@v4
@@ -58,14 +58,12 @@ jobs:
         run: brew install SDL2 SDL2_mixer SDL2_ttf SDL2_image gstreamer pkg-config
       
       - name: Install setup dependencies via pip
-        uses: BSFishy/pip-action@v1
-        with:
-          packages: |
-            pip
-            setuptools
-            wheel
-            build
-          upgrade: true
+        run: |
+              python -m pip install --upgrade pip
+              pip install --upgrade setuptools wheel build
+              pip show setuptools wheel build
+              pip install kivy_deps.sdl2-dev
+              pip show kivy_deps.sdl2-dev
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
