@@ -64,11 +64,7 @@ jobs:
               pip show setuptools wheel build
               pip install kivy_deps.sdl2-dev
               pip show kivy_deps.sdl2-dev
-              c:
-              cd \
-              dir -s
-              d:
-              cd \
+              cd "c:\hostedtoolcache\windows\python\3.9.13\x64\lib\site-packages"
               dir -s
 
       - name: Build wheels
