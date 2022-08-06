@@ -64,8 +64,7 @@ jobs:
               pip show setuptools wheel build
               pip install kivy_deps.sdl2-dev
               pip show kivy_deps.sdl2-dev
-              cd "c:\hostedtoolcache\windows\python\3.9.13\x64\lib\site-packages"
-              dir -s
+              dir env:
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
