@@ -56,8 +56,15 @@ if sys.platform == 'win32':
     
     try:
         import kivy_deps.sdl2_dev
+        print("Found kivy_deps.sdl2_dev")
+        print(kivy_deps.sdl2_dev.__path__)
     except ImportError:
         raise Exception("Missing kivy_deps.sdl2_dev")
+    
+    print("installed packages")
+    import pkgutil
+    for i in pkgutil.iter_modules(None):
+        print(i)
     
     sdl2_pip_data = subprocess.check_output([sys.executable, '-m', 'pip', 'show', '-f', 'kivy-deps.sdl2-dev']).decode()
     
