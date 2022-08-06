@@ -59,12 +59,14 @@ if sys.platform == 'win32':
                  'include_dirs': [f'{posix_prefix}/include/SDL2'],
                  'libraries': ['SDL2', 'SDL2_image']}
     
-    print('*************')
-    print(f'{posix_prefix}/include/SDL2')
-    print(os.listdir(f'{posix_prefix}/include/SDL2'))
-    print('*************')
-    print(f'{posix_prefix}/include')
-    print(os.listdir(f'{posix_prefix}/include'))
+    # print('*************')
+    # print(f'{posix_prefix}/include/SDL2')
+    # print(os.listdir(f'{posix_prefix}/include/SDL2'))
+    # print('*************')
+    # print(f'{posix_prefix}/include')
+    # print(os.listdir(f'{posix_prefix}/include'))
+    
+    # Github installs pip packages to c:\hostedtoolcache\windows\python\3.9.13\x64\lib\site-packages
     
 else:
     audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
