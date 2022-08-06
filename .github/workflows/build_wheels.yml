@@ -59,12 +59,12 @@ jobs:
       
       - name: Install setup dependencies via pip
         run: |
+              dir c:\ /s
               python -m pip install --upgrade pip
               pip install --upgrade setuptools wheel build
               pip show setuptools wheel build
               pip install kivy_deps.sdl2-dev
               pip show kivy_deps.sdl2-dev
-              dir c:\*.* /s
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
