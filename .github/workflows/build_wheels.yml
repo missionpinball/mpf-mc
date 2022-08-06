@@ -59,7 +59,12 @@ jobs:
       
       - name: Install setup dependencies via pip
         run: |
-              dir /s "c:\"
+              c:
+              cd \
+              dir /s
+              d:
+              cd \
+              dir /s
               python -m pip install --upgrade pip
               pip install --upgrade setuptools wheel build
               pip show setuptools wheel build
