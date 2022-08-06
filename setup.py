@@ -4,6 +4,7 @@ Notes:
     See pyproject.toml for the rest of the setup config.
 """
 
+import os
 import sys
 
 if sys.platform != 'win32':
@@ -47,26 +48,49 @@ def members_appended(*ds):
 
 if sys.platform == 'win32':
     
-    import os, pathlib
+    # Since Windows doesn't have pkgconfig, we have to manually find the SDL2 include location. :(
+    # There are so many different places where SDL2 can be installed, and options for its include folder.
+    # This seems so lame, but it works.  
     
-    posix_prefix = pathlib.PureWindowsPath(repr(sys.prefix)).as_posix()[1:-1]
+    import subprocess
+    
+    try:
+        import kivy_deps.sdl2_dev
+    except ImportError:
+        raise Exception("Missing kivy_deps.sdl2_dev")
+    
+    sdl2_pip_data = subprocess.check_output([sys.executable, '-m', 'pip', 'show', '-f', 'kivy-deps.sdl2-dev']).decode()
+    
+    for line in sdl2_pip_data.splitlines():
+
+        if line.startswith("Location:"):
+            site_packages = line[10:] # strip "Location: "
+            print(site_packages)
+        
+        elif line.endswith("SDL.h"):
+            sdl2_include_path = line.strip('\SDL.h').strip()  # strip the file and the padding
+            print(sdl2_include_path)
+            break
+
+    sdl2_include_path = os.path.join(site_packages, sdl2_include_path)
+    print("Setting SDL2 include path:", sdl2_include_path)
+    
+    general_include_path = sdl2_include_path.strip('\SDL2') # strip the SDL2 folder
+    print("Setting general include path:", general_include_path)
+
+    libs_include_path = general_include_path[:-8] # strip the \include
+    libs_include_path = os.path.join(libs_include_path, 'libs')
+    print("Setting libs include path:", libs_include_path)
     
     audio_kws = {'define_macros': [('_THREAD_SAFE', None)],
-                 'include_dirs': [f'{posix_prefix}/include/SDL2'],
-                 'libraries': ['SDL2_mixer', 'SDL2', 'gstreamer-1.0', 'glib-2.0', 'gobject-2.0']}
+                 'include_dirs': [sdl2_include_path, general_include_path],
+                'libraries': ['SDL2_mixer', 'SDL2', 'gstreamer-1.0', 'glib-2.0', 'gobject-2.0'],
+                'library_dirs': [libs_include_path]}
     
     bitmap_font_kws = {'define_macros': [('_THREAD_SAFE', None)],
-                 'include_dirs': [f'{posix_prefix}/include/SDL2'],
-                 'libraries': ['SDL2', 'SDL2_image']}
-    
-    # print('*************')
-    # print(f'{posix_prefix}/include/SDL2')
-    # print(os.listdir(f'{posix_prefix}/include/SDL2'))
-    # print('*************')
-    # print(f'{posix_prefix}/include')
-    # print(os.listdir(f'{posix_prefix}/include'))
-    
-    # Github installs pip packages to c:\hostedtoolcache\windows\python\3.9.13\x64\lib\site-packages
+                 'include_dirs': [sdl2_include_path, general_include_path],
+                 'libraries': ['SDL2', 'SDL2_image'],
+                'library_dirs': [libs_include_path]}
     
 else:
     audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
