@@ -9,6 +9,7 @@ requires = ["setuptools >= 63",
     "kivy_deps.glew-dev >= 0.3.0; platform_system=='Windows'",
     "kivy_deps.gstreamer >= 0.3.1; platform_system=='Windows'",
     "kivy_deps.gstreamer-dev >= 0.3.1; platform_system=='Windows'",
+    "pip",
     ]
 build-backend = "setuptools.build_meta"
 
