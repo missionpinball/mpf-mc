@@ -16,24 +16,24 @@ jobs:
         - os: windows-latest
           python-version: 3.9
           cibw-build: cp39-win_amd64
-        # - os: ubuntu-latest
-        #   python-version: 3.8
-        #   cibw-build: cp38-manylinux_x86_64
-        # - os: ubuntu-latest
-        #   python-version: 3.9
-        #   cibw-build: cp39-manylinux_x86_64
-        # - os: macos-latest
+        - os: ubuntu-latest
+          python-version: 3.8
+          cibw-build: cp38-manylinux_x86_64
+        - os: ubuntu-latest
+          python-version: 3.9
+          cibw-build: cp39-manylinux_x86_64
+        # - os: macos-latest     # Github hosted and self-hosted ARM runners are not yet available, so I'll just build locally for now.
         #   python-version: 3.8
         #   cibw-build: cp38-macosx_arm64
         # - os: macos-latest
         #   python-version: 3.9
         #   cibw-build: cp39-macosx_arm64
-        # - os: macos-latest
-        #   python-version: 3.8
-        #   cibw-build: cp38-macosx_x86_64
-        # - os: macos-latest
-        #   python-version: 3.9
-        #   cibw-build: cp39-macosx_x86_64
+        - os: macos-latest
+          python-version: 3.8
+          cibw-build: cp38-macosx_x86_64
+        - os: macos-latest
+          python-version: 3.9
+          cibw-build: cp39-macosx_x86_64
 
     steps:
       - name: Checkout MPF-MC
