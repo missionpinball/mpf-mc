@@ -106,32 +106,6 @@ if sys.platform == 'win32':
     # There are so many different places where SDL2 can be installed, and options for its include folder.
     # This seems so lame, but it works.  
     
-    # import subprocess
-    
-    # try:
-    #     import kivy_deps.sdl2_dev
-    #     print("Found kivy_deps.sdl2_dev")
-    #     print(kivy_deps.sdl2_dev.__path__)
-    # except ImportError:
-    #     raise Exception("Missing kivy_deps.sdl2_dev")
-    
-    # print("installed packages")
-    # import pkgutil
-    # for i in pkgutil.iter_modules(None):
-    #     print(i)
-    
-    # sdl2_pip_data = subprocess.check_output([sys.executable, '-m', 'pip', 'show', '-f', 'kivy-deps.sdl2-dev']).decode()
-    
-    # for line in sdl2_pip_data.splitlines():
-
-    #     if line.startswith("Location:"):
-    #         site_packages = line[10:] # strip "Location: "
-    #         print(site_packages)
-        
-    #     elif line.endswith("SDL.h"):
-    #         sdl2_include_path = line.strip('\SDL.h').strip()  # strip the file and the padding
-    #         print(sdl2_include_path)
-    #         break
 
     sdl2_include_path = determine_sdl2()['include_dirs'][0]
     print("Setting SDL2 include path:", sdl2_include_path)
