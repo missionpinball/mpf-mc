@@ -10,12 +10,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - os: windows-latest
-          python-version: 3.8
-          cibw-build: cp38-win_amd64
-        - os: windows-latest
-          python-version: 3.9
-          cibw-build: cp39-win_amd64
+        # - os: windows-latest
+        #   python-version: 3.8
+        #   cibw-build: cp38-win_amd64
+        # - os: windows-latest
+        #   python-version: 3.9
+        #   cibw-build: cp39-win_amd64
         - os: ubuntu-latest
           python-version: 3.8
           cibw-build: cp38-manylinux_x86_64
@@ -28,12 +28,12 @@ jobs:
         # - os: macos-latest
         #   python-version: 3.9
         #   cibw-build: cp39-macosx_arm64
-        - os: macos-latest
-          python-version: 3.8
-          cibw-build: cp38-macosx_x86_64
-        - os: macos-latest
-          python-version: 3.9
-          cibw-build: cp39-macosx_x86_64
+        # - os: macos-latest
+        #   python-version: 3.8
+        #   cibw-build: cp38-macosx_x86_64
+        # - os: macos-latest
+        #   python-version: 3.9
+        #   cibw-build: cp39-macosx_x86_64
 
     steps:
       - name: Checkout MPF-MC
@@ -49,6 +49,7 @@ jobs:
         run: |
               sudo apt-get update
               sudo apt-get install -y build-essential git python3-dev libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly libgstreamer1.0-dev libxine2-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff5-dev libx11-dev libmtdev-dev libgl1-mesa-dev libgles2-mesa-dev xvfb pulseaudio
+              pkg-config --list-all
         
       - name: Install dependencies via brew
         if: runner.os == 'macOS'  
