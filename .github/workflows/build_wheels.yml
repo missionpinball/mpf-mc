@@ -38,9 +38,6 @@ jobs:
     steps:
       - name: Checkout MPF-MC
         uses: actions/checkout@v3
-      
-      # - uses: ilammy/msvc-dev-cmd@v1
-      #   if: runner.os == 'Windows'
 
       - name: Setup python
         uses: actions/setup-python@v4

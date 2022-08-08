@@ -104,8 +104,7 @@ if sys.platform == 'win32':
     
     # Since Windows doesn't have pkgconfig, we have to manually find the SDL2 include location. :(
     # There are so many different places where SDL2 can be installed, and options for its include folder.
-    # This seems so lame, but it works.  
-    
+    # This seems so lame, but it works.
 
     sdl2_include_path = determine_sdl2()['include_dirs'][0]
     print("Setting SDL2 include path:", sdl2_include_path)
