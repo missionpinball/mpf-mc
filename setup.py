@@ -128,7 +128,7 @@ if sys.platform == 'win32':
     
 else:
     audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
-    bitmap_font_kws = members_appended(pc.parse('SDL2'), pc.parse('SDL2_image'))
+    bitmap_font_kws = members_appended(pc.parse('sdl2'), pc.parse('SDL2_image'))
 
 ext_modules = [
     Extension('mpfmc.core.audio.sound_file', [*sound_file_source], **audio_kws),
