@@ -44,13 +44,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies via apt-get
-        if: runner.os == 'Linux'
-        run: |
-              sudo apt-get update
-              sudo apt-get install -y build-essential git python3-dev libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly libgstreamer1.0-dev libxine2-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff5-dev libx11-dev libmtdev-dev libgl1-mesa-dev libgles2-mesa-dev xvfb pulseaudio
-              pkg-config --list-all
-              pkg-config sdl2 --cflags --libs
+      # - name: Install dependencies via apt-get
+      #   if: runner.os == 'Linux'
+      #   run: |
+      #         sudo apt-get update
+      #         sudo apt-get install -y build-essential git python3-dev libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly libgstreamer1.0-dev libxine2-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff5-dev libx11-dev libmtdev-dev libgl1-mesa-dev libgles2-mesa-dev xvfb pulseaudio
+      #         pkg-config --list-all
+      #         pkg-config sdl2 --cflags --libs
         
       - name: Install dependencies via brew
         if: runner.os == 'macOS'  
@@ -64,6 +64,11 @@ jobs:
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.8.1
         env:
+          CIBW_BEFORE_ALL_LINUX: |
+            sudo apt-get update
+            sudo apt-get install -y build-essential git libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly libgstreamer1.0-dev libxine2-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff5-dev libx11-dev libmtdev-dev libgl1-mesa-dev libgles2-mesa-dev xvfb pulseaudio
+            pkg-config --list-all
+            pkg-config sdl2 --cflags --libs
           CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
 
