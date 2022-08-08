@@ -65,7 +65,7 @@ jobs:
         uses: pypa/cibuildwheel@v2.8.1
         env:
           CIBW_BEFORE_ALL_LINUX: |
-            yum install -y SDL2.x86_64 SDL2-devel.x86_64 SDL2_image.x86_64 SDL2_image-devel.x86_64 SDL2_mixer.x86_64 SDL2_mixer-devel.x86_64 SDL2_ttf.x86_64 SDL2_ttf-devel.x86_64 PackageKit-gstreamer-plugin.x86_64
+            yum install -y SDL2.x86_64 SDL2-devel.x86_64 SDL2_image.x86_64 SDL2_image-devel.x86_64 SDL2_mixer.x86_64 SDL2_mixer-devel.x86_64 SDL2_ttf.x86_64 SDL2_ttf-devel.x86_64 gstreamer1.x86_64 gstreamer1-devel.x86_64
             pkg-config --list-all
             pkg-config sdl2 --cflags --libs
           CIBW_BUILD: ${{ matrix.cibw-build }}
@@ -74,3 +74,23 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
+
+# Yum packages from the manylinux container if we need them in the future.
+# gstreamer1-plugins-bad-free.i686           1.10.4-3.el7           base          
+# gstreamer1-plugins-bad-free.x86_64         1.10.4-3.el7           base          
+# gstreamer1-plugins-bad-free-devel.i686     1.10.4-3.el7           base          
+# gstreamer1-plugins-bad-free-devel.x86_64   1.10.4-3.el7           base          
+# gstreamer1-plugins-bad-free-gtk.i686       1.10.4-3.el7           base          
+# gstreamer1-plugins-bad-free-gtk.x86_64     1.10.4-3.el7           base          
+# gstreamer1-plugins-base.i686               1.10.4-2.el7           base          
+# gstreamer1-plugins-base.x86_64             1.10.4-2.el7           base          
+# gstreamer1-plugins-base-devel.i686         1.10.4-2.el7           base          
+# gstreamer1-plugins-base-devel.x86_64       1.10.4-2.el7           base          
+# gstreamer1-plugins-base-devel-docs.noarch  1.10.4-2.el7           base          
+# gstreamer1-plugins-base-tools.x86_64       1.10.4-2.el7           base          
+# gstreamer1-plugins-good.i686               1.10.4-2.el7           base          
+# gstreamer1-plugins-good.x86_64             1.10.4-2.el7           base          
+# gstreamer1-plugins-ugly-free.i686          1.10.4-3.el7           base          
+# gstreamer1-plugins-ugly-free.x86_64        1.10.4-3.el7           base          
+# gstreamer1-plugins-ugly-free-devel.i686    1.10.4-3.el7           base          
+# gstreamer1-plugins-ugly-free-devel.x86_64
