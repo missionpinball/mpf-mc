@@ -65,9 +65,10 @@ jobs:
         uses: pypa/cibuildwheel@v2.8.1
         env:
           CIBW_BEFORE_ALL_LINUX: |
-            yum install -y libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev libgstreamer1.0-dev gstreamer1.0-plugins-good gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly 
-            pkg-config --list-all
-            pkg-config sdl2 --cflags --libs
+            yum list available
+            # yum install -y libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev libgstreamer1.0-dev gstreamer1.0-plugins-good gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly 
+            # pkg-config --list-all
+            # pkg-config sdl2 --cflags --libs
           CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
 
