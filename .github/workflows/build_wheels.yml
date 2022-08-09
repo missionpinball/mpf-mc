@@ -70,6 +70,7 @@ jobs:
           CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
           CIBW_TEST_COMMAND: >
+            cd {project} &&
             pwd &&
             ls &&
             python -m unittest discover -s mpfmc/tests
@@ -119,3 +120,24 @@ jobs:
 # gstreamer1-plugins-good.x86_64
 # gstreamer1-plugins-ugly-free.x86_64
 # gstreamer1-plugins-ugly-free-devel.x86_64
+
+
+# Mac runner root of test
+# + pwd && ls
+#   /Users/runner
+#   Desktop
+#   Documents
+#   Downloads
+#   Library
+#   Movies
+#   Music
+#   Pictures
+#   bootstrap
+#   hostedtoolcache
+#   imagedata.json
+#   project
+#   runners
+#   systeminfo.md
+#   systeminfo.txt
+#   target
+#   work
