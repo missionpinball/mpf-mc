@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   build_wheels:
-    name: Build wheel for ${{ matrix.cibw-build }}
+    name: Build for ${{ matrix.cibw-build }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -97,7 +97,7 @@ jobs:
   # This is maybe better since it validates the user-facing install process in a fresh env
 
   test_all:
-    name: Test wheel for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
     needs: [build_wheels, make_sdist]
     strategy:
       fail-fast: false
@@ -126,14 +126,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install --upgrade setuptools wheel build
     
-    - name: Download the newly-build wheel
+    - name: Download the newly-built wheel
       uses: actions/download-artifact@v3
       with:
         name: artifact
         path: dist
     
     - name: Install MPF-MC from new wheel
-      run: pip install --no-index --find-links=/dist mpf-mc
+      run: |
+        pwd
+        pip install --no-index --find-links=/mpf-mc/mpf-mc/dist mpf-mc
 
     - name: Run tests
       run: python -m unittest discover mpfmc
