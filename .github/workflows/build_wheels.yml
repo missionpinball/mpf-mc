@@ -43,14 +43,6 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      # - name: Install dependencies via apt-get
-      #   if: runner.os == 'Linux'
-      #   run: |
-      #         sudo apt-get update
-      #         sudo apt-get install -y build-essential git python3-dev libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly libgstreamer1.0-dev libxine2-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev libavcodec-dev libjpeg-dev libtiff5-dev libx11-dev libmtdev-dev libgl1-mesa-dev libgles2-mesa-dev xvfb pulseaudio
-      #         pkg-config --list-all
-      #         pkg-config sdl2 --cflags --libs
         
       - name: Install dependencies via brew
         if: runner.os == 'macOS'  
@@ -61,13 +53,11 @@ jobs:
               python -m pip install --upgrade pip
               pip install --upgrade setuptools wheel build
 
-      - name: Build wheels
+      - name: Run cibuildwheel
         uses: pypa/cibuildwheel@v2.8.1
         env:
-          CIBW_BEFORE_ALL_LINUX: |
+          CIBW_BEFORE_ALL_LINUX:  # This is done here and not as its own step as this runs inside the cibw containered environment
             yum install -y SDL2.x86_64 SDL2-devel.x86_64 SDL2_image.x86_64 SDL2_image-devel.x86_64 SDL2_mixer.x86_64 SDL2_mixer-devel.x86_64 SDL2_ttf.x86_64 SDL2_ttf-devel.x86_64 gstreamer1.x86_64 gstreamer1-devel.x86_64
-            pkg-config --list-all
-            pkg-config sdl2 --cflags --libs
           CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
 
@@ -76,21 +66,10 @@ jobs:
           path: ./wheelhouse/*.whl
 
 # Yum packages from the manylinux container if we need them in the future.
-# gstreamer1-plugins-bad-free.i686           1.10.4-3.el7           base          
-# gstreamer1-plugins-bad-free.x86_64         1.10.4-3.el7           base          
-# gstreamer1-plugins-bad-free-devel.i686     1.10.4-3.el7           base          
-# gstreamer1-plugins-bad-free-devel.x86_64   1.10.4-3.el7           base          
-# gstreamer1-plugins-bad-free-gtk.i686       1.10.4-3.el7           base          
-# gstreamer1-plugins-bad-free-gtk.x86_64     1.10.4-3.el7           base          
-# gstreamer1-plugins-base.i686               1.10.4-2.el7           base          
-# gstreamer1-plugins-base.x86_64             1.10.4-2.el7           base          
-# gstreamer1-plugins-base-devel.i686         1.10.4-2.el7           base          
-# gstreamer1-plugins-base-devel.x86_64       1.10.4-2.el7           base          
-# gstreamer1-plugins-base-devel-docs.noarch  1.10.4-2.el7           base          
-# gstreamer1-plugins-base-tools.x86_64       1.10.4-2.el7           base          
-# gstreamer1-plugins-good.i686               1.10.4-2.el7           base          
-# gstreamer1-plugins-good.x86_64             1.10.4-2.el7           base          
-# gstreamer1-plugins-ugly-free.i686          1.10.4-3.el7           base          
-# gstreamer1-plugins-ugly-free.x86_64        1.10.4-3.el7           base          
-# gstreamer1-plugins-ugly-free-devel.i686    1.10.4-3.el7           base          
+# gstreamer1-plugins-bad-free.x86_64
+# gstreamer1-plugins-bad-free-devel.x86_64
+# gstreamer1-plugins-base.x86_64
+# gstreamer1-plugins-base-devel.x86_64
+# gstreamer1-plugins-good.x86_64
+# gstreamer1-plugins-ugly-free.x86_64
 # gstreamer1-plugins-ugly-free-devel.x86_64
