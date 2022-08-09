@@ -105,8 +105,52 @@ jobs:
       with:
         path: dist/*.tar.gz
 
-  upload_all:  # only if this release has a tag and is a push from us (e.g. not a pull request)
+  test_all:  # I cannot get the CIBW testing to work, so I rolled my own
+    name: Test wheel for ${{ matrix.cibw-build }}
     needs: [build_wheels, make_sdist]
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install runtime dependencies via brew
+      if: runner.os == 'macOS'  
+      run: brew install SDL2 SDL2_mixer gstreamer
+      
+    - name: Install runtime dependencies via apt-get
+      if: runner.os == 'linux'  
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install libsdl2 libsdl2-mixer gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+    
+    - name: Install runtime dependencies via pip
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade setuptools wheel build
+    
+    - name: Download the newly-build wheel
+      uses: actions/download-artifact@v3
+      with:
+        name: artifact
+        path: dist
+    
+    - name: Install MPF-MC from new wheel
+      run: pip install --no-index --find-links=/dist mpf-mc
+
+    - name: Run tests
+      run: python -m unittest discover mpfmc
+    
+    # TODO add a coverage step (only needed on a single run)
+
+  upload_all:  # only if this release has a tag and is a push from us (e.g. not a pull request)
+    needs: [test_all]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     steps:
@@ -119,33 +163,3 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
-
-# Yum packages from the manylinux container if we need them in the future.
-# gstreamer1-plugins-bad-free.x86_64
-# gstreamer1-plugins-bad-free-devel.x86_64
-# gstreamer1-plugins-base.x86_64
-# gstreamer1-plugins-base-devel.x86_64
-# gstreamer1-plugins-good.x86_64
-# gstreamer1-plugins-ugly-free.x86_64
-# gstreamer1-plugins-ugly-free-devel.x86_64
-
-
-# Mac runner root of test
-# + pwd && ls
-#   /Users/runner
-#   Desktop
-#   Documents
-#   Downloads
-#   Library
-#   Movies
-#   Music
-#   Pictures
-#   bootstrap
-#   hostedtoolcache
-#   imagedata.json
-#   project
-#   runners
-#   systeminfo.md
-#   systeminfo.txt
-#   target
-#   work
