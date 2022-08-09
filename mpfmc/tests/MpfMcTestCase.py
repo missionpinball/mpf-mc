@@ -104,7 +104,6 @@ class MpfMcTestCase(unittest.TestCase):
         return glReadPixels(x, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE)
 
     def tearDown(self):
-        print(f"Test {self.__name__} tearing down")
         self.mc.stop()
 
     def patch_bcp(self):
@@ -133,8 +132,6 @@ class MpfMcTestCase(unittest.TestCase):
         Clock._start_tick = self._start_time
         Clock._last_tick = self._start_time
         Clock.time = self._mc_time
-
-        print(f"Test {self.__name__} start time: {self.test_start_time}")
 
         # prevent sleep in clock
         Clock._max_fps = 0

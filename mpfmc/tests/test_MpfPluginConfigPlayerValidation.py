@@ -17,10 +17,6 @@ from mpf.core.config_validator import ConfigValidator
 
 class TestMpfPluginConfigPlayerValidation(MpfTestCase):
 
-    def setUp(self):  # temporary
-        self.expected_duration = 1.5
-        super().setUp()
-
     def get_absolute_machine_path(self):
         return os.path.abspath(os.path.join(
             mpfmc.__path__[0], os.pardir, 'mpfmc', self.get_machine_path()))
