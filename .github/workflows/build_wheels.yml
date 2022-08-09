@@ -99,7 +99,7 @@ jobs:
   # This is maybe better since it validates the user-facing install process in a fresh env
   # For this test_all to work, the download must not contain the sdist or it will try to build it again ;)
 
-  test_all:
+  test_wheels:
     name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
     needs: [build_wheels]
     strategy:
@@ -138,7 +138,7 @@ jobs:
     - name: Install MPF-MC from new wheel
       run: |
         pwd
-        pip install --find-links=dist mpf-mc
+        pip install --pre --find-links=dist mpf-mc
 
     - name: Run tests
       run: python -m unittest discover mpfmc
