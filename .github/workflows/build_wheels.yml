@@ -97,10 +97,11 @@ jobs:
 
   # I cannot get the CIBW testing to work, so I rolled my own
   # This is maybe better since it validates the user-facing install process in a fresh env
+  # For this test_all to work, the download must not contain the sdist or it will try to build it again ;)
 
   test_all:
     name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
-    needs: [build_wheels, make_sdist]
+    needs: [build_wheels]
     strategy:
       fail-fast: false
       matrix:
@@ -145,7 +146,7 @@ jobs:
     # TODO add a coverage step (only needed on a single run)
 
   publish_to_pypi:  # only if this release has a tag and is a push from us (e.g. not a pull request)
-    needs: [test_all]
+    needs: [test_all, make_sdist]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     steps:
