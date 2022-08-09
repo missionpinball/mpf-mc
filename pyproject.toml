@@ -2,7 +2,7 @@
 name = "mpf-mc"
 description = "Mission Pinball Framework Media Controller"
 readme = "README.md"
-requires-python = ">=3.7; <3.10"
+requires-python = ">=3.7"
 license = {text = "MIT"}
 authors = [{ name = "The Mission Pinball Framework Team", email = "brian@missionpinball.org"}]
 keywords = ["pinball"]
