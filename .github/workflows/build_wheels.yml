@@ -72,6 +72,7 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
+          name: mpf-mc_wheels
           path: ./wheelhouse/*.whl
 
   make_sdist:
@@ -91,6 +92,7 @@ jobs:
 
     - uses: actions/upload-artifact@v3
       with:
+        name: mpf-mc_wheels
         path: dist/*.tar.gz
 
   # I cannot get the CIBW testing to work, so I rolled my own
@@ -129,14 +131,13 @@ jobs:
     - name: Download the newly-built wheel
       uses: actions/download-artifact@v3
       with:
-        name: artifact
+        name: mpf-mc_wheels
         path: dist
     
     - name: Install MPF-MC from new wheel
       run: |
         pwd
-        dir dist
-        pip install --no-index --find-links=dist mpf-mc
+        pip install --find-links=dist mpf-mc
 
     - name: Run tests
       run: python -m unittest discover mpfmc
