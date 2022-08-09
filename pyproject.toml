@@ -60,8 +60,9 @@ version = {attr = "mpfmc._version.__version__"}
 [tool.setuptools.packages.find]
 include = ["mpfmc*"]
 
-[tool.setuptools_scm]
-write_to = "mpfmc/_version.py"
+# TODO when setuptools_scm switches to SemVer, we can prob use this for versioning
+# [tool.setuptools_scm]
+# write_to = "mpfmc/_version.py"
 
 [build-system]
 requires = [
