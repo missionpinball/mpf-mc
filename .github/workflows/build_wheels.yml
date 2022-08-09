@@ -69,7 +69,10 @@ jobs:
             yum install -y SDL2.x86_64 SDL2-devel.x86_64 SDL2_image.x86_64 SDL2_image-devel.x86_64 SDL2_mixer.x86_64 SDL2_mixer-devel.x86_64 SDL2_ttf.x86_64 SDL2_ttf-devel.x86_64 gstreamer1.x86_64 gstreamer1-devel.x86_64
           CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
-          CIBW_TEST_COMMAND: python -m unittest discover -s {project}/tests
+          CIBW_TEST_COMMAND: >
+            pwd &&
+            ls &&
+            python -m unittest discover -s mpfmc/tests
 
       - uses: actions/upload-artifact@v3
         with:
@@ -85,7 +88,7 @@ jobs:
 
     - name: Build SDist
       run: |
-        sudo apt-get install SDL2 SDL2_mixer gstreamer
+        sudo apt-get install libsdl2-2.0 libsdl2-mixer-2.0 libgstreamer1.0-0
         pip install --upgrade setuptools wheel build
         python -m build --sdist
 
