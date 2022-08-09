@@ -135,7 +135,8 @@ jobs:
     - name: Install MPF-MC from new wheel
       run: |
         pwd
-        pip install --no-index --find-links=/mpf-mc/mpf-mc/dist mpf-mc
+        dir dist
+        pip install --no-index --find-links=dist mpf-mc
 
     - name: Run tests
       run: python -m unittest discover mpfmc
