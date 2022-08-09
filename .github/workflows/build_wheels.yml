@@ -70,9 +70,19 @@ jobs:
           CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
 
+      - name: Run tests
+        run: python -m unittest discover -s mpfmc/tests
+
       - uses: actions/upload-artifact@v3
         with:
           path: ./wheelhouse/*.whl
+
+      - name: Publish to PyPI  # only if this release has a tag and is a push from us (e.g. not a pull request)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          print_hash: true
 
 # Yum packages from the manylinux container if we need them in the future.
 # gstreamer1-plugins-bad-free.x86_64
