@@ -84,7 +84,7 @@ test-command = [
     "cd {project}/mpfmc/tests",
     "python -m unittest discover"
 ]
-test-command-windows = [
-    "cd /d {project}/mpfmc/tests",
-    "python -m unittest discover"
-]
+# test-command-windows = [
+#     "cd /d {project}/mpfmc/tests",
+#     "python -m unittest discover"
+# ]
