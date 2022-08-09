@@ -69,9 +69,7 @@ jobs:
             yum install -y SDL2.x86_64 SDL2-devel.x86_64 SDL2_image.x86_64 SDL2_image-devel.x86_64 SDL2_mixer.x86_64 SDL2_mixer-devel.x86_64 SDL2_ttf.x86_64 SDL2_ttf-devel.x86_64 gstreamer1.x86_64 gstreamer1-devel.x86_64
           CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
-
-      - name: Run tests
-        run: python -m unittest discover -s mpfmc/tests
+          CIBW_TEST_COMMAND: python -m unittest discover -s {package}/tests
 
       - uses: actions/upload-artifact@v3
         with:
