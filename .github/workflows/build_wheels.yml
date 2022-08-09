@@ -69,18 +69,6 @@ jobs:
             yum install -y SDL2.x86_64 SDL2-devel.x86_64 SDL2_image.x86_64 SDL2_image-devel.x86_64 SDL2_mixer.x86_64 SDL2_mixer-devel.x86_64 SDL2_ttf.x86_64 SDL2_ttf-devel.x86_64 gstreamer1.x86_64 gstreamer1-devel.x86_64
           CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
-          CIBW_TEST_COMMAND: cd {project}/mpfmc/tests && python -m unittest discover
-          CIBW_TEST_COMMAND_WINDOWS: >
-            cd /d {project} &&
-            pwd &&
-            ls &&
-            cd mpfmc &&
-            pwd &&
-            ls &&
-            cd tests &&
-            pwd &&
-            ls &&
-            python -m unittest discover
 
       - uses: actions/upload-artifact@v3
         with:
@@ -105,7 +93,10 @@ jobs:
       with:
         path: dist/*.tar.gz
 
-  test_all:  # I cannot get the CIBW testing to work, so I rolled my own
+  # I cannot get the CIBW testing to work, so I rolled my own
+  # This is maybe better since it validates the user-facing install process in a fresh env
+
+  test_all:
     name: Test wheel for ${{ matrix.cibw-build }}
     needs: [build_wheels, make_sdist]
     strategy:
@@ -149,7 +140,7 @@ jobs:
     
     # TODO add a coverage step (only needed on a single run)
 
-  upload_all:  # only if this release has a tag and is a push from us (e.g. not a pull request)
+  publish_to_pypi:  # only if this release has a tag and is a push from us (e.g. not a pull request)
     needs: [test_all]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
