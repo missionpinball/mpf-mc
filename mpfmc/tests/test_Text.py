@@ -202,7 +202,7 @@ class TestText(MpfMcTestCase):
 
         bounding_box = self.get_widget().canvas.children[-1]
         self.assertEqual(self.get_widget().text, 'its even')
-        self.assertIn(bounding_box.size, ((346, 118), (343.0, 118.0)))
+        self.assertIn(bounding_box.size, ((346, 118), (343.0, 118.0), (341.0, 118.0)))
         self.assertEqual(bounding_box.pos, (200, 150))
 
         # update var, should update widget with an odd pixel width and offset DOWN
