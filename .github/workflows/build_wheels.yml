@@ -119,7 +119,7 @@ jobs:
       if: runner.os == 'linux'  
       run: |
         sudo apt-get update
-        sudo apt-get -y install libsdl2-2.0 libsdl2-mixer-2.0 libgstreamer-1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+        sudo apt-get -y install libsdl2-2.0 libsdl2-mixer-2.0 gstreamer-1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
     
     - name: Install runtime dependencies via pip
       run: |
