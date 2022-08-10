@@ -90,7 +90,7 @@ class TestBcpClient(MockBcpClient):
                 except KeyError:
                     continue
 
-    def _start_app_as_slave(self):
+    def _start_app_as_worker(self):
         # from app::run
         if not self.mc.built:
             self.mc.load_config()
@@ -144,7 +144,7 @@ class TestBcpClient(MockBcpClient):
         Window.create_window()
         Window.canvas.clear()
 
-        self._start_app_as_slave()
+        self._start_app_as_worker()
 
     def _mc_time(self):
         return self._start_time + self.machine.clock.loop._time

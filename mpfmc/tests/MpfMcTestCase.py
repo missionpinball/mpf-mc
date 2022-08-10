@@ -157,14 +157,14 @@ class MpfMcTestCase(unittest.TestCase):
             Window.create_window()
             Window.canvas.clear()
 
-            self._start_app_as_slave()
+            self._start_app_as_worker()
         except Exception:
             if hasattr(self, "mc") and self.mc:
                 # prevent dead locks with two asset manager threads
                 self.mc.stop()
             raise
 
-    def _start_app_as_slave(self):
+    def _start_app_as_worker(self):
         # from app::run
         if not self.mc.built:
             self.mc.load_config()
