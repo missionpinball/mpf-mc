@@ -167,7 +167,7 @@ jobs:
     - name: Download wheels
       uses: actions/download-artifact@v3
       with:
-        name: artifact
+        name: mpf-mc_wheels
         path: dist
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@v1.5.0
