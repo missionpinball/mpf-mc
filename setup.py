@@ -104,7 +104,12 @@ if sys.platform == 'win32':
     
 else:
     audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
-    bitmap_font_kws = members_appended(pc.parse('sdl2'), pc.parse('SDL2_image'))
+    
+    try:
+        bitmap_font_kws = members_appended(pc.parse('sdl2'), pc.parse('SDL2_image'))
+    except pc.pkgconfig.PackageNotFoundError:
+        # SDL2_image is not found sometimes on MacOS, not sure why, but it works with the mixer paths too
+        bitmap_font_kws = members_appended(pc.parse('sdl2'), pc.parse('SDL2_mixer'))
 
 ext_modules = [
     Extension('mpfmc.core.audio.sound_file', [*sound_file_source], **audio_kws),
