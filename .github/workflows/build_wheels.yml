@@ -1,3 +1,9 @@
+# GitHub Workflow to build, test, and upload wheels
+
+# TODO: Implement GitHub's caching to speed up builds
+# TODO: macOS wheel building randomly fails, but rerunning works. Why?
+# TODO: Implement ARM-based macOS builds on a self-hosted runner
+
 name: Wheel Builder
 
 on: [push, pull_request]
@@ -53,14 +59,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies via brew
         if: runner.os == 'macOS'  
-        run: brew install SDL2 SDL2_mixer SDL2_ttf SDL2_image gstreamer
+        run: brew install SDL2 SDL2_mixer SDL2_image gstreamer
       - name: Run cibuildwheel
         uses: pypa/cibuildwheel@v2.8.1
         env:
           CIBW_BEFORE_ALL_LINUX: > # This is done here and not as its own step as this runs inside the cibw containered environment
             yum install -y SDL2.x86_64 SDL2-devel.x86_64 SDL2_image.x86_64 SDL2_image-devel.x86_64
-            SDL2_mixer.x86_64 SDL2_mixer-devel.x86_64 SDL2_ttf.x86_64 SDL2_ttf-devel.x86_64
-            gstreamer1.x86_64 gstreamer1-devel.x86_64 &&
+            SDL2_mixer.x86_64 SDL2_mixer-devel.x86_64 gstreamer1.x86_64 gstreamer1-devel.x86_64 &&
             python -m pip install --upgrade pip &&
             pip install --upgrade setuptools wheel build &&
             git clone --recursive --branch ${{ github.ref_name }} https://github.com/missionpinball/mpf.git _mpf ||
@@ -93,12 +98,9 @@ jobs:
     - name: Build SDist
       run: >
         sudo apt-get update &&
-        sudo apt-get -y install python3.9 python3-pip build-essential git python3-dev
-        libsdl2-dev libsdl2-ttf-dev libsdl2-image-dev libsdl2-mixer-dev gstreamer1.0-plugins-base
-        gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
-        libgstreamer1.0-dev libxine2-ffmpeg libsmpeg-dev libswscale-dev libavformat-dev
-        libavcodec-dev libjpeg-dev libtiff5-dev libx11-dev libmtdev-dev libgl1-mesa-dev
-        libgles2-mesa-dev xvfb pulseaudio &&
+        sudo apt-get -y install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev
+        gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad
+        gstreamer1.0-plugins-ugly libgstreamer1.0-dev &&
         pip install --upgrade setuptools wheel build &&
         python -m build --sdist
     - name: Upload SDist

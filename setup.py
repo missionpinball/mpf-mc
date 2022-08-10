@@ -23,13 +23,6 @@ audio_interface_source = 'mpfmc/core/audio/audio_interface.pyx',
 playlist_controller_source = 'mpfmc/core/audio/playlist_controller.pyx',
 bitmap_font_source = 'mpfmc/uix/bitmap_font/bitmap_font.pyx',
 
-ext_libs = ['sdl2', 'SDL2_mixer', 'SDL2_image', 'gstreamer-1.0']
-
-if sys.platform != 'win32':
-    for lib in ext_libs:
-        if not pc.exists(lib):
-            raise Exception(f"MPF-MC setup.py cannot find {lib}")
-
 def members_appended(*ds):  # shoutout to the borg backup project
         result = defaultdict(list)
         for d in ds:
