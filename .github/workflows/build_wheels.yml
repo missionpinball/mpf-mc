@@ -99,6 +99,70 @@ jobs:
   # This is maybe better since it validates the user-facing install process in a fresh env
   # For this test_all to work, the download must not contain the sdist or it will try to build it again ;)
 
+  test_integration:
+    name: MPF and MPF-MC Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install runtime library dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get -y install libsdl2-2.0 libsdl2-mixer-2.0 gstreamer-1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.9
+
+    - name: Checkout MPF-MC
+      uses: actions/checkout@v3
+
+    - name: Install Python runtime dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --upgrade setuptools wheel build
+
+    - name: Clone & install MPF
+      run: |
+        git clone --recursive --branch ${{ github.ref_name }} https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch `python get_version.py` https://github.com/missionpinball/mpf.git _mpf || git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf
+        pip install -e _mpf
+
+    - name: Download the newly-built wheel
+      uses: actions/download-artifact@v3
+      with:
+        name: mpf-mc_wheels
+        path: dist
+  
+    - name: Install MPF-MC from new wheel
+      run: |
+        pip install --pre --find-links=dist mpf-mc
+
+    - name: Run integration tests
+      run: |
+        docker run -v $PWD:$PWD -v /dev/snd:/dev/snd --privileged -w $PWD $LINUX /bin/sh -c "export DEBIAN_FRONTEND=noninteractive; _mpf_installer/install-mpf-dependencies && _mpf_installer/install-mc-dependencies && pip3 install --upgrade coveralls && pip3 install prospector==1.3.1 && apt-get -y install xvfb && pip3 install -e _mpf/ && pip3 install -e . && export DISPLAY=:99.0 && /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX && export PYTHONPATH=$PYTHONPATH:$(pwd) && coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests && prospector && coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;";
+
+# pip install --upgrade coveralls
+
+# pip install prospector==1.3.1
+
+# apt-get -y install xvfb
+
+# pip install -e _mpf/
+
+# pip install -e .
+
+# export DISPLAY=:99.0
+
+# /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX
+
+# export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+# coverage3 run --concurrency=thread -m unittest discover -s mpfmc/tests
+
+# prospector
+
+# coverage3 run -a --concurrency=thread -m unittest discover -s mpfmc/integration;
+
   test_wheels:
     name: Test Python ${{ matrix.python-version }} on ${{ matrix.os }}
     needs: [build_wheels]
@@ -146,7 +210,7 @@ jobs:
     # TODO add a coverage step (only needed on a single run)
 
   publish_to_pypi:  # only if this release has a tag and is a push from us (e.g. not a pull request)
-    needs: [test_wheels, make_sdist]
+    needs: [test_wheels, make_sdist, test_integration]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     steps:
