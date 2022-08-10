@@ -101,6 +101,7 @@ jobs:
 
   test_integration:
     name: MPF and MPF-MC Integration Tests
+    needs: [build_wheels]
     runs-on: ubuntu-latest
 
     steps:
