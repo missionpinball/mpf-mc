@@ -97,7 +97,7 @@ jobs:
 
   # I cannot get the CIBW testing to work, so I rolled my own
   # This is maybe better since it validates the user-facing install process in a fresh env
-  # For this test_all to work, the download must not contain the sdist or it will try to build it again ;)
+  # For this test_all to work, the download must not contain the sdist or it will try to build it again
 
   test_integration:
     name: MPF and MPF-MC Integration Tests
