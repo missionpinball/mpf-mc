@@ -23,12 +23,12 @@ audio_interface_source = 'mpfmc/core/audio/audio_interface.pyx',
 playlist_controller_source = 'mpfmc/core/audio/playlist_controller.pyx',
 bitmap_font_source = 'mpfmc/uix/bitmap_font/bitmap_font.pyx',
 
-ext_libs = ['sdl2', 'SDL2_image', 'SDL2_mixer', 'SDL2_ttf', 'gstreamer-1.0']
+ext_libs = ['sdl2', 'SDL2_mixer', 'SDL2_image', 'gstreamer-1.0']
 
 if sys.platform != 'win32':
     for lib in ext_libs:
         if not pc.exists(lib):
-            raise Exception(f"Missing {lib}")
+            raise Exception(f"MPF-MC setup.py cannot find {lib}")
 
 def members_appended(*ds):  # shoutout to the borg backup project
         result = defaultdict(list)
@@ -56,7 +56,7 @@ def determine_sdl2():  # shoutout to the kivy project
     flags = {}
     includes, _ = get_isolated_env_paths()
 
-    flags['libraries'] = ['SDL2', 'SDL2_ttf', 'SDL2_image', 'SDL2_mixer']
+    flags['libraries'] = ['SDL2', 'SDL2_mixer', 'SDL2_image']
 
     sdl2_paths = []
     for include in includes + [join(sys.prefix, 'include')]:
@@ -70,7 +70,7 @@ def determine_sdl2():  # shoutout to the kivy project
     flags['library_dirs'] = sdl2_paths
 
     # ensure headers for all the SDL2 and sub libraries are available
-    libs_to_check = ['SDL', 'SDL_mixer', 'SDL_ttf', 'SDL_image']
+    libs_to_check = ['SDL2', 'SDL2_mixer', 'SDL2_image']
     for lib in libs_to_check:
         found = False
         for d in flags['include_dirs']:
