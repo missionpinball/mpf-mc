@@ -149,7 +149,7 @@ jobs:
     - name: Install MPF-MC from new wheel
       run: pip install --pre --find-links=dist mpf-mc
     - name: Run tests  # Can't figure out how to run tests on mac or windows, but I guess that's ok? At least we test the wheel installs? TODO?
-      if: runner.os == 'linux' and runner.python_version == '3.9'  # Really we just need to run the tests once
+      if: runner.os == 'linux' && runner.python_version == '3.9'  # Really we just need to run the tests once
       run: |
         /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX
         export PYTHONPATH=$PYTHONPATH:$(pwd)
