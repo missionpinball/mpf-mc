@@ -202,7 +202,8 @@ class TestText(MpfMcTestCase):
 
         bounding_box = self.get_widget().canvas.children[-1]
         self.assertEqual(self.get_widget().text, 'its even')
-        self.assertIn(bounding_box.size, ((346, 118), (343.0, 118.0), (341.0, 118.0)))
+        self.assertAlmostEqual(bounding_box.size[0], 343, delta=5)
+        self.assertAlmostEqual(bounding_box.size[1], 118, delta=5)
         self.assertEqual(bounding_box.pos, (200, 150))
 
         # update var, should update widget with an odd pixel width and offset DOWN
@@ -211,7 +212,8 @@ class TestText(MpfMcTestCase):
 
         bounding_box = self.get_widget().canvas.children[-1]
         self.assertEqual(self.get_widget().text, 'odd')
-        self.assertIn(bounding_box.size, ((171, 118), (169.0, 118.0)))
+        self.assertAlmostEqual(bounding_box.size[0], 170, delta=5)
+        self.assertAlmostEqual(bounding_box.size[1], 118, delta=5)
         self.assertEqual(bounding_box.pos, (199.5, 150))
 
         # update var, should update widget with an odd pixel width and offset UP
@@ -221,7 +223,8 @@ class TestText(MpfMcTestCase):
 
         bounding_box = self.get_widget().canvas.children[-1]
         self.assertEqual(self.get_widget().text, 'also odd')
-        self.assertIn(bounding_box.size, ((384, 118), (381.0, 118.0)))
+        self.assertAlmostEqual(bounding_box.size[0], 382, delta=5)
+        self.assertAlmostEqual(bounding_box.size[1], 118, delta=5)
         self.assertIn(bounding_box.pos, ((200.0, 150), (200.5, 150.0)))
 
         # update var, should update widget with an even pixel width and not offset
@@ -230,7 +233,8 @@ class TestText(MpfMcTestCase):
 
         bounding_box = self.get_widget().canvas.children[-1]
         self.assertEqual(self.get_widget().text, 'no round')
-        self.assertIn(bounding_box.size, ((396, 118), (394.0, 118.0)))
+        self.assertAlmostEqual(bounding_box.size[0], 395, delta=5)
+        self.assertAlmostEqual(bounding_box.size[1], 118, delta=5)
         self.assertEqual(bounding_box.pos, (200, 150))
 
     def test_current_player(self):
