@@ -1,8 +1,11 @@
 # GitHub Workflow to build, test, and upload wheels
 
 # TODO: Implement GitHub's caching to speed up builds
-# TODO: macOS wheel building randomly fails, but rerunning works. Why?
+# TODO: Decide on specific versions of dependencies, and our locking strategy
 # TODO: Implement ARM-based macOS builds on a self-hosted runner
+# TODO: Raspberry Pi builds
+# TODO: Do something with coverage
+# TODO: Linting
 
 name: Wheel Builder
 
