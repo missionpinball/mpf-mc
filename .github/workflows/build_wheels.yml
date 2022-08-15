@@ -128,10 +128,10 @@ jobs:
       DISPLAY: ':99.0'
     steps:
     - name: Install runtime libraries on macOS
-      if: runner.os == 'macOS'  
+      if: runner.os == 'macOS'
       run: brew install SDL2 SDL2_mixer gstreamer
     - name: Install runtime libraries on Linux
-      if: runner.os == 'linux'  
+      if: runner.os == 'linux'
       run: |
         sudo apt-get update
         sudo apt-get -y install libsdl2-2.0 libsdl2-mixer-2.0 gstreamer-1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly xvfb
@@ -149,7 +149,7 @@ jobs:
         name: mpf-mc_wheels
         path: dist
     - name: Clone & install MPF  # try to find a matching version before we default to dev
-      run: > 
+      run: >
         git clone --recursive --branch ${{ github.ref_name }} https://github.com/missionpinball/mpf.git _mpf ||
         git clone --recursive --branch `python get_version.py` https://github.com/missionpinball/mpf.git _mpf ||
         git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf &&
@@ -162,6 +162,13 @@ jobs:
         /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX
         coverage3 run --concurrency=thread -m unittest discover mpfmc.tests
         coverage3 run -a --concurrency=thread -m unittest discover mpfmc.integration
+
+    - name: Upload coverage data to coveralls.io
+      run: coveralls --service=github
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_FLAG_NAME: ${{ matrix.python-version }}-${{ matrix.os }}
+        COVERALLS_PARALLEL: true
 
   publish_to_pypi:  # only if this release has a tag and is a push from us (e.g. not a pull request)
     needs: [test_wheels, make_sdist]
@@ -178,3 +185,16 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
+
+  coveralls:
+    name: Indicate completion to coveralls.io
+    needs: test_wheels
+    runs-on: ubuntu-latest
+    container: python:3-slim
+    steps:
+    - name: Finished
+      run: |
+        pip3 install --upgrade coveralls
+        coveralls --service=github --finish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
