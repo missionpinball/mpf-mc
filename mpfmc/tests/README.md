@@ -1,16 +1,12 @@
 Running MPF-MC Tests
 ====================
 
-All tests require the Python "mock" package which you can install via:
-
-`python -m pip install mock`
-
 The exact commands you use to run the tests vary depending on whether you have installed MPF to your system or whether
 you are running tests from an mpf development folder.
 
 If you installed MPF-MC (via pip, etc.)
 ------------------------------------
-If you installed MPF-MC to your system (for example, "pip install mpf-mc"), then you can run the tests from the
+If you installed MPF-MC to your system (for example, `pip install mpf-mc`), then you can run the tests from the
 installed package via the following command:
 
 `python -m unittest discover mpf`
