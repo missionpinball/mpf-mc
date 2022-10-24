@@ -23,7 +23,7 @@ classifiers=[
 dependencies = [
     "ruamel.yaml == 0.15.42",  # newer than this requires c requires compiled c lib, currently no Mac arm versions
     "kivy >=2.0.0",
-    "psutil ==5.9.1",
+    "psutil ==5.9.3",
     "Pygments >=2.6.1",
     "kivy_deps.sdl2 >= 0.3.1; platform_system=='Windows'",
     "kivy_deps.glew >= 0.3.0; platform_system=='Windows'",
