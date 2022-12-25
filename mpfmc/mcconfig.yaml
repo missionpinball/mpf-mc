@@ -43,6 +43,7 @@ mpf-mc:
         - gain
         - gamma
         - glow
+        - linear_gradient
         - monochrome
         - reduce
 
