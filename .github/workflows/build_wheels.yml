@@ -99,7 +99,8 @@ jobs:
     - name: Build SDist
       run: >
         sudo apt-get update &&
-        sudo apt-get -y install libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev
+        sudo apt-get -y remove libunwind-14 &&
+        sudo apt-get -y install libunwind-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev
         gstreamer1.0-plugins-base gstreamer1.0-plugins-base gstreamer1.0-plugins-bad
         gstreamer1.0-plugins-ugly libgstreamer1.0-dev &&
         pip install --upgrade setuptools wheel build &&
