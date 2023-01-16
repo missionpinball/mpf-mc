@@ -21,15 +21,15 @@ classifiers=[
     "Topic :: Games/Entertainment :: Arcade"
     ]
 dependencies = [
-    "ruamel.yaml == 0.15.42",  # newer than this requires c requires compiled c lib, currently no Mac arm versions
+    "ruamel.yaml == 0.15.42",  # 0.15.x newer than this requires compiled c lib, currently no Mac arm versions, 0.16+ require code refactor
     "mpf >= 0.56.0.dev33",
-    "kivy >=2.0.0",
-    "psutil ==5.9.1",
-    "Pygments >=2.6.1",
-    "kivy_deps.sdl2 >= 0.3.1; platform_system=='Windows'",
-    "kivy_deps.glew >= 0.3.0; platform_system=='Windows'",
-    "kivy_deps.gstreamer >= 0.3.1; platform_system=='Windows'",
-    "ffpyplayer >= 4.3.2"
+    "kivy == 2.1.0",  # Mar 6, 2022
+    "psutil == 5.9.4",  # Nov 7, 2022
+    "Pygments == 2.14.0", # Jan 1, 2023
+    "kivy_deps.sdl2 == 0.4.5; platform_system=='Windows'",  # Feb 15, 2022. 0.5.0 (Sept 2002) and 0.5.1 (Oct 2022) cause audio playback issues
+    "kivy_deps.glew == 0.3.1; platform_system=='Windows'",  # Feb 15, 2022
+    "kivy_deps.gstreamer == 0.3.3; platform_system=='Windows'",  # Jan 11, 2022
+    "ffpyplayer == 4.3.5"  # Mar 29, 2022
     ]
 dynamic = ["version"]
 
