@@ -17,30 +17,29 @@ GPU of the computer it's running on. There are other media controller projects (
 MPF-MC runs on Windows, Mac, Linux, and Raspberry Pi. It can run on the same machine as the core MPF engine, or it can be a
 separate machine. It runs as a separate process from MPF, so it works well on a multi-core computer.
 
-The MPF project homepage is here : http://missionpinball.org
+The MPF project homepage is here : https://missionpinball.org
 
 [![Coverage Status](https://coveralls.io/repos/missionpinball/mpf-mc/badge.svg?branch=dev&service=github)](https://coveralls.io/github/missionpinball/mpf-mc?branch=dev)
 [![Test & Build Status](https://github.com/missionpinball/mpf-mc/actions/workflows/build_wheels.yml/badge.svg)](https://github.com/missionpinball/mpf-mc/actions/workflows/build_wheels.yml)
 
-Installation, Documentation, and Examples
------------------------------------------
-* Getting started tutorial : http://docs.missionpinball.org/en/latest/tutorial/
-* Installation : http://docs.missionpinball.org/en/latest/install/
-* User documentation : http://docs.missionpinball.org
-* API / developer documentation : http://docs.missionpinball.org/en/latest/api/
+Documentation
+-------------
+
+* User Docs (installation, tutorials, & reference): https://docs.missionpinball.org
+* Developer documentation: https://developer.missionpinball.org/
 
 Support
 -------
-We have a user support forum at : https://groups.google.com/forum/#!forum/mpf-users
 
-Authors & Contributing
-----------------------
-MPF and the MPF-MC are labors of love by awesome pinball-loving people. There's a list of authors in the AUTHORS file.
-We'd love for you to join us! Even if you don't know Python well, there's plenty to do. Drop us a line in the forum, or
-make a change and submit a pull request! More info [here](http://docs.missionpinball.org/en/latest/about/contributing_to_mpf.html).
+MPF is open source and has no official support. Some MPF users follow the MPF-users Google group: https://groups.google.com/forum/#!forum/mpf-users. Individual hardware providers may provide additional support for users of their hardware.
+
+Contributing
+------------
+
+MPF is a passion project created and maintained by volunteers. If you're a Python coder, documentation writer, or pinball maker, feel free to make a change and submit a pull request. For more information about contributing see the [Contributing Code](http://docs.missionpinball.org/en/latest/about/contributing_to_mpf.html)
+and [Contributing Documentation](http://docs.missionpinball.org/en/latest/about/contributing_to_mpf_docs.html) pages.
 
 License
 -------
-* MPF and the MPF-MC are released under the terms of the MIT License. Please refer to the LICENSE file for details.
-* The MIT license basically means you can do anything you want with MPF, including using it for commercial projects.
-  You don't have to pay us or share your changes if you don't want to.
+
+MPF and related projects are released under the MIT License. Refer to the LICENSE file for details. Docs are released under Creative Commons CC BY 4.0.

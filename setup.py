@@ -56,7 +56,7 @@ def determine_sdl2():  # shoutout to the kivy project
         sdl_inc = join(include, 'SDL2')
         if isdir(sdl_inc):
             sdl2_paths.append(sdl_inc)
-    
+
     flags['include_dirs'] = sdl2_paths
     flags['extra_link_args'] = []
     flags['extra_compile_args'] = []
@@ -79,32 +79,32 @@ def determine_sdl2():  # shoutout to the kivy project
     return flags
 
 if sys.platform == 'win32':
-    
+
     # Since Windows doesn't have pkgconfig, we have to manually find the SDL2 include location. :(
 
     sdl2_include_path = determine_sdl2()['include_dirs'][0]
     print("Setting SDL2 include path:", sdl2_include_path)
-    
+
     general_include_path = sdl2_include_path.strip('\SDL2') # strip the SDL2 folder
     print("Setting general include path:", general_include_path)
 
     libs_include_path = general_include_path[:-8] # strip the \include
     libs_include_path = join(libs_include_path, 'libs')
     print("Setting libs include path:", libs_include_path)
-    
+
     audio_kws = {'define_macros': [('_THREAD_SAFE', None)],
                  'include_dirs': [sdl2_include_path, general_include_path],
                 'libraries': ['SDL2_mixer', 'SDL2', 'gstreamer-1.0', 'glib-2.0', 'gobject-2.0'],
                 'library_dirs': [libs_include_path]}
-    
+
     bitmap_font_kws = {'define_macros': [('_THREAD_SAFE', None)],
                  'include_dirs': [sdl2_include_path, general_include_path],
                  'libraries': ['SDL2', 'SDL2_image'],
                 'library_dirs': [libs_include_path]}
-    
+
 else:
     audio_kws = members_appended(pc.parse('SDL2_mixer'), pc.parse('gstreamer-1.0'))
-    
+
     try:
         bitmap_font_kws = members_appended(pc.parse('sdl2'), pc.parse('SDL2_image'))
     except pc.pkgconfig.PackageNotFoundError:

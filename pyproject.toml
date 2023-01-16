@@ -22,7 +22,7 @@ classifiers=[
     ]
 dependencies = [
     "ruamel.yaml == 0.15.42",  # 0.15.x newer than this requires compiled c lib, currently no Mac arm versions, 0.16+ require code refactor
-    "mpf >= 0.56.0.dev33",
+    "mpf >= 0.56.0",  # Jan 15, 2023, our intention is for MPF-MC 0.56 to also work with MPF 0.57+
     "kivy == 2.1.0",  # Mar 6, 2022
     "psutil == 5.9.4",  # Nov 7, 2022
     "Pygments == 2.14.0", # Jan 1, 2023
