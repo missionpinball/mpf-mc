@@ -18,15 +18,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - os: windows-latest
-          python-version: 3.7
-          cibw-build: cp37-win_amd64
-        - os: windows-latest
-          python-version: 3.8
-          cibw-build: cp38-win_amd64
-        - os: windows-latest
-          python-version: 3.9
-          cibw-build: cp39-win_amd64
+        # - os: windows-latest
+        #   python-version: 3.7
+        #   cibw-build: cp37-win_amd64
+        # - os: windows-latest
+        #   python-version: 3.8
+        #   cibw-build: cp38-win_amd64
+        # - os: windows-latest
+        #   python-version: 3.9
+        #   cibw-build: cp39-win_amd64
         - os: ubuntu-latest
           python-version: 3.7
           cibw-build: cp37-manylinux_x86_64
