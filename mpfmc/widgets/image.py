@@ -103,7 +103,7 @@ class ImageWidget(Widget):
         if self._image.image.anim_available:
             self.fps = self.config['fps']
             self.loops = self.config['loops']
-            self.start_frame = self._image.image.anim_index if self._image.frame_persist else self.config['start_frame']
+            self.start_frame = self._image.image.anim_index +1 if self._image.frame_persist else self.config['start_frame']
             # If not auto playing, set the end index to be the start frame
             if not self.config['auto_play']:
                 # Frame numbers start at 1 and indexes at 0, so subtract 1
@@ -111,7 +111,7 @@ class ImageWidget(Widget):
             self.play(start_frame=self.start_frame, auto_play=self.config['auto_play'])
 
             # If this image should persist its animation frame on future loads, set that now
-            if self._image.config.get('persist_frame'):
+            if self._image.config.get('frame_persist'):
                 self._image.frame_persist = True
 
     def _on_texture_change(self, *args) -> None:
