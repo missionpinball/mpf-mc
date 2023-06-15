@@ -29,7 +29,7 @@ dependencies = [
     "kivy_deps.sdl2 == 0.4.5; platform_system=='Windows'",  # Feb 15, 2022. 0.5.0 (Sept 2002) and 0.5.1 (Oct 2022) cause audio playback issues
     "kivy_deps.glew == 0.3.1; platform_system=='Windows'",  # Feb 15, 2022
     "kivy_deps.gstreamer == 0.3.3; platform_system=='Windows'",  # Jan 11, 2022
-    "ffpyplayer == 4.3.5"  # Mar 29, 2022
+    "ffpyplayer == 4.5.0"  # Mar 29, 2022
     ]
 dynamic = ["version"]
 
