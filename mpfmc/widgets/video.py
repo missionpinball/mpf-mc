@@ -78,9 +78,13 @@ class VideoWidget(Widget, Video):
             with self.canvas:
                 if self.texture:
                     Color(*self.color)
-                    Rotate(angle=self.rotation, origin=anchor)
-                    Scale(self.scale).origin = anchor
-                    Rectangle(pos=self.pos, size=self.size, texture=self.texture)
+
+                else:
+                    Color(0,0,0,1)
+
+                Rotate(angle=self.rotation, origin=anchor)
+                Scale(self.scale).origin = anchor
+                Rectangle(pos=self.pos, size=self.size, texture=self.texture)
 
     def _setup_control_events(self, event_list: list) -> None:
         for entry in event_list:
