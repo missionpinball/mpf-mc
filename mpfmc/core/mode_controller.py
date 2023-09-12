@@ -101,7 +101,8 @@ class ModeController:
                 self._machine_mode_folders[mode_string])
             asset_paths.append(mode_path)
 
-        if not mode_path:
+        # Production builds do not require paths for all modes
+        if not mode_path and not self.mc.options['production']:
             raise ValueError("No folder found for mode '{}'. Is your mode "
                              "folder in your machine's 'modes' folder?"
                              .format(mode_string))
