@@ -1,4 +1,4 @@
-#config_version=5
+#config_version=6
 
 displays:
   default:
@@ -144,4 +144,3 @@ slide_player:
         type: push
         direction: right
   show_slide2_no_transition: slide2
-

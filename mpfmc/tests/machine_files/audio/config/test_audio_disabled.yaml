@@ -1,7 +1,6 @@
-#config_version=5
+#config_version=6
 sound_system:
   enabled: False
 
 modes:
  - mode1
-

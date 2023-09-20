@@ -1,4 +1,4 @@
-#config_version=5
+#config_version=6
 slide_player:
   play_slide_last_game_score: slide_last_game_score
 
