@@ -76,7 +76,12 @@ class VideoWidget(Widget, Video):
 
         if self.state in ('play', 'pause'):
             with self.canvas:
-                Color(*self.color)
+                if self.texture:
+                    Color(*self.color)
+
+                else:
+                    Color(0,0,0,1)
+
                 Rotate(angle=self.rotation, origin=anchor)
                 Scale(self.scale).origin = anchor
                 Rectangle(pos=self.pos, size=self.size, texture=self.texture)
