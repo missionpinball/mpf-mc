@@ -69,7 +69,7 @@ include = ["mpfmc*"]
 requires = [
     "setuptools >= 63",
     "setuptools_scm[toml] >= 6.2",
-    "cython = 3",
+    "cython >= 3",
     "pkgconfig",
     "kivy_deps.sdl2 >= 0.6.0; platform_system=='Windows'",
     "kivy_deps.sdl2-dev >= 0.6.0; platform_system=='Windows'",
