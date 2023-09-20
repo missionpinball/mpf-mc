@@ -26,10 +26,10 @@ jobs:
           cibw-build: cp39-win_amd64
         - os: windows-latest
           python-version: '3.10'
-          cibw-build: cp39-win_amd64
+          cibw-build: cp310-win_amd64
         - os: windows-latest
           python-version: 3.11
-          cibw-build: cp39-win_amd64
+          cibw-build: cp311-win_amd64
         - os: ubuntu-latest
           python-version: 3.8
           cibw-build: cp38-manylinux_x86_64
@@ -38,10 +38,10 @@ jobs:
           cibw-build: cp39-manylinux_x86_64
         - os: ubuntu-latest
           python-version: '3.10'
-          cibw-build: cp39-manylinux_x86_64
+          cibw-build: cp310-manylinux_x86_64
         - os: ubuntu-latest
           python-version: 3.11
-          cibw-build: cp39-manylinux_x86_64
+          cibw-build: cp311-manylinux_x86_64
         # - os: macos-latest     # Github hosted and self-hosted ARM runners are not yet available, so I'll just build locally for now.
         #   python-version: 3.8
         #   cibw-build: cp38-macosx_arm64
@@ -56,10 +56,10 @@ jobs:
           cibw-build: cp39-macosx_x86_64
         - os: macos-latest
           python-version: '3.10'
-          cibw-build: cp39-macosx_x86_64
+          cibw-build: cp310-macosx_x86_64
         - os: macos-latest
           python-version: 3.11
-          cibw-build: cp39-macosx_x86_64
+          cibw-build: cp311-macosx_x86_64
 
     steps:
       - name: Checkout MPF-MC
