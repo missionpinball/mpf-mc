@@ -2,7 +2,7 @@
 name = "mpf-mc"
 description = "Mission Pinball Framework Media Controller"
 readme = "README.md"
-requires-python = ">=3.7, <3.10"
+requires-python = ">=3.8, <3.12"
 license = {text = "MIT"}
 authors = [{ name = "The Mission Pinball Framework Team", email = "brian@missionpinball.org"}]
 keywords = ["pinball"]
@@ -10,9 +10,10 @@ classifiers=[
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Natural Language :: English",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
@@ -21,15 +22,16 @@ classifiers=[
     "Topic :: Games/Entertainment :: Arcade"
     ]
 dependencies = [
-    "ruamel.yaml == 0.15.42",  # 0.15.x newer than this requires compiled c lib, currently no Mac arm versions, 0.16+ require code refactor
-    "mpf >= 0.56.0",  # Jan 15, 2023, our intention is for MPF-MC 0.56 to also work with MPF 0.57+
-    "kivy == 2.1.0",  # Mar 6, 2022
-    "psutil == 5.9.4",  # Nov 7, 2022
-    "Pygments == 2.14.0", # Jan 1, 2023
-    "kivy_deps.sdl2 == 0.4.5; platform_system=='Windows'",  # Feb 15, 2022. 0.5.0 (Sept 2002) and 0.5.1 (Oct 2022) cause audio playback issues
-    "kivy_deps.glew == 0.3.1; platform_system=='Windows'",  # Feb 15, 2022
-    "kivy_deps.gstreamer == 0.3.3; platform_system=='Windows'",  # Jan 11, 2022
-    "ffpyplayer == 4.3.5"  # Mar 29, 2022
+    "ruamel.yaml >= 0.17.26",  # Sept 19, 2023
+    "mpf >= 0.57.0.dev0",  # Sept 19, 2023
+    "kivy == 2.2.1",  # Sept 19, 2023
+    "psutil == 5.9.5",  # Sept 19, 2023
+    "Pygments == 2.16.1", # Sept 19, 2023  Only used for the interactive MC. Does anyone use that?
+    # These kivy versions match the ones from kivy
+    "kivy_deps.sdl2 == 0.6.0; platform_system=='Windows'",  # Sept 19, 2023
+    "kivy_deps.glew == 0.3.1; platform_system=='Windows'",  # Sept 19, 2023
+    "kivy_deps.gstreamer == 0.3.3; platform_system=='Windows'",  # Sept 19, 2023
+    "ffpyplayer == 4.5.0"  # Sept 19, 2023  Need 4.5 for for 3.11 support
     ]
 dynamic = ["version"]
 
@@ -69,11 +71,11 @@ requires = [
     "setuptools_scm[toml] >= 6.2",
     "cython >= 0.29, <3.0",
     "pkgconfig",
-    "kivy_deps.sdl2 >= 0.3.1; platform_system=='Windows'",
-    "kivy_deps.sdl2-dev >= 0.3.1; platform_system=='Windows'",
-    "kivy_deps.glew >= 0.3.0; platform_system=='Windows'",
-    "kivy_deps.glew-dev >= 0.3.0; platform_system=='Windows'",
-    "kivy_deps.gstreamer >= 0.3.1; platform_system=='Windows'",
-    "kivy_deps.gstreamer-dev >= 0.3.1; platform_system=='Windows'",
+    "kivy_deps.sdl2 >= 0.6.0; platform_system=='Windows'",
+    "kivy_deps.sdl2-dev >= 0.6.0; platform_system=='Windows'",
+    "kivy_deps.glew >= 0.3.1; platform_system=='Windows'",
+    "kivy_deps.glew-dev >= 0.3.1; platform_system=='Windows'",
+    "kivy_deps.gstreamer >= 0.3.3; platform_system=='Windows'",
+    "kivy_deps.gstreamer-dev >= 0.3.3; platform_system=='Windows'",
     ]
 build-backend = "setuptools.build_meta"
