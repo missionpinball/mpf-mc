@@ -572,32 +572,15 @@ class MpfMc(App):
         self.events.process_event_queue()
 
     def _load_custom_code(self):
-        if 'mc_scriptlets' in self.machine_config:
-            self.machine_config['mc_scriptlets'] = (
-                self.machine_config['mc_scriptlets'].split(' '))
-
-            self.log.debug("Loading scriptlets... (deprecated)")
-
-            for scriptlet in self.machine_config['mc_scriptlets']:
-
-                self.log.debug("Loading '%s' scriptlet (deprecated)", scriptlet)
-
-                scriptlet_obj = Util.string_to_class(
-                    self.machine_config['mpf-mc']['paths']['scriptlets'] +
-                    "." + scriptlet)(mc=self,
-                                     name=scriptlet.split('.')[1])
-
-                self.custom_code.append(scriptlet_obj)
-
         if 'mc_custom_code' in self.machine_config:
             self.log.debug("Loading custom_code...")
 
-            for custom_code in self.machine_config['mc_custom_code']:
+            for custom_code in Util.string_to_event_list(self.machine_config['mc_custom_code']):
 
                 self.log.debug("Loading '%s' custom_code", custom_code)
 
                 custom_code_obj = Util.string_to_class(
-                    self.machine_config['mpf-mc']['paths']['scriptlets'] +
+                    self.machine_config['mpf-mc']['paths']['custom_code'] +
                     "." + custom_code)(mc=self,
                                        name=custom_code.split('.')[1])
 

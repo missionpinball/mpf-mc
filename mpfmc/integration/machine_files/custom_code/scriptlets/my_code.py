@@ -1,7 +1,7 @@
-from mpfmc.core.mc_custom_code import McCustomCode
+from mpfmc.core.custom_code import CustomCode
 
 
-class MyCode(McCustomCode):
+class MyCode(CustomCode):
 
     def on_connect(self, **kwargs):
         self.add_mpf_event_handler("test_event", self._my_handler)
