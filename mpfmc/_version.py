@@ -2,7 +2,7 @@ __version__ = '0.57.0.dev5'
 __short_version__ = '0.57'
 __bcp_version__ = '1.1'
 __config_version__ = '6'
-__mpf_version_required__ = '0.57.0'
+__mpf_version_required__ = '0.57.0.dev14'
 
 # pylint: disable-msg=invalid-name
 version = f"MPF-MC v{__version__}"
