@@ -27,5 +27,7 @@ python3 -m pip install --upgrade setuptools wheel build twine
 # python3 -m pip install -e ../mpf
 # python3 -m pip install -e .
 
-python3 -m build
+python3.9 -m build
+python3.10 -m build
+python3.11 -m build
 python3 -m twine upload dist/*.whl -u __token__
