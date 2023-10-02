@@ -624,9 +624,9 @@ typedef struct {PyObject **p; const char *s; const Py_ssize_t n; const char* enc
                 const char is_unicode; const char is_str; const char intern; } __Pyx_StringTabEntry;
 
 #define __PYX_DEFAULT_STRING_ENCODING_IS_ASCII 0
-#define __PYX_DEFAULT_STRING_ENCODING_IS_UTF8 1
+#define __PYX_DEFAULT_STRING_ENCODING_IS_UTF8 0
 #define __PYX_DEFAULT_STRING_ENCODING_IS_DEFAULT (PY_MAJOR_VERSION >= 3 && __PYX_DEFAULT_STRING_ENCODING_IS_UTF8)
-#define __PYX_DEFAULT_STRING_ENCODING "utf-8"
+#define __PYX_DEFAULT_STRING_ENCODING ""
 #define __Pyx_PyObject_FromString __Pyx_PyBytes_FromString
 #define __Pyx_PyObject_FromStringAndSize __Pyx_PyBytes_FromStringAndSize
 #define __Pyx_uchar_cast(c) ((unsigned char)c)
@@ -833,7 +833,7 @@ typedef struct __pyx_t_5mpfmc_4core_5audio_4sdl2_AudioCallbackData __pyx_t_5mpfm
 
 /* "mpfmc/core/audio/sdl2.pxd":231
  * # specific data structures used in the MPF media controller audio library:
- *
+ * 
  * cdef struct Sample16Bytes:             # <<<<<<<<<<<<<<
  *     # Structure that represents two bytes of a 16-bit sample.  This is used in
  *     # the union below (nested structs are not permitted in Cython so it is
@@ -845,7 +845,7 @@ struct __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16Bytes {
 
 /* "mpfmc/core/audio/sdl2.pxd":238
  *     Uint8 byte1
- *
+ * 
  * cdef union Sample16:             # <<<<<<<<<<<<<<
  *     # Union structure that represents a single 16-bit sample value.  A union is
  *     # utilized to make it easy to access the individual bytes in the sample.
@@ -857,7 +857,7 @@ union __pyx_t_5mpfmc_4core_5audio_4sdl2_Sample16 {
 
 /* "mpfmc/core/audio/sdl2.pxd":251
  * # ---------------------------------------------------------------------------
- *
+ * 
  * ctypedef struct AudioCallbackData:             # <<<<<<<<<<<<<<
  *     # A pointer to this struct is passed to the main audio callback function and
  *     # is the only way data is made available to the main audio thread.  Must not
@@ -882,11 +882,11 @@ struct __pyx_t_5mpfmc_4core_5audio_5track_TrackState;
 typedef struct __pyx_t_5mpfmc_4core_5audio_5track_TrackState __pyx_t_5mpfmc_4core_5audio_5track_TrackState;
 
 /* "mpfmc/core/audio/track.pxd":10
- *
+ * 
  * # The number of control points per audio buffer (sets control rate for ducking)
  * cdef enum:             # <<<<<<<<<<<<<<
  *     CONTROL_POINTS_PER_BUFFER = 8
- *
+ * 
  */
 enum  {
   __pyx_e_5mpfmc_4core_5audio_5track_CONTROL_POINTS_PER_BUFFER = 8
@@ -894,10 +894,10 @@ enum  {
 
 /* "mpfmc/core/audio/track.pxd":13
  *     CONTROL_POINTS_PER_BUFFER = 8
- *
+ * 
  * cdef enum:             # <<<<<<<<<<<<<<
  *     MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
- *
+ * 
  */
 enum  {
   __pyx_e_5mpfmc_4core_5audio_5track_MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
@@ -905,18 +905,18 @@ enum  {
 
 /* "mpfmc/core/audio/track.pxd":16
  *     MAX_SIMULTANEOUS_SOUNDS_DEFAULT = 8
- *
+ * 
  * cdef enum:             # <<<<<<<<<<<<<<
  *     MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
- *
+ * 
  */
 enum  {
   __pyx_e_5mpfmc_4core_5audio_5track_MAX_SIMULTANEOUS_SOUNDS_LIMIT = 32
 };
 
 /* "mpfmc/core/audio/track.pxd":20
- *
- *
+ * 
+ * 
  * cdef enum TrackStatus:             # <<<<<<<<<<<<<<
  *     track_status_stopped = 0
  *     track_status_stopping = 1
@@ -931,7 +931,7 @@ enum __pyx_t_5mpfmc_4core_5audio_5track_TrackStatus {
 
 /* "mpfmc/core/audio/track.pxd":27
  *     track_status_paused = 4
- *
+ * 
  * ctypedef struct TrackState:             # <<<<<<<<<<<<<<
  *     # Common track state variables (for all track types)
  *     AudioCallbackData *callback_data
@@ -960,7 +960,7 @@ struct __pyx_t_5mpfmc_4core_5audio_5track_TrackState {
  * #    Track base class
  * # ---------------------------------------------------------------------------
  * cdef class Track:             # <<<<<<<<<<<<<<
- *
+ * 
  *     cdef str _name
  */
 struct __pyx_obj_5mpfmc_4core_5audio_5track_Track {
@@ -1787,7 +1787,7 @@ static PyObject *__pyx_codeobj__38;
 
 /* "mpfmc/core/audio/playlist_controller.pyx":19
  *     """
- *
+ * 
  *     def __init__(self, object mc, object track, float crossfade_time=0.0, float volume=1.0):             # <<<<<<<<<<<<<<
  *         """
  *         Constructor
@@ -1964,7 +1964,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         self.mc = mc
  *         self._track = track             # <<<<<<<<<<<<<<
  *         self._crossfade_time = crossfade_time
- *
+ * 
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_track_2, __pyx_v_track) < 0) __PYX_ERR(0, 30, __pyx_L1_error)
 
@@ -1972,7 +1972,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         self.mc = mc
  *         self._track = track
  *         self._crossfade_time = crossfade_time             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Dictionary of PlaylistInstance class objects keyed by SoundInstance ID
  */
   __pyx_t_1 = PyFloat_FromDouble(__pyx_v_crossfade_time); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 31, __pyx_L1_error)
@@ -1981,10 +1981,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":34
- *
+ * 
  *         # Dictionary of PlaylistInstance class objects keyed by SoundInstance ID
  *         self._playlists_by_sound_instance = dict()             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Keep track of current and previous playlist
  */
   __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 34, __pyx_L1_error)
@@ -1993,10 +1993,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":37
- *
+ * 
  *         # Keep track of current and previous playlist
  *         self._current_playlist = None             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Keeps track of a pending request that cannot be immediately serviced because the
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist, Py_None) < 0) __PYX_ERR(0, 37, __pyx_L1_error)
@@ -2005,7 +2005,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         # Keeps track of a pending request that cannot be immediately serviced because the
  *         # underlying audio track is busy (only 2 players)
  *         self._pending_request = None             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Create event handlers for sound instance events
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_pending_request, Py_None) < 0) __PYX_ERR(0, 41, __pyx_L1_error)
@@ -2132,7 +2132,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *                                    self._on_sound_instance_stopped, 0)
  *         self.mc.events.add_handler('{}_playlist_sound_about_to_finish'.format(self.name.lower()),             # <<<<<<<<<<<<<<
  *                                    self._on_sound_instance_about_to_finish)
- *
+ * 
  */
   __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_mc); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 48, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -2185,7 +2185,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *                                    self._on_sound_instance_stopped, 0)
  *         self.mc.events.add_handler('{}_playlist_sound_about_to_finish'.format(self.name.lower()),
  *                                    self._on_sound_instance_about_to_finish)             # <<<<<<<<<<<<<<
- *
+ * 
  *         self.log.debug("Created PlaylistController %s: ", self._track.name)
  */
   __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_on_sound_instance_about_to_fini); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 49, __pyx_L1_error)
@@ -2243,9 +2243,9 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":51
  *                                    self._on_sound_instance_about_to_finish)
- *
+ * 
  *         self.log.debug("Created PlaylistController %s: ", self._track.name)             # <<<<<<<<<<<<<<
- *
+ * 
  *     def __dealloc__(self):
  */
   __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 51, __pyx_L1_error)
@@ -2309,7 +2309,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":19
  *     """
- *
+ * 
  *     def __init__(self, object mc, object track, float crossfade_time=0.0, float volume=1.0):             # <<<<<<<<<<<<<<
  *         """
  *         Constructor
@@ -2336,7 +2336,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":53
  *         self.log.debug("Created PlaylistController %s: ", self._track.name)
- *
+ * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         """Destructor"""
  *         pass
@@ -2371,10 +2371,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":57
  *         pass
- *
+ * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
  *         return '<PlaylistController.{}>'.format(self.name)
- *
+ * 
  */
 
 /* Python wrapper */
@@ -2405,10 +2405,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_RefNannySetupContext("__repr__", 0);
 
   /* "mpfmc/core/audio/playlist_controller.pyx":58
- *
+ * 
  *     def __repr__(self):
  *         return '<PlaylistController.{}>'.format(self.name)             # <<<<<<<<<<<<<<
- *
+ * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
@@ -2438,10 +2438,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":57
  *         pass
- *
+ * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
  *         return '<PlaylistController.{}>'.format(self.name)
- *
+ * 
  */
 
   /* function exit code */
@@ -2459,7 +2459,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 }
 
 /* "mpfmc/core/audio/playlist_controller.pyx":61
- *
+ * 
  *     @property
  *     def name(self):             # <<<<<<<<<<<<<<
  *         """The name of the playlist controller (and corresponding audio track)"""
@@ -2495,7 +2495,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *     def name(self):
  *         """The name of the playlist controller (and corresponding audio track)"""
  *         return self._track.name             # <<<<<<<<<<<<<<
- *
+ * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
@@ -2509,7 +2509,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   goto __pyx_L0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":61
- *
+ * 
  *     @property
  *     def name(self):             # <<<<<<<<<<<<<<
  *         """The name of the playlist controller (and corresponding audio track)"""
@@ -2529,7 +2529,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 }
 
 /* "mpfmc/core/audio/playlist_controller.pyx":66
- *
+ * 
  *     @property
  *     def track(self):             # <<<<<<<<<<<<<<
  *         """The corresponding audio track the playlist is managing"""
@@ -2564,7 +2564,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *     def track(self):
  *         """The corresponding audio track the playlist is managing"""
  *         return self._track             # <<<<<<<<<<<<<<
- *
+ * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
@@ -2575,7 +2575,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   goto __pyx_L0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":66
- *
+ * 
  *     @property
  *     def track(self):             # <<<<<<<<<<<<<<
  *         """The corresponding audio track the playlist is managing"""
@@ -2594,7 +2594,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 }
 
 /* "mpfmc/core/audio/playlist_controller.pyx":71
- *
+ * 
  *     @property
  *     def crossfade_time(self):             # <<<<<<<<<<<<<<
  *         """The time (secs) to use when fading between sounds"""
@@ -2629,7 +2629,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *     def crossfade_time(self):
  *         """The time (secs) to use when fading between sounds"""
  *         return self._crossfade_time             # <<<<<<<<<<<<<<
- *
+ * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
@@ -2640,7 +2640,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   goto __pyx_L0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":71
- *
+ * 
  *     @property
  *     def crossfade_time(self):             # <<<<<<<<<<<<<<
  *         """The time (secs) to use when fading between sounds"""
@@ -2659,7 +2659,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 }
 
 /* "mpfmc/core/audio/playlist_controller.pyx":76
- *
+ * 
  *     @property
  *     def has_pending_request(self):             # <<<<<<<<<<<<<<
  *         """Whether the playlist controller has a pending request queued until it is not busy"""
@@ -2695,7 +2695,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *     def has_pending_request(self):
  *         """Whether the playlist controller has a pending request queued until it is not busy"""
  *         return self._pending_request is not None             # <<<<<<<<<<<<<<
- *
+ * 
  *     def stop_all_sounds(self, float fade_out_seconds = 0.0):
  */
   __Pyx_XDECREF(__pyx_r);
@@ -2710,7 +2710,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   goto __pyx_L0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":76
- *
+ * 
  *     @property
  *     def has_pending_request(self):             # <<<<<<<<<<<<<<
  *         """Whether the playlist controller has a pending request queued until it is not busy"""
@@ -2730,7 +2730,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":80
  *         return self._pending_request is not None
- *
+ * 
  *     def stop_all_sounds(self, float fade_out_seconds = 0.0):             # <<<<<<<<<<<<<<
  *         """
  *         Stops all playing sounds immediately on the playlist track.
@@ -2825,7 +2825,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             fade_out_seconds: The number of seconds to fade out the sounds before stopping
  *         """
  *         self._track.stop_all_sounds(fade_out_seconds)             # <<<<<<<<<<<<<<
- *
+ * 
  *         # TODO: playlist housekeeping (stopped events, remove instance, etc.)
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_track_2); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 86, __pyx_L1_error)
@@ -2855,7 +2855,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":80
  *         return self._pending_request is not None
- *
+ * 
  *     def stop_all_sounds(self, float fade_out_seconds = 0.0):             # <<<<<<<<<<<<<<
  *         """
  *         Stops all playing sounds immediately on the playlist track.
@@ -2879,7 +2879,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":90
  *         # TODO: playlist housekeeping (stopped events, remove instance, etc.)
- *
+ * 
  *     def play(self, str playlist not None, str context=None, dict player_settings=None):             # <<<<<<<<<<<<<<
  *         """
  *         Immediately play a playlist.
@@ -3011,9 +3011,9 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":100
  *         """
- *
+ * 
  *         self.log.debug("play - Preparing playlist '%s' for playback.", playlist)             # <<<<<<<<<<<<<<
- *
+ * 
  *         if player_settings is None:
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 100, __pyx_L1_error)
@@ -3070,20 +3070,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":102
  *         self.log.debug("play - Preparing playlist '%s' for playback.", playlist)
- *
+ * 
  *         if player_settings is None:             # <<<<<<<<<<<<<<
  *             player_settings = dict()
- *
+ * 
  */
   __pyx_t_6 = (__pyx_v_player_settings == ((PyObject*)Py_None));
   __pyx_t_7 = (__pyx_t_6 != 0);
   if (__pyx_t_7) {
 
     /* "mpfmc/core/audio/playlist_controller.pyx":103
- *
+ * 
  *         if player_settings is None:
  *             player_settings = dict()             # <<<<<<<<<<<<<<
- *
+ * 
  *         if playlist not in self.mc.playlists:
  */
     __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
@@ -3093,16 +3093,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":102
  *         self.log.debug("play - Preparing playlist '%s' for playback.", playlist)
- *
+ * 
  *         if player_settings is None:             # <<<<<<<<<<<<<<
  *             player_settings = dict()
- *
+ * 
  */
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":105
  *             player_settings = dict()
- *
+ * 
  *         if playlist not in self.mc.playlists:             # <<<<<<<<<<<<<<
  *             self.log.error("PlaylistController (%s track): Could not play specified playlist "
  *                            "(%s) as it does not exist", self.name, playlist)
@@ -3118,7 +3118,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   if (__pyx_t_6) {
 
     /* "mpfmc/core/audio/playlist_controller.pyx":106
- *
+ * 
  *         if playlist not in self.mc.playlists:
  *             self.log.error("PlaylistController (%s track): Could not play specified playlist "             # <<<<<<<<<<<<<<
  *                            "(%s) as it does not exist", self.name, playlist)
@@ -3135,7 +3135,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             self.log.error("PlaylistController (%s track): Could not play specified playlist "
  *                            "(%s) as it does not exist", self.name, playlist)             # <<<<<<<<<<<<<<
  *             return None
- *
+ * 
  */
     __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_name); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 107, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
@@ -3195,7 +3195,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             self.log.error("PlaylistController (%s track): Could not play specified playlist "
  *                            "(%s) as it does not exist", self.name, playlist)
  *             return None             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Is there already a previous playlist that is still active (fading)?
  */
     __Pyx_XDECREF(__pyx_r);
@@ -3204,7 +3204,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":105
  *             player_settings = dict()
- *
+ * 
  *         if playlist not in self.mc.playlists:             # <<<<<<<<<<<<<<
  *             self.log.error("PlaylistController (%s track): Could not play specified playlist "
  *                            "(%s) as it does not exist", self.name, playlist)
@@ -3212,7 +3212,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":111
- *
+ * 
  *         # Is there already a previous playlist that is still active (fading)?
  *         if self._is_busy():             # <<<<<<<<<<<<<<
  *             # Delay play playlist until track is finished with current crossfade (too busy)
@@ -3244,7 +3244,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             # Delay play playlist until track is finished with current crossfade (too busy)
  *             self._pending_request = partial(self.play, playlist=playlist, context=context,             # <<<<<<<<<<<<<<
  *                                             player_settings=player_settings)
- *
+ * 
  */
     __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_partial); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
@@ -3264,7 +3264,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             # Delay play playlist until track is finished with current crossfade (too busy)
  *             self._pending_request = partial(self.play, playlist=playlist, context=context,
  *                                             player_settings=player_settings)             # <<<<<<<<<<<<<<
- *
+ * 
  *             self.log.debug("play - Playlist track is too busy. Delaying play playlist call.")
  */
     if (PyDict_SetItem(__pyx_t_5, __pyx_n_s_player_settings, __pyx_v_player_settings) < 0) __PYX_ERR(0, 113, __pyx_L1_error)
@@ -3274,7 +3274,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             # Delay play playlist until track is finished with current crossfade (too busy)
  *             self._pending_request = partial(self.play, playlist=playlist, context=context,             # <<<<<<<<<<<<<<
  *                                             player_settings=player_settings)
- *
+ * 
  */
     __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_8, __pyx_t_5); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
@@ -3286,10 +3286,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":116
  *                                             player_settings=player_settings)
- *
+ * 
  *             self.log.debug("play - Playlist track is too busy. Delaying play playlist call.")             # <<<<<<<<<<<<<<
  *             return None
- *
+ * 
  */
     __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
@@ -3314,10 +3314,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":117
- *
+ * 
  *             self.log.debug("play - Playlist track is too busy. Delaying play playlist call.")
  *             return None             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Determine settings (override playlist with player settings)
  */
     __Pyx_XDECREF(__pyx_r);
@@ -3325,7 +3325,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     goto __pyx_L0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":111
- *
+ * 
  *         # Is there already a previous playlist that is still active (fading)?
  *         if self._is_busy():             # <<<<<<<<<<<<<<
  *             # Delay play playlist until track is finished with current crossfade (too busy)
@@ -3334,7 +3334,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":120
- *
+ * 
  *         # Determine settings (override playlist with player settings)
  *         playlist_instance = PlaylistInstance(playlist,             # <<<<<<<<<<<<<<
  *                                              self.mc.playlists[playlist],
@@ -3373,7 +3373,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *                                              self.crossfade_time,
  *                                              context,
  *                                              player_settings)             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Is there already a playlist playing?
  */
   __pyx_t_2 = NULL;
@@ -3438,7 +3438,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":127
- *
+ * 
  *         # Is there already a playlist playing?
  *         if self._current_playlist:             # <<<<<<<<<<<<<<
  *             # Already a playlist playing.  We know there is at least one free sound player because
@@ -3454,7 +3454,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             # of the _is_busy() call above.
  *             # Stop the current playlist
  *             self.stop()             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Start the new playlist (now becomes the current playlist)
  */
     __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_stop); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 131, __pyx_L1_error)
@@ -3477,7 +3477,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":127
- *
+ * 
  *         # Is there already a playlist playing?
  *         if self._current_playlist:             # <<<<<<<<<<<<<<
  *             # Already a playlist playing.  We know there is at least one free sound player because
@@ -3486,20 +3486,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":134
- *
+ * 
  *         # Start the new playlist (now becomes the current playlist)
  *         self._current_playlist = playlist_instance             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Post events when played for playlist
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist, __pyx_v_playlist_instance) < 0) __PYX_ERR(0, 134, __pyx_L1_error)
 
   /* "mpfmc/core/audio/playlist_controller.pyx":137
- *
+ * 
  *         # Post events when played for playlist
  *         for event in self._current_playlist.events_when_played:             # <<<<<<<<<<<<<<
  *             self.mc.post_mc_native_event(event)
- *
+ * 
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 137, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -3553,7 +3553,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         # Post events when played for playlist
  *         for event in self._current_playlist.events_when_played:
  *             self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Get the next sound to play from playlist
  */
     __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_mc); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 138, __pyx_L1_error)
@@ -3579,21 +3579,21 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":137
- *
+ * 
  *         # Post events when played for playlist
  *         for event in self._current_playlist.events_when_played:             # <<<<<<<<<<<<<<
  *             self.mc.post_mc_native_event(event)
- *
+ * 
  */
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":141
- *
+ * 
  *         # Get the next sound to play from playlist
  *         sound_name = self._current_playlist.get_next_sound_name()             # <<<<<<<<<<<<<<
  *         self._play_playlist_sound(sound_name, self._current_playlist)
- *
+ * 
  */
   __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 141, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_8);
@@ -3622,7 +3622,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         # Get the next sound to play from playlist
  *         sound_name = self._current_playlist.get_next_sound_name()
  *         self._play_playlist_sound(sound_name, self._current_playlist)             # <<<<<<<<<<<<<<
- *
+ * 
  *         return playlist_instance
  */
   __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_play_playlist_sound); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
@@ -3680,9 +3680,9 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":144
  *         self._play_playlist_sound(sound_name, self._current_playlist)
- *
+ * 
  *         return playlist_instance             # <<<<<<<<<<<<<<
- *
+ * 
  *     def _is_busy(self):
  */
   __Pyx_XDECREF(__pyx_r);
@@ -3692,7 +3692,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":90
  *         # TODO: playlist housekeeping (stopped events, remove instance, etc.)
- *
+ * 
  *     def play(self, str playlist not None, str context=None, dict player_settings=None):             # <<<<<<<<<<<<<<
  *         """
  *         Immediately play a playlist.
@@ -3720,7 +3720,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":146
  *         return playlist_instance
- *
+ * 
  *     def _is_busy(self):             # <<<<<<<<<<<<<<
  *         """Returns whether or not all the sound players for the playlist track are currently busy"""
  *         if self._track.get_sound_players_in_use_count() > 1:
@@ -3811,7 +3811,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             return True
  *         else:
  *             return False             # <<<<<<<<<<<<<<
- *
+ * 
  *     def _play_playlist_sound(self, str sound_name, object playlist, float fade_in=0.0):
  */
   /*else*/ {
@@ -3823,7 +3823,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":146
  *         return playlist_instance
- *
+ * 
  *     def _is_busy(self):             # <<<<<<<<<<<<<<
  *         """Returns whether or not all the sound players for the playlist track are currently busy"""
  *         if self._track.get_sound_players_in_use_count() > 1:
@@ -3844,7 +3844,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":153
  *             return False
- *
+ * 
  *     def _play_playlist_sound(self, str sound_name, object playlist, float fade_in=0.0):             # <<<<<<<<<<<<<<
  *         """
  *         Plays the specified playlist sound
@@ -3975,10 +3975,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_RefNannySetupContext("_play_playlist_sound", 0);
 
   /* "mpfmc/core/audio/playlist_controller.pyx":165
- *
+ * 
  *         # Create sound instance
  *         sound = self.mc.sounds[sound_name]             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Add custom events to post when particular sound actions occur (stop, about to finish).
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_mc); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 165, __pyx_L1_error)
@@ -4022,7 +4022,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if sound.events_when_stopped:
  *             events_when_stopped.extend(sound.events_when_stopped)             # <<<<<<<<<<<<<<
  *         events_when_stopped.extend(['{}_playlist_sound_stopped'.format(self.name.lower())])
- *
+ * 
  */
     __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_events_when_stopped); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 171, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
@@ -4042,7 +4042,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if sound.events_when_stopped:
  *             events_when_stopped.extend(sound.events_when_stopped)
  *         events_when_stopped.extend(['{}_playlist_sound_stopped'.format(self.name.lower())])             # <<<<<<<<<<<<<<
- *
+ * 
  *         events_when_about_to_finish = []
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_playlist_sound_stopped, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 172, __pyx_L1_error)
@@ -4089,7 +4089,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":174
  *         events_when_stopped.extend(['{}_playlist_sound_stopped'.format(self.name.lower())])
- *
+ * 
  *         events_when_about_to_finish = []             # <<<<<<<<<<<<<<
  *         if sound.events_when_about_to_finish:
  *             events_when_about_to_finish.extend(sound.events_when_about_to_finish)
@@ -4100,7 +4100,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":175
- *
+ * 
  *         events_when_about_to_finish = []
  *         if sound.events_when_about_to_finish:             # <<<<<<<<<<<<<<
  *             events_when_about_to_finish.extend(sound.events_when_about_to_finish)
@@ -4117,7 +4117,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if sound.events_when_about_to_finish:
  *             events_when_about_to_finish.extend(sound.events_when_about_to_finish)             # <<<<<<<<<<<<<<
  *         events_when_about_to_finish.extend(['{}_playlist_sound_about_to_finish'.format(self.name.lower())])
- *
+ * 
  */
     __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_sound, __pyx_n_s_events_when_about_to_finish); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 176, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
@@ -4125,7 +4125,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":175
- *
+ * 
  *         events_when_about_to_finish = []
  *         if sound.events_when_about_to_finish:             # <<<<<<<<<<<<<<
  *             events_when_about_to_finish.extend(sound.events_when_about_to_finish)
@@ -4137,7 +4137,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if sound.events_when_about_to_finish:
  *             events_when_about_to_finish.extend(sound.events_when_about_to_finish)
  *         events_when_about_to_finish.extend(['{}_playlist_sound_about_to_finish'.format(self.name.lower())])             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Post events when sound changed as a new sound is playing now for the current playlist
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_kp_u_playlist_sound_about_to_finish, __pyx_n_s_format); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 177, __pyx_L1_error)
@@ -4183,11 +4183,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   (void)(__pyx_t_4);
 
   /* "mpfmc/core/audio/playlist_controller.pyx":180
- *
+ * 
  *         # Post events when sound changed as a new sound is playing now for the current playlist
  *         for event in self._current_playlist.events_when_sound_changed:             # <<<<<<<<<<<<<<
  *             self.mc.post_mc_native_event(event)
- *
+ * 
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 180, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -4241,7 +4241,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         # Post events when sound changed as a new sound is playing now for the current playlist
  *         for event in self._current_playlist.events_when_sound_changed:
  *             self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Play sound on playlist track (override certain settings needed to manage playlist)
  */
     __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_mc); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 181, __pyx_L1_error)
@@ -4267,11 +4267,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":180
- *
+ * 
  *         # Post events when sound changed as a new sound is playing now for the current playlist
  *         for event in self._current_playlist.events_when_sound_changed:             # <<<<<<<<<<<<<<
  *             self.mc.post_mc_native_event(event)
- *
+ * 
  */
   }
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -4349,7 +4349,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *                                                     'events_when_stopped': events_when_stopped,
  *                                                     'events_when_about_to_finish': events_when_about_to_finish             # <<<<<<<<<<<<<<
  *                                                 })
- *
+ * 
  */
   if (PyDict_SetItem(__pyx_t_5, __pyx_n_u_events_when_about_to_finish, __pyx_v_events_when_about_to_finish) < 0) __PYX_ERR(0, 188, __pyx_L1_error)
   __pyx_t_7 = NULL;
@@ -4408,11 +4408,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":197
- *
+ * 
  *         # Associate sound instance with playlist instance
  *         self._playlists_by_sound_instance[sound_instance] = playlist             # <<<<<<<<<<<<<<
  *         playlist.current_sound_instance = sound_instance
- *
+ * 
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_playlists_by_sound_instance); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 197, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -4423,14 +4423,14 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         # Associate sound instance with playlist instance
  *         self._playlists_by_sound_instance[sound_instance] = playlist
  *         playlist.current_sound_instance = sound_instance             # <<<<<<<<<<<<<<
- *
+ * 
  *     def stop(self):
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_playlist, __pyx_n_s_current_sound_instance, __pyx_v_sound_instance) < 0) __PYX_ERR(0, 198, __pyx_L1_error)
 
   /* "mpfmc/core/audio/playlist_controller.pyx":153
  *             return False
- *
+ * 
  *     def _play_playlist_sound(self, str sound_name, object playlist, float fade_in=0.0):             # <<<<<<<<<<<<<<
  *         """
  *         Plays the specified playlist sound
@@ -4461,7 +4461,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":200
  *         playlist.current_sound_instance = sound_instance
- *
+ * 
  *     def stop(self):             # <<<<<<<<<<<<<<
  *         """Immediately stop the currently playing playlist. Will fade out using the crossfade setting."""
  *         if not self._current_playlist:
@@ -4518,7 +4518,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if not self._current_playlist:
  *             self.log.debug("stop - No playlist is currently playing. Could not stop current playlist.")             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
     __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 203, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
@@ -4546,7 +4546,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if not self._current_playlist:
  *             self.log.debug("stop - No playlist is currently playing. Could not stop current playlist.")
  *             return             # <<<<<<<<<<<<<<
- *
+ * 
  *         self.log.debug("stop - Stopping the current playlist ('%s').",
  */
     __Pyx_XDECREF(__pyx_r);
@@ -4564,10 +4564,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":206
  *             return
- *
+ * 
  *         self.log.debug("stop - Stopping the current playlist ('%s').",             # <<<<<<<<<<<<<<
  *                        self._current_playlist.name)
- *
+ * 
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
@@ -4576,10 +4576,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":207
- *
+ * 
  *         self.log.debug("stop - Stopping the current playlist ('%s').",
  *                        self._current_playlist.name)             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Stop the current sound (if another sound is fading out, let it finish on its own)
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 207, __pyx_L1_error)
@@ -4637,7 +4637,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":210
- *
+ * 
  *         # Stop the current sound (if another sound is fading out, let it finish on its own)
  *         if self._current_playlist.current_sound_instance:             # <<<<<<<<<<<<<<
  *             self._track.stop_sound_instance(self._current_playlist.current_sound_instance,
@@ -4657,7 +4657,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if self._current_playlist.current_sound_instance:
  *             self._track.stop_sound_instance(self._current_playlist.current_sound_instance,             # <<<<<<<<<<<<<<
  *                                             self._current_playlist.crossfade_time)
- *
+ * 
  */
     __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_track_2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 211, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
@@ -4674,7 +4674,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if self._current_playlist.current_sound_instance:
  *             self._track.stop_sound_instance(self._current_playlist.current_sound_instance,
  *                                             self._current_playlist.crossfade_time)             # <<<<<<<<<<<<<<
- *
+ * 
  *         self._current_playlist = None
  */
     __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 212, __pyx_L1_error)
@@ -4734,7 +4734,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":210
- *
+ * 
  *         # Stop the current sound (if another sound is fading out, let it finish on its own)
  *         if self._current_playlist.current_sound_instance:             # <<<<<<<<<<<<<<
  *             self._track.stop_sound_instance(self._current_playlist.current_sound_instance,
@@ -4744,16 +4744,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":214
  *                                             self._current_playlist.crossfade_time)
- *
+ * 
  *         self._current_playlist = None             # <<<<<<<<<<<<<<
- *
+ * 
  *     def advance(self):
  */
   if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist, Py_None) < 0) __PYX_ERR(0, 214, __pyx_L1_error)
 
   /* "mpfmc/core/audio/playlist_controller.pyx":200
  *         playlist.current_sound_instance = sound_instance
- *
+ * 
  *     def stop(self):             # <<<<<<<<<<<<<<
  *         """Immediately stop the currently playing playlist. Will fade out using the crossfade setting."""
  *         if not self._current_playlist:
@@ -4779,10 +4779,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":216
  *         self._current_playlist = None
- *
+ * 
  *     def advance(self):             # <<<<<<<<<<<<<<
  *         """Advance the currently playing playlist to the next sound."""
- *
+ * 
  */
 
 /* Python wrapper */
@@ -4822,7 +4822,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_RefNannySetupContext("advance", 0);
 
   /* "mpfmc/core/audio/playlist_controller.pyx":220
- *
+ * 
  *         # If there is no current playlist, do nothing
  *         if not self._current_playlist:             # <<<<<<<<<<<<<<
  *             self.log.debug("advance - No playlist is currently playing. Could not advance to next sound")
@@ -4840,7 +4840,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if not self._current_playlist:
  *             self.log.debug("advance - No playlist is currently playing. Could not advance to next sound")             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
     __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 221, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
@@ -4868,7 +4868,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         if not self._current_playlist:
  *             self.log.debug("advance - No playlist is currently playing. Could not advance to next sound")
  *             return             # <<<<<<<<<<<<<<
- *
+ * 
  *         self.log.debug("advance - Advancing the current playlist ('%s') to the next sound.",
  */
     __Pyx_XDECREF(__pyx_r);
@@ -4876,7 +4876,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     goto __pyx_L0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":220
- *
+ * 
  *         # If there is no current playlist, do nothing
  *         if not self._current_playlist:             # <<<<<<<<<<<<<<
  *             self.log.debug("advance - No playlist is currently playing. Could not advance to next sound")
@@ -4886,10 +4886,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":224
  *             return
- *
+ * 
  *         self.log.debug("advance - Advancing the current playlist ('%s') to the next sound.",             # <<<<<<<<<<<<<<
  *                        self._current_playlist.name)
- *
+ * 
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 224, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
@@ -4898,10 +4898,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":225
- *
+ * 
  *         self.log.debug("advance - Advancing the current playlist ('%s') to the next sound.",
  *                        self._current_playlist.name)             # <<<<<<<<<<<<<<
- *
+ * 
  *         if self._is_busy():
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 225, __pyx_L1_error)
@@ -4960,7 +4960,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":227
  *                        self._current_playlist.name)
- *
+ * 
  *         if self._is_busy():             # <<<<<<<<<<<<<<
  *             # Delay advance playlist until track is finished with current crossfade (too busy)
  *             self._pending_request = partial(self.advance)
@@ -5021,7 +5021,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             self._pending_request = partial(self.advance)
  *             self.log.debug("advance - Playlist track is too busy. Delaying advance to next sound")             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
     __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 230, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
@@ -5049,7 +5049,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             self._pending_request = partial(self.advance)
  *             self.log.debug("advance - Playlist track is too busy. Delaying advance to next sound")
  *             return             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Determine if playlist will now repeat/loop.  Post playlist looping events (if necessary)
  */
     __Pyx_XDECREF(__pyx_r);
@@ -5058,7 +5058,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":227
  *                        self._current_playlist.name)
- *
+ * 
  *         if self._is_busy():             # <<<<<<<<<<<<<<
  *             # Delay advance playlist until track is finished with current crossfade (too busy)
  *             self._pending_request = partial(self.advance)
@@ -5066,7 +5066,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":234
- *
+ * 
  *         # Determine if playlist will now repeat/loop.  Post playlist looping events (if necessary)
  *         if self._current_playlist.end_of_playlist:             # <<<<<<<<<<<<<<
  *             if self._current_playlist.repeat and self._current_playlist.events_when_looping:
@@ -5116,7 +5116,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             if self._current_playlist.repeat and self._current_playlist.events_when_looping:
  *                     for event in self._current_playlist.events_when_looping:             # <<<<<<<<<<<<<<
  *                         self.mc.post_mc_native_event(event)
- *
+ * 
  */
       __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 236, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
@@ -5170,7 +5170,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             if self._current_playlist.repeat and self._current_playlist.events_when_looping:
  *                     for event in self._current_playlist.events_when_looping:
  *                         self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Set the next sound in the sound player and calculate the fades based on the crossfade setting
  */
         __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_mc); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 237, __pyx_L1_error)
@@ -5200,7 +5200,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             if self._current_playlist.repeat and self._current_playlist.events_when_looping:
  *                     for event in self._current_playlist.events_when_looping:             # <<<<<<<<<<<<<<
  *                         self.mc.post_mc_native_event(event)
- *
+ * 
  */
       }
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -5215,7 +5215,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     }
 
     /* "mpfmc/core/audio/playlist_controller.pyx":234
- *
+ * 
  *         # Determine if playlist will now repeat/loop.  Post playlist looping events (if necessary)
  *         if self._current_playlist.end_of_playlist:             # <<<<<<<<<<<<<<
  *             if self._current_playlist.repeat and self._current_playlist.events_when_looping:
@@ -5224,7 +5224,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":240
- *
+ * 
  *         # Set the next sound in the sound player and calculate the fades based on the crossfade setting
  *         next_sound_name = self._current_playlist.get_next_sound_name()             # <<<<<<<<<<<<<<
  *         if next_sound_name:
@@ -5303,7 +5303,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *                 self._track.stop_sound_instance(self._current_playlist.current_sound_instance,
  *                                                 self._current_playlist.crossfade_time)             # <<<<<<<<<<<<<<
  *                 self._current_playlist.fading_sound_instance = self._current_playlist.current_sound_instance
- *
+ * 
  */
       __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 244, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_8);
@@ -5365,7 +5365,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *                 self._track.stop_sound_instance(self._current_playlist.current_sound_instance,
  *                                                 self._current_playlist.crossfade_time)
  *                 self._current_playlist.fading_sound_instance = self._current_playlist.current_sound_instance             # <<<<<<<<<<<<<<
- *
+ * 
  *             self._play_playlist_sound(next_sound_name, self._current_playlist, self._current_playlist.crossfade_time)
  */
       __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 245, __pyx_L1_error)
@@ -5390,9 +5390,9 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":247
  *                 self._current_playlist.fading_sound_instance = self._current_playlist.current_sound_instance
- *
+ * 
  *             self._play_playlist_sound(next_sound_name, self._current_playlist, self._current_playlist.crossfade_time)             # <<<<<<<<<<<<<<
- *
+ * 
  *     def set_repeat(self, repeat=True):
  */
     __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_play_playlist_sound); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 247, __pyx_L1_error)
@@ -5469,10 +5469,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":216
  *         self._current_playlist = None
- *
+ * 
  *     def advance(self):             # <<<<<<<<<<<<<<
  *         """Advance the currently playing playlist to the next sound."""
- *
+ * 
  */
 
   /* function exit code */
@@ -5497,10 +5497,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":249
  *             self._play_playlist_sound(next_sound_name, self._current_playlist, self._current_playlist.crossfade_time)
- *
+ * 
  *     def set_repeat(self, repeat=True):             # <<<<<<<<<<<<<<
  *         """Set whether or not the currently playing playlist should repeat when finished."""
- *
+ * 
  */
 
 /* Python wrapper */
@@ -5590,7 +5590,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":252
  *         """Set whether or not the currently playing playlist should repeat when finished."""
- *
+ * 
  *         if self._current_playlist:             # <<<<<<<<<<<<<<
  *             self._current_playlist.loop = repeat
  *             self.log.debug("set_repeat - Setting repeat for currently playlist to {}.", str(repeat))
@@ -5602,7 +5602,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   if (__pyx_t_2) {
 
     /* "mpfmc/core/audio/playlist_controller.pyx":253
- *
+ * 
  *         if self._current_playlist:
  *             self._current_playlist.loop = repeat             # <<<<<<<<<<<<<<
  *             self.log.debug("set_repeat - Setting repeat for currently playlist to {}.", str(repeat))
@@ -5678,7 +5678,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":252
  *         """Set whether or not the currently playing playlist should repeat when finished."""
- *
+ * 
  *         if self._current_playlist:             # <<<<<<<<<<<<<<
  *             self._current_playlist.loop = repeat
  *             self.log.debug("set_repeat - Setting repeat for currently playlist to {}.", str(repeat))
@@ -5691,7 +5691,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         else:
  *             self.log.debug("set_repeat - No playlist is currently playing. "             # <<<<<<<<<<<<<<
  *                            "Could not set repeat to {}.", str(repeat))
- *
+ * 
  */
   /*else*/ {
     __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 256, __pyx_L1_error)
@@ -5704,7 +5704,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         else:
  *             self.log.debug("set_repeat - No playlist is currently playing. "
  *                            "Could not set repeat to {}.", str(repeat))             # <<<<<<<<<<<<<<
- *
+ * 
  *     def _on_sound_instance_stopped(self, sound_instance=None, **kwargs):
  */
     __pyx_t_4 = __Pyx_PyObject_CallOneArg(((PyObject *)(&PyUnicode_Type)), __pyx_v_repeat); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 257, __pyx_L1_error)
@@ -5762,10 +5762,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":249
  *             self._play_playlist_sound(next_sound_name, self._current_playlist, self._current_playlist.crossfade_time)
- *
+ * 
  *     def set_repeat(self, repeat=True):             # <<<<<<<<<<<<<<
  *         """Set whether or not the currently playing playlist should repeat when finished."""
- *
+ * 
  */
 
   /* function exit code */
@@ -5787,10 +5787,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":259
  *                            "Could not set repeat to {}.", str(repeat))
- *
+ * 
  *     def _on_sound_instance_stopped(self, sound_instance=None, **kwargs):             # <<<<<<<<<<<<<<
  *         """Callback function called whenever a playlist sound has finished playing."""
- *
+ * 
  */
 
 /* Python wrapper */
@@ -5890,10 +5890,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":262
  *         """Callback function called whenever a playlist sound has finished playing."""
- *
+ * 
  *         if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
   __pyx_t_2 = (__pyx_v_sound_instance == Py_None);
   __pyx_t_3 = (__pyx_t_2 != 0);
@@ -5912,10 +5912,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   if (__pyx_t_1) {
 
     /* "mpfmc/core/audio/playlist_controller.pyx":263
- *
+ * 
  *         if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:
  *             return             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Get playlist for sound_instance and remove it from dictionary of active sounds
  */
     __Pyx_XDECREF(__pyx_r);
@@ -5924,19 +5924,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":262
  *         """Callback function called whenever a playlist sound has finished playing."""
- *
+ * 
  *         if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":266
- *
+ * 
  *         # Get playlist for sound_instance and remove it from dictionary of active sounds
  *         playlist = self._playlists_by_sound_instance[sound_instance]             # <<<<<<<<<<<<<<
  *         del self._playlists_by_sound_instance[sound_instance]
- *
+ * 
  */
   __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_playlists_by_sound_instance); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 266, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
@@ -5950,7 +5950,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         # Get playlist for sound_instance and remove it from dictionary of active sounds
  *         playlist = self._playlists_by_sound_instance[sound_instance]
  *         del self._playlists_by_sound_instance[sound_instance]             # <<<<<<<<<<<<<<
- *
+ * 
  *         if playlist.current_sound_instance == sound_instance:
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_playlists_by_sound_instance); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 267, __pyx_L1_error)
@@ -5960,7 +5960,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":269
  *         del self._playlists_by_sound_instance[sound_instance]
- *
+ * 
  *         if playlist.current_sound_instance == sound_instance:             # <<<<<<<<<<<<<<
  *             playlist.current_sound_instance = None
  *         if playlist.fading_sound_instance == sound_instance:
@@ -5974,7 +5974,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   if (__pyx_t_1) {
 
     /* "mpfmc/core/audio/playlist_controller.pyx":270
- *
+ * 
  *         if playlist.current_sound_instance == sound_instance:
  *             playlist.current_sound_instance = None             # <<<<<<<<<<<<<<
  *         if playlist.fading_sound_instance == sound_instance:
@@ -5984,7 +5984,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":269
  *         del self._playlists_by_sound_instance[sound_instance]
- *
+ * 
  *         if playlist.current_sound_instance == sound_instance:             # <<<<<<<<<<<<<<
  *             playlist.current_sound_instance = None
  *         if playlist.fading_sound_instance == sound_instance:
@@ -5996,7 +5996,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             playlist.current_sound_instance = None
  *         if playlist.fading_sound_instance == sound_instance:             # <<<<<<<<<<<<<<
  *             playlist.fading_sound_instance = None
- *
+ * 
  */
   __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_playlist, __pyx_n_s_fading_sound_instance); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 271, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
@@ -6010,7 +6010,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             playlist.current_sound_instance = None
  *         if playlist.fading_sound_instance == sound_instance:
  *             playlist.fading_sound_instance = None             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Post events when sound stopped for playlist
  */
     if (__Pyx_PyObject_SetAttrStr(__pyx_v_playlist, __pyx_n_s_fading_sound_instance, Py_None) < 0) __PYX_ERR(0, 272, __pyx_L1_error)
@@ -6020,16 +6020,16 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             playlist.current_sound_instance = None
  *         if playlist.fading_sound_instance == sound_instance:             # <<<<<<<<<<<<<<
  *             playlist.fading_sound_instance = None
- *
+ * 
  */
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":275
- *
+ * 
  *         # Post events when sound stopped for playlist
  *         for event in playlist.events_when_sound_stopped:             # <<<<<<<<<<<<<<
  *             self.mc.post_mc_native_event(event)
- *
+ * 
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_playlist, __pyx_n_s_events_when_sound_stopped); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 275, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
@@ -6080,7 +6080,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         # Post events when sound stopped for playlist
  *         for event in playlist.events_when_sound_stopped:
  *             self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Playlist is finished when last sound instance of playlist has completed
  */
     __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_mc); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 276, __pyx_L1_error)
@@ -6106,20 +6106,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":275
- *
+ * 
  *         # Post events when sound stopped for playlist
  *         for event in playlist.events_when_sound_stopped:             # <<<<<<<<<<<<<<
  *             self.mc.post_mc_native_event(event)
- *
+ * 
  */
   }
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":279
- *
+ * 
  *         # Playlist is finished when last sound instance of playlist has completed
  *         if playlist not in self._playlists_by_sound_instance.values():             # <<<<<<<<<<<<<<
- *
+ * 
  *             # Playlist has stopped
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_playlists_by_sound_instance); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 279, __pyx_L1_error)
@@ -6148,7 +6148,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   if (__pyx_t_2) {
 
     /* "mpfmc/core/audio/playlist_controller.pyx":284
- *
+ * 
  *             # Trigger any stopped events
  *             if playlist.events_when_stopped is not None:             # <<<<<<<<<<<<<<
  *                 for event in playlist.events_when_stopped:
@@ -6166,7 +6166,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             if playlist.events_when_stopped is not None:
  *                 for event in playlist.events_when_stopped:             # <<<<<<<<<<<<<<
  *                     self.mc.post_mc_native_event(event)
- *
+ * 
  */
       __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_playlist, __pyx_n_s_events_when_stopped); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 285, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
@@ -6217,7 +6217,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             if playlist.events_when_stopped is not None:
  *                 for event in playlist.events_when_stopped:
  *                     self.mc.post_mc_native_event(event)             # <<<<<<<<<<<<<<
- *
+ * 
  *             if playlist == self._current_playlist:
  */
         __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_mc); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 286, __pyx_L1_error)
@@ -6247,13 +6247,13 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             if playlist.events_when_stopped is not None:
  *                 for event in playlist.events_when_stopped:             # <<<<<<<<<<<<<<
  *                     self.mc.post_mc_native_event(event)
- *
+ * 
  */
       }
       __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
 
       /* "mpfmc/core/audio/playlist_controller.pyx":284
- *
+ * 
  *             # Trigger any stopped events
  *             if playlist.events_when_stopped is not None:             # <<<<<<<<<<<<<<
  *                 for event in playlist.events_when_stopped:
@@ -6263,10 +6263,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":288
  *                     self.mc.post_mc_native_event(event)
- *
+ * 
  *             if playlist == self._current_playlist:             # <<<<<<<<<<<<<<
  *                 self._current_playlist = None
- *
+ * 
  */
     __pyx_t_9 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_9)) __PYX_ERR(0, 288, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_9);
@@ -6277,34 +6277,34 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     if (__pyx_t_1) {
 
       /* "mpfmc/core/audio/playlist_controller.pyx":289
- *
+ * 
  *             if playlist == self._current_playlist:
  *                 self._current_playlist = None             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Service any pending request (play, advance)
  */
       if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist, Py_None) < 0) __PYX_ERR(0, 289, __pyx_L1_error)
 
       /* "mpfmc/core/audio/playlist_controller.pyx":288
  *                     self.mc.post_mc_native_event(event)
- *
+ * 
  *             if playlist == self._current_playlist:             # <<<<<<<<<<<<<<
  *                 self._current_playlist = None
- *
+ * 
  */
     }
 
     /* "mpfmc/core/audio/playlist_controller.pyx":279
- *
+ * 
  *         # Playlist is finished when last sound instance of playlist has completed
  *         if playlist not in self._playlists_by_sound_instance.values():             # <<<<<<<<<<<<<<
- *
+ * 
  *             # Playlist has stopped
  */
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":292
- *
+ * 
  *         # Service any pending request (play, advance)
  *         if self._pending_request:             # <<<<<<<<<<<<<<
  *             request = self._pending_request
@@ -6333,7 +6333,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             request = self._pending_request
  *             self._pending_request = None             # <<<<<<<<<<<<<<
  *             request()
- *
+ * 
  */
     if (__Pyx_PyObject_SetAttrStr(__pyx_v_self, __pyx_n_s_pending_request, Py_None) < 0) __PYX_ERR(0, 294, __pyx_L1_error)
 
@@ -6341,7 +6341,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             request = self._pending_request
  *             self._pending_request = None
  *             request()             # <<<<<<<<<<<<<<
- *
+ * 
  *     def _on_sound_instance_about_to_finish(self, sound_instance=None, **kwargs):
  */
     __Pyx_INCREF(__pyx_v_request);
@@ -6363,7 +6363,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":292
- *
+ * 
  *         # Service any pending request (play, advance)
  *         if self._pending_request:             # <<<<<<<<<<<<<<
  *             request = self._pending_request
@@ -6373,10 +6373,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":259
  *                            "Could not set repeat to {}.", str(repeat))
- *
+ * 
  *     def _on_sound_instance_stopped(self, sound_instance=None, **kwargs):             # <<<<<<<<<<<<<<
  *         """Callback function called whenever a playlist sound has finished playing."""
- *
+ * 
  */
 
   /* function exit code */
@@ -6400,10 +6400,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":297
  *             request()
- *
+ * 
  *     def _on_sound_instance_about_to_finish(self, sound_instance=None, **kwargs):             # <<<<<<<<<<<<<<
  *         """Callback function called whenever a playlist sound is about to finish playing."""
- *
+ * 
  */
 
 /* Python wrapper */
@@ -6498,10 +6498,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":300
  *         """Callback function called whenever a playlist sound is about to finish playing."""
- *
+ * 
  *         if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
   __pyx_t_2 = (__pyx_v_sound_instance == Py_None);
   __pyx_t_3 = (__pyx_t_2 != 0);
@@ -6520,10 +6520,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   if (__pyx_t_1) {
 
     /* "mpfmc/core/audio/playlist_controller.pyx":301
- *
+ * 
  *         if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:
  *             return             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Get playlist for sound_instance
  */
     __Pyx_XDECREF(__pyx_r);
@@ -6532,18 +6532,18 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":300
  *         """Callback function called whenever a playlist sound is about to finish playing."""
- *
+ * 
  *         if sound_instance is None or sound_instance not in self._playlists_by_sound_instance:             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":304
- *
+ * 
  *         # Get playlist for sound_instance
  *         playlist = self._playlists_by_sound_instance[sound_instance]             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Take no action if the sound is not from the current playlist
  */
   __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_playlists_by_sound_instance); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 304, __pyx_L1_error)
@@ -6555,11 +6555,11 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __pyx_t_5 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":307
- *
+ * 
  *         # Take no action if the sound is not from the current playlist
  *         if playlist != self._current_playlist:             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 307, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
@@ -6573,7 +6573,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         # Take no action if the sound is not from the current playlist
  *         if playlist != self._current_playlist:
  *             return             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Determine if this is the last sound in the playlist
  */
     __Pyx_XDECREF(__pyx_r);
@@ -6581,20 +6581,20 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     goto __pyx_L0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":307
- *
+ * 
  *         # Take no action if the sound is not from the current playlist
  *         if playlist != self._current_playlist:             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":311
- *
+ * 
  *         # Determine if this is the last sound in the playlist
  *         if playlist.end_of_playlist and not playlist.repeat:             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
   __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_playlist, __pyx_n_s_end_of_playlist); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 311, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
@@ -6618,7 +6618,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *         # Determine if this is the last sound in the playlist
  *         if playlist.end_of_playlist and not playlist.repeat:
  *             return             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Advance to the next sound in the playlist
  */
     __Pyx_XDECREF(__pyx_r);
@@ -6626,19 +6626,19 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
     goto __pyx_L0;
 
     /* "mpfmc/core/audio/playlist_controller.pyx":311
- *
+ * 
  *         # Determine if this is the last sound in the playlist
  *         if playlist.end_of_playlist and not playlist.repeat:             # <<<<<<<<<<<<<<
  *             return
- *
+ * 
  */
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":315
- *
+ * 
  *         # Advance to the next sound in the playlist
  *         self.advance()             # <<<<<<<<<<<<<<
- *
+ * 
  *     def clear_context(self, context):
  */
   __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_advance); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 315, __pyx_L1_error)
@@ -6662,10 +6662,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":297
  *             request()
- *
+ * 
  *     def _on_sound_instance_about_to_finish(self, sound_instance=None, **kwargs):             # <<<<<<<<<<<<<<
  *         """Callback function called whenever a playlist sound is about to finish playing."""
- *
+ * 
  */
 
   /* function exit code */
@@ -6686,7 +6686,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
 /* "mpfmc/core/audio/playlist_controller.pyx":317
  *         self.advance()
- *
+ * 
  *     def clear_context(self, context):             # <<<<<<<<<<<<<<
  *         """
  *         Stops the current playlist if it was played from the specified context.
@@ -6778,7 +6778,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
  *             context: The context to clear
  *         """
  *         self.log.debug("Clearing context %s", context)             # <<<<<<<<<<<<<<
- *
+ * 
  *         if self._current_playlist and self._current_playlist.context == context:
  */
   __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_log); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 324, __pyx_L1_error)
@@ -6835,10 +6835,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":326
  *         self.log.debug("Clearing context %s", context)
- *
+ * 
  *         if self._current_playlist and self._current_playlist.context == context:             # <<<<<<<<<<<<<<
  *             self.stop()
- *
+ * 
  */
   __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_current_playlist); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 326, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -6863,10 +6863,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   if (__pyx_t_6) {
 
     /* "mpfmc/core/audio/playlist_controller.pyx":327
- *
+ * 
  *         if self._current_playlist and self._current_playlist.context == context:
  *             self.stop()             # <<<<<<<<<<<<<<
- *
+ * 
  *         # Also need to check if there is a pending request to play another playlist with
  */
     __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self, __pyx_n_s_stop); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 327, __pyx_L1_error)
@@ -6890,10 +6890,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
     /* "mpfmc/core/audio/playlist_controller.pyx":326
  *         self.log.debug("Clearing context %s", context)
- *
+ * 
  *         if self._current_playlist and self._current_playlist.context == context:             # <<<<<<<<<<<<<<
  *             self.stop()
- *
+ * 
  */
   }
 
@@ -6975,7 +6975,7 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":317
  *         self.advance()
- *
+ * 
  *     def clear_context(self, context):             # <<<<<<<<<<<<<<
  *         """
  *         Stops the current playlist if it was played from the specified context.
@@ -7185,7 +7185,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":19
  *     """
- *
+ * 
  *     def __init__(self, object mc, object track, float crossfade_time=0.0, float volume=1.0):             # <<<<<<<<<<<<<<
  *         """
  *         Constructor
@@ -7197,7 +7197,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":53
  *         self.log.debug("Created PlaylistController %s: ", self._track.name)
- *
+ * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         """Destructor"""
  *         pass
@@ -7209,10 +7209,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":57
  *         pass
- *
+ * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
  *         return '<PlaylistController.{}>'.format(self.name)
- *
+ * 
  */
   __pyx_tuple__5 = PyTuple_Pack(1, __pyx_n_s_self); if (unlikely(!__pyx_tuple__5)) __PYX_ERR(0, 57, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__5);
@@ -7220,7 +7220,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_codeobj__6 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__5, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_audio_playlist_contro_2, __pyx_n_s_repr, 57, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__6)) __PYX_ERR(0, 57, __pyx_L1_error)
 
   /* "mpfmc/core/audio/playlist_controller.pyx":61
- *
+ * 
  *     @property
  *     def name(self):             # <<<<<<<<<<<<<<
  *         """The name of the playlist controller (and corresponding audio track)"""
@@ -7232,7 +7232,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_codeobj__8 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__7, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_audio_playlist_contro_2, __pyx_n_s_name, 61, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__8)) __PYX_ERR(0, 61, __pyx_L1_error)
 
   /* "mpfmc/core/audio/playlist_controller.pyx":66
- *
+ * 
  *     @property
  *     def track(self):             # <<<<<<<<<<<<<<
  *         """The corresponding audio track the playlist is managing"""
@@ -7244,7 +7244,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_codeobj__10 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__9, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_audio_playlist_contro_2, __pyx_n_s_track, 66, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__10)) __PYX_ERR(0, 66, __pyx_L1_error)
 
   /* "mpfmc/core/audio/playlist_controller.pyx":71
- *
+ * 
  *     @property
  *     def crossfade_time(self):             # <<<<<<<<<<<<<<
  *         """The time (secs) to use when fading between sounds"""
@@ -7256,7 +7256,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __pyx_codeobj__12 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__11, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_mpfmc_core_audio_playlist_contro_2, __pyx_n_s_crossfade_time, 71, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__12)) __PYX_ERR(0, 71, __pyx_L1_error)
 
   /* "mpfmc/core/audio/playlist_controller.pyx":76
- *
+ * 
  *     @property
  *     def has_pending_request(self):             # <<<<<<<<<<<<<<
  *         """Whether the playlist controller has a pending request queued until it is not busy"""
@@ -7269,7 +7269,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":80
  *         return self._pending_request is not None
- *
+ * 
  *     def stop_all_sounds(self, float fade_out_seconds = 0.0):             # <<<<<<<<<<<<<<
  *         """
  *         Stops all playing sounds immediately on the playlist track.
@@ -7281,7 +7281,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":90
  *         # TODO: playlist housekeeping (stopped events, remove instance, etc.)
- *
+ * 
  *     def play(self, str playlist not None, str context=None, dict player_settings=None):             # <<<<<<<<<<<<<<
  *         """
  *         Immediately play a playlist.
@@ -7296,7 +7296,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":146
  *         return playlist_instance
- *
+ * 
  *     def _is_busy(self):             # <<<<<<<<<<<<<<
  *         """Returns whether or not all the sound players for the playlist track are currently busy"""
  *         if self._track.get_sound_players_in_use_count() > 1:
@@ -7308,7 +7308,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":153
  *             return False
- *
+ * 
  *     def _play_playlist_sound(self, str sound_name, object playlist, float fade_in=0.0):             # <<<<<<<<<<<<<<
  *         """
  *         Plays the specified playlist sound
@@ -7320,7 +7320,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":200
  *         playlist.current_sound_instance = sound_instance
- *
+ * 
  *     def stop(self):             # <<<<<<<<<<<<<<
  *         """Immediately stop the currently playing playlist. Will fade out using the crossfade setting."""
  *         if not self._current_playlist:
@@ -7332,10 +7332,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":216
  *         self._current_playlist = None
- *
+ * 
  *     def advance(self):             # <<<<<<<<<<<<<<
  *         """Advance the currently playing playlist to the next sound."""
- *
+ * 
  */
   __pyx_tuple__26 = PyTuple_Pack(3, __pyx_n_s_self, __pyx_n_s_event, __pyx_n_s_next_sound_name); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__26);
@@ -7344,10 +7344,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":249
  *             self._play_playlist_sound(next_sound_name, self._current_playlist, self._current_playlist.crossfade_time)
- *
+ * 
  *     def set_repeat(self, repeat=True):             # <<<<<<<<<<<<<<
  *         """Set whether or not the currently playing playlist should repeat when finished."""
- *
+ * 
  */
   __pyx_tuple__28 = PyTuple_Pack(2, __pyx_n_s_self, __pyx_n_s_repeat); if (unlikely(!__pyx_tuple__28)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__28);
@@ -7359,10 +7359,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":259
  *                            "Could not set repeat to {}.", str(repeat))
- *
+ * 
  *     def _on_sound_instance_stopped(self, sound_instance=None, **kwargs):             # <<<<<<<<<<<<<<
  *         """Callback function called whenever a playlist sound has finished playing."""
- *
+ * 
  */
   __pyx_tuple__31 = PyTuple_Pack(6, __pyx_n_s_self, __pyx_n_s_sound_instance, __pyx_n_s_kwargs, __pyx_n_s_playlist, __pyx_n_s_event, __pyx_n_s_request); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 259, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__31);
@@ -7374,10 +7374,10 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":297
  *             request()
- *
+ * 
  *     def _on_sound_instance_about_to_finish(self, sound_instance=None, **kwargs):             # <<<<<<<<<<<<<<
  *         """Callback function called whenever a playlist sound is about to finish playing."""
- *
+ * 
  */
   __pyx_tuple__34 = PyTuple_Pack(4, __pyx_n_s_self, __pyx_n_s_sound_instance, __pyx_n_s_kwargs, __pyx_n_s_playlist); if (unlikely(!__pyx_tuple__34)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__34);
@@ -7389,7 +7389,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":317
  *         self.advance()
- *
+ * 
  *     def clear_context(self, context):             # <<<<<<<<<<<<<<
  *         """
  *         Stops the current playlist if it was played from the specified context.
@@ -7700,10 +7700,10 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":4
  * #cython: embedsignature=True, language_level=3
- *
+ * 
  * import logging             # <<<<<<<<<<<<<<
  * from functools import partial
- *
+ * 
  */
   __pyx_t_1 = __Pyx_Import(__pyx_n_s_logging, 0, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 4, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
@@ -7711,10 +7711,10 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":5
- *
+ * 
  * import logging
  * from functools import partial             # <<<<<<<<<<<<<<
- *
+ * 
  * from mpfmc.config_collections.playlist import PlaylistInstance
  */
   __pyx_t_1 = PyList_New(1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 5, __pyx_L1_error)
@@ -7733,10 +7733,10 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":7
  * from functools import partial
- *
+ * 
  * from mpfmc.config_collections.playlist import PlaylistInstance             # <<<<<<<<<<<<<<
  * from mpfmc.core.audio.track cimport *
- *
+ * 
  */
   __pyx_t_2 = PyList_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 7, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -7764,7 +7764,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":19
  *     """
- *
+ * 
  *     def __init__(self, object mc, object track, float crossfade_time=0.0, float volume=1.0):             # <<<<<<<<<<<<<<
  *         """
  *         Constructor
@@ -7790,7 +7790,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":53
  *         self.log.debug("Created PlaylistController %s: ", self._track.name)
- *
+ * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         """Destructor"""
  *         pass
@@ -7802,10 +7802,10 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":57
  *         pass
- *
+ * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
  *         return '<PlaylistController.{}>'.format(self.name)
- *
+ * 
  */
   __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5mpfmc_4core_5audio_19playlist_controller_18PlaylistController_5__repr__, 0, __pyx_n_s_PlaylistController___repr, NULL, __pyx_n_s_mpfmc_core_audio_playlist_contro, __pyx_d, ((PyObject *)__pyx_codeobj__6)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 57, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -7813,7 +7813,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":61
- *
+ * 
  *     @property
  *     def name(self):             # <<<<<<<<<<<<<<
  *         """The name of the playlist controller (and corresponding audio track)"""
@@ -7824,7 +7824,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":60
  *         return '<PlaylistController.{}>'.format(self.name)
- *
+ * 
  *     @property             # <<<<<<<<<<<<<<
  *     def name(self):
  *         """The name of the playlist controller (and corresponding audio track)"""
@@ -7836,7 +7836,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":66
- *
+ * 
  *     @property
  *     def track(self):             # <<<<<<<<<<<<<<
  *         """The corresponding audio track the playlist is managing"""
@@ -7847,7 +7847,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":65
  *         return self._track.name
- *
+ * 
  *     @property             # <<<<<<<<<<<<<<
  *     def track(self):
  *         """The corresponding audio track the playlist is managing"""
@@ -7859,7 +7859,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":71
- *
+ * 
  *     @property
  *     def crossfade_time(self):             # <<<<<<<<<<<<<<
  *         """The time (secs) to use when fading between sounds"""
@@ -7870,7 +7870,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":70
  *         return self._track
- *
+ * 
  *     @property             # <<<<<<<<<<<<<<
  *     def crossfade_time(self):
  *         """The time (secs) to use when fading between sounds"""
@@ -7882,7 +7882,7 @@ if (!__Pyx_RefNanny) {
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":76
- *
+ * 
  *     @property
  *     def has_pending_request(self):             # <<<<<<<<<<<<<<
  *         """Whether the playlist controller has a pending request queued until it is not busy"""
@@ -7893,7 +7893,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":75
  *         return self._crossfade_time
- *
+ * 
  *     @property             # <<<<<<<<<<<<<<
  *     def has_pending_request(self):
  *         """Whether the playlist controller has a pending request queued until it is not busy"""
@@ -7906,7 +7906,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":80
  *         return self._pending_request is not None
- *
+ * 
  *     def stop_all_sounds(self, float fade_out_seconds = 0.0):             # <<<<<<<<<<<<<<
  *         """
  *         Stops all playing sounds immediately on the playlist track.
@@ -7927,7 +7927,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":90
  *         # TODO: playlist housekeeping (stopped events, remove instance, etc.)
- *
+ * 
  *     def play(self, str playlist not None, str context=None, dict player_settings=None):             # <<<<<<<<<<<<<<
  *         """
  *         Immediately play a playlist.
@@ -7940,7 +7940,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":146
  *         return playlist_instance
- *
+ * 
  *     def _is_busy(self):             # <<<<<<<<<<<<<<
  *         """Returns whether or not all the sound players for the playlist track are currently busy"""
  *         if self._track.get_sound_players_in_use_count() > 1:
@@ -7952,7 +7952,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":153
  *             return False
- *
+ * 
  *     def _play_playlist_sound(self, str sound_name, object playlist, float fade_in=0.0):             # <<<<<<<<<<<<<<
  *         """
  *         Plays the specified playlist sound
@@ -7973,7 +7973,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":200
  *         playlist.current_sound_instance = sound_instance
- *
+ * 
  *     def stop(self):             # <<<<<<<<<<<<<<
  *         """Immediately stop the currently playing playlist. Will fade out using the crossfade setting."""
  *         if not self._current_playlist:
@@ -7985,10 +7985,10 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":216
  *         self._current_playlist = None
- *
+ * 
  *     def advance(self):             # <<<<<<<<<<<<<<
  *         """Advance the currently playing playlist to the next sound."""
- *
+ * 
  */
   __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5mpfmc_4core_5audio_19playlist_controller_18PlaylistController_25advance, 0, __pyx_n_s_PlaylistController_advance, NULL, __pyx_n_s_mpfmc_core_audio_playlist_contro, __pyx_d, ((PyObject *)__pyx_codeobj__27)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 216, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -7997,10 +7997,10 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":249
  *             self._play_playlist_sound(next_sound_name, self._current_playlist, self._current_playlist.crossfade_time)
- *
+ * 
  *     def set_repeat(self, repeat=True):             # <<<<<<<<<<<<<<
  *         """Set whether or not the currently playing playlist should repeat when finished."""
- *
+ * 
  */
   __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5mpfmc_4core_5audio_19playlist_controller_18PlaylistController_27set_repeat, 0, __pyx_n_s_PlaylistController_set_repeat, NULL, __pyx_n_s_mpfmc_core_audio_playlist_contro, __pyx_d, ((PyObject *)__pyx_codeobj__29)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 249, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -8010,10 +8010,10 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":259
  *                            "Could not set repeat to {}.", str(repeat))
- *
+ * 
  *     def _on_sound_instance_stopped(self, sound_instance=None, **kwargs):             # <<<<<<<<<<<<<<
  *         """Callback function called whenever a playlist sound has finished playing."""
- *
+ * 
  */
   __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5mpfmc_4core_5audio_19playlist_controller_18PlaylistController_29_on_sound_instance_stopped, 0, __pyx_n_s_PlaylistController__on_sound_ins, NULL, __pyx_n_s_mpfmc_core_audio_playlist_contro, __pyx_d, ((PyObject *)__pyx_codeobj__32)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 259, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -8023,10 +8023,10 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":297
  *             request()
- *
+ * 
  *     def _on_sound_instance_about_to_finish(self, sound_instance=None, **kwargs):             # <<<<<<<<<<<<<<
  *         """Callback function called whenever a playlist sound is about to finish playing."""
- *
+ * 
  */
   __pyx_t_3 = __Pyx_CyFunction_New(&__pyx_mdef_5mpfmc_4core_5audio_19playlist_controller_18PlaylistController_31_on_sound_instance_about_to_finish, 0, __pyx_n_s_PlaylistController__on_sound_ins_2, NULL, __pyx_n_s_mpfmc_core_audio_playlist_contro, __pyx_d, ((PyObject *)__pyx_codeobj__35)); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 297, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
@@ -8036,7 +8036,7 @@ if (!__Pyx_RefNanny) {
 
   /* "mpfmc/core/audio/playlist_controller.pyx":317
  *         self.advance()
- *
+ * 
  *     def clear_context(self, context):             # <<<<<<<<<<<<<<
  *         """
  *         Stops the current playlist if it was played from the specified context.
@@ -8062,7 +8062,7 @@ if (!__Pyx_RefNanny) {
   /* "mpfmc/core/audio/playlist_controller.pyx":1
  * #!python             # <<<<<<<<<<<<<<
  * #cython: embedsignature=True, language_level=3
- *
+ * 
  */
   __pyx_t_1 = __Pyx_PyDict_NewPresized(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);

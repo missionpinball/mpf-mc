@@ -52,7 +52,7 @@ class Display(ScreenManager):
         Display(mc, 'default', width=800, height=600, enabled=True)
 
     def __init__(self, mc: "MpfMc", name: str, **kwargs) -> None:
-        """Initialise Display."""
+        """initialize Display."""
         self.mc = mc
         self.name = name
         self.config = kwargs

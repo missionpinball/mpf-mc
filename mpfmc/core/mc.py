@@ -176,7 +176,7 @@ class MpfMc(App):
         VideoAsset.initialize(self)
         BitmapFontAsset.initialize(self)
 
-        self._initialise_sound_system()
+        self._initialize_sound_system()
 
         self.clock.schedule_interval(self._check_crash_queue, 1)
 
@@ -256,7 +256,7 @@ class MpfMc(App):
         resource_add_path(os.path.join(os.path.dirname(mpfmc.__file__),
                                        'fonts'))
 
-    def _initialise_sound_system(self):
+    def _initialize_sound_system(self):
         # Only initialize sound assets if sound system is loaded and enabled
         if self.sound_system is not None and self.sound_system.enabled:
             SoundAsset.extensions = tuple(

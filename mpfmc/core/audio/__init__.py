@@ -35,7 +35,7 @@ class SoundSystem:
 
     # pylint: disable=invalid-name, too-many-branches
     def __init__(self, mc):
-        """Initialise sound system."""
+        """initialize sound system."""
         self.mc = mc
         self.log = logging.getLogger('SoundSystem')
         self._initialized = False

@@ -57,7 +57,7 @@ class ModeController:
         for mode in set(self.mc.machine_config['modes']):
             self.mc.modes[mode] = self._load_mode(mode)
 
-        # initialise modes after loading all of them to prevent races
+        # initialize modes after loading all of them to prevent races
         for item in self.loader_methods:
             for mode in self.mc.modes.values():
                 try:

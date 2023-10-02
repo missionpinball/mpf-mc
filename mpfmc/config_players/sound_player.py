@@ -56,7 +56,7 @@ Here are several various examples:
     machine_collection_name = 'sounds'
 
     def __init__(self, machine) -> None:
-        """Initialise variable player."""
+        """initialize variable player."""
         super().__init__(machine)
         self.blocks = {}    # type: Dict[str, List[SoundBlock]]
 

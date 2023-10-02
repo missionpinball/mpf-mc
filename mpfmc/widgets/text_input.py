@@ -24,7 +24,7 @@ class MpfTextInput(Text):
     animation_properties = list()
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
-        """Initialise text input.
+        """initialize text input.
 
         Note that this class is called *MpfTextInput* instead of *TextInput*
         because Kivy has a class called *TextInput* which collides with this

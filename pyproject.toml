@@ -61,6 +61,10 @@ version = {attr = "mpfmc._version.__version__"}
 [tool.setuptools.packages.find]
 include = ["mpfmc*"]
 
+# TODO Should we use these lines
+# [tool.setuptools.package_data]
+# "mpfmc" = ["*.yaml"]
+
 # TODO when setuptools_scm switches to SemVer, we can prob use this for versioning
 # [tool.setuptools_scm]
 # write_to = "mpfmc/_version.py"

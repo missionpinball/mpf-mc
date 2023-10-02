@@ -35,7 +35,7 @@ class Slide(Screen, StencilView):
     def __init__(self, mc: "MpfMc", name: Optional[str], config: Optional[dict] = None,
                  target: str = 'default', key: Optional[str] = None,
                  priority: int = 0, play_kwargs: Optional[dict] = None) -> None:
-        """Initialise slide."""
+        """initialize slide."""
         # config is a dict. widgets will be in a key
         # assumes config, if present, is validated.
         self.creation_order = Slide.get_next_id()

@@ -24,7 +24,7 @@ class DmdBase:
     dmd_name_string = 'DMD'
 
     def __init__(self, mc: "MpfMc", name: str, config: dict) -> None:
-        """Initialise DMD."""
+        """initialize DMD."""
 
         self.mc = mc
         self.name = name

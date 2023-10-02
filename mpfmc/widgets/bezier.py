@@ -21,7 +21,7 @@ class Bezier(Widget):
     animation_properties = ('color', 'thickness', 'opacity', 'points', 'rotation', 'scale')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
-        """Initialise bezier."""
+        """initialize bezier."""
         del kwargs
         super().__init__(mc=mc, config=config, key=key)
 

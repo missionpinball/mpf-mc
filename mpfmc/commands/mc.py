@@ -174,7 +174,7 @@ class Command:
         except OSError:
             pass
 
-        # initialise file log
+        # initialize file log
         if args.jsonlogging:
             formatter = JSONFormatter()
             file_log = logging.FileHandler(full_logfile_path)

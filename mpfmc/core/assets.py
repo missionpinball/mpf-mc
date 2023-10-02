@@ -15,7 +15,7 @@ class ThreadedAssetManager(BaseAssetManager):
     """AssetManager which uses the Threading module."""
 
     def __init__(self, machine):
-        """Initialise queues and start loader thread."""
+        """initialize queues and start loader thread."""
         super().__init__(machine)
         self.loader_queue = PriorityQueue()  # assets for to the loader thread
         self.loaded_queue = Queue()  # assets loaded from the loader thread
@@ -91,7 +91,7 @@ class AssetLoader(threading.Thread):
 
     def __init__(self, loader_queue, loaded_queue, exception_queue,
                  thread_stopper):
-        """Initialise asset loader."""
+        """initialize asset loader."""
         threading.Thread.__init__(self)
         self.log = logging.getLogger('Asset Loader')
         self.loader_queue = loader_queue
