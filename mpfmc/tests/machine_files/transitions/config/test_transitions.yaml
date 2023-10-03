@@ -20,7 +20,7 @@ slides:
     - type: rectangle
       width: 400
       height: 300
-      color: 330000
+      color: '330000'
 
   slide2:
     - type: text
@@ -36,7 +36,7 @@ slides:
     - type: rectangle
       width: 400
       height: 300
-      color: 003300
+      color: '003300'
 
 slide_player:
   show_slide1: slide1
