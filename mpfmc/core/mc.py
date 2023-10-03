@@ -1,55 +1,53 @@
 """Contains the MpfMc base class, which is the main App instance for the
 mpf-mc."""
+import gc
 import importlib
+import logging
 import os
 import queue
 import sys
 import threading
 import time
-import logging
-
-import gc
 import weakref
-
+from packaging import version
+from pathlib import Path
 from typing import Dict
 
+import mpf
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.resources import resource_add_path
-from kivy.logger import Logger
-
 from kivy.config import Config
-
-import mpf
+from kivy.logger import Logger
+from kivy.resources import resource_add_path
 from mpf._version import __version__ as __mpfversion__
-from mpf.core.config_loader import MpfMcConfig
 from mpf.core.case_insensitive_dict import CaseInsensitiveDict
+from mpf.core.config_loader import MpfMcConfig
 from mpf.core.config_validator import ConfigValidator
+from mpf.core.device_manager import DeviceCollection
 from mpf.core.events import EventManager
 from mpf.core.player import Player
-from mpf.core.device_manager import DeviceCollection
-from mpf.core.utility_functions import Util
 from mpf.core.rgb_color import RGBColor
+from mpf.core.utility_functions import Util
 
 import mpfmc
-from mpfmc._version import __version__
-from mpfmc.assets.video import VideoAsset
-from mpfmc.core.bcp_processor import BcpProcessor
-from mpfmc.core.config_processor import ConfigProcessor
-from mpfmc.core.mode_controller import ModeController
-from mpfmc.uix.transitions import TransitionManager
-from mpfmc.uix.effects import EffectsManager
-from mpfmc.core.config_collection import create_config_collections
-from mpfmc.assets.image import ImageAsset
+from mpfmc._version import __version__, __mpf_version_required__
 from mpfmc.assets.bitmap_font import BitmapFontAsset
-from mpfmc.core.dmd import Dmd, RgbDmd
+from mpfmc.assets.image import ImageAsset
+from mpfmc.assets.video import VideoAsset
 from mpfmc.core.assets import ThreadedAssetManager
+from mpfmc.core.bcp_processor import BcpProcessor
+from mpfmc.core.config_collection import create_config_collections
+from mpfmc.core.config_processor import ConfigProcessor
+from mpfmc.core.dmd import Dmd, RgbDmd
 from mpfmc.core.mc_placeholder_manager import McPlaceholderManager
 from mpfmc.core.mc_settings_controller import McSettingsController
+from mpfmc.core.mode_controller import ModeController
+from mpfmc.uix.effects import EffectsManager
+from mpfmc.uix.transitions import TransitionManager
 
 try:
-    from mpfmc.core.audio import SoundSystem
     from mpfmc.assets.sound import SoundAsset
+    from mpfmc.core.audio import SoundSystem
 except ImportError:
     SoundSystem = None
     SoundAsset = None
@@ -71,19 +69,11 @@ class MpfMc(App):
                  thread_stopper=None):
 
         self.log = logging.getLogger('mpfmc')
-        self.log.info("Mission Pinball Framework Media Controller v%s", __version__)
-        self.log.info("Mission Pinball Framework Game Engine v%s", __mpfversion__)
+        self.log.info(f"Mission Pinball Framework Media Controller (MPF-MC) v{__version__}")
+        self.log.info(f"Mission Pinball Framework Game Engine (MPF) v{__mpfversion__}")
 
-        if (__version__.split('.')[0] != __mpfversion__.split('.')[0] or
-                __version__.split('.')[1] != __mpfversion__.split('.')[1]):
-
-            self.log.error("MPF MC and MPF Game engines must be same "
-                           "major.minor versions. You have MPF v%s and MPF-MC"
-                           " v%s", __mpfversion__, __version__)
-
-            raise ValueError("MPF MC and MPF Game engines must be same "
-                             "major.minor versions. You have MPF v{} and MPF-MC"
-                             " v{}".format(__mpfversion__, __version__))
+        if version.parse(__mpfversion__) < version.parse(__mpf_version_required__):
+            raise ValueError(f"MPF MC requires at least MPF v{__mpf_version_required__}. You have MPF v{__mpfversion__}")
 
         super().__init__()
 
@@ -253,8 +243,7 @@ class MpfMc(App):
                                            self.machine_config['mpf-mc']['paths']['fonts']))
 
         # Add mpfmc fonts path
-        resource_add_path(os.path.join(os.path.dirname(mpfmc.__file__),
-                                       'fonts'))
+        resource_add_path(Path(mpfmc.__path__[0]) / 'fonts')
 
     def _initialize_sound_system(self):
         # Only initialize sound assets if sound system is loaded and enabled
