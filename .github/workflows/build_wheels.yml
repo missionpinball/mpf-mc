@@ -171,8 +171,10 @@ jobs:
         git clone --recursive --branch `python get_version.py` https://github.com/missionpinball/mpf.git _mpf ||
         git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf &&
         pip install -e _mpf
+    - name: List wheels in dist
+      run: ls -l dist
     - name: Install MPF-MC from new wheel
-      run: pip install --pre --find-links=dist mpf-mc
+      run: pip install --pre --no-index --find-links=dist mpf-mc
     - name: Run tests  # Can't figure out how to run tests on mac or windows, but I guess that's ok? At least we test the wheel installs? TODO?
       if: ${{ matrix.run-tests }}
       run: |
