@@ -51,8 +51,8 @@ try:
 except ImportError:
     SoundSystem = None
     SoundAsset = None
-    logging.warning("mpfmc.core.audio library could not be loaded. Audio "
-                    "features will not be available")
+    logging.warning("Error importing MPF-MC audio library. Audio will be disabled.")
+    logging.warning("*** [[[[[[[[[[[[[[[[[[[ NO AUDIO ]]]]]]]]]]]]]]]]] ***")
 
 # The following line is needed to allow mpfmc modules to use the
 # getLogger(name) method
@@ -157,6 +157,8 @@ class MpfMc(App):
             self.sound_system = SoundSystem(self)
             if self.sound_system.audio_interface is None:
                 self.sound_system = None
+
+
 
         self.asset_manager = ThreadedAssetManager(self)
         self.bcp_processor = BcpProcessor(self)
