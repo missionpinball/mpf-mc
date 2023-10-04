@@ -22,8 +22,7 @@ classifiers=[
     "Topic :: Games/Entertainment :: Arcade"
     ]
 dependencies = [
-    "toml",  # Oct 3 2023, used to extract version info from pyproject.toml
-    "mpf >= 0.57.0.dev16",  # Sept 19, 2023  ALSO CHANGE THIS IN _version.py
+    "mpf >= 0.57.0.dev16",  # ALSO CHANGE THIS IN _version.py
     "kivy == 2.2.1",  # Sept 19, 2023
     "psutil == 5.9.5",  # Sept 19, 2023
     "Pygments == 2.16.1", # Sept 19, 2023  Only used for the interactive MC. Does anyone use that?
