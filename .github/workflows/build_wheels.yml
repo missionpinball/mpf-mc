@@ -173,19 +173,18 @@ jobs:
         pip install -e _mpf
     - name: Install MPF-MC from new wheel
       run: pip install --pre --find-links=dist mpf-mc
-    # DISABLED tests on Oct 2 2023 since many need to be updated for MPF 0.57, but we want this build to run for prelease testing via pip
-    # - name: Run tests  # Can't figure out how to run tests on mac or windows, but I guess that's ok? At least we test the wheel installs? TODO?
-    #   # if: ${{ matrix.run-tests }}
-    #   run: |
-    #     /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX
-    #     coverage3 run --concurrency=thread -m unittest discover mpfmc.tests
-    #     coverage3 run -a --concurrency=thread -m unittest discover mpfmc.integration
-    # - name: Upload coverage data to coveralls.io
-    #   run: coveralls --service=github
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #     COVERALLS_FLAG_NAME: ${{ matrix.python-version }}-${{ matrix.os }}
-    #     COVERALLS_PARALLEL: true
+    - name: Run tests  # Can't figure out how to run tests on mac or windows, but I guess that's ok? At least we test the wheel installs? TODO?
+      # if: ${{ matrix.run-tests }}
+      run: |
+        /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX
+        coverage3 run --concurrency=thread -m unittest discover mpfmc.tests
+        coverage3 run -a --concurrency=thread -m unittest discover mpfmc.integration
+    - name: Upload coverage data to coveralls.io
+      run: coveralls --service=github
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_FLAG_NAME: ${{ matrix.python-version }}-${{ matrix.os }}
+        COVERALLS_PARALLEL: true
 
   publish_to_pypi:  # only if this release has a tag and is a push from us (e.g. not a pull request)
     name: Publish to PYPI
@@ -206,16 +205,15 @@ jobs:
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
 
-  # DISABLED Oct 2 2023 until we re-enabled the tests
-  # coveralls:
-  #   name: Finalize Coveralls
-  #   needs: test_wheels
-  #   runs-on: ubuntu-latest
-  #   container: python:3-slim
-  #   steps:
-  #   - name: Finished
-  #     run: |
-  #       pip3 install --upgrade coveralls
-  #       coveralls --service=github --finish
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  coveralls:
+    name: Finalize Coveralls
+    needs: test_wheels
+    runs-on: ubuntu-latest
+    container: python:3-slim
+    steps:
+    - name: Finished
+      run: |
+        pip3 install --upgrade coveralls
+        coveralls --service=github --finish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
