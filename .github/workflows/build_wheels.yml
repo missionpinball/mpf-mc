@@ -174,7 +174,17 @@ jobs:
     - name: List wheels in dist
       run: ls -l dist
     - name: Install MPF-MC from new wheel
-      run: pip install --pre --no-index --find-links=dist mpf-mc
+      run: |  # We need to hard code the wheel to install or else pip will try to get it from pypi. We can't use --no-index because we need to install dependencies from pypi
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          platform="manylinux_2_17_x86_64.manylinux2014_x86_64"
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          platform="macosx_10_9_x86_64"
+        elif [ "${{ runner.os }}" == "Windows" ]; then
+          platform="win_amd64"
+        fi
+
+        wheel_file=$(ls dist/mpf_mc-*cp${{ matrix.python-version//. }}*-${platform}.whl)
+        pip install "$wheel_file"
     - name: Run tests  # Can't figure out how to run tests on mac or windows, but I guess that's ok? At least we test the wheel installs? TODO?
       if: ${{ matrix.run-tests }}
       run: |
