@@ -1,14 +1,15 @@
+import logging
+import queue
 from copy import deepcopy
 
-import queue
-import logging
-from distutils.version import LooseVersion
-
+import mpf.core.bcp.bcp_socket_client as bcp
 import psutil
 from kivy.clock import Clock
+from packaging import version
 
-import mpf.core.bcp.bcp_socket_client as bcp
-from mpfmc._version import __bcp_version__, version as mc_version, extended_version as mc_extended_version
+from mpfmc._version import __bcp_version__
+from mpfmc._version import extended_version as mc_extended_version
+from mpfmc._version import version as mc_version
 from mpfmc.core.bcp_server import BCPServer
 
 
@@ -170,8 +171,7 @@ class BcpProcessor:
     def _bcp_hello(self, **kwargs):
         """Processes an incoming BCP 'hello' command."""
         try:
-            if LooseVersion(kwargs['version']) == (
-                    LooseVersion(__bcp_version__)):
+            if version.parse(kwargs['version']) == version.parse(__bcp_version__):
                 self.send('hello', version=__bcp_version__)
             else:
                 self.send('hello', version='unknown protocol version')
