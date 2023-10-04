@@ -159,13 +159,13 @@ class InteractiveMc(App):
         else:
             self._initialized = True
         self.slide_player.play(settings, 'imc', 100)
-        self.clock.loop.run_until_complete(asyncio.sleep(.1, loop=self.clock.loop))
+        self.clock.loop.run_until_complete(asyncio.sleep(.1)
 
     def send_debug_dump_stats(self, value):
         """Send event to MC via BCP."""
         del value
         self.bcp.interface.bcp_trigger("debug_dump_stats")
-        self.clock.loop.run_until_complete(asyncio.sleep(.1, loop=self.clock.loop))
+        self.clock.loop.run_until_complete(asyncio.sleep(.1)
 
 
 class Variables:
