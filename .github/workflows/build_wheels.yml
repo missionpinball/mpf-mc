@@ -194,8 +194,8 @@ jobs:
       if: ${{ matrix.run-tests }}
       run: |
         /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1280x720x24 -ac +extension GLX
-        coverage3 run --concurrency=thread -m unittest discover mpfmc.tests
-        coverage3 run -a --concurrency=thread -m unittest discover mpfmc.integration
+        coverage3 run --concurrency=thread -m unittest discover -v mpfmc.tests
+        coverage3 run -a --concurrency=thread -m unittest discover -v mpfmc.integration
     - name: Upload coverage data to coveralls.io
       run: coveralls --service=github
       env:
