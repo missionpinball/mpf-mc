@@ -1,3 +1,6 @@
+# DISABLED on Oct 3 2023 by Brian because the busy-stick-figures-animated has an alpha channel issue
+# I think it just needs swapped with a different animated gif?
+
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
 

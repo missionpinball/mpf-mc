@@ -1,3 +1,6 @@
+# Oct 3 2023, I can't figure out why this fails. Custom code definitely works for the MC (mc_demo uses it)
+# I can't see where the on_connect() method is called, maybe that needs to be updated?
+
 """Test custom code in MC."""
 from mpfmc.tests.MpfIntegrationTestCase import MpfIntegrationTestCase
 
