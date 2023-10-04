@@ -568,10 +568,9 @@ class MpfMc(App):
 
                 self.log.debug("Loading '%s' custom_code", custom_code)
 
-                custom_code_obj = Util.string_to_class(
-                    self.machine_config['mpf-mc']['paths']['custom_code'] +
-                    "." + custom_code)(mc=self,
-                                       name=custom_code.split('.')[1])
+                custom_code_obj = Util.string_to_class(custom_code)(
+                    mc=self,
+                    name=custom_code)
 
                 self.custom_code.append(custom_code_obj)
 
