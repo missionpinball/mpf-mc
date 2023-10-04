@@ -183,7 +183,8 @@ jobs:
           platform="win_amd64"
         fi
 
-        wheel_file=$(ls dist/mpf_mc-*cp${{ matrix.python-version//. }}*-${platform}.whl)
+        python_version_nodot=$(echo "${{ matrix.python-version }}" | tr -d '.')
+        wheel_file=$(ls dist/mpf_mc-*cp${python_version_nodot}-*-${platform}.whl)
         pip install "$wheel_file"
     - name: Run tests  # Can't figure out how to run tests on mac or windows, but I guess that's ok? At least we test the wheel installs? TODO?
       if: ${{ matrix.run-tests }}
