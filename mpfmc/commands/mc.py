@@ -32,15 +32,9 @@ class Command:
             p.nice(psutil.BELOW_NORMAL_PRIORITY_CLASS)
         else:
             p.nice(10)
-        # undo all of Kivy's built-in logging so we can do it our way
-        os.environ['KIVY_NO_FILELOG'] = '1'
-        os.environ['KIVY_NO_CONSOLELOG'] = '1'
-        # pylint: disable-msg=import-outside-toplevel
-        from kivy.logger import Logger
 
-        for handler in Logger.handlers:
-            Logger.removeHandler(handler)
-        sys.stderr = sys.__stderr__
+        # Force Kivy to not do its own weird logging, adding in Kivy 2.2
+        os.environ['KIVY_LOG_MODE'] = 'PYTHON'
 
         # Need to have these in here because we don't want them to load when
         # the module is loaded as an mpf.command
@@ -154,10 +148,6 @@ class Command:
 
         args.configfile = Util.string_to_event_list(args.configfile)
 
-        # Configure logging. Creates a logfile and logs to the console.
-        # Formatting options are documented here:
-        # https://docs.python.org/2.7/library/logging.html#logrecord-attributes
-
         try:
             os.makedirs(os.path.join(machine_path, 'logs'))
         except OSError as exception:
@@ -197,7 +187,7 @@ class Command:
             console.setLevel(args.consoleloglevel)
 
         # set a format which is simpler for console use
-        formatter = logging.Formatter('%(name)s: %(message)s')
+        formatter = logging.Formatter('%(asctime)s.%(msecs)03d : %(levelname)s [%(name)s] %(message)s', "%H:%M:%S")
 
         # tell the handler to use this format
         console.setFormatter(formatter)
