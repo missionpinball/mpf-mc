@@ -175,7 +175,10 @@ jobs:
       run: ls -l dist
     - name: Install MPF-MC from new wheel
       shell: bash  # Need bash on windows to use the if statement
-      run: |  # We need to hard code the wheel to install or else pip will try to get it from pypi. We can't use --no-index because we need to install dependencies from pypi
+
+      # We need some logic here to force pip to use the new wheel we just built. Otherwise if we're on a pull request, it will try to install from pypi which won't test the new wheel.
+      # We can't use --no-index because we need to install the rest of the dependencies from pypi
+      run: |
         if [ "${{ runner.os }}" == "Linux" ]; then
           platform="manylinux_2_17_x86_64.manylinux2014_x86_64"
         elif [ "${{ runner.os }}" == "macOS" ]; then

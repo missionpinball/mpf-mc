@@ -69,8 +69,8 @@ class MpfMc(App):
                  thread_stopper=None):
 
         self.log = logging.getLogger('mpfmc')
-        self.log.info(f"Mission Pinball Framework Media Controller (MPF-MC) v{__version__}")
-        self.log.info(f"Mission Pinball Framework Game Engine (MPF) v{__mpfversion__}")
+        self.log.info(f"Mission Pinball Framework Media Controller (MPF-MC) v{__version__}. Requires MPF v{__mpf_version_required__} or newer.")
+        self.log.info(f"Found MPF v{__mpfversion__}")
 
         if version.parse(__mpfversion__) < version.parse(__mpf_version_required__):
             raise ValueError(f"MPF MC requires at least MPF v{__mpf_version_required__}. You have MPF v{__mpfversion__}")
