@@ -1,5 +1,4 @@
 """Widget emulating a segment display."""
-from collections import OrderedDict
 from typing import Optional, List, Dict, Any
 import math
 
@@ -229,7 +228,7 @@ class SegmentDisplayEmulator(Widget):
             segment_points = self._calculate_eight_segment_points(x, y, segment_width, segment_interval, bevel_width)
 
         # Sort the segment dictionary by segment name (key)
-        segment_points = OrderedDict(sorted(segment_points.items()))
+        segment_points = dict(sorted(segment_points.items()))
 
         if self.dot_enabled:
             # Store center point of dot/period circle (diameter will be segment_width) (x, y, radius)
