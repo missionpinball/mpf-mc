@@ -18,8 +18,8 @@ command -v brew >/dev/null 2>&1 || { echo >&2 "Installing Homebrew Now"; \
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install)"; }
 
 brew update
-brew install SDL2 SDL2_mixer SDL2_image SDL2_ttf gstreamer
-brew upgrade SDL2 SDL2_mixer SDL2_image SDL2_ttf gstreamer
+brew install SDL2 SDL2_mixer SDL2_image SDL2_ttf gstreamer pkg-config
+brew upgrade SDL2 SDL2_mixer SDL2_image SDL2_ttf gstreamer pkg-config
 
 rm -rf dist/*
 
