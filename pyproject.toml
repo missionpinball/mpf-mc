@@ -30,7 +30,7 @@ dependencies = [
     "kivy_deps.sdl2 == 0.6.0; platform_system=='Windows'",  # Sept 19, 2023
     "kivy_deps.glew == 0.3.1; platform_system=='Windows'",  # Sept 19, 2023
     "kivy_deps.gstreamer == 0.3.3; platform_system=='Windows'",  # Sept 19, 2023
-    "ffpyplayer == 4.5.0"  # Sept 19, 2023  Need 4.5 for for 3.11 support
+    "ffpyplayer == 4.5.1"  # Nov 3, 2023  4.5.1 needed for RPi.
     ]
 dynamic = ["version"]
 
