@@ -22,7 +22,7 @@ classifiers=[
     "Topic :: Games/Entertainment :: Arcade"
     ]
 dependencies = [
-    "mpf >= 0.57.0.dev32",  # ALSO CHANGE THIS IN _version.py
+    "mpf >= 0.57.0.dev34",  # ALSO CHANGE THIS IN _version.py
     "kivy == 2.2.1",  # Sept 19, 2023  # ALSO CHECK for updates to kivy_deps packages below
     "psutil == 5.9.5",  # Sept 19, 2023
     "Pygments == 2.16.1", # Sept 19, 2023  Only used for the interactive MC. Does anyone use that?
