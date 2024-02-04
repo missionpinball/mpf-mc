@@ -48,13 +48,20 @@ from mpfmc.core.mc_placeholder_manager import McPlaceholderManager
 from mpfmc.core.mc_settings_controller import McSettingsController
 
 try:
-    from mpfmc.core.audio import SoundSystem
+    # The following two lines are needed because of circular dependencies.
+    # These Cython based imports also import assets.sound which then import these (causing a loop/circle).
+    # Loading these first resolves an issue on Windows that otherwise causes audio to not load.
+    from mpfmc.core.audio.audio_interface import AudioInterface
+    from mpfmc.core.audio.audio_exception import AudioException
+
     from mpfmc.assets.sound import SoundAsset
-except ImportError:
+    from mpfmc.core.audio import SoundSystem
+except ImportError as e:
     SoundSystem = None
     SoundAsset = None
-    logging.warning("mpfmc.core.audio library could not be loaded. Audio "
-                    "features will not be available")
+    logging.warning("Error importing MPF-MC audio library. Audio will be disabled.")
+    logging.warning("*** [[[[[[[[[[[[[[[[[[[ NO AUDIO ]]]]]]]]]]]]]]]]] ***")
+    logging.exception(str(e))
 
 # The following line is needed to allow mpfmc modules to use the
 # getLogger(name) method
