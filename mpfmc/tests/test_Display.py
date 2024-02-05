@@ -1,4 +1,3 @@
-from kivy.metrics import dp
 from mpfmc.uix.display import Display, DisplayOutput
 from mpfmc.tests.MpfMcTestCase import MpfMcTestCase
 
@@ -12,14 +11,12 @@ class TestDisplay(MpfMcTestCase):
 
     def test_display(self):
         # Make sure nested multiple displays are loaded properly and are centered
-        self.assertEqual(self.mc.root_window.system_size, [800, 600])
+        self.assertEqual(self.mc.root_window.size, (800, 600))
         self.assertIn('window', self.mc.displays)
         self.assertTrue(isinstance(self.mc.displays['window'], Display))
         self.assertEqual(self.mc.displays['window'].size, [600, 200])
         self.assertIsInstance(self.mc.displays['window'].parent, DisplayOutput)
-        self.assertEqual(self.mc.displays['window'].parent.pos[0], 0)
-        # Rounding DPI can cause single pixel offset, so accept within 1px
-        self.assertAlmostEqual(self.mc.displays['window'].parent.pos[1], dp(167), delta=1)
+        self.assertEqual(self.mc.displays['window'].parent.pos, (0, 167))
 
         self.assertIn('dmd', self.mc.displays)
         self.assertTrue(isinstance(self.mc.displays['dmd'], Display))

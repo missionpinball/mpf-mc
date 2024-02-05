@@ -102,7 +102,7 @@ class McSlidePlayer(McConfigPlayer):
         instance_dict = self._get_instance_dict(context)
         full_context = self._get_full_context(context)
 
-        self.machine.log.debug("SlidePlayer: Play called with settings=%s", settings)
+        self.machine.log.info("SlidePlayer: Play called with settings=%s", settings)
 
         settings = settings.get('slides', settings)
 

@@ -75,16 +75,13 @@ Here are several various examples:
         action:
         priority:
         volume:
-        ducking:
         loops:
         max_queue_time:
         block:
 
         Notes:
-         -  Ducking settings only apply to sound assets without ducking config
-            (i.e. sound asset ducking overrides sound_player ducking)
-         -  Markers cannot currently be specified/overridden in the sound_player
-            (they must be specified in the sounds section of a config file).
+            Ducking settings and markers cannot currently be specified/overridden in the
+            sound_player (they must be specified in the sounds section of a config file).
 
         """
         settings = deepcopy(settings)
@@ -138,15 +135,7 @@ Here are several various examples:
 
             # Determine action to perform
             if action == 'play':
-                temp_ducking = None
-                if s.get('ducking') and not sound.has_ducking:
-                    sound.set_ducking(s['ducking'])
-                    temp_ducking = True
-
                 track.play_sound(sound, context, s)
-                # Remove the temporary ducking
-                if temp_ducking:
-                    sound.set_ducking()
 
             elif action == 'stop':
                 if 'fade_out' in s:

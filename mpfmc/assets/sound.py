@@ -556,12 +556,6 @@ class SoundAsset(McAsset):
         """Return whether or not this sound has ducking"""
         return self._ducking is not None
 
-    def set_ducking(self, ducking_settings=None):
-        if not ducking_settings:
-            self._ducking = None
-            return
-        self._ducking = DuckingSettings(self.machine, ducking_settings)
-
     @property
     def key(self):
         """Return the unique key value for this sound"""
