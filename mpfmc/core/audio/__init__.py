@@ -115,18 +115,9 @@ class SoundSystem:
 
         self.mc.events.add_handler("shutdown", self.shutdown)
         self.mc.events.add_handler("machine_var_master_volume", self._set_volume)
-        for track in self.tracks.keys():
-            self.mc.events.add_handler(f"machine_var_{track}_volume", self._set_volume, track=track)
 
     def _set_volume(self, **kwargs):
-        track = kwargs.get("track")
-        if not track:
-            self.master_volume = kwargs['value']
-            return
-        elif not track in self.tracks:
-            raise AttributeError(f"Track {track} not found in sound system.")
-
-        self.tracks[track].set_volume(kwargs['value'])
+        self.master_volume = kwargs['value']
 
     def shutdown(self, **kwargs):
         """Shuts down the audio interface"""
