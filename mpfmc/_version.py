@@ -1,10 +1,10 @@
 import os
 
-__version__ = '0.57.0.dev12'
+__version__ = '0.57.0.dev13'
 __short_version__ = '0.57'
 __bcp_version__ = '1.1'
 __config_version__ = '6'
-__mpf_version_required__ = '0.57.0.dev32'  # ALSO UPDATE in pyproject.toml
+__mpf_version_required__ = '0.57.0.dev34'  # ALSO UPDATE in pyproject.toml
 
 # pylint: disable-msg=invalid-name
 version = f"MPF-MC v{__version__}"
