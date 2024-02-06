@@ -18,18 +18,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - os: windows-latest
-          python-version: 3.8
-          cibw-build: cp38-win_amd64
-        - os: windows-latest
-          python-version: 3.9
-          cibw-build: cp39-win_amd64
-        - os: windows-latest
-          python-version: '3.10'
-          cibw-build: cp310-win_amd64
-        - os: windows-latest
-          python-version: 3.11
-          cibw-build: cp311-win_amd64
+        # - os: windows-latest
+        #   python-version: 3.8
+        #   cibw-build: cp38-win_amd64
+        # - os: windows-latest
+        #   python-version: 3.9
+        #   cibw-build: cp39-win_amd64
+        # - os: windows-latest
+        #   python-version: '3.10'
+        #   cibw-build: cp310-win_amd64
+        # - os: windows-latest
+        #   python-version: 3.11
+        #   cibw-build: cp311-win_amd64
         - os: ubuntu-latest
           python-version: 3.8
           cibw-build: cp38-manylinux_x86_64
@@ -42,18 +42,18 @@ jobs:
         - os: ubuntu-latest
           python-version: 3.11
           cibw-build: cp311-manylinux_x86_64
-        - os: macos-latest
-          python-version: 3.8
-          cibw-build: cp38-macosx_x86_64
-        - os: macos-latest
-          python-version: 3.9
-          cibw-build: cp39-macosx_x86_64
-        - os: macos-latest
-          python-version: '3.10'
-          cibw-build: cp310-macosx_x86_64
-        - os: macos-latest
-          python-version: 3.11
-          cibw-build: cp311-macosx_x86_64
+        # - os: macos-latest
+        #   python-version: 3.8
+        #   cibw-build: cp38-macosx_x86_64
+        # - os: macos-latest
+        #   python-version: 3.9
+        #   cibw-build: cp39-macosx_x86_64
+        # - os: macos-latest
+        #   python-version: '3.10'
+        #   cibw-build: cp310-macosx_x86_64
+        # - os: macos-latest
+        #   python-version: 3.11
+        #   cibw-build: cp311-macosx_x86_64
         # I have no idea how to use the ARM runners on GitHub. Supposedly they exist but I can't figure them out.
         # So for now we'll just manually build and upload Apple Silicon wheels? Last updated Oct 2 2023
         # - os: macos-13-arm64
