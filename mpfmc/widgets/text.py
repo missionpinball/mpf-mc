@@ -250,7 +250,7 @@ class Text(Widget):
             if self.config['number_grouping']:
 
                 # find the numbers in the string
-                number_list = [s for s in text.split() if s.isdigit()]
+                number_list = Text.find_numbers(text)
 
                 # group the numbers and replace them in the string
                 for item in number_list:
@@ -305,6 +305,23 @@ class Text(Widget):
         super().prepare_for_removal()
         self.mc.events.remove_handler(self._player_var_change)
         self.mc.events.remove_handler(self._machine_var_change)
+
+    @staticmethod
+    def find_numbers(text: str):
+        """Sorts through the text string passed in to find all actual digits.
+        This includes both positive and negative numbers, which requires finding
+        ints and not just digits
+
+        Args:
+            text: The incoming string of text
+        """
+        number_list = [s for s in text.split()]
+        for item in number_list:
+            try:
+                number_list[number_list.index(item)] = str(int(number_list[number_list.index(item)].lstrip("-")))
+            except ValueError:
+                pass
+        return number_list
 
     @staticmethod
     def group_digits(text: str, separator: str = ',', group_size: int = 3) -> str:
