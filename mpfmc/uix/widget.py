@@ -376,15 +376,9 @@ class Widget(KivyWidget):
                 return
         else:
             try:
-                styles = [self.mc.machine_config['widget_styles'][s] for s in self.config['style']]
+                styles = [self.mc.widget_styles[s] for s in self.config['style']]
             except KeyError as e:
-                # TOOD: After sufficient time post-0.51, remove this breaking-change-related message
-                if " ".join(self.config['style']) in self.mc.machine_config['widget_styles']:
-                    raise ValueError("{} has an invalid style name: {}. ".format(self, e) +
-                                     "Please note that as of MPF 0.51, spaces are no longer valid " +
-                                     "in widget style names (see '{}')".format(" ".join(self.config['style'])))
-                raise ValueError("{} has an invalid style name: {}".format(
-                    self, e))
+                raise ValueError("{} has an invalid style name: {}".format(self, e))
 
         found = False
 
