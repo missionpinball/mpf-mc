@@ -17,7 +17,7 @@ class ImageWidget(Widget):
     """Widget showing an image."""
 
     widget_type_name = 'Image'
-    merge_settings = ('height', 'width')
+    merge_settings = ('height', 'width', 'mag_filter', 'min_filter')
     animation_properties = ('x', 'y', 'color', 'rotation', 'scale', 'fps', 'current_frame', 'end_frame', 'opacity')
 
     def __init__(self, mc: "MpfMc", config: dict, key: Optional[str] = None, **kwargs) -> None:
@@ -119,6 +119,8 @@ class ImageWidget(Widget):
         del args
 
         self.texture = self._image.image.texture
+        self.texture.mag_filter = self.config['mag_filter']
+        self.texture.min_filter = self.config['min_filter']
         self.size = self.texture.size
         self._draw_widget()
 
