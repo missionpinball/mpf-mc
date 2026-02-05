@@ -119,8 +119,8 @@ class ImageWidget(Widget):
         del args
 
         self.texture = self._image.image.texture
-        self.texture.mag_filter = self.config['mag_filter']
-        self.texture.min_filter = self.config['min_filter']
+        self.texture.mag_filter = self.config.get('mag_filter', 'linear')
+        self.texture.min_filter = self.config.get('min_filter', 'linear')
         self.size = self.texture.size
         self._draw_widget()
 
