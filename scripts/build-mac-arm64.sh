@@ -2,7 +2,7 @@
 
 # This script builds the mpf-mc package for macOS arm64
 # It's done manually for now since GitHub does not have arm64 macOS runners
-# It assumes Python 3.9, 3.10, and 3.11 are installed
+# It assumes Python 3.9, 3.10, 3.11, and 3.12 are installed
 
 # Run from root of repo, paste in the PyPI token when asked
 
@@ -24,7 +24,7 @@ brew upgrade SDL2 SDL2_mixer SDL2_image SDL2_ttf gstreamer pkg-config
 rm -rf dist/*
 
 # Loop through the Python versions
-for version in 3.9 3.10 3.11; do
+for version in 3.9 3.10 3.11 3.12; do
     python${version} -m pip install --upgrade pip
     python${version} -m pip install --upgrade setuptools wheel build
 
