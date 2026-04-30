@@ -84,8 +84,6 @@ jobs:
             SDL2_mixer.x86_64 SDL2_mixer-devel.x86_64 gstreamer1.x86_64 gstreamer1-devel.x86_64 &&
             python -m pip install --upgrade pip &&
             pip install --upgrade setuptools wheel build &&
-            git clone --recursive --branch ${{ github.ref_name }} https://github.com/missionpinball/mpf.git _mpf ||
-            git clone --recursive --branch `python get_version.py` https://github.com/missionpinball/mpf.git _mpf ||
             git clone --recursive --branch 0.57.x https://github.com/missionpinball/mpf.git _mpf &&
             pip install -e _mpf
           CIBW_BEFORE_ALL_MACOS: >
@@ -93,8 +91,6 @@ jobs:
           CIBW_BEFORE_ALL: >
             python -m pip install --upgrade pip &&
             pip install --upgrade setuptools wheel build &&
-            git clone --recursive --branch ${{ github.ref_name }} https://github.com/missionpinball/mpf.git _mpf ||
-            git clone --recursive --branch `python get_version.py` https://github.com/missionpinball/mpf.git _mpf ||
             git clone --recursive --branch 0.57.x https://github.com/missionpinball/mpf.git _mpf &&
             pip install -e _mpf
           CIBW_BUILD: ${{ matrix.cibw-build }}
@@ -166,11 +162,9 @@ jobs:
       with:
         name: mpf-mc_wheels
         path: dist
-    - name: Clone & install MPF  # try to find a matching version before we default to dev
+    - name: Clone & install MPF
       run: >
-        git clone --recursive --branch ${{ github.ref_name }} https://github.com/missionpinball/mpf.git _mpf ||
-        git clone --recursive --branch `python get_version.py` https://github.com/missionpinball/mpf.git _mpf ||
-        git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf &&
+        git clone --recursive --branch 0.57.x https://github.com/missionpinball/mpf.git _mpf &&
         pip install -e _mpf
     - name: List wheels in dist
       run: ls -l dist
