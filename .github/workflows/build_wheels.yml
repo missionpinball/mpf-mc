@@ -86,7 +86,7 @@ jobs:
             pip install --upgrade setuptools wheel build &&
             git clone --recursive --branch ${{ github.ref_name }} https://github.com/missionpinball/mpf.git _mpf ||
             git clone --recursive --branch `python get_version.py` https://github.com/missionpinball/mpf.git _mpf ||
-            git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf &&
+            git clone --recursive --branch 0.57.x https://github.com/missionpinball/mpf.git _mpf &&
             pip install -e _mpf
           CIBW_BEFORE_ALL_MACOS: >
             brew install SDL2 SDL2_mixer SDL2_image SDL2_ttf gstreamer
@@ -95,7 +95,7 @@ jobs:
             pip install --upgrade setuptools wheel build &&
             git clone --recursive --branch ${{ github.ref_name }} https://github.com/missionpinball/mpf.git _mpf ||
             git clone --recursive --branch `python get_version.py` https://github.com/missionpinball/mpf.git _mpf ||
-            git clone --recursive --branch dev https://github.com/missionpinball/mpf.git _mpf &&
+            git clone --recursive --branch 0.57.x https://github.com/missionpinball/mpf.git _mpf &&
             pip install -e _mpf
           CIBW_BUILD: ${{ matrix.cibw-build }}
           CIBW_BUILD_VERBOSITY: 3
