@@ -349,6 +349,42 @@ class TestText(MpfMcTestCase):
         self.assertEqual(self.get_widget().text, '2,000,000')
         self.advance_time()
 
+    def test_number_grouping_with_text(self):
+        self.mc.events.post('number_grouping')
+        self.advance_time()
+
+        # should be 00 even though text is 0
+        self.assertEqual(self.get_widget().text, '00')
+        self.advance_time()
+
+        self.get_widget().update_text('2000000 abc')
+        self.assertEqual(self.get_widget().text, '2,000,000 abc')
+        self.advance_time()
+
+    def test_negative_number_grouping(self):
+        self.mc.events.post('number_grouping')
+        self.advance_time()
+
+        # should be 00 even though text is 0
+        self.assertEqual(self.get_widget().text, '00')
+        self.advance_time()
+
+        self.get_widget().update_text('-123456')
+        self.assertEqual(self.get_widget().text, '-123,456')
+        self.advance_time()
+
+    def test_multiple_number_grouping(self):
+        self.mc.events.post('number_grouping')
+        self.advance_time()
+
+        # should be 00 even though text is 0
+        self.assertEqual(self.get_widget().text, '00')
+        self.advance_time()
+
+        self.get_widget().update_text('2000000 -9 -1234')
+        self.assertEqual(self.get_widget().text, '2,000,000 -9 -1,234')
+        self.advance_time()
+
     def test_text_casing(self):
         self.mc.events.post('text_nocase')
         self.advance_time()
