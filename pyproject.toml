@@ -25,7 +25,7 @@ dependencies = [
     "mpf >= 0.57.0",  # ALSO CHANGE THIS IN _version.py
     "kivy == 2.2.1",  # Sept 19, 2023  # ALSO CHECK for updates to kivy_deps packages below
     "psutil == 5.9.8",  # Sept 19, 2023
-    "Pygments == 2.16.1", # Sept 19, 2023  Only used for the interactive MC. Does anyone use that?
+    "Pygments == 2.18.0", # Sept 19, 2023  Only used for the interactive MC. Does anyone use that?
     "ffpyplayer == 4.5.1",  # Nov 3, 2023  4.5.1 needed for RPi.
 
     # These kivy versions match the ones from kivy
