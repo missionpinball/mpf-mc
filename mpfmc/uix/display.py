@@ -3,6 +3,7 @@ from typing import List, Union, Optional
 from math import floor
 
 from kivy.uix.floatlayout import FloatLayout
+from kivy.graphics.instructions import Callback
 
 from kivy.clock import Clock
 from kivy.uix.screenmanager import (ScreenManager, NoTransition,
@@ -18,7 +19,6 @@ from kivy.properties import ObjectProperty
 
 from mpfmc.uix.widget import Widget
 from mpfmc.uix.slide import Slide
-
 
 MYPY = False
 if MYPY:   # pragma: no cover
@@ -619,7 +619,6 @@ class Display(ScreenManager):
 
 
 class DisplayOutput(Scatter):
-
     """Show a display as a widget."""
 
     def __init__(self, parent: "KivyWidget", display: "Display", **kwargs):
@@ -656,13 +655,23 @@ class DisplayOutput(Scatter):
         """
         if not isinstance(widget, Display):
             raise KivyWidgetException(
-                'add_widget_multi_parent() can be used only with instances'
+                'add_display_source() can be used only with instances'
                 ' of the Display class.')
 
         widget = widget.__self__
         if widget is self:
             raise KivyWidgetException(
                 'Widget instances cannot be added to themselves.')
+
+        # This DisplayOutput instance will become the actual parent of the display. Other
+        # DisplayOutput instances connected to the same display will be stored in a list
+        # of parents and will be redrawn whenever this instance is redrawn.
+
+        if widget.parents:
+            previous_parent = widget.parents[-1]
+            previous_parent.canvas.after.clear()
+            with self.canvas.after:  # pylint: disable=not-context-manager
+                Callback(self.on_draw_display_source)
 
         widget.parent = self
         widget.parents.append(self)
@@ -677,15 +686,33 @@ class DisplayOutput(Scatter):
                 'remove_display_source() can be used only with instances'
                 ' of the Display class.')
         widget.parents.remove(self)
-        widget.parent = None
+        self.canvas.after.clear()
+
+        if widget.parents:
+            widget.parent = widget.parents[-1]
+
+            if len(widget.parents) > 1:
+                with widget.parent.canvas.after:
+                    Callback(widget.parent.on_draw_display_source)
+        else:
+            widget.parent = None
+
         self.canvas.remove(widget.container.canvas)
 
     def __repr__(self) -> str:  # pragma: no cover
         try:
-            return '<DisplayOutput size={}, pos={}, source={}>'.format(
-                self.size, self.pos, self.display.name)
+            return '<DisplayOutput size={}, pos={}, source={}, id={}>'.format(
+                self.size, self.pos, self.display.name, id(self))
         except AttributeError:
-            return '<DisplayOutput size={}, source=(none)>'.format(self.size)
+            return '<DisplayOutput size={}, source=(none), id={}>'.format(self.size, id(self))
+
+    def on_draw_display_source(self, instr):
+        """Callback function when primary display source is redrawn."""
+        del instr
+
+        for display_source in self.display.parents:
+            if display_source != self:
+                display_source.canvas.ask_update()
 
     def on_parent_resize(self, *args):
         """Fit to parent on resize."""
