@@ -117,7 +117,8 @@ class PlaylistController:
             return None
 
         # Determine settings (override playlist with player settings)
-        playlist_instance = PlaylistInstance(playlist,
+        playlist_instance = PlaylistInstance(self.mc,
+                                             playlist,
                                              self.mc.playlists[playlist],
                                              self.crossfade_time,
                                              context,

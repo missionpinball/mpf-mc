@@ -65,7 +65,8 @@ class TestAudioPlaylist(MpfMcTestCase):
                              self.mc.playlists['attract_music']['sounds'])
 
         # Create a PlaylistInstance to manipulate directly for testing
-        attract_music_playlist = PlaylistInstance('attract_music',
+        attract_music_playlist = PlaylistInstance(self.mc,
+                                                  'attract_music',
                                                   self.mc.playlists['attract_music'],
                                                   playlist_controller.crossfade_time,
                                                   settings={
@@ -93,7 +94,8 @@ class TestAudioPlaylist(MpfMcTestCase):
         self.assertIsNone(current_sound)
 
         # Create another PlaylistInstance, this time enable repeat
-        attract_music_playlist = PlaylistInstance('attract_music',
+        attract_music_playlist = PlaylistInstance(self.mc,
+                                                  'attract_music',
                                                   self.mc.playlists['attract_music'],
                                                   playlist_controller.crossfade_time,
                                                   settings={'repeat': True})

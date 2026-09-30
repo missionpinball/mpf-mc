@@ -103,9 +103,10 @@ class PlaylistInstance:
     """
 
     # pylint: disable-msg=too-many-arguments
-    def __init__(self, name: str, playlist: dict, track_crossfade_time: float,
+    def __init__(self, mc, name: str, playlist: dict, track_crossfade_time: float,
                  context: Optional[str] = None, settings: Optional[dict] = None):
         """Constructor"""
+        self._mc = mc
         self._name = name
         if playlist is None:
             raise ValueError("Cannot create playlist instance: playlist parameter is None")
@@ -139,7 +140,7 @@ class PlaylistInstance:
         settings.setdefault('events_when_sound_stopped', playlist['events_when_sound_stopped'])
         self._settings = settings
 
-        self._sounds = Randomizer(self._settings['sounds'])
+        self._sounds = Randomizer(self._settings['sounds'], self._mc)
         self._sounds.disable_random = not self._settings['shuffle']
         self._sounds.force_all = True
         self._sounds.force_different = True
