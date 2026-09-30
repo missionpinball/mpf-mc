@@ -3498,9 +3498,10 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   }
 
   /* "mpfmc/core/audio/playlist_controller.pyx":120
- * 
+ *
  *         # Determine settings (override playlist with player settings)
- *         playlist_instance = PlaylistInstance(playlist,             # <<<<<<<<<<<<<<
+ *         playlist_instance = PlaylistInstance(self.mc,
+ *                                              playlist,             # <<<<<<<<<<<<<<
  *                                              self.mc.playlists[playlist],
  *                                              self.crossfade_time,
  */
@@ -3509,7 +3510,8 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
 
   /* "mpfmc/core/audio/playlist_controller.pyx":121
  *         # Determine settings (override playlist with player settings)
- *         playlist_instance = PlaylistInstance(playlist,
+ *         playlist_instance = PlaylistInstance(self.mc,
+ *                                              playlist,
  *                                              self.mc.playlists[playlist],             # <<<<<<<<<<<<<<
  *                                              self.crossfade_time,
  *                                              context,
@@ -3524,7 +3526,8 @@ static PyObject *__pyx_pf_5mpfmc_4core_5audio_19playlist_controller_18PlaylistCo
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
   /* "mpfmc/core/audio/playlist_controller.pyx":122
- *         playlist_instance = PlaylistInstance(playlist,
+ *         playlist_instance = PlaylistInstance(self.mc,
+ *                                              playlist,
  *                                              self.mc.playlists[playlist],
  *                                              self.crossfade_time,             # <<<<<<<<<<<<<<
  *                                              context,
